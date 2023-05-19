@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public final class CommandInvocation {
-    private final CommandSender sender;
+    private final InvocationSender invocationSender;
     private final SubCommand command;
     private final String[] arguments;
 }

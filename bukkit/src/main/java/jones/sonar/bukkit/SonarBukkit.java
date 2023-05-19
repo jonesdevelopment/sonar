@@ -21,10 +21,14 @@ import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.statistics.Statistics;
+import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.common.SonarPlugin;
+import jones.sonar.common.command.subcommand.SubCommandManager;
 import jones.sonar.common.fallback.FallbackManager;
 import jones.sonar.common.statistics.SonarStatistics;
 import lombok.Getter;
+
+import java.util.Objects;
 
 public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
@@ -52,6 +56,12 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
         SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
+
+        // Register Sonar command
+        Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());
+
+        // Initialize all subcommands
+        SubCommandManager.initialize();
     }
 
     @Override

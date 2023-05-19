@@ -25,6 +25,6 @@ public final class VerboseCommand extends SubCommand {
 
     @Override
     public void execute(final CommandInvocation invocation) {
-        invocation.getSender().sendMessage("Verbose");
+        invocation.getInvocationSender().sendMessage("Verbose");
     }
 }

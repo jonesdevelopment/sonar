@@ -23,8 +23,6 @@ import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.statistics.Statistics;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.common.command.subcommand.SubCommandManager;
-import jones.sonar.common.command.subcommand.impl.StatisticsCommand;
-import jones.sonar.common.command.subcommand.impl.VerboseCommand;
 import jones.sonar.common.fallback.FallbackManager;
 import jones.sonar.common.statistics.SonarStatistics;
 import jones.sonar.velocity.command.SonarCommand;
@@ -60,9 +58,8 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         // Register Sonar command
         plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
 
-        // Register subcommands
-        SubCommandManager.register(new StatisticsCommand());
-        SubCommandManager.register(new VerboseCommand());
+        // Initialize all subcommands
+        SubCommandManager.initialize();
     }
 
     @Override

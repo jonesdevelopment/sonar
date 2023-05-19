@@ -14,85 +14,90 @@
  *  limitations under the License.
  */
 
-package jones.sonar.velocity.command;
+package jones.sonar.bungee.command;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.command.SimpleCommand;
-import com.velocitypowered.api.proxy.Player;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import jones.sonar.common.command.CommandHelper;
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.InvocationSender;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandManager;
-import net.kyori.adventure.text.Component;
+import lombok.var;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Command;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-public final class SonarCommand implements SimpleCommand {
-    private static final Cache<CommandSource, Long> delay = Caffeine.newBuilder()
+public final class SonarCommand extends Command {
+    private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
             .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
             .build();
-    private static final Component ONLY_PLAYERS = Component.text(
+    private static final TextComponent ONLY_PLAYERS = new TextComponent(
             "§cYou can only execute this command as a player."
     );
-    private static final Component CANNOT_RUN_YET = Component.text(
+    private static final TextComponent CANNOT_RUN_YET = new TextComponent(
             "§cYou can only execute this command every 0.5 seconds."
     );
     private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
-    @Override
-    public void execute(final Invocation invocation) {
-        if (delay.asMap().containsKey(invocation.source())) {
-            invocation.source().sendMessage(CANNOT_RUN_YET);
+    public SonarCommand() {
+        super("sonar", "sonar.command");
+    }
 
-            final long timestamp = delay.asMap().get(invocation.source());
+    @Override
+    public void execute(final CommandSender sender, final String[] args) {
+        if (delay.asMap().containsKey(sender)) {
+            sender.sendMessage(CANNOT_RUN_YET);
+
+            final long timestamp = delay.asMap().get(sender);
             final double left = 0.5D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
             final String format = decimalFormat.format(left);
 
-            final Component pleaseWaitAnother = Component.text("§cPlease wait another §l" + format + "s§r§c.");
+            final TextComponent pleaseWaitAnother = new TextComponent("§cPlease wait another §l" + format + "s§r§c.");
 
-            invocation.source().sendMessage(pleaseWaitAnother);
+            sender.sendMessage(pleaseWaitAnother);
             return;
         }
 
-        delay.put(invocation.source(), System.currentTimeMillis());
+        delay.put(sender, System.currentTimeMillis());
 
         var subCommand = Optional.<SubCommand>empty();
 
-        final InvocationSender invocationSender = message -> invocation.source().sendMessage(Component.text(message));
+        final InvocationSender invocationSender = sender::sendMessage;
 
-        if (invocation.arguments().length > 0) {
+        if (args.length > 0) {
             subCommand = SubCommandManager.getSubCommands().stream()
-                    .filter(sub -> sub.getInfo().name().equalsIgnoreCase(invocation.arguments()[0])
+                    .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
                             || (sub.getInfo().aliases().length > 0
                             && Arrays.stream(sub.getInfo().aliases())
-                            .anyMatch(alias -> alias.equalsIgnoreCase(invocation.arguments()[0]))))
+                            .anyMatch(alias -> alias.equalsIgnoreCase(args[0]))))
                     .findFirst();
         }
 
-        subCommand.ifPresentOrElse(sub -> {
-            if (sub.getInfo().onlyPlayers() && !(invocation.source() instanceof Player)) {
-                invocation.source().sendMessage(ONLY_PLAYERS);
+        if (!subCommand.isPresent()) {
+            CommandHelper.printHelp(invocationSender);
+            return;
+        }
+
+        subCommand.ifPresent(sub -> {
+            if (sub.getInfo().onlyPlayers() && !(sender instanceof ProxiedPlayer)) {
+                sender.sendMessage(ONLY_PLAYERS);
                 return;
             }
 
             final CommandInvocation commandInvocation = new CommandInvocation(
                     invocationSender,
                     sub,
-                    invocation.arguments()
+                    args
             );
 
             sub.execute(commandInvocation);
-        }, () -> CommandHelper.printHelp(invocationSender));
-    }
-
-    @Override
-    public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("sonar.command");
+        });
     }
 }

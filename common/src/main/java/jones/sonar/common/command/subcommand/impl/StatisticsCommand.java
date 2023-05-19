@@ -28,6 +28,6 @@ public final class StatisticsCommand extends SubCommand {
     @Override
     public void execute(final CommandInvocation invocation) {
         final int total = Sonar.get().getStatistics().get(StatisticType.TOTAL_CONNECTIONS, 0);
-        invocation.getSender().sendMessage("Total connections: " + total);
+        invocation.getInvocationSender().sendMessage("Total connections: " + total);
     }
 }

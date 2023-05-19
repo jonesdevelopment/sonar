@@ -17,6 +17,6 @@
 package jones.sonar.common.command;
 
 @FunctionalInterface
-public interface CommandSender {
+public interface InvocationSender {
     void sendMessage(final String message);
 }
