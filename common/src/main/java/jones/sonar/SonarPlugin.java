@@ -17,8 +17,6 @@
 package jones.sonar;
 
 public interface SonarPlugin<T> {
-    SonarPlatform getPlatform();
-
     void enable(final T plugin);
 
     void disable();
