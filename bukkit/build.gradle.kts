@@ -4,6 +4,8 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
 }
 
+apply(plugin = "net.minecrell.plugin-yml.bukkit")
+
 bukkit {
     name = rootProject.name
     version = rootProject.version.toString()
