@@ -22,7 +22,11 @@ import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
 
-@SubCommandInfo(name = "statistics", aliases = {"stats"}, description = "Show session statistics of this server")
+@SubCommandInfo(
+        name = "statistics",
+        aliases = {"stats"},
+        description = "Show session statistics of this server"
+)
 public final class StatisticsCommand extends SubCommand {
 
     @Override

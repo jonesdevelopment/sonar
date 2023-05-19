@@ -40,6 +40,7 @@ public final class SonarCommand implements CommandExecutor {
             .build();
     private static final String ONLY_PLAYERS = "§cYou can only execute this command as a player.";
     private static final String CANNOT_RUN_YET = "§cYou can only execute this command every 0.5 seconds.";
+    private static final String NO_PERM_SUB = "§cYou do not have permission to execute this subcommand.";
     private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
     @Override
@@ -73,6 +74,11 @@ public final class SonarCommand implements CommandExecutor {
                             && Arrays.stream(sub.getInfo().aliases())
                             .anyMatch(alias -> alias.equalsIgnoreCase(args[0]))))
                     .findFirst();
+
+            if (subCommand.isPresent() && !sender.hasPermission("sonar." + subCommand.get().getInfo().name())) {
+                sender.sendMessage(NO_PERM_SUB);
+                return false;
+            }
         }
 
         if (!subCommand.isPresent()) {

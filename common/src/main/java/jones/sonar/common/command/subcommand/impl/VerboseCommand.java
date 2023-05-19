@@ -20,7 +20,11 @@ import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
 
-@SubCommandInfo(name = "verbose", description = "Enable and disable Sonar verbose", onlyPlayers = true)
+@SubCommandInfo(
+        name = "verbose",
+        description = "Enable and disable Sonar verbose",
+        onlyPlayers = true
+)
 public final class VerboseCommand extends SubCommand {
 
     @Override

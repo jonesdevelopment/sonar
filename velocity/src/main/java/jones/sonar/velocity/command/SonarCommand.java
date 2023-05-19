@@ -43,6 +43,9 @@ public final class SonarCommand implements SimpleCommand {
     private static final Component CANNOT_RUN_YET = Component.text(
             "§cYou can only execute this command every 0.5 seconds."
     );
+    private static final Component NO_PERM_SUB = Component.text(
+            "§cYou do not have permission to execute this subcommand."
+    );
     private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
     @Override
@@ -73,6 +76,11 @@ public final class SonarCommand implements SimpleCommand {
                             && Arrays.stream(sub.getInfo().aliases())
                             .anyMatch(alias -> alias.equalsIgnoreCase(invocation.arguments()[0]))))
                     .findFirst();
+
+            if (subCommand.isPresent() && !invocation.source().hasPermission("sonar." + subCommand.get().getInfo().name())) {
+                invocation.source().sendMessage(NO_PERM_SUB);
+                return;
+            }
         }
 
         subCommand.ifPresentOrElse(sub -> {
