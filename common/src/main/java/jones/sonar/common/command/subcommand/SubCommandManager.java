@@ -21,14 +21,16 @@ import jones.sonar.common.command.subcommand.impl.VerboseCommand;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
 @UtilityClass
 public class SubCommandManager {
     @Getter
-    private final Collection<SubCommand> subCommands = new ArrayList<>();
+    private final Collection<SubCommand> subCommands = Arrays.asList(
+            new StatisticsCommand(),
+            new VerboseCommand()
+    );
 
     public void register(final SubCommand... commands) {
         subCommands.addAll(Arrays.asList(commands));
@@ -36,10 +38,5 @@ public class SubCommandManager {
 
     public void unregister(final SubCommand... commands) {
         subCommands.removeAll(Arrays.asList(commands));
-    }
-
-    public void initialize() {
-        register(new StatisticsCommand());
-        register(new VerboseCommand());
     }
 }

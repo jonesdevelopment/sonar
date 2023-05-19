@@ -75,9 +75,15 @@ public final class SonarCommand implements CommandExecutor {
                             .anyMatch(alias -> alias.equalsIgnoreCase(args[0]))))
                     .findFirst();
 
-            if (subCommand.isPresent() && !sender.hasPermission("sonar." + subCommand.get().getInfo().name())) {
-                sender.sendMessage(NO_PERM_SUB);
-                return false;
+            if (subCommand.isPresent()) {
+                final String permission = "sonar." + subCommand.get().getInfo().name();
+
+                if (!sender.hasPermission(permission)) {
+                    sender.sendMessage(
+                            "§cYou do not have permission to execute this subcommand. §7(" + permission + ")"
+                    );
+                    return false;
+                }
             }
         }
 
