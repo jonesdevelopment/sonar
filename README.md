@@ -30,8 +30,8 @@
     <p>
       Sonar operates using a one main check for handling incoming bot traffic: Fallback
       <br>
-      Sonar's Fallback component is supposed to analyze a player's behaviour before joining
-      the actual server therefore stopping malicious traffic from ever getting to the backend.
+      Sonar's Fallback component is supposed to analyze a player's behavior before joining
+      the actual server therefore stopping malicious traffic from ever getting to the back-end.
     </p>
     <p>
       The second component is in-game player analysis such as checking if the player joined
@@ -49,7 +49,7 @@
     </p>
     <h2>2.2 False positives</h2>
     <p>
-      Sonar's in-game check is which analyses packet behaviour of a client should theoretically
+      Sonar's in-game check is which analyses packet behavior of a client should theoretically
       not falsely punish a player since it only checks for <b>illegal</b> and <b>impossible</b> packets.
       <br>
       However, there are edge cases where the Sonar's Fallback might not receive a packet
