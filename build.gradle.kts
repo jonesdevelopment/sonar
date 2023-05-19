@@ -18,7 +18,7 @@ plugins {
 
 apply(plugin = "io.toolebox.git-versioner")
 
-val semanticVersion = "0.1.0"
+val semanticVersion = "2.0.0"
 
 versioner {
     pattern {

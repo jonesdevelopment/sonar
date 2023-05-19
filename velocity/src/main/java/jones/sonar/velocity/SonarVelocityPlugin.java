@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 @Getter
 @Plugin(id = "sonar",
         name = "Sonar",
-        version = "0.1.0",
+        version = "2.0.0",
         authors = "jonesdev.xyz",
         url = "https://jonesdev.xyz/",
         description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
