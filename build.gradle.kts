@@ -1,6 +1,29 @@
+buildscript {
+    repositories {
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
+    }
+
+    dependencies {
+        classpath("gradle.plugin.io.toolebox:gradle-git-versioner:1.6.7")
+    }
+}
+
 plugins {
     id("java")
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.toolebox.git-versioner") version "1.6.7"
+}
+
+apply(plugin = "io.toolebox.git-versioner")
+
+val semanticVersion = "0.1.0"
+
+versioner {
+    pattern {
+        pattern = "$semanticVersion-%h"
+    }
 }
 
 subprojects {
