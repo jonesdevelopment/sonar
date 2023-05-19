@@ -16,15 +16,18 @@
 
 package jones.sonar.velocity.command.subcommand;
 
+import jones.sonar.api.statistics.StatisticType;
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
+import jones.sonar.velocity.SonarVelocity;
 
 @SubCommandInfo(name = "statistics", aliases = {"stats"}, description = "Show session statistics of this server")
 public final class StatisticsCommand extends SubCommand {
 
     @Override
     public void execute(final CommandInvocation invocation) {
-        invocation.getSender().sendMessage("Stats");
+        final int total = SonarVelocity.INSTANCE.getStatistics().get(StatisticType.TOTAL_CONNECTIONS, 0);
+        invocation.getSender().sendMessage("Total connections: " + total);
     }
 }

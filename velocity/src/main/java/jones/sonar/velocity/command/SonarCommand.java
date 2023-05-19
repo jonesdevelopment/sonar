@@ -35,13 +35,13 @@ import java.util.concurrent.TimeUnit;
 
 public final class SonarCommand implements SimpleCommand {
     private static final Cache<CommandSource, Long> delay = Caffeine.newBuilder()
-            .expireAfterWrite(1L, TimeUnit.SECONDS)
+            .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
             .build();
     private static final Component ONLY_PLAYERS = Component.text(
             "§cYou can only execute this command as a player."
     );
     private static final Component CANNOT_RUN_YET = Component.text(
-            "§cYou can only execute this command every second."
+            "§cYou can only execute this command every 0.5 seconds."
     );
     private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
 

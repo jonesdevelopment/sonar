@@ -14,15 +14,14 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.api.statistics;
 
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.statistics.Statistics;
+public interface Statistics {
+    int add(final StatisticType type, final int value);
 
-public interface Sonar {
-    SonarPlatform getPlatform();
+    int replace(final StatisticType type, final int value);
 
-    Statistics getStatistics();
+    int increment(final StatisticType type, final int by);
 
-    Fallback getFallback();
+    int get(final StatisticType type, final int def);
 }

@@ -14,15 +14,10 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.api.statistics;
 
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.statistics.Statistics;
-
-public interface Sonar {
-    SonarPlatform getPlatform();
-
-    Statistics getStatistics();
-
-    Fallback getFallback();
+public enum StatisticType {
+    TOTAL_CONNECTIONS,
+    PLAYERS_ONLINE,
+    AVERAGE_PING,
 }
