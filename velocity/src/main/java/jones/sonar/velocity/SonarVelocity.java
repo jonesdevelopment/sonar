@@ -14,12 +14,34 @@
  *  limitations under the License.
  */
 
-package jones.sonar;
+package jones.sonar.velocity;
 
-public interface SonarPlugin<T> {
-    SonarPlatform getPlatform();
+import jones.sonar.SonarPlatform;
+import jones.sonar.SonarPlugin;
+import jones.sonar.api.Sonar;
+import lombok.Getter;
 
-    void enable(final T plugin);
+public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
-    void disable();
+    INSTANCE;
+
+    @Getter
+    private SonarVelocityPlugin plugin;
+
+    @Override
+    public SonarPlatform getPlatform() {
+        return SonarPlatform.VELOCITY;
+    }
+
+    @Override
+    public void enable(final SonarVelocityPlugin plugin) {
+        this.plugin = plugin;
+
+        plugin.getLogger().info("Initializing Sonar...");
+    }
+
+    @Override
+    public void disable() {
+        // Do nothing
+    }
 }
