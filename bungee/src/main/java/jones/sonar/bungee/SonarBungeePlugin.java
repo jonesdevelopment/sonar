@@ -14,10 +14,29 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.bungee;
 
-import jones.sonar.SonarPlugin;
+import lombok.Getter;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.plugin.Plugin;
 
-public interface Sonar {
-    SonarPlugin<?> getPlugin();
+import java.util.logging.Logger;
+
+@Getter
+public final class SonarBungeePlugin extends Plugin {
+    private ProxyServer server;
+    private Logger logger;
+
+    @Override
+    public void onEnable() {
+        server = ProxyServer.getInstance();
+        logger = server.getLogger();
+
+        SonarBungee.INSTANCE.enable(this);
+    }
+
+    @Override
+    public void onDisable() {
+        SonarBungee.INSTANCE.disable();
+    }
 }

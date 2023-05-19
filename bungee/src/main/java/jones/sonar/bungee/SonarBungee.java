@@ -14,10 +14,34 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.bungee;
 
+import jones.sonar.SonarPlatform;
 import jones.sonar.SonarPlugin;
+import jones.sonar.api.Sonar;
+import lombok.Getter;
 
-public interface Sonar {
-    SonarPlugin<?> getPlugin();
+public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
+
+    INSTANCE;
+
+    @Getter
+    private SonarBungeePlugin plugin;
+
+    @Override
+    public SonarPlatform getPlatform() {
+        return SonarPlatform.BUNGEE;
+    }
+
+    @Override
+    public void enable(final SonarBungeePlugin plugin) {
+        this.plugin = plugin;
+
+        plugin.getLogger().info("Initializing Sonar...");
+    }
+
+    @Override
+    public void disable() {
+        // Do nothing
+    }
 }
