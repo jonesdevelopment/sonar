@@ -21,14 +21,15 @@ import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.common.SonarPlugin;
+import jones.sonar.common.fallback.FallbackManager;
 import lombok.Getter;
 
 public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
     INSTANCE;
 
-    @Getter // TODO: Fallback
-    private Fallback fallback = null;
+    @Getter
+    private final Fallback fallback = new FallbackManager();
 
     @Getter
     private SonarBukkitPlugin plugin;

@@ -24,7 +24,7 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ConnectionManager implements Fallback {
+public final class FallbackManager implements Fallback {
     @Getter
     private final Map<String, FallbackConnection> fallbackConnections = new HashMap<>();
 

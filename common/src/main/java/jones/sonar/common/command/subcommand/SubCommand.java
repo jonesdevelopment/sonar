@@ -14,27 +14,18 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api.fallback;
+package jones.sonar.common.command.subcommand;
 
-import io.netty.channel.Channel;
+import jones.sonar.common.command.CommandInvocation;
+import lombok.Getter;
 
-public interface FallbackPlayer {
-    Object getPlayer();
+public abstract class SubCommand {
+    @Getter
+    private final SubCommandInfo info;
 
-    Channel getChannel();
+    public SubCommand() {
+        info = getClass().getAnnotation(SubCommandInfo.class);
+    }
 
-    /**
-     * Kicks the target player for a specific kick message
-     *
-     * @return if the player was successfully kicked
-     */
-    boolean disconnect(final String kickMessage);
-
-    String getName();
-
-    boolean needsCheck();
-
-    int getProtocolVersion();
-
-    int getPing();
+    public abstract void execute(final CommandInvocation invocation);
 }

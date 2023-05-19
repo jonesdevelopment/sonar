@@ -14,27 +14,17 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api.fallback;
+package jones.sonar.velocity.command.subcommand;
 
-import io.netty.channel.Channel;
+import jones.sonar.common.command.CommandInvocation;
+import jones.sonar.common.command.subcommand.SubCommand;
+import jones.sonar.common.command.subcommand.SubCommandInfo;
 
-public interface FallbackPlayer {
-    Object getPlayer();
+@SubCommandInfo(name = "statistics", aliases = {"stats"}, description = "Show session statistics of this server")
+public final class StatisticsCommand extends SubCommand {
 
-    Channel getChannel();
-
-    /**
-     * Kicks the target player for a specific kick message
-     *
-     * @return if the player was successfully kicked
-     */
-    boolean disconnect(final String kickMessage);
-
-    String getName();
-
-    boolean needsCheck();
-
-    int getProtocolVersion();
-
-    int getPing();
+    @Override
+    public void execute(final CommandInvocation invocation) {
+        invocation.getSender().sendMessage("Stats");
+    }
 }

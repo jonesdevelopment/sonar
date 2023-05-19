@@ -21,14 +21,19 @@ import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.common.SonarPlugin;
+import jones.sonar.common.command.subcommand.SubCommandManager;
+import jones.sonar.common.fallback.FallbackManager;
+import jones.sonar.velocity.command.SonarCommand;
+import jones.sonar.velocity.command.subcommand.StatisticsCommand;
+import jones.sonar.velocity.command.subcommand.VerboseCommand;
 import lombok.Getter;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
     INSTANCE;
 
-    @Getter // TODO: Fallback
-    private Fallback fallback = null;
+    @Getter
+    private final Fallback fallback = new FallbackManager();
 
     @Getter
     private SonarVelocityPlugin plugin;
@@ -46,6 +51,13 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
+
+        // Register Sonar command
+        plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
+
+        // Register subcommands
+        SubCommandManager.register(new StatisticsCommand());
+        SubCommandManager.register(new VerboseCommand());
     }
 
     @Override
