@@ -28,9 +28,9 @@ import org.slf4j.Logger;
 @Plugin(id = "sonar",
         name = "Sonar",
         version = "0.1.0",
-        description = "Sonar antibot",
         authors = "jonesdev.xyz",
-        url = "https://jonesdev.xyz/"
+        url = "https://jonesdev.xyz/",
+        description = "Anti-bot plugin for Velocity, BungeeCord and Spigot (1.8-latest)"
 )
 public final class SonarVelocityPlugin {
     private final ProxyServer server;

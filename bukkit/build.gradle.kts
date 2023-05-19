@@ -12,13 +12,20 @@ bukkit {
     main = "jones.sonar.bukkit.SonarBukkitPlugin"
     author = "jonesdev.xyz"
     website = "https://discord.jonesdev.xyz/"
-    description = "Sonar anti bot"
+    description = "Anti-bot plugin for Velocity, BungeeCord and Spigot (1.8-latest)"
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+}
+
+repositories {
+    maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
 }
 
 dependencies {
     implementation(project(":sonar-api"))
     implementation(project(":sonar-common"))
+
+    // use 1.8 for backwards compatibility
+    compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
