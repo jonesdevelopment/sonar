@@ -51,7 +51,7 @@ public final class SonarCommand implements SimpleCommand {
             invocation.source().sendMessage(CANNOT_RUN_YET);
 
             final long timestamp = delay.asMap().get(invocation.source());
-            final double left = 1D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
+            final double left = 0.5D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
             final String format = decimalFormat.format(left);
 
             final Component pleaseWaitAnother = Component.text("§cPlease wait another §l" + format + "s§r§c.");

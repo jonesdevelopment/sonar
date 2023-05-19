@@ -14,20 +14,20 @@
  *  limitations under the License.
  */
 
-package jones.sonar.velocity.command.subcommand;
+package jones.sonar.common.command.subcommand.impl;
 
+import jones.sonar.api.Sonar;
 import jones.sonar.api.statistics.StatisticType;
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
-import jones.sonar.velocity.SonarVelocity;
 
 @SubCommandInfo(name = "statistics", aliases = {"stats"}, description = "Show session statistics of this server")
 public final class StatisticsCommand extends SubCommand {
 
     @Override
     public void execute(final CommandInvocation invocation) {
-        final int total = SonarVelocity.INSTANCE.getStatistics().get(StatisticType.TOTAL_CONNECTIONS, 0);
+        final int total = Sonar.get().getStatistics().get(StatisticType.TOTAL_CONNECTIONS, 0);
         invocation.getSender().sendMessage("Total connections: " + total);
     }
 }

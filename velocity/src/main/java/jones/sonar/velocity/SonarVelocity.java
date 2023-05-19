@@ -23,11 +23,11 @@ import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.statistics.Statistics;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.common.command.subcommand.SubCommandManager;
+import jones.sonar.common.command.subcommand.impl.StatisticsCommand;
+import jones.sonar.common.command.subcommand.impl.VerboseCommand;
 import jones.sonar.common.fallback.FallbackManager;
 import jones.sonar.common.statistics.SonarStatistics;
 import jones.sonar.velocity.command.SonarCommand;
-import jones.sonar.velocity.command.subcommand.StatisticsCommand;
-import jones.sonar.velocity.command.subcommand.VerboseCommand;
 import lombok.Getter;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {

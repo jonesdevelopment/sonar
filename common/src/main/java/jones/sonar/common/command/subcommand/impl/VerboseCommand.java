@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package jones.sonar.velocity.command.subcommand;
+package jones.sonar.common.command.subcommand.impl;
 
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.subcommand.SubCommand;

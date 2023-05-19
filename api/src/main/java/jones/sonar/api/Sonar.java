@@ -25,4 +25,8 @@ public interface Sonar {
     Statistics getStatistics();
 
     Fallback getFallback();
+
+    static Sonar get() {
+        return SonarProvider.get();
+    }
 }
