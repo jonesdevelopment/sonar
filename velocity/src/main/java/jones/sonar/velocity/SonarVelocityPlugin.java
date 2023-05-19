@@ -30,7 +30,7 @@ import org.slf4j.Logger;
         version = "0.1.0",
         authors = "jonesdev.xyz",
         url = "https://jonesdev.xyz/",
-        description = "Anti-bot plugin for Velocity, BungeeCord and Spigot (1.8-latest)"
+        description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
 )
 public final class SonarVelocityPlugin {
     private final ProxyServer server;

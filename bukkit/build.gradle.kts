@@ -12,7 +12,7 @@ bukkit {
     main = "jones.sonar.bukkit.SonarBukkitPlugin"
     author = "jonesdev.xyz"
     website = "https://discord.jonesdev.xyz/"
-    description = "Anti-bot plugin for Velocity, BungeeCord and Spigot (1.8-latest)"
+    description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 }
 
