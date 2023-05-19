@@ -1,5 +1,5 @@
 dependencies {
-    compileOnly(project(":sonar-common"))
+    compileOnly("io.netty:netty-all:4.1.92.Final")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8

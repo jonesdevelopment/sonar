@@ -16,8 +16,23 @@
 
 package jones.sonar.api.fallback;
 
+import io.netty.channel.Channel;
+
 public interface FallbackPlayer {
+    Object getPlayer();
+
+    Channel getChannel();
+
+    /**
+     * Kicks the target player for a specific kick message
+     *
+     * @return if the player was successfully kicked
+     */
+    boolean disconnect(final String kickMessage);
+
     String getName();
 
     int getProtocolVersion();
+
+    int getPing();
 }

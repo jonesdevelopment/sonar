@@ -18,6 +18,5 @@ package jones.sonar.api.fallback;
 
 public enum FallbackCheckResult {
     DENIED,
-    ALLOWED,
-    UNKNOWN
+    ALLOWED
 }

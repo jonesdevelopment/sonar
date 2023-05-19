@@ -14,12 +14,10 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.common;
 
-import jones.sonar.api.fallback.Fallback;
+public interface SonarPlugin<T> {
+    void enable(final T plugin);
 
-public interface Sonar {
-    SonarPlatform getPlatform();
-
-    Fallback getFallback();
+    void disable();
 }

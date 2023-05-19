@@ -16,11 +16,11 @@
 
 package jones.sonar.bungee;
 
-import jones.sonar.SonarPlatform;
-import jones.sonar.SonarPlugin;
 import jones.sonar.api.Sonar;
+import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.fallback.Fallback;
+import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {

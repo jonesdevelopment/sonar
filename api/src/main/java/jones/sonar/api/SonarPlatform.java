@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package jones.sonar;
+package jones.sonar.api;
 
 public enum SonarPlatform {
     BUKKIT,

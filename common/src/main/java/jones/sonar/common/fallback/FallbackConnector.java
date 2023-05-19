@@ -14,10 +14,19 @@
  *  limitations under the License.
  */
 
-package jones.sonar;
+package jones.sonar.common.fallback;
 
-public interface SonarPlugin<T> {
-    void enable(final T plugin);
+import jones.sonar.api.fallback.FallbackCheckResult;
+import jones.sonar.api.fallback.FallbackConnection;
+import jones.sonar.api.fallback.FallbackPlayer;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-    void disable();
+@Getter
+@RequiredArgsConstructor
+public final class FallbackConnector implements FallbackConnection {
+    private final FallbackPlayer player;
+    @Setter
+    private FallbackCheckResult result = FallbackCheckResult.DENIED;
 }

@@ -14,12 +14,27 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.common.fallback;
 
 import jones.sonar.api.fallback.Fallback;
+import jones.sonar.api.fallback.FallbackConnection;
+import jones.sonar.api.fallback.FallbackPlayer;
+import lombok.Getter;
 
-public interface Sonar {
-    SonarPlatform getPlatform();
+import java.util.HashMap;
+import java.util.Map;
 
-    Fallback getFallback();
+public final class ConnectionManager implements Fallback {
+    @Getter
+    private final Map<String, FallbackConnection> fallbackConnections = new HashMap<>();
+
+    @Override
+    public void handleConnection(final FallbackPlayer player) {
+        if (fallbackConnections.containsKey(player.getName())) {
+            player.disconnect("already-connected");
+            return;
+        }
+
+        fallbackConnections.put(player.getName(), new FallbackConnector(player));
+    }
 }
