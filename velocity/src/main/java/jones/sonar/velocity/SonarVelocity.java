@@ -19,11 +19,16 @@ package jones.sonar.velocity;
 import jones.sonar.SonarPlatform;
 import jones.sonar.SonarPlugin;
 import jones.sonar.api.Sonar;
+import jones.sonar.api.SonarProvider;
+import jones.sonar.api.fallback.Fallback;
 import lombok.Getter;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
     INSTANCE;
+
+    @Getter // TODO: Fallback
+    private Fallback fallback = null;
 
     @Getter
     private SonarVelocityPlugin plugin;
@@ -36,6 +41,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     @Override
     public void enable(final SonarVelocityPlugin plugin) {
         this.plugin = plugin;
+
+        // Set the API to this class
+        SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
     }

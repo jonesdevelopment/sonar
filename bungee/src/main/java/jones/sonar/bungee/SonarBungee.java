@@ -19,11 +19,16 @@ package jones.sonar.bungee;
 import jones.sonar.SonarPlatform;
 import jones.sonar.SonarPlugin;
 import jones.sonar.api.Sonar;
+import jones.sonar.api.SonarProvider;
+import jones.sonar.api.fallback.Fallback;
 import lombok.Getter;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
     INSTANCE;
+
+    @Getter // TODO: Fallback
+    private Fallback fallback = null;
 
     @Getter
     private SonarBungeePlugin plugin;
@@ -36,6 +41,9 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     @Override
     public void enable(final SonarBungeePlugin plugin) {
         this.plugin = plugin;
+
+        // Set the API to this class
+        SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
     }

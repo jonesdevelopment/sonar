@@ -14,10 +14,10 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.api.fallback;
 
-import jones.sonar.api.fallback.Fallback;
+import java.util.Collection;
 
-public interface Sonar {
-    Fallback getFallback();
+public interface Fallback {
+    Collection<FallbackConnection> getFallbackConnections();
 }

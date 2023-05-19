@@ -14,10 +14,10 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.api.fallback;
 
-import jones.sonar.api.fallback.Fallback;
-
-public interface Sonar {
-    Fallback getFallback();
+public enum FallbackCheckResult {
+    DENIED,
+    ALLOWED,
+    UNKNOWN
 }

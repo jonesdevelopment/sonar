@@ -19,11 +19,16 @@ package jones.sonar.bukkit;
 import jones.sonar.SonarPlatform;
 import jones.sonar.SonarPlugin;
 import jones.sonar.api.Sonar;
+import jones.sonar.api.SonarProvider;
+import jones.sonar.api.fallback.Fallback;
 import lombok.Getter;
 
 public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
     INSTANCE;
+
+    @Getter // TODO: Fallback
+    private Fallback fallback = null;
 
     @Getter
     private SonarBukkitPlugin plugin;
@@ -36,6 +41,9 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     @Override
     public void enable(final SonarBukkitPlugin plugin) {
         this.plugin = plugin;
+
+        // Set the API to this class
+        SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
     }

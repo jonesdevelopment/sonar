@@ -18,6 +18,7 @@ bukkit {
 
 repositories {
     maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/") // BungeeCord Chat API
 }
 
 dependencies {
