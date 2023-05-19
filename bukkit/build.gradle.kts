@@ -14,6 +14,12 @@ bukkit {
     website = "https://discord.jonesdev.xyz/"
     description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+
+    commands {
+        register("sonar") {
+            permission = "sonar.command"
+        }
+    }
 }
 
 repositories {
