@@ -23,14 +23,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.net.InetAddress;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
   @Getter
-  private final Map<InetAddress, Runnable> queuedPlayers = Collections.synchronizedMap(new HashMap<>());
+  private final Map<InetAddress, Runnable> queuedPlayers = new HashMap<>();
 
   public void queue(final InetAddress inetAddress, final Runnable runnable) {
     queuedPlayers.put(inetAddress, runnable);
