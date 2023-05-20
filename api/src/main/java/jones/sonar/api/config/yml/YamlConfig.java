@@ -23,7 +23,10 @@ import org.yaml.snakeyaml.error.YAMLException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public final class YamlConfig {
     private final Yaml yaml;
@@ -152,8 +155,6 @@ public final class YamlConfig {
     }
 
     public Collection<String> getStringList(String path, Collection<String> def) {
-        Collection<String> defaultStrings = new ArrayList<>();
-        def.forEach(string -> defaultStrings.add(string.replace("§", "&")));
-        return get(path, defaultStrings);
+        return get(path, def);
     }
 }

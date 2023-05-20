@@ -14,17 +14,23 @@
  *  limitations under the License.
  */
 
-package jones.sonar.common.verbose;
+package jones.sonar.common.command.subcommand.impl;
 
 import jones.sonar.api.Sonar;
-import lombok.experimental.UtilityClass;
+import jones.sonar.common.command.CommandInvocation;
+import jones.sonar.common.command.subcommand.SubCommand;
+import jones.sonar.common.command.subcommand.SubCommandInfo;
 
-@UtilityClass
-public class VerboseAnimation {
-    private int stateIndex = 0;
+@SubCommandInfo(
+        name = "reload",
+        description = "Reload the configuration"
+)
+public final class ReloadCommand extends SubCommand {
 
-    public String nextState() {
-        final int nextIndex = ++stateIndex % Sonar.get().getConfig().ANIMATION.size();
-        return String.valueOf(Sonar.get().getConfig().ANIMATION.toArray()[nextIndex]);
+    @Override
+    public void execute(final CommandInvocation invocation) {
+        invocation.getInvocationSender().sendMessage("§7Reloading...");
+        Sonar.get().getConfig().load();
+        invocation.getInvocationSender().sendMessage("§aSuccessfully reloaded.");
     }
 }

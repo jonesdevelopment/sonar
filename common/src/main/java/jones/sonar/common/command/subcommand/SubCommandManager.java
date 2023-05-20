@@ -16,6 +16,7 @@
 
 package jones.sonar.common.command.subcommand;
 
+import jones.sonar.common.command.subcommand.impl.ReloadCommand;
 import jones.sonar.common.command.subcommand.impl.StatisticsCommand;
 import jones.sonar.common.command.subcommand.impl.VerboseCommand;
 import lombok.Getter;
@@ -29,7 +30,8 @@ public class SubCommandManager {
     @Getter
     private final Collection<SubCommand> subCommands = Arrays.asList(
             new StatisticsCommand(),
-            new VerboseCommand()
+            new VerboseCommand(),
+            new ReloadCommand()
     );
 
     public void register(final SubCommand... commands) {

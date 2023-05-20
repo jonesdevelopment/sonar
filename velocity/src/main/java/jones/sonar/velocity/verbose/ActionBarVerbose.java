@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,12 +33,14 @@ public final class ActionBarVerbose implements Verbose {
     private final ProxyServer server;
     @Getter
     private final Collection<String> subscribers = new ArrayList<>();
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
     public void update() {
-        final Component component = Component.text("§e§lSonar"
-                + " §3▪ §7Queued §f" + Sonar.get().getFallback().getQueue().getQueuedPlayers().size()
-                + " §3▪ §7Verifying §f" + Sonar.get().getFallback().getConnected().size()
-                + " §3▪ §6" + VerboseAnimation.nextState());
+        final Component component = Component.text(Sonar.get().getConfig().ACTION_BAR_LAYOUT
+                .replace("%queued%", decimalFormat.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+                .replace("%verifying%", decimalFormat.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+                .replace("%animation%", VerboseAnimation.nextState())
+        );
 
         for (final String subscriber : subscribers) {
             server.getPlayer(subscriber).ifPresent(player -> {

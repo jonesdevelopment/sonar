@@ -14,17 +14,22 @@
  *  limitations under the License.
  */
 
-package jones.sonar.common.verbose;
+package jones.sonar.api.chatcolor;
 
-import jones.sonar.api.Sonar;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class VerboseAnimation {
-    private int stateIndex = 0;
+public class ChatColor {
+    public String translateAlternateColorCodes(final char altColorChar, final String textToTranslate) {
+        final char[] b = textToTranslate.toCharArray();
 
-    public String nextState() {
-        final int nextIndex = ++stateIndex % Sonar.get().getConfig().ANIMATION.size();
-        return String.valueOf(Sonar.get().getConfig().ANIMATION.toArray()[nextIndex]);
+        for (int i = 0; i < b.length - 1; i++) {
+            if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i+1]) > -1) {
+                b[i] = '§';
+                b[i+1] = Character.toLowerCase(b[i+1]);
+            }
+        }
+
+        return new String(b);
     }
 }
