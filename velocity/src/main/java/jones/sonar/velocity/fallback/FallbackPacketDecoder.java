@@ -20,10 +20,7 @@ import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.ClientSettings;
-import com.velocitypowered.proxy.protocol.packet.JoinGame;
-import com.velocitypowered.proxy.protocol.packet.KeepAlive;
-import com.velocitypowered.proxy.protocol.packet.PluginMessage;
+import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
@@ -75,7 +72,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
                 hasSentClientBrand = true;
 
                 fallbackPlayer.getFallback().getVerified().add(fallbackPlayer.getInetAddress());
-                fallbackPlayer.getPlayer().disconnect0(VERIFIED, false);
+                fallbackPlayer.getConnection().closeWith(Disconnect.create(VERIFIED, fallbackPlayer.getPlayer().getProtocolVersion()));
             }
 
             if (packet instanceof KeepAlive keepAlive && keepAlive.getRandomId() == startKeepAliveId) {
