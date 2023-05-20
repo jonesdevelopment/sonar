@@ -130,6 +130,7 @@ public final class FallbackListener {
      */
     @Subscribe(order = PostOrder.LAST)
     public void handle(final PreLoginEvent event) {
+        totalConnections++;
         var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
         if (fallback.getBlacklisted().contains(inetAddress)) {
@@ -159,6 +160,7 @@ public final class FallbackListener {
 
         premium.add(event.getUsername());
     }
+    public static long totalConnections;
 
     /**
      * Handles inbound connections
@@ -238,8 +240,8 @@ public final class FallbackListener {
 
                     // ==================================================================
                     if (!fallback.isUnderAttack()) {
-                        logger.info("[Fallback] Processing connection for: {} ({})",
-                                event.getUsername(), fallbackPlayer.getProtocolVersion());
+                        logger.info("[Fallback] Processing: {}{} ({})",
+                                event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
                     }
 
                     fallback.getConnected().add(inetAddress);

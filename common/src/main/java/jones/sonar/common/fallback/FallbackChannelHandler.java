@@ -20,13 +20,16 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import jones.sonar.api.Sonar;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.net.InetSocketAddress;
 
 @ChannelHandler.Sharable
+@RequiredArgsConstructor
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
-    public static final FallbackChannelHandler INSTANCE = new FallbackChannelHandler();
+    public static final FallbackChannelHandler INSTANCE = new FallbackChannelHandler(Sonar.get());
+    private final Sonar sonar;
 
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
@@ -34,6 +37,8 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
 
         val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
 
-        Sonar.get().getFallback().getConnected().remove(inetAddress);
+        sonar.getFallback().getConnected().remove(inetAddress);
+
+        sonar.getLogger().info("[Fallback] Disconnect: {}", inetAddress);
     }
 }

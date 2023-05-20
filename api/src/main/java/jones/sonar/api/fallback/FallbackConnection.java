@@ -41,6 +41,7 @@ public final class FallbackConnection<Player, Connection> {
 
         fallback.getBlacklisted().add(inetAddress);
 
-        Sonar.get().getLogger().info("[Fallback] " + inetAddress + " has failed the bot check for: " + reason);
+        Sonar.get().getLogger().info("[Fallback] {} ({}) has failed the bot check for: {}",
+                inetAddress, protocolVersion, reason);
     }
 }

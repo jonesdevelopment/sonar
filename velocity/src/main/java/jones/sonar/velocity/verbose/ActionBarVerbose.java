@@ -20,6 +20,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.verbose.Verbose;
 import jones.sonar.common.verbose.VerboseAnimation;
+import jones.sonar.velocity.fallback.FallbackListener;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -40,6 +41,7 @@ public final class ActionBarVerbose implements Verbose {
                 .replace("%queued%", decimalFormat.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
                 .replace("%verifying%", decimalFormat.format(Sonar.get().getFallback().getConnected().size()))
                 .replace("%blacklisted%", decimalFormat.format(Sonar.get().getFallback().getBlacklisted().size()))
+                .replace("%total%", decimalFormat.format(FallbackListener.totalConnections))
                 .replace("%animation%", VerboseAnimation.nextState())
         );
 
