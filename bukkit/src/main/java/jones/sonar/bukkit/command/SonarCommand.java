@@ -65,7 +65,18 @@ public final class SonarCommand implements CommandExecutor {
 
         var subCommand = Optional.<SubCommand>empty();
 
-        final InvocationSender invocationSender = sender::sendMessage;
+        var invocationSender = new InvocationSender<CommandSender>() {
+
+            @Override
+            public void sendMessage(final String message) {
+                sender.sendMessage(message);
+            }
+
+            @Override
+            public CommandSender getPlayer() {
+                return sender;
+            }
+        };
 
         if (args.length > 0) {
             subCommand = SubCommandManager.getSubCommands().stream()
@@ -99,6 +110,7 @@ public final class SonarCommand implements CommandExecutor {
             }
 
             final CommandInvocation commandInvocation = new CommandInvocation(
+                    sender.getName(),
                     invocationSender,
                     sub,
                     args

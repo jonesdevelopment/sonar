@@ -64,7 +64,18 @@ public final class SonarCommand implements SimpleCommand {
 
         var subCommand = Optional.<SubCommand>empty();
 
-        final InvocationSender invocationSender = message -> invocation.source().sendMessage(Component.text(message));
+        var invocationSender = new InvocationSender<CommandSource>() {
+
+            @Override
+            public void sendMessage(final String message) {
+                invocation.source().sendMessage(Component.text(message));
+            }
+
+            @Override
+            public CommandSource getPlayer() {
+                return invocation.source();
+            }
+        };
 
         if (invocation.arguments().length > 0) {
             subCommand = SubCommandManager.getSubCommands().stream()
@@ -74,7 +85,7 @@ public final class SonarCommand implements SimpleCommand {
                             .anyMatch(alias -> alias.equalsIgnoreCase(invocation.arguments()[0]))))
                     .findFirst();
 
-            if (subCommand.isPresent()) {
+           /* if (subCommand.isPresent()) {
                 final String permission = "sonar." + subCommand.get().getInfo().name();
 
                 if (!invocation.source().hasPermission(permission)) {
@@ -83,7 +94,7 @@ public final class SonarCommand implements SimpleCommand {
                     ));
                     return;
                 }
-            }
+            }*/
         }
 
         subCommand.ifPresentOrElse(sub -> {
@@ -93,6 +104,7 @@ public final class SonarCommand implements SimpleCommand {
             }
 
             final CommandInvocation commandInvocation = new CommandInvocation(
+                    (invocation.source() instanceof Player ? ((Player) invocation.source()).getUsername() : "Console"),
                     invocationSender,
                     sub,
                     invocation.arguments()
@@ -104,6 +116,6 @@ public final class SonarCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("sonar.command");
+        return true;//invocation.source().hasPermission("sonar.command");
     }
 }

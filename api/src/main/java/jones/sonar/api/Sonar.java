@@ -18,6 +18,7 @@ package jones.sonar.api;
 
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.fallback.FallbackHolder;
+import jones.sonar.api.verbose.Verbose;
 
 public interface Sonar {
     SonarPlatform getPlatform();
@@ -25,6 +26,8 @@ public interface Sonar {
     default Fallback getFallback() {
         return FallbackHolder.INSTANCE;
     }
+
+    Verbose getActionBarVerbose();
 
     static Sonar get() {
         return SonarProvider.get();

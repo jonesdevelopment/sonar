@@ -19,6 +19,7 @@ package jones.sonar.bungee;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
+import jones.sonar.api.verbose.Verbose;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
@@ -29,6 +30,9 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
     @Getter
     private SonarBungeePlugin plugin;
+
+    @Getter
+    private final Verbose actionBarVerbose = null;
 
     @Override
     public SonarPlatform getPlatform() {

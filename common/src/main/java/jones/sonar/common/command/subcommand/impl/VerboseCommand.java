@@ -16,6 +16,7 @@
 
 package jones.sonar.common.command.subcommand.impl;
 
+import jones.sonar.api.Sonar;
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
@@ -29,6 +30,15 @@ public final class VerboseCommand extends SubCommand {
 
     @Override
     public void execute(final CommandInvocation invocation) {
-        invocation.getInvocationSender().sendMessage("Verbose");
+        final String verboseSubscriber = invocation.getExecutorName();
+
+        if (Sonar.get().getActionBarVerbose().isSubscribed(verboseSubscriber)) {
+            Sonar.get().getActionBarVerbose().unsubscribe(verboseSubscriber);
+            invocation.getInvocationSender().sendMessage("§cUnsubscribed");
+            return;
+        }
+
+        invocation.getInvocationSender().sendMessage("§aSubscribed");
+        Sonar.get().getActionBarVerbose().subscribe(verboseSubscriber);
     }
 }

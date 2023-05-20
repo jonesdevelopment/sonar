@@ -14,10 +14,22 @@
  *  limitations under the License.
  */
 
-package jones.sonar.common.command;
+package jones.sonar.api.verbose;
 
-public interface InvocationSender<T> {
-    void sendMessage(final String message);
+import java.util.Collection;
 
-    T getPlayer();
+public interface Verbose {
+    Collection<String> getSubscribers();
+
+    default boolean isSubscribed(final String subscriber) {
+        return getSubscribers().contains(subscriber);
+    }
+
+    default void subscribe(final String username) {
+        getSubscribers().add(username);
+    }
+
+    default void unsubscribe(final String subscriber) {
+        getSubscribers().remove(subscriber);
+    }
 }

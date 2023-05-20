@@ -24,6 +24,7 @@ import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackConnectionLimiter;
 import jones.sonar.velocity.fallback.FallbackListener;
+import jones.sonar.velocity.verbose.ActionBarVerbose;
 import lombok.Getter;
 
 import java.util.concurrent.TimeUnit;
@@ -34,6 +35,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
     @Getter
     private SonarVelocityPlugin plugin;
+
+    @Getter
+    private ActionBarVerbose actionBarVerbose;
 
     @Override
     public SonarPlatform getPlatform() {
@@ -65,6 +69,14 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         // Register Fallback queue task
         plugin.getServer().getScheduler().buildTask(plugin, getFallback().getQueue()::poll)
                 .repeat(500L, TimeUnit.MILLISECONDS)
+                .schedule();
+
+        // Initialize action bar verbose
+        actionBarVerbose = new ActionBarVerbose(plugin.getServer());
+
+        // Register action bar verbose task
+        plugin.getServer().getScheduler().buildTask(plugin, actionBarVerbose::update)
+                .repeat(100L, TimeUnit.MILLISECONDS)
                 .schedule();
 
         // Done
