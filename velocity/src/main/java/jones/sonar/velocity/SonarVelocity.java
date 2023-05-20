@@ -23,7 +23,7 @@ import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
-import jones.sonar.velocity.fallback.FallbackConnectionLimiter;
+import jones.sonar.velocity.fallback.FallbackAttemptLimiter;
 import jones.sonar.velocity.fallback.FallbackListener;
 import jones.sonar.velocity.verbose.ActionBarVerbose;
 import lombok.Getter;
@@ -68,11 +68,11 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
         // Register Fallback listener
         plugin.getServer().getEventManager().register(plugin, new FallbackListener(
-                (VelocityServer) plugin.getServer(), plugin.getLogger()
+                (VelocityServer) plugin.getServer(), plugin.getLogger(), getFallback()
         ));
 
         // Apply filter (connection limiter) to Fallback
-        Sonar.get().getFallback().setFilter(FallbackConnectionLimiter::shouldAllow);
+        Sonar.get().getFallback().setAttemptLimiter(FallbackAttemptLimiter::allow);
 
         // Register Fallback queue task
         plugin.getServer().getScheduler().buildTask(plugin, getFallback().getQueue()::poll)

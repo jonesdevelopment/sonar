@@ -16,7 +16,6 @@
 
 package jones.sonar.velocity.fallback;
 
-import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.packet.ClientSettings;
@@ -24,27 +23,16 @@ import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.PluginMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.FallbackConnection;
-import jones.sonar.velocity.SonarVelocity;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import net.kyori.adventure.text.Component;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 import static com.velocitypowered.proxy.protocol.util.NettyPreconditions.checkFrame;
 
 // TODO: small fall check
-@RequiredArgsConstructor
+@AllArgsConstructor
 public final class FallbackPacketInterceptor extends ChannelInboundHandlerAdapter {
     private final FallbackConnection<ConnectedPlayer, MinecraftConnection> fallbackPlayer;
-    private State state = State.SETTINGS;
-    private enum State {
-        SETTINGS,
-        BRAND,
-        KEEP_ALIVE,
-        FINISHED
-    }
     private long keepAliveId;
 
     // TODO: make configurable
@@ -55,42 +43,22 @@ public final class FallbackPacketInterceptor extends ChannelInboundHandlerAdapte
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         if (msg instanceof ClientSettings) {
-            checkFrame(state == State.SETTINGS, "Did not expect " + state);
-
-            state = State.BRAND;
         }
 
         if (msg instanceof PluginMessage pluginMessage) {
             if (pluginMessage.getChannel().equals("MC|Brand")
                     || pluginMessage.getChannel().equals("minecraft:brand")) {
-                checkFrame(state == State.BRAND, "Did not expect " + state);
-
-                keepAliveId = ThreadLocalRandom.current().nextInt();
-                state = State.KEEP_ALIVE;
-
-                var keepAlive = new KeepAlive();
-                keepAlive.setRandomId(keepAliveId);
-                fallbackPlayer.getConnection().write(keepAlive);
             }
         }
 
-        // TODO: check for 1.9+
-        if (msg instanceof KeepAlive keepAlive && state != State.FINISHED) {
-            checkFrame(state == State.KEEP_ALIVE, "Did not expect " + state);
+        if (msg instanceof KeepAlive keepAlive) {
             checkFrame(keepAlive.getRandomId() == keepAliveId, "Invalid KeepAlive id");
 
-            if (keepAliveId == 0L
-                    || fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
-                state = State.FINISHED;
+            System.out.println("[client → server] " + fallbackPlayer.getPlayer().getUsername() + " - KeepAlive → " + keepAlive.getRandomId());
 
-                SonarVelocity.INSTANCE.getPlugin().getLogger().info("[Fallback] Verified: {} ({})",
-                        fallbackPlayer.getPlayer().getUsername(), fallbackPlayer.getProtocolVersion());
+            fallbackPlayer.getFallback().getVerified().add(fallbackPlayer.getInetAddress());
 
-                Sonar.get().getFallback().getVerified().add(fallbackPlayer.getInetAddress());
-
-                fallbackPlayer.getPlayer().disconnect0(SUCCESSFULLY_VERIFIED, true);
-                return;
-            }
+            fallbackPlayer.getPlayer().disconnect0(SUCCESSFULLY_VERIFIED, true);
 
             keepAliveId = 0L;
         }

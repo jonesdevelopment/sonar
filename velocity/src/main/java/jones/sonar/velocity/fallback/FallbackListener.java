@@ -33,9 +33,10 @@ import com.velocitypowered.proxy.connection.registry.DimensionInfo;
 import com.velocitypowered.proxy.network.Connections;
 import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.JoinGame;
+import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
-import jones.sonar.api.Sonar;
+import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.fallback.FallbackConnection;
 import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.velocity.fallback.dummy.DummyConnection;
@@ -52,6 +53,7 @@ import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Vector;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 
@@ -59,6 +61,7 @@ import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 public final class FallbackListener {
     private final VelocityServer server;
     private final Logger logger;
+    private final Fallback fallback;
 
     // We need to cache if the joining player is a premium player or not
     // If we don't do that, many authentication plugins can potentially break
@@ -66,18 +69,23 @@ public final class FallbackListener {
 
     // TODO: make configurable
     private static final Component ALREADY_VERIFYING = Component.text(
-            "§cYou are already being verified at the moment! Please try again later."
+            "§e§lSonar §7» §cYou are already being verified at the moment! Please try again later."
     );
     private static final PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING_RESULT = PreLoginEvent.PreLoginComponentResult.denied(ALREADY_VERIFYING);
     // TODO: make configurable
     private static final Component TOO_MANY_PLAYERS = Component.text(
-            "§cToo many players are currently trying to log in. Please try again later."
+            "§e§lSonar §7» §cToo many players are currently trying to log in. Please try again later."
     );
     private static final PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS_RESULT = PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_PLAYERS);
     // TODO: make configurable
     private static final Component TOO_MANY_VERIFICATIONS = Component.text(
-            "§cPlease wait a minute before trying to verify again."
+            "§e§lSonar §7» §cPlease wait a minute before trying to verify again."
     );
+    // TODO: make configurable
+    private static final Component JOINING_TOO_FAST = Component.text(
+            "§e§lSonar §7» §cYou are reconnecting too fast. Please try again later."
+    );
+    private static final PreLoginEvent.PreLoginComponentResult JOINING_TOO_FAST_RESULT = PreLoginEvent.PreLoginComponentResult.denied(JOINING_TOO_FAST);
 
     private static final String DIMENSION = "minecraft:the_end"; // TODO: make configurable
     private static final JoinGame JOIN_GAME = new JoinGame();
@@ -145,17 +153,17 @@ public final class FallbackListener {
     public void handle(final PreLoginEvent event) {
         var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
-        if (Sonar.get().getFallback().getVerified().contains(inetAddress)) return;
+        if (fallback.getVerified().contains(inetAddress)) return;
 
         // We cannot allow too many players on our Fallback server
-        if (Sonar.get().getFallback().getQueue().getQueuedPlayers().size() > Short.MAX_VALUE) {
+        if (fallback.getQueue().getQueuedPlayers().size() > Short.MAX_VALUE) {
             event.setResult(TOO_MANY_PLAYERS_RESULT);
             return;
         }
 
         // Check if Fallback is already verifying a player
         // → is another player with the same ip address connected to Fallback?
-        if (Sonar.get().getFallback().getConnected().contains(inetAddress)) {
+        if (fallback.getConnected().contains(inetAddress)) {
             event.setResult(ALREADY_VERIFYING_RESULT);
             return;
         }
@@ -176,7 +184,7 @@ public final class FallbackListener {
     public void handle(final GameProfileRequestEvent event) throws Throwable {
         val inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
-        if (Sonar.get().getFallback().getVerified().contains(inetAddress)) return;
+        if (fallback.getVerified().contains(inetAddress)) return;
 
         val inboundConnection = (LoginInboundConnection) event.getConnection();
         val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
@@ -186,7 +194,7 @@ public final class FallbackListener {
 
         CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
-        Sonar.get().getFallback().getQueue().queue(() -> channel.eventLoop().execute(() -> {
+        fallback.getQueue().queue(() -> channel.eventLoop().execute(() -> {
             if (mcConnection.isClosed()) return;
 
             try {
@@ -206,8 +214,8 @@ public final class FallbackListener {
                 // -> we are intercepting the packets!
                 premium.remove(event.getUsername());
 
-                // Check if the ip address had too many verifications
-                if (!Sonar.get().getFallback().getFilter().allow(inetAddress)) {
+                // Check if the ip address had too many verifications or is rejoining too quickly
+                if (!fallback.getAttemptLimiter().allow(inetAddress)) {
                     player.disconnect0(TOO_MANY_VERIFICATIONS, true);
                     return;
                 }
@@ -221,6 +229,7 @@ public final class FallbackListener {
                 // Create an instance for the Fallback connection
                 // TODO: simpler alternative?
                 val fallbackPlayer = new FallbackConnection<>(
+                        fallback,
                         player,
                         mcConnection,
                         channel,
@@ -233,7 +242,7 @@ public final class FallbackListener {
                 logger.info("[Fallback] Processing connection for: {} ({})",
                         event.getUsername(), fallbackPlayer.getProtocolVersion());
 
-                Sonar.get().getFallback().getConnected().add(inetAddress);
+                fallback.getConnected().add(inetAddress);
 
                 // We have to add this pipeline to monitor whenever the client disconnects
                 // to remove them from the list of connected players
@@ -261,14 +270,18 @@ public final class FallbackListener {
                 mcConnection.setAssociation(player);
                 mcConnection.setState(StateRegistry.PLAY);
 
+                var keepAlive = new KeepAlive();
+                var keepAliveId = ThreadLocalRandom.current().nextInt();
+                keepAlive.setRandomId(keepAliveId);
+
                 // We have to add this pipeline to monitor all incoming traffic (packets)
                 fallbackPlayer.getPipeline().addAfter(
                         Connections.MINECRAFT_DECODER,
                         "sonar-interceptor",
-                        new FallbackPacketInterceptor(fallbackPlayer)
+                        new FallbackPacketInterceptor(fallbackPlayer, keepAliveId)
                 );
 
-                mcConnection.write(JOIN_GAME);
+                mcConnection.write(keepAlive);
             } catch (Throwable throwable) {
                 throw new RuntimeException(throwable);
             }

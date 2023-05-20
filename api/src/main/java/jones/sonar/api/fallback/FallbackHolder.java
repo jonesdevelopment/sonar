@@ -34,5 +34,5 @@ public final class FallbackHolder implements Fallback {
     private final FallbackQueue queue = new FallbackQueue();
     @Getter
     @Setter
-    private FallbackFilter filter = inetAddress -> true;
+    private FallbackFilter attemptLimiter = inetAddress -> true;
 }

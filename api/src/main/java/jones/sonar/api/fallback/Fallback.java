@@ -26,7 +26,7 @@ public interface Fallback {
 
     FallbackQueue getQueue();
 
-    FallbackFilter getFilter();
+    FallbackFilter getAttemptLimiter();
 
-    void setFilter(final FallbackFilter filter);
+    void setAttemptLimiter(final FallbackFilter limiter);
 }
