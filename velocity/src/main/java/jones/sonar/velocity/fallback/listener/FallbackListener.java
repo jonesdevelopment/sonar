@@ -161,16 +161,22 @@ public final class FallbackListener {
                 // -> we are intercepting the packets!
                 premium.remove(event.getUsername());
 
+                // Check if Fallback is already verifying a player
+                // → is another player with the same ip address connected to Fallback?
+                if (Sonar.get().getFallback().getConnected().contains(inetAddress)) {
+                    player.disconnect0(ALREADY_VERIFYING, true);
+                    return;
+                }
+
                 // Check if the ip address had too many verifications
                 if (FallbackLimiter.shouldDeny(inetAddress)) {
                     player.disconnect0(TOO_MANY_VERIFICATIONS, true);
                     return;
                 }
 
-                // Check if Fallback is already verifying a player
-                // → is another player with the same ip address connected to Fallback?
-                if (!Sonar.get().getFallback().getConnected().contains(inetAddress)) {
-                    player.disconnect0(ALREADY_VERIFYING, true);
+                // Check if the player is already connected to the proxy
+                if (!server.canRegisterConnection(player)) {
+                    player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED), true);
                     return;
                 }
 
@@ -184,15 +190,13 @@ public final class FallbackListener {
                         player.getProtocolVersion().getProtocol()
                 );
 
+                // ==================================================================
                 logger.info("[fallback/debug] Processing connection for: {} ({})",
                         fallbackPlayer.getUsername(),
                         fallbackPlayer.getProtocolVersion());
 
-                // Check if the player is already connected to the proxy
-                if (!server.canRegisterConnection(player)) {
-                    player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED), true);
-                    return;
-                }
+                Sonar.get().getFallback().getConnected().add(inetAddress);
+                // ==================================================================
 
                 // Set compression
                 val threshold = server.getConfiguration().getCompressionThreshold();
