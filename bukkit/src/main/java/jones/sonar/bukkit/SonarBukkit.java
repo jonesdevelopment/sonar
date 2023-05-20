@@ -19,8 +19,8 @@ package jones.sonar.bukkit;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
-import jones.sonar.api.verbose.Verbose;
 import jones.sonar.bukkit.command.SonarCommand;
+import jones.sonar.bukkit.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
 
@@ -34,7 +34,7 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     private SonarBukkitPlugin plugin;
 
     @Getter
-    private final Verbose actionBarVerbose = null;
+    private ActionBarVerbose actionBarVerbose;
 
     @Override
     public SonarPlatform getPlatform() {
@@ -52,6 +52,13 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
         // Register Sonar command
         Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());
+
+        // Initialize action bar verbose
+        actionBarVerbose = new ActionBarVerbose();
+
+        // Register action bar verbose task
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, actionBarVerbose::update,
+                100L, 100L);
     }
 
     @Override

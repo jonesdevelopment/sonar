@@ -19,10 +19,12 @@ package jones.sonar.bungee;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
-import jones.sonar.api.verbose.Verbose;
 import jones.sonar.bungee.command.SonarCommand;
+import jones.sonar.bungee.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
+
+import java.util.concurrent.TimeUnit;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
@@ -32,7 +34,7 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     private SonarBungeePlugin plugin;
 
     @Getter
-    private final Verbose actionBarVerbose = null;
+    private ActionBarVerbose actionBarVerbose;
 
     @Override
     public SonarPlatform getPlatform() {
@@ -50,6 +52,13 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
         // Register Sonar command
         plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());
+
+        // Initialize action bar verbose
+        actionBarVerbose = new ActionBarVerbose(plugin.getServer());
+
+        // Register action bar verbose task
+        plugin.getServer().getScheduler().schedule(plugin, actionBarVerbose::update,
+                100L, TimeUnit.MILLISECONDS);
     }
 
     @Override

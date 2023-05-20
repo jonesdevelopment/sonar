@@ -14,17 +14,19 @@
  *  limitations under the License.
  */
 
-package jones.sonar.velocity.verbose;
+package jones.sonar.bungee.verbose;
 
-import com.velocitypowered.api.proxy.ProxyServer;
 import jones.sonar.api.verbose.Verbose;
 import jones.sonar.common.verbose.VerboseAnimation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public final class ActionBarVerbose implements Verbose {
@@ -33,11 +35,11 @@ public final class ActionBarVerbose implements Verbose {
     private final Collection<String> subscribers = new ArrayList<>();
 
     public void update() {
-        final Component component = Component.text("§e§lSonar §7> §f" + VerboseAnimation.nextState());
+        final TextComponent component = new TextComponent("§e§lSonar §7> §f" + VerboseAnimation.nextState());
 
         for (final String subscriber : subscribers) {
-            server.getPlayer(subscriber).ifPresent(player -> {
-                player.sendActionBar(component);
+            Optional.ofNullable(server.getPlayer(subscriber)).ifPresent(player -> {
+                player.sendMessage(ChatMessageType.ACTION_BAR, component);
             });
         }
     }
