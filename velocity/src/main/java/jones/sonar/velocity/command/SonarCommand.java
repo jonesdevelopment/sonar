@@ -85,7 +85,7 @@ public final class SonarCommand implements SimpleCommand {
                             .anyMatch(alias -> alias.equalsIgnoreCase(invocation.arguments()[0]))))
                     .findFirst();
 
-           /* if (subCommand.isPresent()) {
+            if (subCommand.isPresent()) {
                 final String permission = "sonar." + subCommand.get().getInfo().name();
 
                 if (!invocation.source().hasPermission(permission)) {
@@ -94,7 +94,7 @@ public final class SonarCommand implements SimpleCommand {
                     ));
                     return;
                 }
-            }*/
+            }
         }
 
         subCommand.ifPresentOrElse(sub -> {
@@ -116,6 +116,6 @@ public final class SonarCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return true;//invocation.source().hasPermission("sonar.command");
+        return invocation.source().hasPermission("sonar.command");
     }
 }
