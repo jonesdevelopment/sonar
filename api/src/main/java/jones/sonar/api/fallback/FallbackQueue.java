@@ -24,9 +24,8 @@ import java.util.Queue;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
-    private final Fallback fallback;
     private final Queue<Runnable> queue = new ArrayDeque<>();
-    private static final int POLL_RATE = 20; // TODO: make configurable
+    private static final int POLL_RATE = 10; // TODO: make configurable
 
     public void queue(final Runnable runnable) {
         queue.add(runnable);

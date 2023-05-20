@@ -23,7 +23,7 @@ import jones.sonar.api.SonarProvider;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackConnectionLimiter;
-import jones.sonar.velocity.fallback.listener.FallbackListener;
+import jones.sonar.velocity.fallback.FallbackListener;
 import lombok.Getter;
 
 import java.util.concurrent.TimeUnit;

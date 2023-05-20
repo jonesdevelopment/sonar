@@ -14,8 +14,10 @@
  *  limitations under the License.
  */
 
-package jones.sonar.velocity.fallback.listener;
+package jones.sonar.velocity.fallback;
 
+import com.google.common.collect.ImmutableSet;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.GameProfileRequestEvent;
@@ -27,7 +29,10 @@ import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
+import com.velocitypowered.proxy.connection.registry.DimensionInfo;
+import com.velocitypowered.proxy.network.Connections;
 import com.velocitypowered.proxy.protocol.StateRegistry;
+import com.velocitypowered.proxy.protocol.packet.JoinGame;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import jones.sonar.api.Sonar;
@@ -61,12 +66,33 @@ public final class FallbackListener {
 
     // TODO: make configurable
     private static final Component ALREADY_VERIFYING = Component.text(
-            "§e§lSonar Fallback\n\n§7You are already being verified at the moment! Please wait."
+            "§cYou are already being verified at the moment! Please try again later."
     );
     // TODO: make configurable
     private static final Component TOO_MANY_VERIFICATIONS = Component.text(
-            "§e§lSonar Fallback\n\n§7Please wait a minute before trying to verify again."
+            "§cPlease wait a minute before trying to verify again."
     );
+
+    private static final String DIMENSION = "minecraft:the_end"; // TODO: make configurable
+    private static final JoinGame JOIN_GAME = new JoinGame();
+
+    // TODO: make work for 1.9+
+    static {
+        JOIN_GAME.setIsHardcore(true);
+        JOIN_GAME.setLevelType("flat");
+        JOIN_GAME.setGamemode((short) 3);
+        JOIN_GAME.setReducedDebugInfo(true);
+
+        JOIN_GAME.setDimensionInfo(new DimensionInfo(DIMENSION, DIMENSION, false, false));
+
+        try {
+            MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
+                    .findSetter(JoinGame.class, "levelNames", ImmutableSet.class)
+                    .invokeExact(JOIN_GAME, ImmutableSet.of(DIMENSION));
+        } catch (Throwable throwable) {
+            throw new IllegalStateException();
+        }
+    }
 
     private static final DummyConnection CLOSED_MINECRAFT_CONNECTION;
 
@@ -75,10 +101,10 @@ public final class FallbackListener {
     private static final MethodHandle CONNECTED_PLAYER;
     private static final Field CONNECTION_FIELD;
 
-    // https://github.com/Elytrium/LimboAPI/blob/ca6eb7155740bf3ff32596412a48e537fe55606d/plugin/src/main/java/net/elytrium/limboapi/injection/login/LoginListener.java#L239
     static {
         CLOSED_MINECRAFT_CONNECTION = new DummyConnection(null);
 
+        // https://github.com/Elytrium/LimboAPI/blob/ca6eb7155740bf3ff32596412a48e537fe55606d/plugin/src/main/java/net/elytrium/limboapi/injection/login/LoginListener.java#L239
         try {
             CONNECTION_FIELD = AuthSessionHandler.class.getDeclaredField("mcConnection");
             CONNECTION_FIELD.setAccessible(true);
@@ -98,7 +124,7 @@ public final class FallbackListener {
 
             INITIAL_CONNECTION = MethodHandles.privateLookupIn(LoginInboundConnection.class, LOOKUP)
                     .findGetter(LoginInboundConnection.class, "delegate", InitialInboundConnection.class);
-        } catch (Exception exception) {
+        } catch (Throwable throwable) {
             throw new IllegalStateException();
         }
     }
@@ -109,11 +135,24 @@ public final class FallbackListener {
      *
      * @param event PreLoginEvent
      */
-    @Subscribe
+    @Subscribe(order = PostOrder.LAST)
     public void handle(final PreLoginEvent event) {
         var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
         if (Sonar.get().getFallback().getVerified().contains(inetAddress)) return;
+
+        // Check if Fallback is already verifying a player
+        // → is another player with the same ip address connected to Fallback?
+        if (Sonar.get().getFallback().getConnected().contains(inetAddress)) {
+            event.setResult(PreLoginEvent.PreLoginComponentResult.denied(ALREADY_VERIFYING));
+            return;
+        }
+
+        // Check if the ip address had too many verifications
+        if (!Sonar.get().getFallback().getFilter().allow(inetAddress)) {
+            event.setResult(PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_VERIFICATIONS));
+            return;
+        }
 
         if (event.getResult().isForceOfflineMode()) return;
         if (!event.getResult().isOnlineModeAllowed() && !server.getConfiguration().isOnlineMode()) return;
@@ -127,7 +166,7 @@ public final class FallbackListener {
      * @param event GameProfileRequestEvent
      * @throws java.lang.Throwable Unexpected error
      */
-    @Subscribe
+    @Subscribe(order = PostOrder.LAST)
     public void handle(final GameProfileRequestEvent event) throws Throwable {
         val inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
@@ -161,19 +200,6 @@ public final class FallbackListener {
                 // -> we are intercepting the packets!
                 premium.remove(event.getUsername());
 
-                // Check if Fallback is already verifying a player
-                // → is another player with the same ip address connected to Fallback?
-                if (Sonar.get().getFallback().getConnected().contains(inetAddress)) {
-                    player.disconnect0(ALREADY_VERIFYING, true);
-                    return;
-                }
-
-                // Check if the ip address had too many verifications
-                if (!Sonar.get().getFallback().getFilter().allow(inetAddress)) {
-                    player.disconnect0(TOO_MANY_VERIFICATIONS, true);
-                    return;
-                }
-
                 // Check if the player is already connected to the proxy
                 if (!server.canRegisterConnection(player)) {
                     player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED), true);
@@ -182,8 +208,9 @@ public final class FallbackListener {
 
                 // Create an instance for the Fallback connection
                 // TODO: simpler alternative?
-                val fallbackPlayer = new FallbackConnection(
-                        player.getUsername(),
+                val fallbackPlayer = new FallbackConnection<>(
+                        player,
+                        mcConnection,
                         channel,
                         channel.pipeline(),
                         inetAddress,
@@ -192,8 +219,7 @@ public final class FallbackListener {
 
                 // ==================================================================
                 logger.info("[Fallback] Processing connection for: {} ({})",
-                        fallbackPlayer.getUsername(),
-                        fallbackPlayer.getProtocolVersion());
+                        event.getUsername(), fallbackPlayer.getProtocolVersion());
 
                 Sonar.get().getFallback().getConnected().add(inetAddress);
 
@@ -222,6 +248,15 @@ public final class FallbackListener {
                 // Set the status to PLAY, so we can receive and send more packets
                 mcConnection.setAssociation(player);
                 mcConnection.setState(StateRegistry.PLAY);
+
+                // We have to add this pipeline to monitor all incoming traffic (packets)
+                fallbackPlayer.getPipeline().addAfter(
+                        Connections.MINECRAFT_DECODER,
+                        "sonar-interceptor",
+                        new FallbackPacketInterceptor(fallbackPlayer)
+                );
+
+                mcConnection.write(JOIN_GAME);
             } catch (Throwable throwable) {
                 throw new RuntimeException(throwable);
             }

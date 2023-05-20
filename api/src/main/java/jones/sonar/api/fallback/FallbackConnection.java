@@ -25,8 +25,9 @@ import java.net.InetAddress;
 
 @Getter
 @RequiredArgsConstructor
-public final class FallbackConnection {
-    private final String username;
+public final class FallbackConnection<Player, Connection> {
+    private final Player player;
+    private final Connection connection;
     private final Channel channel;
     private final ChannelPipeline pipeline;
     private final InetAddress inetAddress;
