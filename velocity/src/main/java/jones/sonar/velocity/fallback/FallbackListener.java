@@ -43,7 +43,6 @@ import jones.sonar.common.fallback.FallbackTimeoutHandler;
 import jones.sonar.velocity.SonarVelocity;
 import jones.sonar.velocity.fallback.dummy.DummyConnection;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -172,16 +171,16 @@ public final class FallbackListener {
    */
   @Subscribe(order = PostOrder.LAST)
   public void handle(final GameProfileRequestEvent event) throws Throwable {
-    val inetAddress = event.getConnection().getRemoteAddress().getAddress();
+    var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     // We don't want to check players that have already been verified
     if (fallback.getVerified().contains(inetAddress)) return;
 
-    val inboundConnection = (LoginInboundConnection) event.getConnection();
-    val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
+    var inboundConnection = (LoginInboundConnection) event.getConnection();
+    var initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
 
-    val mcConnection = initialConnection.getConnection();
-    val channel = mcConnection.getChannel();
+    var mcConnection = initialConnection.getConnection();
+    var channel = mcConnection.getChannel();
 
     // The AuthSessionHandler isn't supposed to continue the connection process
     // which is why we override the field value for the MinecraftConnection with
@@ -211,7 +210,7 @@ public final class FallbackListener {
         try {
 
           // Create an instance for player
-          val player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
+          var player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
             mcConnection.server,
             event.getGameProfile(),
             mcConnection,
@@ -240,7 +239,7 @@ public final class FallbackListener {
           }
 
           // Create an instance for the Fallback connection
-          val fallbackPlayer = new FallbackConnection<>(
+          var fallbackPlayer = new FallbackConnection<>(
             fallback, player, mcConnection, channel,
             channel.pipeline(), inetAddress,
             player.getProtocolVersion().getProtocol()
@@ -256,7 +255,7 @@ public final class FallbackListener {
           // ==================================================================
 
           // Set compression
-          val threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
+          var threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
 
           if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
             mcConnection.write(new SetCompression(threshold));

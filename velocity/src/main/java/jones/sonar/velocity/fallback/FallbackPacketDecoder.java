@@ -27,7 +27,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import net.kyori.adventure.text.Component;
 
 @RequiredArgsConstructor
@@ -62,7 +61,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         if (!payload.getChannel().equals("MC|Brand") && !payload.getChannel().equals("minecraft:brand")) return;
 
-        val valid = fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_13.getProtocol();
+        final boolean valid = fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_13.getProtocol();
 
         // MCStorm actually messes this up
         checkFrame(payload.getChannel().equals("MC|Brand") || valid, "invalid client brand");

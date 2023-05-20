@@ -23,9 +23,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.Fallback;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 @ChannelHandler.Sharable
@@ -43,7 +43,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       // unexpectedly - we cannot blacklist for this
       if (cause instanceof IOException) return;
 
-      val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
+      final InetAddress inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
 
       fallback.getBlacklisted().add(inetAddress);
     }
@@ -53,7 +53,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
   public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
     super.channelInactive(ctx);
 
-    val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
+    final InetAddress inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
 
     fallback.getConnected().remove(inetAddress);
     fallback.getQueue().getQueuedPlayers().remove(inetAddress);
