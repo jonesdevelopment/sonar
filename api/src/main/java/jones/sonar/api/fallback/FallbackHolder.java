@@ -35,7 +35,4 @@ public final class FallbackHolder implements Fallback {
     @Getter
     @Setter
     private FallbackFilter filter = inetAddress -> true;
-    @Getter
-    @Setter
-    private FallbackCleaner cleaner = null;
 }

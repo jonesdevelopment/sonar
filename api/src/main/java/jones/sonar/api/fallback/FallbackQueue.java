@@ -38,7 +38,5 @@ public final class FallbackQueue {
 
             queue.poll().run();
         }
-
-        fallback.getCleaner().clean(fallback);
     }
 }

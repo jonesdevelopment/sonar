@@ -14,27 +14,26 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api.fallback;
+package jones.sonar.common.fallback;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import jones.sonar.api.Sonar;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.val;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
-@Getter
-@RequiredArgsConstructor
-public final class FallbackConnection {
-    private final String username;
-    private final Channel channel;
-    private final ChannelPipeline pipeline;
-    private final InetAddress inetAddress;
-    private final int protocolVersion;
-    private final long loginTimestamp = System.currentTimeMillis();
+@ChannelHandler.Sharable
+public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
+    public static final FallbackChannelHandler INSTANCE = new FallbackChannelHandler();
 
-    public void handleDisconnect() {
+    @Override
+    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+
+        val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
+
         Sonar.get().getFallback().getConnected().remove(inetAddress);
     }
 }

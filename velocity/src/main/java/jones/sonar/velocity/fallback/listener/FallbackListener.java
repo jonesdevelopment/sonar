@@ -32,6 +32,7 @@ import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.FallbackConnection;
+import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.velocity.fallback.dummy.DummyConnection;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -195,6 +196,10 @@ public final class FallbackListener {
                         fallbackPlayer.getProtocolVersion());
 
                 Sonar.get().getFallback().getConnected().add(inetAddress);
+
+                // We have to add this pipeline to monitor whenever the client disconnects
+                // to remove them from the list of connected players
+                fallbackPlayer.getPipeline().addFirst("sonar-handler", FallbackChannelHandler.INSTANCE);
                 // ==================================================================
 
                 // Set compression
