@@ -24,6 +24,7 @@ import jones.sonar.api.fallback.Fallback;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 @ChannelHandler.Sharable
@@ -31,6 +32,21 @@ import java.net.InetSocketAddress;
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     public static final FallbackChannelHandler INSTANCE = new FallbackChannelHandler(Sonar.get().getFallback());
     private final Fallback fallback;
+
+    @Override
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        if (ctx.channel().isActive()) {
+            ctx.close();
+
+            // Clients throw an IOException if the connection is interrupted
+            // unexpectedly - we cannot blacklist for this
+            if (cause instanceof IOException) return;
+
+            val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
+
+            fallback.getBlacklisted().add(inetAddress);
+        }
+    }
 
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
