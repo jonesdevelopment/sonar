@@ -36,15 +36,17 @@ public final class FallbackQueue {
     }
 
     public void poll() {
-        for (int i = 0; i < Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS; i++) {
-            if (queuedPlayers.isEmpty()) break;
+        synchronized (queuedPlayers) {
+            for (int i = 0; i < Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS; i++) {
+                if (queuedPlayers.isEmpty()) break;
 
-            queuedPlayers.keySet().stream()
-                    .findFirst()
-                    .ifPresent(inetAddress -> {
-                        queuedPlayers.get(inetAddress).run();
-                        queuedPlayers.remove(inetAddress);
-                    });
+                queuedPlayers.keySet().stream()
+                        .findFirst()
+                        .ifPresent(inetAddress -> {
+                            queuedPlayers.get(inetAddress).run();
+                            queuedPlayers.remove(inetAddress);
+                        });
+            }
         }
     }
 }
