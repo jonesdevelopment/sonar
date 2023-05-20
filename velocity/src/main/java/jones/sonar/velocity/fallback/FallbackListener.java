@@ -197,7 +197,12 @@ public final class FallbackListener {
                             TimeUnit.MILLISECONDS
                     ));
 
-            fallback.getQueue().queue(() -> channel.eventLoop().execute(() -> {
+            // We have to add this pipeline to monitor whenever the client disconnects
+            // to remove them from the list of connected and queued players
+            channel.pipeline().addFirst("sonar-handler", FallbackChannelHandler.INSTANCE);
+
+            // Queue the connection for further processing
+            fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
                 if (mcConnection.isClosed()) return;
 
                 // Most of the following code was taken from Velocity
@@ -245,10 +250,6 @@ public final class FallbackListener {
                     }
 
                     fallback.getConnected().add(inetAddress);
-
-                    // We have to add this pipeline to monitor whenever the client disconnects
-                    // to remove them from the list of connected players
-                    fallbackPlayer.getPipeline().addFirst("sonar-handler", FallbackChannelHandler.INSTANCE);
                     // ==================================================================
 
                     // Set compression

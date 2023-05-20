@@ -21,23 +21,30 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.net.InetAddress;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
     @Getter
-    private final Queue<Runnable> queuedPlayers = new ArrayDeque<>();
+    private final Map<InetAddress, Runnable> queuedPlayers = Collections.synchronizedMap(new HashMap<>());
 
-    public void queue(final Runnable runnable) {
-        queuedPlayers.add(runnable);
+    public void queue(final InetAddress inetAddress, final Runnable runnable) {
+        queuedPlayers.put(inetAddress, runnable);
     }
 
     public void poll() {
         for (int i = 0; i < Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS; i++) {
             if (queuedPlayers.isEmpty()) break;
 
-            queuedPlayers.poll().run();
+            queuedPlayers.keySet().stream()
+                    .findFirst()
+                    .ifPresent(inetAddress -> {
+                        queuedPlayers.get(inetAddress).run();
+                        queuedPlayers.remove(inetAddress);
+                    });
         }
     }
 }

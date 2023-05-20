@@ -39,5 +39,6 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
         val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
 
         fallback.getConnected().remove(inetAddress);
+        fallback.getQueue().getQueuedPlayers().remove(inetAddress);
     }
 }
