@@ -39,8 +39,6 @@ subprojects {
     dependencies {
         compileOnly("io.netty:netty-all:4.1.92.Final") // Netty
 
-        implementation("org.yaml:snakeyaml:2.0")
-
         compileOnly("org.projectlombok:lombok:1.18.26")
         annotationProcessor("org.projectlombok:lombok:1.18.26")
 
@@ -48,6 +46,12 @@ subprojects {
         testAnnotationProcessor("org.projectlombok:lombok:1.18.26")
     }
 }
+
+/*tasks {
+    shadowJar {
+        relocate("org.yaml.snakeyaml", "snakeyaml")
+    }
+}*/
 
 dependencies {
     sequenceOf("api", "bukkit", "bungee", "common", "velocity").forEach {
