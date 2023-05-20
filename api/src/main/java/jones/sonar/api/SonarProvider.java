@@ -23,14 +23,14 @@ import java.util.Objects;
 
 @UtilityClass
 public class SonarProvider {
-    private Sonar cached;
+  private Sonar cached;
 
-    public void set(final Sonar sonar) {
-        assert cached == null;
-        cached = Objects.requireNonNull(sonar);
-    }
+  public void set(final Sonar sonar) {
+    assert cached == null;
+    cached = Objects.requireNonNull(sonar);
+  }
 
-    public Sonar get() {
-        return cached;
-    }
+  public Sonar get() {
+    return cached;
+  }
 }

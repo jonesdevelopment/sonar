@@ -30,16 +30,16 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public final class ActionBarVerbose implements Verbose {
-    @Getter
-    private final Collection<String> subscribers = new ArrayList<>();
+  @Getter
+  private final Collection<String> subscribers = new ArrayList<>();
 
-    public void update() {
-        final TextComponent component = new TextComponent("§e§lSonar §7> §f" + VerboseAnimation.nextState());
+  public void update() {
+    final TextComponent component = new TextComponent("§e§lSonar §7> §f" + VerboseAnimation.nextState());
 
-        for (final String subscriber : subscribers) {
-            Optional.ofNullable(Bukkit.getPlayer(subscriber)).ifPresent(player -> {
-                // TODO: action bar
-            });
-        }
+    for (final String subscriber : subscribers) {
+      Optional.ofNullable(Bukkit.getPlayer(subscriber)).ifPresent(player -> {
+        // TODO: action bar
+      });
     }
+  }
 }

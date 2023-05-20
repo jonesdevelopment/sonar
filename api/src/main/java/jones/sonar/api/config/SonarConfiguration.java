@@ -26,48 +26,48 @@ import java.util.Collection;
 import java.util.Objects;
 
 public final class SonarConfiguration {
-    private final YamlConfig yamlConfig;
+  private final YamlConfig yamlConfig;
 
-    public SonarConfiguration(final File folder) {
-        if (!folder.exists() && !folder.mkdir()) {
-            throw new IllegalStateException("Could not create folder?!");
-        }
-
-        yamlConfig = new YamlConfig(folder, "config");
+  public SonarConfiguration(final File folder) {
+    if (!folder.exists() && !folder.mkdir()) {
+      throw new IllegalStateException("Could not create folder?!");
     }
 
-    public String PREFIX;
+    yamlConfig = new YamlConfig(folder, "config");
+  }
 
-    public String ACTION_BAR_LAYOUT;
-    public Collection<String> ANIMATION;
+  public String PREFIX;
 
-    public int MINIMUM_PLAYERS_FOR_ATTACK;
-    public int MAXIMUM_VERIFYING_PLAYERS;
-    public int MAXIMUM_QUEUED_PLAYERS;
-    public int MAXIMUM_QUEUE_POLLS;
-    public int VERIFICATION_TIMEOUT;
+  public String ACTION_BAR_LAYOUT;
+  public Collection<String> ANIMATION;
 
-    public void load() {
-        Objects.requireNonNull(yamlConfig);
+  public int MINIMUM_PLAYERS_FOR_ATTACK;
+  public int MAXIMUM_VERIFYING_PLAYERS;
+  public int MAXIMUM_QUEUED_PLAYERS;
+  public int MAXIMUM_QUEUE_POLLS;
+  public int VERIFICATION_TIMEOUT;
 
-        yamlConfig.load();
+  public void load() {
+    Objects.requireNonNull(yamlConfig);
 
-        // General options
-        MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
-        MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.max-verifying-players", Short.MAX_VALUE);
-        MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.max-queued-players", Short.MAX_VALUE);
-        MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);
+    yamlConfig.load();
 
-        VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
+    // General options
+    MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
+    MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.max-verifying-players", Short.MAX_VALUE);
+    MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.max-queued-players", Short.MAX_VALUE);
+    MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);
 
-        // Message settings
-        PREFIX = ChatColor.translateAlternateColorCodes('&',
-                yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
+    VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
 
-        ACTION_BAR_LAYOUT = ChatColor.translateAlternateColorCodes('&', yamlConfig.getString(
-                "messages.action-bar.layout",
-                "&e&lSonar &3▪ &7Queued &f%queued% &3▪ &7Verifying &f%verifying% &3▪ &6%animation%"
-        ));
-        ANIMATION = yamlConfig.getStringList("messages.action-bar.animation", Arrays.asList("▙", "▛", "▜", "▟"));
-    }
+    // Message settings
+    PREFIX = ChatColor.translateAlternateColorCodes('&',
+      yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
+
+    ACTION_BAR_LAYOUT = ChatColor.translateAlternateColorCodes('&', yamlConfig.getString(
+      "messages.action-bar.layout",
+      "&e&lSonar &3▪ &7Queued &f%queued% &3▪ &7Verifying &f%verifying% &3▪ &7Blacklisted &f%blacklisted% &3▪ &6%animation%"
+    ));
+    ANIMATION = yamlConfig.getStringList("messages.action-bar.animation", Arrays.asList("▙", "▛", "▜", "▟"));
+  }
 }

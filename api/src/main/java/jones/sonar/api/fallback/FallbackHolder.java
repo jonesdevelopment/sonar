@@ -25,17 +25,17 @@ import java.util.Collection;
 import java.util.Vector;
 
 public final class FallbackHolder implements Fallback {
-    public static final FallbackHolder INSTANCE = new FallbackHolder();
+  public static final FallbackHolder INSTANCE = new FallbackHolder();
 
-    @Getter
-    private final Collection<InetAddress> connected = new Vector<>();
-    @Getter
-    private final Collection<InetAddress> verified = new Vector<>();
-    @Getter
-    private final Collection<InetAddress> blacklisted = new Vector<>();
-    @Getter
-    private final FallbackQueue queue = new FallbackQueue();
-    @Getter
-    @Setter
-    private FallbackFilter attemptLimiter = inetAddress -> true;
+  @Getter
+  private final Collection<InetAddress> connected = new Vector<>();
+  @Getter
+  private final Collection<InetAddress> verified = new Vector<>();
+  @Getter
+  private final Collection<InetAddress> blacklisted = new Vector<>();
+  @Getter
+  private final FallbackQueue queue = new FallbackQueue();
+  @Getter
+  @Setter
+  private FallbackFilter attemptLimiter = inetAddress -> true;
 }

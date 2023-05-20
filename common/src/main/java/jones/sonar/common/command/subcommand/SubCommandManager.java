@@ -28,18 +28,18 @@ import java.util.Collection;
 
 @UtilityClass
 public class SubCommandManager {
-    @Getter
-    private final Collection<SubCommand> subCommands = Arrays.asList(
-            new StatisticsCommand(),
-            new VerboseCommand(),
-            new ReloadCommand()
-    );
+  @Getter
+  private final Collection<SubCommand> subCommands = Arrays.asList(
+    new StatisticsCommand(),
+    new VerboseCommand(),
+    new ReloadCommand()
+  );
 
-    public void register(final SubCommand... commands) {
-        subCommands.addAll(Arrays.asList(commands));
-    }
+  public void register(final SubCommand... commands) {
+    subCommands.addAll(Arrays.asList(commands));
+  }
 
-    public void unregister(final SubCommand... commands) {
-        subCommands.removeAll(Arrays.asList(commands));
-    }
+  public void unregister(final SubCommand... commands) {
+    subCommands.removeAll(Arrays.asList(commands));
+  }
 }

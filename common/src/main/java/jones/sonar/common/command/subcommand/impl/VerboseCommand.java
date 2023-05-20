@@ -23,23 +23,23 @@ import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
 
 @SubCommandInfo(
-        name = "verbose",
-        description = "Enable and disable Sonar verbose",
-        onlyPlayers = true
+  name = "verbose",
+  description = "Enable and disable Sonar verbose",
+  onlyPlayers = true
 )
 public final class VerboseCommand extends SubCommand {
 
-    @Override
-    public void execute(final CommandInvocation invocation) {
-        final String verboseSubscriber = invocation.getExecutorName();
+  @Override
+  public void execute(final CommandInvocation invocation) {
+    final String verboseSubscriber = invocation.getExecutorName();
 
-        if (Sonar.get().getActionBarVerbose().isSubscribed(verboseSubscriber)) {
-            Sonar.get().getActionBarVerbose().unsubscribe(verboseSubscriber);
-            invocation.getInvocationSender().sendMessage("§cUnsubscribed");
-            return;
-        }
-
-        invocation.getInvocationSender().sendMessage("§aSubscribed");
-        Sonar.get().getActionBarVerbose().subscribe(verboseSubscriber);
+    if (Sonar.get().getActionBarVerbose().isSubscribed(verboseSubscriber)) {
+      Sonar.get().getActionBarVerbose().unsubscribe(verboseSubscriber);
+      invocation.getInvocationSender().sendMessage("§cUnsubscribed");
+      return;
     }
+
+    invocation.getInvocationSender().sendMessage("§aSubscribed");
+    Sonar.get().getActionBarVerbose().subscribe(verboseSubscriber);
+  }
 }

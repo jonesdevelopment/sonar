@@ -30,28 +30,28 @@ import java.nio.file.Path;
 
 @Getter
 @Plugin(id = "sonar",
-        name = "Sonar",
-        version = "2.0.0",
-        authors = "jonesdev.xyz",
-        url = "https://jonesdev.xyz/",
-        description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
+  name = "Sonar",
+  version = "2.0.0",
+  authors = "jonesdev.xyz",
+  url = "https://jonesdev.xyz/",
+  description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
 )
 public final class SonarVelocityPlugin {
-    private final ProxyServer server;
-    private final Logger logger;
-    private final Path dataDirectory;
+  private final ProxyServer server;
+  private final Logger logger;
+  private final Path dataDirectory;
 
-    @Inject
-    public SonarVelocityPlugin(final ProxyServer server,
-                               final Logger logger,
-                               final @DataDirectory Path dataDirectory) {
-        this.server = server;
-        this.logger = logger;
-        this.dataDirectory = dataDirectory;
-    }
+  @Inject
+  public SonarVelocityPlugin(final ProxyServer server,
+                             final Logger logger,
+                             final @DataDirectory Path dataDirectory) {
+    this.server = server;
+    this.logger = logger;
+    this.dataDirectory = dataDirectory;
+  }
 
-    @Subscribe
-    public void handle(final ProxyInitializeEvent event) {
-        SonarVelocity.INSTANCE.enable(this);
-    }
+  @Subscribe
+  public void handle(final ProxyInitializeEvent event) {
+    SonarVelocity.INSTANCE.enable(this);
+  }
 }

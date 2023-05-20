@@ -25,35 +25,35 @@ import io.netty.handler.timeout.IdleStateHandler;
 import java.util.concurrent.TimeUnit;
 
 public final class FallbackTimeoutHandler extends IdleStateHandler {
-    private boolean closed;
+  private boolean closed;
 
-    public FallbackTimeoutHandler(final long timeout, final TimeUnit timeUnit) {
-        super(timeout, 0L, 0L, timeUnit);
+  public FallbackTimeoutHandler(final long timeout, final TimeUnit timeUnit) {
+    super(timeout, 0L, 0L, timeUnit);
+  }
+
+  @Override
+  protected void channelIdle(final ChannelHandlerContext ctx,
+                             final IdleStateEvent idleStateEvent) throws Exception {
+    assert idleStateEvent.state() == IdleState.READER_IDLE;
+
+    readTimedOut(ctx);
+  }
+
+  private void readTimedOut(final ChannelHandlerContext ctx) throws Exception {
+    if (!closed) {
+
+      // ==========================================================
+      // The netty (default) ReadTimeoutHandler would normally just throw an Exception
+      // The default ReadTimeoutHandler does only check for the boolean 'closed' and
+      // still throws the Exception even if the channel is closed
+      // This was discovered and fixed by @jones
+      // ==========================================================
+
+      if (ctx.channel().isActive()) {
+        ctx.close();
+      }
+
+      closed = true;
     }
-
-    @Override
-    protected void channelIdle(final ChannelHandlerContext ctx,
-                               final IdleStateEvent idleStateEvent) throws Exception {
-        assert idleStateEvent.state() == IdleState.READER_IDLE;
-
-        readTimedOut(ctx);
-    }
-
-    private void readTimedOut(final ChannelHandlerContext ctx) throws Exception {
-        if (!closed) {
-
-            // ==========================================================
-            // The netty (default) ReadTimeoutHandler would normally just throw an Exception
-            // The default ReadTimeoutHandler does only check for the boolean 'closed' and
-            // still throws the Exception even if the channel is closed
-            // This was discovered and fixed by @jones
-            // ==========================================================
-
-            if (ctx.channel().isActive()) {
-                ctx.close();
-            }
-
-            closed = true;
-        }
-    }
+  }
 }

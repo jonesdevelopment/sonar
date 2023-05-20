@@ -23,20 +23,20 @@ import java.net.InetAddress;
 import java.util.Collection;
 
 public interface Fallback {
-    Collection<InetAddress> getConnected();
+  Collection<InetAddress> getConnected();
 
-    Collection<InetAddress> getVerified();
+  Collection<InetAddress> getVerified();
 
-    Collection<InetAddress> getBlacklisted();
+  Collection<InetAddress> getBlacklisted();
 
-    FallbackQueue getQueue();
+  FallbackQueue getQueue();
 
-    FallbackFilter getAttemptLimiter();
+  FallbackFilter getAttemptLimiter();
 
-    void setAttemptLimiter(final FallbackFilter limiter);
+  void setAttemptLimiter(final FallbackFilter limiter);
 
-    default boolean isUnderAttack() {
-        return getConnected().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK
-                || getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK;
-    }
+  default boolean isUnderAttack() {
+    return getConnected().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK
+      || getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK;
+  }
 }

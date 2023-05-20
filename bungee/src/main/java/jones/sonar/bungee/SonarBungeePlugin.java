@@ -25,19 +25,19 @@ import java.util.logging.Logger;
 
 @Getter
 public final class SonarBungeePlugin extends Plugin {
-    private ProxyServer server;
-    private Logger logger;
+  private ProxyServer server;
+  private Logger logger;
 
-    @Override
-    public void onEnable() {
-        server = ProxyServer.getInstance();
-        logger = server.getLogger();
+  @Override
+  public void onEnable() {
+    server = ProxyServer.getInstance();
+    logger = server.getLogger();
 
-        SonarBungee.INSTANCE.enable(this);
-    }
+    SonarBungee.INSTANCE.enable(this);
+  }
 
-    @Override
-    public void onDisable() {
-        SonarBungee.INSTANCE.disable();
-    }
+  @Override
+  public void onDisable() {
+    SonarBungee.INSTANCE.disable();
+  }
 }

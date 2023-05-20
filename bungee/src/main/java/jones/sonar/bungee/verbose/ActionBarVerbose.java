@@ -31,17 +31,17 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public final class ActionBarVerbose implements Verbose {
-    private final ProxyServer server;
-    @Getter
-    private final Collection<String> subscribers = new ArrayList<>();
+  private final ProxyServer server;
+  @Getter
+  private final Collection<String> subscribers = new ArrayList<>();
 
-    public void update() {
-        final TextComponent component = new TextComponent("§e§lSonar §7> §f" + VerboseAnimation.nextState());
+  public void update() {
+    final TextComponent component = new TextComponent("§e§lSonar §7> §f" + VerboseAnimation.nextState());
 
-        for (final String subscriber : subscribers) {
-            Optional.ofNullable(server.getPlayer(subscriber)).ifPresent(player -> {
-                player.sendMessage(ChatMessageType.ACTION_BAR, component);
-            });
-        }
+    for (final String subscriber : subscribers) {
+      Optional.ofNullable(server.getPlayer(subscriber)).ifPresent(player -> {
+        player.sendMessage(ChatMessageType.ACTION_BAR, component);
+      });
     }
+  }
 }

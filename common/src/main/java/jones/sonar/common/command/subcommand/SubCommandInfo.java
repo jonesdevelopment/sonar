@@ -25,11 +25,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface SubCommandInfo {
-    String name();
+  String name();
 
-    String description();
+  String description();
 
-    String[] aliases() default {};
+  String[] aliases() default {};
 
-    boolean onlyPlayers() default false;
+  boolean onlyPlayers() default false;
 }

@@ -33,89 +33,89 @@ import java.util.concurrent.TimeUnit;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
-    INSTANCE;
+  INSTANCE;
 
-    @Getter
-    private SonarVelocityPlugin plugin;
+  @Getter
+  private SonarVelocityPlugin plugin;
 
-    @Getter
-    private ActionBarVerbose actionBarVerbose;
+  @Getter
+  private ActionBarVerbose actionBarVerbose;
 
-    @Getter
-    private SonarConfiguration config;
+  @Getter
+  private SonarConfiguration config;
 
-    @Getter
-    private Logger logger;
+  @Getter
+  private Logger logger;
 
-    @Override
-    public SonarPlatform getPlatform() {
-        return SonarPlatform.VELOCITY;
-    }
+  @Override
+  public SonarPlatform getPlatform() {
+    return SonarPlatform.VELOCITY;
+  }
 
-    @Override
-    public void enable(final SonarVelocityPlugin plugin) {
-        this.plugin = plugin;
+  @Override
+  public void enable(final SonarVelocityPlugin plugin) {
+    this.plugin = plugin;
 
-        final long start = System.currentTimeMillis();
+    final long start = System.currentTimeMillis();
 
-        // Set the API to this class
-        SonarProvider.set(this);
+    // Set the API to this class
+    SonarProvider.set(this);
 
-        plugin.getLogger().info("Initializing Sonar...");
+    plugin.getLogger().info("Initializing Sonar...");
 
-        // Initialize logger
-        logger = new Logger() {
+    // Initialize logger
+    logger = new Logger() {
 
-            @Override
-            public void info(final String message, final Object... args) {
-                plugin.getLogger().info(message, args);
-            }
+      @Override
+      public void info(final String message, final Object... args) {
+        plugin.getLogger().info(message, args);
+      }
 
-            @Override
-            public void warn(final String message, final Object... args) {
-                plugin.getLogger().warn(message, args);
-            }
+      @Override
+      public void warn(final String message, final Object... args) {
+        plugin.getLogger().warn(message, args);
+      }
 
-            @Override
-            public void error(final String message, final Object... args) {
-                plugin.getLogger().error(message, args);
-            }
-        };
+      @Override
+      public void error(final String message, final Object... args) {
+        plugin.getLogger().error(message, args);
+      }
+    };
 
-        // Initialize configuration
-        config = new SonarConfiguration(plugin.getDataDirectory().toFile());
-        config.load();
+    // Initialize configuration
+    config = new SonarConfiguration(plugin.getDataDirectory().toFile());
+    config.load();
 
-        // Register Sonar command
-        plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
+    // Register Sonar command
+    plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
 
-        // Register Fallback listener
-        plugin.getServer().getEventManager().register(plugin, new FallbackListener(logger, getFallback()));
+    // Register Fallback listener
+    plugin.getServer().getEventManager().register(plugin, new FallbackListener(logger, getFallback()));
 
-        // Apply filter (connection limiter) to Fallback
-        Sonar.get().getFallback().setAttemptLimiter(FallbackAttemptLimiter::shouldAllow);
+    // Apply filter (connection limiter) to Fallback
+    Sonar.get().getFallback().setAttemptLimiter(FallbackAttemptLimiter::shouldAllow);
 
-        // Register Fallback queue task
-        plugin.getServer().getScheduler().buildTask(plugin, getFallback().getQueue()::poll)
-                .repeat(500L, TimeUnit.MILLISECONDS)
-                .schedule();
+    // Register Fallback queue task
+    plugin.getServer().getScheduler().buildTask(plugin, getFallback().getQueue()::poll)
+      .repeat(500L, TimeUnit.MILLISECONDS)
+      .schedule();
 
-        // Initialize action bar verbose
-        actionBarVerbose = new ActionBarVerbose(plugin.getServer());
+    // Initialize action bar verbose
+    actionBarVerbose = new ActionBarVerbose(plugin.getServer());
 
-        // Register action bar verbose task
-        plugin.getServer().getScheduler().buildTask(plugin, actionBarVerbose::update)
-                .repeat(100L, TimeUnit.MILLISECONDS)
-                .schedule();
+    // Register action bar verbose task
+    plugin.getServer().getScheduler().buildTask(plugin, actionBarVerbose::update)
+      .repeat(100L, TimeUnit.MILLISECONDS)
+      .schedule();
 
-        // Done
-        final long startDelay = System.currentTimeMillis() - start;
+    // Done
+    final long startDelay = System.currentTimeMillis() - start;
 
-        plugin.getLogger().info("Done ({}s)!", String.format("%.3f", startDelay / 1000D));
-    }
+    plugin.getLogger().info("Done ({}s)!", String.format("%.3f", startDelay / 1000D));
+  }
 
-    @Override
-    public void disable() {
-        // Do nothing
-    }
+  @Override
+  public void disable() {
+    // Do nothing
+  }
 }

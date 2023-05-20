@@ -32,77 +32,77 @@ import java.util.logging.Level;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
-    INSTANCE;
+  INSTANCE;
 
-    @Getter
-    private SonarBungeePlugin plugin;
+  @Getter
+  private SonarBungeePlugin plugin;
 
-    @Getter
-    private ActionBarVerbose actionBarVerbose;
+  @Getter
+  private ActionBarVerbose actionBarVerbose;
 
-    @Getter
-    private SonarConfiguration config;
+  @Getter
+  private SonarConfiguration config;
 
-    @Getter
-    private Logger logger;
+  @Getter
+  private Logger logger;
 
-    @Override
-    public SonarPlatform getPlatform() {
-        return SonarPlatform.BUNGEE;
-    }
+  @Override
+  public SonarPlatform getPlatform() {
+    return SonarPlatform.BUNGEE;
+  }
 
-    @Override
-    public void enable(final SonarBungeePlugin plugin) {
-        this.plugin = plugin;
+  @Override
+  public void enable(final SonarBungeePlugin plugin) {
+    this.plugin = plugin;
 
-        final long start = System.currentTimeMillis();
+    final long start = System.currentTimeMillis();
 
-        // Set the API to this class
-        SonarProvider.set(this);
+    // Set the API to this class
+    SonarProvider.set(this);
 
-        plugin.getLogger().info("Initializing Sonar...");
+    plugin.getLogger().info("Initializing Sonar...");
 
-        // Initialize logger
-        logger = new Logger() {
+    // Initialize logger
+    logger = new Logger() {
 
-            @Override
-            public void info(final String message, final Object... args) {
-                plugin.getLogger().log(Level.INFO, message, args);
-            }
+      @Override
+      public void info(final String message, final Object... args) {
+        plugin.getLogger().log(Level.INFO, message, args);
+      }
 
-            @Override
-            public void warn(final String message, final Object... args) {
-                plugin.getLogger().log(Level.WARNING, message, args);
-            }
+      @Override
+      public void warn(final String message, final Object... args) {
+        plugin.getLogger().log(Level.WARNING, message, args);
+      }
 
-            @Override
-            public void error(final String message, final Object... args) {
-                plugin.getLogger().log(Level.SEVERE, message, args);
-            }
-        };
+      @Override
+      public void error(final String message, final Object... args) {
+        plugin.getLogger().log(Level.SEVERE, message, args);
+      }
+    };
 
-        // Initialize configuration
-        config = new SonarConfiguration(plugin.getDataFolder());
-        config.load();
+    // Initialize configuration
+    config = new SonarConfiguration(plugin.getDataFolder());
+    config.load();
 
-        // Register Sonar command
-        plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());
+    // Register Sonar command
+    plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());
 
-        // Initialize action bar verbose
-        actionBarVerbose = new ActionBarVerbose(plugin.getServer());
+    // Initialize action bar verbose
+    actionBarVerbose = new ActionBarVerbose(plugin.getServer());
 
-        // Register action bar verbose task
-        plugin.getServer().getScheduler().schedule(plugin, actionBarVerbose::update,
-                100L, TimeUnit.MILLISECONDS);
+    // Register action bar verbose task
+    plugin.getServer().getScheduler().schedule(plugin, actionBarVerbose::update,
+      100L, TimeUnit.MILLISECONDS);
 
-        // Done
-        final long startDelay = System.currentTimeMillis() - start;
+    // Done
+    final long startDelay = System.currentTimeMillis() - start;
 
-        plugin.getLogger().info("Done (" + String.format("%.3f", startDelay / 1000D) + "s)!");
-    }
+    plugin.getLogger().info("Done (" + String.format("%.3f", startDelay / 1000D) + "s)!");
+  }
 
-    @Override
-    public void disable() {
-        // Do nothing
-    }
+  @Override
+  public void disable() {
+    // Do nothing
+  }
 }

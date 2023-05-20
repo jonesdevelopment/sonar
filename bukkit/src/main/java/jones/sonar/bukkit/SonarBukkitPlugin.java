@@ -21,13 +21,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class SonarBukkitPlugin extends JavaPlugin {
 
-    @Override
-    public void onEnable() {
-        SonarBukkit.INSTANCE.enable(this);
-    }
+  @Override
+  public void onEnable() {
+    SonarBukkit.INSTANCE.enable(this);
+  }
 
-    @Override
-    public void onDisable() {
-        SonarBukkit.INSTANCE.disable();
-    }
+  @Override
+  public void onDisable() {
+    SonarBukkit.INSTANCE.disable();
+  }
 }

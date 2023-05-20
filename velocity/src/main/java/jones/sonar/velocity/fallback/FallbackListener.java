@@ -61,244 +61,246 @@ import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
-    private final Logger logger;
-    private final Fallback fallback;
+  private final Logger logger;
+  private final Fallback fallback;
 
-    // We need to cache if the joining player is a premium player or not
-    // If we don't do that, many authentication plugins can potentially break
-    private final Collection<String> premium = new Vector<>();
+  // We need to cache if the joining player is a premium player or not
+  // If we don't do that, many authentication plugins can potentially break
+  private final Collection<String> premium = new Vector<>();
 
-    // TODO: make configurable
-    private static final Component ALREADY_VERIFYING = Component.text(
-            "§e§lSonar §7» §cYou are already being verified at the moment! Please try again later."
-    );
-    private static final PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING_RESULT = PreLoginEvent.PreLoginComponentResult.denied(ALREADY_VERIFYING);
-    // TODO: make configurable
-    private static final Component TOO_MANY_PLAYERS = Component.text(
-            "§e§lSonar §7» §cToo many players are currently trying to log in. Please try again later."
-    );
-    private static final PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS_RESULT = PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_PLAYERS);
-    // TODO: make configurable
-    private static final Component TOO_MANY_VERIFICATIONS = Component.text(
-            "§e§lSonar §7» §cPlease wait a minute before trying to verify again."
-    );
-    // TODO: make configurable
-    private static final Component BLACKLISTED = Component.text(
-            "§e§lSonar §7» §cYour ip address is denied from logging into the server."
-    );
-    private static final PreLoginEvent.PreLoginComponentResult BLACKLISTED_RESULT = PreLoginEvent.PreLoginComponentResult.denied(BLACKLISTED);
+  // TODO: make configurable
+  private static final Component ALREADY_VERIFYING = Component.text(
+    "§e§lSonar §7» §cYou are already being verified at the moment! Please try again later."
+  );
+  private static final PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING_RESULT =
+    PreLoginEvent.PreLoginComponentResult.denied(ALREADY_VERIFYING);
+  // TODO: make configurable
+  private static final Component TOO_MANY_PLAYERS = Component.text(
+    "§e§lSonar §7» §cToo many players are currently trying to log in. Please try again later."
+  );
+  private static final PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS_RESULT =
+    PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_PLAYERS);
+  // TODO: make configurable
+  private static final Component TOO_MANY_VERIFICATIONS = Component.text(
+    "§e§lSonar §7» §cPlease wait a minute before trying to verify again."
+  );
+  // TODO: make configurable
+  private static final Component BLACKLISTED = Component.text(
+    "§e§lSonar §7» §cYour ip address is denied from logging into the server."
+  );
+  private static final PreLoginEvent.PreLoginComponentResult BLACKLISTED_RESULT =
+    PreLoginEvent.PreLoginComponentResult.denied(BLACKLISTED);
 
-    private static final DummyConnection CLOSED_MINECRAFT_CONNECTION;
+  private static final DummyConnection CLOSED_MINECRAFT_CONNECTION;
 
-    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
-    private static final MethodHandle INITIAL_CONNECTION;
-    private static final MethodHandle CONNECTED_PLAYER;
-    private static final Field CONNECTION_FIELD;
+  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+  private static final MethodHandle INITIAL_CONNECTION;
+  private static final MethodHandle CONNECTED_PLAYER;
+  private static final Field CONNECTION_FIELD;
 
-    static {
-        CLOSED_MINECRAFT_CONNECTION = new DummyConnection(null);
+  static {
+    CLOSED_MINECRAFT_CONNECTION = new DummyConnection(null);
 
-        // https://github.com/Elytrium/LimboAPI/blob/ca6eb7155740bf3ff32596412a48e537fe55606d/plugin/src/main/java/net/elytrium/limboapi/injection/login/LoginListener.java#L239
+    // https://github.com/Elytrium/LimboAPI/blob/ca6eb7155740bf3ff32596412a48e537fe55606d/plugin/src/main/java/net/elytrium/limboapi/injection/login/LoginListener.java#L239
+    try {
+      CONNECTION_FIELD = AuthSessionHandler.class.getDeclaredField("mcConnection");
+      CONNECTION_FIELD.setAccessible(true);
+
+      CONNECTED_PLAYER = MethodHandles.privateLookupIn(ConnectedPlayer.class, MethodHandles.lookup())
+        .findConstructor(ConnectedPlayer.class,
+          MethodType.methodType(
+            void.class,
+            VelocityServer.class,
+            GameProfile.class,
+            MinecraftConnection.class,
+            InetSocketAddress.class,
+            boolean.class,
+            IdentifiedKey.class
+          )
+        );
+
+      INITIAL_CONNECTION = MethodHandles.privateLookupIn(LoginInboundConnection.class, LOOKUP)
+        .findGetter(LoginInboundConnection.class, "delegate", InitialInboundConnection.class);
+    } catch (Throwable throwable) {
+      throw new IllegalStateException();
+    }
+  }
+
+  /**
+   * If we don't handle online/offline mode players correctly,
+   * many plugins (especially Auth-related) will have issues
+   *
+   * @param event PreLoginEvent
+   */
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final PreLoginEvent event) {
+    var inetAddress = event.getConnection().getRemoteAddress().getAddress();
+
+    if (fallback.getBlacklisted().contains(inetAddress)) {
+      event.setResult(BLACKLISTED_RESULT);
+      return;
+    }
+
+    if (fallback.getVerified().contains(inetAddress)) return;
+
+    // Check if Fallback is already verifying a player
+    // → is another player with the same ip address connected to Fallback?
+    if (fallback.getConnected().contains(inetAddress)) {
+      event.setResult(ALREADY_VERIFYING_RESULT);
+      return;
+    }
+
+    // We cannot allow too many players on our Fallback server
+    if (fallback.getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MAXIMUM_QUEUED_PLAYERS
+      || fallback.getConnected().size() > Sonar.get().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
+      event.setResult(TOO_MANY_PLAYERS_RESULT);
+      return;
+    }
+
+    if (event.getResult().isForceOfflineMode()) return;
+    if (!SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
+      && !event.getResult().isOnlineModeAllowed()) return;
+
+    premium.add(event.getUsername());
+  }
+
+  /**
+   * Handles inbound connections
+   *
+   * @param event GameProfileRequestEvent
+   * @throws java.lang.Throwable Unexpected error
+   */
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final GameProfileRequestEvent event) throws Throwable {
+    val inetAddress = event.getConnection().getRemoteAddress().getAddress();
+
+    // We don't want to check players that have already been verified
+    if (fallback.getVerified().contains(inetAddress)) return;
+
+    val inboundConnection = (LoginInboundConnection) event.getConnection();
+    val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
+
+    val mcConnection = initialConnection.getConnection();
+    val channel = mcConnection.getChannel();
+
+    // The AuthSessionHandler isn't supposed to continue the connection process
+    // which is why we override the field value for the MinecraftConnection with
+    // a dummy connection
+    CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
+
+    channel.eventLoop().execute(() -> {
+      if (mcConnection.isClosed()) return;
+
+      // Replace timeout handler to avoid known exploits or issues
+      // We also want to timeout bots quickly to avoid flooding
+      channel.pipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
+        new FallbackTimeoutHandler(
+          Sonar.get().getConfig().VERIFICATION_TIMEOUT,
+          TimeUnit.MILLISECONDS
+        ));
+
+      // We have to add this pipeline to monitor whenever the client disconnects
+      // to remove them from the list of connected and queued players
+      channel.pipeline().addFirst("sonar-handler", FallbackChannelHandler.INSTANCE);
+
+      // Queue the connection for further processing
+      fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
+        if (mcConnection.isClosed()) return;
+
+        // Most of the following code was taken from Velocity
         try {
-            CONNECTION_FIELD = AuthSessionHandler.class.getDeclaredField("mcConnection");
-            CONNECTION_FIELD.setAccessible(true);
 
-            CONNECTED_PLAYER = MethodHandles.privateLookupIn(ConnectedPlayer.class, MethodHandles.lookup())
-                    .findConstructor(ConnectedPlayer.class,
-                            MethodType.methodType(
-                                    void.class,
-                                    VelocityServer.class,
-                                    GameProfile.class,
-                                    MinecraftConnection.class,
-                                    InetSocketAddress.class,
-                                    boolean.class,
-                                    IdentifiedKey.class
-                            )
-                    );
+          // Create an instance for player
+          val player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
+            mcConnection.server,
+            event.getGameProfile(),
+            mcConnection,
+            inboundConnection.getVirtualHost().orElse(null),
+            premium.contains(event.getUsername()),
+            inboundConnection.getIdentifiedKey()
+          );
 
-            INITIAL_CONNECTION = MethodHandles.privateLookupIn(LoginInboundConnection.class, LOOKUP)
-                    .findGetter(LoginInboundConnection.class, "delegate", InitialInboundConnection.class);
+          // Remove the player from the premium list in order to prevent memory leaks
+          // We cannot rely on the DisconnectEvent since the server will not call it
+          // -> we are intercepting the packets!
+          premium.remove(event.getUsername());
+
+          // Check if the ip address had too many verifications or is rejoining too quickly
+          if (!fallback.getAttemptLimiter().allow(inetAddress)) {
+            player.disconnect0(TOO_MANY_VERIFICATIONS, true);
+            return;
+          }
+
+          // Check if the player is already connected to the proxy
+          // We use the default Velocity method for this to avoid incompatibilities
+          if (!mcConnection.server.canRegisterConnection(player)) {
+            player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
+              true);
+            return;
+          }
+
+          // Create an instance for the Fallback connection
+          val fallbackPlayer = new FallbackConnection<>(
+            fallback, player, mcConnection, channel,
+            channel.pipeline(), inetAddress,
+            player.getProtocolVersion().getProtocol()
+          );
+
+          // ==================================================================
+          if (!fallback.isUnderAttack()) {
+            logger.info("[Fallback] Processing: {}{} ({})",
+              event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
+          }
+
+          fallback.getConnected().add(inetAddress);
+          // ==================================================================
+
+          // Set compression
+          val threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
+
+          if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+            mcConnection.write(new SetCompression(threshold));
+            mcConnection.setCompressionThreshold(threshold);
+          }
+
+          // Send LoginSuccess packet to spoof our fake lobby
+          var success = new ServerLoginSuccess();
+
+          success.setUsername(player.getUsername());
+          success.setProperties(player.getGameProfileProperties());
+          success.setUuid(player.getUniqueId());
+
+          mcConnection.write(success);
+
+          // Set the state to a custom one, so we can receive and send more packets
+          mcConnection.setAssociation(player);
+          mcConnection.setState(StateRegistry.PLAY);
+
+          // ==================================================================
+          // The first step of the verification is a simple KeepAlive packet
+          // We don't want to waste resources by directly sending all packets to
+          // the client which is why we first send a KeepAlive packet and then
+          // wait for a valid response to continue the verification process
+          final KeepAlive keepAlive = new KeepAlive();
+          final long keepAliveId = ThreadLocalRandom.current().nextInt();
+
+          keepAlive.setRandomId(keepAliveId);
+
+          // We have to add this pipeline to monitor all incoming traffic
+          // We add the pipeline after the MinecraftDecoder since we want
+          // the packets to be processed and decoded already
+          fallbackPlayer.getPipeline().addAfter(
+            Connections.MINECRAFT_DECODER,
+            "sonar-decoder",
+            new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
+          );
+
+          mcConnection.write(keepAlive);
+          // ==================================================================
         } catch (Throwable throwable) {
-            throw new IllegalStateException();
+          throw new RuntimeException(throwable);
         }
-    }
-
-    /**
-     * If we don't handle online/offline mode players correctly,
-     * many plugins (especially Auth-related) will have issues
-     *
-     * @param event PreLoginEvent
-     */
-    @Subscribe(order = PostOrder.LAST)
-    public void handle(final PreLoginEvent event) {
-        totalConnections++;
-        var inetAddress = event.getConnection().getRemoteAddress().getAddress();
-
-        if (fallback.getBlacklisted().contains(inetAddress)) {
-            event.setResult(BLACKLISTED_RESULT);
-            return;
-        }
-
-        if (fallback.getVerified().contains(inetAddress)) return;
-
-        // Check if Fallback is already verifying a player
-        // → is another player with the same ip address connected to Fallback?
-        if (fallback.getConnected().contains(inetAddress)) {
-            event.setResult(ALREADY_VERIFYING_RESULT);
-            return;
-        }
-
-        // We cannot allow too many players on our Fallback server
-        if (fallback.getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MAXIMUM_QUEUED_PLAYERS
-                || fallback.getConnected().size() > Sonar.get().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
-            event.setResult(TOO_MANY_PLAYERS_RESULT);
-            return;
-        }
-
-        if (event.getResult().isForceOfflineMode()) return;
-        if (!SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
-                && !event.getResult().isOnlineModeAllowed()) return;
-
-        premium.add(event.getUsername());
-    }
-    public static long totalConnections;
-
-    /**
-     * Handles inbound connections
-     *
-     * @param event GameProfileRequestEvent
-     * @throws java.lang.Throwable Unexpected error
-     */
-    @Subscribe(order = PostOrder.LAST)
-    public void handle(final GameProfileRequestEvent event) throws Throwable {
-        val inetAddress = event.getConnection().getRemoteAddress().getAddress();
-
-        // We don't want to check players that have already been verified
-        if (fallback.getVerified().contains(inetAddress)) return;
-
-        val inboundConnection = (LoginInboundConnection) event.getConnection();
-        val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
-
-        val mcConnection = initialConnection.getConnection();
-        val channel = mcConnection.getChannel();
-
-        // The AuthSessionHandler isn't supposed to continue the connection process
-        // which is why we override the field value for the MinecraftConnection with
-        // a dummy connection
-        CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
-
-        channel.eventLoop().execute(() -> {
-            if (mcConnection.isClosed()) return;
-
-            // Replace timeout handler to avoid known exploits or issues
-            // We also want to timeout bots quickly to avoid flooding
-            channel.pipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
-                    new FallbackTimeoutHandler(
-                            Sonar.get().getConfig().VERIFICATION_TIMEOUT,
-                            TimeUnit.MILLISECONDS
-                    ));
-
-            // We have to add this pipeline to monitor whenever the client disconnects
-            // to remove them from the list of connected and queued players
-            channel.pipeline().addFirst("sonar-handler", FallbackChannelHandler.INSTANCE);
-
-            // Queue the connection for further processing
-            fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
-                if (mcConnection.isClosed()) return;
-
-                // Most of the following code was taken from Velocity
-                try {
-
-                    // Create an instance for player
-                    val player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
-                            mcConnection.server,
-                            event.getGameProfile(),
-                            mcConnection,
-                            inboundConnection.getVirtualHost().orElse(null),
-                            premium.contains(event.getUsername()),
-                            inboundConnection.getIdentifiedKey()
-                    );
-
-                    // Remove the player from the premium list in order to prevent memory leaks
-                    // We cannot rely on the DisconnectEvent since the server will not call it
-                    // -> we are intercepting the packets!
-                    premium.remove(event.getUsername());
-
-                    // Check if the ip address had too many verifications or is rejoining too quickly
-                    if (!fallback.getAttemptLimiter().allow(inetAddress)) {
-                        player.disconnect0(TOO_MANY_VERIFICATIONS, true);
-                        return;
-                    }
-
-                    // Check if the player is already connected to the proxy
-                    // We use the default Velocity method for this to avoid incompatibilities
-                    if (!mcConnection.server.canRegisterConnection(player)) {
-                        player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED), true);
-                        return;
-                    }
-
-                    // Create an instance for the Fallback connection
-                    val fallbackPlayer = new FallbackConnection<>(
-                            fallback, player, mcConnection, channel,
-                            channel.pipeline(), inetAddress,
-                            player.getProtocolVersion().getProtocol()
-                    );
-
-                    // ==================================================================
-                    if (!fallback.isUnderAttack()) {
-                        logger.info("[Fallback] Processing: {}{} ({})",
-                                event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
-                    }
-
-                    fallback.getConnected().add(inetAddress);
-                    // ==================================================================
-
-                    // Set compression
-                    val threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
-
-                    if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
-                        mcConnection.write(new SetCompression(threshold));
-                        mcConnection.setCompressionThreshold(threshold);
-                    }
-
-                    // Send LoginSuccess packet to spoof our fake lobby
-                    var success = new ServerLoginSuccess();
-
-                    success.setUsername(player.getUsername());
-                    success.setProperties(player.getGameProfileProperties());
-                    success.setUuid(player.getUniqueId());
-
-                    mcConnection.write(success);
-
-                    // Set the state to a custom one, so we can receive and send more packets
-                    mcConnection.setAssociation(player);
-                    mcConnection.setState(StateRegistry.PLAY);
-
-                    // ==================================================================
-                    // The first step of the verification is a simple KeepAlive packet
-                    // We don't want to waste resources by directly sending all packets to
-                    // the client which is why we first send a KeepAlive packet and then
-                    // wait for a valid response to continue the verification process
-                    final KeepAlive keepAlive = new KeepAlive();
-                    final long keepAliveId = ThreadLocalRandom.current().nextInt();
-
-                    keepAlive.setRandomId(keepAliveId);
-
-                    // We have to add this pipeline to monitor all incoming traffic
-                    // We add the pipeline after the MinecraftDecoder since we want
-                    // the packets to be processed and decoded already
-                    fallbackPlayer.getPipeline().addAfter(
-                            Connections.MINECRAFT_DECODER,
-                            "sonar-decoder",
-                            new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
-                    );
-
-                    mcConnection.write(keepAlive);
-                    // ==================================================================
-                } catch (Throwable throwable) {
-                    throw new RuntimeException(throwable);
-                }
-            }));
-        });
-    }
+      }));
+    });
+  }
 }

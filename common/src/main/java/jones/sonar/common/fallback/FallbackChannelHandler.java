@@ -31,31 +31,31 @@ import java.net.InetSocketAddress;
 @ChannelHandler.Sharable
 @RequiredArgsConstructor
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
-    public static final FallbackChannelHandler INSTANCE = new FallbackChannelHandler(Sonar.get().getFallback());
-    private final Fallback fallback;
+  public static final FallbackChannelHandler INSTANCE = new FallbackChannelHandler(Sonar.get().getFallback());
+  private final Fallback fallback;
 
-    @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (ctx.channel().isActive()) {
-            ctx.close();
+  @Override
+  public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+    if (ctx.channel().isActive()) {
+      ctx.close();
 
-            // Clients throw an IOException if the connection is interrupted
-            // unexpectedly - we cannot blacklist for this
-            if (cause instanceof IOException) return;
+      // Clients throw an IOException if the connection is interrupted
+      // unexpectedly - we cannot blacklist for this
+      if (cause instanceof IOException) return;
 
-            val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
+      val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
 
-            fallback.getBlacklisted().add(inetAddress);
-        }
+      fallback.getBlacklisted().add(inetAddress);
     }
+  }
 
-    @Override
-    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
+  @Override
+  public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+    super.channelInactive(ctx);
 
-        val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
+    val inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
 
-        fallback.getConnected().remove(inetAddress);
-        fallback.getQueue().getQueuedPlayers().remove(inetAddress);
-    }
+    fallback.getConnected().remove(inetAddress);
+    fallback.getQueue().getQueuedPlayers().remove(inetAddress);
+  }
 }

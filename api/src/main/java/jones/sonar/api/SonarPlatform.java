@@ -18,7 +18,7 @@
 package jones.sonar.api;
 
 public enum SonarPlatform {
-    BUKKIT,
-    BUNGEE,
-    VELOCITY
+  BUKKIT,
+  BUNGEE,
+  VELOCITY
 }

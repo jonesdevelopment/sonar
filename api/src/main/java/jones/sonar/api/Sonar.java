@@ -24,19 +24,19 @@ import jones.sonar.api.logger.Logger;
 import jones.sonar.api.verbose.Verbose;
 
 public interface Sonar {
-    SonarPlatform getPlatform();
+  SonarPlatform getPlatform();
 
-    SonarConfiguration getConfig();
+  SonarConfiguration getConfig();
 
-    default Fallback getFallback() {
-        return FallbackHolder.INSTANCE;
-    }
+  default Fallback getFallback() {
+    return FallbackHolder.INSTANCE;
+  }
 
-    Verbose getActionBarVerbose();
+  Verbose getActionBarVerbose();
 
-    Logger getLogger();
+  Logger getLogger();
 
-    static Sonar get() {
-        return SonarProvider.get();
-    }
+  static Sonar get() {
+    return SonarProvider.get();
+  }
 }

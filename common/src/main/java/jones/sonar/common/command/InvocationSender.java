@@ -18,7 +18,7 @@
 package jones.sonar.common.command;
 
 public interface InvocationSender<T> {
-    void sendMessage(final String message);
+  void sendMessage(final String message);
 
-    T getPlayer();
+  T getPlayer();
 }

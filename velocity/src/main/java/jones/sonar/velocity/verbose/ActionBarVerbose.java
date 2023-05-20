@@ -21,7 +21,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.verbose.Verbose;
 import jones.sonar.common.verbose.VerboseAnimation;
-import jones.sonar.velocity.fallback.FallbackListener;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -32,24 +31,23 @@ import java.util.Collection;
 
 @RequiredArgsConstructor
 public final class ActionBarVerbose implements Verbose {
-    private final ProxyServer server;
-    @Getter
-    private final Collection<String> subscribers = new ArrayList<>();
-    private static final DecimalFormat decimalFormat = new DecimalFormat("#,###");
+  private final ProxyServer server;
+  @Getter
+  private final Collection<String> subscribers = new ArrayList<>();
+  private static final DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
-    public void update() {
-        final Component component = Component.text(Sonar.get().getConfig().ACTION_BAR_LAYOUT
-                .replace("%queued%", decimalFormat.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-                .replace("%verifying%", decimalFormat.format(Sonar.get().getFallback().getConnected().size()))
-                .replace("%blacklisted%", decimalFormat.format(Sonar.get().getFallback().getBlacklisted().size()))
-                .replace("%total%", decimalFormat.format(FallbackListener.totalConnections))
-                .replace("%animation%", VerboseAnimation.nextState())
-        );
+  public void update() {
+    final Component component = Component.text(Sonar.get().getConfig().ACTION_BAR_LAYOUT
+      .replace("%queued%", decimalFormat.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+      .replace("%verifying%", decimalFormat.format(Sonar.get().getFallback().getConnected().size()))
+      .replace("%blacklisted%", decimalFormat.format(Sonar.get().getFallback().getBlacklisted().size()))
+      .replace("%animation%", VerboseAnimation.nextState())
+    );
 
-        for (final String subscriber : subscribers) {
-            server.getPlayer(subscriber).ifPresent(player -> {
-                player.sendActionBar(component);
-            });
-        }
+    for (final String subscriber : subscribers) {
+      server.getPlayer(subscriber).ifPresent(player -> {
+        player.sendActionBar(component);
+      });
     }
+  }
 }

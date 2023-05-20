@@ -20,17 +20,17 @@ package jones.sonar.api.verbose;
 import java.util.Collection;
 
 public interface Verbose {
-    Collection<String> getSubscribers();
+  Collection<String> getSubscribers();
 
-    default boolean isSubscribed(final String subscriber) {
-        return getSubscribers().contains(subscriber);
-    }
+  default boolean isSubscribed(final String subscriber) {
+    return getSubscribers().contains(subscriber);
+  }
 
-    default void subscribe(final String username) {
-        getSubscribers().add(username);
-    }
+  default void subscribe(final String username) {
+    getSubscribers().add(username);
+  }
 
-    default void unsubscribe(final String subscriber) {
-        getSubscribers().remove(subscriber);
-    }
+  default void unsubscribe(final String subscriber) {
+    getSubscribers().remove(subscriber);
+  }
 }

@@ -25,13 +25,13 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum PacketDimension {
-    OVERWORLD("minecraft:overworld", 0, 0, 28, true), // (384 + 64) / 16
-    NETHER("minecraft:the_nether", -1, 1, 16, false), // 256 / 16
-    THE_END("minecraft:the_end", 1, 2, 16, false); // 256 / 16
+  OVERWORLD("minecraft:overworld", 0, 0, 28, true), // (384 + 64) / 16
+  NETHER("minecraft:the_nether", -1, 1, 16, false), // 256 / 16
+  THE_END("minecraft:the_end", 1, 2, 16, false); // 256 / 16
 
-    private final String key;
-    private final int legacyID;
-    private final int modernID;
-    private final int maxSections;
-    private final boolean hasLegacySkyLight;
+  private final String key;
+  private final int legacyID;
+  private final int modernID;
+  private final int maxSections;
+  private final boolean hasLegacySkyLight;
 }

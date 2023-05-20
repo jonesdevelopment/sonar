@@ -21,5 +21,5 @@ import java.net.InetAddress;
 
 @FunctionalInterface
 public interface FallbackFilter {
-    boolean allow(final InetAddress inetAddress);
+  boolean allow(final InetAddress inetAddress);
 }

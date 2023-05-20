@@ -23,15 +23,15 @@ import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
 
 @SubCommandInfo(
-        name = "reload",
-        description = "Reload the configuration"
+  name = "reload",
+  description = "Reload the configuration"
 )
 public final class ReloadCommand extends SubCommand {
 
-    @Override
-    public void execute(final CommandInvocation invocation) {
-        invocation.getInvocationSender().sendMessage("§7Reloading...");
-        Sonar.get().getConfig().load();
-        invocation.getInvocationSender().sendMessage("§aSuccessfully reloaded.");
-    }
+  @Override
+  public void execute(final CommandInvocation invocation) {
+    invocation.getInvocationSender().sendMessage("§7Reloading...");
+    Sonar.get().getConfig().load();
+    invocation.getInvocationSender().sendMessage("§aSuccessfully reloaded.");
+  }
 }

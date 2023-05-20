@@ -18,9 +18,9 @@
 package jones.sonar.api.logger;
 
 public interface Logger {
-    void info(final String message, final Object... args);
+  void info(final String message, final Object... args);
 
-    void warn(final String message, final Object... args);
+  void warn(final String message, final Object... args);
 
-    void error(final String message, final Object... args);
+  void error(final String message, final Object... args);
 }

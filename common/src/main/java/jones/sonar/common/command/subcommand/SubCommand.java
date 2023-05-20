@@ -21,12 +21,12 @@ import jones.sonar.common.command.CommandInvocation;
 import lombok.Getter;
 
 public abstract class SubCommand {
-    @Getter
-    private final SubCommandInfo info;
+  @Getter
+  private final SubCommandInfo info;
 
-    public SubCommand() {
-        info = getClass().getAnnotation(SubCommandInfo.class);
-    }
+  public SubCommand() {
+    info = getClass().getAnnotation(SubCommandInfo.class);
+  }
 
-    public abstract void execute(final CommandInvocation invocation);
+  public abstract void execute(final CommandInvocation invocation);
 }

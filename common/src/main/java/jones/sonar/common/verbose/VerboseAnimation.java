@@ -22,10 +22,10 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class VerboseAnimation {
-    private int stateIndex = 0;
+  private int stateIndex = 0;
 
-    public String nextState() {
-        final int nextIndex = ++stateIndex % Sonar.get().getConfig().ANIMATION.size();
-        return String.valueOf(Sonar.get().getConfig().ANIMATION.toArray()[nextIndex]);
-    }
+  public String nextState() {
+    final int nextIndex = ++stateIndex % Sonar.get().getConfig().ANIMATION.size();
+    return String.valueOf(Sonar.get().getConfig().ANIMATION.toArray()[nextIndex]);
+  }
 }

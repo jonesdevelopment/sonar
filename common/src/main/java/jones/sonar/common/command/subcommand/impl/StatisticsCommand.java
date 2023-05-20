@@ -22,14 +22,14 @@ import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
 
 @SubCommandInfo(
-        name = "statistics",
-        aliases = {"stats"},
-        description = "Show session statistics of this server"
+  name = "statistics",
+  aliases = {"stats"},
+  description = "Show session statistics of this server"
 )
 public final class StatisticsCommand extends SubCommand {
 
-    @Override
-    public void execute(final CommandInvocation invocation) {
-        invocation.getInvocationSender().sendMessage("Total connections: XD");
-    }
+  @Override
+  public void execute(final CommandInvocation invocation) {
+    invocation.getInvocationSender().sendMessage("Total connections: XD");
+  }
 }

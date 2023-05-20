@@ -26,21 +26,21 @@ import java.util.concurrent.TimeUnit;
 
 @UtilityClass
 public class FallbackAttemptLimiter {
-    private final Cache<InetAddress, Integer> CHECKS_PER_MINUTE = Caffeine.newBuilder()
-            .expireAfterWrite(1L, TimeUnit.MINUTES)
-            .build();
-    private static final byte LIMIT_PER_MINUTE = 3; // TODO: make configurable
+  private final Cache<InetAddress, Integer> CHECKS_PER_MINUTE = Caffeine.newBuilder()
+    .expireAfterWrite(1L, TimeUnit.MINUTES)
+    .build();
+  private static final byte LIMIT_PER_MINUTE = 3; // TODO: make configurable
 
-    public boolean shouldAllow(final InetAddress inetAddress) {
-        if (!CHECKS_PER_MINUTE.asMap().containsKey(inetAddress)) {
-            CHECKS_PER_MINUTE.put(inetAddress, 1);
-            return true;
-        }
-
-        final int newCount = CHECKS_PER_MINUTE.asMap().get(inetAddress) + 1;
-
-        CHECKS_PER_MINUTE.asMap().replace(inetAddress, newCount);
-
-        return newCount <= LIMIT_PER_MINUTE;
+  public boolean shouldAllow(final InetAddress inetAddress) {
+    if (!CHECKS_PER_MINUTE.asMap().containsKey(inetAddress)) {
+      CHECKS_PER_MINUTE.put(inetAddress, 1);
+      return true;
     }
+
+    final int newCount = CHECKS_PER_MINUTE.asMap().get(inetAddress) + 1;
+
+    CHECKS_PER_MINUTE.asMap().replace(inetAddress, newCount);
+
+    return newCount <= LIMIT_PER_MINUTE;
+  }
 }

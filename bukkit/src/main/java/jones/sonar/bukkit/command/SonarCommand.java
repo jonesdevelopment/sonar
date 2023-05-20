@@ -36,89 +36,88 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public final class SonarCommand implements CommandExecutor {
-    private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
-            .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
-            .build();
-    private static final String ONLY_PLAYERS = "§cYou can only execute this command as a player.";
-    private static final String CANNOT_RUN_YET = "§cYou can only execute this command every 0.5 seconds.";
-    private static final String NO_PERM_SUB = "§cYou do not have permission to execute this subcommand.";
-    private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
+  private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
+    .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
+    .build();
+  private static final String ONLY_PLAYERS = "§cYou can only execute this command as a player.";
+  private static final String CANNOT_RUN_YET = "§cYou can only execute this command every 0.5 seconds.";
+  private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
-    @Override
-    public boolean onCommand(final CommandSender sender,
-                             final Command command,
-                             final String label,
-                             final String[] args) {
-        if (delay.asMap().containsKey(sender)) {
-            sender.sendMessage(CANNOT_RUN_YET);
+  @Override
+  public boolean onCommand(final CommandSender sender,
+                           final Command command,
+                           final String label,
+                           final String[] args) {
+    if (delay.asMap().containsKey(sender)) {
+      sender.sendMessage(CANNOT_RUN_YET);
 
-            final long timestamp = delay.asMap().get(sender);
-            final double left = 0.5D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
-            final String format = decimalFormat.format(left);
+      final long timestamp = delay.asMap().get(sender);
+      final double left = 0.5D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
+      final String format = decimalFormat.format(left);
 
-            final String pleaseWaitAnother = "§cPlease wait another §l" + format + "s§r§c.";
+      final String pleaseWaitAnother = "§cPlease wait another §l" + format + "s§r§c.";
 
-            sender.sendMessage(pleaseWaitAnother);
-            return false;
-        }
-
-        delay.put(sender, System.currentTimeMillis());
-
-        var subCommand = Optional.<SubCommand>empty();
-
-        var invocationSender = new InvocationSender<CommandSender>() {
-
-            @Override
-            public void sendMessage(final String message) {
-                sender.sendMessage(message);
-            }
-
-            @Override
-            public CommandSender getPlayer() {
-                return sender;
-            }
-        };
-
-        if (args.length > 0) {
-            subCommand = SubCommandManager.getSubCommands().stream()
-                    .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
-                            || (sub.getInfo().aliases().length > 0
-                            && Arrays.stream(sub.getInfo().aliases())
-                            .anyMatch(alias -> alias.equalsIgnoreCase(args[0]))))
-                    .findFirst();
-
-            if (subCommand.isPresent()) {
-                final String permission = "sonar." + subCommand.get().getInfo().name();
-
-                if (!sender.hasPermission(permission)) {
-                    sender.sendMessage(
-                            "§cYou do not have permission to execute this subcommand. §7(" + permission + ")"
-                    );
-                    return false;
-                }
-            }
-        }
-
-        if (!subCommand.isPresent()) {
-            CommandHelper.printHelp(invocationSender);
-            return false;
-        }
-
-        subCommand.ifPresent(sub -> {
-            if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
-                sender.sendMessage(ONLY_PLAYERS);
-                return;
-            }
-
-            final CommandInvocation commandInvocation = new CommandInvocation(
-                    sender.getName(),
-                    invocationSender,
-                    sub,
-                    args
-            );
-
-            sub.execute(commandInvocation);
-        });
-        return false;
+      sender.sendMessage(pleaseWaitAnother);
+      return false;
     }
+
+    delay.put(sender, System.currentTimeMillis());
+
+    var subCommand = Optional.<SubCommand>empty();
+
+    var invocationSender = new InvocationSender<CommandSender>() {
+
+      @Override
+      public void sendMessage(final String message) {
+        sender.sendMessage(message);
+      }
+
+      @Override
+      public CommandSender getPlayer() {
+        return sender;
+      }
+    };
+
+    if (args.length > 0) {
+      subCommand = SubCommandManager.getSubCommands().stream()
+        .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
+          || (sub.getInfo().aliases().length > 0
+          && Arrays.stream(sub.getInfo().aliases())
+          .anyMatch(alias -> alias.equalsIgnoreCase(args[0]))))
+        .findFirst();
+
+      if (subCommand.isPresent()) {
+        final String permission = "sonar." + subCommand.get().getInfo().name();
+
+        if (!sender.hasPermission(permission)) {
+          sender.sendMessage(
+            "§cYou do not have permission to execute this subcommand. §7(" + permission + ")"
+          );
+          return false;
+        }
+      }
+    }
+
+    if (!subCommand.isPresent()) {
+      CommandHelper.printHelp(invocationSender);
+      return false;
+    }
+
+    subCommand.ifPresent(sub -> {
+      if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
+        sender.sendMessage(ONLY_PLAYERS);
+        return;
+      }
+
+      final CommandInvocation commandInvocation = new CommandInvocation(
+        sender.getName(),
+        invocationSender,
+        sub,
+        args
+      );
+
+      sub.execute(commandInvocation);
+    });
+    return false;
+  }
 }

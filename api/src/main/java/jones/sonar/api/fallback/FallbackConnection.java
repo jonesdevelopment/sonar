@@ -28,21 +28,21 @@ import java.net.InetAddress;
 @Getter
 @RequiredArgsConstructor
 public final class FallbackConnection<Player, Connection> {
-    private final Fallback fallback;
-    private final Player player;
-    private final Connection connection;
-    private final Channel channel;
-    private final ChannelPipeline pipeline;
-    private final InetAddress inetAddress;
-    private final int protocolVersion;
-    private final long loginTimestamp = System.currentTimeMillis();
+  private final Fallback fallback;
+  private final Player player;
+  private final Connection connection;
+  private final Channel channel;
+  private final ChannelPipeline pipeline;
+  private final InetAddress inetAddress;
+  private final int protocolVersion;
+  private final long loginTimestamp = System.currentTimeMillis();
 
-    public void fail(final String reason) {
-        channel.close();
+  public void fail(final String reason) {
+    channel.close();
 
-        fallback.getBlacklisted().add(inetAddress);
+    fallback.getBlacklisted().add(inetAddress);
 
-        Sonar.get().getLogger().info("[Fallback] {} ({}) has failed the bot check for: {}",
-                inetAddress, protocolVersion, reason);
-    }
+    Sonar.get().getLogger().info("[Fallback] {} ({}) has failed the bot check for: {}",
+      inetAddress, protocolVersion, reason);
+  }
 }
