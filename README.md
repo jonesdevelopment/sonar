@@ -56,5 +56,27 @@
       in the necessary time period. In that case, Sonar is trying to account for those edge
       cases and lag in order to prevent false blacklists.
     </p>
+    <h2>3.0 Building</h2>
+    <p>
+      You can build the jar using <code>gradle shadowJar</code> in the main project.
+      <br>
+      If there are any issues, you can also try <code>gradle shadowJar --stacktrace</code>
+      or <code>gradle shadowJar --debug</code>.
+    </p>
+    <h2>3.1 Contributing</h2>
+    Pull requests are welcome but please follow some simple rules in order for your
+    pull request to be merged:
+    <br>
+    <ul>
+      <li>
+        Test your code before you commit and push it
+      </li>
+      <li>
+        Try to use the same code style as the rest of the project
+      </li>
+      <li>
+        Try to avoid bloat - Sonar is supposed to be light-weight
+      </li>
+    </ul>
   </body>
 </html>
