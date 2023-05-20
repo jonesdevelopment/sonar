@@ -46,6 +46,7 @@ public final class SonarConfiguration {
   public int MAXIMUM_QUEUED_PLAYERS;
   public int MAXIMUM_QUEUE_POLLS;
   public int VERIFICATION_TIMEOUT;
+  public int VERIFICATIONS_PER_MINUTE;
 
   public void load() {
     Objects.requireNonNull(yamlConfig);
@@ -59,6 +60,7 @@ public final class SonarConfiguration {
     MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);
 
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
+    VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
 
     // Message settings
     PREFIX = ChatColor.translateAlternateColorCodes('&',

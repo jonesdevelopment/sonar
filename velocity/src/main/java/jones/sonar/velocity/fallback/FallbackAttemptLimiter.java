@@ -19,6 +19,7 @@ package jones.sonar.velocity.fallback;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import jones.sonar.api.Sonar;
 import lombok.experimental.UtilityClass;
 
 import java.net.InetAddress;
@@ -29,7 +30,6 @@ public class FallbackAttemptLimiter {
   private final Cache<InetAddress, Integer> CHECKS_PER_MINUTE = Caffeine.newBuilder()
     .expireAfterWrite(1L, TimeUnit.MINUTES)
     .build();
-  private static final byte LIMIT_PER_MINUTE = 3; // TODO: make configurable
 
   public boolean shouldAllow(final InetAddress inetAddress) {
     final int newCount = CHECKS_PER_MINUTE.asMap().getOrDefault(inetAddress, 0) + 1;
@@ -40,6 +40,6 @@ public class FallbackAttemptLimiter {
       CHECKS_PER_MINUTE.asMap().replace(inetAddress, newCount);
     }
 
-    return newCount <= LIMIT_PER_MINUTE;
+    return newCount <= Sonar.get().getConfig().VERIFICATIONS_PER_MINUTE;
   }
 }
