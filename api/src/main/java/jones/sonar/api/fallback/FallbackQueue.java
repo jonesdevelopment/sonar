@@ -16,7 +16,22 @@
 
 package jones.sonar.api.fallback;
 
-public enum FallbackCheckResult {
-    DENIED,
-    ALLOWED
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+public interface FallbackQueue {
+    Queue<Runnable> QUEUE = new ArrayDeque<>();
+    int POLL_RATE = 20; // TODO: make configurable
+
+    static void queue(final Runnable runnable) {
+        QUEUE.add(runnable);
+    }
+
+    static void poll() {
+        for (int i = 0; i < POLL_RATE; i++) {
+            if (QUEUE.isEmpty()) break;
+
+            QUEUE.poll().run();
+        }
+    }
 }

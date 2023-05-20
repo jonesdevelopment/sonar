@@ -20,10 +20,13 @@ import com.velocitypowered.proxy.VelocityServer;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
+import jones.sonar.api.fallback.FallbackQueue;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.listener.FallbackListener;
 import lombok.Getter;
+
+import java.util.concurrent.TimeUnit;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
@@ -49,8 +52,15 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         // Register Sonar command
         plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
 
-        // Register listener
-        plugin.getServer().getEventManager().register(plugin, new FallbackListener((VelocityServer) plugin.getServer(), plugin.getLogger()));
+        // Register Fallback listener
+        var fallback = new FallbackListener((VelocityServer) plugin.getServer(), plugin.getLogger());
+
+        plugin.getServer().getEventManager().register(plugin, fallback);
+
+        // Register Fallback queue task
+        plugin.getServer().getScheduler().buildTask(plugin, FallbackQueue::poll)
+                .repeat(500L, TimeUnit.MILLISECONDS)
+                .schedule();
     }
 
     @Override

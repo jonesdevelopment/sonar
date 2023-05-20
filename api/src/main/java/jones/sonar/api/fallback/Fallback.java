@@ -22,7 +22,7 @@ import java.util.Map;
 public interface Fallback {
     Map<String, FallbackConnection> connected = new HashMap<>();
 
-    static boolean connection(final FallbackConnection connection) {
+    static boolean shouldHandle(final FallbackConnection connection) {
         if (connected.containsKey(connection.getUsername())) {
             return false;
         }

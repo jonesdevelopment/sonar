@@ -17,6 +17,7 @@
 package jones.sonar.velocity.fallback.listener;
 
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
@@ -49,16 +50,20 @@ import java.util.Collection;
 import java.util.Vector;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
+import static jones.sonar.api.fallback.FallbackQueue.queue;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
     private final VelocityServer server;
     private final Logger logger;
+
     private final Collection<String> premium = new Vector<>();
 
+    // TODO: make configurable
     private static final Component ALREADY_VERIFYING = Component.text(
             "§e§lSonar Fallback\n\n§7You are already being verified at the moment! Please wait."
     );
+    // TODO: make configurable
     private static final Component TOO_MANY_VERIFICATIONS = Component.text(
             "§e§lSonar Fallback\n\n§7Please wait a minute before trying to verify again."
     );
@@ -113,6 +118,16 @@ public final class FallbackListener {
     }
 
     /**
+     * Remove the player from the premium list in order to prevent memory leaks
+     *
+     * @param event DisconnectEvent
+     */
+    @Subscribe
+    public void handle(final DisconnectEvent event) {
+        premium.remove(event.getPlayer().getUsername());
+    }
+
+    /**
      * Handles inbound connections
      *
      * @param event GameProfileRequestEvent
@@ -128,7 +143,7 @@ public final class FallbackListener {
 
         CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
-        channel.eventLoop().execute(() -> {
+        queue(() -> channel.eventLoop().execute(() -> {
             if (mcConnection.isClosed()) return;
 
             try {
@@ -143,16 +158,21 @@ public final class FallbackListener {
                         inboundConnection.getIdentifiedKey()
                 );
 
+                // Remove the player from the premium list in order to prevent memory leaks
+                // We cannot rely on the DisconnectEvent since the server will not call it
+                // -> we are intercepting the packets!
+                premium.remove(event.getUsername());
+
                 // Create an instance for the Fallback connection
                 val fallbackPlayer = new FallbackConnection(
                         player.getUsername(),
                         channel,
                         channel.pipeline(),
                         player.getProtocolVersion().getProtocol()
-                    );
+                );
 
                 // Check if Fallback is already verifying a player
-                if (!Fallback.connection(fallbackPlayer)) {
+                if (!Fallback.shouldHandle(fallbackPlayer)) {
                     player.disconnect0(ALREADY_VERIFYING, true);
                     return;
                 }
@@ -194,6 +214,6 @@ public final class FallbackListener {
             } catch (Throwable throwable) {
                 throw new RuntimeException(throwable);
             }
-        });
+        }));
     }
 }

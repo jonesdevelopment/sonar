@@ -30,7 +30,7 @@ public class FallbackLimiter {
     private final Cache<InetAddress, Byte> CHECKS = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.MINUTES)
             .build();
-    private static final byte LIMIT_PER_MINUTE = 2; // max. 2 checks per minute
+    private static final byte LIMIT_PER_MINUTE = 2; // TODO: make configurable
 
     public boolean shouldDeny(final FallbackConnection connection) {
 
@@ -41,7 +41,7 @@ public class FallbackLimiter {
             final byte newCount = (byte) (CHECKS.asMap().get(inetAddress) + 1);
 
             CHECKS.asMap().replace(inetAddress, newCount);
-            return newCount > 2;
+            return newCount > LIMIT_PER_MINUTE;
         }
 
         CHECKS.put(inetAddress, (byte) 1);
