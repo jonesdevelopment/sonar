@@ -16,14 +16,18 @@
 
 package jones.sonar.api.fallback;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public interface Fallback {
-    Map<String, FallbackConnection> getFallbackConnections();
+    Map<String, FallbackConnection> connected = new HashMap<>();
 
-    void handleConnection(final FallbackPlayer player);
+    static boolean connection(final FallbackConnection connection) {
+        if (connected.containsKey(connection.getUsername())) {
+            return false;
+        }
 
-    default boolean isConnected(final FallbackPlayer player) {
-        return getFallbackConnections().containsKey(player.getName());
+        connected.put(connection.getUsername(), connection);
+        return true;
     }
 }

@@ -16,8 +16,17 @@
 
 package jones.sonar.api.fallback;
 
-public interface FallbackConnection {
-    FallbackPlayer getPlayer();
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-    FallbackCheckResult getResult();
+@Getter
+@RequiredArgsConstructor
+public final class FallbackConnection {
+    private final String username;
+    private final Channel channel;
+    private final ChannelPipeline pipeline;
+    private final int protocolVersion;
+    private final long loginTimestamp = System.currentTimeMillis();
 }

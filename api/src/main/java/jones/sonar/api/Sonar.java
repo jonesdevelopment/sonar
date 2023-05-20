@@ -16,15 +16,8 @@
 
 package jones.sonar.api;
 
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.statistics.Statistics;
-
 public interface Sonar {
     SonarPlatform getPlatform();
-
-    Statistics getStatistics();
-
-    Fallback getFallback();
 
     static Sonar get() {
         return SonarProvider.get();

@@ -19,12 +19,8 @@ package jones.sonar.bukkit;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.statistics.Statistics;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.common.SonarPlugin;
-import jones.sonar.common.fallback.FallbackManager;
-import jones.sonar.common.statistics.SonarStatistics;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -32,12 +28,6 @@ import java.util.Objects;
 public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
     INSTANCE;
-
-    @Getter
-    private final Fallback fallback = new FallbackManager();
-
-    @Getter
-    private final Statistics statistics = new SonarStatistics();
 
     @Getter
     private SonarBukkitPlugin plugin;

@@ -16,8 +16,6 @@
 
 package jones.sonar.common.command.subcommand.impl;
 
-import jones.sonar.api.Sonar;
-import jones.sonar.api.statistics.StatisticType;
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandInfo;
@@ -31,7 +29,6 @@ public final class StatisticsCommand extends SubCommand {
 
     @Override
     public void execute(final CommandInvocation invocation) {
-        final int total = Sonar.get().getStatistics().get(StatisticType.TOTAL_CONNECTIONS, 0);
-        invocation.getInvocationSender().sendMessage("Total connections: " + total);
+        invocation.getInvocationSender().sendMessage("Total connections: XD");
     }
 }

@@ -19,23 +19,13 @@ package jones.sonar.bungee;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.statistics.Statistics;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.common.SonarPlugin;
-import jones.sonar.common.fallback.FallbackManager;
-import jones.sonar.common.statistics.SonarStatistics;
 import lombok.Getter;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
     INSTANCE;
-
-    @Getter
-    private final Fallback fallback = new FallbackManager();
-
-    @Getter
-    private final Statistics statistics = new SonarStatistics();
 
     @Getter
     private SonarBungeePlugin plugin;
