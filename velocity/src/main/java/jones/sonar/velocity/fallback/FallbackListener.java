@@ -68,10 +68,17 @@ public final class FallbackListener {
     private static final Component ALREADY_VERIFYING = Component.text(
             "§cYou are already being verified at the moment! Please try again later."
     );
+    private static final PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING_RESULT = PreLoginEvent.PreLoginComponentResult.denied(ALREADY_VERIFYING);
+    // TODO: make configurable
+    private static final Component TOO_MANY_PLAYERS = Component.text(
+            "§cToo many players are currently trying to log in. Please try again later."
+    );
+    private static final PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS_RESULT = PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_PLAYERS);
     // TODO: make configurable
     private static final Component TOO_MANY_VERIFICATIONS = Component.text(
             "§cPlease wait a minute before trying to verify again."
     );
+    private static final PreLoginEvent.PreLoginComponentResult TOO_MANY_VERIFICATIONS_RESULT = PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_VERIFICATIONS);
 
     private static final String DIMENSION = "minecraft:the_end"; // TODO: make configurable
     private static final JoinGame JOIN_GAME = new JoinGame();
@@ -141,16 +148,22 @@ public final class FallbackListener {
 
         if (Sonar.get().getFallback().getVerified().contains(inetAddress)) return;
 
+        // We cannot allow too many players on our Fallback server
+        if (Sonar.get().getFallback().getQueue().getQueuedPlayers().size() > Short.MAX_VALUE) {
+            event.setResult(TOO_MANY_PLAYERS_RESULT);
+            return;
+        }
+
         // Check if Fallback is already verifying a player
         // → is another player with the same ip address connected to Fallback?
         if (Sonar.get().getFallback().getConnected().contains(inetAddress)) {
-            event.setResult(PreLoginEvent.PreLoginComponentResult.denied(ALREADY_VERIFYING));
+            event.setResult(ALREADY_VERIFYING_RESULT);
             return;
         }
 
         // Check if the ip address had too many verifications
         if (!Sonar.get().getFallback().getFilter().allow(inetAddress)) {
-            event.setResult(PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_VERIFICATIONS));
+            event.setResult(TOO_MANY_VERIFICATIONS_RESULT);
             return;
         }
 
