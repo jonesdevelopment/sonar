@@ -34,4 +34,9 @@ public final class FallbackConnection<Player, Connection> {
     private final InetAddress inetAddress;
     private final int protocolVersion;
     private final long loginTimestamp = System.currentTimeMillis();
+
+    public void fail(final String reason) {
+        channel.close();
+        System.out.println("[Fallback]" + inetAddress + " failed: " + reason);
+    }
 }

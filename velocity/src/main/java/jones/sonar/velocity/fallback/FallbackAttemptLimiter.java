@@ -28,9 +28,9 @@ public class FallbackAttemptLimiter {
     private final Cache<InetAddress, Integer> CHECKS_PER_MINUTE = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.MINUTES)
             .build();
-    private static final byte LIMIT_PER_MINUTE = 2; // TODO: make configurable
+    private static final byte LIMIT_PER_MINUTE = 3; // TODO: make configurable
 
-    public boolean allow(final InetAddress inetAddress) {
+    public boolean shouldAllow(final InetAddress inetAddress) {
         if (!CHECKS_PER_MINUTE.asMap().containsKey(inetAddress)) {
             CHECKS_PER_MINUTE.put(inetAddress, 1);
             return true;
