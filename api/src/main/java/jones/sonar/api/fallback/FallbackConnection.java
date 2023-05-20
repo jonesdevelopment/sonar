@@ -18,6 +18,7 @@ package jones.sonar.api.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import jones.sonar.api.Sonar;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +38,6 @@ public final class FallbackConnection<Player, Connection> {
 
     public void fail(final String reason) {
         channel.close();
-        System.out.println("[Fallback]" + inetAddress + " failed: " + reason);
+        Sonar.get().getLogger().info("[Fallback] " + inetAddress + " failed: " + reason);
     }
 }

@@ -20,12 +20,14 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.logger.Logger;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.bungee.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
@@ -39,6 +41,9 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
     @Getter
     private SonarConfiguration config;
+
+    @Getter
+    private Logger logger;
 
     @Override
     public SonarPlatform getPlatform() {
@@ -55,6 +60,25 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
         SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
+
+        // Initialize logger
+        logger = new Logger() {
+
+            @Override
+            public void info(final String message, final Object... args) {
+                plugin.getLogger().log(Level.INFO, message, args);
+            }
+
+            @Override
+            public void warn(final String message, final Object... args) {
+                plugin.getLogger().log(Level.WARNING, message, args);
+            }
+
+            @Override
+            public void error(final String message, final Object... args) {
+                plugin.getLogger().log(Level.SEVERE, message, args);
+            }
+        };
 
         // Initialize configuration
         config = new SonarConfiguration(plugin.getDataFolder());

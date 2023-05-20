@@ -35,6 +35,7 @@ import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.fallback.FallbackConnection;
+import jones.sonar.api.logger.Logger;
 import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.common.fallback.FallbackTimeoutHandler;
 import jones.sonar.velocity.SonarVelocity;
@@ -43,7 +44,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.slf4j.Logger;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

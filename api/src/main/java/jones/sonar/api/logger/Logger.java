@@ -14,28 +14,12 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.api.logger;
 
-import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.fallback.FallbackHolder;
-import jones.sonar.api.logger.Logger;
-import jones.sonar.api.verbose.Verbose;
+public interface Logger {
+    void info(final String message, final Object... args);
 
-public interface Sonar {
-    SonarPlatform getPlatform();
+    void warn(final String message, final Object... args);
 
-    SonarConfiguration getConfig();
-
-    default Fallback getFallback() {
-        return FallbackHolder.INSTANCE;
-    }
-
-    Verbose getActionBarVerbose();
-
-    Logger getLogger();
-
-    static Sonar get() {
-        return SonarProvider.get();
-    }
+    void error(final String message, final Object... args);
 }

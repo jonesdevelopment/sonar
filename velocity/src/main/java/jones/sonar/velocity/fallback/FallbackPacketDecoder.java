@@ -21,6 +21,7 @@ import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.ClientSettings;
+import com.velocitypowered.proxy.protocol.packet.JoinGame;
 import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.PluginMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,7 +46,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     public void channelRead(final ChannelHandlerContext ctx,
                             final Object msg) throws Exception {
         if (msg instanceof MinecraftPacket packet) {
-            System.out.println("[client → server] " + fallbackPlayer.getPlayer().getUsername() + ": " + msg);
+            //System.out.println("[client → server] " + fallbackPlayer.getPlayer().getUsername() + ": " + msg);
 
             final boolean legalPacket = packet instanceof ClientSettings
                     || packet instanceof PluginMessage
@@ -82,19 +83,22 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
                 hasSentKeepAlive = true;
 
-                if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_19_4.getProtocol()) {
-                    fallbackPlayer.getConnection().write(FallbackPackets.JOIN_GAME_1_19_4);
-                } else if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_19_1.getProtocol()) {
-                    fallbackPlayer.getConnection().write(FallbackPackets.JOIN_GAME_1_19_1);
-                } else if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_18_2.getProtocol()) {
-                    fallbackPlayer.getConnection().write(FallbackPackets.JOIN_GAME_1_18_2);
-                } else if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_16_2.getProtocol()) {
-                    fallbackPlayer.getConnection().write(FallbackPackets.JOIN_GAME_1_16_2);
-                } else {
-                    fallbackPlayer.getConnection().write(FallbackPackets.LEGACY_JOIN_GAME);
-                }
+                fallbackPlayer.getConnection().write(getForVersion(fallbackPlayer.getProtocolVersion()));
             }
         }
+    }
+
+    private static JoinGame getForVersion(final int protocolVersion) {
+        if (protocolVersion >= ProtocolVersion.MINECRAFT_1_19_4.getProtocol()) {
+            return FallbackPackets.JOIN_GAME_1_19_4;
+        } else if (protocolVersion >= ProtocolVersion.MINECRAFT_1_19_1.getProtocol()) {
+            return FallbackPackets.JOIN_GAME_1_19_1;
+        } else if (protocolVersion >= ProtocolVersion.MINECRAFT_1_18_2.getProtocol()) {
+            return FallbackPackets.JOIN_GAME_1_18_2;
+        } else if (protocolVersion >= ProtocolVersion.MINECRAFT_1_16_2.getProtocol()) {
+            return FallbackPackets.JOIN_GAME_1_16_2;
+        }
+        return FallbackPackets.LEGACY_JOIN_GAME;
     }
 
     private static final CorruptedFrameException CORRUPTED_FRAME = new CorruptedFrameException();

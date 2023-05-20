@@ -20,6 +20,7 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.logger.Logger;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackAttemptLimiter;
@@ -42,6 +43,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     @Getter
     private SonarConfiguration config;
 
+    @Getter
+    private Logger logger;
+
     @Override
     public SonarPlatform getPlatform() {
         return SonarPlatform.VELOCITY;
@@ -58,6 +62,25 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
         plugin.getLogger().info("Initializing Sonar...");
 
+        // Initialize logger
+        logger = new Logger() {
+
+            @Override
+            public void info(final String message, final Object... args) {
+                plugin.getLogger().info(message, args);
+            }
+
+            @Override
+            public void warn(final String message, final Object... args) {
+                plugin.getLogger().warn(message, args);
+            }
+
+            @Override
+            public void error(final String message, final Object... args) {
+                plugin.getLogger().error(message, args);
+            }
+        };
+
         // Initialize configuration
         config = new SonarConfiguration(plugin.getDataDirectory().toFile());
         config.load();
@@ -66,7 +89,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
 
         // Register Fallback listener
-        plugin.getServer().getEventManager().register(plugin, new FallbackListener(plugin.getLogger(), getFallback()));
+        plugin.getServer().getEventManager().register(plugin, new FallbackListener(logger, getFallback()));
 
         // Apply filter (connection limiter) to Fallback
         Sonar.get().getFallback().setAttemptLimiter(FallbackAttemptLimiter::shouldAllow);
