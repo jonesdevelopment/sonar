@@ -16,9 +16,13 @@
 
 package jones.sonar.api.fallback;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayDeque;
 import java.util.Queue;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
     private final Queue<Runnable> QUEUE = new ArrayDeque<>();
     private static final int POLL_RATE = 20; // TODO: make configurable
