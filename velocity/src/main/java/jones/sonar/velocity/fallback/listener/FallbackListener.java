@@ -33,7 +33,6 @@ import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.FallbackConnection;
 import jones.sonar.velocity.fallback.dummy.DummyConnection;
-import jones.sonar.velocity.fallback.limit.FallbackLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.kyori.adventure.text.Component;
@@ -169,7 +168,7 @@ public final class FallbackListener {
                 }
 
                 // Check if the ip address had too many verifications
-                if (FallbackLimiter.shouldDeny(inetAddress)) {
+                if (!Sonar.get().getFallback().getFilter().allow(inetAddress)) {
                     player.disconnect0(TOO_MANY_VERIFICATIONS, true);
                     return;
                 }

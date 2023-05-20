@@ -17,16 +17,8 @@
 package jones.sonar.api.fallback;
 
 import java.net.InetAddress;
-import java.util.Collection;
 
-public interface Fallback {
-    Collection<InetAddress> getConnected();
-
-    Collection<InetAddress> getVerified();
-
-    FallbackQueue getQueue();
-
-    FallbackFilter getFilter();
-
-    void setFilter(final FallbackFilter filter);
+@FunctionalInterface
+public interface FallbackFilter {
+    boolean allow(final InetAddress inetAddress);
 }

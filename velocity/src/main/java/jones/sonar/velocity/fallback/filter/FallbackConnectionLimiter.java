@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package jones.sonar.velocity.fallback.limit;
+package jones.sonar.velocity.fallback.filter;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -24,21 +24,22 @@ import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
-public class FallbackLimiter {
-    private final Cache<InetAddress, Byte> CHECKS = Caffeine.newBuilder()
+public class FallbackConnectionLimiter {
+    private final Cache<InetAddress, Byte> CHECKS_PER_MINUTE = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.MINUTES)
             .build();
     private static final byte LIMIT_PER_MINUTE = 2; // TODO: make configurable
 
-    public boolean shouldDeny(final InetAddress inetAddress) {
-        if (CHECKS.asMap().containsKey(inetAddress)) {
-            final byte newCount = (byte) (CHECKS.asMap().get(inetAddress) + 1);
-
-            CHECKS.asMap().replace(inetAddress, newCount);
-            return newCount > LIMIT_PER_MINUTE;
+    public boolean shouldAllow(final InetAddress inetAddress) {
+        if (!CHECKS_PER_MINUTE.asMap().containsKey(inetAddress)) {
+            CHECKS_PER_MINUTE.put(inetAddress, (byte) 1);
+            return true;
         }
 
-        CHECKS.put(inetAddress, (byte) 1);
-        return false;
+        final byte newCount = (byte) (CHECKS_PER_MINUTE.asMap().get(inetAddress) + 1);
+
+        CHECKS_PER_MINUTE.asMap().replace(inetAddress, newCount);
+
+        return newCount <= LIMIT_PER_MINUTE;
     }
 }

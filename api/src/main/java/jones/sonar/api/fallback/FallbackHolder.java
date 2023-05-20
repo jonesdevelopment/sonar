@@ -17,6 +17,7 @@
 package jones.sonar.api.fallback;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.net.InetAddress;
 import java.util.Collection;
@@ -31,4 +32,7 @@ public final class FallbackHolder implements Fallback {
     private final Collection<InetAddress> verified = new Vector<>();
     @Getter
     private final FallbackQueue queue = new FallbackQueue();
+    @Getter
+    @Setter
+    private FallbackFilter filter = inetAddress -> true;
 }
