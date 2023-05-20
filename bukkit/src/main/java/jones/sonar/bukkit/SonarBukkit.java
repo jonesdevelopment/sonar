@@ -19,6 +19,7 @@ package jones.sonar.bukkit;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
+import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
@@ -36,6 +37,9 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     @Getter
     private ActionBarVerbose actionBarVerbose;
 
+    @Getter
+    private SonarConfiguration config;
+
     @Override
     public SonarPlatform getPlatform() {
         return SonarPlatform.BUKKIT;
@@ -49,6 +53,10 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
         SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
+
+        // Initialize configuration
+        config = new SonarConfiguration(plugin.getDataFolder());
+        config.load();
 
         // Register Sonar command
         Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());

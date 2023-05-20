@@ -19,6 +19,7 @@ package jones.sonar.bungee;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
+import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.bungee.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
@@ -36,6 +37,9 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     @Getter
     private ActionBarVerbose actionBarVerbose;
 
+    @Getter
+    private SonarConfiguration config;
+
     @Override
     public SonarPlatform getPlatform() {
         return SonarPlatform.BUNGEE;
@@ -49,6 +53,10 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
         SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
+
+        // Initialize configuration
+        config = new SonarConfiguration(plugin.getDataFolder());
+        config.load();
 
         // Register Sonar command
         plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());

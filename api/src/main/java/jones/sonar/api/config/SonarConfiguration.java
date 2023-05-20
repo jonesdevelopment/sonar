@@ -14,25 +14,27 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api;
+package jones.sonar.api.config;
 
-import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.fallback.FallbackHolder;
-import jones.sonar.api.verbose.Verbose;
+import jones.sonar.api.config.yml.YamlConfig;
 
-public interface Sonar {
-    SonarPlatform getPlatform();
+import java.io.File;
+import java.util.Objects;
 
-    SonarConfiguration getConfig();
+public final class SonarConfiguration {
+    private final YamlConfig yamlConfig;
 
-    default Fallback getFallback() {
-        return FallbackHolder.INSTANCE;
+    public SonarConfiguration(final File folder) {
+        if (!folder.exists() && !folder.mkdir()) {
+            throw new IllegalStateException("Could not create folder?!");
+        }
+
+        this.yamlConfig = new YamlConfig(folder, "config");
     }
 
-    Verbose getActionBarVerbose();
+    public void load() {
+        Objects.requireNonNull(yamlConfig);
 
-    static Sonar get() {
-        return SonarProvider.get();
+        yamlConfig.load();
     }
 }

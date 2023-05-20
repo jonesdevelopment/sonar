@@ -20,6 +20,7 @@ import com.velocitypowered.proxy.VelocityServer;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
+import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackConnectionLimiter;
@@ -39,6 +40,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     @Getter
     private ActionBarVerbose actionBarVerbose;
 
+    @Getter
+    private SonarConfiguration config;
+
     @Override
     public SonarPlatform getPlatform() {
         return SonarPlatform.VELOCITY;
@@ -54,6 +58,10 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         SonarProvider.set(this);
 
         plugin.getLogger().info("Initializing Sonar...");
+
+        // Initialize configuration
+        config = new SonarConfiguration(plugin.getDataDirectory().toFile());
+        config.load();
 
         // Register Sonar command
         plugin.getServer().getCommandManager().register("sonar", new SonarCommand());

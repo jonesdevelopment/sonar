@@ -35,9 +35,9 @@ public final class ActionBarVerbose implements Verbose {
 
     public void update() {
         final Component component = Component.text("§e§lSonar"
-                + " §7Queued §f" + Sonar.get().getFallback().getQueue().getQueuedPlayers().size()
-                + " §7Verifying §f" + Sonar.get().getFallback().getConnected().size()
-                + " §6" + VerboseAnimation.nextState());
+                + " §3▪ §7Queued §f" + Sonar.get().getFallback().getQueue().getQueuedPlayers().size()
+                + " §3▪ §7Verifying §f" + Sonar.get().getFallback().getConnected().size()
+                + " §3▪ §6" + VerboseAnimation.nextState());
 
         for (final String subscriber : subscribers) {
             server.getPlayer(subscriber).ifPresent(player -> {

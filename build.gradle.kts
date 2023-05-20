@@ -26,16 +26,20 @@ versioner {
     }
 }
 
+allprojects {
+    repositories {
+        mavenCentral() // Lombok
+    }
+}
+
 subprojects {
     apply(plugin = "java")
     apply(plugin = "com.github.johnrengelman.shadow")
 
-    repositories {
-        mavenCentral() // Lombok
-    }
-
     dependencies {
         compileOnly("io.netty:netty-all:4.1.92.Final") // Netty
+
+        implementation("org.yaml:snakeyaml:2.0")
 
         compileOnly("org.projectlombok:lombok:1.18.26")
         annotationProcessor("org.projectlombok:lombok:1.18.26")

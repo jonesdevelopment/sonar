@@ -20,9 +20,12 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import org.slf4j.Logger;
+
+import java.nio.file.Path;
 
 @Getter
 @Plugin(id = "sonar",
@@ -35,11 +38,15 @@ import org.slf4j.Logger;
 public final class SonarVelocityPlugin {
     private final ProxyServer server;
     private final Logger logger;
+    private final Path dataDirectory;
 
     @Inject
-    public SonarVelocityPlugin(final ProxyServer server, final Logger logger) {
+    public SonarVelocityPlugin(final ProxyServer server,
+                               final Logger logger,
+                               final @DataDirectory Path dataDirectory) {
         this.server = server;
         this.logger = logger;
+        this.dataDirectory = dataDirectory;
     }
 
     @Subscribe
