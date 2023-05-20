@@ -16,6 +16,8 @@
 
 package jones.sonar.api.fallback;
 
+import jones.sonar.api.Sonar;
+
 import java.net.InetAddress;
 import java.util.Collection;
 
@@ -31,4 +33,9 @@ public interface Fallback {
     FallbackFilter getAttemptLimiter();
 
     void setAttemptLimiter(final FallbackFilter limiter);
+
+    default boolean isUnderAttack() {
+        return getConnected().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK
+                || getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK;
+    }
 }

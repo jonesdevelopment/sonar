@@ -40,11 +40,26 @@ public final class SonarConfiguration {
     public String ACTION_BAR_LAYOUT;
     public Collection<String> ANIMATION;
 
+    public int MINIMUM_PLAYERS_FOR_ATTACK;
+    public int MAXIMUM_VERIFYING_PLAYERS;
+    public int MAXIMUM_QUEUED_PLAYERS;
+    public int MAXIMUM_QUEUE_POLLS;
+    public int VERIFICATION_TIMEOUT;
+
     public void load() {
         Objects.requireNonNull(yamlConfig);
 
         yamlConfig.load();
 
+        // General options
+        MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
+        MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.max-verifying-players", Short.MAX_VALUE);
+        MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.max-queued-players", Short.MAX_VALUE);
+        MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);
+
+        VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
+
+        // Message settings
         PREFIX = ChatColor.translateAlternateColorCodes('&',
                 yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
 

@@ -33,6 +33,7 @@ import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
+import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.fallback.FallbackConnection;
 import jones.sonar.api.logger.Logger;
@@ -138,16 +139,17 @@ public final class FallbackListener {
 
         if (fallback.getVerified().contains(inetAddress)) return;
 
-        // We cannot allow too many players on our Fallback server
-        if (fallback.getQueue().getQueuedPlayers().size() >= Short.MAX_VALUE) {
-            event.setResult(TOO_MANY_PLAYERS_RESULT);
-            return;
-        }
-
         // Check if Fallback is already verifying a player
         // → is another player with the same ip address connected to Fallback?
         if (fallback.getConnected().contains(inetAddress)) {
             event.setResult(ALREADY_VERIFYING_RESULT);
+            return;
+        }
+
+        // We cannot allow too many players on our Fallback server
+        if (fallback.getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MAXIMUM_QUEUED_PLAYERS
+                || fallback.getConnected().size() > Sonar.get().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
+            event.setResult(TOO_MANY_PLAYERS_RESULT);
             return;
         }
 
@@ -168,6 +170,7 @@ public final class FallbackListener {
     public void handle(final GameProfileRequestEvent event) throws Throwable {
         val inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
+        // We don't want to check players that have already been verified
         if (fallback.getVerified().contains(inetAddress)) return;
 
         val inboundConnection = (LoginInboundConnection) event.getConnection();
@@ -176,20 +179,26 @@ public final class FallbackListener {
         val mcConnection = initialConnection.getConnection();
         val channel = mcConnection.getChannel();
 
+        // The AuthSessionHandler isn't supposed to continue the connection process
+        // which is why we override the field value for the MinecraftConnection with
+        // a dummy connection
         CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
         channel.eventLoop().execute(() -> {
             if (mcConnection.isClosed()) return;
 
-            // Replace timeout handler to avoid issues
-            channel.pipeline().replace(
-                    Connections.READ_TIMEOUT,
-                    Connections.READ_TIMEOUT,
-                    new FallbackTimeoutHandler(5L, TimeUnit.SECONDS));
+            // Replace timeout handler to avoid known exploits or issues
+            // We also want to timeout bots quickly to avoid flooding
+            channel.pipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
+                    new FallbackTimeoutHandler(
+                            Sonar.get().getConfig().VERIFICATION_TIMEOUT,
+                            TimeUnit.MILLISECONDS
+                    ));
 
             fallback.getQueue().queue(() -> channel.eventLoop().execute(() -> {
                 if (mcConnection.isClosed()) return;
 
+                // Most of the following code was taken from Velocity
                 try {
 
                     // Create an instance for player
@@ -214,26 +223,24 @@ public final class FallbackListener {
                     }
 
                     // Check if the player is already connected to the proxy
+                    // We use the default Velocity method for this to avoid incompatibilities
                     if (!mcConnection.server.canRegisterConnection(player)) {
                         player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED), true);
                         return;
                     }
 
                     // Create an instance for the Fallback connection
-                    // TODO: simpler alternative?
                     val fallbackPlayer = new FallbackConnection<>(
-                            fallback,
-                            player,
-                            mcConnection,
-                            channel,
-                            channel.pipeline(),
-                            inetAddress,
+                            fallback, player, mcConnection, channel,
+                            channel.pipeline(), inetAddress,
                             player.getProtocolVersion().getProtocol()
                     );
 
                     // ==================================================================
-                    logger.info("[Fallback] Processing connection for: {} ({})",
-                            event.getUsername(), fallbackPlayer.getProtocolVersion());
+                    if (!fallback.isUnderAttack()) {
+                        logger.info("[Fallback] Processing connection for: {} ({})",
+                                event.getUsername(), fallbackPlayer.getProtocolVersion());
+                    }
 
                     fallback.getConnected().add(inetAddress);
 
@@ -263,12 +270,19 @@ public final class FallbackListener {
                     mcConnection.setAssociation(player);
                     mcConnection.setState(StateRegistry.PLAY);
 
+                    // ==================================================================
+                    // The first step of the verification is a simple KeepAlive packet
+                    // We don't want to waste resources by directly sending all packets to
+                    // the client which is why we first send a KeepAlive packet and then
+                    // wait for a valid response to continue the verification process
                     final KeepAlive keepAlive = new KeepAlive();
                     final long keepAliveId = ThreadLocalRandom.current().nextInt();
 
                     keepAlive.setRandomId(keepAliveId);
 
                     // We have to add this pipeline to monitor all incoming traffic
+                    // We add the pipeline after the MinecraftDecoder since we want
+                    // the packets to be processed and decoded already
                     fallbackPlayer.getPipeline().addAfter(
                             Connections.MINECRAFT_DECODER,
                             "sonar-decoder",
@@ -276,6 +290,7 @@ public final class FallbackListener {
                     );
 
                     mcConnection.write(keepAlive);
+                    // ==================================================================
                 } catch (Throwable throwable) {
                     throw new RuntimeException(throwable);
                 }
