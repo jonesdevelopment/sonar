@@ -49,6 +49,8 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     public void enable(final SonarBungeePlugin plugin) {
         this.plugin = plugin;
 
+        final long start = System.currentTimeMillis();
+
         // Set the API to this class
         SonarProvider.set(this);
 
@@ -67,6 +69,11 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
         // Register action bar verbose task
         plugin.getServer().getScheduler().schedule(plugin, actionBarVerbose::update,
                 100L, TimeUnit.MILLISECONDS);
+
+        // Done
+        final long startDelay = System.currentTimeMillis() - start;
+
+        plugin.getLogger().info("Done (" + String.format("%.3f", startDelay / 1000D) + "s)!");
     }
 
     @Override

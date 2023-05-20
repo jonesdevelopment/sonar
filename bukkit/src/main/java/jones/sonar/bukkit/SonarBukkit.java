@@ -49,6 +49,8 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     public void enable(final SonarBukkitPlugin plugin) {
         this.plugin = plugin;
 
+        final long start = System.currentTimeMillis();
+
         // Set the API to this class
         SonarProvider.set(this);
 
@@ -67,6 +69,11 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
         // Register action bar verbose task
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, actionBarVerbose::update,
                 100L, 100L);
+
+        // Done
+        final long startDelay = System.currentTimeMillis() - start;
+
+        plugin.getLogger().info("Done (" + String.format("%.3f", startDelay / 1000D) + "s)!");
     }
 
     @Override
