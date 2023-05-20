@@ -44,10 +44,12 @@ public final class ActionBarVerbose implements Verbose {
       .replace("%animation%", VerboseAnimation.nextState())
     );
 
-    for (final String subscriber : subscribers) {
-      server.getPlayer(subscriber).ifPresent(player -> {
-        player.sendActionBar(component);
-      });
+    synchronized (subscribers) {
+      for (final String subscriber : subscribers) {
+        server.getPlayer(subscriber).ifPresent(player -> {
+          player.sendActionBar(component);
+        });
+      }
     }
   }
 }
