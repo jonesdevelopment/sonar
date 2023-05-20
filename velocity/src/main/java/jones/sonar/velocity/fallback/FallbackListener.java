@@ -78,7 +78,6 @@ public final class FallbackListener {
     private static final Component TOO_MANY_VERIFICATIONS = Component.text(
             "§cPlease wait a minute before trying to verify again."
     );
-    private static final PreLoginEvent.PreLoginComponentResult TOO_MANY_VERIFICATIONS_RESULT = PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_VERIFICATIONS);
 
     private static final String DIMENSION = "minecraft:the_end"; // TODO: make configurable
     private static final JoinGame JOIN_GAME = new JoinGame();
@@ -161,12 +160,6 @@ public final class FallbackListener {
             return;
         }
 
-        // Check if the ip address had too many verifications
-        if (!Sonar.get().getFallback().getFilter().allow(inetAddress)) {
-            event.setResult(TOO_MANY_VERIFICATIONS_RESULT);
-            return;
-        }
-
         if (event.getResult().isForceOfflineMode()) return;
         if (!event.getResult().isOnlineModeAllowed() && !server.getConfiguration().isOnlineMode()) return;
 
@@ -212,6 +205,12 @@ public final class FallbackListener {
                 // We cannot rely on the DisconnectEvent since the server will not call it
                 // -> we are intercepting the packets!
                 premium.remove(event.getUsername());
+
+                // Check if the ip address had too many verifications
+                if (!Sonar.get().getFallback().getFilter().allow(inetAddress)) {
+                    player.disconnect0(TOO_MANY_VERIFICATIONS, true);
+                    return;
+                }
 
                 // Check if the player is already connected to the proxy
                 if (!server.canRegisterConnection(player)) {
