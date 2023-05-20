@@ -16,20 +16,19 @@
 
 package jones.sonar.api.fallback;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.net.InetAddress;
+import java.util.Collection;
+import java.util.Vector;
 
-@Getter
-@RequiredArgsConstructor
-public final class FallbackConnection {
-    private final String username;
-    private final Channel channel;
-    private final ChannelPipeline pipeline;
-    private final InetAddress inetAddress;
-    private final int protocolVersion;
-    private final long loginTimestamp = System.currentTimeMillis();
+public final class FallbackHolder implements Fallback {
+    public static final FallbackHolder INSTANCE = new FallbackHolder();
+
+    @Getter
+    private final Collection<InetAddress> connected = new Vector<>();
+    @Getter
+    private final Collection<InetAddress> verified = new Vector<>();
+    @Getter
+    private final FallbackQueue queue = new FallbackQueue();
 }

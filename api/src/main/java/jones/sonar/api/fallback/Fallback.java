@@ -16,18 +16,13 @@
 
 package jones.sonar.api.fallback;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.InetAddress;
+import java.util.Collection;
 
 public interface Fallback {
-    Map<String, FallbackConnection> connected = new HashMap<>();
+    Collection<InetAddress> getConnected();
 
-    static boolean shouldHandle(final FallbackConnection connection) {
-        if (connected.containsKey(connection.getUsername())) {
-            return false;
-        }
+    Collection<InetAddress> getVerified();
 
-        connected.put(connection.getUsername(), connection);
-        return true;
-    }
+    FallbackQueue getQueue();
 }

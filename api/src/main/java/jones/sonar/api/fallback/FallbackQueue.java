@@ -19,15 +19,15 @@ package jones.sonar.api.fallback;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-public interface FallbackQueue {
-    Queue<Runnable> QUEUE = new ArrayDeque<>();
-    int POLL_RATE = 20; // TODO: make configurable
+public final class FallbackQueue {
+    private final Queue<Runnable> QUEUE = new ArrayDeque<>();
+    private static final int POLL_RATE = 20; // TODO: make configurable
 
-    static void queue(final Runnable runnable) {
+    public void queue(final Runnable runnable) {
         QUEUE.add(runnable);
     }
 
-    static void poll() {
+    public void poll() {
         for (int i = 0; i < POLL_RATE; i++) {
             if (QUEUE.isEmpty()) break;
 

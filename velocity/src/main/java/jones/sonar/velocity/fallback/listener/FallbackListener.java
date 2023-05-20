@@ -17,7 +17,6 @@
 package jones.sonar.velocity.fallback.listener;
 
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
@@ -31,7 +30,7 @@ import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
 import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
-import jones.sonar.api.fallback.Fallback;
+import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.FallbackConnection;
 import jones.sonar.velocity.fallback.dummy.DummyConnection;
 import jones.sonar.velocity.fallback.limit.FallbackLimiter;
@@ -50,13 +49,14 @@ import java.util.Collection;
 import java.util.Vector;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
-import static jones.sonar.api.fallback.FallbackQueue.queue;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
     private final VelocityServer server;
     private final Logger logger;
 
+    // We need to cache if the joining player is a premium player or not
+    // If we don't do that, many authentication plugins can potentially break
     private final Collection<String> premium = new Vector<>();
 
     // TODO: make configurable
@@ -111,20 +111,14 @@ public final class FallbackListener {
      */
     @Subscribe
     public void handle(final PreLoginEvent event) {
+        var inetAddress = event.getConnection().getRemoteAddress().getAddress();
+
+        if (Sonar.get().getFallback().getVerified().contains(inetAddress)) return;
+
         if (event.getResult().isForceOfflineMode()) return;
         if (!event.getResult().isOnlineModeAllowed() && !server.getConfiguration().isOnlineMode()) return;
 
         premium.add(event.getUsername());
-    }
-
-    /**
-     * Remove the player from the premium list in order to prevent memory leaks
-     *
-     * @param event DisconnectEvent
-     */
-    @Subscribe
-    public void handle(final DisconnectEvent event) {
-        premium.remove(event.getPlayer().getUsername());
     }
 
     /**
@@ -135,15 +129,19 @@ public final class FallbackListener {
      */
     @Subscribe
     public void handle(final GameProfileRequestEvent event) throws Throwable {
-        var inboundConnection = (LoginInboundConnection) event.getConnection();
-        var initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
+        val inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
-        var mcConnection = initialConnection.getConnection();
-        var channel = mcConnection.getChannel();
+        if (Sonar.get().getFallback().getVerified().contains(inetAddress)) return;
+
+        val inboundConnection = (LoginInboundConnection) event.getConnection();
+        val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
+
+        val mcConnection = initialConnection.getConnection();
+        val channel = mcConnection.getChannel();
 
         CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
-        queue(() -> channel.eventLoop().execute(() -> {
+        Sonar.get().getFallback().getQueue().queue(() -> channel.eventLoop().execute(() -> {
             if (mcConnection.isClosed()) return;
 
             try {
@@ -163,27 +161,32 @@ public final class FallbackListener {
                 // -> we are intercepting the packets!
                 premium.remove(event.getUsername());
 
-                // Create an instance for the Fallback connection
-                val fallbackPlayer = new FallbackConnection(
-                        player.getUsername(),
-                        channel,
-                        channel.pipeline(),
-                        player.getProtocolVersion().getProtocol()
-                );
-
-                // Check if Fallback is already verifying a player
-                if (!Fallback.shouldHandle(fallbackPlayer)) {
-                    player.disconnect0(ALREADY_VERIFYING, true);
-                    return;
-                }
-
                 // Check if the ip address had too many verifications
-                if (FallbackLimiter.shouldDeny(fallbackPlayer)) {
+                if (FallbackLimiter.shouldDeny(inetAddress)) {
                     player.disconnect0(TOO_MANY_VERIFICATIONS, true);
                     return;
                 }
 
-                logger.info("[Fallback] Initialized connection for: {} ({})", fallbackPlayer.getUsername(), fallbackPlayer.getProtocolVersion());
+                // Check if Fallback is already verifying a player
+                // → is another player with the same ip address connected to Fallback?
+                if (!Sonar.get().getFallback().getConnected().contains(inetAddress)) {
+                    player.disconnect0(ALREADY_VERIFYING, true);
+                    return;
+                }
+
+                // Create an instance for the Fallback connection
+                // TODO: simpler alternative?
+                val fallbackPlayer = new FallbackConnection(
+                        player.getUsername(),
+                        channel,
+                        channel.pipeline(),
+                        inetAddress,
+                        player.getProtocolVersion().getProtocol()
+                );
+
+                logger.info("[fallback/debug] Processing connection for: {} ({})",
+                        fallbackPlayer.getUsername(),
+                        fallbackPlayer.getProtocolVersion());
 
                 // Check if the player is already connected to the proxy
                 if (!server.canRegisterConnection(player)) {

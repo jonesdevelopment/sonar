@@ -18,11 +18,9 @@ package jones.sonar.velocity.fallback.limit;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import jones.sonar.api.fallback.FallbackConnection;
 import lombok.experimental.UtilityClass;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
@@ -32,11 +30,7 @@ public class FallbackLimiter {
             .build();
     private static final byte LIMIT_PER_MINUTE = 2; // TODO: make configurable
 
-    public boolean shouldDeny(final FallbackConnection connection) {
-
-        // Using InetSocketAddress is not good since we don't want the port
-        var inetAddress = ((InetSocketAddress) connection.getChannel().remoteAddress()).getAddress();
-
+    public boolean shouldDeny(final InetAddress inetAddress) {
         if (CHECKS.asMap().containsKey(inetAddress)) {
             final byte newCount = (byte) (CHECKS.asMap().get(inetAddress) + 1);
 

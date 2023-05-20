@@ -16,8 +16,15 @@
 
 package jones.sonar.api;
 
+import jones.sonar.api.fallback.Fallback;
+import jones.sonar.api.fallback.FallbackHolder;
+
 public interface Sonar {
     SonarPlatform getPlatform();
+
+    default Fallback getFallback() {
+        return FallbackHolder.INSTANCE;
+    }
 
     static Sonar get() {
         return SonarProvider.get();
