@@ -18,7 +18,6 @@ package jones.sonar.api.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
-import jones.sonar.api.Sonar;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -33,8 +32,4 @@ public final class FallbackConnection {
     private final InetAddress inetAddress;
     private final int protocolVersion;
     private final long loginTimestamp = System.currentTimeMillis();
-
-    public void handleDisconnect() {
-        Sonar.get().getFallback().getConnected().remove(inetAddress);
-    }
 }
