@@ -43,6 +43,8 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     public void enable(final SonarVelocityPlugin plugin) {
         this.plugin = plugin;
 
+        final long start = System.currentTimeMillis();
+
         // Set the API to this class
         SonarProvider.set(this);
 
@@ -60,6 +62,11 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         plugin.getServer().getScheduler().buildTask(plugin, getFallback().getQueue()::poll)
                 .repeat(500L, TimeUnit.MILLISECONDS)
                 .schedule();
+
+        // Done
+        final long startDelay = System.currentTimeMillis() - start;
+
+        plugin.getLogger().info("Done ({}s)!", String.format("%.3f", startDelay / 1000D));
     }
 
     @Override

@@ -191,7 +191,7 @@ public final class FallbackListener {
                 );
 
                 // ==================================================================
-                logger.info("[fallback/debug] Processing connection for: {} ({})",
+                logger.info("[Fallback] Processing connection for: {} ({})",
                         fallbackPlayer.getUsername(),
                         fallbackPlayer.getProtocolVersion());
 
