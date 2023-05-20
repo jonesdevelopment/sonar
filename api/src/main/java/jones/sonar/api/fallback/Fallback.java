@@ -24,6 +24,8 @@ public interface Fallback {
 
     Collection<InetAddress> getVerified();
 
+    Collection<InetAddress> getBlacklisted();
+
     FallbackQueue getQueue();
 
     FallbackFilter getAttemptLimiter();

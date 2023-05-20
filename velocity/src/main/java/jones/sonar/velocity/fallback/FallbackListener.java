@@ -80,6 +80,11 @@ public final class FallbackListener {
     private static final Component TOO_MANY_VERIFICATIONS = Component.text(
             "§e§lSonar §7» §cPlease wait a minute before trying to verify again."
     );
+    // TODO: make configurable
+    private static final Component BLACKLISTED = Component.text(
+            "§e§lSonar §7» §cYour ip address is denied from logging into the server."
+    );
+    private static final PreLoginEvent.PreLoginComponentResult BLACKLISTED_RESULT = PreLoginEvent.PreLoginComponentResult.denied(BLACKLISTED);
 
     private static final DummyConnection CLOSED_MINECRAFT_CONNECTION;
 
@@ -126,10 +131,15 @@ public final class FallbackListener {
     public void handle(final PreLoginEvent event) {
         var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
+        if (fallback.getBlacklisted().contains(inetAddress)) {
+            event.setResult(BLACKLISTED_RESULT);
+            return;
+        }
+
         if (fallback.getVerified().contains(inetAddress)) return;
 
         // We cannot allow too many players on our Fallback server
-        if (fallback.getQueue().getQueuedPlayers().size() > Short.MAX_VALUE) {
+        if (fallback.getQueue().getQueuedPlayers().size() >= Short.MAX_VALUE) {
             event.setResult(TOO_MANY_PLAYERS_RESULT);
             return;
         }

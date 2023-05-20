@@ -88,12 +88,12 @@ public final class SonarCommand implements SimpleCommand {
             if (subCommand.isPresent()) {
                 final String permission = "sonar." + subCommand.get().getInfo().name();
 
-                if (!invocation.source().hasPermission(permission)) {
+                /*if (!invocation.source().hasPermission(permission)) {
                     invocation.source().sendMessage(Component.text(
                             "§cYou do not have permission to execute this subcommand. §7(" + permission + ")"
                     ));
                     return;
-                }
+                }*/
             }
         }
 
@@ -116,6 +116,6 @@ public final class SonarCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("sonar.command");
+        return true;// invocation.source().hasPermission("sonar.command");
     }
 }

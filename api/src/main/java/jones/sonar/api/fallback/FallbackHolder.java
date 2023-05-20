@@ -31,6 +31,8 @@ public final class FallbackHolder implements Fallback {
     @Getter
     private final Collection<InetAddress> verified = new Vector<>();
     @Getter
+    private final Collection<InetAddress> blacklisted = new Vector<>();
+    @Getter
     private final FallbackQueue queue = new FallbackQueue();
     @Getter
     @Setter

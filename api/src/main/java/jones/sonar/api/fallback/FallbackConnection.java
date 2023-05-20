@@ -38,6 +38,9 @@ public final class FallbackConnection<Player, Connection> {
 
     public void fail(final String reason) {
         channel.close();
-        Sonar.get().getLogger().info("[Fallback] " + inetAddress + " failed: " + reason);
+
+        fallback.getBlacklisted().add(inetAddress);
+
+        Sonar.get().getLogger().info("[Fallback] " + inetAddress + " has failed the bot check for: " + reason);
     }
 }
