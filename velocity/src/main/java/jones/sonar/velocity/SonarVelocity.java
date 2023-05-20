@@ -67,9 +67,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
 
         // Register Fallback listener
-        var fallback = new FallbackListener((VelocityServer) plugin.getServer(), plugin.getLogger());
-
-        plugin.getServer().getEventManager().register(plugin, fallback);
+        plugin.getServer().getEventManager().register(plugin, new FallbackListener(
+                (VelocityServer) plugin.getServer(), plugin.getLogger()
+        ));
 
         // Apply filter (connection limiter) to Fallback
         Sonar.get().getFallback().setFilter(FallbackConnectionLimiter::shouldAllow);
