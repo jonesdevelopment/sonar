@@ -32,14 +32,13 @@ public class FallbackAttemptLimiter {
   private static final byte LIMIT_PER_MINUTE = 3; // TODO: make configurable
 
   public boolean shouldAllow(final InetAddress inetAddress) {
+    final int newCount = CHECKS_PER_MINUTE.asMap().getOrDefault(inetAddress, 0) + 1;
+
     if (!CHECKS_PER_MINUTE.asMap().containsKey(inetAddress)) {
-      CHECKS_PER_MINUTE.put(inetAddress, 1);
-      return true;
+      CHECKS_PER_MINUTE.put(inetAddress, newCount);
+    } else {
+      CHECKS_PER_MINUTE.asMap().replace(inetAddress, newCount);
     }
-
-    final int newCount = CHECKS_PER_MINUTE.asMap().get(inetAddress) + 1;
-
-    CHECKS_PER_MINUTE.asMap().replace(inetAddress, newCount);
 
     return newCount <= LIMIT_PER_MINUTE;
   }
