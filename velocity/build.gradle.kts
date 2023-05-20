@@ -9,6 +9,8 @@ dependencies {
 
     compileOnly("com.velocitypowered:velocity-proxy:3.2.0-SNAPSHOT") // Proxy module
 
+    compileOnly("net.kyori:adventure-nbt:4.13.1") // Proxy module
+
     compileOnly("com.velocitypowered:velocity-api:3.2.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.2.0-SNAPSHOT")
 

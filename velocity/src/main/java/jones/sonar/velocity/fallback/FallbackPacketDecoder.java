@@ -21,7 +21,6 @@ import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.ClientSettings;
-import com.velocitypowered.proxy.protocol.packet.JoinGame;
 import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.PluginMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -39,15 +38,6 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
     private static final Component VERIFIED = Component.text("§e§lSonar §7» §aYou were successfully verified. §7Please reconnect to the server.");
 
-    private static final JoinGame LEGACY_JOIN_GAME = new JoinGame();
-
-    // TODO: make work for 1.9+
-    static {
-        LEGACY_JOIN_GAME.setIsHardcore(true);
-        LEGACY_JOIN_GAME.setLevelType("flat");
-        LEGACY_JOIN_GAME.setGamemode((short) 3);
-        LEGACY_JOIN_GAME.setReducedDebugInfo(true);
-    }
     private boolean hasSentClientBrand, hasSentClientSettings;
     private boolean hasSentKeepAlive;
 
@@ -92,7 +82,17 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
                 hasSentKeepAlive = true;
 
-                fallbackPlayer.getConnection().write(LEGACY_JOIN_GAME);
+                if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_19_4.getProtocol()) {
+                    fallbackPlayer.getConnection().write(FallbackPackets.JOIN_GAME_1_19_4);
+                } else if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_19_1.getProtocol()) {
+                    fallbackPlayer.getConnection().write(FallbackPackets.JOIN_GAME_1_19_1);
+                } else if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_18_2.getProtocol()) {
+                    fallbackPlayer.getConnection().write(FallbackPackets.JOIN_GAME_1_18_2);
+                } else if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_16_2.getProtocol()) {
+                    fallbackPlayer.getConnection().write(FallbackPackets.JOIN_GAME_1_16_2);
+                } else {
+                    fallbackPlayer.getConnection().write(FallbackPackets.LEGACY_JOIN_GAME);
+                }
             }
         }
     }
