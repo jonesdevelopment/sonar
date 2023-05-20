@@ -14,23 +14,18 @@
  *  limitations under the License.
  */
 
-package jones.sonar.api.fallback;
+package jones.sonar.velocity.fallback;
 
-import java.net.InetAddress;
-import java.util.Collection;
+import jones.sonar.api.fallback.Fallback;
+import jones.sonar.api.fallback.FallbackCleaner;
+import jones.sonar.velocity.SonarVelocity;
 
-public interface Fallback {
-    Collection<InetAddress> getConnected();
+public final class FallbackPlayerCleaner implements FallbackCleaner {
 
-    Collection<InetAddress> getVerified();
-
-    FallbackQueue getQueue();
-
-    FallbackFilter getFilter();
-
-    void setFilter(final FallbackFilter filter);
-
-    FallbackCleaner getCleaner();
-
-    void setCleaner(final FallbackCleaner filter);
+    @Override
+    public void clean(final Fallback fallback) {
+        fallback.getConnected()
+                .removeIf(inetAddress -> SonarVelocity.INSTANCE.getPlugin().getServer().getAllPlayers().stream()
+                .noneMatch(player -> player.getRemoteAddress().getAddress().toString().equals(inetAddress.toString())));
+    }
 }

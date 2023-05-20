@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package jones.sonar.velocity.fallback.filter;
+package jones.sonar.velocity.fallback;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

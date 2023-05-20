@@ -16,26 +16,7 @@
 
 package jones.sonar.api.fallback;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.net.InetAddress;
-import java.util.Collection;
-import java.util.Vector;
-
-public final class FallbackHolder implements Fallback {
-    public static final FallbackHolder INSTANCE = new FallbackHolder();
-
-    @Getter
-    private final Collection<InetAddress> connected = new Vector<>();
-    @Getter
-    private final Collection<InetAddress> verified = new Vector<>();
-    @Getter
-    private final FallbackQueue queue = new FallbackQueue(this);
-    @Getter
-    @Setter
-    private FallbackFilter filter = inetAddress -> true;
-    @Getter
-    @Setter
-    private FallbackCleaner cleaner = null;
+@FunctionalInterface
+public interface FallbackCleaner {
+    <T extends Fallback> void clean(final T fallback);
 }
