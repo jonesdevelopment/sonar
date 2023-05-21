@@ -36,7 +36,6 @@ import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.logger.Logger;
 import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.common.fallback.FallbackTimeoutHandler;
 import jones.sonar.velocity.SonarVelocity;
@@ -62,7 +61,6 @@ import static jones.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
-  private final Logger logger;
   private final Fallback fallback;
 
   // We need to cache if the joining player is a premium player or not
@@ -250,7 +248,7 @@ public final class FallbackListener {
 
           // ==================================================================
           if (!fallback.isUnderAttack()) {
-            logger.info("[Fallback] Processing: {}{} ({})",
+            fallback.getLogger().info("Processing: {}{} ({})",
               event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
           }
 
