@@ -20,7 +20,10 @@ package jones.sonar.velocity.fallback;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
+import com.velocitypowered.api.permission.PermissionFunction;
+import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
@@ -43,6 +46,7 @@ import net.kyori.adventure.text.Component;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -59,6 +63,8 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
   private static final MethodHandle CONNECT_TO_INITIAL_SERVER;
   private static final MethodHandle CONNECT_SESSION_HANDLER;
+  private static final MethodHandle SET_PERMISSION_FUNCTION;
+  private static final PermissionProvider DEFAULT_PERMISSION;
 
   static {
     try {
@@ -73,6 +79,18 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
           InitialConnectSessionHandler.class, MethodHandles.lookup())
         .findConstructor(InitialConnectSessionHandler.class,
           MethodType.methodType(void.class, ConnectedPlayer.class, VelocityServer.class)
+        );
+
+      final Field PERMISSIONS_FIELD = ConnectedPlayer.class.getDeclaredField("DEFAULT_PERMISSIONS");
+      PERMISSIONS_FIELD.setAccessible(true);
+
+      DEFAULT_PERMISSION = (PermissionProvider) PERMISSIONS_FIELD.get(PermissionProvider.class);
+
+      SET_PERMISSION_FUNCTION = MethodHandles.privateLookupIn(
+          AuthSessionHandler.class, MethodHandles.lookup())
+        .findVirtual(ConnectedPlayer.class,
+          "setPermissionFunction",
+          MethodType.methodType(void.class, PermissionFunction.class)
         );
     } catch (Throwable throwable) {
       throw new IllegalStateException(throwable);
@@ -170,54 +188,79 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   // Mostly taken from Velocity
   private void initialConnection(final AuthSessionHandler handler) {
     player.getConnection().server.getEventManager()
-      .fire(new LoginEvent(player.getPlayer()))
-      .thenAcceptAsync(event -> {
+      .fire(new PermissionsSetupEvent(player.getPlayer(), DEFAULT_PERMISSION))
+      .thenAcceptAsync(permissionEvent -> {
+        if (!player.getConnection().isClosed()) {
+          // wait for permissions to load, then set the players permission function
+          final PermissionFunction function = permissionEvent.createFunction(player.getPlayer());
 
-        // The player was disconnected
-        if (player.getConnection().isClosed()) {
-          var disconnectEvent = new DisconnectEvent(
-            player.getPlayer(), DisconnectEvent.LoginStatus.CANCELLED_BY_USER_BEFORE_COMPLETE
-          );
-
-          player.getConnection().server.getEventManager().fireAndForget(disconnectEvent);
-          return;
-        }
-
-        event.getResult().getReasonComponent().ifPresentOrElse(reason -> {
-          player.getPlayer().disconnect0(reason, true);
-        }, () -> {
-          if (player.getConnection().server.registerConnection(player.getPlayer())) {
+          if (function == null) {
+            player.getFallback().getLogger().error(
+              "A plugin permission provider {} provided an invalid permission function"
+                + " for player {}. This is a bug in the plugin, not in Velocity. Falling"
+                + " back to the default permission function.",
+              permissionEvent.getProvider().getClass().getName(),
+              player.getPlayer().getUsername());
+          } else {
             try {
-              var initialConnection = (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
-                .invokeExact(player.getPlayer(), (VelocityServer) player.getConnection().server);
+              SET_PERMISSION_FUNCTION.invokeExact(player.getPlayer(), function);
+            } catch (Throwable throwable) {
+              throwable.printStackTrace();
+              throw new RuntimeException(throwable);
+            }
+          }
 
-              player.getConnection().setSessionHandler(initialConnection);
+          player.getConnection().server.getEventManager()
+            .fire(new LoginEvent(player.getPlayer()))
+            .thenAcceptAsync(event -> {
 
-              player.getConnection().server.getEventManager()
-                .fire(new PostLoginEvent(player.getPlayer()))
-                .thenAccept(postLoginEvent -> {
+              // The player was disconnected
+              if (player.getConnection().isClosed()) {
+                var disconnectEvent = new DisconnectEvent(
+                  player.getPlayer(), DisconnectEvent.LoginStatus.CANCELLED_BY_USER_BEFORE_COMPLETE
+                );
+
+                player.getConnection().server.getEventManager().fireAndForget(disconnectEvent);
+                return;
+              }
+
+              event.getResult().getReasonComponent().ifPresentOrElse(reason -> {
+                player.getPlayer().disconnect0(reason, true);
+              }, () -> {
+                if (player.getConnection().server.registerConnection(player.getPlayer())) {
                   try {
-                    CONNECTION_FIELD.set(handler, player.getConnection());
-                    CONNECT_TO_INITIAL_SERVER.invoke(handler, player.getPlayer());
+                    var initialConnection = (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
+                      .invokeExact(player.getPlayer(), (VelocityServer) player.getConnection().server);
+
+                    player.getConnection().setSessionHandler(initialConnection);
+
+                    player.getConnection().server.getEventManager()
+                      .fire(new PostLoginEvent(player.getPlayer()))
+                      .thenAccept(postLoginEvent -> {
+                        try {
+                          CONNECTION_FIELD.set(handler, player.getConnection());
+                          CONNECT_TO_INITIAL_SERVER.invoke(handler, player.getPlayer());
+                        } catch (Throwable throwable) {
+                          throw new RuntimeException(throwable);
+                        }
+                      });
                   } catch (Throwable throwable) {
                     throw new RuntimeException(throwable);
                   }
-                });
-            } catch (Throwable throwable) {
-              throw new RuntimeException(throwable);
-            }
-          } else {
-            player.getPlayer().disconnect0(
-              Component.translatable("velocity.error.already-connected-proxy"), true
-            );
-          }
-        });
-      }, player.getChannel().eventLoop()).exceptionally(throwable -> {
-        player.getFallback().getSonar().getLogger().error(
-          "Exception while completing login initialisation phase for {}", player, throwable
-        );
-        return null;
-      });
+                } else {
+                  player.getPlayer().disconnect0(
+                    Component.translatable("velocity.error.already-connected-proxy"), true
+                  );
+                }
+              });
+            }, player.getChannel().eventLoop()).exceptionally(throwable -> {
+              player.getFallback().getLogger().error(
+                "Exception while completing login initialisation phase for {}", player, throwable
+              );
+              return null;
+            });
+        }
+      }, player.getChannel().eventLoop());
   }
 
   private static JoinGame getForVersion(final int protocolVersion) {
