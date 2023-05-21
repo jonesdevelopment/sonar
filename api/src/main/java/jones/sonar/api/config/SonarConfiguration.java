@@ -53,7 +53,7 @@ public final class SonarConfiguration {
   public String TOO_MANY_VERIFICATIONS;
   public String ALREADY_VERIFYING;
   public String BLACKLISTED;
-  public String SUCCESSFULLY_VERIFIED;
+  public String NO_SERVER_FOUND;
 
   public void load() {
     Objects.requireNonNull(yamlConfig);
@@ -107,11 +107,12 @@ public final class SonarConfiguration {
         "&cPlease wait a few minutes before trying to verify again.",
         "%footer%"
       )));
-    SUCCESSFULLY_VERIFIED = fromList(yamlConfig.getStringList("general.verification.success",
+    NO_SERVER_FOUND = fromList(yamlConfig.getStringList("general.verification.no-server",
       Arrays.asList(
         "%header%",
-        "&aYour verification was successful.",
-        "&7Please reconnect in order to play on the server."
+        "&cThere is currently no server available.",
+        "&cPlease try again in a few minutes.",
+        "%footer%"
       )));
 
     ACTION_BAR_LAYOUT = formatString(yamlConfig.getString(

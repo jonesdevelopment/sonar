@@ -114,14 +114,14 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     fallbackPlayer.getFallback().getConnected().remove(fallbackPlayer.getInetAddress());
     fallbackPlayer.getFallback().getQueue().getQueuedPlayers().remove(fallbackPlayer.getInetAddress());
 
-    for (final MinecraftPacket packet : FallbackPackets.fastServerSwitch(
-      getForVersion(fallbackPlayer.getProtocolVersion()), fallbackPlayer.getPlayer().getProtocolVersion()
-    )) {
-      fallbackPlayer.getConnection().write(packet);
-    }
-
     // TODO: fix chunks not loading correctly
-    fallbackPlayer.getPlayer().getNextServerToTry().ifPresent(registeredServer -> {
+    fallbackPlayer.getPlayer().getNextServerToTry().ifPresentOrElse(registeredServer -> {
+      for (final MinecraftPacket packet : FallbackPackets.fastServerSwitch(
+        getForVersion(fallbackPlayer.getProtocolVersion()), fallbackPlayer.getPlayer().getProtocolVersion()
+      )) {
+        fallbackPlayer.getConnection().write(packet);
+      }
+
       fallbackPlayer.getFallback().getLogger().info(
         "Successfully verified "
         + fallbackPlayer.getPlayer().getUsername()
@@ -130,6 +130,8 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       );
 
       fallbackPlayer.sendToRealServer(registeredServer);
+    }, () -> {
+      fallbackPlayer.getPlayer().disconnect0(FallbackListener.CachedMessages.NO_SERVER_FOUND, true);
     });
   }
 
