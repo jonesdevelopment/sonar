@@ -21,22 +21,23 @@ import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.*;
+import com.velocitypowered.proxy.protocol.packet.ClientSettings;
+import com.velocitypowered.proxy.protocol.packet.JoinGame;
+import com.velocitypowered.proxy.protocol.packet.KeepAlive;
+import com.velocitypowered.proxy.protocol.packet.PluginMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
+
+import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
+import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final FallbackConnection<ConnectedPlayer, MinecraftConnection> fallbackPlayer;
   private final long startKeepAliveId;
-
-  // TODO: make configurable
-  private static final Component VERIFIED = Component.text("§e§lSonar §7» §aYou were successfully verified. §7Please " +
-    "reconnect to the server.");
 
   private boolean hasSentClientBrand, hasSentClientSettings, hasSentKeepAlive;
 
@@ -72,7 +73,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         if (fallbackPlayer.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_8.getProtocol()) return;
 
-        finish(fallbackPlayer);
+        finish();
       }
 
       if (packet instanceof KeepAlive keepAlive
@@ -96,17 +97,40 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
         checkFrame(hasSentClientSettings, "unexpected timing #6");
 
         // We already ran the other checks, let's verify the player
-        finish(fallbackPlayer);
+        finish();
       }
+    } else {
+      // We want the backend server to actually receive the packets
+      ctx.fireChannelRead(msg);
     }
   }
 
-  private static void finish(final FallbackConnection<ConnectedPlayer, MinecraftConnection> fallbackPlayer) {
+  private void finish() {
+    fallbackPlayer.getPipeline().remove(DECODER);
+    fallbackPlayer.getPipeline().remove(HANDLER);
+
     fallbackPlayer.getFallback().getVerified().add(fallbackPlayer.getInetAddress());
 
-    var kickPacket = Disconnect.create(VERIFIED, fallbackPlayer.getPlayer().getProtocolVersion());
+    fallbackPlayer.getFallback().getConnected().remove(fallbackPlayer.getInetAddress());
+    fallbackPlayer.getFallback().getQueue().getQueuedPlayers().remove(fallbackPlayer.getInetAddress());
 
-    fallbackPlayer.getConnection().closeWith(kickPacket);
+    for (final MinecraftPacket packet : FallbackPackets.fastServerSwitch(
+      getForVersion(fallbackPlayer.getProtocolVersion()), fallbackPlayer.getPlayer().getProtocolVersion()
+    )) {
+      fallbackPlayer.getConnection().write(packet);
+    }
+
+    // TODO: fix chunks not loading correctly
+    fallbackPlayer.getPlayer().getNextServerToTry().ifPresent(registeredServer -> {
+      fallbackPlayer.getFallback().getLogger().info(
+        "Successfully verified "
+        + fallbackPlayer.getPlayer().getUsername()
+        + " → "
+          + registeredServer.getServerInfo().getName()
+      );
+
+      fallbackPlayer.sendToRealServer(registeredServer);
+    });
   }
 
   private static JoinGame getForVersion(final int protocolVersion) {

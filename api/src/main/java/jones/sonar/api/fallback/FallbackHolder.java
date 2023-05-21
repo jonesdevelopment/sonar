@@ -17,6 +17,8 @@
 
 package jones.sonar.api.fallback;
 
+import jones.sonar.api.Sonar;
+import jones.sonar.api.logger.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,4 +40,24 @@ public final class FallbackHolder implements Fallback {
   @Getter
   @Setter
   private FallbackFilter attemptLimiter = inetAddress -> true;
+  @Getter
+  private final Sonar sonar = Sonar.get();
+  @Getter
+  private final Logger logger = new Logger() {
+
+        @Override
+        public void info(final String message, final Object... args) {
+          sonar.getLogger().info("[Fallback] " + message, args);
+        }
+
+        @Override
+        public void warn(final String message, final Object... args) {
+          sonar.getLogger().warn("[Fallback] " + message, args);
+        }
+
+        @Override
+        public void error(final String message, final Object... args) {
+          sonar.getLogger().error("[Fallback] " + message, args);
+        }
+      };
 }

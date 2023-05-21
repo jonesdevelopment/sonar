@@ -18,6 +18,7 @@
 package jones.sonar.api.fallback;
 
 import jones.sonar.api.Sonar;
+import jones.sonar.api.logger.Logger;
 
 import java.net.InetAddress;
 import java.util.Collection;
@@ -32,6 +33,10 @@ public interface Fallback {
   FallbackQueue getQueue();
 
   FallbackFilter getAttemptLimiter();
+
+  Sonar getSonar();
+
+  Logger getLogger();
 
   void setAttemptLimiter(final FallbackFilter limiter);
 

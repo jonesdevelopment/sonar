@@ -20,29 +20,32 @@ package jones.sonar.api.fallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import jones.sonar.api.Sonar;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.net.InetAddress;
 
-@Getter
-@RequiredArgsConstructor
-public final class FallbackConnection<Player, Connection> {
-  private final Fallback fallback;
-  private final Player player;
-  private final Connection connection;
-  private final Channel channel;
-  private final ChannelPipeline pipeline;
-  private final InetAddress inetAddress;
-  private final int protocolVersion;
-  private final long loginTimestamp = System.currentTimeMillis();
+public interface FallbackConnection<Player, Connection> {
+  Fallback getFallback();
 
-  public void fail(final String reason) {
-    channel.close();
+  Player getPlayer();
 
-    fallback.getBlacklisted().add(inetAddress);
+  Connection getConnection();
+
+  Channel getChannel();
+
+  ChannelPipeline getPipeline();
+
+  InetAddress getInetAddress();
+
+  int getProtocolVersion();
+
+  <T> void sendToRealServer(final T server);
+
+  default void fail(final String reason) {
+    getChannel().close();
+
+    getFallback().getBlacklisted().add(getInetAddress());
 
     Sonar.get().getLogger().info("[Fallback] {} ({}) has failed the bot check for: {}",
-      inetAddress, protocolVersion, reason);
+      getInetAddress(), getProtocolVersion(), reason);
   }
 }

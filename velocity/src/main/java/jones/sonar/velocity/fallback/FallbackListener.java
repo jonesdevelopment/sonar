@@ -36,7 +36,6 @@ import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.fallback.FallbackConnection;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.common.fallback.FallbackTimeoutHandler;
@@ -57,6 +56,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
+import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
+import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
 import static jones.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
@@ -73,6 +74,7 @@ public final class FallbackListener {
     static PreLoginEvent.PreLoginComponentResult BLACKLISTED;
     static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
     static Component TOO_MANY_VERIFICATIONS;
+    public static Component SUCCESSFULLY_VERIFIED;
 
     public static void update() {
       ALREADY_VERIFYING = PreLoginEvent.PreLoginComponentResult.denied(
@@ -85,6 +87,7 @@ public final class FallbackListener {
         Component.text(Sonar.get().getConfig().BLACKLISTED)
       );
       TOO_MANY_VERIFICATIONS = Component.text(Sonar.get().getConfig().TOO_MANY_VERIFICATIONS);
+      SUCCESSFULLY_VERIFIED = Component.text(Sonar.get().getConfig().SUCCESSFULLY_VERIFIED);
     }
   }
 
@@ -200,7 +203,7 @@ public final class FallbackListener {
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
-      channel.pipeline().addFirst("sonar-handler", FallbackChannelHandler.INSTANCE);
+      channel.pipeline().addFirst(HANDLER, FallbackChannelHandler.INSTANCE);
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
@@ -239,9 +242,9 @@ public final class FallbackListener {
           }
 
           // Create an instance for the Fallback connection
-          var fallbackPlayer = new FallbackConnection<>(
-            fallback, player, mcConnection, channel,
-            channel.pipeline(), inetAddress,
+          var fallbackPlayer = new FallbackPlayer(
+            fallback,
+            player, mcConnection, channel, channel.pipeline(), inetAddress,
             player.getProtocolVersion().getProtocol()
           );
 
@@ -290,7 +293,7 @@ public final class FallbackListener {
           // the packets to be processed and decoded already
           fallbackPlayer.getPipeline().addAfter(
             Connections.MINECRAFT_DECODER,
-            "sonar-decoder",
+            DECODER,
             new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
           );
 

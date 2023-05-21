@@ -53,6 +53,7 @@ public final class SonarConfiguration {
   public String TOO_MANY_VERIFICATIONS;
   public String ALREADY_VERIFYING;
   public String BLACKLISTED;
+  public String SUCCESSFULLY_VERIFIED;
 
   public void load() {
     Objects.requireNonNull(yamlConfig);
@@ -105,6 +106,12 @@ public final class SonarConfiguration {
         "&cYour ip address is temporarily denied from verifying.",
         "&cPlease wait a few minutes before trying to verify again.",
         "%footer%"
+      )));
+    SUCCESSFULLY_VERIFIED = fromList(yamlConfig.getStringList("general.verification.success",
+      Arrays.asList(
+        "%header%",
+        "&aYour verification was successful.",
+        "&7Please reconnect in order to play on the server."
       )));
 
     ACTION_BAR_LAYOUT = formatString(yamlConfig.getString(
