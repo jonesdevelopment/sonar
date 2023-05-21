@@ -96,7 +96,7 @@ public final class FallbackListener {
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private static final MethodHandle INITIAL_CONNECTION;
   private static final MethodHandle CONNECTED_PLAYER;
-  private static final Field CONNECTION_FIELD;
+  public static final Field CONNECTION_FIELD;
 
   static {
     CLOSED_MINECRAFT_CONNECTION = new DummyConnection(null);
@@ -120,7 +120,10 @@ public final class FallbackListener {
         );
 
       INITIAL_CONNECTION = MethodHandles.privateLookupIn(LoginInboundConnection.class, LOOKUP)
-        .findGetter(LoginInboundConnection.class, "delegate", InitialInboundConnection.class);
+        .findGetter(LoginInboundConnection.class,
+          "delegate",
+          InitialInboundConnection.class
+        );
     } catch (Throwable throwable) {
       throw new IllegalStateException();
     }

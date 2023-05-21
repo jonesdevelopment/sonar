@@ -17,9 +17,15 @@
 
 package jones.sonar.velocity.fallback;
 
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
+import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
+import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
+import com.velocitypowered.proxy.connection.client.InitialConnectSessionHandler;
 import com.velocitypowered.proxy.network.Connections;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.ClientSettings;
@@ -32,11 +38,17 @@ import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
 import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
+import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
@@ -44,6 +56,28 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final long startKeepAliveId;
 
   private boolean hasSentClientBrand, hasSentClientSettings, hasSentKeepAlive;
+
+  private static final MethodHandle CONNECT_TO_INITIAL_SERVER;
+  private static final MethodHandle CONNECT_SESSION_HANDLER;
+
+  static {
+    try {
+      CONNECT_TO_INITIAL_SERVER = MethodHandles.privateLookupIn(
+        AuthSessionHandler.class, MethodHandles.lookup())
+        .findVirtual(AuthSessionHandler.class,
+          "connectToInitialServer",
+          MethodType.methodType(CompletableFuture.class, ConnectedPlayer.class)
+        );
+
+      CONNECT_SESSION_HANDLER = MethodHandles.privateLookupIn(
+          InitialConnectSessionHandler.class, MethodHandles.lookup())
+        .findConstructor(InitialConnectSessionHandler.class,
+          MethodType.methodType(void.class, ConnectedPlayer.class, VelocityServer.class)
+        );
+    } catch (Throwable throwable) {
+      throw new IllegalStateException(throwable);
+    }
+  }
 
   @Override
   public void channelRead(final ChannelHandlerContext ctx,
@@ -128,18 +162,62 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       ));
 
     // TODO: fix chunks not loading correctly
-    player.getPlayer().getNextServerToTry().ifPresentOrElse(registeredServer -> {
-      player.getFallback().getLogger().info(
-        "Successfully verified "
-        + player.getPlayer().getUsername()
-        + " → "
-          + registeredServer.getServerInfo().getName()
-      );
+    initialConnection((AuthSessionHandler) player.getConnection().getSessionHandler());
 
-      player.sendToRealServer(registeredServer);
-    }, () -> {
-      player.getPlayer().disconnect0(FallbackListener.CachedMessages.NO_SERVER_FOUND, true);
-    });
+    player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
+  }
+
+  // Mostly taken from Velocity
+  private void initialConnection(final AuthSessionHandler handler) {
+    player.getConnection().server.getEventManager()
+      .fire(new LoginEvent(player.getPlayer()))
+      .thenAcceptAsync(event -> {
+
+        // The player was disconnected
+        if (player.getConnection().isClosed()) {
+          var disconnectEvent = new DisconnectEvent(
+            player.getPlayer(), DisconnectEvent.LoginStatus.CANCELLED_BY_USER_BEFORE_COMPLETE
+          );
+
+          player.getConnection().server.getEventManager().fireAndForget(disconnectEvent);
+          return;
+        }
+
+        event.getResult().getReasonComponent().ifPresentOrElse(reason -> {
+          player.getPlayer().disconnect0(reason, true);
+        }, () -> {
+          if (player.getConnection().server.registerConnection(player.getPlayer())) {
+            try {
+              var initialConnection = (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
+                .invokeExact(player.getPlayer(), (VelocityServer) player.getConnection().server);
+
+              player.getConnection().setSessionHandler(initialConnection);
+
+              player.getConnection().server.getEventManager()
+                .fire(new PostLoginEvent(player.getPlayer()))
+                .thenAccept(postLoginEvent -> {
+                  try {
+                    CONNECTION_FIELD.set(handler, player.getConnection());
+                    CONNECT_TO_INITIAL_SERVER.invoke(handler, player.getPlayer());
+                  } catch (Throwable throwable) {
+                    throw new RuntimeException(throwable);
+                  }
+                });
+            } catch (Throwable throwable) {
+              throw new RuntimeException(throwable);
+            }
+          } else {
+            player.getPlayer().disconnect0(
+              Component.translatable("velocity.error.already-connected-proxy"), true
+            );
+          }
+        });
+      }, player.getChannel().eventLoop()).exceptionally(throwable -> {
+        player.getFallback().getSonar().getLogger().error(
+          "Exception while completing login initialisation phase for {}", player, throwable
+        );
+        return null;
+      });
   }
 
   private static JoinGame getForVersion(final int protocolVersion) {

@@ -38,14 +38,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class FallbackPackets {
+  private final PacketDimension USED_DIMENSION = PacketDimension.OVERWORLD;
   public final JoinGame LEGACY_JOIN_GAME = new JoinGame();
 
   static {
-    LEGACY_JOIN_GAME.setIsHardcore(true);
-    LEGACY_JOIN_GAME.setLevelType("flat");
     LEGACY_JOIN_GAME.setGamemode((short) 3);
-    LEGACY_JOIN_GAME.setPreviousGamemode((short) -1);
-    LEGACY_JOIN_GAME.setReducedDebugInfo(true);
+    LEGACY_JOIN_GAME.setDimension(USED_DIMENSION.getLegacyID());
   }
 
   private static final ImmutableSet<String> LEVELS = ImmutableSet.of(
@@ -115,8 +113,7 @@ public class FallbackPackets {
       throw new IllegalStateException(throwable);
     }
 
-    final PacketDimension dimension = PacketDimension.THE_END;
-    joinGame.setDimensionInfo(new DimensionInfo(dimension.getKey(), dimension.getKey(), false, false));
+    joinGame.setDimensionInfo(new DimensionInfo(USED_DIMENSION.getKey(), USED_DIMENSION.getKey(), false, false));
 
     CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
     ListBinaryTag encodedDimensionRegistry = ListBinaryTag.builder(BinaryTagTypes.COMPOUND)
@@ -148,7 +145,7 @@ public class FallbackPackets {
     }
 
     try {
-      CompoundBinaryTag currentDimensionData = encodedDimensionRegistry.getCompound(dimension.getModernID());
+      CompoundBinaryTag currentDimensionData = encodedDimensionRegistry.getCompound(USED_DIMENSION.getModernID());
 
       if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
         currentDimensionData = currentDimensionData.getCompound("element");
