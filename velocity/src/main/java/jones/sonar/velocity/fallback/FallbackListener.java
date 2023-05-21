@@ -132,7 +132,7 @@ public final class FallbackListener {
    */
   @Subscribe(order = PostOrder.LAST)
   public void handle(final PreLoginEvent event) {
-    Sonar.get().getStatistics().increment("total");
+    fallback.getSonar().getStatistics().increment("total");
 
     var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
@@ -151,8 +151,8 @@ public final class FallbackListener {
     }
 
     // We cannot allow too many players on our Fallback server
-    if (fallback.getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MAXIMUM_QUEUED_PLAYERS
-      || fallback.getConnected().size() > Sonar.get().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
+    if (fallback.getQueue().getQueuedPlayers().size() > fallback.getSonar().getConfig().MAXIMUM_QUEUED_PLAYERS
+      || fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
       event.setResult(TOO_MANY_PLAYERS);
       return;
     }
@@ -195,7 +195,7 @@ public final class FallbackListener {
       // We also want to timeout bots quickly to avoid flooding
       channel.pipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
         new FallbackTimeoutHandler(
-          Sonar.get().getConfig().VERIFICATION_TIMEOUT,
+          fallback.getSonar().getConfig().VERIFICATION_TIMEOUT,
           TimeUnit.MILLISECONDS
         ));
 

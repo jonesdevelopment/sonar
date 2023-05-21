@@ -20,6 +20,7 @@ package jones.sonar.velocity.fallback;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
+import com.velocitypowered.proxy.network.Connections;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.ClientSettings;
 import com.velocitypowered.proxy.protocol.packet.JoinGame;
@@ -28,8 +29,11 @@ import com.velocitypowered.proxy.protocol.packet.PluginMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
+
+import java.util.concurrent.TimeUnit;
 
 import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
 import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
@@ -106,16 +110,28 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   }
 
   private void finish() {
+
+    // Remove Sonar pipelines to avoid issues
     player.getPipeline().remove(DECODER);
     player.getPipeline().remove(HANDLER);
 
     player.getFallback().getVerified().add(player.getInetAddress());
 
+    // Remove player from the queue and connected player list
     player.getFallback().getConnected().remove(player.getInetAddress());
-    player.getFallback().getQueue().getQueuedPlayers().remove(player.getInetAddress());
+
+    // Replace timeout handler with the old one to let Velocity handle timeouts again
+    player.getPipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
+      new ReadTimeoutHandler(
+        player.getFallback().getSonar().getConfig().VERIFICATION_TIMEOUT,
+        TimeUnit.MILLISECONDS
+      ));
 
     // TODO: fix chunks not loading correctly
     player.getPlayer().getNextServerToTry().ifPresentOrElse(registeredServer -> {
+
+      // TODO: check if this causes issues
+      // Send Respawn and JoinGame packet to prepare the join state
       for (final MinecraftPacket packet : FallbackPackets.fastServerSwitch(
         getForVersion(player.getProtocolVersion()), player.getPlayer().getProtocolVersion()
       )) {

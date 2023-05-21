@@ -45,9 +45,7 @@ public class FallbackPlayer implements FallbackConnection<ConnectedPlayer, Minec
   public <T> void sendToRealServer(final T server) {
     if (server instanceof RegisteredServer registeredServer) {
       getChannel().eventLoop().execute(() -> {
-        if (connection.getState() != StateRegistry.PLAY) {
-          connection.setState(StateRegistry.PLAY);
-        }
+        connection.setState(StateRegistry.PLAY);
 
         player.createConnectionRequest(registeredServer).fireAndForget();
       });
