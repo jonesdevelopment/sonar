@@ -112,4 +112,9 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
   @Override
   public void disable() {
   }
+
+  @Override
+  public void reload() {
+    getConfig().load();
+  }
 }

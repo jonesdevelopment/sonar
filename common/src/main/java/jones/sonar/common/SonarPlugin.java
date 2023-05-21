@@ -21,4 +21,6 @@ public interface SonarPlugin<T> {
   void enable(final T plugin);
 
   void disable();
+
+  void reload();
 }

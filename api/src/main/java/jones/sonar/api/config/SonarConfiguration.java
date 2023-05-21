@@ -48,10 +48,19 @@ public final class SonarConfiguration {
   public int VERIFICATION_TIMEOUT;
   public int VERIFICATIONS_PER_MINUTE;
 
+  public String HEADER, FOOTER;
+  public String TOO_MANY_PLAYERS;
+  public String TOO_MANY_VERIFICATIONS;
+  public String ALREADY_VERIFYING;
+  public String BLACKLISTED;
+
   public void load() {
     Objects.requireNonNull(yamlConfig);
 
     yamlConfig.load();
+
+    // Message settings
+    PREFIX = formatString(yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
 
     // General options
     MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
@@ -62,11 +71,43 @@ public final class SonarConfiguration {
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
     VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
 
-    // Message settings
-    PREFIX = ChatColor.translateAlternateColorCodes('&',
-      yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
+    HEADER = fromList(yamlConfig.getStringList("general.verification.message.header",
+      Arrays.asList(
+        "&e&lSonar"
+      )));
+    FOOTER = fromList(yamlConfig.getStringList("general.verification.message.footer",
+      Arrays.asList(
+        "&7If you believe that this is an error, contact an administrator."
+      )));
+    TOO_MANY_PLAYERS = fromList(yamlConfig.getStringList("general.verification.too-many-players",
+      Arrays.asList(
+        "%header%",
+        "&cToo many players are currently trying to log in.",
+        "&7Please try again in a few seconds.",
+        "%footer%"
+      )));
+    TOO_MANY_VERIFICATIONS = fromList(yamlConfig.getStringList("general.verification.too-many-verifications",
+      Arrays.asList(
+        "%header%",
+        "&cYour ip address is denied from logging into the server.",
+        "%footer%"
+      )));
+    ALREADY_VERIFYING = fromList(yamlConfig.getStringList("general.verification.already-verifying",
+      Arrays.asList(
+        "%header%",
+        "&cYour ip address is currently queued for verification.",
+        "&cPlease wait a few minutes before trying to verify again.",
+        "%footer%"
+      )));
+    BLACKLISTED = fromList(yamlConfig.getStringList("general.verification.blacklisted",
+      Arrays.asList(
+        "%header%",
+        "&cYour ip address is temporarily denied from verifying.",
+        "&cPlease wait a few minutes before trying to verify again.",
+        "%footer%"
+      )));
 
-    ACTION_BAR_LAYOUT = ChatColor.translateAlternateColorCodes('&', yamlConfig.getString(
+    ACTION_BAR_LAYOUT = formatString(yamlConfig.getString(
       "messages.action-bar.layout",
       "&e&lSonar" +
         " &3▪ &7Queued &f%queued%" +
@@ -75,6 +116,19 @@ public final class SonarConfiguration {
         " &3▪ &7Total &f%total%" +
         " &3▪ &6%animation%"
     ));
-    ANIMATION = yamlConfig.getStringList("messages.action-bar.animation", Arrays.asList("▙", "▛", "▜", "▟"));
+    ANIMATION = yamlConfig.getStringList("messages.action-bar.animation",
+      Arrays.asList("▙", "▛", "▜", "▟")
+    );
+  }
+
+  private String fromList(final Collection<String> list) {
+    return formatString(String.join("\n", list));
+  }
+
+  private String formatString(final String string) {
+    return ChatColor.translateAlternateColorCodes('&', string)
+      .replace("%prefix%", PREFIX == null ? "" : PREFIX)
+      .replace("%header%", HEADER == null ? "" : HEADER)
+      .replace("%footer%", FOOTER == null ? "" : FOOTER);
   }
 }

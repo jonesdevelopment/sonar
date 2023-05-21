@@ -126,4 +126,10 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
   public void disable() {
     // Do nothing
   }
+
+  @Override
+  public void reload() {
+    getConfig().load();
+    FallbackListener.CachedMessages.update();
+  }
 }

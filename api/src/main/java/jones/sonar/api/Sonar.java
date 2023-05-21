@@ -39,6 +39,8 @@ public interface Sonar {
 
   Statistics getStatistics();
 
+  void reload();
+
   static Sonar get() {
     return SonarProvider.get();
   }

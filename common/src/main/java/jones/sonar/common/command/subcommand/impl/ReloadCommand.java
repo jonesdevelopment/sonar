@@ -31,7 +31,7 @@ public final class ReloadCommand extends SubCommand {
   @Override
   public void execute(final CommandInvocation invocation) {
     invocation.getInvocationSender().sendMessage("§7Reloading...");
-    Sonar.get().getConfig().load();
+    Sonar.get().reload();
     invocation.getInvocationSender().sendMessage("§aSuccessfully reloaded.");
   }
 }

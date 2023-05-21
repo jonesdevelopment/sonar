@@ -57,6 +57,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
+import static jones.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
@@ -67,28 +68,25 @@ public final class FallbackListener {
   // If we don't do that, many authentication plugins can potentially break
   private final Collection<String> premium = new Vector<>();
 
-  // TODO: make configurable
-  private static final Component ALREADY_VERIFYING = Component.text(
-    "§e§lSonar §7» §cYou are already being verified at the moment! Please try again later."
-  );
-  private static final PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING_RESULT =
-    PreLoginEvent.PreLoginComponentResult.denied(ALREADY_VERIFYING);
-  // TODO: make configurable
-  private static final Component TOO_MANY_PLAYERS = Component.text(
-    "§e§lSonar §7» §cToo many players are currently trying to log in. Please try again later."
-  );
-  private static final PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS_RESULT =
-    PreLoginEvent.PreLoginComponentResult.denied(TOO_MANY_PLAYERS);
-  // TODO: make configurable
-  private static final Component TOO_MANY_VERIFICATIONS = Component.text(
-    "§e§lSonar §7» §cPlease wait a minute before trying to verify again."
-  );
-  // TODO: make configurable
-  private static final Component BLACKLISTED = Component.text(
-    "§e§lSonar §7» §cYour ip address is denied from logging into the server."
-  );
-  private static final PreLoginEvent.PreLoginComponentResult BLACKLISTED_RESULT =
-    PreLoginEvent.PreLoginComponentResult.denied(BLACKLISTED);
+  public static class CachedMessages {
+    static PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS;
+    static PreLoginEvent.PreLoginComponentResult BLACKLISTED;
+    static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
+    static Component TOO_MANY_VERIFICATIONS;
+
+    public static void update() {
+      ALREADY_VERIFYING = PreLoginEvent.PreLoginComponentResult.denied(
+        Component.text(Sonar.get().getConfig().ALREADY_VERIFYING)
+      );
+      TOO_MANY_PLAYERS = PreLoginEvent.PreLoginComponentResult.denied(
+        Component.text(Sonar.get().getConfig().TOO_MANY_PLAYERS)
+      );
+      BLACKLISTED = PreLoginEvent.PreLoginComponentResult.denied(
+        Component.text(Sonar.get().getConfig().BLACKLISTED)
+      );
+      TOO_MANY_VERIFICATIONS = Component.text(Sonar.get().getConfig().TOO_MANY_VERIFICATIONS);
+    }
+  }
 
   private static final DummyConnection CLOSED_MINECRAFT_CONNECTION;
 
@@ -138,7 +136,7 @@ public final class FallbackListener {
     var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     if (fallback.getBlacklisted().contains(inetAddress)) {
-      event.setResult(BLACKLISTED_RESULT);
+      event.setResult(BLACKLISTED);
       return;
     }
 
@@ -147,14 +145,14 @@ public final class FallbackListener {
     // Check if Fallback is already verifying a player
     // → is another player with the same ip address connected to Fallback?
     if (fallback.getConnected().contains(inetAddress)) {
-      event.setResult(ALREADY_VERIFYING_RESULT);
+      event.setResult(ALREADY_VERIFYING);
       return;
     }
 
     // We cannot allow too many players on our Fallback server
     if (fallback.getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MAXIMUM_QUEUED_PLAYERS
       || fallback.getConnected().size() > Sonar.get().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
-      event.setResult(TOO_MANY_PLAYERS_RESULT);
+      event.setResult(TOO_MANY_PLAYERS);
       return;
     }
 

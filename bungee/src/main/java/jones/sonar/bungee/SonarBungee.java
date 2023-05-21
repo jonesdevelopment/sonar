@@ -113,4 +113,9 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
   public void disable() {
     // Do nothing
   }
+
+  @Override
+  public void reload() {
+    getConfig().load();
+  }
 }
