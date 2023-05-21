@@ -22,9 +22,11 @@ import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.logger.Logger;
+import jones.sonar.api.statistics.Statistics;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
+import jones.sonar.common.statistics.SonarStatistics;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -45,6 +47,9 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
   @Getter
   private Logger logger;
+
+  @Getter
+  private Statistics statistics;
 
   @Override
   public SonarPlatform getPlatform() {
@@ -80,6 +85,9 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
         plugin.getLogger().log(Level.SEVERE, message, args);
       }
     };
+
+    // Initialize statistics
+    statistics = new SonarStatistics();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());

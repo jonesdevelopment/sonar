@@ -55,8 +55,8 @@ public final class SonarConfiguration {
 
     // General options
     MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
-    MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.max-verifying-players", Short.MAX_VALUE);
-    MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.max-queued-players", Short.MAX_VALUE);
+    MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.max-verifying-players", Short.MAX_VALUE / 4);
+    MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.max-queued-players", Short.MAX_VALUE / 4);
     MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);
 
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
@@ -68,7 +68,12 @@ public final class SonarConfiguration {
 
     ACTION_BAR_LAYOUT = ChatColor.translateAlternateColorCodes('&', yamlConfig.getString(
       "messages.action-bar.layout",
-      "&e&lSonar &3▪ &7Queued &f%queued% &3▪ &7Verifying &f%verifying% &3▪ &7Blacklisted &f%blacklisted% &3▪ &6%animation%"
+      "&e&lSonar" +
+        " &3▪ &7Queued &f%queued%" +
+        " &3▪ &7Verifying &f%verifying%" +
+        " &3▪ &7Blacklisted &f%blacklisted%" +
+        " &3▪ &7Total &f%total%" +
+        " &3▪ &6%animation%"
     ));
     ANIMATION = yamlConfig.getStringList("messages.action-bar.animation", Arrays.asList("▙", "▛", "▜", "▟"));
   }

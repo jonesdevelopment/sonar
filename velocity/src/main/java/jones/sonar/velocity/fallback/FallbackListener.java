@@ -133,6 +133,8 @@ public final class FallbackListener {
    */
   @Subscribe(order = PostOrder.LAST)
   public void handle(final PreLoginEvent event) {
+    Sonar.get().getStatistics().increment("total");
+
     var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     if (fallback.getBlacklisted().contains(inetAddress)) {

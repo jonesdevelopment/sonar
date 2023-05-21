@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023, jones
+ * Copyright (C) 2023 jones
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,31 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api;
+package jones.sonar.common.statistics;
 
-import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.fallback.FallbackHolder;
-import jones.sonar.api.logger.Logger;
 import jones.sonar.api.statistics.Statistics;
-import jones.sonar.api.verbose.Verbose;
+import lombok.Getter;
 
-public interface Sonar {
-  SonarPlatform getPlatform();
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-  SonarConfiguration getConfig();
-
-  default Fallback getFallback() {
-    return FallbackHolder.INSTANCE;
-  }
-
-  Verbose getActionBarVerbose();
-
-  Logger getLogger();
-
-  Statistics getStatistics();
-
-  static Sonar get() {
-    return SonarProvider.get();
-  }
+public class SonarStatistics implements Statistics {
+  @Getter
+  private final Map<String, Integer> rawMap = Collections.synchronizedMap(new HashMap<>());
 }

@@ -22,7 +22,9 @@ import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.logger.Logger;
+import jones.sonar.api.statistics.Statistics;
 import jones.sonar.common.SonarPlugin;
+import jones.sonar.common.statistics.SonarStatistics;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackAttemptLimiter;
 import jones.sonar.velocity.fallback.FallbackListener;
@@ -46,6 +48,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
   @Getter
   private Logger logger;
+
+  @Getter
+  private Statistics statistics;
 
   @Override
   public SonarPlatform getPlatform() {
@@ -81,6 +86,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
         plugin.getLogger().error(message, args);
       }
     };
+
+    // Initialize statistics
+    statistics = new SonarStatistics();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());
