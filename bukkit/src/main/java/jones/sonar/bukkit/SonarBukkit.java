@@ -91,7 +91,7 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
-    config.load();
+    reload();
 
     // Register Sonar command
     Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());

@@ -92,7 +92,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());
-    config.load();
+    reload();
 
     // Register Sonar command
     plugin.getServer().getCommandManager().register("sonar", new SonarCommand());

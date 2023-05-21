@@ -91,7 +91,7 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
-    config.load();
+    reload();
 
     // Register Sonar command
     plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());
