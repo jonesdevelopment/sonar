@@ -36,7 +36,7 @@ import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
-  private final FallbackConnection<ConnectedPlayer, MinecraftConnection> fallbackPlayer;
+  private final FallbackConnection<ConnectedPlayer, MinecraftConnection> player;
   private final long startKeepAliveId;
 
   private boolean hasSentClientBrand, hasSentClientSettings, hasSentKeepAlive;
@@ -62,7 +62,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         if (!payload.getChannel().equals("MC|Brand") && !payload.getChannel().equals("minecraft:brand")) return;
 
-        final boolean valid = fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_13.getProtocol();
+        final boolean valid = player.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_13.getProtocol();
 
         // MCStorm actually messes this up
         checkFrame(payload.getChannel().equals("MC|Brand") || valid, "invalid client brand");
@@ -71,7 +71,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         hasSentClientBrand = true;
 
-        if (fallbackPlayer.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_8.getProtocol()) return;
+        if (player.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_8.getProtocol()) return;
 
         finish();
       }
@@ -82,14 +82,14 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         hasSentKeepAlive = true;
 
-        fallbackPlayer.getConnection().write(getForVersion(fallbackPlayer.getProtocolVersion()));
+        player.getConnection().write(getForVersion(player.getProtocolVersion()));
       }
 
       // 1.8 clients send a KeepAlive packet with the id 0 every second
       // while being in the "Downloading terrain" gui
       if (packet instanceof KeepAlive keepAlive
         && keepAlive.getRandomId() == 0
-        && fallbackPlayer.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
+        && player.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
 
         // First, let's validate if the packet could actually be sent at this point
         checkFrame(hasSentKeepAlive, "unexpected keep alive (1.8)");
@@ -106,32 +106,32 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   }
 
   private void finish() {
-    fallbackPlayer.getPipeline().remove(DECODER);
-    fallbackPlayer.getPipeline().remove(HANDLER);
+    player.getPipeline().remove(DECODER);
+    player.getPipeline().remove(HANDLER);
 
-    fallbackPlayer.getFallback().getVerified().add(fallbackPlayer.getInetAddress());
+    player.getFallback().getVerified().add(player.getInetAddress());
 
-    fallbackPlayer.getFallback().getConnected().remove(fallbackPlayer.getInetAddress());
-    fallbackPlayer.getFallback().getQueue().getQueuedPlayers().remove(fallbackPlayer.getInetAddress());
+    player.getFallback().getConnected().remove(player.getInetAddress());
+    player.getFallback().getQueue().getQueuedPlayers().remove(player.getInetAddress());
 
     // TODO: fix chunks not loading correctly
-    fallbackPlayer.getPlayer().getNextServerToTry().ifPresentOrElse(registeredServer -> {
+    player.getPlayer().getNextServerToTry().ifPresentOrElse(registeredServer -> {
       for (final MinecraftPacket packet : FallbackPackets.fastServerSwitch(
-        getForVersion(fallbackPlayer.getProtocolVersion()), fallbackPlayer.getPlayer().getProtocolVersion()
+        getForVersion(player.getProtocolVersion()), player.getPlayer().getProtocolVersion()
       )) {
-        fallbackPlayer.getConnection().write(packet);
+        player.getConnection().write(packet);
       }
 
-      fallbackPlayer.getFallback().getLogger().info(
+      player.getFallback().getLogger().info(
         "Successfully verified "
-        + fallbackPlayer.getPlayer().getUsername()
+        + player.getPlayer().getUsername()
         + " → "
           + registeredServer.getServerInfo().getName()
       );
 
-      fallbackPlayer.sendToRealServer(registeredServer);
+      player.sendToRealServer(registeredServer);
     }, () -> {
-      fallbackPlayer.getPlayer().disconnect0(FallbackListener.CachedMessages.NO_SERVER_FOUND, true);
+      player.getPlayer().disconnect0(FallbackListener.CachedMessages.NO_SERVER_FOUND, true);
     });
   }
 
@@ -152,7 +152,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
   private void checkFrame(final boolean condition, final String message) {
     if (!condition) {
-      fallbackPlayer.fail(message);
+      player.fail(message);
       throw CORRUPTED_FRAME;
     }
   }
