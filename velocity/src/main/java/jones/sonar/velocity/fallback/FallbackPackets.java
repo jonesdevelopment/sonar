@@ -20,9 +20,7 @@ package jones.sonar.velocity.fallback;
 import com.google.common.collect.ImmutableSet;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.registry.DimensionInfo;
-import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.JoinGame;
-import com.velocitypowered.proxy.protocol.packet.Respawn;
 import jones.sonar.api.Sonar;
 import jones.sonar.velocity.fallback.dimension.Biome;
 import jones.sonar.velocity.fallback.dimension.PacketDimension;
@@ -35,8 +33,6 @@ import net.kyori.adventure.nbt.ListBinaryTag;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -50,32 +46,6 @@ public class FallbackPackets {
     LEGACY_JOIN_GAME.setGamemode((short) 3);
     LEGACY_JOIN_GAME.setPreviousGamemode((short) -1);
     LEGACY_JOIN_GAME.setReducedDebugInfo(true);
-  }
-
-  // From Velocity.
-  public List<MinecraftPacket> fastServerSwitch(final JoinGame joinGame,final ProtocolVersion version) {
-    // In order to handle switching to another server, you will need to send two packets:
-    //
-    // - The join game packet from the backend server, with a different dimension.
-    // - A respawn with the correct dimension.
-    //
-    // Most notably, by having the client accept the join game packet, we can work around the need
-    // to perform entity ID rewrites, eliminating potential issues from rewriting packets and
-    // improving compatibility with mods.
-    final List<MinecraftPacket> packets = new ArrayList<>();
-
-    final Respawn respawn = Respawn.fromJoinGame(joinGame);
-
-    if (version.compareTo(ProtocolVersion.MINECRAFT_1_16) < 0) {
-      // Before Minecraft 1.16, we could not switch to the same dimension without sending an
-      // additional respawn. On older versions of Minecraft this forces the client to perform
-      // garbage collection which adds additional latency.
-      joinGame.setDimension(joinGame.getDimension() == 0 ? -1 : 0);
-    }
-
-    packets.add(joinGame);
-    packets.add(respawn);
-    return packets;
   }
 
   private static final ImmutableSet<String> LEVELS = ImmutableSet.of(

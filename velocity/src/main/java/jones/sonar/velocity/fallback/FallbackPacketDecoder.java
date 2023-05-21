@@ -129,15 +129,6 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
     // TODO: fix chunks not loading correctly
     player.getPlayer().getNextServerToTry().ifPresentOrElse(registeredServer -> {
-
-      // TODO: check if this causes issues
-      // Send Respawn and JoinGame packet to prepare the join state
-      for (final MinecraftPacket packet : FallbackPackets.fastServerSwitch(
-        getForVersion(player.getProtocolVersion()), player.getPlayer().getProtocolVersion()
-      )) {
-        player.getConnection().write(packet);
-      }
-
       player.getFallback().getLogger().info(
         "Successfully verified "
         + player.getPlayer().getUsername()
