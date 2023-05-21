@@ -123,7 +123,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     // Replace timeout handler with the old one to let Velocity handle timeouts again
     player.getPipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
       new ReadTimeoutHandler(
-        player.getFallback().getSonar().getConfig().VERIFICATION_TIMEOUT,
+        player.getConnection().server.getConfiguration().getConnectTimeout(),
         TimeUnit.MILLISECONDS
       ));
 
