@@ -66,25 +66,39 @@ public class FallbackPackets {
   static {
     try {
       PARTIAL_HASHED_SEED = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
-        .findSetter(JoinGame.class, "partialHashedSeed", long.class);
+        .findSetter(JoinGame.class,
+          "partialHashedSeed", long.class
+        );
+
       CURRENT_DIMENSION_DATA = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
-        .findSetter(JoinGame.class, "currentDimensionData", CompoundBinaryTag.class);
+        .findSetter(JoinGame.class,
+          "currentDimensionData", CompoundBinaryTag.class
+        );
+
       REGISTRY = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
-        .findSetter(JoinGame.class, "registry", CompoundBinaryTag.class);
+        .findSetter(JoinGame.class,
+          "registry", CompoundBinaryTag.class
+        );
+
       LEVEL_NAMES = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
-        .findSetter(JoinGame.class, "levelNames", ImmutableSet.class);
+        .findSetter(JoinGame.class,
+          "levelNames", ImmutableSet.class
+        );
 
       try (final InputStream stream = Sonar.class.getResourceAsStream("/mappings/chat_1_19.nbt")) {
         CHAT_TYPE_119 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(stream),
-          BinaryTagIO.Compression.GZIP);
+          BinaryTagIO.Compression.GZIP
+        );
       }
       try (final InputStream stream = Sonar.class.getResourceAsStream("/mappings/chat_1_19_1.nbt")) {
         CHAT_TYPE_1191 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(stream),
-          BinaryTagIO.Compression.GZIP);
+          BinaryTagIO.Compression.GZIP
+        );
       }
       try (final InputStream stream = Sonar.class.getResourceAsStream("/mappings/damage_1_19_4.nbt")) {
         DAMAGE_TYPE_1194 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(stream),
-          BinaryTagIO.Compression.GZIP);
+          BinaryTagIO.Compression.GZIP
+        );
       }
     } catch (Throwable throwable) {
       throw new IllegalStateException(throwable);
