@@ -43,6 +43,7 @@ public class FallbackPackets {
 
   static {
     LEGACY_JOIN_GAME.setGamemode((short) 3);
+    LEGACY_JOIN_GAME.setLevelType("flat");
     LEGACY_JOIN_GAME.setDimension(USED_DIMENSION.getLegacyID());
   }
 
