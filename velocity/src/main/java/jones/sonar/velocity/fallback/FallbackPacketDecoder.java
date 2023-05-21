@@ -21,7 +21,6 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.permission.PermissionFunction;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.proxy.VelocityServer;
@@ -42,6 +41,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -50,13 +50,14 @@ import java.lang.reflect.Field;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
 import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
 import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
-  private final FallbackConnection<ConnectedPlayer, MinecraftConnection> player;
+  private final @NotNull FallbackConnection<ConnectedPlayer, MinecraftConnection> player;
   private final long startKeepAliveId;
 
   private boolean hasSentClientBrand, hasSentClientSettings, hasSentKeepAlive;
@@ -98,8 +99,8 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelRead(final ChannelHandlerContext ctx,
-                          final Object msg) throws Exception {
+  public void channelRead(final @NotNull ChannelHandlerContext ctx,
+                          final @NotNull Object msg) throws Exception {
     if (msg instanceof MinecraftPacket packet) {
       final boolean legalPacket = packet instanceof ClientSettings
         || packet instanceof PluginMessage || packet instanceof KeepAlive;
@@ -118,7 +119,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         if (!payload.getChannel().equals("MC|Brand") && !payload.getChannel().equals("minecraft:brand")) return;
 
-        final boolean valid = player.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_13.getProtocol();
+        final boolean valid = player.getProtocolVersion() >= MINECRAFT_1_13.getProtocol();
 
         // MCStorm actually messes this up
         checkFrame(payload.getChannel().equals("MC|Brand") || valid, "invalid client brand");
@@ -127,7 +128,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         hasSentClientBrand = true;
 
-        if (player.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_8.getProtocol()) return;
+        if (player.getProtocolVersion() == MINECRAFT_1_8.getProtocol()) return;
 
         finish();
       }
@@ -145,7 +146,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       // while being in the "Downloading terrain" gui
       if (packet instanceof KeepAlive keepAlive
         && keepAlive.getRandomId() == 0
-        && player.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
+        && player.getProtocolVersion() == MINECRAFT_1_8.getProtocol()) {
 
         // First, let's validate if the packet could actually be sent at this point
         checkFrame(hasSentKeepAlive, "unexpected keep alive (1.8)");
@@ -264,13 +265,13 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   }
 
   private static JoinGame getForVersion(final int protocolVersion) {
-    if (protocolVersion >= ProtocolVersion.MINECRAFT_1_19_4.getProtocol()) {
+    if (protocolVersion >= MINECRAFT_1_19_4.getProtocol()) {
       return FallbackPackets.JOIN_GAME_1_19_4;
-    } else if (protocolVersion >= ProtocolVersion.MINECRAFT_1_19_1.getProtocol()) {
+    } else if (protocolVersion >= MINECRAFT_1_19_1.getProtocol()) {
       return FallbackPackets.JOIN_GAME_1_19_1;
-    } else if (protocolVersion >= ProtocolVersion.MINECRAFT_1_18_2.getProtocol()) {
+    } else if (protocolVersion >= MINECRAFT_1_18_2.getProtocol()) {
       return FallbackPackets.JOIN_GAME_1_18_2;
-    } else if (protocolVersion >= ProtocolVersion.MINECRAFT_1_16_2.getProtocol()) {
+    } else if (protocolVersion >= MINECRAFT_1_16_2.getProtocol()) {
       return FallbackPackets.JOIN_GAME_1_16_2;
     }
     return FallbackPackets.LEGACY_JOIN_GAME;
