@@ -34,6 +34,8 @@ import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.common.fallback.FallbackChannelHandler;
@@ -181,19 +183,22 @@ public final class FallbackListener {
     var initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
 
     var mcConnection = initialConnection.getConnection();
-    var channel = mcConnection.getChannel();
+    final Channel channel = mcConnection.getChannel();
 
     // The AuthSessionHandler isn't supposed to continue the connection process
     // which is why we override the field value for the MinecraftConnection with
     // a dummy connection
     CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
+    // Run in the channel's event loop
     channel.eventLoop().execute(() -> {
       if (mcConnection.isClosed()) return;
 
+      final ChannelPipeline pipeline = channel.pipeline();
+
       // Replace timeout handler to avoid known exploits or issues
       // We also want to timeout bots quickly to avoid flooding
-      channel.pipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
+      pipeline.replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
         new FallbackTimeoutHandler(
           fallback.getSonar().getConfig().VERIFICATION_TIMEOUT,
           TimeUnit.MILLISECONDS
@@ -201,7 +206,7 @@ public final class FallbackListener {
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
-      channel.pipeline().addFirst(HANDLER, FallbackChannelHandler.INSTANCE);
+      pipeline.addFirst(HANDLER, FallbackChannelHandler.INSTANCE);
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
@@ -242,7 +247,7 @@ public final class FallbackListener {
           // Create an instance for the Fallback connection
           var fallbackPlayer = new FallbackPlayer(
             fallback,
-            player, mcConnection, channel, channel.pipeline(), inetAddress,
+            player, mcConnection, channel, pipeline, inetAddress,
             player.getProtocolVersion().getProtocol()
           );
 
