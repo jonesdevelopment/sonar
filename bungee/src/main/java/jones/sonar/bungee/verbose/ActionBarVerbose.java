@@ -17,6 +17,7 @@
 
 package jones.sonar.bungee.verbose;
 
+import jones.sonar.api.Sonar;
 import jones.sonar.api.verbose.Verbose;
 import jones.sonar.common.verbose.VerboseAnimation;
 import lombok.Getter;
@@ -25,6 +26,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -34,14 +36,23 @@ public final class ActionBarVerbose implements Verbose {
   private final ProxyServer server;
   @Getter
   private final Collection<String> subscribers = new ArrayList<>();
+  private static final DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
   public void update() {
-    final TextComponent component = new TextComponent("§e§lSonar §7> §f" + VerboseAnimation.nextState());
+    final TextComponent component = new TextComponent(Sonar.get().getConfig().ACTION_BAR_LAYOUT
+      .replace("%queued%", decimalFormat.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+      .replace("%verifying%", decimalFormat.format(Sonar.get().getFallback().getConnected().size()))
+      .replace("%blacklisted%", decimalFormat.format(Sonar.get().getFallback().getBlacklisted().size()))
+      .replace("%total%", decimalFormat.format(Sonar.get().getStatistics().get("total", 0)))
+      .replace("%animation%", VerboseAnimation.nextState())
+    );
 
-    for (final String subscriber : subscribers) {
-      Optional.ofNullable(server.getPlayer(subscriber)).ifPresent(player -> {
-        player.sendMessage(ChatMessageType.ACTION_BAR, component);
-      });
+    synchronized (subscribers) {
+      for (final String subscriber : subscribers) {
+        Optional.ofNullable(server.getPlayer(subscriber)).ifPresent(player -> {
+          player.sendMessage(ChatMessageType.ACTION_BAR, component);
+        });
+      }
     }
   }
 }
