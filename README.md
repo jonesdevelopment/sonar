@@ -2,59 +2,105 @@
   <body>
     <h2>1.0 Introduction</h2>
     <p>
-      The old version of Sonar had a lot of features but wasn't a good Antibot overall.
+      Free software, high quality, and open-source;
       <br>
-      This is supposed to replace the old Sonar version.
+      Sonar efficiently scales to large networks and operates with minimal resources.
       <br>
-      It does not contain a ton of bloat and is supposed to be very light-weight.
+      <p>
+        The old version of Sonar had a ton of features, but it never really protected
+        against advanced types of bots. This is going to change:
+        <br>
+        This version features more advanced checks and less bloated features
+        and is designed to work on more than one type of server.
+      </p>
     </p>
-    <h2>1.1 Goals</h2>
+    <h2>1.1 Design</h2>
     <ul>
       <li>
-        Fast bot check
+        Effective and lightweight
       </li>
       <li>
-        Slow join prevention
+        No complicated installation
+      </li>
+      <li>
+        Avoid unnecessary features
+      </li>
+      <li>
+        Protection against exploits
+      </li>
+      <li>
+        Protection against bots
+        <ul>
+          <li>
+            No annoying captcha
+          </li>
+          <li>
+            No vpn or proxy check
+          </li>
+        </ul>
       </li>
       <li>
         Multi-platform support
       </li>
-      <li>
-        No annoying captcha(s)
-      </li>
-      <li>
-        No vpn/proxy check
-      </li>
     </ul>
     <h2>2.0 Checks</h2>
     <p>
-      Sonar operates using a one main check for handling incoming bot traffic: Fallback
+      Sonar has one main component called Fallback.
       <br>
-      Sonar's Fallback component is supposed to analyze a player's behavior before joining
-      the actual server therefore stopping malicious traffic from ever getting to the back-end.
+      Fallback analyzes a player's behavior before joining the actual server; therefore
+      stopping malicious traffic from ever getting to the backend.
+      <br>
+      It is supposed to be an instant, powerful, and invisible method of verification
+      which should prevent all typical and advanced types of bots.
+      <br>
+      <h3>Fallback</h3>
+      <ul>
+        <li>
+          Sends the player to a lightweight fake server when they first connect
+        </li>
+        <li>
+          Analyzes if the player is sending the necessary packets
+        </li>
+        <li>
+          Analyzes if the player is sending legitimate packets
+        </li>
+        <li>
+          Checks if the player is obeying client gravity
+        </li>
+        <li>
+          Redirect the player to the backend server without them actually noticing that they
+          were checked for being a bot
+        </li>
+      </ul>
+      Fallback also protects from huge spam bot attacks since it queues the incoming connections,
+      therefore making it technically impossible to make a ton of bots join the server at the same time.
     </p>
     <p>
-      The second component is in-game player analysis such as checking if the player joined
-      is sending a legit amount of traffic to the server.
-      This component does not act as an exploit-prevention system and will not protect you
-      from in-game attacks using crash exploits.
+      Exploit prevention is done by checking for exceptions within the pipeline to ensure
+      the player is sending the correct packets to the server.
+      <br>
+      Note: This does not block backend attacks and should not be used as a first line of defense.
     </p>
     <h2>2.1 How Sonar operates</h2>
     <p>
       Sonar hooks itself into the <a href="https://netty.io/4.1/api/io/netty/channel/ChannelPipeline.html">netty channel pipeline</a> of an
-      incoming connection to analyse the traffic (packets) sent by the client.
+      incoming connection to analyze the traffic (packets) sent by the client.
       <br>
       However, Sonar also sends packets to check if the client responds accordingly.
       This only happens when the client has not been verified by Fallback before.
     </p>
     <h2>2.2 False positives</h2>
     <p>
-      Sonar's in-game check is which analyses packet behavior of a client should theoretically
-      not falsely punish a player since it only checks for <b>illegal</b> and <b>impossible</b> packets.
+      Fallback is unlikely to ever falsely prevent a player from joining the server
+      since Minecraft uses the TCP protocol which means that packets are always sent in the
+      correct order. Lag should not affect the bot check.
       <br>
       However, there are edge cases where the Sonar's Fallback might not receive a packet
-      in the necessary time period. In that case, Sonar is trying to account for those edge
-      cases and lag in order to prevent false blacklists.
+      in a necessary time period. In that case, Sonar is trying to account for those edge
+      cases in order to prevent false positives.
+      <br>
+      If you or one of your players experiences a false positive, make sure to report them
+      by opening a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or a ticket on the <a href="https://discord.jonesdev.xyz/">Discord server</a>.
     </p>
     <h2>3.0 Building</h2>
     <p>
@@ -62,9 +108,11 @@
       <br>
       If there are any issues, you can also try <code>gradle shadowJar --stacktrace</code>
       or <code>gradle shadowJar --debug</code>.
+      <br>
+      You can also take a look at the <a href="https://docs.gradle.org/current/userguide/userguide.html">gradle documentation</a>.
     </p>
     <h2>3.1 Contributing</h2>
-    Pull requests are welcome but please follow some simple rules in order for your
+    Pull requests are welcome, but please follow some simple rules in order for your
     pull request to be merged:
     <br>
     <ul>
@@ -75,7 +123,7 @@
         Try to use the same code style as the rest of the project
       </li>
       <li>
-        Try to avoid bloat - Sonar is supposed to be light-weight
+        Try to avoid bloat - Sonar is supposed to be lightweight
       </li>
     </ul>
   </body>
