@@ -1,0 +1,82 @@
+name: Bug Report
+description: Report bugs to improve security, stability and usability
+title: "Bug Report"
+labels: ["bug"]
+
+assignees: []
+
+body:
+  - type: textarea
+    id: general
+    attributes:
+      label: "General information"
+      description: |
+        Please provide some information about what happened.
+        Is there a known way the issue can be reproduced?
+        Please provide a short list of steps you need to do to reproduce the issue.
+      placeholder: |
+        [...]
+        Reproducing the issue:
+        1. ...
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected outcome"
+      description: |
+        What should the expected outcome be?
+      placeholder: []
+    validations:
+      required: true
+
+  - type: dropdown
+    id: java_version
+    attributes:
+      label: "Java version"
+      description: "Please select the version of Java your are using to run your server"
+      multiple: false
+      options:
+        - Java 8 or below
+        - Java 9 or above
+    validations:
+      required: true
+
+  - type: dropdown
+    id: server_type
+    attributes:
+      label: "Server type"
+      description: "Please select the which server you are using Sonar on"
+      multiple: false
+      options:
+        - Velocity
+        - BungeeCord
+        - BungeeCord fork
+        - Bukkit/Spigot
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: server_version
+    attributes:
+      label: "Server version"
+      description: "Please provide the version of the server you are using"
+      placeholder: |
+        Velocity X.X.X-SNAPSHOT build XXX
+        Waterfall X.XX-XXX
+        Paper/Spigot X.XX.X
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: "Additional information"
+      description: |
+        Is there any additional information you would like to provide?
+      placeholder: []
+    validations:
+      required: false
