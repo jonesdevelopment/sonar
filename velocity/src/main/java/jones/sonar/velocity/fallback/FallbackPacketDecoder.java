@@ -121,7 +121,6 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         final boolean valid = player.getProtocolVersion() >= MINECRAFT_1_13.getProtocol();
 
-        // MCStorm actually messes this up
         checkFrame(payload.getChannel().equals("MC|Brand") || valid, "invalid client brand");
         checkFrame(!hasSentClientBrand, "duplicate client brand");
         checkFrame(hasSentClientSettings, "unexpected timing #4");
@@ -168,9 +167,10 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     player.getPipeline().remove(DECODER);
     player.getPipeline().remove(HANDLER);
 
+    // Add the player to the list of verified players
     player.getFallback().getVerified().add(player.getInetAddress());
 
-    // Remove player from the queue and connected player list
+    // Remove player from the list of connected players
     player.getFallback().getConnected().remove(player.getInetAddress());
 
     // Replace timeout handler with the old one to let Velocity handle timeouts again
