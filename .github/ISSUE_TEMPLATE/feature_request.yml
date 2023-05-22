@@ -14,7 +14,6 @@ body:
         Please provide some information about the feature you would like to be implemented.
         Is it related to an existing problem/bug/issue?
         Are there any screenshots or videos showcasing the feature to better understand your request?
-      placeholder: ""
     validations:
       required: true
 
@@ -24,7 +23,6 @@ body:
       label: "Reason"
       description: |
         Is there a specific reason why you would like this feature to be implemented?
-      placeholder: ""
     validations:
       required: true
 
@@ -34,6 +32,5 @@ body:
       label: "Additional information"
       description: |
         Is there any additional information you would like to provide?
-      placeholder: ""
     validations:
       required: false
