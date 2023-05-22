@@ -28,7 +28,6 @@ body:
       label: "Expected outcome"
       description: |
         What should the expected outcome be?
-      placeholder: ""
     validations:
       required: true
 
@@ -77,6 +76,5 @@ body:
       label: "Additional information"
       description: |
         Is there any additional information you would like to provide?
-      placeholder: ""
     validations:
       required: false
