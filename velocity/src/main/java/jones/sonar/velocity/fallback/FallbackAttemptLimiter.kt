@@ -15,31 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.velocity.fallback;
+package jones.sonar.velocity.fallback
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import jones.sonar.api.Sonar;
-import lombok.experimental.UtilityClass;
+import com.github.benmanes.caffeine.cache.Caffeine
+import jones.sonar.api.Sonar
+import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 
-import java.net.InetAddress;
-import java.util.concurrent.TimeUnit;
+class FallbackAttemptLimiter {
+    companion object {
+        private val CHECKS_PER_MINUTE = Caffeine.newBuilder()
+            .expireAfterWrite(1L, TimeUnit.MINUTES)
+            .build<InetAddress, Int>()
 
-@UtilityClass
-public class FallbackAttemptLimiter {
-  private final Cache<InetAddress, Integer> CHECKS_PER_MINUTE = Caffeine.newBuilder()
-    .expireAfterWrite(1L, TimeUnit.MINUTES)
-    .build();
+        @JvmStatic
+        fun shouldAllow(inetAddress: InetAddress): Boolean {
+            val newCount = CHECKS_PER_MINUTE.asMap().getOrDefault(inetAddress, 0) + 1
 
-  public boolean shouldAllow(final InetAddress inetAddress) {
-    final int newCount = CHECKS_PER_MINUTE.asMap().getOrDefault(inetAddress, 0) + 1;
+            if (!CHECKS_PER_MINUTE.asMap().containsKey(inetAddress)) {
+                CHECKS_PER_MINUTE.put(inetAddress, newCount)
+            } else {
+                CHECKS_PER_MINUTE.asMap().replace(inetAddress, newCount)
+            }
 
-    if (!CHECKS_PER_MINUTE.asMap().containsKey(inetAddress)) {
-      CHECKS_PER_MINUTE.put(inetAddress, newCount);
-    } else {
-      CHECKS_PER_MINUTE.asMap().replace(inetAddress, newCount);
+            return newCount <= Sonar.get().config.VERIFICATIONS_PER_MINUTE
+        }
     }
-
-    return newCount <= Sonar.get().getConfig().VERIFICATIONS_PER_MINUTE;
-  }
 }

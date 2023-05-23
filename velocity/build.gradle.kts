@@ -1,6 +1,11 @@
+plugins {
+    kotlin("jvm") version "1.8.21"
+}
+
 repositories {
     maven(url = "https://repo.papermc.io/repository/maven-public/") // Velocity
     maven(url = "https://maven.elytrium.net/repo/") // Velocity proxy module
+    mavenCentral()
 }
 
 val velocityVersion = "3.2.0-SNAPSHOT"
@@ -17,7 +22,13 @@ dependencies {
 
     testCompileOnly("com.velocitypowered:velocity-api:$velocityVersion")
     testAnnotationProcessor("com.velocitypowered:velocity-api:$velocityVersion")
+
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
+
+kotlin {
+    jvmToolchain(17)
+}

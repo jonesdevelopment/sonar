@@ -15,42 +15,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.velocity.verbose;
+package jones.sonar.velocity.verbose
 
-import com.velocitypowered.api.proxy.ProxyServer;
-import jones.sonar.api.Sonar;
-import jones.sonar.api.verbose.Verbose;
-import jones.sonar.common.verbose.VerboseAnimation;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
+import com.velocitypowered.api.proxy.Player
+import com.velocitypowered.api.proxy.ProxyServer
+import jones.sonar.api.Sonar
+import jones.sonar.api.verbose.Verbose
+import jones.sonar.common.verbose.VerboseAnimation
+import net.kyori.adventure.text.Component
+import java.text.DecimalFormat
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
+class ActionBarVerbose(private val server: ProxyServer) : Verbose {
+    private val subscribers: MutableCollection<String> = ArrayList()
 
-@RequiredArgsConstructor
-public final class ActionBarVerbose implements Verbose {
-  private final ProxyServer server;
-  @Getter
-  private final Collection<String> subscribers = new ArrayList<>();
-  private static final DecimalFormat decimalFormat = new DecimalFormat("#,###");
-
-  public void update() {
-    final Component component = Component.text(Sonar.get().getConfig().ACTION_BAR_LAYOUT
-      .replace("%queued%", decimalFormat.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-      .replace("%verifying%", decimalFormat.format(Sonar.get().getFallback().getConnected().size()))
-      .replace("%blacklisted%", decimalFormat.format(Sonar.get().getFallback().getBlacklisted().size()))
-      .replace("%total%", decimalFormat.format(Sonar.get().getStatistics().get("total", 0)))
-      .replace("%animation%", VerboseAnimation.nextState())
-    );
-
-    synchronized (subscribers) {
-      for (final String subscriber : subscribers) {
-        server.getPlayer(subscriber).ifPresent(player -> {
-          player.sendActionBar(component);
-        });
-      }
+    override fun getSubscribers(): MutableCollection<String> {
+        return subscribers
     }
-  }
+
+    fun update() {
+        val component: Component = Component.text(
+            Sonar.get().config.ACTION_BAR_LAYOUT
+                .replace("%queued%", decimalFormat.format(Sonar.get().fallback.queue.queuedPlayers.size.toLong()))
+                .replace("%verifying%", decimalFormat.format(Sonar.get().fallback.connected.size.toLong()))
+                .replace("%blacklisted%", decimalFormat.format(Sonar.get().fallback.blacklisted.size.toLong()))
+                .replace("%total%", decimalFormat.format(Sonar.get().statistics["total", 0].toLong()))
+                .replace("%animation%", VerboseAnimation.nextState())
+        )
+
+        synchronized(subscribers) {
+            for (subscriber in subscribers) {
+                server.getPlayer(subscriber).ifPresent {
+                    player: Player -> player.sendActionBar(component)
+                }
+            }
+        }
+    }
+
+    companion object {
+        private val decimalFormat = DecimalFormat("#,###")
+    }
 }

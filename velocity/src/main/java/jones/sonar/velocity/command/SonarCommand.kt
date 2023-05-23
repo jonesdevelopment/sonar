@@ -15,108 +15,101 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.velocity.command;
+package jones.sonar.velocity.command
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.command.SimpleCommand;
-import com.velocitypowered.api.proxy.Player;
-import jones.sonar.common.command.CommandHelper;
-import jones.sonar.common.command.CommandInvocation;
-import jones.sonar.common.command.InvocationSender;
-import jones.sonar.common.command.subcommand.SubCommand;
-import jones.sonar.common.command.subcommand.SubCommandManager;
-import net.kyori.adventure.text.Component;
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.velocitypowered.api.command.CommandSource
+import com.velocitypowered.api.command.SimpleCommand
+import com.velocitypowered.api.proxy.Player
+import jones.sonar.common.command.CommandHelper
+import jones.sonar.common.command.CommandInvocation
+import jones.sonar.common.command.InvocationSender
+import jones.sonar.common.command.subcommand.SubCommand
+import jones.sonar.common.command.subcommand.SubCommandManager
+import net.kyori.adventure.text.Component
+import java.text.DecimalFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
-import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+class SonarCommand : SimpleCommand {
+    override fun execute(invocation: SimpleCommand.Invocation) {
+        if (delay.asMap().containsKey(invocation.source())) {
+            invocation.source().sendMessage(CANNOT_RUN_YET)
 
-public final class SonarCommand implements SimpleCommand {
-  private static final Cache<CommandSource, Long> delay = Caffeine.newBuilder()
-    .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
-    .build();
-  private static final Component ONLY_PLAYERS = Component.text(
-    "§cYou can only execute this command as a player."
-  );
-  private static final Component CANNOT_RUN_YET = Component.text(
-    "§cYou can only execute this command every 0.5 seconds."
-  );
-  private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
+            val timestamp = delay.asMap()[invocation.source()]!!
+            val left = 0.5 - (System.currentTimeMillis() - timestamp.toDouble()) / 1000.0
+            val format = decimalFormat.format(left)
 
-  @Override
-  public void execute(final Invocation invocation) {
-    if (delay.asMap().containsKey(invocation.source())) {
-      invocation.source().sendMessage(CANNOT_RUN_YET);
-
-      final long timestamp = delay.asMap().get(invocation.source());
-      final double left = 0.5D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
-      final String format = decimalFormat.format(left);
-
-      final Component pleaseWaitAnother = Component.text("§cPlease wait another §l" + format + "s§r§c.");
-
-      invocation.source().sendMessage(pleaseWaitAnother);
-      return;
-    }
-
-    delay.put(invocation.source(), System.currentTimeMillis());
-
-    var subCommand = Optional.<SubCommand>empty();
-
-    var invocationSender = new InvocationSender<CommandSource>() {
-
-      @Override
-      public void sendMessage(final String message) {
-        invocation.source().sendMessage(Component.text(message));
-      }
-
-      @Override
-      public CommandSource getPlayer() {
-        return invocation.source();
-      }
-    };
-
-    if (invocation.arguments().length > 0) {
-      subCommand = SubCommandManager.getSubCommands().stream()
-        .filter(sub -> sub.getInfo().name().equalsIgnoreCase(invocation.arguments()[0])
-          || (sub.getInfo().aliases().length > 0
-          && Arrays.stream(sub.getInfo().aliases())
-          .anyMatch(alias -> alias.equalsIgnoreCase(invocation.arguments()[0]))))
-        .findFirst();
-
-      if (subCommand.isPresent()) {
-        final String permission = "sonar." + subCommand.get().getInfo().name();
-
-        if (!invocation.source().hasPermission(permission)) {
-          invocation.source().sendMessage(Component.text(
-            "§cYou do not have permission to execute this subcommand. §7(" + permission + ")"
-          ));
-          return;
+            invocation.source().sendMessage(Component.text("§cPlease wait another §l" + format + "s§r§c."))
+            return
         }
-      }
+
+        delay.put(invocation.source(), System.currentTimeMillis())
+
+        var subCommand = Optional.empty<SubCommand>()
+
+        val invocationSender: InvocationSender<CommandSource?> = object : InvocationSender<CommandSource?> {
+
+            override fun sendMessage(message: String) {
+                invocation.source().sendMessage(Component.text(message))
+            }
+
+            override fun getPlayer(): CommandSource {
+                return invocation.source()
+            }
+        }
+
+        if (invocation.arguments().isNotEmpty()) {
+            subCommand = SubCommandManager.getSubCommands().stream()
+                .filter { sub: SubCommand ->
+                    (sub.info.name.equals(invocation.arguments()[0], ignoreCase = true)
+                            || (sub.info.aliases.isNotEmpty()
+                            && Arrays.stream(sub.info.aliases)
+                        .anyMatch { alias: String -> alias.equals(invocation.arguments()[0], ignoreCase = true) }))
+                }
+                .findFirst()
+
+            if (subCommand.isPresent) {
+                val permission = "sonar." + subCommand.get().info.name
+
+                if (!invocation.source().hasPermission(permission)) {
+                    invocation.source().sendMessage(Component.text(
+                        "§cYou do not have permission to execute this subcommand. §7($permission)"
+                    ))
+                    return
+                }
+            }
+        }
+
+        subCommand.ifPresentOrElse({ sub: SubCommand ->
+            if (sub.info.onlyPlayers && invocation.source() !is Player) {
+                invocation.source().sendMessage(ONLY_PLAYERS)
+                return@ifPresentOrElse
+            }
+
+            sub.execute(CommandInvocation(
+                if (invocation.source() is Player) (invocation.source() as Player).username else "Console",
+                invocationSender,
+                sub,
+                invocation.arguments()
+            ))
+        }) { CommandHelper.printHelp(invocationSender) }
     }
 
-    subCommand.ifPresentOrElse(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(invocation.source() instanceof Player)) {
-        invocation.source().sendMessage(ONLY_PLAYERS);
-        return;
-      }
+    override fun hasPermission(invocation: SimpleCommand.Invocation): Boolean {
+        return invocation.source().hasPermission("sonar.command")
+    }
 
-      final CommandInvocation commandInvocation = new CommandInvocation(
-        (invocation.source() instanceof Player ? ((Player) invocation.source()).getUsername() : "Console"),
-        invocationSender,
-        sub,
-        invocation.arguments()
-      );
-
-      sub.execute(commandInvocation);
-    }, () -> CommandHelper.printHelp(invocationSender));
-  }
-
-  @Override
-  public boolean hasPermission(final Invocation invocation) {
-    return invocation.source().hasPermission("sonar.command");
-  }
+    companion object {
+        private val delay = Caffeine.newBuilder()
+            .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
+            .build<CommandSource, Long>()
+        private val ONLY_PLAYERS: Component = Component.text(
+            "§cYou can only execute this command as a player."
+        )
+        private val CANNOT_RUN_YET: Component = Component.text(
+            "§cYou can only execute this command every 0.5 seconds."
+        )
+        private val decimalFormat = DecimalFormat("#.#")
+    }
 }
