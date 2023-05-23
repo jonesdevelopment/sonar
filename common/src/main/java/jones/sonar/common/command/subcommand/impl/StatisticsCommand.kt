@@ -15,21 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.common.command.subcommand.impl;
+package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.common.command.CommandInvocation;
-import jones.sonar.common.command.subcommand.SubCommand;
-import jones.sonar.common.command.subcommand.SubCommandInfo;
+import jones.sonar.api.Sonar
+import jones.sonar.common.command.CommandInvocation
+import jones.sonar.common.command.subcommand.SubCommand
+import jones.sonar.common.command.subcommand.SubCommandInfo
 
 @SubCommandInfo(
-  name = "statistics",
-  aliases = {"stats"},
-  description = "Show session statistics of this server"
+    name = "statistics",
+    aliases = ["stats"],
+    description = "Show session statistics of this server"
 )
-public final class StatisticsCommand extends SubCommand {
-
-  @Override
-  public void execute(final CommandInvocation invocation) {
-    invocation.getInvocationSender().sendMessage("Total connections: XD");
-  }
+class StatisticsCommand : SubCommand() {
+    override fun execute(invocation: CommandInvocation) {
+        invocation.invocationSender.sendMessage("Total connections: " + Sonar.get().statistics.get("total", 0))
+    }
 }

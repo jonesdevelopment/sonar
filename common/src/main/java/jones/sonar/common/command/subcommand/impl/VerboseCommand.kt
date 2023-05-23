@@ -15,31 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.common.command.subcommand.impl;
+package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.Sonar;
-import jones.sonar.common.command.CommandInvocation;
-import jones.sonar.common.command.subcommand.SubCommand;
-import jones.sonar.common.command.subcommand.SubCommandInfo;
+import jones.sonar.api.Sonar
+import jones.sonar.common.command.CommandInvocation
+import jones.sonar.common.command.subcommand.SubCommand
+import jones.sonar.common.command.subcommand.SubCommandInfo
 
 @SubCommandInfo(
-  name = "verbose",
-  description = "Enable and disable Sonar verbose",
-  onlyPlayers = true
+    name = "verbose",
+    description = "Enable and disable Sonar verbose",
+    onlyPlayers = true
 )
-public final class VerboseCommand extends SubCommand {
+class VerboseCommand : SubCommand() {
+    override fun execute(invocation: CommandInvocation) {
+        val verboseSubscriber = invocation.executorName
 
-  @Override
-  public void execute(final CommandInvocation invocation) {
-    final String verboseSubscriber = invocation.getExecutorName();
+        if (Sonar.get().actionBarVerbose.isSubscribed(verboseSubscriber)) {
+            Sonar.get().actionBarVerbose.unsubscribe(verboseSubscriber)
+            invocation.invocationSender.sendMessage("§cUnsubscribed")
+            return
+        }
 
-    if (Sonar.get().getActionBarVerbose().isSubscribed(verboseSubscriber)) {
-      Sonar.get().getActionBarVerbose().unsubscribe(verboseSubscriber);
-      invocation.getInvocationSender().sendMessage("§cUnsubscribed");
-      return;
+        invocation.invocationSender.sendMessage("§aSubscribed")
+        Sonar.get().actionBarVerbose.subscribe(verboseSubscriber)
     }
-
-    invocation.getInvocationSender().sendMessage("§aSubscribed");
-    Sonar.get().getActionBarVerbose().subscribe(verboseSubscriber);
-  }
 }

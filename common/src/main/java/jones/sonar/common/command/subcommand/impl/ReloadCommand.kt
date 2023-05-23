@@ -15,23 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.common.command.subcommand.impl;
+package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.Sonar;
-import jones.sonar.common.command.CommandInvocation;
-import jones.sonar.common.command.subcommand.SubCommand;
-import jones.sonar.common.command.subcommand.SubCommandInfo;
+import jones.sonar.api.Sonar
+import jones.sonar.common.command.CommandInvocation
+import jones.sonar.common.command.subcommand.SubCommand
+import jones.sonar.common.command.subcommand.SubCommandInfo
 
 @SubCommandInfo(
-  name = "reload",
-  description = "Reload the configuration"
+    name = "reload",
+    description = "Reload the configuration"
 )
-public final class ReloadCommand extends SubCommand {
-
-  @Override
-  public void execute(final CommandInvocation invocation) {
-    invocation.getInvocationSender().sendMessage("§7Reloading...");
-    Sonar.get().reload();
-    invocation.getInvocationSender().sendMessage("§aSuccessfully reloaded.");
-  }
+class ReloadCommand : SubCommand() {
+    override fun execute(invocation: CommandInvocation) {
+        invocation.invocationSender.sendMessage("§7Reloading...")
+        Sonar.get().reload()
+        invocation.invocationSender.sendMessage("§aSuccessfully reloaded.")
+    }
 }

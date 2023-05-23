@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.common;
+package jones.sonar.common
 
-public interface SonarPlugin<T> {
-  void enable(final T plugin);
+interface SonarPlugin<T> {
+    fun enable(plugin: T)
 
-  void disable();
+    fun disable()
 
-  void reload();
+    fun reload()
 }

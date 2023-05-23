@@ -15,16 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.common.statistics;
+package jones.sonar.common.statistics
 
-import jones.sonar.api.statistics.Statistics;
-import lombok.Getter;
+import jones.sonar.api.statistics.Statistics
+import java.util.*
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+class SonarStatistics : Statistics {
+    private val rawMap = Collections.synchronizedMap(HashMap<String, Int>())
 
-public class SonarStatistics implements Statistics {
-  @Getter
-  private final Map<String, Integer> rawMap = Collections.synchronizedMap(new HashMap<>());
+    override fun getRawMap(): MutableMap<String, Int> {
+        return rawMap;
+    }
 }

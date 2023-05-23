@@ -15,47 +15,47 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.common.fallback;
+package jones.sonar.common.fallback
 
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import jones.sonar.api.Sonar;
-import jones.sonar.api.fallback.Fallback;
-import lombok.RequiredArgsConstructor;
+import io.netty.channel.ChannelHandler.Sharable
+import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.ChannelInboundHandlerAdapter
+import jones.sonar.api.Sonar
+import jones.sonar.api.fallback.Fallback
+import java.io.IOException
+import java.net.InetSocketAddress
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
+@Sharable
+class FallbackChannelHandler(private val fallback: Fallback) : ChannelInboundHandlerAdapter() {
 
-@ChannelHandler.Sharable
-@RequiredArgsConstructor
-public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
-  public static final FallbackChannelHandler INSTANCE = new FallbackChannelHandler(Sonar.get().getFallback());
-  private final Fallback fallback;
+    @Throws(Exception::class)
+    override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+        if (ctx.channel().isActive) {
+            ctx.close()
 
-  @Override
-  public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-    if (ctx.channel().isActive()) {
-      ctx.close();
+            // Clients throw an IOException if the connection is interrupted
+            // unexpectedly - we cannot blacklist for this
+            if (cause is IOException) return
 
-      // Clients throw an IOException if the connection is interrupted
-      // unexpectedly - we cannot blacklist for this
-      if (cause instanceof IOException) return;
+            val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
-      final InetAddress inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
-
-      fallback.getBlacklisted().add(inetAddress);
+            fallback.blacklisted.add(inetAddress)
+        }
     }
-  }
 
-  @Override
-  public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-    super.channelInactive(ctx);
+    @Throws(Exception::class)
+    override fun channelInactive(ctx: ChannelHandlerContext) {
+        super.channelInactive(ctx)
 
-    final InetAddress inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
+        val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
-    fallback.getConnected().remove(inetAddress);
-    fallback.getQueue().getQueuedPlayers().remove(inetAddress);
-  }
+        fallback.connected.remove(inetAddress)
+        fallback.queue.queuedPlayers.remove(inetAddress)
+    }
+
+    companion object {
+
+        @JvmField
+        val INSTANCE = FallbackChannelHandler(Sonar.get().fallback)
+    }
 }

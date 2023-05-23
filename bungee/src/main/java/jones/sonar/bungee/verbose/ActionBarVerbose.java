@@ -44,7 +44,7 @@ public final class ActionBarVerbose implements Verbose {
       .replace("%verifying%", decimalFormat.format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%", decimalFormat.format(Sonar.get().getFallback().getBlacklisted().size()))
       .replace("%total%", decimalFormat.format(Sonar.get().getStatistics().get("total", 0)))
-      .replace("%animation%", VerboseAnimation.nextState())
+      .replace("%animation%", VerboseAnimation.Companion.nextState())
     );
 
     synchronized (subscribers) {

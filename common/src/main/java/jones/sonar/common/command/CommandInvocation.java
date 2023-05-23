@@ -18,14 +18,31 @@
 package jones.sonar.common.command;
 
 import jones.sonar.common.command.subcommand.SubCommand;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
 public final class CommandInvocation {
   private final String executorName;
+
+  public String getExecutorName() {
+    return executorName;
+  }
+
   private final InvocationSender<?> invocationSender;
+
+  public InvocationSender<?> getInvocationSender() {
+    return invocationSender;
+  }
+
   private final SubCommand command;
+
+  public SubCommand getCommand() {
+    return command;
+  }
+
   private final String[] arguments;
+
+  public String[] getArguments() {
+    return arguments;
+  }
 }
