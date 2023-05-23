@@ -209,7 +209,7 @@ public final class FallbackListener {
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
-      pipeline.addLast(HANDLER, FallbackChannelHandler.INSTANCE);
+      pipeline.addFirst(HANDLER, FallbackChannelHandler.INSTANCE);
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
