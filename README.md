@@ -126,5 +126,10 @@
         Try to avoid bloat - Sonar is supposed to be lightweight
       </li>
     </ul>
+    <h2>3.2 License</h2>
+    <p>
+      Sonar is licensed under the GNU General Public License 3.0.
+    </p>
+    <a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg"/></a>
   </body>
 </html>
