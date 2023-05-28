@@ -38,8 +38,6 @@ public interface FallbackConnection<Player, Connection> {
 
   int getProtocolVersion();
 
-  <T> void sendToRealServer(final T server);
-
   default void fail(final String reason) {
     getChannel().close();
 

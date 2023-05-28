@@ -17,10 +17,8 @@
 
 package jones.sonar.velocity.fallback;
 
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.protocol.StateRegistry;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import jones.sonar.api.fallback.Fallback;
@@ -40,17 +38,4 @@ public class FallbackPlayer implements FallbackConnection<ConnectedPlayer, Minec
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final int protocolVersion;
-
-  @Override
-  public <T> void sendToRealServer(final T server) {
-    if (server instanceof RegisteredServer registeredServer) {
-      getChannel().eventLoop().execute(() -> {
-        connection.setState(StateRegistry.PLAY);
-
-        player.createConnectionRequest(registeredServer).fireAndForget();
-      });
-    } else {
-      throw new IllegalArgumentException("Type must extend RegisteredServer");
-    }
-  }
 }
