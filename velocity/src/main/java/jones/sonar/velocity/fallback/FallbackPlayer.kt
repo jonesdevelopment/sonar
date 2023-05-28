@@ -15,27 +15,51 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.velocity.fallback;
+package jones.sonar.velocity.fallback
 
-import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
-import jones.sonar.api.fallback.Fallback;
-import jones.sonar.api.fallback.FallbackConnection;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.velocitypowered.proxy.connection.MinecraftConnection
+import com.velocitypowered.proxy.connection.client.ConnectedPlayer
+import io.netty.channel.Channel
+import io.netty.channel.ChannelPipeline
+import jones.sonar.api.fallback.Fallback
+import jones.sonar.api.fallback.FallbackConnection
+import java.net.InetAddress
 
-import java.net.InetAddress;
+private class FallbackPlayer(
+    private val fallback: Fallback,
+    private val player: ConnectedPlayer,
+    private val connection: MinecraftConnection,
+    private val channel: Channel,
+    private val pipeline: ChannelPipeline,
+    private val inetAddress: InetAddress,
+    private val protocolVersion: Int,
+) : FallbackConnection<ConnectedPlayer?, MinecraftConnection?> {
 
-@Getter
-@RequiredArgsConstructor
-public final class FallbackPlayer implements FallbackConnection<ConnectedPlayer, MinecraftConnection> {
-  private final Fallback fallback;
-  private final ConnectedPlayer player;
-  private final MinecraftConnection connection;
-  private final Channel channel;
-  private final ChannelPipeline pipeline;
-  private final InetAddress inetAddress;
-  private final int protocolVersion;
+    override fun getFallback(): Fallback {
+        return fallback
+    }
+
+    override fun getPlayer(): ConnectedPlayer {
+        return player
+    }
+
+    override fun getConnection(): MinecraftConnection {
+        return connection
+    }
+
+    override fun getChannel(): Channel {
+        return channel
+    }
+
+    override fun getPipeline(): ChannelPipeline {
+        return pipeline
+    }
+
+    override fun getInetAddress(): InetAddress {
+        return inetAddress
+    }
+
+    override fun getProtocolVersion(): Int {
+        return protocolVersion
+    }
 }
