@@ -54,12 +54,14 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
           return;
         }
 
+        player.getConnection().delayedWrite(getJoinPacketForVersion(player.getProtocolVersion()));
+
         // Set session handler to custom fallback handler to intercept all incoming packets
         player.getConnection().setSessionHandler(new FallbackSessionHandler(
           player.getConnection().getSessionHandler(), player
         ));
 
-        player.getConnection().write(getJoinPacketForVersion(player.getProtocolVersion()));
+        player.getConnection().flush();
         return; // Don't read this packet twice
       } else if (!hasFallbackHandler) {
         player.fail("handler not initialized yet");
