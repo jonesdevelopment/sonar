@@ -38,6 +38,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -180,7 +181,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       initialConnection((AuthSessionHandler) previousHandler);
     }, () -> {
       player.getPlayer().disconnect0(
-        Component.translatable("velocity.error.no-available-servers"), true
+        Component.translatable("velocity.error.no-available-servers", NamedTextColor.RED), true
       );
     });
 
