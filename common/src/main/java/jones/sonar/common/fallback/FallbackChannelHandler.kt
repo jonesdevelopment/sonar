@@ -33,10 +33,10 @@ class FallbackChannelHandler(private val fallback: Fallback) : ChannelInboundHan
         if (ctx.channel().isActive) {
             ctx.close()
 
-            // Clients throw an IOException if the connection is interrupted
-            // unexpectedly - we cannot blacklist for this
+            // Clients can throw an IOException if the connection is interrupted unexpectedly
             if (cause is IOException) return
 
+            // Blacklist the ip address
             val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
             fallback.blacklisted.add(inetAddress)
@@ -45,10 +45,11 @@ class FallbackChannelHandler(private val fallback: Fallback) : ChannelInboundHan
 
     @Throws(Exception::class)
     override fun channelInactive(ctx: ChannelHandlerContext) {
-        super.channelInactive(ctx)
+        ctx.fireChannelInactive()
 
         val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
+        // Remove the ip address from the queue
         fallback.connected.remove(inetAddress)
         fallback.queue.queuedPlayers.remove(inetAddress)
     }
