@@ -36,16 +36,11 @@ import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static com.velocitypowered.api.network.ProtocolVersion.*;
+
 @UtilityClass
 public class FallbackPackets {
   private final PacketDimension USED_DIMENSION = PacketDimension.OVERWORLD;
-  public final JoinGame LEGACY_JOIN_GAME = new JoinGame();
-
-  static {
-    LEGACY_JOIN_GAME.setGamemode((short) 3);
-    LEGACY_JOIN_GAME.setLevelType("flat");
-    LEGACY_JOIN_GAME.setDimension(USED_DIMENSION.getLegacyID());
-  }
 
   private static final ImmutableSet<String> LEVELS = ImmutableSet.of(
     PacketDimension.OVERWORLD.getKey(),
@@ -105,10 +100,34 @@ public class FallbackPackets {
     }
   }
 
+  public final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
   public final JoinGame JOIN_GAME_1_16_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16_2);
   public final JoinGame JOIN_GAME_1_18_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_18_2);
   public final JoinGame JOIN_GAME_1_19_1 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_1);
   public final JoinGame JOIN_GAME_1_19_4 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_4);
+
+  static JoinGame getJoinPacketForVersion(final int protocolVersion) {
+    if (protocolVersion >= MINECRAFT_1_19_4.getProtocol()) {
+      return FallbackPackets.JOIN_GAME_1_19_4;
+    } else if (protocolVersion >= MINECRAFT_1_19_1.getProtocol()) {
+      return FallbackPackets.JOIN_GAME_1_19_1;
+    } else if (protocolVersion >= MINECRAFT_1_18_2.getProtocol()) {
+      return FallbackPackets.JOIN_GAME_1_18_2;
+    } else if (protocolVersion >= MINECRAFT_1_16_2.getProtocol()) {
+      return FallbackPackets.JOIN_GAME_1_16_2;
+    }
+    return FallbackPackets.LEGACY_JOIN_GAME;
+  }
+
+  private JoinGame createLegacyJoinGamePacket() {
+    final JoinGame joinGame = new JoinGame();
+
+    joinGame.setGamemode((short) 3);
+    joinGame.setLevelType("flat");
+    joinGame.setDimension(USED_DIMENSION.getLegacyID());
+
+    return joinGame;
+  }
 
   private JoinGame createJoinGamePacket(final ProtocolVersion version) {
     final JoinGame joinGame = new JoinGame();

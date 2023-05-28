@@ -28,8 +28,9 @@ import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import static com.velocitypowered.api.network.ProtocolVersion.*;
+import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_16;
 import static com.velocitypowered.proxy.protocol.util.NettyPreconditions.checkFrame;
+import static jones.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
@@ -53,7 +54,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
           return;
         }
 
-        final JoinGame joinGame = getForVersion(player.getProtocolVersion());
+        final JoinGame joinGame = getJoinPacketForVersion(player.getProtocolVersion());
 
         if (player.getConnection().getType() == ConnectionTypes.LEGACY_FORGE) {
           doSafeClientServerSwitch(joinGame);
@@ -117,18 +118,5 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     // Now send a respawn packet in the correct dimension.
     final Respawn correctSwitchPacket = Respawn.fromJoinGame(joinGame);
     player.getConnection().delayedWrite(correctSwitchPacket);
-  }
-
-  private static JoinGame getForVersion(final int protocolVersion) {
-    if (protocolVersion >= MINECRAFT_1_19_4.getProtocol()) {
-      return FallbackPackets.JOIN_GAME_1_19_4;
-    } else if (protocolVersion >= MINECRAFT_1_19_1.getProtocol()) {
-      return FallbackPackets.JOIN_GAME_1_19_1;
-    } else if (protocolVersion >= MINECRAFT_1_18_2.getProtocol()) {
-      return FallbackPackets.JOIN_GAME_1_18_2;
-    } else if (protocolVersion >= MINECRAFT_1_16_2.getProtocol()) {
-      return FallbackPackets.JOIN_GAME_1_16_2;
-    }
-    return FallbackPackets.LEGACY_JOIN_GAME;
   }
 }
