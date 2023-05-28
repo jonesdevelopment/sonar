@@ -17,86 +17,24 @@
 
 package jones.sonar.velocity.fallback;
 
-import com.velocitypowered.api.event.connection.DisconnectEvent;
-import com.velocitypowered.api.event.connection.LoginEvent;
-import com.velocitypowered.api.event.connection.PostLoginEvent;
-import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.permission.PermissionFunction;
-import com.velocitypowered.api.permission.PermissionProvider;
-import com.velocitypowered.proxy.VelocityServer;
+import com.velocitypowered.proxy.connection.ConnectionTypes;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.connection.client.InitialConnectSessionHandler;
-import com.velocitypowered.proxy.network.Connections;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.ClientSettings;
-import com.velocitypowered.proxy.protocol.packet.JoinGame;
-import com.velocitypowered.proxy.protocol.packet.KeepAlive;
-import com.velocitypowered.proxy.protocol.packet.PluginMessage;
+import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.CorruptedFrameException;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Field;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
 import static com.velocitypowered.api.network.ProtocolVersion.*;
-import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
-import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
-import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
+import static com.velocitypowered.proxy.protocol.util.NettyPreconditions.checkFrame;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final @NotNull FallbackConnection<ConnectedPlayer, MinecraftConnection> player;
   private final long startKeepAliveId;
-
-  private boolean hasSentClientBrand, hasSentClientSettings, hasSentKeepAlive;
-
-  private static final MethodHandle CONNECT_TO_INITIAL_SERVER;
-  private static final MethodHandle CONNECT_SESSION_HANDLER;
-  private static final MethodHandle SET_PERMISSION_FUNCTION;
-  private static final PermissionProvider DEFAULT_PERMISSION;
-
-  static {
-    try {
-      CONNECT_TO_INITIAL_SERVER = MethodHandles.privateLookupIn(
-        AuthSessionHandler.class, MethodHandles.lookup())
-        .findVirtual(AuthSessionHandler.class,
-          "connectToInitialServer",
-          MethodType.methodType(CompletableFuture.class, ConnectedPlayer.class)
-        );
-
-      CONNECT_SESSION_HANDLER = MethodHandles.privateLookupIn(
-          InitialConnectSessionHandler.class, MethodHandles.lookup())
-        .findConstructor(InitialConnectSessionHandler.class,
-          MethodType.methodType(void.class, ConnectedPlayer.class, VelocityServer.class)
-        );
-
-      final Field PERMISSIONS_FIELD = ConnectedPlayer.class.getDeclaredField("DEFAULT_PERMISSIONS");
-      PERMISSIONS_FIELD.setAccessible(true);
-
-      DEFAULT_PERMISSION = (PermissionProvider) PERMISSIONS_FIELD.get(PermissionProvider.class);
-
-      SET_PERMISSION_FUNCTION = MethodHandles.privateLookupIn(
-          AuthSessionHandler.class, MethodHandles.lookup())
-        .findVirtual(ConnectedPlayer.class,
-          "setPermissionFunction",
-          MethodType.methodType(void.class, PermissionFunction.class)
-        );
-    } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
-    }
-  }
 
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx,
@@ -107,164 +45,80 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
       checkFrame(legalPacket, "unexpected packet: " + packet.getClass().getSimpleName());
 
-      if (packet instanceof ClientSettings && !hasSentClientSettings) {
-        checkFrame(hasSentKeepAlive, "unexpected timing #1");
-        checkFrame(!hasSentClientBrand, "unexpected timing #2");
+      final boolean hasFallbackHandler = player.getConnection().getSessionHandler() instanceof FallbackSessionHandler;
 
-        hasSentClientSettings = true;
+      if (packet instanceof KeepAlive keepAlive && keepAlive.getRandomId() == startKeepAliveId) {
+        if (hasFallbackHandler) {
+          player.fail("duplicate packet");
+          return;
+        }
+
+        final JoinGame joinGame = getForVersion(player.getProtocolVersion());
+
+        if (player.getConnection().getType() == ConnectionTypes.LEGACY_FORGE) {
+          doSafeClientServerSwitch(joinGame);
+        } else {
+          doFastClientServerSwitch(joinGame);
+        }
+
+        player.getConnection().setSessionHandler(new FallbackSessionHandler(
+          player.getConnection().getSessionHandler(), player
+        ));
+        player.getConnection().flush();
+        return; // Don't read this packet twice
+      } else if (!hasFallbackHandler) {
+        player.fail("handler not initialized yet");
+        return; // Don't handle illegal packets
       }
 
-      if (packet instanceof PluginMessage payload) {
-        checkFrame(hasSentKeepAlive, "unexpected timing #3");
-
-        if (!payload.getChannel().equals("MC|Brand") && !payload.getChannel().equals("minecraft:brand")) return;
-
-        final boolean valid = player.getProtocolVersion() >= MINECRAFT_1_13.getProtocol();
-
-        checkFrame(payload.getChannel().equals("MC|Brand") || valid, "invalid client brand");
-        checkFrame(!hasSentClientBrand, "duplicate client brand");
-        checkFrame(hasSentClientSettings, "unexpected timing #4");
-
-        hasSentClientBrand = true;
-
-        if (player.getProtocolVersion() == MINECRAFT_1_8.getProtocol()) return;
-
-        finish();
-      }
-
-      if (packet instanceof KeepAlive keepAlive
-        && keepAlive.getRandomId() == startKeepAliveId) {
-        checkFrame(!hasSentKeepAlive, "duplicate keep alive");
-
-        hasSentKeepAlive = true;
-
-        player.getConnection().write(getForVersion(player.getProtocolVersion()));
-      }
-
-      // 1.8 clients send a KeepAlive packet with the id 0 every second
-      // while being in the "Downloading terrain" gui
-      if (packet instanceof KeepAlive keepAlive
-        && keepAlive.getRandomId() == 0
-        && player.getProtocolVersion() == MINECRAFT_1_8.getProtocol()) {
-
-        // First, let's validate if the packet could actually be sent at this point
-        checkFrame(hasSentKeepAlive, "unexpected keep alive (1.8)");
-        checkFrame(hasSentClientBrand, "unexpected timing #5");
-        checkFrame(hasSentClientSettings, "unexpected timing #6");
-
-        // We already ran the other checks, let's verify the player
-        finish();
-      }
+      // We want the session handler to handle the packets properly
+      ctx.fireChannelRead(msg);
     } else {
       // We want the backend server to actually receive the packets
       ctx.fireChannelRead(msg);
     }
   }
 
-  private void finish() {
+  // Taken from Velocity
+  private void doFastClientServerSwitch(final JoinGame joinGame) {
+    // In order to handle switching to another server, you will need to send two packets:
+    //
+    // - The join game packet from the backend server, with a different dimension
+    // - A respawn with the correct dimension
+    //
+    // Most notably, by having the client accept the join game packet, we can work around the need
+    // to perform entity ID rewrites, eliminating potential issues from rewriting packets and
+    // improving compatibility with mods.
+    final Respawn respawn = Respawn.fromJoinGame(joinGame);
 
-    // Remove Sonar pipelines to avoid issues
-    player.getPipeline().remove(DECODER);
-    player.getPipeline().remove(HANDLER);
-
-    // Add the player to the list of verified players
-    player.getFallback().getVerified().add(player.getInetAddress());
-
-    // Remove player from the list of connected players
-    player.getFallback().getConnected().remove(player.getInetAddress());
-
-    // Replace timeout handler with the old one to let Velocity handle timeouts again
-    player.getPipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
-      new ReadTimeoutHandler(
-        player.getConnection().server.getConfiguration().getConnectTimeout(),
-        TimeUnit.MILLISECONDS
-      ));
-
-    // TODO: fix chunks not loading correctly
-    // handle initial connection
-    initialConnection((AuthSessionHandler) player.getConnection().getSessionHandler());
-
-    player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
-  }
-
-  // Mostly taken from Velocity
-  private void initialConnection(final AuthSessionHandler sessionHandler) {
-    player.getConnection().server.getEventManager()
-      .fire(new PermissionsSetupEvent(player.getPlayer(), DEFAULT_PERMISSION))
-      .thenAcceptAsync(permissionEvent -> {
-        if (!player.getConnection().isClosed()) {
-          // wait for permissions to load, then set the players permission function
-          final PermissionFunction function = permissionEvent.createFunction(player.getPlayer());
-
-          if (function == null) {
-            player.getFallback().getLogger().error(
-              "A plugin permission provider {} provided an invalid permission function"
-                + " for player {}. This is a bug in the plugin, not in Velocity. Falling"
-                + " back to the default permission function.",
-              permissionEvent.getProvider().getClass().getName(),
-              player.getPlayer().getUsername());
-          } else {
-            try {
-              SET_PERMISSION_FUNCTION.invokeExact(player.getPlayer(), function);
-            } catch (Throwable throwable) {
-              throwable.printStackTrace();
-              throw new RuntimeException(throwable);
-            }
-          }
-
-          player.getConnection().server.getEventManager()
-            .fire(new LoginEvent(player.getPlayer()))
-            .thenAcceptAsync(event -> {
-
-              // The player was disconnected
-              if (player.getConnection().isClosed()) {
-                var disconnectEvent = new DisconnectEvent(
-                  player.getPlayer(), DisconnectEvent.LoginStatus.CANCELLED_BY_USER_BEFORE_COMPLETE
-                );
-
-                player.getConnection().server.getEventManager().fireAndForget(disconnectEvent);
-                return;
-              }
-
-              event.getResult().getReasonComponent().ifPresentOrElse(reason -> {
-                player.getPlayer().disconnect0(reason, true);
-              }, () -> {
-                if (player.getConnection().server.registerConnection(player.getPlayer())) {
-                  try {
-                    var initialConnection = (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
-                      .invokeExact(player.getPlayer(), (VelocityServer) player.getConnection().server);
-
-                    player.getConnection().setSessionHandler(initialConnection);
-
-                    player.getConnection().server.getEventManager()
-                      .fire(new PostLoginEvent(player.getPlayer()))
-                      .thenAccept(ignored -> connectToInitialServer(sessionHandler, player.getPlayer()));
-                  } catch (Throwable throwable) {
-                    throw new RuntimeException(throwable);
-                  }
-                } else {
-                  player.getPlayer().disconnect0(
-                    Component.translatable("velocity.error.already-connected-proxy"), true
-                  );
-                }
-              });
-            }, player.getChannel().eventLoop()).exceptionally(throwable -> {
-              player.getFallback().getLogger().error(
-                "Exception while completing login initialisation phase for {}", player, throwable
-              );
-              return null;
-            });
-        }
-      }, player.getChannel().eventLoop());
-  }
-
-  private static void connectToInitialServer(final AuthSessionHandler sessionHandler, final ConnectedPlayer player) {
-    try {
-      CONNECTION_FIELD.set(sessionHandler, player.getConnection());
-      CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player);
-    } catch (Throwable throwable) {
-      throw new RuntimeException(throwable);
+    if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_16) < 0) {
+      // Before Minecraft 1.16, we could not switch to the same dimension without sending an
+      // additional respawn. On older versions of Minecraft this forces the client to perform
+      // garbage collection which adds additional latency.
+      joinGame.setDimension(joinGame.getDimension() == 0 ? -1 : 0);
     }
+
+    player.getConnection().delayedWrite(joinGame);
+    player.getConnection().delayedWrite(respawn);
+  }
+
+  // Taken from Velocity
+  private void doSafeClientServerSwitch(final JoinGame joinGame) {
+    // Some clients do not behave well with the "fast" respawn sequence. In this case we will use
+    // a "safe" respawn sequence that involves sending three packets to the client. They have the
+    // same effect but tend to work better with buggier clients (Forge 1.8 in particular).
+
+    // Send the JoinGame packet itself, unmodified.
+    player.getConnection().delayedWrite(joinGame);
+
+    // Send a respawn packet in a different dimension.
+    final Respawn fakeSwitchPacket = Respawn.fromJoinGame(joinGame);
+    fakeSwitchPacket.setDimension(joinGame.getDimension() == 0 ? -1 : 0);
+    player.getConnection().delayedWrite(fakeSwitchPacket);
+
+    // Now send a respawn packet in the correct dimension.
+    final Respawn correctSwitchPacket = Respawn.fromJoinGame(joinGame);
+    player.getConnection().delayedWrite(correctSwitchPacket);
   }
 
   private static JoinGame getForVersion(final int protocolVersion) {
@@ -278,14 +132,5 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       return FallbackPackets.JOIN_GAME_1_16_2;
     }
     return FallbackPackets.LEGACY_JOIN_GAME;
-  }
-
-  private static final CorruptedFrameException CORRUPTED_FRAME = new CorruptedFrameException();
-
-  private void checkFrame(final boolean condition, final String message) {
-    if (!condition) {
-      player.fail(message);
-      throw CORRUPTED_FRAME;
-    }
   }
 }
