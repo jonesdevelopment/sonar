@@ -74,7 +74,6 @@ public final class FallbackListener {
     static PreLoginEvent.PreLoginComponentResult BLACKLISTED;
     static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
     static Component TOO_MANY_VERIFICATIONS;
-    public static Component NO_SERVER_FOUND;
 
     public static void update() {
       ALREADY_VERIFYING = PreLoginEvent.PreLoginComponentResult.denied(
@@ -87,7 +86,6 @@ public final class FallbackListener {
         Component.text(Sonar.get().getConfig().BLACKLISTED)
       );
       TOO_MANY_VERIFICATIONS = Component.text(Sonar.get().getConfig().TOO_MANY_VERIFICATIONS);
-      NO_SERVER_FOUND = Component.text(Sonar.get().getConfig().NO_SERVER_FOUND);
     }
   }
 

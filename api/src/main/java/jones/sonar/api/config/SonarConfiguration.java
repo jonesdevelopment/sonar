@@ -53,7 +53,6 @@ public final class SonarConfiguration {
   public String TOO_MANY_VERIFICATIONS;
   public String ALREADY_VERIFYING;
   public String BLACKLISTED;
-  public String NO_SERVER_FOUND;
 
   public void load() {
     Objects.requireNonNull(yamlConfig);
@@ -105,13 +104,6 @@ public final class SonarConfiguration {
         "%header%",
         "&cYour ip address is temporarily denied from verifying.",
         "&cPlease wait a few minutes before trying to verify again.",
-        "%footer%"
-      )));
-    NO_SERVER_FOUND = fromList(yamlConfig.getStringList("general.verification.no-server",
-      Arrays.asList(
-        "%header%",
-        "&cThere is currently no server available.",
-        "&cPlease try again in a few minutes.",
         "%footer%"
       )));
 
