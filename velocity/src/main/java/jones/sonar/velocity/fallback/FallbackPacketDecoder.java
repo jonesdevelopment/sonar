@@ -70,13 +70,11 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
         player.fail("handler not initialized yet");
         return; // Don't handle illegal packets
       }
-
-      // We want the session handler to handle the packets properly
-      ctx.fireChannelRead(msg);
-    } else {
-      // We want the backend server to actually receive the packets
-      ctx.fireChannelRead(msg);
     }
+
+    // We want the backend server to actually receive the packets
+    // We also want the session handler to handle the packets properly
+    ctx.fireChannelRead(msg);
   }
 
   // Taken from Velocity
