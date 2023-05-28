@@ -67,7 +67,7 @@ public final class FallbackListener {
 
   // We need to cache if the joining player is a premium player or not
   // If we don't do that, many authentication plugins can potentially break
-  private final Collection<String> premium = new Vector<>();
+  private final Collection<String> premium = new Vector<>(1);
 
   public static class CachedMessages {
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS;
