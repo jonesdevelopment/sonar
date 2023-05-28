@@ -17,18 +17,18 @@
 
 package jones.sonar.velocity.fallback;
 
-import com.velocitypowered.proxy.connection.ConnectionTypes;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.*;
+import com.velocitypowered.proxy.protocol.packet.ClientSettings;
+import com.velocitypowered.proxy.protocol.packet.KeepAlive;
+import com.velocitypowered.proxy.protocol.packet.PluginMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_16;
 import static com.velocitypowered.proxy.protocol.util.NettyPreconditions.checkFrame;
 import static jones.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion;
 
@@ -54,18 +54,12 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
           return;
         }
 
-        final JoinGame joinGame = getJoinPacketForVersion(player.getProtocolVersion());
-
-        if (player.getConnection().getType() == ConnectionTypes.LEGACY_FORGE) {
-          doSafeClientServerSwitch(joinGame);
-        } else {
-          doFastClientServerSwitch(joinGame);
-        }
-
+        // Set session handler to custom fallback handler to intercept all incoming packets
         player.getConnection().setSessionHandler(new FallbackSessionHandler(
           player.getConnection().getSessionHandler(), player
         ));
-        player.getConnection().flush();
+
+        player.getConnection().write(getJoinPacketForVersion(player.getProtocolVersion()));
         return; // Don't read this packet twice
       } else if (!hasFallbackHandler) {
         player.fail("handler not initialized yet");
@@ -76,47 +70,5 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     // We want the backend server to actually receive the packets
     // We also want the session handler to handle the packets properly
     ctx.fireChannelRead(msg);
-  }
-
-  // Taken from Velocity
-  private void doFastClientServerSwitch(final JoinGame joinGame) {
-    // In order to handle switching to another server, you will need to send two packets:
-    //
-    // - The join game packet from the backend server, with a different dimension
-    // - A respawn with the correct dimension
-    //
-    // Most notably, by having the client accept the join game packet, we can work around the need
-    // to perform entity ID rewrites, eliminating potential issues from rewriting packets and
-    // improving compatibility with mods.
-    final Respawn respawn = Respawn.fromJoinGame(joinGame);
-
-    if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_16) < 0) {
-      // Before Minecraft 1.16, we could not switch to the same dimension without sending an
-      // additional respawn. On older versions of Minecraft this forces the client to perform
-      // garbage collection which adds additional latency.
-      joinGame.setDimension(joinGame.getDimension() == 0 ? -1 : 0);
-    }
-
-    player.getConnection().delayedWrite(joinGame);
-    player.getConnection().delayedWrite(respawn);
-  }
-
-  // Taken from Velocity
-  private void doSafeClientServerSwitch(final JoinGame joinGame) {
-    // Some clients do not behave well with the "fast" respawn sequence. In this case we will use
-    // a "safe" respawn sequence that involves sending three packets to the client. They have the
-    // same effect but tend to work better with buggier clients (Forge 1.8 in particular).
-
-    // Send the JoinGame packet itself, unmodified.
-    player.getConnection().delayedWrite(joinGame);
-
-    // Send a respawn packet in a different dimension.
-    final Respawn fakeSwitchPacket = Respawn.fromJoinGame(joinGame);
-    fakeSwitchPacket.setDimension(joinGame.getDimension() == 0 ? -1 : 0);
-    player.getConnection().delayedWrite(fakeSwitchPacket);
-
-    // Now send a respawn packet in the correct dimension.
-    final Respawn correctSwitchPacket = Respawn.fromJoinGame(joinGame);
-    player.getConnection().delayedWrite(correctSwitchPacket);
   }
 }
