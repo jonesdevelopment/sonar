@@ -39,6 +39,7 @@ import jones.sonar.api.fallback.FallbackConnection;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -55,7 +56,7 @@ import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 @RequiredArgsConstructor
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
-  private final MinecraftSessionHandler previousHandler;
+  private final @Nullable MinecraftSessionHandler previousHandler;
   private final @NotNull FallbackConnection<ConnectedPlayer, MinecraftConnection> player;
 
   private boolean hasSentClientBrand, hasSentClientSettings;
