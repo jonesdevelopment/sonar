@@ -181,13 +181,14 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       ));
 
     // TODO: fix chunks not loading correctly
+    // handle initial connection
     initialConnection((AuthSessionHandler) player.getConnection().getSessionHandler());
 
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
   }
 
   // Mostly taken from Velocity
-  private void initialConnection(final AuthSessionHandler handler) {
+  private void initialConnection(final AuthSessionHandler sessionHandler) {
     player.getConnection().server.getEventManager()
       .fire(new PermissionsSetupEvent(player.getPlayer(), DEFAULT_PERMISSION))
       .thenAcceptAsync(permissionEvent -> {
@@ -237,14 +238,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
                     player.getConnection().server.getEventManager()
                       .fire(new PostLoginEvent(player.getPlayer()))
-                      .thenAccept(postLoginEvent -> {
-                        try {
-                          CONNECTION_FIELD.set(handler, player.getConnection());
-                          CONNECT_TO_INITIAL_SERVER.invoke(handler, player.getPlayer());
-                        } catch (Throwable throwable) {
-                          throw new RuntimeException(throwable);
-                        }
-                      });
+                      .thenAccept(ignored -> connectToInitialServer(sessionHandler, player.getPlayer()));
                   } catch (Throwable throwable) {
                     throw new RuntimeException(throwable);
                   }
@@ -262,6 +256,15 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
             });
         }
       }, player.getChannel().eventLoop());
+  }
+
+  private static void connectToInitialServer(final AuthSessionHandler sessionHandler, final ConnectedPlayer player) {
+    try {
+      CONNECTION_FIELD.set(sessionHandler, player.getConnection());
+      CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player);
+    } catch (Throwable throwable) {
+      throw new RuntimeException(throwable);
+    }
   }
 
   private static JoinGame getForVersion(final int protocolVersion) {
