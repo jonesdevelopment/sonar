@@ -234,7 +234,7 @@ public final class FallbackListener {
           premium.remove(event.getUsername());
 
           // Check if the ip address had too many verifications or is rejoining too quickly
-          if (!fallback.getAttemptLimiter().allow(inetAddress)) {
+          if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
             player.disconnect0(TOO_MANY_VERIFICATIONS, true);
             return;
           }

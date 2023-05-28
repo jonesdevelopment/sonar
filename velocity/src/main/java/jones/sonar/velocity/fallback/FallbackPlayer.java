@@ -30,7 +30,7 @@ import java.net.InetAddress;
 
 @Getter
 @RequiredArgsConstructor
-public class FallbackPlayer implements FallbackConnection<ConnectedPlayer, MinecraftConnection> {
+public final class FallbackPlayer implements FallbackConnection<ConnectedPlayer, MinecraftConnection> {
   private final Fallback fallback;
   private final ConnectedPlayer player;
   private final MinecraftConnection connection;
