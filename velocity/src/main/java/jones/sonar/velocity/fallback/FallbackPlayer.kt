@@ -25,7 +25,7 @@ import jones.sonar.api.fallback.Fallback
 import jones.sonar.api.fallback.FallbackConnection
 import java.net.InetAddress
 
-private class FallbackPlayer(
+class FallbackPlayer(
     private val fallback: Fallback,
     private val player: ConnectedPlayer,
     private val connection: MinecraftConnection,
