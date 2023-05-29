@@ -39,11 +39,11 @@ subprojects {
     dependencies {
         compileOnly("io.netty:netty-all:4.1.92.Final") // Netty
 
-        compileOnly("org.projectlombok:lombok:1.18.26")
-        annotationProcessor("org.projectlombok:lombok:1.18.26")
+        compileOnly("org.projectlombok:lombok:1.18.28")
+        annotationProcessor("org.projectlombok:lombok:1.18.28")
 
-        testCompileOnly("org.projectlombok:lombok:1.18.26")
-        testAnnotationProcessor("org.projectlombok:lombok:1.18.26")
+        testCompileOnly("org.projectlombok:lombok:1.18.28")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.28")
     }
 }
 
