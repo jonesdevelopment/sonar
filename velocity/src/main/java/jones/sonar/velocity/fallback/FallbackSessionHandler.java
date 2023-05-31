@@ -185,6 +185,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   }
 
   // Taken from Velocity
+  // TODO: fix chunk issues
   private void initialConnection(final AuthSessionHandler sessionHandler) {
     player.getConnection().server.getEventManager()
       .fire(new PermissionsSetupEvent(player.getPlayer(), DEFAULT_PERMISSION))
@@ -239,15 +240,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                         try {
                           CONNECTION_FIELD.set(sessionHandler, player.getConnection());
                           CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
-
-                          // TODO: check what causes chunk issues
-                          /*final JoinGame joinGame = getJoinPacketForVersion(player.getProtocolVersion());
-
-                          if (player.getConnection().getType() == ConnectionTypes.LEGACY_FORGE) {
-                            doSafeClientServerSwitch(joinGame);
-                          } else {
-                            doFastClientServerSwitch(joinGame);
-                          }*/
                         } catch (Throwable throwable) {
                           throw new RuntimeException(throwable);
                         }
