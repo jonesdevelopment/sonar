@@ -145,7 +145,13 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   private static final CorruptedFrameException CORRUPTED_FRAME = new CorruptedFrameException();
 
-  public void checkFrame(final boolean condition, final String message) {
+  private void checkFrame(final boolean condition, final String message) {
+    checkFrame(player, condition, message);
+  }
+
+  static void checkFrame(final FallbackConnection<?, ?> player,
+                         final boolean condition,
+                         final String message) {
     if (!condition) {
       player.fail(message);
       throw CORRUPTED_FRAME;

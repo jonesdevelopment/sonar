@@ -14,63 +14,55 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package jones.sonar.velocity.fallback
 
-package jones.sonar.velocity.fallback;
+import com.velocitypowered.proxy.connection.MinecraftConnection
+import com.velocitypowered.proxy.connection.client.ConnectedPlayer
+import com.velocitypowered.proxy.protocol.MinecraftPacket
+import com.velocitypowered.proxy.protocol.packet.ClientSettings
+import com.velocitypowered.proxy.protocol.packet.KeepAlive
+import com.velocitypowered.proxy.protocol.packet.PluginMessage
+import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.ChannelInboundHandlerAdapter
+import jones.sonar.api.fallback.FallbackConnection
 
-import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.ClientSettings;
-import com.velocitypowered.proxy.protocol.packet.KeepAlive;
-import com.velocitypowered.proxy.protocol.packet.PluginMessage;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import jones.sonar.api.fallback.FallbackConnection;
-import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+class FallbackPacketDecoder(
+    private val player: FallbackConnection<ConnectedPlayer, MinecraftConnection>,
+    private val startKeepAliveId: Long
+) : ChannelInboundHandlerAdapter() {
 
-import static com.velocitypowered.proxy.protocol.util.NettyPreconditions.checkFrame;
-import static jones.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion;
+    @Throws(Exception::class)
+    override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
+        if (msg is MinecraftPacket) {
+            val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive
 
-@RequiredArgsConstructor
-public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
-  private final @NotNull FallbackConnection<ConnectedPlayer, MinecraftConnection> player;
-  private final long startKeepAliveId;
+            FallbackSessionHandler.checkFrame(player, legalPacket, "bad packet: " + msg.javaClass.simpleName)
 
-  @Override
-  public void channelRead(final @NotNull ChannelHandlerContext ctx,
-                          final @NotNull Object msg) throws Exception {
-    if (msg instanceof MinecraftPacket packet) {
-      final boolean legalPacket = packet instanceof ClientSettings
-        || packet instanceof PluginMessage || packet instanceof KeepAlive;
+            val hasFallbackHandler = player.connection.sessionHandler is FallbackSessionHandler
 
-      checkFrame(legalPacket, "unexpected packet: " + packet.getClass().getSimpleName());
+            if (msg is KeepAlive && msg.randomId == startKeepAliveId) {
+                if (hasFallbackHandler) {
+                    player.fail("duplicate packet")
+                    return
+                }
 
-      final boolean hasFallbackHandler = player.getConnection().getSessionHandler() instanceof FallbackSessionHandler;
+                player.connection.delayedWrite(FallbackPackets.getJoinPacketForVersion(player.protocolVersion))
 
-      if (packet instanceof KeepAlive keepAlive && keepAlive.getRandomId() == startKeepAliveId) {
-        if (hasFallbackHandler) {
-          player.fail("duplicate packet");
-          return;
+                // Set session handler to custom fallback handler to intercept all incoming packets
+                player.connection.sessionHandler = FallbackSessionHandler(
+                    player.connection.sessionHandler, player
+                )
+
+                player.connection.flush()
+                return  // Don't read this packet twice
+            } else if (!hasFallbackHandler) {
+                player.fail("handler not initialized yet")
+                return  // Don't handle illegal packets
+            }
         }
 
-        player.getConnection().delayedWrite(getJoinPacketForVersion(player.getProtocolVersion()));
-
-        // Set session handler to custom fallback handler to intercept all incoming packets
-        player.getConnection().setSessionHandler(new FallbackSessionHandler(
-          player.getConnection().getSessionHandler(), player
-        ));
-
-        player.getConnection().flush();
-        return; // Don't read this packet twice
-      } else if (!hasFallbackHandler) {
-        player.fail("handler not initialized yet");
-        return; // Don't handle illegal packets
-      }
+        // We want the backend server to actually receive the packets
+        // We also want the session handler to handle the packets properly
+        ctx.fireChannelRead(msg)
     }
-
-    // We want the backend server to actually receive the packets
-    // We also want the session handler to handle the packets properly
-    ctx.fireChannelRead(msg);
-  }
 }
