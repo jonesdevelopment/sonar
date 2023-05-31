@@ -55,10 +55,10 @@ class FallbackPacketDecoder(
                 )
 
                 player.connection.flush()
-                return  // Don't read this packet twice
+                return // Don't read this packet twice
             } else if (!hasFallbackHandler) {
                 player.fail("handler not initialized yet")
-                return  // Don't handle illegal packets
+                return // Don't handle illegal packets
             }
         }
 

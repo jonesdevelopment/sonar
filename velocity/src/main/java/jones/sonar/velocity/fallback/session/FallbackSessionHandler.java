@@ -34,7 +34,6 @@ import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
@@ -52,10 +51,15 @@ import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
 import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
 import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
-@RequiredArgsConstructor
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @Nullable MinecraftSessionHandler previousHandler;
   private final @NotNull FallbackConnection<ConnectedPlayer, MinecraftConnection> player;
+
+  public FallbackSessionHandler(final @Nullable MinecraftSessionHandler previousHandler,
+                                final @NotNull FallbackConnection<ConnectedPlayer, MinecraftConnection> player) {
+    this.previousHandler = previousHandler;
+    this.player = player;
+  }
 
   private boolean hasSentClientBrand, hasSentClientSettings;
 
