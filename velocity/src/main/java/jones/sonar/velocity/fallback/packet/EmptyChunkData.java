@@ -23,7 +23,6 @@ import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
-import io.netty.handler.codec.CorruptedFrameException;
 import lombok.Data;
 
 import java.io.IOException;
@@ -124,9 +123,9 @@ public class EmptyChunkData implements MinecraftPacket {
     }
 
     if (protocolVersion.getProtocol() < MINECRAFT_1_13.getProtocol()) {
-      writeArray(byteBuf, new byte[256]); //1.8 - 1.12.2
+      ProtocolUtils.writeByteArray(byteBuf, new byte[256]); //1.8 - 1.12.2
     } else if (protocolVersion.getProtocol() < MINECRAFT_1_15.getProtocol()) {
-      writeArray(byteBuf, new byte[1024]); //1.13 - 1.14.4
+      ProtocolUtils.writeByteArray(byteBuf, new byte[1024]); //1.13 - 1.14.4
     } else if (protocolVersion.getProtocol() < MINECRAFT_1_18.getProtocol()) {
       writeVarInt(byteBuf, 0); //1.15 - 1.17.1
     } else {
@@ -147,15 +146,6 @@ public class EmptyChunkData implements MinecraftPacket {
       byte[] lightData = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
       byteBuf.writeBytes(lightData);
     }
-  }
-
-  private static void writeArray(final ByteBuf byteBuf, final byte[] bytes) {
-    if (bytes.length > Short.MAX_VALUE) {
-      throw new CorruptedFrameException("Array too long");
-    }
-
-    writeVarInt(byteBuf, bytes.length);
-    byteBuf.writeBytes(bytes);
   }
 
   @Override
