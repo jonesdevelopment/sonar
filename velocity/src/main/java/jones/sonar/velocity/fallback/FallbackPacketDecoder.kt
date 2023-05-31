@@ -25,6 +25,7 @@ import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import jones.sonar.api.fallback.FallbackConnection
+import jones.sonar.velocity.fallback.session.FallbackSessionHandler
 
 class FallbackPacketDecoder(
     private val player: FallbackConnection<ConnectedPlayer, MinecraftConnection>,

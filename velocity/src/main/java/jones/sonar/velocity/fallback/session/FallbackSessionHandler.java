@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.velocity.fallback;
+package jones.sonar.velocity.fallback.session;
 
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
@@ -149,7 +149,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     checkFrame(player, condition, message);
   }
 
-  static void checkFrame(final FallbackConnection<?, ?> player,
+  public static void checkFrame(final FallbackConnection<?, ?> player,
                          final boolean condition,
                          final String message) {
     if (!condition) {
