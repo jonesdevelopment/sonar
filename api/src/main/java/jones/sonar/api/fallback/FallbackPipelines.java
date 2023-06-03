@@ -19,5 +19,6 @@ package jones.sonar.api.fallback;
 
 public interface FallbackPipelines {
   String HANDLER = "sonar-handler";
+  String RESPAWN = "sonar-respawn";
   String DECODER = "sonar-decoder";
 }

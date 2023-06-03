@@ -21,7 +21,6 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.permission.PermissionFunction;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.proxy.VelocityServer;
@@ -31,12 +30,13 @@ import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialConnectSessionHandler;
 import com.velocitypowered.proxy.network.Connections;
-import com.velocitypowered.proxy.protocol.packet.*;
+import com.velocitypowered.proxy.protocol.packet.ClientSettings;
+import com.velocitypowered.proxy.protocol.packet.KeepAlive;
+import com.velocitypowered.proxy.protocol.packet.PluginMessage;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,11 +44,12 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static com.velocitypowered.api.network.ProtocolVersion.*;
-import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
-import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
+import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_13;
+import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
+import static jones.sonar.api.fallback.FallbackPipelines.*;
 import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
@@ -63,12 +64,20 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   private boolean hasSentClientBrand, hasSentClientSettings;
 
+  private static final MethodHandle CONNECT_TO_INITIAL_SERVER;
   private static final MethodHandle CONNECT_SESSION_HANDLER;
   private static final MethodHandle SET_PERMISSION_FUNCTION;
   private static final PermissionProvider DEFAULT_PERMISSION;
 
   static {
     try {
+      CONNECT_TO_INITIAL_SERVER = MethodHandles.privateLookupIn(
+          AuthSessionHandler.class, MethodHandles.lookup())
+        .findVirtual(AuthSessionHandler.class,
+          "connectToInitialServer",
+          MethodType.methodType(CompletableFuture.class, ConnectedPlayer.class)
+        );
+
       CONNECT_SESSION_HANDLER = MethodHandles.privateLookupIn(
           InitialConnectSessionHandler.class, MethodHandles.lookup())
         .findConstructor(InitialConnectSessionHandler.class,
@@ -178,8 +187,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
   }
 
-  // Taken from Velocity
-  // TODO: fix chunk issues
+  // Mostly taken from Velocity
   private void initialConnection(final AuthSessionHandler sessionHandler) {
     player.getConnection().server.getEventManager()
       .fire(new PermissionsSetupEvent(player.getPlayer(), DEFAULT_PERMISSION))
@@ -234,7 +242,14 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                         try {
                           CONNECTION_FIELD.set(sessionHandler, player.getConnection());
 
-                          connectToInitialServer();
+                          // It works. We'll leave it at that
+                          player.getPipeline().addAfter(
+                            Connections.MINECRAFT_ENCODER,
+                            RESPAWN,
+                            new FallbackRespawnHandler(player)
+                          );
+
+                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
                         } catch (Throwable throwable) {
                           throw new RuntimeException(throwable);
                         }
@@ -256,62 +271,5 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
             });
         }
       }, player.getConnection().eventLoop());
-  }
-
-  private void connectToInitialServer() {
-    final PlayerChooseInitialServerEvent event = new PlayerChooseInitialServerEvent(
-      player.getPlayer(), player.getPlayer().getNextServerToTry().orElse(null)
-    );
-
-    player.getConnection().server.getEventManager().fire(event)
-      .thenRunAsync(() -> event.getInitialServer().ifPresentOrElse(server -> {
-        player.getPlayer().createConnectionRequest(server).fireAndForget();
-      }, () -> {
-        player.getPlayer().disconnect0(Component.translatable(
-          "velocity.error.no-available-servers", NamedTextColor.RED), true
-        );
-      }), player.getConnection().eventLoop());
-  }
-
-  // Taken from Velocity
-  private void doFastClientServerSwitch(final JoinGame joinGame) {
-    // In order to handle switching to another server, you will need to send two packets:
-    //
-    // - The join game packet from the backend server, with a different dimension
-    // - A respawn with the correct dimension
-    //
-    // Most notably, by having the client accept the join game packet, we can work around the need
-    // to perform entity ID rewrites, eliminating potential issues from rewriting packets and
-    // improving compatibility with mods.
-    final Respawn respawn = Respawn.fromJoinGame(joinGame);
-
-    if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_16) < 0) {
-      // Before Minecraft 1.16, we could not switch to the same dimension without sending an
-      // additional respawn. On older versions of Minecraft this forces the client to perform
-      // garbage collection which adds additional latency.
-      joinGame.setDimension(joinGame.getDimension() == 0 ? -1 : 0);
-    }
-
-    player.getConnection().delayedWrite(joinGame);
-    player.getConnection().delayedWrite(respawn);
-  }
-
-  // Taken from Velocity
-  private void doSafeClientServerSwitch(final JoinGame joinGame) {
-    // Some clients do not behave well with the "fast" respawn sequence. In this case we will use
-    // a "safe" respawn sequence that involves sending three packets to the client. They have the
-    // same effect but tend to work better with buggier clients (Forge 1.8 in particular).
-
-    // Send the JoinGame packet itself, unmodified.
-    player.getConnection().delayedWrite(joinGame);
-
-    // Send a respawn packet in a different dimension.
-    final Respawn fakeSwitchPacket = Respawn.fromJoinGame(joinGame);
-    fakeSwitchPacket.setDimension(joinGame.getDimension() == 0 ? -1 : 0);
-    player.getConnection().delayedWrite(fakeSwitchPacket);
-
-    // Now send a respawn packet in the correct dimension.
-    final Respawn correctSwitchPacket = Respawn.fromJoinGame(joinGame);
-    player.getConnection().delayedWrite(correctSwitchPacket);
   }
 }
