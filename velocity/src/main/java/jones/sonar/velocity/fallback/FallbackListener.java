@@ -203,10 +203,10 @@ public final class FallbackListener {
     // We don't want to check players that have already been verified
     if (fallback.getVerified().contains(inetAddress)) return;
 
-    var inboundConnection = (LoginInboundConnection) event.getConnection();
-    var initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
+    final var inboundConnection = (LoginInboundConnection) event.getConnection();
+    final var initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
 
-    var mcConnection = initialConnection.getConnection();
+    final MinecraftConnection mcConnection = initialConnection.getConnection();
     final Channel channel = mcConnection.getChannel();
 
     // The AuthSessionHandler isn't supposed to continue the connection process
@@ -240,7 +240,7 @@ public final class FallbackListener {
         try {
 
           // Create an instance for player
-          var player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
+          final ConnectedPlayer player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
             mcConnection.server,
             event.getGameProfile(),
             mcConnection,
