@@ -22,9 +22,9 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class CommandHelper {
-  public void printHelp(final InvocationSender sender) {
+  public void printHelp(final InvocationSender<?> sender) {
     sender.sendMessage("§a● §fThis server is running §6§lSonar §f(version §72.0.0§f)");
-    sender.sendMessage("");
+    sender.sendMessage();
 
     SubCommandManager.getSubCommands().forEach(subcommand -> {
       sender.sendMessage(" /sonar "
@@ -34,6 +34,6 @@ public class CommandHelper {
       );
     });
 
-    sender.sendMessage("");
+    sender.sendMessage();
   }
 }
