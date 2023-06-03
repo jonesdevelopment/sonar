@@ -23,18 +23,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.net.InetAddress;
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 public final class FallbackHolder implements Fallback {
   public static final FallbackHolder INSTANCE = new FallbackHolder();
 
   @Getter
-  private final Collection<InetAddress> connected = new Vector<>();
+  private final List<InetAddress> connected = new Vector<>();
   @Getter
-  private final Collection<InetAddress> verified = new Vector<>();
+  private final List<InetAddress> verified = new Vector<>();
   @Getter
-  private final Collection<InetAddress> blacklisted = new Vector<>();
+  private final List<InetAddress> blacklisted = new Vector<>();
   @Getter
   private final FallbackQueue queue = new FallbackQueue();
   @Getter

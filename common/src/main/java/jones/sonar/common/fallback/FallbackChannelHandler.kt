@@ -22,26 +22,10 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import jones.sonar.api.Sonar
 import jones.sonar.api.fallback.Fallback
-import java.io.IOException
 import java.net.InetSocketAddress
 
 @Sharable
 class FallbackChannelHandler(private val fallback: Fallback) : ChannelInboundHandlerAdapter() {
-
-    @Throws(Exception::class)
-    override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-        if (ctx.channel().isActive) {
-            ctx.close()
-
-            // Clients can throw an IOException if the connection is interrupted unexpectedly
-            if (cause is IOException) return
-
-            // Blacklist the ip address
-            val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
-
-            fallback.blacklisted.add(inetAddress)
-        }
-    }
 
     @Throws(Exception::class)
     override fun channelInactive(ctx: ChannelHandlerContext) {

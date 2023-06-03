@@ -24,13 +24,31 @@ import com.velocitypowered.proxy.protocol.packet.KeepAlive
 import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
+import jones.sonar.api.Sonar
 import jones.sonar.api.fallback.FallbackConnection
 import jones.sonar.velocity.fallback.session.FallbackSessionHandler
+import java.io.IOException
+import java.net.InetSocketAddress
 
 class FallbackPacketDecoder(
     private val player: FallbackConnection<ConnectedPlayer, MinecraftConnection>,
     private val startKeepAliveId: Long
 ) : ChannelInboundHandlerAdapter() {
+
+    @Throws(Exception::class)
+    override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+        if (ctx.channel().isActive) {
+            ctx.close()
+
+            // Clients can throw an IOException if the connection is interrupted unexpectedly
+            if (cause is IOException) return
+
+            // Blacklist the ip address
+            val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
+
+            Sonar.get().fallback.blacklisted.add(inetAddress)
+        }
+    }
 
     @Throws(Exception::class)
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
