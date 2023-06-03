@@ -23,11 +23,11 @@ public interface Statistics {
   Map<String, Integer> getRawMap();
 
   default void increment(final String key) {
-    set(key, get(key, 0));
+    increment(key, 0);
   }
 
   default void increment(final String key, final int fallback) {
-    set(key, get(key, fallback));
+    set(key, get(key, fallback) + 1);
   }
 
   default int get(final String key, final int fallback) {
@@ -35,7 +35,7 @@ public interface Statistics {
   }
 
   default void set(final String key, final int value) {
-    if (has(key)) getRawMap().put(key, value);
+    if (!has(key)) getRawMap().put(key, value);
     else getRawMap().replace(key, value);
   }
 
