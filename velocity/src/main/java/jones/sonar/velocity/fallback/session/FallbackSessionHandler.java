@@ -116,7 +116,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     final boolean valid = player.getProtocolVersion() >= MINECRAFT_1_13.getProtocol();
 
-    checkFrame(pluginMessage.getChannel().equals("MC|Brand") || valid, "invalid client brand");
+    checkFrame(pluginMessage.getChannel().equals("MC|Brand") || valid, "invalid channel");
+    checkFrame(pluginMessage.content().readableBytes() > 1, "invalid client brand");
     checkFrame(!hasSentClientBrand, "unexpected timing (P1)");
     checkFrame(hasSentClientSettings, "unexpected timing (P2)");
 
