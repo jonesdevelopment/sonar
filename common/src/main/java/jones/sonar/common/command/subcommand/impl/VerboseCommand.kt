@@ -33,11 +33,11 @@ class VerboseCommand : SubCommand() {
 
         if (Sonar.get().actionBarVerbose.isSubscribed(verboseSubscriber)) {
             Sonar.get().actionBarVerbose.unsubscribe(verboseSubscriber)
-            invocation.invocationSender.sendMessage("§cUnsubscribed")
+            invocation.invocationSender.sendMessage(Sonar.get().config.VERBOSE_UNSUBSCRIBED)
             return
         }
 
-        invocation.invocationSender.sendMessage("§aSubscribed")
+        invocation.invocationSender.sendMessage(Sonar.get().config.VERBOSE_SUBSCRIBED)
         Sonar.get().actionBarVerbose.subscribe(verboseSubscriber)
     }
 }

@@ -31,15 +31,16 @@ import java.util.Map;
 
 public final class YamlConfig {
   private final Yaml yaml;
-  private final File file;
+  private final File folder, file;
   private Map<String, Object> config;
 
   public YamlConfig(final File dataFolder, final String fileName) {
-    this(new File(dataFolder, fileName + ".yml"));
+    this(new File(dataFolder, fileName + ".yml"), dataFolder);
   }
 
-  private YamlConfig(final File file) {
+  private YamlConfig(final File file, final File folder) {
     this.file = file;
+    this.folder = folder;
 
     final DumperOptions options = new DumperOptions();
 
@@ -50,6 +51,10 @@ public final class YamlConfig {
 
   public void load() {
     try {
+      if (!folder.exists() && !folder.mkdir()) {
+        throw new IllegalStateException("Could not create folder?!");
+      }
+
       file.createNewFile();
 
       try (final InputStream is = Files.newInputStream(file.toPath())) {

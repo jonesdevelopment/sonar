@@ -29,10 +29,6 @@ public final class SonarConfiguration {
   private final YamlConfig yamlConfig;
 
   public SonarConfiguration(final File folder) {
-    if (!folder.exists() && !folder.mkdir()) {
-      throw new IllegalStateException("Could not create folder?!");
-    }
-
     yamlConfig = new YamlConfig(folder, "config");
   }
 
@@ -56,6 +52,9 @@ public final class SonarConfiguration {
   public String ALREADY_VERIFYING;
   public String BLACKLISTED;
 
+  public String VERBOSE_SUBSCRIBED;
+  public String VERBOSE_UNSUBSCRIBED;
+
   public void load() {
     Objects.requireNonNull(yamlConfig);
 
@@ -73,6 +72,13 @@ public final class SonarConfiguration {
 
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
     VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
+
+    VERBOSE_SUBSCRIBED = formatString(yamlConfig.getString("general.verbose.subscribed",
+      "%prefix%You are now viewing Sonar verbose."
+    ));
+    VERBOSE_UNSUBSCRIBED = formatString(yamlConfig.getString("general.verbose.unsubscribed",
+      "%prefix%You are no longer viewing Sonar verbose."
+    ));
 
     HEADER = fromList(yamlConfig.getStringList("general.verification.message.header",
       Arrays.asList(
