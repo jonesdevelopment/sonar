@@ -109,12 +109,11 @@ public final class SonarConfiguration {
 
     ACTION_BAR_LAYOUT = formatString(yamlConfig.getString(
       "messages.action-bar.layout",
-      "&e&lSonar" +
-        " &3▪ &7Queued &f%queued%" +
-        " &3▪ &7Verifying &f%verifying%" +
-        " &3▪ &7Blacklisted &f%blacklisted%" +
-        " &3▪ &7Total &f%total%" +
-        " &3▪ &6%animation%"
+      "%prefix%&fQueued &7%queued%" +
+        "  &fVerifying &7%verifying%" +
+        "  &fBlacklisted &7%blacklisted%" +
+        "  &fTotal &7%total%" +
+        "  &a%animation%"
     ));
     ANIMATION = yamlConfig.getStringList("messages.action-bar.animation",
       Arrays.asList("▙", "▛", "▜", "▟")
