@@ -210,7 +210,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
               // The player was disconnected
               if (player.getConnection().isClosed()) {
-                var disconnectEvent = new DisconnectEvent(
+                final var disconnectEvent = new DisconnectEvent(
                   player.getPlayer(), DisconnectEvent.LoginStatus.CANCELLED_BY_USER_BEFORE_COMPLETE
                 );
 
@@ -255,7 +255,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
               return null;
             });
         }
-      }, player.getChannel().eventLoop());
+      }, player.getConnection().eventLoop());
   }
 
   private void connectToInitialServer() {
