@@ -54,6 +54,8 @@ public final class SonarConfiguration {
 
   public String VERBOSE_SUBSCRIBED;
   public String VERBOSE_UNSUBSCRIBED;
+  public String RELOADING;
+  public String RELOADED;
 
   public void load() {
     Objects.requireNonNull(yamlConfig);
@@ -72,6 +74,13 @@ public final class SonarConfiguration {
 
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
     VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
+
+    RELOADING = formatString(yamlConfig.getString("general.reload.start",
+      "%prefix%Reloading Sonar..."
+    ));
+    RELOADED = formatString(yamlConfig.getString("general.reload.finish",
+      "%prefix%&aSuccessfully reloaded &7(%taken%ms)"
+    ));
 
     VERBOSE_SUBSCRIBED = formatString(yamlConfig.getString("general.verbose.subscribed",
       "%prefix%You are now viewing Sonar verbose."
