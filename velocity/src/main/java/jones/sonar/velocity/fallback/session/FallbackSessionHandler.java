@@ -102,7 +102,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final ClientSettings clientSettings) {
-    checkFrame(!hasSentClientBrand, "unexpected timing (C)");
+    checkFrame(!hasSentClientBrand && !hasSentClientSettings, "unexpected timing (C)");
 
     hasSentClientSettings = true;
     return false;
