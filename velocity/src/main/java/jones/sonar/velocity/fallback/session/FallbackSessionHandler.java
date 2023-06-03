@@ -21,6 +21,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.permission.PermissionFunction;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.proxy.VelocityServer;
@@ -43,7 +44,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.*;
@@ -63,20 +63,12 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   private boolean hasSentClientBrand, hasSentClientSettings;
 
-  private static final MethodHandle CONNECT_TO_INITIAL_SERVER;
   private static final MethodHandle CONNECT_SESSION_HANDLER;
   private static final MethodHandle SET_PERMISSION_FUNCTION;
   private static final PermissionProvider DEFAULT_PERMISSION;
 
   static {
     try {
-      CONNECT_TO_INITIAL_SERVER = MethodHandles.privateLookupIn(
-          AuthSessionHandler.class, MethodHandles.lookup())
-        .findVirtual(AuthSessionHandler.class,
-          "connectToInitialServer",
-          MethodType.methodType(CompletableFuture.class, ConnectedPlayer.class)
-        );
-
       CONNECT_SESSION_HANDLER = MethodHandles.privateLookupIn(
           InitialConnectSessionHandler.class, MethodHandles.lookup())
         .findConstructor(InitialConnectSessionHandler.class,
@@ -181,15 +173,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
         TimeUnit.MILLISECONDS
       ));
 
-    player.getPlayer().getNextServerToTry().ifPresentOrElse(registeredServer -> {
-
-      // Handle initial connection
-      initialConnection((AuthSessionHandler) previousHandler);
-    }, () -> {
-      player.getPlayer().disconnect0(
-        Component.translatable("velocity.error.no-available-servers", NamedTextColor.RED), true
-      );
-    });
+    initialConnection((AuthSessionHandler) previousHandler);
 
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
   }
@@ -239,7 +223,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
               }, () -> {
                 if (player.getConnection().server.registerConnection(player.getPlayer())) {
                   try {
-                    var initialConnection = (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
+                    final var initialConnection = (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
                       .invokeExact(player.getPlayer(), (VelocityServer) player.getConnection().server);
 
                     player.getConnection().setSessionHandler(initialConnection);
@@ -249,7 +233,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                       .thenAcceptAsync(ignored -> {
                         try {
                           CONNECTION_FIELD.set(sessionHandler, player.getConnection());
-                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
+
+                          connectToInitialServer();
                         } catch (Throwable throwable) {
                           throw new RuntimeException(throwable);
                         }
@@ -271,6 +256,21 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
             });
         }
       }, player.getChannel().eventLoop());
+  }
+
+  private void connectToInitialServer() {
+    final PlayerChooseInitialServerEvent event = new PlayerChooseInitialServerEvent(
+      player.getPlayer(), player.getPlayer().getNextServerToTry().orElse(null)
+    );
+
+    player.getConnection().server.getEventManager().fire(event)
+      .thenRunAsync(() -> event.getInitialServer().ifPresentOrElse(server -> {
+        player.getPlayer().createConnectionRequest(server).fireAndForget();
+      }, () -> {
+        player.getPlayer().disconnect0(Component.translatable(
+          "velocity.error.no-available-servers", NamedTextColor.RED), true
+        );
+      }), player.getConnection().eventLoop());
   }
 
   // Taken from Velocity
