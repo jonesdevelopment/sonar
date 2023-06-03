@@ -53,6 +53,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -74,6 +75,7 @@ public final class FallbackListener {
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS;
     static PreLoginEvent.PreLoginComponentResult BLACKLISTED;
     static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
+    static PreLoginEvent.PreLoginComponentResult TOO_MANY_ONLINE_PER_IP;
     static Component TOO_MANY_VERIFICATIONS;
 
     public static void update() {
@@ -85,6 +87,9 @@ public final class FallbackListener {
       );
       BLACKLISTED = PreLoginEvent.PreLoginComponentResult.denied(
         Component.text(Sonar.get().getConfig().BLACKLISTED)
+      );
+      TOO_MANY_ONLINE_PER_IP = PreLoginEvent.PreLoginComponentResult.denied(
+        Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP)
       );
       TOO_MANY_VERIFICATIONS = Component.text(Sonar.get().getConfig().TOO_MANY_VERIFICATIONS);
     }
@@ -138,11 +143,28 @@ public final class FallbackListener {
   public void handle(final PreLoginEvent event) {
     fallback.getSonar().getStatistics().increment("total");
 
-    var inetAddress = event.getConnection().getRemoteAddress().getAddress();
+    final var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     if (fallback.getBlacklisted().contains(inetAddress)) {
       event.setResult(BLACKLISTED);
       return;
+    }
+
+    // Check if the amount of online players using the same ip address as
+    // the connecting player is greater than the configured amount
+    final int maxOnlinePerIp = fallback.getSonar().getConfig().MAXIMUM_ONLINE_PER_IP;
+
+    if (maxOnlinePerIp > 0) {
+      final long onlinePerIp = SonarVelocity.INSTANCE.getPlugin().getServer().getAllPlayers().stream()
+        // We have to do this since it's 2 different instances...
+        .filter(player -> Objects.equals(player.getRemoteAddress().getAddress(), inetAddress))
+        .count();
+
+      // We use '>=' because the player connecting to the server hasn't joined yet
+      if (onlinePerIp >= maxOnlinePerIp) {
+        event.setResult(TOO_MANY_ONLINE_PER_IP);
+        return;
+      }
     }
 
     if (fallback.getVerified().contains(inetAddress)) return;
@@ -176,7 +198,7 @@ public final class FallbackListener {
    */
   @Subscribe(order = PostOrder.LAST)
   public void handle(final GameProfileRequestEvent event) throws Throwable {
-    var inetAddress = event.getConnection().getRemoteAddress().getAddress();
+    final var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     // We don't want to check players that have already been verified
     if (fallback.getVerified().contains(inetAddress)) return;

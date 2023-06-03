@@ -43,6 +43,7 @@ public final class SonarConfiguration {
 
   public int MINIMUM_PLAYERS_FOR_ATTACK;
   public int MAXIMUM_VERIFYING_PLAYERS;
+  public int MAXIMUM_ONLINE_PER_IP;
   public int MAXIMUM_QUEUED_PLAYERS;
   public int MAXIMUM_QUEUE_POLLS;
   public int VERIFICATION_TIMEOUT;
@@ -51,6 +52,7 @@ public final class SonarConfiguration {
   public String HEADER, FOOTER;
   public String TOO_MANY_PLAYERS;
   public String TOO_MANY_VERIFICATIONS;
+  public String TOO_MANY_ONLINE_PER_IP;
   public String ALREADY_VERIFYING;
   public String BLACKLISTED;
 
@@ -63,6 +65,7 @@ public final class SonarConfiguration {
     PREFIX = formatString(yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
 
     // General options
+    MAXIMUM_ONLINE_PER_IP = yamlConfig.getInt("general.max-online-per-ip", 3);
     MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
     MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.max-verifying-players", Short.MAX_VALUE / 4);
     MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.max-queued-players", Short.MAX_VALUE / 4);
@@ -89,21 +92,27 @@ public final class SonarConfiguration {
     TOO_MANY_VERIFICATIONS = fromList(yamlConfig.getStringList("general.verification.too-many-verifications",
       Arrays.asList(
         "%header%",
-        "&cYour ip address is denied from logging into the server.",
+        "&cYour IP address is denied from logging into the server.",
         "%footer%"
       )));
     ALREADY_VERIFYING = fromList(yamlConfig.getStringList("general.verification.already-verifying",
       Arrays.asList(
         "%header%",
-        "&cYour ip address is currently queued for verification.",
+        "&cYour IP address is currently queued for verification.",
         "&cPlease wait a few minutes before trying to verify again.",
         "%footer%"
       )));
     BLACKLISTED = fromList(yamlConfig.getStringList("general.verification.blacklisted",
       Arrays.asList(
         "%header%",
-        "&cYour ip address is temporarily denied from verifying.",
+        "&cYour IP address is temporarily denied from verifying.",
         "&cPlease wait a few minutes before trying to verify again.",
+        "%footer%"
+      )));
+    TOO_MANY_ONLINE_PER_IP = fromList(yamlConfig.getStringList("general.too-many-online-per-ip",
+      Arrays.asList(
+        "%header%",
+        "&cThere are too many players online with your IP address.",
         "%footer%"
       )));
 
