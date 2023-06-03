@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_13;
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
+import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
 import static jones.sonar.api.fallback.FallbackPipelines.*;
 import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
@@ -177,11 +178,14 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     player.getFallback().getConnected().remove(player.getInetAddress());
 
     // Replace timeout handler with the old one to let Velocity handle timeouts again
-    player.getPipeline().replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
+    player.getPipeline().replace(
+      READ_TIMEOUT,
+      READ_TIMEOUT,
       new ReadTimeoutHandler(
         player.getConnection().server.getConfiguration().getConnectTimeout(),
         TimeUnit.MILLISECONDS
-      ));
+      )
+    );
 
     initialConnection((AuthSessionHandler) previousHandler);
 
