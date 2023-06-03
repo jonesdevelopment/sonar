@@ -35,7 +35,7 @@ class FallbackChannelHandler(private val fallback: Fallback) : ChannelInboundHan
 
         // Remove the ip address from the queue
         fallback.connected.remove(inetAddress)
-        fallback.queue.queuedPlayers.remove(inetAddress)
+        fallback.queue.remove(inetAddress)
     }
 
     companion object {

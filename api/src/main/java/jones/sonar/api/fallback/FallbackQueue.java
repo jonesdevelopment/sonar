@@ -18,43 +18,41 @@
 package jones.sonar.api.fallback;
 
 import jones.sonar.api.Sonar;
+import jones.sonar.api.list.Pair;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Collection;
+import java.util.Vector;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
   @Getter
-  private final Map<InetAddress, Runnable> queuedPlayers = new HashMap<>();
+  private final Collection<Pair<InetAddress, Runnable>> queuedPlayers = new Vector<>();
 
   public void queue(final InetAddress inetAddress, final Runnable runnable) {
-    queuedPlayers.put(inetAddress, runnable);
+    queuedPlayers.add(new Pair<>(inetAddress, runnable));
+  }
+
+  public void remove(final InetAddress inetAddress) {
+    queuedPlayers.removeIf(pair -> pair.getFirst() == inetAddress);
   }
 
   public void poll() {
     synchronized (queuedPlayers) {
-      final AtomicInteger index = new AtomicInteger();
-      final List<Runnable> execute = new ArrayList<>();
+      final Collection<Pair<InetAddress, Runnable>> toRemove = new Vector<>();
 
-      final int max = Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS;
+      queuedPlayers.parallelStream()
+        .limit(Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS)
+        .forEach(pair -> {
+          pair.getSecond().run();
 
-      queuedPlayers.keySet().removeIf(inetAddress -> {
-        if (index.incrementAndGet() > max) {
-          return false;
-        }
+          toRemove.add(pair);
+        });
 
-        execute.add(queuedPlayers.get(inetAddress));
-        return true;
-      });
-
-      execute.forEach(Runnable::run);
+      queuedPlayers.removeAll(toRemove);
     }
   }
 }
