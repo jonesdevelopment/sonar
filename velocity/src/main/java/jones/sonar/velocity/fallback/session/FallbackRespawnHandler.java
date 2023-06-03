@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_16;
+import static jones.sonar.api.fallback.FallbackPipelines.RESPAWN;
 
 @RequiredArgsConstructor
 final class FallbackRespawnHandler extends ChannelOutboundHandlerAdapter {
@@ -42,7 +43,7 @@ final class FallbackRespawnHandler extends ChannelOutboundHandlerAdapter {
     if (msg instanceof JoinGame joinGame) {
 
       // Remove the pipeline to avoid issues
-      player.getPipeline().remove(this);
+      player.getPipeline().remove(RESPAWN);
 
       // Fix the chunks
       if (player.getConnection().getType() == ConnectionTypes.LEGACY_FORGE) {
