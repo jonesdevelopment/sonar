@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class DummyConnection extends MinecraftConnection {
+public final class DummyConnection extends MinecraftConnection {
   public DummyConnection(final VelocityServer server) {
     super(new Channel() {
       @Override

@@ -34,7 +34,7 @@ import static com.velocitypowered.proxy.protocol.ProtocolUtils.writeVarInt;
 // pasted from
 // https://github.com/Leymooo/BungeeCord/blob/master/protocol/src/main/java/ru/leymooo/botfilter/packets/EmptyChunkPacket.java
 @Data
-public class EmptyChunkData implements MinecraftPacket {
+public final class EmptyChunkData implements MinecraftPacket {
   private void write1_14Heightmaps(final ByteBuf buf, final ProtocolVersion protocolVersion) {
     try (final ByteBufOutputStream output = new ByteBufOutputStream(buf)) {
       output.writeByte(10);
