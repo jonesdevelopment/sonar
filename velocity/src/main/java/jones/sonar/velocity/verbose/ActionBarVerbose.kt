@@ -35,10 +35,10 @@ class ActionBarVerbose(private val server: ProxyServer) : Verbose {
     fun update() {
         val component: Component = Component.text(
             Sonar.get().config.ACTION_BAR_LAYOUT
-                .replace("%queued%", decimalFormat.format(Sonar.get().fallback.queue.queuedPlayers.size.toLong()))
-                .replace("%verifying%", decimalFormat.format(Sonar.get().fallback.connected.size.toLong()))
-                .replace("%blacklisted%", decimalFormat.format(Sonar.get().fallback.blacklisted.size.toLong()))
-                .replace("%total%", decimalFormat.format(Sonar.get().statistics["total", 0].toLong()))
+                .replace("%queued%", decimalFormat.format(Sonar.get().fallback.queue.queuedPlayers.size))
+                .replace("%verifying%", decimalFormat.format(Sonar.get().fallback.connected.size))
+                .replace("%blacklisted%", decimalFormat.format(Sonar.get().fallback.blacklisted.size))
+                .replace("%total%", decimalFormat.format(Sonar.get().statistics.get("total", 0)))
                 .replace("%animation%", VerboseAnimation.nextState())
         )
 
