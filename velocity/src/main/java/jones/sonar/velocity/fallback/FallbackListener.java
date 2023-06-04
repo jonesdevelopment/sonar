@@ -29,7 +29,6 @@ import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
-import com.velocitypowered.proxy.network.Connections;
 import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
@@ -59,6 +58,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
+import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
+import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
 import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
 import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
 import static jones.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
@@ -222,7 +223,9 @@ public final class FallbackListener {
 
       // Replace timeout handler to avoid known exploits or issues
       // We also want to timeout bots quickly to avoid flooding
-      pipeline.replace(Connections.READ_TIMEOUT, Connections.READ_TIMEOUT,
+      pipeline.replace(
+        READ_TIMEOUT,
+        READ_TIMEOUT,
         new FallbackTimeoutHandler(
           fallback.getSonar().getConfig().VERIFICATION_TIMEOUT,
           TimeUnit.MILLISECONDS
@@ -319,7 +322,7 @@ public final class FallbackListener {
           // We add the pipeline after the MinecraftDecoder since we want
           // the packets to be processed and decoded already
           fallbackPlayer.getPipeline().addAfter(
-            Connections.MINECRAFT_DECODER,
+            MINECRAFT_DECODER,
             DECODER,
             new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
           );
