@@ -48,10 +48,11 @@ public final class SonarCommand implements CommandExecutor {
                            final Command command,
                            final String label,
                            final String[] args) {
-    if (delay.asMap().containsKey(sender)) {
+    final long timestamp = delay.asMap().getOrDefault(sender, -1L);
+
+    if (timestamp > 0L) {
       sender.sendMessage(CANNOT_RUN_YET);
 
-      final long timestamp = delay.asMap().get(sender);
       final double left = 0.5D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
       final String format = decimalFormat.format(left);
 

@@ -33,10 +33,11 @@ import java.util.concurrent.TimeUnit
 
 class SonarCommand : SimpleCommand {
     override fun execute(invocation: SimpleCommand.Invocation) {
-        if (delay.asMap().containsKey(invocation.source())) {
+        val timestamp = delay.asMap().getOrDefault(invocation.source(), -1L)
+
+        if (timestamp > 0L) {
             invocation.source().sendMessage(CANNOT_RUN_YET)
 
-            val timestamp = delay.asMap()[invocation.source()]!!
             val left = 0.5 - (System.currentTimeMillis() - timestamp.toDouble()) / 1000.0
             val format = decimalFormat.format(left)
 
