@@ -16,8 +16,6 @@
  */
 package jones.sonar.velocity.fallback
 
-import com.velocitypowered.proxy.connection.MinecraftConnection
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer
 import com.velocitypowered.proxy.protocol.MinecraftPacket
 import com.velocitypowered.proxy.protocol.packet.ClientSettings
 import com.velocitypowered.proxy.protocol.packet.KeepAlive
@@ -25,13 +23,13 @@ import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import jones.sonar.api.Sonar
-import jones.sonar.api.fallback.FallbackConnection
+import jones.sonar.velocity.fallback.session.FallbackPlayer
 import jones.sonar.velocity.fallback.session.FallbackSessionHandler
 import java.io.IOException
 import java.net.InetSocketAddress
 
 class FallbackPacketDecoder(
-    private val player: FallbackConnection<ConnectedPlayer, MinecraftConnection>,
+    private val player: FallbackPlayer,
     private val startKeepAliveId: Long
 ) : ChannelInboundHandlerAdapter() {
 

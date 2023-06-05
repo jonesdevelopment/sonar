@@ -278,7 +278,7 @@ public final class FallbackListener {
           }
 
           // Create an instance for the Fallback connection
-          var fallbackPlayer = new FallbackPlayer(
+          final FallbackPlayer fallbackPlayer = new FallbackPlayer(
             fallback,
             player, mcConnection, channel, pipeline, inetAddress,
             player.getProtocolVersion().getProtocol()
@@ -295,7 +295,7 @@ public final class FallbackListener {
 
           // Set compression
           if (fallback.getSonar().getConfig().ENABLE_COMPRESSION) {
-            var threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
+            final int threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
 
             if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
               mcConnection.write(new SetCompression(threshold));
@@ -304,7 +304,7 @@ public final class FallbackListener {
           }
 
           // Send LoginSuccess packet to spoof our fake lobby
-          var success = new ServerLoginSuccess();
+          final ServerLoginSuccess success = new ServerLoginSuccess();
 
           success.setUsername(player.getUsername());
           success.setProperties(player.getGameProfileProperties());

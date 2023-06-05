@@ -24,7 +24,6 @@ import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.permission.PermissionFunction;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.proxy.VelocityServer;
-import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
@@ -55,10 +54,10 @@ import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @Nullable MinecraftSessionHandler previousHandler;
-  private final @NotNull FallbackConnection<ConnectedPlayer, MinecraftConnection> player;
+  private final @NotNull FallbackPlayer player;
 
   public FallbackSessionHandler(final @Nullable MinecraftSessionHandler previousHandler,
-                                final @NotNull FallbackConnection<ConnectedPlayer, MinecraftConnection> player) {
+                                final @NotNull FallbackPlayer player) {
     this.previousHandler = previousHandler;
     this.player = player;
   }
