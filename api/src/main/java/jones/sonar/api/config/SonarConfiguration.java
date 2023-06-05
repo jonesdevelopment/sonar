@@ -45,6 +45,9 @@ public final class SonarConfiguration {
   public int VERIFICATION_TIMEOUT;
   public int VERIFICATIONS_PER_MINUTE;
 
+  public boolean ENABLE_COMPRESSION;
+  public boolean ENABLE_VERIFICATION;
+
   public String HEADER, FOOTER;
   public String TOO_MANY_PLAYERS;
   public String TOO_MANY_VERIFICATIONS;
@@ -67,12 +70,16 @@ public final class SonarConfiguration {
 
     // General options
     MAXIMUM_ONLINE_PER_IP = yamlConfig.getInt("general.max-online-per-ip", 3);
+
     MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
-    MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.max-verifying-players", 4096);
-    MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.max-queued-players", 8192);
+
+    MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.queue.max-players", 8192);
     MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);
 
+    ENABLE_VERIFICATION = yamlConfig.getBoolean("general.verification.enabled", true);
+    ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
+    MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 4096);
     VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
 
     RELOADING = formatString(yamlConfig.getString("messages.reload.start",

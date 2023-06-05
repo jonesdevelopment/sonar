@@ -135,8 +135,7 @@ public final class FallbackListener {
   }
 
   /**
-   * If we don't handle online/offline mode players correctly,
-   * many plugins (especially Auth-related) will have issues
+   * Pre-login
    *
    * @param event PreLoginEvent
    */
@@ -169,6 +168,7 @@ public final class FallbackListener {
     }
 
     if (fallback.getVerified().contains(inetAddress)) return;
+    if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
     // Check if Fallback is already verifying a player
     // → is another player with the same ip address connected to Fallback?
@@ -184,6 +184,10 @@ public final class FallbackListener {
       return;
     }
 
+    /*
+     * If we don't handle online/offline mode players correctly,
+     * many plugins (especially Auth-related) will have issues
+     */
     if (event.getResult().isForceOfflineMode()) return;
     if (!SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
       && !event.getResult().isOnlineModeAllowed()) return;
@@ -199,6 +203,8 @@ public final class FallbackListener {
    */
   @Subscribe(order = PostOrder.LAST)
   public void handle(final GameProfileRequestEvent event) throws Throwable {
+    if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
+
     final var inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     // We don't want to check players that have already been verified
@@ -288,11 +294,13 @@ public final class FallbackListener {
           // ==================================================================
 
           // Set compression
-          var threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
+          if (fallback.getSonar().getConfig().ENABLE_COMPRESSION) {
+            var threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
 
-          if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
-            mcConnection.write(new SetCompression(threshold));
-            mcConnection.setCompressionThreshold(threshold);
+            if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+              mcConnection.write(new SetCompression(threshold));
+              mcConnection.setCompressionThreshold(threshold);
+            }
           }
 
           // Send LoginSuccess packet to spoof our fake lobby
