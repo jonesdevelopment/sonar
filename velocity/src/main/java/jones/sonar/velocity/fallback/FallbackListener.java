@@ -330,7 +330,7 @@ public final class FallbackListener {
             new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
           );
 
-          if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
+          if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
             // ==================================================================
             // The first step of the verification is a simple KeepAlive packet
             // We don't want to waste resources by directly sending all packets to
