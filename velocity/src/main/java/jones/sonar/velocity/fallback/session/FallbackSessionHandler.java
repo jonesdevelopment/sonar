@@ -55,6 +55,7 @@ import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @Nullable MinecraftSessionHandler previousHandler;
   private final @NotNull FallbackPlayer player;
+  private boolean v1_8or1_7;
 
   public FallbackSessionHandler(final @Nullable MinecraftSessionHandler previousHandler,
                                 final @NotNull FallbackPlayer player) {
@@ -123,8 +124,10 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     hasSentClientBrand = true;
 
-    if (player.getProtocolVersion() == MINECRAFT_1_8.getProtocol()) {
-      return false; // We use a different verification method for 1.8
+    v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
+
+    if (v1_8or1_7) {
+      return false; // We use a different verification method for 1.7-1.8
     }
 
     finish();
@@ -133,7 +136,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final KeepAlive keepAlive) {
-    if (keepAlive.getRandomId() == 0 && player.getProtocolVersion() == MINECRAFT_1_8.getProtocol()) {
+    if (keepAlive.getRandomId() == 0 && v1_8or1_7) {
 
       // First, let's validate if the packet could actually be sent at this point
       checkFrame(hasSentClientBrand, "unexpected timing (K1): " + keepAlive.getRandomId());
