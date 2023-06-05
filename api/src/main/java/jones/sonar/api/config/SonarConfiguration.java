@@ -75,56 +75,56 @@ public final class SonarConfiguration {
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
     VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
 
-    RELOADING = formatString(yamlConfig.getString("general.reload.start",
+    RELOADING = formatString(yamlConfig.getString("messages.reload.start",
       "%prefix%Reloading Sonar..."
     ));
-    RELOADED = formatString(yamlConfig.getString("general.reload.finish",
+    RELOADED = formatString(yamlConfig.getString("messages.reload.finish",
       "%prefix%&aSuccessfully reloaded &7(%taken%ms)"
     ));
 
-    VERBOSE_SUBSCRIBED = formatString(yamlConfig.getString("general.verbose.subscribed",
+    VERBOSE_SUBSCRIBED = formatString(yamlConfig.getString("messages.verbose.subscribed",
       "%prefix%You are now viewing Sonar verbose."
     ));
-    VERBOSE_UNSUBSCRIBED = formatString(yamlConfig.getString("general.verbose.unsubscribed",
+    VERBOSE_UNSUBSCRIBED = formatString(yamlConfig.getString("messages.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."
     ));
 
-    HEADER = fromList(yamlConfig.getStringList("general.verification.message.header",
+    HEADER = fromList(yamlConfig.getStringList("messages.verification.header",
       Arrays.asList(
         "&e&lSonar"
       )));
-    FOOTER = fromList(yamlConfig.getStringList("general.verification.message.footer",
+    FOOTER = fromList(yamlConfig.getStringList("messages.verification.footer",
       Arrays.asList(
         "&7If you believe that this is an error, contact an administrator."
       )));
-    TOO_MANY_PLAYERS = fromList(yamlConfig.getStringList("general.verification.too-many-players",
+    TOO_MANY_PLAYERS = fromList(yamlConfig.getStringList("messages.verification.too-many-players",
       Arrays.asList(
         "%header%",
         "&cToo many players are currently trying to log in.",
         "&7Please try again in a few seconds.",
         "%footer%"
       )));
-    TOO_MANY_VERIFICATIONS = fromList(yamlConfig.getStringList("general.verification.too-many-verifications",
+    TOO_MANY_VERIFICATIONS = fromList(yamlConfig.getStringList("messages.verification.too-many-verifications",
       Arrays.asList(
         "%header%",
         "&cYour IP address is denied from logging into the server.",
         "%footer%"
       )));
-    ALREADY_VERIFYING = fromList(yamlConfig.getStringList("general.verification.already-verifying",
+    ALREADY_VERIFYING = fromList(yamlConfig.getStringList("messages.verification.already-verifying",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently queued for verification.",
         "&cPlease wait a few minutes before trying to verify again.",
         "%footer%"
       )));
-    BLACKLISTED = fromList(yamlConfig.getStringList("general.verification.blacklisted",
+    BLACKLISTED = fromList(yamlConfig.getStringList("messages.verification.blacklisted",
       Arrays.asList(
         "%header%",
         "&cYour IP address is temporarily denied from verifying.",
         "&cPlease wait a few minutes before trying to verify again.",
         "%footer%"
       )));
-    TOO_MANY_ONLINE_PER_IP = fromList(yamlConfig.getStringList("general.too-many-online-per-ip",
+    TOO_MANY_ONLINE_PER_IP = fromList(yamlConfig.getStringList("messages.too-many-online-per-ip",
       Arrays.asList(
         "%header%",
         "&cThere are too many players online with your IP address.",
