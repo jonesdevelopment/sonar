@@ -27,20 +27,20 @@ import java.net.InetSocketAddress
 @Sharable
 class FallbackChannelHandler(private val fallback: Fallback) : ChannelInboundHandlerAdapter() {
 
-    @Throws(Exception::class)
-    override fun channelInactive(ctx: ChannelHandlerContext) {
-        ctx.fireChannelInactive()
+  @Throws(Exception::class)
+  override fun channelInactive(ctx: ChannelHandlerContext) {
+    ctx.fireChannelInactive()
 
-        val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
+    val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
-        // Remove the ip address from the queue
-        fallback.connected.remove(inetAddress)
-        fallback.queue.remove(inetAddress)
-    }
+    // Remove the ip address from the queue
+    fallback.connected.remove(inetAddress)
+    fallback.queue.remove(inetAddress)
+  }
 
-    companion object {
+  companion object {
 
-        @JvmField
-        val INSTANCE = FallbackChannelHandler(Sonar.get().fallback)
-    }
+    @JvmField
+    val INSTANCE = FallbackChannelHandler(Sonar.get().fallback)
+  }
 }

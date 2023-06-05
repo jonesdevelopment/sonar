@@ -24,29 +24,29 @@ import jones.sonar.common.command.subcommand.SubCommandInfo
 import java.text.DecimalFormat
 
 @SubCommandInfo(
-    name = "statistics",
-    aliases = ["stats"],
-    description = "Show session statistics of this server"
+  name = "statistics",
+  aliases = ["stats"],
+  description = "Show session statistics of this server"
 )
 class StatisticsCommand : SubCommand() {
-    override fun execute(invocation: CommandInvocation) {
-        val total = Sonar.get().statistics.get("total", 0)
-        val queued = Sonar.get().fallback.queue.queuedPlayers.size
-        val verifying = Sonar.get().fallback.connected.size
-        val verified = Sonar.get().fallback.verified.size
-        val blacklisted = Sonar.get().fallback.blacklisted.size
+  override fun execute(invocation: CommandInvocation) {
+    val total = Sonar.get().statistics.get("total", 0)
+    val queued = Sonar.get().fallback.queue.queuedPlayers.size
+    val verifying = Sonar.get().fallback.connected.size
+    val verified = Sonar.get().fallback.verified.size
+    val blacklisted = Sonar.get().fallback.blacklisted.size
 
-        invocation.invocationSender.sendMessage("§a● §fSonar session statistics")
-        invocation.invocationSender.sendMessage()
-        invocation.invocationSender.sendMessage(" §7Verified IP addresses §f${decimalFormat.format(verified)}")
-        invocation.invocationSender.sendMessage(" §7Verifying IP addresses §f${decimalFormat.format(verifying)}")
-        invocation.invocationSender.sendMessage(" §7Blacklisted IP addresses §f${decimalFormat.format(blacklisted)}")
-        invocation.invocationSender.sendMessage(" §7Queued connections §f${decimalFormat.format(queued)}")
-        invocation.invocationSender.sendMessage(" §7Total traffic §f${decimalFormat.format(total)}")
-        invocation.invocationSender.sendMessage()
-    }
+    invocation.invocationSender.sendMessage("§a● §fSonar session statistics")
+    invocation.invocationSender.sendMessage()
+    invocation.invocationSender.sendMessage(" §7Verified IP addresses §f${decimalFormat.format(verified)}")
+    invocation.invocationSender.sendMessage(" §7Verifying IP addresses §f${decimalFormat.format(verifying)}")
+    invocation.invocationSender.sendMessage(" §7Blacklisted IP addresses §f${decimalFormat.format(blacklisted)}")
+    invocation.invocationSender.sendMessage(" §7Queued connections §f${decimalFormat.format(queued)}")
+    invocation.invocationSender.sendMessage(" §7Total traffic §f${decimalFormat.format(total)}")
+    invocation.invocationSender.sendMessage()
+  }
 
-    companion object {
-        private val decimalFormat = DecimalFormat("#,###")
-    }
+  companion object {
+    private val decimalFormat = DecimalFormat("#,###")
+  }
 }

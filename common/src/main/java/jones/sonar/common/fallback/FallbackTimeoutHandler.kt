@@ -24,32 +24,32 @@ import io.netty.handler.timeout.IdleStateHandler
 import java.util.concurrent.TimeUnit
 
 class FallbackTimeoutHandler(timeout: Long, timeUnit: TimeUnit?) : IdleStateHandler(timeout, 0L, 0L, timeUnit) {
-    private var closed = false
+  private var closed = false
 
-    @Throws(Exception::class)
-    override fun channelIdle(
-        ctx: ChannelHandlerContext,
-        idleStateEvent: IdleStateEvent
-    ) {
-        assert(idleStateEvent.state() == IdleState.READER_IDLE)
-        readTimedOut(ctx)
+  @Throws(Exception::class)
+  override fun channelIdle(
+    ctx: ChannelHandlerContext,
+    idleStateEvent: IdleStateEvent
+  ) {
+    assert(idleStateEvent.state() == IdleState.READER_IDLE)
+    readTimedOut(ctx)
+  }
+
+  @Throws(Exception::class)
+  private fun readTimedOut(ctx: ChannelHandlerContext) {
+    if (!closed) {
+
+      // ==========================================================
+      // The netty (default) ReadTimeoutHandler would normally just throw an Exception
+      // The default ReadTimeoutHandler does only check for the boolean 'closed' and
+      // still throws the Exception even if the channel is closed
+      // This was discovered and fixed by @jones
+      // ==========================================================
+      if (ctx.channel().isActive) {
+        ctx.close()
+      }
+
+      closed = true
     }
-
-    @Throws(Exception::class)
-    private fun readTimedOut(ctx: ChannelHandlerContext) {
-        if (!closed) {
-
-            // ==========================================================
-            // The netty (default) ReadTimeoutHandler would normally just throw an Exception
-            // The default ReadTimeoutHandler does only check for the boolean 'closed' and
-            // still throws the Exception even if the channel is closed
-            // This was discovered and fixed by @jones
-            // ==========================================================
-            if (ctx.channel().isActive) {
-                ctx.close()
-            }
-
-            closed = true
-        }
-    }
+  }
 }

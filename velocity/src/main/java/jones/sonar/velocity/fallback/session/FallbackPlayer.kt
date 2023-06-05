@@ -26,40 +26,40 @@ import jones.sonar.api.fallback.FallbackConnection
 import java.net.InetAddress
 
 class FallbackPlayer(
-    private val fallback: Fallback,
-    private val player: ConnectedPlayer,
-    private val connection: MinecraftConnection,
-    private val channel: Channel,
-    private val pipeline: ChannelPipeline,
-    private val inetAddress: InetAddress,
-    private val protocolVersion: Int,
+  private val fallback: Fallback,
+  private val player: ConnectedPlayer,
+  private val connection: MinecraftConnection,
+  private val channel: Channel,
+  private val pipeline: ChannelPipeline,
+  private val inetAddress: InetAddress,
+  private val protocolVersion: Int,
 ) : FallbackConnection<ConnectedPlayer?, MinecraftConnection?> {
 
-    override fun getFallback(): Fallback {
-        return fallback
-    }
+  override fun getFallback(): Fallback {
+    return fallback
+  }
 
-    override fun getPlayer(): ConnectedPlayer {
-        return player
-    }
+  override fun getPlayer(): ConnectedPlayer {
+    return player
+  }
 
-    override fun getConnection(): MinecraftConnection {
-        return connection
-    }
+  override fun getConnection(): MinecraftConnection {
+    return connection
+  }
 
-    override fun getChannel(): Channel {
-        return channel
-    }
+  override fun getChannel(): Channel {
+    return channel
+  }
 
-    override fun getPipeline(): ChannelPipeline {
-        return pipeline
-    }
+  override fun getPipeline(): ChannelPipeline {
+    return pipeline
+  }
 
-    override fun getInetAddress(): InetAddress {
-        return inetAddress
-    }
+  override fun getInetAddress(): InetAddress {
+    return inetAddress
+  }
 
-    override fun getProtocolVersion(): Int {
-        return protocolVersion
-    }
+  override fun getProtocolVersion(): Int {
+    return protocolVersion
+  }
 }

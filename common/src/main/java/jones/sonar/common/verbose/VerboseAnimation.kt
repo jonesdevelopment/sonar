@@ -20,12 +20,12 @@ package jones.sonar.common.verbose
 import jones.sonar.api.Sonar
 
 class VerboseAnimation {
-    companion object {
-        private var stateIndex = 0
+  companion object {
+    private var stateIndex = 0
 
-        fun nextState(): String {
-            val nextIndex = ++stateIndex % Sonar.get().config.ANIMATION.size
-            return Sonar.get().config.ANIMATION.toTypedArray()[nextIndex].toString()
-        }
+    fun nextState(): String {
+      val nextIndex = ++stateIndex % Sonar.get().config.ANIMATION.size
+      return Sonar.get().config.ANIMATION.toTypedArray()[nextIndex].toString()
     }
+  }
 }

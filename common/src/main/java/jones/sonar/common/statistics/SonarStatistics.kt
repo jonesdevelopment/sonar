@@ -21,9 +21,9 @@ import jones.sonar.api.statistics.Statistics
 import java.util.*
 
 class SonarStatistics : Statistics {
-    private val rawMap = Collections.synchronizedMap(HashMap<String, Int>())
+  private val rawMap = Collections.synchronizedMap(HashMap<String, Int>())
 
-    override fun getRawMap(): MutableMap<String, Int> {
-        return rawMap;
-    }
+  override fun getRawMap(): MutableMap<String, Int> {
+    return rawMap;
+  }
 }

@@ -26,32 +26,32 @@ import net.kyori.adventure.text.Component
 import java.text.DecimalFormat
 
 class ActionBarVerbose(private val server: ProxyServer) : Verbose {
-    private val subscribers: MutableCollection<String> = ArrayList()
+  private val subscribers: MutableCollection<String> = ArrayList()
 
-    override fun getSubscribers(): MutableCollection<String> {
-        return subscribers
-    }
+  override fun getSubscribers(): MutableCollection<String> {
+    return subscribers
+  }
 
-    fun update() {
-        val component: Component = Component.text(
-            Sonar.get().config.ACTION_BAR_LAYOUT
-                .replace("%queued%", decimalFormat.format(Sonar.get().fallback.queue.queuedPlayers.size))
-                .replace("%verifying%", decimalFormat.format(Sonar.get().fallback.connected.size))
-                .replace("%blacklisted%", decimalFormat.format(Sonar.get().fallback.blacklisted.size))
-                .replace("%total%", decimalFormat.format(Sonar.get().statistics.get("total", 0)))
-                .replace("%animation%", VerboseAnimation.nextState())
-        )
+  fun update() {
+    val component: Component = Component.text(
+      Sonar.get().config.ACTION_BAR_LAYOUT
+        .replace("%queued%", decimalFormat.format(Sonar.get().fallback.queue.queuedPlayers.size))
+        .replace("%verifying%", decimalFormat.format(Sonar.get().fallback.connected.size))
+        .replace("%blacklisted%", decimalFormat.format(Sonar.get().fallback.blacklisted.size))
+        .replace("%total%", decimalFormat.format(Sonar.get().statistics.get("total", 0)))
+        .replace("%animation%", VerboseAnimation.nextState())
+    )
 
-        synchronized(subscribers) {
-            for (subscriber in subscribers) {
-                server.getPlayer(subscriber).ifPresent {
-                    player: Player -> player.sendActionBar(component)
-                }
-            }
+    synchronized(subscribers) {
+      for (subscriber in subscribers) {
+        server.getPlayer(subscriber).ifPresent { player: Player ->
+          player.sendActionBar(component)
         }
+      }
     }
+  }
 
-    companion object {
-        private val decimalFormat = DecimalFormat("#,###")
-    }
+  companion object {
+    private val decimalFormat = DecimalFormat("#,###")
+  }
 }

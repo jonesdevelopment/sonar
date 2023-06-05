@@ -352,7 +352,7 @@ public final class FallbackListener {
 
             // Set session handler to custom fallback handler to intercept all incoming packets
             mcConnection.setSessionHandler(new FallbackSessionHandler(
-                mcConnection.getSessionHandler(), fallbackPlayer
+              mcConnection.getSessionHandler(), fallbackPlayer
             ));
 
             mcConnection.flush();

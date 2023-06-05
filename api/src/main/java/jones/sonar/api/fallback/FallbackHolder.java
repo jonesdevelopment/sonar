@@ -45,19 +45,19 @@ public final class FallbackHolder implements Fallback {
   @Getter
   private final Logger logger = new Logger() {
 
-        @Override
-        public void info(final String message, final Object... args) {
-          sonar.getLogger().info("[Fallback] " + message, args);
-        }
+    @Override
+    public void info(final String message, final Object... args) {
+      sonar.getLogger().info("[Fallback] " + message, args);
+    }
 
-        @Override
-        public void warn(final String message, final Object... args) {
-          sonar.getLogger().warn("[Fallback] " + message, args);
-        }
+    @Override
+    public void warn(final String message, final Object... args) {
+      sonar.getLogger().warn("[Fallback] " + message, args);
+    }
 
-        @Override
-        public void error(final String message, final Object... args) {
-          sonar.getLogger().error("[Fallback] " + message, args);
-        }
-      };
+    @Override
+    public void error(final String message, final Object... args) {
+      sonar.getLogger().error("[Fallback] " + message, args);
+    }
+  };
 }

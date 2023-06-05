@@ -23,21 +23,21 @@ import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
 
 @SubCommandInfo(
-    name = "verbose",
-    description = "Enable and disable Sonar verbose",
-    onlyPlayers = true
+  name = "verbose",
+  description = "Enable and disable Sonar verbose",
+  onlyPlayers = true
 )
 class VerboseCommand : SubCommand() {
-    override fun execute(invocation: CommandInvocation) {
-        val verboseSubscriber = invocation.executorName
+  override fun execute(invocation: CommandInvocation) {
+    val verboseSubscriber = invocation.executorName
 
-        if (Sonar.get().actionBarVerbose.isSubscribed(verboseSubscriber)) {
-            Sonar.get().actionBarVerbose.unsubscribe(verboseSubscriber)
-            invocation.invocationSender.sendMessage(Sonar.get().config.VERBOSE_UNSUBSCRIBED)
-            return
-        }
-
-        invocation.invocationSender.sendMessage(Sonar.get().config.VERBOSE_SUBSCRIBED)
-        Sonar.get().actionBarVerbose.subscribe(verboseSubscriber)
+    if (Sonar.get().actionBarVerbose.isSubscribed(verboseSubscriber)) {
+      Sonar.get().actionBarVerbose.unsubscribe(verboseSubscriber)
+      invocation.invocationSender.sendMessage(Sonar.get().config.VERBOSE_UNSUBSCRIBED)
+      return
     }
+
+    invocation.invocationSender.sendMessage(Sonar.get().config.VERBOSE_SUBSCRIBED)
+    Sonar.get().actionBarVerbose.subscribe(verboseSubscriber)
+  }
 }
