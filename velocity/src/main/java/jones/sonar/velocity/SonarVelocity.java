@@ -31,6 +31,7 @@ import jones.sonar.velocity.fallback.FallbackListener;
 import jones.sonar.velocity.verbose.ActionBarVerbose;
 import lombok.Getter;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
@@ -51,6 +52,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
   @Getter
   private Statistics statistics;
+
+  @Getter
+  private final DecimalFormat formatter = new DecimalFormat("#,###");
 
   @Override
   public SonarPlatform getPlatform() {

@@ -21,7 +21,6 @@ import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
-import java.text.DecimalFormat
 
 @SubCommandInfo(
   name = "statistics",
@@ -38,15 +37,11 @@ class StatisticsCommand : SubCommand() {
 
     invocation.invocationSender.sendMessage("§a● §fSonar session statistics")
     invocation.invocationSender.sendMessage()
-    invocation.invocationSender.sendMessage(" §7Verified IP addresses §f${decimalFormat.format(verified)}")
-    invocation.invocationSender.sendMessage(" §7Verifying IP addresses §f${decimalFormat.format(verifying)}")
-    invocation.invocationSender.sendMessage(" §7Blacklisted IP addresses §f${decimalFormat.format(blacklisted)}")
-    invocation.invocationSender.sendMessage(" §7Queued connections §f${decimalFormat.format(queued)}")
-    invocation.invocationSender.sendMessage(" §7Total traffic §f${decimalFormat.format(total)}")
+    invocation.invocationSender.sendMessage(" Verified IP addresses §7${Sonar.get().formatter.format(verified)}")
+    invocation.invocationSender.sendMessage(" Verifying IP addresses §7${Sonar.get().formatter.format(verifying)}")
+    invocation.invocationSender.sendMessage(" Blacklisted IP addresses §7${Sonar.get().formatter.format(blacklisted)}")
+    invocation.invocationSender.sendMessage(" Queued connections (logins) §7${Sonar.get().formatter.format(queued)}")
+    invocation.invocationSender.sendMessage(" Total connections (traffic) §7${Sonar.get().formatter.format(total)}")
     invocation.invocationSender.sendMessage()
-  }
-
-  companion object {
-    private val decimalFormat = DecimalFormat("#,###")
   }
 }

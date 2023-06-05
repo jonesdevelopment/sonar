@@ -24,10 +24,14 @@ import jones.sonar.api.logger.Logger;
 import jones.sonar.api.statistics.Statistics;
 import jones.sonar.api.verbose.Verbose;
 
+import java.text.DecimalFormat;
+
 public interface Sonar {
   SonarPlatform getPlatform();
 
   SonarConfiguration getConfig();
+
+  DecimalFormat getFormatter();
 
   default Fallback getFallback() {
     return FallbackHolder.INSTANCE;

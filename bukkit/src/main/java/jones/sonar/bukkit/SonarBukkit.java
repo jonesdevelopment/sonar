@@ -29,6 +29,7 @@ import jones.sonar.common.SonarPlugin;
 import jones.sonar.common.statistics.SonarStatistics;
 import lombok.Getter;
 
+import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.logging.Level;
 
@@ -50,6 +51,9 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
   @Getter
   private Statistics statistics;
+
+  @Getter
+  private final DecimalFormat formatter = new DecimalFormat("#,###");
 
   @Override
   public SonarPlatform getPlatform() {

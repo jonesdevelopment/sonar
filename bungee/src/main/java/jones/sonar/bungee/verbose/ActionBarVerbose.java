@@ -26,7 +26,6 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -36,14 +35,13 @@ public final class ActionBarVerbose implements Verbose {
   private final ProxyServer server;
   @Getter
   private final Collection<String> subscribers = new ArrayList<>();
-  private static final DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
   public void update() {
     final TextComponent component = new TextComponent(Sonar.get().getConfig().ACTION_BAR_LAYOUT
-      .replace("%queued%", decimalFormat.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-      .replace("%verifying%", decimalFormat.format(Sonar.get().getFallback().getConnected().size()))
-      .replace("%blacklisted%", decimalFormat.format(Sonar.get().getFallback().getBlacklisted().size()))
-      .replace("%total%", decimalFormat.format(Sonar.get().getStatistics().get("total", 0)))
+      .replace("%queued%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+      .replace("%verifying%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getConnected().size()))
+      .replace("%blacklisted%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getBlacklisted().size()))
+      .replace("%total%", Sonar.get().getFormatter().format(Sonar.get().getStatistics().get("total", 0)))
       .replace("%animation%", VerboseAnimation.Companion.nextState())
     );
 

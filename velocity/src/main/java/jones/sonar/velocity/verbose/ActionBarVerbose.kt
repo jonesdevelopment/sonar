@@ -23,7 +23,6 @@ import jones.sonar.api.Sonar
 import jones.sonar.api.verbose.Verbose
 import jones.sonar.common.verbose.VerboseAnimation
 import net.kyori.adventure.text.Component
-import java.text.DecimalFormat
 
 class ActionBarVerbose(private val server: ProxyServer) : Verbose {
   private val subscribers: MutableCollection<String> = ArrayList()
@@ -35,10 +34,10 @@ class ActionBarVerbose(private val server: ProxyServer) : Verbose {
   fun update() {
     val component: Component = Component.text(
       Sonar.get().config.ACTION_BAR_LAYOUT
-        .replace("%queued%", decimalFormat.format(Sonar.get().fallback.queue.queuedPlayers.size))
-        .replace("%verifying%", decimalFormat.format(Sonar.get().fallback.connected.size))
-        .replace("%blacklisted%", decimalFormat.format(Sonar.get().fallback.blacklisted.size))
-        .replace("%total%", decimalFormat.format(Sonar.get().statistics.get("total", 0)))
+        .replace("%queued%", Sonar.get().formatter.format(Sonar.get().fallback.queue.queuedPlayers.size))
+        .replace("%verifying%", Sonar.get().formatter.format(Sonar.get().fallback.connected.size))
+        .replace("%blacklisted%", Sonar.get().formatter.format(Sonar.get().fallback.blacklisted.size))
+        .replace("%total%", Sonar.get().formatter.format(Sonar.get().statistics.get("total", 0)))
         .replace("%animation%", VerboseAnimation.nextState())
     )
 
@@ -49,9 +48,5 @@ class ActionBarVerbose(private val server: ProxyServer) : Verbose {
         }
       }
     }
-  }
-
-  companion object {
-    private val decimalFormat = DecimalFormat("#,###")
   }
 }

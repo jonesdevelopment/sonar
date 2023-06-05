@@ -17,6 +17,7 @@
 
 package jones.sonar.common.command.subcommand;
 
+import jones.sonar.common.command.subcommand.impl.BlacklistCommand;
 import jones.sonar.common.command.subcommand.impl.ReloadCommand;
 import jones.sonar.common.command.subcommand.impl.StatisticsCommand;
 import jones.sonar.common.command.subcommand.impl.VerboseCommand;
@@ -30,6 +31,7 @@ import java.util.Collection;
 public class SubCommandManager {
   @Getter
   private final Collection<SubCommand> subCommands = Arrays.asList(
+    new BlacklistCommand(),
     new StatisticsCommand(),
     new VerboseCommand(),
     new ReloadCommand()

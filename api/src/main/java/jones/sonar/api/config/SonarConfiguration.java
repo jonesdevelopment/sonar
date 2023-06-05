@@ -55,6 +55,19 @@ public final class SonarConfiguration {
   public String ALREADY_VERIFYING;
   public String BLACKLISTED;
 
+  public String INCORRECT_COMMAND_ARG;
+  public String INCORRECT_COMMAND_USAGE;
+  public String INCORRECT_IP_ADDRESS;
+  public String ILLEGAL_IP_ADDRESS;
+
+  public String BLACKLIST_EMPTY;
+  public String BLACKLIST_ADD;
+  public String BLACKLIST_DUPLICATE;
+  public String BLACKLIST_NOT_FOUND;
+  public String BLACKLIST_REMOVE;
+  public String BLACKLIST_CLEARED;
+  public String BLACKLIST_SIZE;
+
   public String VERBOSE_SUBSCRIBED;
   public String VERBOSE_UNSUBSCRIBED;
   public String RELOADING;
@@ -94,6 +107,41 @@ public final class SonarConfiguration {
     ));
     VERBOSE_UNSUBSCRIBED = formatString(yamlConfig.getString("messages.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."
+    ));
+
+    INCORRECT_COMMAND_ARG = formatString(yamlConfig.getString("messages.incorrect-command-argument",
+      "%prefix%&cIncorrect command usage. &7Try &f/sonar %subcommand%&7."
+    ));
+    INCORRECT_COMMAND_USAGE = formatString(yamlConfig.getString("messages.incorrect-command-usage",
+      "%prefix%Usage: /sonar %subcommand%"
+    ));
+    INCORRECT_IP_ADDRESS = formatString(yamlConfig.getString("messages.invalid-ip-address",
+      "%prefix%The IP address you provided seems to be invalid."
+    ));
+    ILLEGAL_IP_ADDRESS = formatString(yamlConfig.getString("messages.illegal-ip-address",
+      "%prefix%The IP address you provided seems to be either a local or loopback IP."
+    ));
+
+    BLACKLIST_EMPTY = formatString(yamlConfig.getString("messages.blacklist.empty",
+      "%prefix%The blacklist is currently empty. Therefore, no IP addresses were removed from the blacklist."
+    ));
+    BLACKLIST_CLEARED = formatString(yamlConfig.getString("messages.blacklist.cleared",
+      "%prefix%You successfully removed a total of %removed% ip address(es) from the blacklist."
+    ));
+    BLACKLIST_SIZE = formatString(yamlConfig.getString("messages.blacklist.size",
+      "%prefix%The blacklist currently contains %amount% ip address(es)."
+    ));
+    BLACKLIST_ADD = formatString(yamlConfig.getString("messages.blacklist.added",
+      "%prefix%Successfully added %ip% to the blacklist."
+    ));
+    BLACKLIST_REMOVE = formatString(yamlConfig.getString("messages.blacklist.removed",
+      "%prefix%Successfully remove %ip% from the blacklist."
+    ));
+    BLACKLIST_DUPLICATE = formatString(yamlConfig.getString("messages.blacklist.duplicate-ip",
+      "%prefix%The IP address you provided is already blacklisted."
+    ));
+    BLACKLIST_NOT_FOUND = formatString(yamlConfig.getString("messages.blacklist.ip-not-found",
+      "%prefix%The IP address you provided is not blacklisted."
     ));
 
     HEADER = fromList(yamlConfig.getStringList("messages.verification.header",
