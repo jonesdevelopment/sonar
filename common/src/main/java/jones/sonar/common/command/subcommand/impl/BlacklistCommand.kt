@@ -125,7 +125,7 @@ class BlacklistCommand : SubCommand() {
 
           if (blacklisted == 0) {
             invocation.invocationSender.sendMessage(Sonar.get().config.BLACKLIST_EMPTY)
-            return@synchronized
+            return
           }
 
           Sonar.get().fallback.blacklisted.clear()
