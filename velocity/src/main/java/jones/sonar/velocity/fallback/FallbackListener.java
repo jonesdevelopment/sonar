@@ -21,6 +21,7 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.GameProfileRequestEvent;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.VelocityServer;
@@ -30,6 +31,7 @@ import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
 import com.velocitypowered.proxy.protocol.StateRegistry;
+import com.velocitypowered.proxy.protocol.packet.JoinGame;
 import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
@@ -41,6 +43,7 @@ import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.common.fallback.FallbackTimeoutHandler;
 import jones.sonar.velocity.SonarVelocity;
 import jones.sonar.velocity.fallback.session.FallbackPlayer;
+import jones.sonar.velocity.fallback.session.FallbackSessionHandler;
 import jones.sonar.velocity.fallback.session.dummy.DummyConnection;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -316,15 +319,7 @@ public final class FallbackListener {
           mcConnection.setAssociation(player);
           mcConnection.setState(StateRegistry.PLAY);
 
-          // ==================================================================
-          // The first step of the verification is a simple KeepAlive packet
-          // We don't want to waste resources by directly sending all packets to
-          // the client which is why we first send a KeepAlive packet and then
-          // wait for a valid response to continue the verification process
-          final KeepAlive keepAlive = new KeepAlive();
           final long keepAliveId = ThreadLocalRandom.current().nextInt();
-
-          keepAlive.setRandomId(keepAliveId);
 
           // We have to add this pipeline to monitor all incoming traffic
           // We add the pipeline after the MinecraftDecoder since we want
@@ -335,8 +330,34 @@ public final class FallbackListener {
             new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
           );
 
-          mcConnection.write(keepAlive);
-          // ==================================================================
+          if (fallbackPlayer.getProtocolVersion() >= ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
+            // ==================================================================
+            // The first step of the verification is a simple KeepAlive packet
+            // We don't want to waste resources by directly sending all packets to
+            // the client which is why we first send a KeepAlive packet and then
+            // wait for a valid response to continue the verification process
+            final KeepAlive keepAlive = new KeepAlive();
+
+            keepAlive.setRandomId(keepAliveId);
+
+            mcConnection.write(keepAlive);
+            // ==================================================================
+          } else {
+            // ==================================================================
+            // KeepAlive packets do not exist during the login process on 1.7
+            // We have to fall back to the regular method of verification
+            final JoinGame joinGame = FallbackPackets.getJoinPacketForVersion(fallbackPlayer.getProtocolVersion());
+
+            mcConnection.delayedWrite(joinGame);
+
+            // Set session handler to custom fallback handler to intercept all incoming packets
+            mcConnection.setSessionHandler(new FallbackSessionHandler(
+                mcConnection.getSessionHandler(), fallbackPlayer
+            ));
+
+            mcConnection.flush();
+            // ==================================================================
+          }
         } catch (Throwable throwable) {
           throw new RuntimeException(throwable);
         }
