@@ -38,7 +38,8 @@ public final class ActionBarVerbose implements Verbose {
 
   public void update() {
     final TextComponent component = new TextComponent(Sonar.get().getConfig().ACTION_BAR_LAYOUT
-      .replace("%queued%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+      .replace("%queued%",
+        Sonar.get().getFormatter().format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
       .replace("%verifying%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getBlacklisted().size()))
       .replace("%total%", Sonar.get().getFormatter().format(Sonar.get().getStatistics().get("total", 0)))
