@@ -238,7 +238,8 @@ public final class FallbackListener {
         new FallbackTimeoutHandler(
           fallback.getSonar().getConfig().VERIFICATION_TIMEOUT,
           TimeUnit.MILLISECONDS
-        ));
+        )
+      );
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
