@@ -48,7 +48,23 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
   private SonarConfiguration config;
 
   @Getter
-  private Logger logger;
+  private final Logger logger = new Logger() {
+
+    @Override
+    public void info(final String message, final Object... args) {
+      plugin.getLogger().info(message, args);
+    }
+
+    @Override
+    public void warn(final String message, final Object... args) {
+      plugin.getLogger().warn(message, args);
+    }
+
+    @Override
+    public void error(final String message, final Object... args) {
+      plugin.getLogger().error(message, args);
+    }
+  };
 
   @Getter
   private Statistics statistics;
@@ -71,25 +87,6 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     SonarProvider.set(this);
 
     plugin.getLogger().info("Initializing Sonar...");
-
-    // Initialize logger
-    logger = new Logger() {
-
-      @Override
-      public void info(final String message, final Object... args) {
-        plugin.getLogger().info(message, args);
-      }
-
-      @Override
-      public void warn(final String message, final Object... args) {
-        plugin.getLogger().warn(message, args);
-      }
-
-      @Override
-      public void error(final String message, final Object... args) {
-        plugin.getLogger().error(message, args);
-      }
-    };
 
     // Initialize statistics
     statistics = new SonarStatistics();

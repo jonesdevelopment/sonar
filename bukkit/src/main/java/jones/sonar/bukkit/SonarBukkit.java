@@ -47,7 +47,23 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
   private SonarConfiguration config;
 
   @Getter
-  private Logger logger;
+  private final Logger logger = new Logger() {
+
+    @Override
+    public void info(final String message, final Object... args) {
+      plugin.getLogger().log(Level.INFO, message, args);
+    }
+
+    @Override
+    public void warn(final String message, final Object... args) {
+      plugin.getLogger().log(Level.WARNING, message, args);
+    }
+
+    @Override
+    public void error(final String message, final Object... args) {
+      plugin.getLogger().log(Level.SEVERE, message, args);
+    }
+  };
 
   @Getter
   private Statistics statistics;
@@ -70,25 +86,6 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     SonarProvider.set(this);
 
     plugin.getLogger().info("Initializing Sonar...");
-
-    // Initialize logger
-    logger = new Logger() {
-
-      @Override
-      public void info(final String message, final Object... args) {
-        plugin.getLogger().log(Level.INFO, message, args);
-      }
-
-      @Override
-      public void warn(final String message, final Object... args) {
-        plugin.getLogger().log(Level.WARNING, message, args);
-      }
-
-      @Override
-      public void error(final String message, final Object... args) {
-        plugin.getLogger().log(Level.SEVERE, message, args);
-      }
-    };
 
     // Initialize statistics
     statistics = new SonarStatistics();
