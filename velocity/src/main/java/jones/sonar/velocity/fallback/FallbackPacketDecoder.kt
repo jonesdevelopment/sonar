@@ -29,7 +29,7 @@ import java.io.IOException
 import java.net.InetSocketAddress
 
 class FallbackPacketDecoder(
-  private val player: FallbackPlayer,
+  private val fallbackPlayer: FallbackPlayer,
   private val startKeepAliveId: Long
 ) : ChannelInboundHandlerAdapter() {
 
@@ -53,27 +53,28 @@ class FallbackPacketDecoder(
     if (msg is MinecraftPacket) {
       val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive
 
-      FallbackSessionHandler.checkFrame(player, legalPacket, "bad packet: " + msg.javaClass.simpleName)
+      FallbackSessionHandler.checkFrame(fallbackPlayer, legalPacket, "bad packet: " + msg.javaClass.simpleName)
 
-      val hasFallbackHandler = player.connection.sessionHandler is FallbackSessionHandler
+      val hasFallbackHandler = fallbackPlayer.connection.sessionHandler is FallbackSessionHandler
 
       if (msg is KeepAlive && msg.randomId == startKeepAliveId) {
         if (hasFallbackHandler) {
-          player.fail("duplicate packet")
+          fallbackPlayer.fail("duplicate packet")
           return
         }
 
-        player.connection.delayedWrite(FallbackPackets.getJoinPacketForVersion(player.protocolVersion))
+        val joinGame = FallbackPackets.getJoinPacketForVersion(fallbackPlayer.player.protocolVersion);
+        fallbackPlayer.connection.delayedWrite(joinGame)
 
         // Set session handler to custom fallback handler to intercept all incoming packets
-        player.connection.sessionHandler = FallbackSessionHandler(
-          player.connection.sessionHandler, player
+        fallbackPlayer.connection.sessionHandler = FallbackSessionHandler(
+          fallbackPlayer.connection.sessionHandler, fallbackPlayer
         )
 
-        player.connection.flush()
+        fallbackPlayer.connection.flush()
         return // Don't read this packet twice
       } else if (!hasFallbackHandler) {
-        player.fail("handler not initialized yet")
+        fallbackPlayer.fail("handler not initialized yet")
         return // Don't handle illegal packets
       }
     }

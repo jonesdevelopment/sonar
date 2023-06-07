@@ -347,7 +347,7 @@ public final class FallbackListener {
             // ==================================================================
             // KeepAlive packets do not exist during the login process on 1.7
             // We have to fall back to the regular method of verification
-            final JoinGame joinGame = FallbackPackets.getJoinPacketForVersion(fallbackPlayer.getProtocolVersion());
+            final JoinGame joinGame = FallbackPackets.getJoinPacketForVersion(mcConnection.getProtocolVersion());
 
             mcConnection.delayedWrite(joinGame);
 

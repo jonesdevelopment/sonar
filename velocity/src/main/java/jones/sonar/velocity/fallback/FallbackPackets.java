@@ -34,7 +34,6 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static com.velocitypowered.api.network.ProtocolVersion.*;
 
@@ -48,7 +47,6 @@ public class FallbackPackets {
     PacketDimension.THE_END.getKey()
   );
 
-  private static final MethodHandle PARTIAL_HASHED_SEED;
   private static final MethodHandle CURRENT_DIMENSION_DATA;
   private static final MethodHandle REGISTRY;
   private static final MethodHandle LEVEL_NAMES;
@@ -60,11 +58,6 @@ public class FallbackPackets {
   // https://github.com/Elytrium/LimboAPI/blob/91bedd5dad5e659092fbb0a7411bd00d67044d01/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L813
   static {
     try {
-      PARTIAL_HASHED_SEED = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
-        .findSetter(JoinGame.class,
-          "partialHashedSeed", long.class
-        );
-
       CURRENT_DIMENSION_DATA = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
         .findSetter(JoinGame.class,
           "currentDimensionData", CompoundBinaryTag.class
@@ -80,18 +73,20 @@ public class FallbackPackets {
           "levelNames", ImmutableSet.class
         );
 
-      try (final InputStream stream = Sonar.class.getResourceAsStream("/mappings/chat_1_19.nbt")) {
-        CHAT_TYPE_119 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(stream),
+      try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/chat_1_19.nbt")) {
+        CHAT_TYPE_119 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream),
           BinaryTagIO.Compression.GZIP
         );
       }
-      try (final InputStream stream = Sonar.class.getResourceAsStream("/mappings/chat_1_19_1.nbt")) {
-        CHAT_TYPE_1191 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(stream),
+
+      try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/chat_1_19_1.nbt")) {
+        CHAT_TYPE_1191 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream),
           BinaryTagIO.Compression.GZIP
         );
       }
-      try (final InputStream stream = Sonar.class.getResourceAsStream("/mappings/damage_1_19_4.nbt")) {
-        DAMAGE_TYPE_1194 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(stream),
+
+      try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/damage_1_19_4.nbt")) {
+        DAMAGE_TYPE_1194 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream),
           BinaryTagIO.Compression.GZIP
         );
       }
@@ -106,14 +101,14 @@ public class FallbackPackets {
   public final JoinGame JOIN_GAME_1_19_1 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_1);
   public final JoinGame JOIN_GAME_1_19_4 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_4);
 
-  static JoinGame getJoinPacketForVersion(final int protocolVersion) {
-    if (protocolVersion >= MINECRAFT_1_19_4.getProtocol()) {
+  static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(MINECRAFT_1_19_4) >= 0) {
       return FallbackPackets.JOIN_GAME_1_19_4;
-    } else if (protocolVersion >= MINECRAFT_1_19_1.getProtocol()) {
+    } else if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
       return FallbackPackets.JOIN_GAME_1_19_1;
-    } else if (protocolVersion >= MINECRAFT_1_18_2.getProtocol()) {
+    } else if (protocolVersion.compareTo(MINECRAFT_1_18_2) >= 0) {
       return FallbackPackets.JOIN_GAME_1_18_2;
-    } else if (protocolVersion >= MINECRAFT_1_16_2.getProtocol()) {
+    } else if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
       return FallbackPackets.JOIN_GAME_1_16_2;
     }
     return FallbackPackets.LEGACY_JOIN_GAME;
@@ -122,8 +117,9 @@ public class FallbackPackets {
   private JoinGame createLegacyJoinGamePacket() {
     final JoinGame joinGame = new JoinGame();
 
-    joinGame.setGamemode((short) 3);
     joinGame.setLevelType("flat");
+    joinGame.setGamemode((short) 3);
+    joinGame.setReducedDebugInfo(true);
     joinGame.setDimension(USED_DIMENSION.getLegacyID());
 
     return joinGame;
@@ -132,25 +128,21 @@ public class FallbackPackets {
   private JoinGame createJoinGamePacket(final ProtocolVersion version) {
     final JoinGame joinGame = new JoinGame();
 
-    joinGame.setIsHardcore(true);
     joinGame.setLevelType("flat");
     joinGame.setGamemode((short) 3);
-    joinGame.setPreviousGamemode((short) -1);
+    joinGame.setPreviousGamemode((short) 3);
     joinGame.setReducedDebugInfo(true);
-    joinGame.setDimension(1);
+    joinGame.setDimension(USED_DIMENSION.getModernID());
     joinGame.setDifficulty((short) 0);
     joinGame.setMaxPlayers(1);
 
-    try {
-      PARTIAL_HASHED_SEED.invokeExact(joinGame, ThreadLocalRandom.current().nextLong());
-    } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
-    }
+    // https://github.com/Elytrium/LimboAPI/blob/91bedd5dad5e659092fbb0a7411bd00d67044d01/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L611
+    joinGame.setDimensionInfo(new DimensionInfo(
+      USED_DIMENSION.getKey(), USED_DIMENSION.getKey(), false, false
+    ));
 
-    joinGame.setDimensionInfo(new DimensionInfo(USED_DIMENSION.getKey(), USED_DIMENSION.getKey(), false, false));
-
-    CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
-    ListBinaryTag encodedDimensionRegistry = ListBinaryTag.builder(BinaryTagTypes.COMPOUND)
+    final CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
+    final ListBinaryTag encodedDimensionRegistry = ListBinaryTag.builder(BinaryTagTypes.COMPOUND)
       .add(createDimensionData(PacketDimension.OVERWORLD, version))
       .add(createDimensionData(PacketDimension.NETHER, version))
       .add(createDimensionData(PacketDimension.THE_END, version))
@@ -225,8 +217,8 @@ public class FallbackPackets {
         .putInt("id", dimension.getModernID())
         .put("element", details)
         .build();
-    } else {
-      return details.putString("name", dimension.getKey());
     }
+
+    return details.putString("name", dimension.getKey());
   }
 }
