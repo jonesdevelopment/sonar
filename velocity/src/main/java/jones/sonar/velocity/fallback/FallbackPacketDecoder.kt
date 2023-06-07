@@ -22,7 +22,6 @@ import com.velocitypowered.proxy.protocol.packet.KeepAlive
 import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
-import jones.sonar.api.Sonar
 import jones.sonar.velocity.fallback.session.FallbackPlayer
 import jones.sonar.velocity.fallback.session.FallbackSessionHandler
 import java.io.IOException
@@ -44,7 +43,7 @@ class FallbackPacketDecoder(
       // Blacklist the ip address
       val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
-      Sonar.get().fallback.blacklisted.add(inetAddress)
+      fallbackPlayer.fallback.blacklisted.add(inetAddress)
     }
   }
 
