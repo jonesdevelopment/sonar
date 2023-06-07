@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit
 
 class SonarCommand : SimpleCommand {
   override fun execute(invocation: SimpleCommand.Invocation) {
-    val timestamp = delay.asMap().getOrDefault(invocation.source(), -1L)
+    val timestamp = DELAY.asMap().getOrDefault(invocation.source(), -1L)
 
     if (timestamp > 0L) {
       invocation.source().sendMessage(CANNOT_RUN_YET)
@@ -45,7 +45,7 @@ class SonarCommand : SimpleCommand {
       return
     }
 
-    delay.put(invocation.source(), System.currentTimeMillis())
+    DELAY.put(invocation.source(), System.currentTimeMillis())
 
     var subCommand = Optional.empty<SubCommand>()
 
@@ -101,12 +101,22 @@ class SonarCommand : SimpleCommand {
     }) { CommandHelper.printHelp(invocationSender) }
   }
 
+  override fun suggest(invocation: SimpleCommand.Invocation): List<String> {
+    return if (invocation.arguments().size <= 1) {
+      TAB_SUGGESTIONS
+    } else Collections.emptyList()
+  }
+
   override fun hasPermission(invocation: SimpleCommand.Invocation): Boolean {
     return invocation.source().hasPermission("sonar.command")
   }
 
   companion object {
-    private val delay = Caffeine.newBuilder()
+    private val TAB_SUGGESTIONS = SubCommandManager.getSubCommands()
+      .stream()
+      .map { subCommand -> subCommand.info.name }
+      .toList()
+    private val DELAY = Caffeine.newBuilder()
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSource, Long>()
     private val ONLY_PLAYERS: Component = Component.text(
