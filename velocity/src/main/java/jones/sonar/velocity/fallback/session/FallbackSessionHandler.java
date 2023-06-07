@@ -103,6 +103,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final ClientSettings clientSettings) {
+    // TODO: check for false positives with spam reconnecting as it could cause potential, rare issues
     checkFrame(!hasSentClientBrand && !hasSentClientSettings, "unexpected timing (C)");
 
     hasSentClientSettings = true;
@@ -118,6 +119,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     final boolean valid = player.getProtocolVersion() >= MINECRAFT_1_13.getProtocol();
 
     checkFrame(pluginMessage.getChannel().equals("MC|Brand") || valid, "invalid channel");
+    // TODO: actually implement a client brand check?
     checkFrame(pluginMessage.content().readableBytes() > 1, "invalid client brand");
     checkFrame(!hasSentClientBrand, "unexpected timing (P1)");
     checkFrame(hasSentClientSettings, "unexpected timing (P2)");
@@ -126,11 +128,10 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
 
-    if (v1_8or1_7) {
-      return false; // We use a different verification method for 1.7-1.8
+    // We use a different verification method for 1.7-1.8
+    if (!v1_8or1_7) {
+      finish();
     }
-
-    finish();
     return false;
   }
 
@@ -167,7 +168,10 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     }
   }
 
-  private void finish() {
+  /**
+   * Restore old pipelines and send the player to the actual server
+   */
+  private synchronized void finish() {
 
     // Remove Sonar pipelines to avoid issues
     player.getPipeline().remove(DECODER);
