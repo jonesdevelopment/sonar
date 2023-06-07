@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.list;
+package jones.sonar.api.util;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

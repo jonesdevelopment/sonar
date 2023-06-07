@@ -18,7 +18,7 @@
 package jones.sonar.api.fallback;
 
 import jones.sonar.api.Sonar;
-import jones.sonar.api.list.Pair;
+import jones.sonar.api.util.Pair;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
