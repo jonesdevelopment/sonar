@@ -258,6 +258,13 @@ public final class FallbackListener {
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
         if (mcConnection.isClosed()) return;
 
+        final boolean isPremium = premium.contains(event.getUsername());
+
+        // Remove the player from the premium list in order to prevent memory leaks
+        // We cannot rely on the DisconnectEvent since the server will not call it
+        // -> we are intercepting the packets!
+        premium.remove(event.getUsername());
+
         // Create an instance for the connected player
         final ConnectedPlayer player;
         try {
@@ -266,7 +273,7 @@ public final class FallbackListener {
             event.getGameProfile(),
             mcConnection,
             inboundConnection.getVirtualHost().orElse(null),
-            premium.contains(event.getUsername()),
+            isPremium,
             inboundConnection.getIdentifiedKey()
           );
         } catch (Throwable throwable) {
@@ -274,11 +281,6 @@ public final class FallbackListener {
           mcConnection.close(true);
           return;
         }
-
-        // Remove the player from the premium list in order to prevent memory leaks
-        // We cannot rely on the DisconnectEvent since the server will not call it
-        // -> we are intercepting the packets!
-        premium.remove(event.getUsername());
 
         // Check if the ip address had too many verifications or is rejoining too quickly
         if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
