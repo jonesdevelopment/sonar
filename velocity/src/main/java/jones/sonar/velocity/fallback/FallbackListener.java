@@ -258,11 +258,10 @@ public final class FallbackListener {
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
         if (mcConnection.isClosed()) return;
 
-        // Most of the following code was taken from Velocity
+        // Create an instance for the connected player
+        final ConnectedPlayer player;
         try {
-
-          // Create an instance for player
-          final ConnectedPlayer player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
+          player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
             mcConnection.server,
             event.getGameProfile(),
             mcConnection,
@@ -270,106 +269,108 @@ public final class FallbackListener {
             premium.contains(event.getUsername()),
             inboundConnection.getIdentifiedKey()
           );
-
-          // Remove the player from the premium list in order to prevent memory leaks
-          // We cannot rely on the DisconnectEvent since the server will not call it
-          // -> we are intercepting the packets!
-          premium.remove(event.getUsername());
-
-          // Check if the ip address had too many verifications or is rejoining too quickly
-          if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
-            player.disconnect0(TOO_MANY_VERIFICATIONS, true);
-            return;
-          }
-
-          // Check if the player is already connected to the proxy
-          // We use the default Velocity method for this to avoid incompatibilities
-          if (!mcConnection.server.canRegisterConnection(player)) {
-            player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
-              true);
-            return;
-          }
-
-          // Create an instance for the Fallback connection
-          final FallbackPlayer fallbackPlayer = new FallbackPlayer(
-            fallback,
-            player, mcConnection, channel, pipeline, inetAddress,
-            player.getProtocolVersion().getProtocol()
-          );
-
-          // ==================================================================
-          if (!fallback.isUnderAttack()) {
-            fallback.getLogger().info("Processing: {}{} ({})",
-              event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
-          }
-
-          fallback.getConnected().add(inetAddress);
-          // ==================================================================
-
-          // Set compression
-          if (fallback.getSonar().getConfig().ENABLE_COMPRESSION) {
-            final int threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
-
-            if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
-              mcConnection.write(new SetCompression(threshold));
-              mcConnection.setCompressionThreshold(threshold);
-            }
-          }
-
-          // Send LoginSuccess packet to spoof our fake lobby
-          final ServerLoginSuccess success = new ServerLoginSuccess();
-
-          success.setUsername(player.getUsername());
-          success.setProperties(player.getGameProfileProperties());
-          success.setUuid(player.getUniqueId());
-
-          mcConnection.write(success);
-
-          // Set the state to a custom one, so we can receive and send more packets
-          mcConnection.setAssociation(player);
-          mcConnection.setState(StateRegistry.PLAY);
-
-          final long keepAliveId = ThreadLocalRandom.current().nextInt();
-
-          // We have to add this pipeline to monitor all incoming traffic
-          // We add the pipeline after the MinecraftDecoder since we want
-          // the packets to be processed and decoded already
-          fallbackPlayer.getPipeline().addAfter(
-            MINECRAFT_DECODER,
-            DECODER,
-            new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
-          );
-
-          if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
-            // ==================================================================
-            // The first step of the verification is a simple KeepAlive packet
-            // We don't want to waste resources by directly sending all packets to
-            // the client which is why we first send a KeepAlive packet and then
-            // wait for a valid response to continue the verification process
-            final KeepAlive keepAlive = new KeepAlive();
-
-            keepAlive.setRandomId(keepAliveId);
-
-            mcConnection.write(keepAlive);
-            // ==================================================================
-          } else {
-            // ==================================================================
-            // KeepAlive packets do not exist during the login process on 1.7
-            // We have to fall back to the regular method of verification
-            final JoinGame joinGame = FallbackPackets.getJoinPacketForVersion(mcConnection.getProtocolVersion());
-
-            mcConnection.delayedWrite(joinGame);
-
-            // Set session handler to custom fallback handler to intercept all incoming packets
-            mcConnection.setSessionHandler(new FallbackSessionHandler(
-              mcConnection.getSessionHandler(), fallbackPlayer
-            ));
-
-            mcConnection.flush();
-            // ==================================================================
-          }
         } catch (Throwable throwable) {
-          throw new RuntimeException(throwable);
+          fallback.getLogger().error("Error while processing {}: {}", event.getUsername(), throwable);
+          mcConnection.close(true);
+          return;
+        }
+
+        // Remove the player from the premium list in order to prevent memory leaks
+        // We cannot rely on the DisconnectEvent since the server will not call it
+        // -> we are intercepting the packets!
+        premium.remove(event.getUsername());
+
+        // Check if the ip address had too many verifications or is rejoining too quickly
+        if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
+          player.disconnect0(TOO_MANY_VERIFICATIONS, true);
+          return;
+        }
+
+        // Check if the player is already connected to the proxy
+        // We use the default Velocity method for this to avoid incompatibilities
+        if (!mcConnection.server.canRegisterConnection(player)) {
+          player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
+            true);
+          return;
+        }
+
+        // Create an instance for the Fallback connection
+        final FallbackPlayer fallbackPlayer = new FallbackPlayer(
+          fallback,
+          player, mcConnection, channel, pipeline, inetAddress,
+          player.getProtocolVersion().getProtocol()
+        );
+
+        // ==================================================================
+        if (!fallback.isUnderAttack()) {
+          fallback.getLogger().info("Processing: {}{} ({})",
+            event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
+        }
+
+        fallback.getConnected().add(inetAddress);
+        // ==================================================================
+
+        // Set compression
+        if (fallback.getSonar().getConfig().ENABLE_COMPRESSION) {
+          final int threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
+
+          if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+            mcConnection.write(new SetCompression(threshold));
+            mcConnection.setCompressionThreshold(threshold);
+          }
+        }
+
+        // Send LoginSuccess packet to spoof our fake lobby
+        final ServerLoginSuccess success = new ServerLoginSuccess();
+
+        success.setUsername(player.getUsername());
+        success.setProperties(player.getGameProfileProperties());
+        success.setUuid(player.getUniqueId());
+
+        mcConnection.write(success);
+
+        // Set the state to a custom one, so we can receive and send more packets
+        mcConnection.setAssociation(player);
+        mcConnection.setState(StateRegistry.PLAY);
+
+        final long keepAliveId = ThreadLocalRandom.current().nextInt();
+
+        // We have to add this pipeline to monitor all incoming traffic
+        // We add the pipeline after the MinecraftDecoder since we want
+        // the packets to be processed and decoded already
+        fallbackPlayer.getPipeline().addAfter(
+          MINECRAFT_DECODER,
+          DECODER,
+          new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
+        );
+
+        if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
+          // ==================================================================
+          // The first step of the verification is a simple KeepAlive packet
+          // We don't want to waste resources by directly sending all packets to
+          // the client which is why we first send a KeepAlive packet and then
+          // wait for a valid response to continue the verification process
+          final KeepAlive keepAlive = new KeepAlive();
+
+          keepAlive.setRandomId(keepAliveId);
+
+          mcConnection.write(keepAlive);
+          // ==================================================================
+        } else {
+          // ==================================================================
+          // KeepAlive packets do not exist during the login process on 1.7
+          // We have to fall back to the regular method of verification
+          final JoinGame joinGame = FallbackPackets.getJoinPacketForVersion(mcConnection.getProtocolVersion());
+
+          mcConnection.delayedWrite(joinGame);
+
+          // Set session handler to custom fallback handler to intercept all incoming packets
+          mcConnection.setSessionHandler(new FallbackSessionHandler(
+            mcConnection.getSessionHandler(), fallbackPlayer
+          ));
+
+          mcConnection.flush();
+          // ==================================================================
         }
       }));
     });
