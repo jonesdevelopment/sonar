@@ -203,7 +203,7 @@ public final class SonarConfiguration {
   }
 
   private String formatString(final String string) {
-    return translateAlternateColorCodes(string)
+    return translateAlternateColorCodes(Objects.requireNonNull(string))
       .replace("%prefix%", PREFIX == null ? "" : PREFIX)
       .replace("%header%", HEADER == null ? "" : HEADER)
       .replace("%footer%", FOOTER == null ? "" : FOOTER);
