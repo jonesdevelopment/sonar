@@ -39,7 +39,9 @@ public interface FallbackConnection<Player, Connection> {
   int getProtocolVersion();
 
   default void fail(final String reason) {
-    getChannel().close();
+    if (getChannel().isActive()) {
+      getChannel().close();
+    }
 
     getFallback().getBlacklisted().add(getInetAddress());
 
