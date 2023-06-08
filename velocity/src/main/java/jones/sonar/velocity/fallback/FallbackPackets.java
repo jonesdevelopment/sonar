@@ -103,15 +103,15 @@ public class FallbackPackets {
 
   static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_19_4) >= 0) {
-      return FallbackPackets.JOIN_GAME_1_19_4;
+      return JOIN_GAME_1_19_4;
     } else if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-      return FallbackPackets.JOIN_GAME_1_19_1;
+      return JOIN_GAME_1_19_1;
     } else if (protocolVersion.compareTo(MINECRAFT_1_18_2) >= 0) {
-      return FallbackPackets.JOIN_GAME_1_18_2;
+      return JOIN_GAME_1_18_2;
     } else if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
-      return FallbackPackets.JOIN_GAME_1_16_2;
+      return JOIN_GAME_1_16_2;
     }
-    return FallbackPackets.LEGACY_JOIN_GAME;
+    return LEGACY_JOIN_GAME;
   }
 
   private JoinGame createLegacyJoinGamePacket() {
@@ -125,7 +125,7 @@ public class FallbackPackets {
     return joinGame;
   }
 
-  private JoinGame createJoinGamePacket(final ProtocolVersion version) {
+  private JoinGame createJoinGamePacket(final ProtocolVersion protocolVersion) {
     final JoinGame joinGame = new JoinGame();
 
     joinGame.setLevelType("flat");
@@ -143,27 +143,27 @@ public class FallbackPackets {
 
     final CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
     final ListBinaryTag encodedDimensionRegistry = ListBinaryTag.builder(BinaryTagTypes.COMPOUND)
-      .add(createDimensionData(PacketDimension.OVERWORLD, version))
-      .add(createDimensionData(PacketDimension.NETHER, version))
-      .add(createDimensionData(PacketDimension.THE_END, version))
+      .add(createDimensionData(PacketDimension.OVERWORLD, protocolVersion))
+      .add(createDimensionData(PacketDimension.NETHER, protocolVersion))
+      .add(createDimensionData(PacketDimension.THE_END, protocolVersion))
       .build();
 
-    if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
       final CompoundBinaryTag.Builder dimensionRegistryEntry = CompoundBinaryTag.builder();
 
       dimensionRegistryEntry.putString("type", "minecraft:dimension_type");
       dimensionRegistryEntry.put("value", encodedDimensionRegistry);
 
       registryContainer.put("minecraft:dimension_type", dimensionRegistryEntry.build());
-      registryContainer.put("minecraft:worldgen/biome", Biome.getRegistry(version));
+      registryContainer.put("minecraft:worldgen/biome", Biome.getRegistry(protocolVersion));
 
-      if (version.compareTo(ProtocolVersion.MINECRAFT_1_19) == 0) {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) == 0) {
         registryContainer.put("minecraft:chat_type", CHAT_TYPE_119);
-      } else if (version.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
+      } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
         registryContainer.put("minecraft:chat_type", CHAT_TYPE_1191);
       }
 
-      if (version.compareTo(ProtocolVersion.MINECRAFT_1_19_4) >= 0) {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_4) >= 0) {
         registryContainer.put("minecraft:damage_type", DAMAGE_TYPE_1194);
       }
     } else {
@@ -173,7 +173,7 @@ public class FallbackPackets {
     try {
       CompoundBinaryTag currentDimensionData = encodedDimensionRegistry.getCompound(USED_DIMENSION.getModernID());
 
-      if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
         currentDimensionData = currentDimensionData.getCompound("element");
       }
 
