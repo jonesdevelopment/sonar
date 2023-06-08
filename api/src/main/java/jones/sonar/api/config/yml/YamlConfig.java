@@ -61,8 +61,7 @@ public final class YamlConfig {
         try {
           config = yaml.load(is);
         } catch (YAMLException exception) {
-          throw new RuntimeException("Invalid configuration encountered - this is a configuration error and NOT a " +
-            "bug!", exception);
+          throw new IllegalStateException("Invalid configuration encountered!", exception);
         }
       }
 
@@ -83,6 +82,7 @@ public final class YamlConfig {
   @SuppressWarnings("unchecked")
   private <T> T get(String path, T def, Map submap) {
     int index = path.indexOf('.');
+
     if (index == -1) {
       Object val = submap.get(path);
       if (val == null && def != null) {
@@ -116,15 +116,18 @@ public final class YamlConfig {
       } else {
         submap.put(path, val);
       }
+
       save();
     } else {
       String first = path.substring(0, index);
       String second = path.substring(index + 1);
       Map sub = (Map) submap.get(first);
+
       if (sub == null) {
         sub = new LinkedHashMap<>();
         submap.put(first, sub);
       }
+
       set(second, val, sub);
     }
   }
