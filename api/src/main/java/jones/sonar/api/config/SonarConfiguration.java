@@ -17,7 +17,6 @@
 
 package jones.sonar.api.config;
 
-import jones.sonar.api.chatcolor.ChatColor;
 import jones.sonar.api.config.yml.YamlConfig;
 
 import java.io.File;
@@ -204,9 +203,22 @@ public final class SonarConfiguration {
   }
 
   private String formatString(final String string) {
-    return ChatColor.translateAlternateColorCodes('&', string)
+    return translateAlternateColorCodes(string)
       .replace("%prefix%", PREFIX == null ? "" : PREFIX)
       .replace("%header%", HEADER == null ? "" : HEADER)
       .replace("%footer%", FOOTER == null ? "" : FOOTER);
+  }
+
+  private static String translateAlternateColorCodes(final String textToTranslate) {
+    final char[] b = textToTranslate.toCharArray();
+
+    for (int i = 0; i < b.length - 1; i++) {
+      if (b[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
+        b[i] = '§';
+        b[i + 1] = Character.toLowerCase(b[i + 1]);
+      }
+    }
+
+    return new String(b);
   }
 }
