@@ -199,7 +199,7 @@ public final class SonarConfiguration {
   }
 
   private String fromList(final Collection<String> list) {
-    return formatString(String.join("\n", list));
+    return formatString(String.join(System.lineSeparator(), list));
   }
 
   private String formatString(final String string) {
