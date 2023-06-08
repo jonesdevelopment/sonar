@@ -65,6 +65,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   private boolean hasSentClientBrand, hasSentClientSettings;
 
+  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private static final MethodHandle CONNECT_TO_INITIAL_SERVER;
   private static final MethodHandle CONNECT_SESSION_HANDLER;
   private static final MethodHandle SET_PERMISSION_FUNCTION;
@@ -73,14 +74,14 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   static {
     try {
       CONNECT_TO_INITIAL_SERVER = MethodHandles.privateLookupIn(
-          AuthSessionHandler.class, MethodHandles.lookup())
+          AuthSessionHandler.class, LOOKUP)
         .findVirtual(AuthSessionHandler.class,
           "connectToInitialServer",
           MethodType.methodType(CompletableFuture.class, ConnectedPlayer.class)
         );
 
       CONNECT_SESSION_HANDLER = MethodHandles.privateLookupIn(
-          InitialConnectSessionHandler.class, MethodHandles.lookup())
+          InitialConnectSessionHandler.class, LOOKUP)
         .findConstructor(InitialConnectSessionHandler.class,
           MethodType.methodType(void.class, ConnectedPlayer.class, VelocityServer.class)
         );
@@ -90,8 +91,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
       DEFAULT_PERMISSION = (PermissionProvider) PERMISSIONS_FIELD.get(PermissionProvider.class);
 
-      SET_PERMISSION_FUNCTION = MethodHandles.privateLookupIn(
-          AuthSessionHandler.class, MethodHandles.lookup())
+      SET_PERMISSION_FUNCTION = MethodHandles.privateLookupIn(AuthSessionHandler.class, LOOKUP)
         .findVirtual(ConnectedPlayer.class,
           "setPermissionFunction",
           MethodType.methodType(void.class, PermissionFunction.class)

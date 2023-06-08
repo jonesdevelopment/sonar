@@ -31,6 +31,14 @@ public final class Transaction implements MinecraftPacket {
   private int windowId, actionId;
   private boolean accepted;
 
+  public Transaction() {
+  }
+
+  public Transaction(final int windowId, final int actionId) {
+    this.windowId = windowId;
+    this.actionId = actionId;
+  }
+
   @Override
   public void decode(final ByteBuf byteBuf,
                      final ProtocolUtils.Direction direction,

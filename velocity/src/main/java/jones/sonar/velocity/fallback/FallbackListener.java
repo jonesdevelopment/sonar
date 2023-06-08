@@ -48,6 +48,7 @@ import jones.sonar.velocity.fallback.session.dummy.DummyConnection;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -101,6 +102,7 @@ public final class FallbackListener {
 
   private static final DummyConnection CLOSED_MINECRAFT_CONNECTION;
 
+  private static StateRegistry SONAR_STATE;
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private static final MethodHandle INITIAL_CONNECTION;
   private static final MethodHandle CONNECTED_PLAYER;
@@ -132,8 +134,15 @@ public final class FallbackListener {
           "delegate",
           InitialInboundConnection.class
         );
+
+      final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+      unsafeField.setAccessible(true);
+
+      final Unsafe unsafe = (Unsafe) unsafeField.get(null);
+
+      SONAR_STATE = (StateRegistry) unsafe.allocateInstance(StateRegistry.class);
     } catch (Throwable throwable) {
-      throw new IllegalStateException();
+      throw new IllegalStateException(throwable);
     }
   }
 
