@@ -46,6 +46,7 @@ public final class SonarConfiguration {
 
   public boolean ENABLE_COMPRESSION;
   public boolean ENABLE_VERIFICATION;
+  public boolean LOG_DURING_ATTACK;
 
   public String HEADER, FOOTER;
   public String TOO_MANY_PLAYERS;
@@ -89,6 +90,7 @@ public final class SonarConfiguration {
     MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);
 
     ENABLE_VERIFICATION = yamlConfig.getBoolean("general.verification.enabled", true);
+    LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
     ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4500);
     MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 4096);
