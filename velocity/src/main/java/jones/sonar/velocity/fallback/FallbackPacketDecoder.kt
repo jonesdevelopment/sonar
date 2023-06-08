@@ -54,7 +54,7 @@ class FallbackPacketDecoder(
 
       FallbackSessionHandler.checkFrame(fallbackPlayer, legalPacket, "bad packet: " + msg.javaClass.simpleName)
 
-      val hasFallbackHandler = fallbackPlayer.connection.sessionHandler is FallbackSessionHandler
+      val hasFallbackHandler = fallbackPlayer.connection.sessionHandler!! is FallbackSessionHandler
 
       if (msg is KeepAlive && msg.randomId == startKeepAliveId) {
         if (hasFallbackHandler) {
