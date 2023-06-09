@@ -135,9 +135,9 @@
     <p>
       Special thanks to the <a href="https://github.com/jonesdevelopment/sonar-antibot/graphs/contributors">contributors of Sonar</a>.
       <br>
-      Parts of the Java Reflections used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/velocity">velocity</a> module was taken from <a href="https://github.com/Elytrium/LimboAPI">LimboAPI</a>.
+      Parts of the Java Reflections used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/velocity">velocity</a> module were taken from <a href="https://github.com/Elytrium/LimboAPI">LimboAPI</a>.
       <br>
-      Parts of the Yaml configuration system used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/api">api</a> module was taken from <a href="https://github.com/SpigotMC">SpigotMC</a>'s Yaml configuration system.
+      Parts of the Yaml configuration system used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/api">api</a> module were taken from <a href="https://github.com/SpigotMC">SpigotMC</a>'s Yaml configuration system.
     </p> 
   </body>
 </html>
