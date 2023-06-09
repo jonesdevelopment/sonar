@@ -131,5 +131,13 @@
       Sonar is licensed under the GNU General Public License 3.0.
     </p>
     <a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg"/></a>
+    <h2>3.3 Credits</h2>
+    <p>
+      Special thanks to the <a href="https://github.com/jonesdevelopment/sonar-antibot/graphs/contributors">contributors of Sonar</a>.
+      <br>
+      Parts of the Java Reflections used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/velocity">velocity</a> module was taken from <a href="https://github.com/Elytrium/LimboAPI">LimboAPI</a>.
+      <br>
+      Parts of the Yaml configuration system used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/api">api</a> module was taken from <a href="https://github.com/SpigotMC">SpigotMC</a>'s Yaml configuration system.
+    </p> 
   </body>
 </html>
