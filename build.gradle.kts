@@ -47,14 +47,14 @@ subprojects {
     }
 }
 
-/*tasks {
-    shadowJar {
-        relocate("org.yaml.snakeyaml", "snakeyaml")
-    }
-}*/
-
 dependencies {
     sequenceOf("api", "bukkit", "bungee", "common", "velocity").forEach {
         implementation(project(":sonar-$it"))
+    }
+}
+
+tasks {
+    compileJava {
+        options.encoding = "UTF-8"
     }
 }
