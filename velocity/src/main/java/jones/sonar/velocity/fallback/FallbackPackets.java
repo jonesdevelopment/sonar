@@ -29,6 +29,7 @@ import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -41,57 +42,55 @@ import static com.velocitypowered.api.network.ProtocolVersion.*;
 public class FallbackPackets {
   private final PacketDimension USED_DIMENSION = PacketDimension.OVERWORLD;
 
-  private static final ImmutableSet<String> LEVELS = ImmutableSet.of(
+  private final ImmutableSet<String> LEVELS = ImmutableSet.of(
     PacketDimension.OVERWORLD.getKey(),
     PacketDimension.NETHER.getKey(),
     PacketDimension.THE_END.getKey()
   );
 
-  private static final MethodHandle CURRENT_DIMENSION_DATA;
-  private static final MethodHandle REGISTRY;
-  private static final MethodHandle LEVEL_NAMES;
+  private final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
-  private static final CompoundBinaryTag CHAT_TYPE_119;
-  private static final CompoundBinaryTag CHAT_TYPE_1191;
-  private static final CompoundBinaryTag DAMAGE_TYPE_1194;
+  private final MethodHandle CURRENT_DIMENSION_DATA;
+  private final MethodHandle REGISTRY;
+  private final MethodHandle LEVEL_NAMES;
+
+  private final CompoundBinaryTag CHAT_TYPE_119;
+  private final CompoundBinaryTag CHAT_TYPE_1191;
+  private final CompoundBinaryTag DAMAGE_TYPE_1194;
+  private final CompoundBinaryTag DAMAGE_TYPE_120;
 
   // https://github.com/Elytrium/LimboAPI/blob/91bedd5dad5e659092fbb0a7411bd00d67044d01/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L813
   static {
     try {
-      CURRENT_DIMENSION_DATA = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
+      CURRENT_DIMENSION_DATA = MethodHandles.privateLookupIn(JoinGame.class, LOOKUP)
         .findSetter(JoinGame.class,
           "currentDimensionData", CompoundBinaryTag.class
         );
 
-      REGISTRY = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
+      REGISTRY = MethodHandles.privateLookupIn(JoinGame.class, LOOKUP)
         .findSetter(JoinGame.class,
           "registry", CompoundBinaryTag.class
         );
 
-      LEVEL_NAMES = MethodHandles.privateLookupIn(JoinGame.class, MethodHandles.lookup())
+      LEVEL_NAMES = MethodHandles.privateLookupIn(JoinGame.class, LOOKUP)
         .findSetter(JoinGame.class,
           "levelNames", ImmutableSet.class
         );
 
-      try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/chat_1_19.nbt")) {
-        CHAT_TYPE_119 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream),
-          BinaryTagIO.Compression.GZIP
-        );
-      }
-
-      try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/chat_1_19_1.nbt")) {
-        CHAT_TYPE_1191 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream),
-          BinaryTagIO.Compression.GZIP
-        );
-      }
-
-      try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/damage_1_19_4.nbt")) {
-        DAMAGE_TYPE_1194 = BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream),
-          BinaryTagIO.Compression.GZIP
-        );
-      }
+      CHAT_TYPE_119 = getMapping("chat_1_19.nbt");
+      CHAT_TYPE_1191 = getMapping("chat_1_19_1.nbt");
+      DAMAGE_TYPE_1194 = getMapping("damage_1_19_4.nbt");
+      DAMAGE_TYPE_120 = getMapping("damage_type_1_20.nbt");
     } catch (Throwable throwable) {
       throw new IllegalStateException(throwable);
+    }
+  }
+
+  private CompoundBinaryTag getMapping(final String fileName) throws Throwable {
+    try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/" + fileName)) {
+      return BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream),
+        BinaryTagIO.Compression.GZIP
+      );
     }
   }
 
@@ -100,9 +99,12 @@ public class FallbackPackets {
   public final JoinGame JOIN_GAME_1_18_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_18_2);
   public final JoinGame JOIN_GAME_1_19_1 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_1);
   public final JoinGame JOIN_GAME_1_19_4 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_4);
+  public final JoinGame JOIN_GAME_1_20 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_20);
 
-  static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_19_4) >= 0) {
+  static JoinGame getJoinPacketForVersion(final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(MINECRAFT_1_20) >= 0) {
+      return JOIN_GAME_1_20;
+    } else if (protocolVersion.compareTo(MINECRAFT_1_19_4) == 0) {
       return JOIN_GAME_1_19_4;
     } else if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
       return JOIN_GAME_1_19_1;
@@ -114,7 +116,7 @@ public class FallbackPackets {
     return LEGACY_JOIN_GAME;
   }
 
-  private JoinGame createLegacyJoinGamePacket() {
+  private @NotNull JoinGame createLegacyJoinGamePacket() {
     final JoinGame joinGame = new JoinGame();
 
     joinGame.setLevelType("flat");
@@ -125,7 +127,7 @@ public class FallbackPackets {
     return joinGame;
   }
 
-  private JoinGame createJoinGamePacket(final ProtocolVersion protocolVersion) {
+  private @NotNull JoinGame createJoinGamePacket(final ProtocolVersion protocolVersion) {
     final JoinGame joinGame = new JoinGame();
 
     joinGame.setLevelType("flat");
@@ -163,8 +165,10 @@ public class FallbackPackets {
         registryContainer.put("minecraft:chat_type", CHAT_TYPE_1191);
       }
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_4) >= 0) {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_4) == 0) {
         registryContainer.put("minecraft:damage_type", DAMAGE_TYPE_1194);
+      } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20) >= 0) {
+        registryContainer.put("minecraft:damage_type", DAMAGE_TYPE_120);
       }
     } else {
       registryContainer.put("dimension", encodedDimensionRegistry);
@@ -188,7 +192,8 @@ public class FallbackPackets {
   }
 
   // https://github.com/Elytrium/LimboAPI/blob/91bedd5dad5e659092fbb0a7411bd00d67044d01/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L552
-  private CompoundBinaryTag createDimensionData(final PacketDimension dimension, final ProtocolVersion version) {
+  private @NotNull CompoundBinaryTag createDimensionData(final @NotNull PacketDimension dimension,
+                                                         final @NotNull ProtocolVersion version) {
     CompoundBinaryTag details = CompoundBinaryTag.builder()
       .putBoolean("natural", false)
       .putFloat("ambient_light", 0.0F)

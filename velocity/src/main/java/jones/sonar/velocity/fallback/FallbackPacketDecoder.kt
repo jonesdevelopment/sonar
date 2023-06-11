@@ -40,6 +40,7 @@ class FallbackPacketDecoder(
       // Clients can throw an IOException if the connection is interrupted unexpectedly
       if (cause is IOException) return
 
+      cause.printStackTrace()
       // Blacklist the ip address
       val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
