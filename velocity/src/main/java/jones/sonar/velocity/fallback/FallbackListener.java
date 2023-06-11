@@ -31,7 +31,6 @@ import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
 import com.velocitypowered.proxy.protocol.StateRegistry;
-import com.velocitypowered.proxy.protocol.packet.JoinGame;
 import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
@@ -67,6 +66,7 @@ import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
 import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
 import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
 import static jones.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
+import static jones.sonar.velocity.fallback.FallbackPackets.LEGACY_JOIN_GAME;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
@@ -362,9 +362,7 @@ public final class FallbackListener {
           // ==================================================================
           // KeepAlive packets do not exist during the login process on 1.7
           // We have to fall back to the regular method of verification
-          final JoinGame joinGame = FallbackPackets.getJoinPacketForVersion(mcConnection.getProtocolVersion());
-
-          mcConnection.delayedWrite(joinGame);
+          mcConnection.delayedWrite(LEGACY_JOIN_GAME);
 
           // Set session handler to custom fallback handler to intercept all incoming packets
           mcConnection.setSessionHandler(new FallbackSessionHandler(
