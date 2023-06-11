@@ -137,6 +137,10 @@
       <br>
       Parts of the Java Reflections used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/velocity">velocity</a> module were taken from <a href="https://github.com/Elytrium/LimboAPI">LimboAPI</a>.
       <br>
+      <a href="https://github.com/jonesdevelopment/sonar-antibot/blob/main/common/src/main/java/jones/sonar/common/fallback/dimension/PacketDimension.java">PacketDimension</a> was taken from <a href="https://github.com/Elytrium/LimboAPI/blob/master/api/src/main/java/net/elytrium/limboapi/api/chunk/Dimension.java">LimboAPI/Dimension</a>
+      <br>
+      <a href="https://github.com/jonesdevelopment/sonar-antibot/blob/main/velocity/src/main/java/jones/sonar/velocity/fallback/dimension/Biome.java">Biome</a> was taken from <a href="https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/material/Biome.java">LimboAPI/Biome</a>
+      <br>
       Parts of the Yaml configuration system used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/api">api</a> module were taken from <a href="https://github.com/SpigotMC">SpigotMC</a>'s Yaml configuration system.
     </p> 
   </body>
