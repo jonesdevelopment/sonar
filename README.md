@@ -101,7 +101,7 @@
       cases in order to prevent false positives.
       <br>
       If you or one of your players experiences a false positive, make sure to report them
-      by opening a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or a ticket on the <a href="https://discord.jonesdev.xyz/">Discord server</a>.
+      by opening a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or a ticket on the <a href="https://discord.jonesdev.xyz/">Discord</a>.
     </p>
     <h2>3.0 Building</h2>
     <p>
