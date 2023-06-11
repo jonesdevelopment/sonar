@@ -94,7 +94,7 @@ public class FallbackPackets {
     }
   }
 
-  public final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
+  public static final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
   public final JoinGame JOIN_GAME_1_16_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16_2);
   public final JoinGame JOIN_GAME_1_18_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_18_2);
   public final JoinGame JOIN_GAME_1_19_1 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_1);
