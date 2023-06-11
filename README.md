@@ -2,17 +2,18 @@
   <body>
     <h2>1.0 Introduction</h2>
     <p>
-      Free software, high quality, and open-source;
+      The old version of Sonar had a ton of features, but it never really protected
+      against advanced types of bots.
       <br>
-      Sonar efficiently scales to large networks and operates with minimal resources.
+      This version features more advanced checks and less bloated features
+      and is designed to work on more than one type of server.
+    </p>
+    <p>
+      Please note that this version is still in development and may have bugs and issues.
       <br>
-      <p>
-        The old version of Sonar had a ton of features, but it never really protected
-        against advanced types of bots. This is going to change:
-        <br>
-        This version features more advanced checks and less bloated features
-        and is designed to work on more than one type of server.
-      </p>
+      If you want to report a bug or issue, please open a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or ticket on the <a href="https://discord.jonesdev.xyz/">Discord</a>.
+      If you encounter a false positive, please read <a href="https://github.com/jonesdevelopment/sonar-antibot/#22-false-positives">this</a>.
+      Make sure to join the <a href="https://discord.jonesdev.xyz/">Discord</a> in order to receive update notifications.
     </p>
     <h2>1.1 Design</h2>
     <ul>
