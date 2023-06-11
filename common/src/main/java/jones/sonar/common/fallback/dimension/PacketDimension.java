@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.velocity.fallback.dimension;
+package jones.sonar.common.fallback.dimension;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
