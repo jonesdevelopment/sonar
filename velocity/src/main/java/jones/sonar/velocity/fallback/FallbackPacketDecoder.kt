@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package jones.sonar.velocity.fallback
 
 import com.velocitypowered.proxy.protocol.MinecraftPacket
@@ -78,8 +79,7 @@ class FallbackPacketDecoder(
       }
     }
 
-    // We want the backend server to actually receive the packets
-    // We also want the session handler to handle the packets properly
+    // The session handler must handle the packets properly
     ctx.fireChannelRead(msg)
   }
 }
