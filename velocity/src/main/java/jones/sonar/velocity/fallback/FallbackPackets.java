@@ -101,7 +101,7 @@ public class FallbackPackets {
   public final JoinGame JOIN_GAME_1_19_4 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_4);
   public final JoinGame JOIN_GAME_1_20 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_20);
 
-  static JoinGame getJoinPacketForVersion(final @NotNull ProtocolVersion protocolVersion) {
+  static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_20) >= 0) {
       return JOIN_GAME_1_20;
     } else if (protocolVersion.compareTo(MINECRAFT_1_19_4) == 0) {
