@@ -55,12 +55,13 @@ import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @Nullable MinecraftSessionHandler previousHandler;
   private final @NotNull FallbackPlayer player;
-  private boolean v1_8or1_7;
+  private final boolean v1_8or1_7;
 
   public FallbackSessionHandler(final @Nullable MinecraftSessionHandler previousHandler,
                                 final @NotNull FallbackPlayer player) {
     this.previousHandler = previousHandler;
     this.player = player;
+    this.v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
   }
 
   private boolean hasSentClientBrand, hasSentClientSettings;
@@ -125,8 +126,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     checkFrame(hasSentClientSettings, "unexpected timing (P2)");
 
     hasSentClientBrand = true;
-
-    v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
 
     // We use a different verification method for 1.7-1.8
     if (!v1_8or1_7) {
