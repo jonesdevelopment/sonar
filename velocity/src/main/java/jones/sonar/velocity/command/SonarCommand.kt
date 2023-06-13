@@ -34,18 +34,19 @@ import java.util.concurrent.TimeUnit
 class SonarCommand : SimpleCommand {
   override fun execute(invocation: SimpleCommand.Invocation) {
     val timestamp = DELAY.asMap().getOrDefault(invocation.source(), -1L)
+    val currentTimestamp = System.currentTimeMillis()
 
     if (timestamp > 0L) {
       invocation.source().sendMessage(CANNOT_RUN_YET)
 
-      val left = 0.5 - (System.currentTimeMillis() - timestamp.toDouble()) / 1000.0
+      val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
       val format = decimalFormat.format(left)
 
       invocation.source().sendMessage(Component.text("§cPlease wait another §l" + format + "s§r§c."))
       return
     }
 
-    DELAY.put(invocation.source(), System.currentTimeMillis())
+    DELAY.put(invocation.source(), currentTimestamp)
 
     var subCommand = Optional.empty<SubCommand>()
 

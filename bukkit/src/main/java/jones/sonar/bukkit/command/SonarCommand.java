@@ -49,11 +49,12 @@ public final class SonarCommand implements CommandExecutor {
                            final String label,
                            final String[] args) {
     final long timestamp = delay.asMap().getOrDefault(sender, -1L);
+    final long currentTimestamp = System.currentTimeMillis();
 
     if (timestamp > 0L) {
       sender.sendMessage(CANNOT_RUN_YET);
 
-      final double left = 0.5D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
+      final double left = 0.5D - ((currentTimestamp - (double) timestamp) / 1000D);
       final String format = decimalFormat.format(left);
 
       final String pleaseWaitAnother = "§cPlease wait another §l" + format + "s§r§c.";
@@ -62,7 +63,7 @@ public final class SonarCommand implements CommandExecutor {
       return false;
     }
 
-    delay.put(sender, System.currentTimeMillis());
+    delay.put(sender, currentTimestamp);
 
     var subCommand = Optional.<SubCommand>empty();
 

@@ -54,11 +54,12 @@ public final class SonarCommand extends Command {
   @Override
   public void execute(final CommandSender sender, final String[] args) {
     final long timestamp = delay.asMap().getOrDefault(sender, -1L);
+    final long currentTimestamp = System.currentTimeMillis();
 
     if (timestamp > 0L) {
       sender.sendMessage(CANNOT_RUN_YET);
 
-      final double left = 0.5D - ((System.currentTimeMillis() - (double) timestamp) / 1000D);
+      final double left = 0.5D - ((currentTimestamp - (double) timestamp) / 1000D);
       final String format = decimalFormat.format(left);
 
       final TextComponent pleaseWaitAnother = new TextComponent("§cPlease wait another §l" + format + "s§r§c.");
@@ -67,11 +68,11 @@ public final class SonarCommand extends Command {
       return;
     }
 
-    delay.put(sender, System.currentTimeMillis());
+    delay.put(sender, currentTimestamp);
 
-    var subCommand = Optional.<SubCommand>empty();
+    Optional<SubCommand> subCommand = Optional.empty();
 
-    var invocationSender = new InvocationSender<CommandSender>() {
+    final var invocationSender = new InvocationSender<CommandSender>() {
 
       @Override
       public void sendMessage(final String message) {
