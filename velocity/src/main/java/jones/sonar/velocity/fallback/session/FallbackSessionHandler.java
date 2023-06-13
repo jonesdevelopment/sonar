@@ -170,7 +170,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   /**
    * Restore old pipelines and send the player to the actual server
    */
-  private synchronized void finish() {
+  private void finish() {
 
     // Remove Sonar pipelines to avoid issues
     player.getPipeline().remove(DECODER);
