@@ -29,13 +29,13 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public final class SonarCommand extends Command {
+public final class SonarCommand extends Command implements TabExecutor {
   private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
     .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
     .build();
@@ -125,5 +125,27 @@ public final class SonarCommand extends Command {
 
       sub.execute(commandInvocation);
     });
+  }
+
+  private static final Collection<String> TAB_SUGGESTIONS = new ArrayList<>();
+
+  @Override
+  public Iterable<String> onTabComplete(final CommandSender sender, final String[] args) {
+    return args.length <= 1
+      ? (TAB_SUGGESTIONS.isEmpty() ? refreshSuggestions() : TAB_SUGGESTIONS)
+      : Collections.emptyList();
+  }
+
+  private static Collection<String> refreshSuggestions() {
+    if (TAB_SUGGESTIONS.isEmpty()) {
+      for (final SubCommand subCommand : SubCommandManager.getSubCommands()) {
+        TAB_SUGGESTIONS.add(subCommand.getInfo().name());
+
+        if (subCommand.getInfo().aliases().length > 0) {
+          TAB_SUGGESTIONS.addAll(Arrays.asList(subCommand.getInfo().aliases()));
+        }
+      }
+    }
+    return TAB_SUGGESTIONS;
   }
 }
