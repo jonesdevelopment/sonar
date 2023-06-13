@@ -104,7 +104,16 @@ class SonarCommand : SimpleCommand {
 
   override fun suggest(invocation: SimpleCommand.Invocation): List<String> {
     return if (invocation.arguments().size <= 1) {
-      TAB_SUGGESTIONS
+      if (TAB_SUGGESTIONS.isEmpty()) {
+        for (subCommand in SubCommandManager.getSubCommands()) {
+          TAB_SUGGESTIONS.add(subCommand.info.name)
+
+          if (subCommand.info.aliases.isNotEmpty()) {
+            TAB_SUGGESTIONS.addAll(subCommand.info.aliases)
+          }
+        }
+      }
+      return TAB_SUGGESTIONS
     } else Collections.emptyList()
   }
 
@@ -113,10 +122,7 @@ class SonarCommand : SimpleCommand {
   }
 
   companion object {
-    private val TAB_SUGGESTIONS = SubCommandManager.getSubCommands()
-      .stream()
-      .map { subCommand -> subCommand.info.name }
-      .toList()
+    private val TAB_SUGGESTIONS = ArrayList<String>()
     private val DELAY = Caffeine.newBuilder()
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSource, Long>()
