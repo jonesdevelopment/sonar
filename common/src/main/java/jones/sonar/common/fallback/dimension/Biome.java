@@ -15,21 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.velocity.fallback.dimension;
+package jones.sonar.common.fallback.dimension;
 
-import com.velocitypowered.api.network.ProtocolVersion;
 import lombok.Getter;
+import lombok.ToString;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag.Builder;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.stream.Collectors;
 
-// pasted from
 // https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/material/Biome.java
 @Getter
 public enum Biome {
@@ -113,7 +110,7 @@ public enum Biome {
     this.element = element;
   }
 
-  public CompoundBinaryTag encodeBiome(ProtocolVersion version) {
+  public CompoundBinaryTag encodeBiome(int version) {
     return CompoundBinaryTag.builder()
       .putString("name", this.name)
       .putInt("id", this.id)
@@ -131,7 +128,7 @@ public enum Biome {
     return BUILT_IN_BIOME_MAP.get(index);
   }
 
-  public static CompoundBinaryTag getRegistry(ProtocolVersion version) {
+  public static CompoundBinaryTag getRegistry(int version) {
     return CompoundBinaryTag.builder()
       .putString("type", "minecraft:worldgen/biome")
       .put("value",
@@ -139,8 +136,8 @@ public enum Biome {
       .build();
   }
 
+  @ToString
   public static class Element {
-
     public final boolean hasPrecipitation;
     public final float depth;
     public final float temperature;
@@ -160,7 +157,7 @@ public enum Biome {
       this.effects = effects;
     }
 
-    public CompoundBinaryTag encode(ProtocolVersion version) {
+    public CompoundBinaryTag encode(int version) {
       CompoundBinaryTag.Builder tagBuilder = CompoundBinaryTag.builder()
         .putFloat("depth", this.depth)
         .putFloat("temperature", this.temperature)
@@ -169,7 +166,7 @@ public enum Biome {
         .putString("category", this.category)
         .put("effects", this.effects.encode());
 
-      if (version.compareTo(ProtocolVersion.MINECRAFT_1_19_4) < 0) {
+      if (version < 762) { // 1.19.4
         tagBuilder.putString("precipitation", this.hasPrecipitation ? "rain" : "none");
       } else {
         tagBuilder.putBoolean("has_precipitation", this.hasPrecipitation);
@@ -205,48 +202,28 @@ public enum Biome {
     public Effects getEffects() {
       return this.effects;
     }
-
-    @Override
-    public String toString() {
-      return "Biome.Element{"
-        + "hasPrecipitation=" + this.hasPrecipitation
-        + ", depth=" + this.depth
-        + ", temperature=" + this.temperature
-        + ", scale=" + this.scale
-        + ", downfall=" + this.downfall
-        + ", category=" + this.category
-        + ", effects=" + this.effects
-        + "}";
-    }
   }
 
+  @ToString
   public static class Effects {
-
     private final int skyColor;
     private final int waterFogColor;
     private final int fogColor;
     private final int waterColor;
 
-    @Nullable
     private final Integer foliageColor;
-    @Nullable
     private final String grassColorModifier;
-    @Nullable
     private final Music music;
-    @Nullable
     private final String ambientSound;
-    @Nullable
     private final AdditionsSound additionsSound;
-    @Nullable
     private final MoodSound moodSound;
-    @Nullable
     private final Particle particle;
 
     public Effects(int skyColor,
                    int waterFogColor, int fogColor, int waterColor,
-                   @Nullable Integer foliageColor, @Nullable String grassColorModifier, @Nullable Music music,
-                   @Nullable String ambientSound, @Nullable AdditionsSound additionsSound,
-                   @Nullable MoodSound moodSound, @Nullable Particle particle) {
+                   Integer foliageColor, String grassColorModifier, Music music,
+                   String ambientSound, AdditionsSound additionsSound,
+                   MoodSound moodSound, Particle particle) {
       this.skyColor = skyColor;
       this.waterFogColor = waterFogColor;
       this.fogColor = fogColor;
@@ -323,74 +300,49 @@ public enum Biome {
       return this.waterColor;
     }
 
-    @Nullable
     public Integer getFoliageColor() {
       return this.foliageColor;
     }
 
-    @Nullable
     public String getGrassColorModifier() {
       return this.grassColorModifier;
     }
 
-    @Nullable
     public Music getMusic() {
       return this.music;
     }
 
-    @Nullable
     public String getAmbientSound() {
       return this.ambientSound;
     }
 
-    @Nullable
     public AdditionsSound getAdditionsSound() {
       return this.additionsSound;
     }
 
-    @Nullable
     public MoodSound getMoodSound() {
       return this.moodSound;
     }
 
-    @Nullable
     public Particle getParticle() {
       return this.particle;
     }
 
-    @Override
-    public String toString() {
-      return "Biome.Effects{"
-        + "skyColor=" + this.skyColor
-        + ", waterFogColor=" + this.waterFogColor
-        + ", fogColor=" + this.fogColor
-        + ", waterColor=" + this.waterColor
-        + ", foliageColor=" + this.foliageColor
-        + ", grassColorModifier=" + this.grassColorModifier
-        + ", music=" + this.music
-        + ", ambientSound=" + this.ambientSound
-        + ", additionsSound=" + this.additionsSound
-        + ", moodSound=" + this.moodSound
-        + ", particle=" + this.particle
-        + "}";
-    }
-
+    @ToString
     public static final class MoodSound {
-
       private final int tickDelay;
       private final double offset;
       private final int blockSearchExtent;
-      @NonNull
       private final String sound;
 
-      private MoodSound(int tickDelay, double offset, int blockSearchExtent, @NonNull String sound) {
+      private MoodSound(int tickDelay, double offset, int blockSearchExtent, String sound) {
         this.tickDelay = tickDelay;
         this.offset = offset;
         this.blockSearchExtent = blockSearchExtent;
         this.sound = sound;
       }
 
-      public static MoodSound of(int tickDelay, double offset, int blockSearchExtent, @NonNull String sound) {
+      public static MoodSound of(int tickDelay, double offset, int blockSearchExtent, String sound) {
         return new MoodSound(tickDelay, offset, blockSearchExtent, sound);
       }
 
@@ -415,38 +367,26 @@ public enum Biome {
         return this.blockSearchExtent;
       }
 
-      @NonNull
       public String getSound() {
         return this.sound;
       }
-
-      @Override
-      public String toString() {
-        return "Biome.Effects.MoodSound{"
-          + "tickDelay=" + this.tickDelay
-          + ", offset=" + this.offset
-          + ", blockSearchExtent=" + this.blockSearchExtent
-          + ", sound=" + this.sound
-          + "}";
-      }
     }
 
+    @ToString
     public static final class Music {
-
       private final boolean replaceCurrentMusic;
-      @NonNull
       private final String sound;
       private final int maxDelay;
       private final int minDelay;
 
-      private Music(boolean replaceCurrentMusic, @NonNull String sound, int maxDelay, int minDelay) {
+      private Music(boolean replaceCurrentMusic, String sound, int maxDelay, int minDelay) {
         this.replaceCurrentMusic = replaceCurrentMusic;
         this.sound = sound;
         this.maxDelay = maxDelay;
         this.minDelay = minDelay;
       }
 
-      public static Music of(boolean replaceCurrentMusic, @NonNull String sound, int maxDelay, int minDelay) {
+      public static Music of(boolean replaceCurrentMusic, String sound, int maxDelay, int minDelay) {
         return new Music(replaceCurrentMusic, sound, maxDelay, minDelay);
       }
 
@@ -463,7 +403,6 @@ public enum Biome {
         return this.replaceCurrentMusic;
       }
 
-      @NonNull
       public String getSound() {
         return this.sound;
       }
@@ -475,30 +414,19 @@ public enum Biome {
       public int getMinDelay() {
         return this.minDelay;
       }
-
-      @Override
-      public String toString() {
-        return "Biome.Effects.Music{"
-          + "replaceCurrentMusic=" + this.replaceCurrentMusic
-          + ", sound=" + this.sound
-          + ", maxDelay=" + this.maxDelay
-          + ", minDelay=" + this.minDelay
-          + "}";
-      }
     }
 
+    @ToString
     public static final class AdditionsSound {
-
-      @NonNull
       private final String sound;
       private final double tickChance;
 
-      private AdditionsSound(@NonNull String sound, double tickChance) {
+      private AdditionsSound(String sound, double tickChance) {
         this.sound = sound;
         this.tickChance = tickChance;
       }
 
-      public static AdditionsSound of(@NonNull String sound, double tickChance) {
+      public static AdditionsSound of(String sound, double tickChance) {
         return new AdditionsSound(sound, tickChance);
       }
 
@@ -509,7 +437,6 @@ public enum Biome {
           .build();
       }
 
-      @NonNull
       public String getSound() {
         return this.sound;
       }
@@ -517,28 +444,19 @@ public enum Biome {
       public double getTickChance() {
         return this.tickChance;
       }
-
-      @Override
-      public String toString() {
-        return "Biome.Effects.AdditionsSound{"
-          + "sound=" + this.sound
-          + ", tickChance=" + this.tickChance
-          + "}";
-      }
     }
 
+    @ToString
     public static final class Particle {
-
       private final float probability;
-      @NonNull
       private final ParticleOptions options;
 
-      private Particle(float probability, @NonNull ParticleOptions options) {
+      private Particle(float probability, ParticleOptions options) {
         this.probability = probability;
         this.options = options;
       }
 
-      public static Particle of(float probability, @NonNull ParticleOptions options) {
+      public static Particle of(float probability, ParticleOptions options) {
         return new Particle(probability, options);
       }
 
@@ -553,25 +471,15 @@ public enum Biome {
         return this.probability;
       }
 
-      @NonNull
       public ParticleOptions getOptions() {
         return this.options;
       }
 
-      @Override
-      public String toString() {
-        return "Biome.Effects.Particle{"
-          + "probability=" + this.probability
-          + ", options=" + this.options
-          + "}";
-      }
-
+      @ToString
       public static class ParticleOptions {
-
-        @NonNull
         private final String type;
 
-        public ParticleOptions(@NonNull String type) {
+        public ParticleOptions(String type) {
           this.type = type;
         }
 
@@ -581,20 +489,13 @@ public enum Biome {
             .build();
         }
 
-        @NonNull
         public String getType() {
           return this.type;
-        }
-
-        @Override
-        public String toString() {
-          return "Biome.Effects.Particle.ParticleOptions{"
-            + "type=" + this.type
-            + "}";
         }
       }
     }
 
+    @ToString
     public static class EffectsBuilder {
 
       private int skyColor;
@@ -678,23 +579,6 @@ public enum Biome {
           this.moodSound,
           this.particle
         );
-      }
-
-      @Override
-      public String toString() {
-        return "Biome.Effects.EffectsBuilder{"
-          + "skyColor=" + this.skyColor
-          + ", waterFogColor=" + this.waterFogColor
-          + ", fogColor=" + this.fogColor
-          + ", waterColor=" + this.waterColor
-          + ", foliageColor=" + this.foliageColor
-          + ", grassColorModifier=" + this.grassColorModifier
-          + ", music=" + this.music
-          + ", ambientSound=" + this.ambientSound
-          + ", additionsSound=" + this.additionsSound
-          + ", moodSound=" + this.moodSound
-          + ", particle=" + this.particle
-          + "}";
       }
     }
   }

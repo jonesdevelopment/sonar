@@ -20,7 +20,6 @@ package jones.sonar.common.fallback.dimension;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-// pasted from
 // https://github.com/Elytrium/LimboAPI/blob/91bedd5dad5e659092fbb0a7411bd00d67044d01/api/src/main/java/net/elytrium/limboapi/api/chunk/Dimension.java
 @Getter
 @RequiredArgsConstructor

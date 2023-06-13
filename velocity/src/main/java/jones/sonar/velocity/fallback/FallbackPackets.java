@@ -22,8 +22,8 @@ import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.registry.DimensionInfo;
 import com.velocitypowered.proxy.protocol.packet.JoinGame;
 import jones.sonar.api.Sonar;
+import jones.sonar.common.fallback.dimension.Biome;
 import jones.sonar.common.fallback.dimension.PacketDimension;
-import jones.sonar.velocity.fallback.dimension.Biome;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
@@ -157,7 +157,7 @@ public class FallbackPackets {
       dimensionRegistryEntry.put("value", encodedDimensionRegistry);
 
       registryContainer.put("minecraft:dimension_type", dimensionRegistryEntry.build());
-      registryContainer.put("minecraft:worldgen/biome", Biome.getRegistry(protocolVersion));
+      registryContainer.put("minecraft:worldgen/biome", Biome.getRegistry(protocolVersion.getProtocol()));
 
       if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) == 0) {
         registryContainer.put("minecraft:chat_type", CHAT_TYPE_119);
