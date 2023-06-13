@@ -195,6 +195,7 @@ public final class FallbackListener {
     if (!SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
       && !event.getResult().isOnlineModeAllowed()) return;
 
+    // TODO: test with jPremium or nLogin
     premium.add(event.getUsername());
   }
 
@@ -247,14 +248,15 @@ public final class FallbackListener {
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
-        if (mcConnection.isClosed()) return;
-
         final boolean isPremium = premium.contains(event.getUsername());
 
         // Remove the player from the premium list in order to prevent memory leaks
         // We cannot rely on the DisconnectEvent since the server will not call it
         // -> we are intercepting the packets!
         premium.remove(event.getUsername());
+
+        // Do not continue if the connection is closed
+        if (mcConnection.isClosed()) return;
 
         // Create an instance for the connected player
         final ConnectedPlayer player;
