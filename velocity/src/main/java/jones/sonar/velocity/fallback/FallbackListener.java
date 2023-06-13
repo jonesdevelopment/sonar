@@ -285,8 +285,9 @@ public final class FallbackListener {
         // Check if the player is already connected to the proxy
         // We use the default Velocity method for this to avoid incompatibilities
         if (!mcConnection.server.canRegisterConnection(player)) {
-          player.disconnect0(Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
-            true);
+          player.disconnect0( // TODO: Cache translations?
+            Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED), true
+          );
           return;
         }
 
@@ -297,19 +298,17 @@ public final class FallbackListener {
           player.getProtocolVersion().getProtocol()
         );
 
-        // ==================================================================
         if (!fallback.isUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
           fallback.getLogger().info("Processing: {}{} ({})",
             event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
         }
 
         fallback.getConnected().add(inetAddress);
-        // ==================================================================
 
-        // Set compression
         if (fallback.getSonar().getConfig().ENABLE_COMPRESSION) {
           final int threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
 
+          // Set compression
           if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
             mcConnection.write(new SetCompression(threshold));
             mcConnection.setCompressionThreshold(threshold);
@@ -340,8 +339,8 @@ public final class FallbackListener {
           new FallbackPacketDecoder(fallbackPlayer, keepAliveId)
         );
 
+        // ==================================================================
         if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
-          // ==================================================================
           // The first step of the verification is a simple KeepAlive packet
           // We don't want to waste resources by directly sending all packets to
           // the client which is why we first send a KeepAlive packet and then
@@ -351,9 +350,7 @@ public final class FallbackListener {
           keepAlive.setRandomId(keepAliveId);
 
           mcConnection.write(keepAlive);
-          // ==================================================================
         } else {
-          // ==================================================================
           // KeepAlive packets do not exist during the login process on 1.7
           // We have to fall back to the regular method of verification
           mcConnection.delayedWrite(LEGACY_JOIN_GAME);
@@ -364,8 +361,8 @@ public final class FallbackListener {
           ));
 
           mcConnection.flush();
-          // ==================================================================
         }
+        // ==================================================================
       }));
     });
   }
