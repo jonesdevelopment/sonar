@@ -28,14 +28,14 @@ import lombok.var;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public final class SonarCommand implements CommandExecutor {
+public final class SonarCommand implements CommandExecutor, TabExecutor {
   private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
     .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
     .build();
@@ -121,5 +121,28 @@ public final class SonarCommand implements CommandExecutor {
       sub.execute(commandInvocation);
     });
     return false;
+  }
+
+  private static final List<String> TAB_SUGGESTIONS = new ArrayList<>();
+
+  @Override
+  public List<String> onTabComplete(final CommandSender sender, final Command command,
+                                    final String alias, final String[] args) {
+    return args.length <= 1
+      ? getSuggestions()
+      : Collections.emptyList();
+  }
+
+  private static List<String> getSuggestions() {
+    if (TAB_SUGGESTIONS.isEmpty()) {
+      for (final SubCommand subCommand : SubCommandManager.getSubCommands()) {
+        TAB_SUGGESTIONS.add(subCommand.getInfo().name());
+
+        if (subCommand.getInfo().aliases().length > 0) {
+          TAB_SUGGESTIONS.addAll(Arrays.asList(subCommand.getInfo().aliases()));
+        }
+      }
+    }
+    return TAB_SUGGESTIONS;
   }
 }

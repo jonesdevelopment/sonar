@@ -132,11 +132,11 @@ public final class SonarCommand extends Command implements TabExecutor {
   @Override
   public Iterable<String> onTabComplete(final CommandSender sender, final String[] args) {
     return args.length <= 1
-      ? (TAB_SUGGESTIONS.isEmpty() ? refreshSuggestions() : TAB_SUGGESTIONS)
+      ? getSuggestions()
       : Collections.emptyList();
   }
 
-  private static Collection<String> refreshSuggestions() {
+  private static Collection<String> getSuggestions() {
     if (TAB_SUGGESTIONS.isEmpty()) {
       for (final SubCommand subCommand : SubCommandManager.getSubCommands()) {
         TAB_SUGGESTIONS.add(subCommand.getInfo().name());
