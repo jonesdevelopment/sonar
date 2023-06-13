@@ -127,10 +127,10 @@ public final class SonarConfiguration {
       "%prefix%The blacklist is currently empty. Therefore, no IP addresses were removed from the blacklist."
     ));
     BLACKLIST_CLEARED = formatString(yamlConfig.getString("messages.blacklist.cleared",
-      "%prefix%You successfully removed a total of %removed% ip address(es) from the blacklist."
+      "%prefix%You successfully removed a total of %removed% IP address(es) from the blacklist."
     ));
     BLACKLIST_SIZE = formatString(yamlConfig.getString("messages.blacklist.size",
-      "%prefix%The blacklist currently contains %amount% ip address(es)."
+      "%prefix%The blacklist currently contains %amount% IP address(es)."
     ));
     BLACKLIST_ADD = formatString(yamlConfig.getString("messages.blacklist.added",
       "%prefix%Successfully added %ip% to the blacklist."

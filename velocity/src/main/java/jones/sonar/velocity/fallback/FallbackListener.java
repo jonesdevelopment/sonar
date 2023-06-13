@@ -153,7 +153,7 @@ public final class FallbackListener {
       return;
     }
 
-    // Check if the amount of online players using the same ip address as
+    // Check if the amount of online players using the same IP address as
     // the connecting player is greater than the configured amount
     final int maxOnlinePerIp = fallback.getSonar().getConfig().MAXIMUM_ONLINE_PER_IP;
 
@@ -174,7 +174,7 @@ public final class FallbackListener {
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
     // Check if Fallback is already verifying a player
-    // → is another player with the same ip address connected to Fallback?
+    // → is another player with the same IP address connected to Fallback?
     if (fallback.getConnected().contains(inetAddress)) {
       event.setResult(ALREADY_VERIFYING);
       return;
@@ -275,7 +275,8 @@ public final class FallbackListener {
           return;
         }
 
-        // Check if the ip address had too many verifications or is rejoining too quickly
+        // Check if the IP address had too many verifications or is rejoining too quickly
+        // TODO: should the IP address be blacklisted here?
         if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
           player.disconnect0(TOO_MANY_VERIFICATIONS, true);
           return;
