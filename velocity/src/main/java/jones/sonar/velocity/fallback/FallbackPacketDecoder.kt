@@ -23,6 +23,7 @@ import com.velocitypowered.proxy.protocol.packet.KeepAlive
 import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
+import jones.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion
 import jones.sonar.velocity.fallback.session.FallbackPlayer
 import jones.sonar.velocity.fallback.session.FallbackSessionHandler
 import java.io.IOException
@@ -60,19 +61,20 @@ class FallbackPacketDecoder(
 
       if (msg is KeepAlive && msg.randomId == startKeepAliveId) {
         if (hasFallbackHandler) {
-          fallbackPlayer.fail("duplicate packet")
+          fallbackPlayer.fail("handler already initialized")
           return
         }
-
-        val joinGame = FallbackPackets.getJoinPacketForVersion(fallbackPlayer.player.protocolVersion);
-        fallbackPlayer.connection.delayedWrite(joinGame)
 
         // Set session handler to custom fallback handler to intercept all incoming packets
         fallbackPlayer.connection.sessionHandler = FallbackSessionHandler(
           fallbackPlayer.connection.sessionHandler, fallbackPlayer
         )
 
-        fallbackPlayer.connection.flush()
+        // Create JoinGame packet for the client's version
+        val joinGame = getJoinPacketForVersion(fallbackPlayer.player.protocolVersion)
+
+        // Send JoinGame packet
+        fallbackPlayer.connection.write(joinGame)
         return // Don't read this packet twice
       } else if (!hasFallbackHandler) {
         fallbackPlayer.fail("handler not initialized yet")
