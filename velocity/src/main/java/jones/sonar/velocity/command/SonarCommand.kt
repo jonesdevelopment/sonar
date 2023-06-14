@@ -22,11 +22,12 @@ import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.command.SimpleCommand
 import com.velocitypowered.api.proxy.Player
 import jones.sonar.api.Sonar
-import jones.sonar.common.command.CommandHelper
 import jones.sonar.common.command.CommandInvocation
+import jones.sonar.common.command.CommandInvocation.printHelp
+import jones.sonar.common.command.CommandInvocation.printSubNotFound
 import jones.sonar.common.command.InvocationSender
 import jones.sonar.common.command.subcommand.SubCommand
-import jones.sonar.common.command.subcommand.SubCommandManager
+import jones.sonar.common.command.subcommand.SubCommandRegistry
 import net.kyori.adventure.text.Component
 import java.text.DecimalFormat
 import java.util.*
@@ -70,7 +71,7 @@ class SonarCommand : SimpleCommand {
 
     if (invocation.arguments().isNotEmpty()) {
       // Search subcommand if command arguments are present
-      subCommand = SubCommandManager.getSubCommands().parallelStream()
+      subCommand = SubCommandRegistry.getSubCommands().parallelStream()
         .filter { sub: SubCommand ->
           (sub.info.name.equals(invocation.arguments()[0], ignoreCase = true)
             || (sub.info.aliases.isNotEmpty()
@@ -110,21 +111,7 @@ class SonarCommand : SimpleCommand {
       // The subcommands has arguments which are not present in the executed command
       if (sub.info.arguments.isNotEmpty()
         && commandInvocation.arguments.size <= 1) {
-        invocationSender.sendMessage("§fAvailable command arguments for §e/sonar " + sub.info.name + "§f:")
-        invocationSender.sendMessage()
-
-        for (argument in sub.info.arguments) {
-          invocationSender.sendMessage(
-            " §e● §7/sonar "
-              + sub.info.name
-              + " "
-              + argument.name
-              + " §f"
-              + argument.description
-          )
-        }
-
-        invocationSender.sendMessage()
+        printSubNotFound(invocationSender, sub)
         return@ifPresentOrElse
       }
 
@@ -132,7 +119,7 @@ class SonarCommand : SimpleCommand {
       sub.execute(commandInvocation)
     }) {
       // No subcommand was found
-      CommandHelper.printHelp(invocationSender)
+      printHelp(invocationSender)
     }
   }
 
@@ -140,7 +127,7 @@ class SonarCommand : SimpleCommand {
   override fun suggest(invocation: SimpleCommand.Invocation): List<String> {
     return if (invocation.arguments().size <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
-        for (subCommand in SubCommandManager.getSubCommands()) {
+        for (subCommand in SubCommandRegistry.getSubCommands()) {
           TAB_SUGGESTIONS.add(subCommand.info.name)
 
           if (subCommand.info.aliases.isNotEmpty()) {

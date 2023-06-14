@@ -20,12 +20,10 @@ package jones.sonar.bukkit.command;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import jones.sonar.api.Sonar;
-import jones.sonar.common.command.CommandHelper;
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.InvocationSender;
 import jones.sonar.common.command.subcommand.SubCommand;
-import jones.sonar.common.command.subcommand.SubCommandManager;
-import jones.sonar.common.command.subcommand.argument.Argument;
+import jones.sonar.common.command.subcommand.SubCommandRegistry;
 import lombok.var;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -36,6 +34,9 @@ import org.bukkit.entity.Player;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static jones.sonar.common.command.CommandInvocation.printHelp;
+import static jones.sonar.common.command.CommandInvocation.printSubNotFound;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class SonarCommand implements CommandExecutor, TabExecutor {
@@ -87,7 +88,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
 
     if (args.length > 0) {
       // Search subcommand if command arguments are present
-      subCommand = SubCommandManager.getSubCommands().stream()
+      subCommand = SubCommandRegistry.getSubCommands().stream()
         .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
           || (sub.getInfo().aliases().length > 0
           && Arrays.stream(sub.getInfo().aliases())
@@ -109,7 +110,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
 
     // No subcommand was found
     if (!subCommand.isPresent()) {
-      CommandHelper.printHelp(invocationSender);
+      printHelp(invocationSender);
       return false;
     }
 
@@ -130,21 +131,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
       // The subcommands has arguments which are not present in the executed command
       if (sub.getInfo().arguments().length > 0
         && commandInvocation.getArguments().length <= 1) {
-        invocationSender.sendMessage("§fAvailable command arguments for §e/sonar " + sub.getInfo().name() + "§f:");
-        invocationSender.sendMessage();
-
-        for (final Argument argument : sub.getInfo().arguments()) {
-          invocationSender.sendMessage(
-            " §e● §7/sonar "
-              + sub.getInfo().name()
-              + " "
-              + argument.name()
-              + " §f"
-              + argument.description()
-          );
-        }
-
-        invocationSender.sendMessage();
+        printSubNotFound(invocationSender, sub);
         return;
       }
 
@@ -166,7 +153,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
 
   private static List<String> getSuggestions() {
     if (TAB_SUGGESTIONS.isEmpty()) {
-      for (final SubCommand subCommand : SubCommandManager.getSubCommands()) {
+      for (final SubCommand subCommand : SubCommandRegistry.getSubCommands()) {
         TAB_SUGGESTIONS.add(subCommand.getInfo().name());
 
         if (subCommand.getInfo().aliases().length > 0) {

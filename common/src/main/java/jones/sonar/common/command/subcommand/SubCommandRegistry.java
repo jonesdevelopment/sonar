@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @UtilityClass
-public class SubCommandManager {
+public class SubCommandRegistry {
   @Getter
   private final Collection<SubCommand> subCommands = Arrays.asList(
     new BlacklistCommand(),
