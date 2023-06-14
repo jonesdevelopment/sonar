@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.8.22"
 }
 
 repositories {
     maven(url = "https://repo.papermc.io/repository/maven-public/") // Velocity
-    maven(url = "https://maven.elytrium.net/repo/") // Velocity proxy module
+    maven(url = "https://maven.elytrium.net/repo/") // Velocity proxy module // TODO: set up own repo
 }
 
 val velocityVersion = "3.2.0-SNAPSHOT"
