@@ -34,6 +34,7 @@ class FallbackPacketDecoder(
 ) : ChannelInboundHandlerAdapter() {
 
   @Throws(Exception::class)
+  @Suppress("OverridingDeprecatedMember")
   override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
     if (ctx.channel().isActive) {
       ctx.close()
