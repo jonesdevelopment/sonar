@@ -10,11 +10,12 @@ repositories {
 val velocityVersion = "3.2.0-SNAPSHOT"
 
 dependencies {
-    implementation(project(":sonar-api"))
-    implementation(project(":sonar-common"))
+    compileOnly(project(":sonar-api"))
+    compileOnly(project(":sonar-common"))
 
     compileOnly("com.velocitypowered:velocity-proxy:$velocityVersion") // Proxy module
-    compileOnly("net.kyori:adventure-nbt:4.13.1") // nbt
+
+    compileOnly("net.kyori:adventure-nbt:4.14.0")
 
     compileOnly("com.velocitypowered:velocity-api:$velocityVersion")
     annotationProcessor("com.velocitypowered:velocity-api:$velocityVersion")
@@ -22,7 +23,7 @@ dependencies {
     testCompileOnly("com.velocitypowered:velocity-api:$velocityVersion")
     testAnnotationProcessor("com.velocitypowered:velocity-api:$velocityVersion")
 
-    implementation(kotlin("stdlib-jdk8"))
+    compileOnly(kotlin("stdlib-jdk8"))
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
