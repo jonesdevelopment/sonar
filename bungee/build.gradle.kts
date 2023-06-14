@@ -6,7 +6,7 @@ dependencies {
     implementation(project(":sonar-api"))
     implementation(project(":sonar-common"))
 
-    compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")
+    compileOnly("net.md-5:bungeecord-api:1.20-R0.1-SNAPSHOT")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
