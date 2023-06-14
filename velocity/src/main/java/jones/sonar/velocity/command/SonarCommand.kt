@@ -43,13 +43,13 @@ class SonarCommand : SimpleCommand {
     // Spamming should be prevented especially if some heavy operations are done
     // which is not the case here but let's still stay safe!
     if (timestamp > 0L) {
-      invocation.source().sendMessage(CANNOT_RUN_YET)
+      invocation.source().sendMessage(Component.text(Sonar.get().config.COMMAND_COOL_DOWN))
 
       // Format delay
       val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
-      val format = decimalFormat.format(left)
 
-      invocation.source().sendMessage(Component.text("§cPlease wait another §l" + format + "s§r§c."))
+      invocation.source().sendMessage(Component.text(Sonar.get().config.COMMAND_COOL_DOWN_LEFT
+        .replace("%time-left%", decimalFormat.format(left))))
       return
     }
 
@@ -162,9 +162,6 @@ class SonarCommand : SimpleCommand {
     private val DELAY = Caffeine.newBuilder()
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSource, Long>()
-    private val CANNOT_RUN_YET: Component = Component.text(
-      "§cYou can only execute this command every 0.5 seconds."
-    )
     private val decimalFormat = DecimalFormat("#.#")
   }
 }

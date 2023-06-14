@@ -41,8 +41,6 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
   private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
     .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
     .build();
-  private static final String ONLY_PLAYERS = "§cYou can only execute this command as a player.";
-  private static final String CANNOT_RUN_YET = "§cYou can only execute this command every 0.5 seconds.";
   private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
   @Override
@@ -59,15 +57,13 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
     // Spamming should be prevented especially if some heavy operations are done
     // which is not the case here but let's still stay safe!
     if (timestamp > 0L) {
-      sender.sendMessage(CANNOT_RUN_YET);
+      sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN);
 
       // Format delay
       final double left = 0.5D - ((currentTimestamp - (double) timestamp) / 1000D);
-      final String format = decimalFormat.format(left);
 
-      final String pleaseWaitAnother = "§cPlease wait another §l" + format + "s§r§c.";
-
-      sender.sendMessage(pleaseWaitAnother);
+      sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
+        .replace("%time-left%", decimalFormat.format(left)));
       return false;
     }
 
