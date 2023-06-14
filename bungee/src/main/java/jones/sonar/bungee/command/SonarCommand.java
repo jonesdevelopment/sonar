@@ -58,13 +58,13 @@ public final class SonarCommand extends Command implements TabExecutor {
     // Spamming should be prevented especially if some heavy operations are done
     // which is not the case here but let's still stay safe!
     if (timestamp > 0L) {
-      sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN);
+      sender.sendMessage(new TextComponent(Sonar.get().getConfig().COMMAND_COOL_DOWN));
 
       // Format delay
       final double left = 0.5D - ((currentTimestamp - (double) timestamp) / 1000D);
 
-      sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
-        .replace("%time-left%", decimalFormat.format(left)));
+      sender.sendMessage(new TextComponent(Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
+        .replace("%time-left%", decimalFormat.format(left))));
       return;
     }
 
@@ -76,7 +76,7 @@ public final class SonarCommand extends Command implements TabExecutor {
 
       @Override
       public void sendMessage(final String message) {
-        sender.sendMessage(message);
+        sender.sendMessage(new TextComponent(message));
       }
 
       @Override
