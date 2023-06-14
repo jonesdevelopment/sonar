@@ -357,14 +357,14 @@ public final class FallbackListener {
         } else {
           // KeepAlive packets do not exist during the login process on 1.7
           // We have to fall back to the regular method of verification
-          mcConnection.delayedWrite(LEGACY_JOIN_GAME); // TODO: does write(...) work?
 
           // Set session handler to custom fallback handler to intercept all incoming packets
           mcConnection.setSessionHandler(new FallbackSessionHandler(
             mcConnection.getSessionHandler(), fallbackPlayer
           ));
 
-          mcConnection.flush();// TODO: check if flushing is needed (check TODO above)
+          // Send JoinGame packet
+          mcConnection.write(LEGACY_JOIN_GAME);
         }
         // ==================================================================
       }));
