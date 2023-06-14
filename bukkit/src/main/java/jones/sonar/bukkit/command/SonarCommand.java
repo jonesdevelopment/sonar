@@ -37,6 +37,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("UnstableApiUsage")
 public final class SonarCommand implements CommandExecutor, TabExecutor {
   private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
     .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
