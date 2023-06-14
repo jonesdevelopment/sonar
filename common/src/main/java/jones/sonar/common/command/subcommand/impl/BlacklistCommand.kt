@@ -21,10 +21,17 @@ import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
+import jones.sonar.common.command.subcommand.argument.Argument
 import java.net.InetAddress
 
 @SubCommandInfo(
-  name = "blacklist", description = "Manage blacklisted IP addresses"
+  name = "blacklist", description = "Manage blacklisted IP addresses",
+  arguments = [
+    Argument(name = "add", description = "Add an IP to the blacklist"),
+    Argument(name = "remove", description = "Remove an IP from the blacklist"),
+    Argument(name = "clear", description = "Remove all IP addresses from the blacklist"),
+    Argument(name = "size", description = "View the current size of the blacklist"),
+  ],
 )
 class BlacklistCommand : SubCommand() {
   companion object {
@@ -34,13 +41,6 @@ class BlacklistCommand : SubCommand() {
 
   override fun execute(invocation: CommandInvocation) {
     if (invocation.arguments.size <= 1) {
-      invocation.invocationSender.sendMessage("§a● §fSonar blacklist management")
-      invocation.invocationSender.sendMessage()
-      invocation.invocationSender.sendMessage(" §f/sonar blacklist add <IP address> §7Add an IP to the blacklist")
-      invocation.invocationSender.sendMessage(" §f/sonar blacklist remove <IP address> §7Remove an IP from the blacklist")
-      invocation.invocationSender.sendMessage(" §f/sonar blacklist clear §7Remove all IP addresses from the blacklist")
-      invocation.invocationSender.sendMessage(" §f/sonar blacklist size §7View the current size of the blacklist")
-      invocation.invocationSender.sendMessage()
       return
     }
 

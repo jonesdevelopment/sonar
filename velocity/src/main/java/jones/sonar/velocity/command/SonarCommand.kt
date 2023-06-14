@@ -21,6 +21,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.command.SimpleCommand
 import com.velocitypowered.api.proxy.Player
+import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandHelper
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.InvocationSender
@@ -33,12 +34,18 @@ import java.util.concurrent.TimeUnit
 
 class SonarCommand : SimpleCommand {
   override fun execute(invocation: SimpleCommand.Invocation) {
+    // Checking if it contains will only break more since it can throw
+    // a NullPointerException if the cache is being accessed from parallel threads
     val timestamp = DELAY.asMap().getOrDefault(invocation.source(), -1L)
     val currentTimestamp = System.currentTimeMillis()
 
+    // There were some exploits with spamming commands in the past
+    // Spamming should be prevented especially if some heavy operations are done
+    // which is not the case here but let's still stay safe!
     if (timestamp > 0L) {
       invocation.source().sendMessage(CANNOT_RUN_YET)
 
+      // Format delay
       val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
       val format = decimalFormat.format(left)
 
@@ -62,7 +69,8 @@ class SonarCommand : SimpleCommand {
     }
 
     if (invocation.arguments().isNotEmpty()) {
-      subCommand = SubCommandManager.getSubCommands().stream()
+      // Search subcommand if command arguments are present
+      subCommand = SubCommandManager.getSubCommands().parallelStream()
         .filter { sub: SubCommand ->
           (sub.info.name.equals(invocation.arguments()[0], ignoreCase = true)
             || (sub.info.aliases.isNotEmpty()
@@ -71,6 +79,7 @@ class SonarCommand : SimpleCommand {
         }
         .findFirst()
 
+      // Check permissions for subcommands
       if (subCommand.isPresent) {
         val permission = "sonar." + subCommand.get().info.name
 
@@ -87,21 +96,47 @@ class SonarCommand : SimpleCommand {
 
     subCommand.ifPresentOrElse({ sub: SubCommand ->
       if (sub.info.onlyPlayers && invocation.source() !is Player) {
-        invocation.source().sendMessage(ONLY_PLAYERS)
+        invocation.source().sendMessage(Component.text(Sonar.get().config.PLAYERS_ONLY))
         return@ifPresentOrElse
       }
 
-      sub.execute(
-        CommandInvocation(
-          if (invocation.source() is Player) (invocation.source() as Player).username else "Console",
-          invocationSender,
-          sub,
-          invocation.arguments()
-        )
+      val commandInvocation = CommandInvocation(
+        if (invocation.source() is Player) (invocation.source() as Player).username else "Console",
+        invocationSender,
+        sub,
+        invocation.arguments()
       )
-    }) { CommandHelper.printHelp(invocationSender) }
+
+      // The subcommands has arguments which are not present in the executed command
+      if (sub.info.arguments.isNotEmpty()
+        && commandInvocation.arguments.size <= 1) {
+        invocationSender.sendMessage("§fAvailable command arguments for §e/sonar " + sub.info.name + "§f:")
+        invocationSender.sendMessage()
+
+        for (argument in sub.info.arguments) {
+          invocationSender.sendMessage(
+            " §e● §7/sonar "
+              + sub.info.name
+              + " "
+              + argument.name
+              + " §f"
+              + argument.description
+          )
+        }
+
+        invocationSender.sendMessage()
+        return@ifPresentOrElse
+      }
+
+      // Execute the sub command with the custom invocation properties
+      sub.execute(commandInvocation)
+    }) {
+      // No subcommand was found
+      CommandHelper.printHelp(invocationSender)
+    }
   }
 
+  // Tab completion handling
   override fun suggest(invocation: SimpleCommand.Invocation): List<String> {
     return if (invocation.arguments().size <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
@@ -117,6 +152,7 @@ class SonarCommand : SimpleCommand {
     } else Collections.emptyList()
   }
 
+  // Permission handling
   override fun hasPermission(invocation: SimpleCommand.Invocation): Boolean {
     return invocation.source().hasPermission("sonar.command")
   }
@@ -126,9 +162,6 @@ class SonarCommand : SimpleCommand {
     private val DELAY = Caffeine.newBuilder()
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSource, Long>()
-    private val ONLY_PLAYERS: Component = Component.text(
-      "§cYou can only execute this command as a player."
-    )
     private val CANNOT_RUN_YET: Component = Component.text(
       "§cYou can only execute this command every 0.5 seconds."
     )

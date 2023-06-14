@@ -59,6 +59,7 @@ public final class SonarConfiguration {
   public String INCORRECT_COMMAND_USAGE;
   public String INCORRECT_IP_ADDRESS;
   public String ILLEGAL_IP_ADDRESS;
+  public String PLAYERS_ONLY;
 
   public String BLACKLIST_EMPTY;
   public String BLACKLIST_ADD;
@@ -121,6 +122,9 @@ public final class SonarConfiguration {
     ));
     ILLEGAL_IP_ADDRESS = formatString(yamlConfig.getString("messages.illegal-ip-address",
       "%prefix%The IP address you provided seems to be either a local or loopback IP."
+    ));
+    PLAYERS_ONLY = formatString(yamlConfig.getString("messages.players-only",
+      "%prefix%&cYou can only execute this command as a player."
     ));
 
     BLACKLIST_EMPTY = formatString(yamlConfig.getString("messages.blacklist.empty",

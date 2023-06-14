@@ -17,8 +17,15 @@
 
 package jones.sonar.api;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum SonarPlatform {
-  BUKKIT,
-  BUNGEE,
-  VELOCITY
+  BUKKIT("Bukkit"),
+  BUNGEE("BungeeCord"),
+  VELOCITY("Velocity");
+
+  @Getter
+  private final String displayName;
 }

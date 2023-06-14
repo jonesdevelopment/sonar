@@ -19,11 +19,13 @@ package jones.sonar.bukkit.command;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import jones.sonar.api.Sonar;
 import jones.sonar.common.command.CommandHelper;
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.InvocationSender;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandManager;
+import jones.sonar.common.command.subcommand.argument.Argument;
 import lombok.var;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -48,12 +50,18 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
                            final Command command,
                            final String label,
                            final String[] args) {
+    // Checking if it contains will only break more since it can throw
+    // a NullPointerException if the cache is being accessed from parallel threads
     final long timestamp = delay.asMap().getOrDefault(sender, -1L);
     final long currentTimestamp = System.currentTimeMillis();
 
+    // There were some exploits with spamming commands in the past
+    // Spamming should be prevented especially if some heavy operations are done
+    // which is not the case here but let's still stay safe!
     if (timestamp > 0L) {
       sender.sendMessage(CANNOT_RUN_YET);
 
+      // Format delay
       final double left = 0.5D - ((currentTimestamp - (double) timestamp) / 1000D);
       final String format = decimalFormat.format(left);
 
@@ -81,6 +89,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
     };
 
     if (args.length > 0) {
+      // Search subcommand if command arguments are present
       subCommand = SubCommandManager.getSubCommands().stream()
         .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
           || (sub.getInfo().aliases().length > 0
@@ -88,6 +97,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
           .anyMatch(alias -> alias.equalsIgnoreCase(args[0]))))
         .findFirst();
 
+      // Check permissions for subcommands
       if (subCommand.isPresent()) {
         final String permission = "sonar." + subCommand.get().getInfo().name();
 
@@ -100,14 +110,16 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
       }
     }
 
+    // No subcommand was found
     if (!subCommand.isPresent()) {
       CommandHelper.printHelp(invocationSender);
       return false;
     }
 
+    // ifPresentOrElse() doesn't exist yet... (version compatibility)
     subCommand.ifPresent(sub -> {
       if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
-        sender.sendMessage(ONLY_PLAYERS);
+        sender.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
         return;
       }
 
@@ -118,6 +130,28 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
         args
       );
 
+      // The subcommands has arguments which are not present in the executed command
+      if (sub.getInfo().arguments().length > 0
+        && commandInvocation.getArguments().length <= 1) {
+        invocationSender.sendMessage("§fAvailable command arguments for §e/sonar " + sub.getInfo().name() + "§f:");
+        invocationSender.sendMessage();
+
+        for (final Argument argument : sub.getInfo().arguments()) {
+          invocationSender.sendMessage(
+            " §e● §7/sonar "
+              + sub.getInfo().name()
+              + " "
+              + argument.name()
+              + " §f"
+              + argument.description()
+          );
+        }
+
+        invocationSender.sendMessage();
+        return;
+      }
+
+      // Execute the sub command with the custom invocation properties
       sub.execute(commandInvocation);
     });
     return false;

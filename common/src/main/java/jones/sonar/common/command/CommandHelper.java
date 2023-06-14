@@ -17,20 +17,24 @@
 
 package jones.sonar.common.command;
 
+import jones.sonar.api.Sonar;
 import jones.sonar.common.command.subcommand.SubCommandManager;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class CommandHelper {
   public void printHelp(final InvocationSender<?> sender) {
-    sender.sendMessage("§a● §fThis server is running §6§lSonar §f(version §72.0.0§f)");
+    sender.sendMessage("§fThis server is running §6§lSonar §7"
+      + Sonar.get().getVersion()
+      + "§f on §7"
+      + Sonar.get().getPlatform().getDisplayName());
     sender.sendMessage();
 
-    SubCommandManager.getSubCommands().forEach(subcommand -> {
-      sender.sendMessage(" /sonar "
-        + subcommand.getInfo().name()
-        + " §7"
-        + subcommand.getInfo().description()
+    SubCommandManager.getSubCommands().forEach(sub -> {
+      sender.sendMessage(" §e● §7/sonar "
+        + sub.getInfo().name()
+        + " §f"
+        + sub.getInfo().description()
       );
     });
 

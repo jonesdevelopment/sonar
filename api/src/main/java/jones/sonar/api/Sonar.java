@@ -33,6 +33,10 @@ public interface Sonar {
 
   DecimalFormat getFormatter();
 
+  default String getVersion() {
+    return "2.0.0"; // TODO: automatic version
+  }
+
   default Fallback getFallback() {
     return FallbackHolder.INSTANCE;
   }
