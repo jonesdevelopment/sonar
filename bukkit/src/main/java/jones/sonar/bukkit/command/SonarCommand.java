@@ -70,7 +70,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
 
     delay.put(sender, currentTimestamp);
 
-    var subCommand = Optional.<SubCommand>empty();
+    Optional<SubCommand> subCommand = Optional.empty();
 
     var invocationSender = new InvocationSender<CommandSender>() {
 
