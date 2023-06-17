@@ -80,7 +80,7 @@ public final class FallbackListener {
     static PreLoginEvent.PreLoginComponentResult BLACKLISTED;
     static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_ONLINE_PER_IP;
-    static Component TOO_MANY_VERIFICATIONS;
+    static PreLoginEvent.PreLoginComponentResult TOO_MANY_VERIFICATIONS;
     public static Component UNEXPECTED_ERROR;
 
     public static void update() {
@@ -96,7 +96,9 @@ public final class FallbackListener {
       TOO_MANY_ONLINE_PER_IP = PreLoginEvent.PreLoginComponentResult.denied(
         Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP)
       );
-      TOO_MANY_VERIFICATIONS = Component.text(Sonar.get().getConfig().TOO_MANY_VERIFICATIONS);
+      TOO_MANY_VERIFICATIONS = PreLoginEvent.PreLoginComponentResult.denied(
+        Component.text(Sonar.get().getConfig().TOO_MANY_VERIFICATIONS)
+      );
       UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
     }
   }
@@ -189,6 +191,12 @@ public final class FallbackListener {
       return;
     }
 
+    // Check if the IP address had too many verifications or is rejoining too quickly
+    if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
+      event.setResult(TOO_MANY_VERIFICATIONS);
+      return;
+    }
+
     /*
      * If we don't handle online/offline mode players correctly,
      * many plugins (especially Auth-related) will have issues
@@ -277,13 +285,6 @@ public final class FallbackListener {
           // This should not happen
           fallback.getLogger().error("Error while processing {}: {}", event.getUsername(), throwable);
           mcConnection.close(true);
-          return;
-        }
-
-        // Check if the IP address had too many verifications or is rejoining too quickly
-        // TODO: should the IP address be blacklisted here?
-        if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
-          player.disconnect0(TOO_MANY_VERIFICATIONS, true);
           return;
         }
 
