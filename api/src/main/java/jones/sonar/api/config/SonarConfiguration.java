@@ -54,6 +54,7 @@ public final class SonarConfiguration {
   public String TOO_MANY_ONLINE_PER_IP;
   public String ALREADY_VERIFYING;
   public String BLACKLISTED;
+  public String UNEXPECTED_ERROR;
 
   public String INCORRECT_COMMAND_ARG;
   public String INCORRECT_COMMAND_USAGE;
@@ -190,6 +191,13 @@ public final class SonarConfiguration {
         "%header%",
         "&cYour IP address is temporarily denied from verifying.",
         "&cPlease wait a few minutes before trying to verify again.",
+        "%footer%"
+      )));
+    UNEXPECTED_ERROR = fromList(yamlConfig.getStringList("messages.verification.unexpected-error",
+      Arrays.asList(
+        "%header%",
+        "&6An unexpected error occurred when trying to process your connection.",
+        "&7Please wait a few seconds before trying to verify again.",
         "%footer%"
       )));
     TOO_MANY_ONLINE_PER_IP = fromList(yamlConfig.getStringList("messages.too-many-online-per-ip",

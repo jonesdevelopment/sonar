@@ -33,6 +33,7 @@ import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
+import jones.sonar.velocity.fallback.FallbackListener;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -107,8 +108,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final ClientSettings clientSettings) {
-    if (!hasSentClientBrand && !hasSentClientSettings) {
-      player.getPlayer().disconnect0(UNEXPECTED_ERROR, true);
+    if (hasSentClientBrand || hasSentClientSettings) {
+      player.getPlayer().disconnect0(FallbackListener.CachedMessages.UNEXPECTED_ERROR, true);
       return false;
     }
 

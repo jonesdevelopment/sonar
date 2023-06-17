@@ -81,6 +81,7 @@ public final class FallbackListener {
     static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_ONLINE_PER_IP;
     static Component TOO_MANY_VERIFICATIONS;
+    public static Component UNEXPECTED_ERROR;
 
     public static void update() {
       ALREADY_VERIFYING = PreLoginEvent.PreLoginComponentResult.denied(
@@ -96,6 +97,7 @@ public final class FallbackListener {
         Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP)
       );
       TOO_MANY_VERIFICATIONS = Component.text(Sonar.get().getConfig().TOO_MANY_VERIFICATIONS);
+      UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
     }
   }
 
