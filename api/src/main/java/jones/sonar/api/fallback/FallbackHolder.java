@@ -21,28 +21,36 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.logger.Logger;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Vector;
 
 public final class FallbackHolder implements Fallback {
-  public static final FallbackHolder INSTANCE = new FallbackHolder();
+  public static final @NotNull FallbackHolder INSTANCE = new FallbackHolder();
 
   @Getter
+  @NotNull
   private final List<InetAddress> connected = new Vector<>();
   @Getter
+  @NotNull
   private final List<InetAddress> verified = new Vector<>();
   @Getter
+  @NotNull
   private final List<InetAddress> blacklisted = new Vector<>();
   @Getter
+  @NotNull
   private final FallbackQueue queue = new FallbackQueue();
   @Getter
   @Setter
+  @NotNull
   private FallbackFilter attemptLimiter = inetAddress -> true;
   @Getter
+  @NotNull
   private final Sonar sonar = Sonar.get();
   @Getter
+  @NotNull
   private final Logger logger = new Logger() {
 
     @Override

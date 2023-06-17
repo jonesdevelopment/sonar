@@ -19,26 +19,27 @@ package jones.sonar.api.fallback;
 
 import jones.sonar.api.Sonar;
 import jones.sonar.api.logger.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
 import java.util.List;
 
 public interface Fallback {
-  List<InetAddress> getConnected();
+  @NotNull List<InetAddress> getConnected();
 
-  List<InetAddress> getVerified();
+  @NotNull List<InetAddress> getVerified();
 
-  List<InetAddress> getBlacklisted();
+  @NotNull List<InetAddress> getBlacklisted();
 
-  FallbackQueue getQueue();
+  @NotNull FallbackQueue getQueue();
 
-  FallbackFilter getAttemptLimiter();
+  @NotNull FallbackFilter getAttemptLimiter();
 
-  Sonar getSonar();
+  @NotNull Sonar getSonar();
 
-  Logger getLogger();
+  @NotNull Logger getLogger();
 
-  void setAttemptLimiter(final FallbackFilter limiter);
+  void setAttemptLimiter(final @NotNull FallbackFilter limiter);
 
   default boolean isUnderAttack() {
     return getConnected().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK

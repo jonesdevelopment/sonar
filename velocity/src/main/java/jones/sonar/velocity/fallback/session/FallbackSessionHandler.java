@@ -58,7 +58,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @Nullable MinecraftSessionHandler previousHandler;
   private final @NotNull FallbackPlayer player;
   private final boolean v1_8or1_7;
-  private String resourcePackHash;
+  private @Nullable String resourcePackHash;
   private static final Random random = new SecureRandom();
 
   public FallbackSessionHandler(final @Nullable MinecraftSessionHandler previousHandler,
