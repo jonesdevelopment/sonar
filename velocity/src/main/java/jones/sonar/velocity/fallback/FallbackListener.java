@@ -163,7 +163,6 @@ public final class FallbackListener {
 
     if (maxOnlinePerIp > 0) {
       final long onlinePerIp = SonarVelocity.INSTANCE.getPlugin().getServer().getAllPlayers().stream()
-        // We have to do this since it's 2 different instances...
         .filter(player -> Objects.equals(player.getRemoteAddress().getAddress(), inetAddress))
         .count();
 
