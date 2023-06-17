@@ -21,6 +21,7 @@ import com.velocitypowered.proxy.protocol.MinecraftPacket
 import com.velocitypowered.proxy.protocol.packet.ClientSettings
 import com.velocitypowered.proxy.protocol.packet.KeepAlive
 import com.velocitypowered.proxy.protocol.packet.PluginMessage
+import com.velocitypowered.proxy.protocol.packet.ResourcePackResponse
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import jones.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion
@@ -41,8 +42,10 @@ class FallbackPacketDecoder(
       ctx.close()
 
       // Clients can throw an IOException if the connection is interrupted unexpectedly
-      if (cause is IOException) return
+      // Velocity can throw an IllegalStateException if Sonar messed something up
+      if (cause is IOException || cause is IllegalStateException) return
 
+      cause.printStackTrace()
       // Blacklist the IP address
       val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
@@ -53,7 +56,7 @@ class FallbackPacketDecoder(
   @Throws(Exception::class)
   override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
     if (msg is MinecraftPacket) {
-      val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive
+      val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive || msg is ResourcePackResponse
 
       FallbackSessionHandler.checkFrame(fallbackPlayer, legalPacket, "bad packet: " + msg.javaClass.simpleName)
 

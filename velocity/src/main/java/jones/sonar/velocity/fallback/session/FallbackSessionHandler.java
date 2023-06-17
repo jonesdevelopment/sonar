@@ -21,6 +21,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
 import com.velocitypowered.api.permission.PermissionFunction;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.proxy.VelocityServer;
@@ -28,9 +29,7 @@ import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialConnectSessionHandler;
-import com.velocitypowered.proxy.protocol.packet.ClientSettings;
-import com.velocitypowered.proxy.protocol.packet.KeepAlive;
-import com.velocitypowered.proxy.protocol.packet.PluginMessage;
+import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
@@ -42,11 +41,13 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.security.SecureRandom;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_13;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
+import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
 import static jones.sonar.api.fallback.FallbackPipelines.*;
@@ -56,6 +57,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @Nullable MinecraftSessionHandler previousHandler;
   private final @NotNull FallbackPlayer player;
   private final boolean v1_8or1_7;
+  private String resourcePackHash;
+  private static final Random random = new SecureRandom();
 
   public FallbackSessionHandler(final @Nullable MinecraftSessionHandler previousHandler,
                                 final @NotNull FallbackPlayer player) {
@@ -105,7 +108,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   @Override
   public boolean handle(final ClientSettings clientSettings) {
     // TODO: check for false positives with spam reconnecting as it could cause potential, rare issues
-    checkFrame(!hasSentClientBrand && !hasSentClientSettings, "unexpected timing (C)");
+    //checkFrame(!hasSentClientBrand && !hasSentClientSettings, "unexpected timing (C)");
 
     hasSentClientSettings = true;
     return false;
@@ -129,7 +132,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     // We use a different verification method for 1.7-1.8
     if (!v1_8or1_7) {
-      finish();
+      sendResourcePackRequest();
     }
     return false;
   }
@@ -142,13 +145,46 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       checkFrame(hasSentClientBrand, "unexpected timing (K1): " + keepAlive.getRandomId());
       checkFrame(hasSentClientSettings, "unexpected timing (K2): " + keepAlive.getRandomId());
 
-      // We already ran the other checks, let's verify the player
-      finish();
+      // 1.7 does not support resource pack prompts, verify the connection
+      if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_7_6) <= 0) {
+        finish();
+      } else {
+        // We already ran the other checks, let's go to the next stage
+        sendResourcePackRequest();
+      }
     } else {
 
       // On non-1.8 clients there isn't any other KeepAlive packet that can be sent now
       player.fail("unexpected timing (K3): " + keepAlive.getRandomId());
     }
+    return false;
+  }
+
+  private void sendResourcePackRequest() {
+    final ResourcePackRequest resourcePackRequest = new ResourcePackRequest();
+
+    resourcePackHash = Integer.toHexString(random.nextInt());
+    resourcePackRequest.setHash(resourcePackHash);
+    resourcePackRequest.setUrl(resourcePackHash);
+
+    player.getConnection().write(resourcePackRequest);
+  }
+
+  @Override
+  public boolean handle(final ResourcePackResponse resourcePackResponse) {
+    checkFrame(resourcePackHash != null, "hash has not been set");
+
+    // 1.10+ clients do not send the hash back to the server if the download fails
+    if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_10) >= 0) {
+      checkFrame(resourcePackResponse.getHash().isEmpty(), "invalid hash (1.9+)");
+    } else {
+      checkFrame(Objects.equals(resourcePackResponse.getHash(), resourcePackHash), "invalid hash");
+    }
+
+    // The status will always be FAILED_DOWNLOAD
+    checkFrame(resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD, "invalid status");
+
+    finish();
     return false;
   }
 
