@@ -45,7 +45,6 @@ class FallbackPacketDecoder(
       // Velocity can throw an IllegalStateException if Sonar messed something up
       if (cause is IOException || cause is IllegalStateException) return
 
-      cause.printStackTrace()
       // Blacklist the IP address
       val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 

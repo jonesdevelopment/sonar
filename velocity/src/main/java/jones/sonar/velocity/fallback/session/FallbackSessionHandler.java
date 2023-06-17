@@ -107,8 +107,10 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final ClientSettings clientSettings) {
-    // TODO: check for false positives with spam reconnecting as it could cause potential, rare issues
-    //checkFrame(!hasSentClientBrand && !hasSentClientSettings, "unexpected timing (C)");
+    if (!hasSentClientBrand && !hasSentClientSettings) {
+      player.getPlayer().disconnect0(UNEXPECTED_ERROR, true);
+      return false;
+    }
 
     hasSentClientSettings = true;
     return false;
@@ -163,10 +165,14 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private void sendResourcePackRequest() {
     final ResourcePackRequest resourcePackRequest = new ResourcePackRequest();
 
+    // The hash and URL have to be invalid for this check to work
+    // since we don't want to client to actually download a resource pack
+    // or override the server resource packets option (prompt)
     resourcePackHash = Integer.toHexString(random.nextInt());
     resourcePackRequest.setHash(resourcePackHash);
     resourcePackRequest.setUrl(resourcePackHash);
 
+    // Send the ResourcePackRequest packet
     player.getConnection().write(resourcePackRequest);
   }
 
@@ -181,7 +187,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       checkFrame(Objects.equals(resourcePackResponse.getHash(), resourcePackHash), "invalid hash");
     }
 
-    // The status will always be FAILED_DOWNLOAD
     checkFrame(resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD, "invalid status");
 
     finish();
