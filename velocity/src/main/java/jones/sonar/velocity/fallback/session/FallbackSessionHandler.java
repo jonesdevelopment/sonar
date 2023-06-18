@@ -183,7 +183,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     // 1.10+ clients do not send the hash back to the server if the download fails
     if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_10) >= 0) {
-      checkFrame(resourcePackResponse.getHash().isEmpty(), "invalid hash (1.9+)");
+      checkFrame(resourcePackResponse.getHash().isEmpty(), "invalid hash (1.10+)");
     } else {
       checkFrame(Objects.equals(resourcePackResponse.getHash(), resourcePackHash), "invalid hash");
     }
