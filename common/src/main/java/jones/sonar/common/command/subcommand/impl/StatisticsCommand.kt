@@ -38,7 +38,13 @@ class StatisticsCommand : SubCommand() {
     invocation.invocationSender.sendMessage()
     invocation.invocationSender.sendMessage(" §a▪ §7Verified IP addresses: §f${Sonar.get().formatter.format(verified)}")
     invocation.invocationSender.sendMessage(" §a▪ §7Verifying IP addresses: §f${Sonar.get().formatter.format(verifying)}")
-    invocation.invocationSender.sendMessage(" §a▪ §7Blacklisted IP addresses: §f${Sonar.get().formatter.format(blacklisted)}")
+    invocation.invocationSender.sendMessage(
+      " §a▪ §7Blacklisted IP addresses: §f${
+        Sonar.get().formatter.format(
+          blacklisted
+        )
+      }"
+    )
     invocation.invocationSender.sendMessage(" §a▪ §7Queued connections: §f${Sonar.get().formatter.format(queued)}")
     invocation.invocationSender.sendMessage(" §a▪ §7Total connections: §f${Sonar.get().formatter.format(total)}")
     invocation.invocationSender.sendMessage()

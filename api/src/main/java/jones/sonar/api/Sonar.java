@@ -34,11 +34,13 @@ public interface Sonar {
 
   @NotNull DecimalFormat getFormatter();
 
-  @NotNull default String getVersion() {
+  @NotNull
+  default String getVersion() {
     return "2.0.0"; // TODO: automatic version
   }
 
-  @NotNull default Fallback getFallback() {
+  @NotNull
+  default Fallback getFallback() {
     return FallbackHolder.INSTANCE;
   }
 
@@ -50,7 +52,8 @@ public interface Sonar {
 
   void reload();
 
-  @NotNull static Sonar get() {
+  @NotNull
+  static Sonar get() {
     return SonarProvider.get();
   }
 }

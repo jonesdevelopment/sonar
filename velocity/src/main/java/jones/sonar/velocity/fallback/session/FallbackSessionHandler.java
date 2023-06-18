@@ -188,7 +188,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       checkFrame(Objects.equals(resourcePackResponse.getHash(), resourcePackHash), "invalid hash");
     }
 
-    checkFrame(resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD, "invalid status");
+    checkFrame(resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD, "invalid " +
+      "status");
 
     finish();
     return false;

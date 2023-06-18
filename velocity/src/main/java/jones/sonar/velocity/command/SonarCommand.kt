@@ -50,8 +50,12 @@ class SonarCommand : SimpleCommand {
       // Format delay
       val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
 
-      invocation.source().sendMessage(Component.text(Sonar.get().config.COMMAND_COOL_DOWN_LEFT
-        .replace("%time-left%", decimalFormat.format(left))))
+      invocation.source().sendMessage(
+        Component.text(
+          Sonar.get().config.COMMAND_COOL_DOWN_LEFT
+            .replace("%time-left%", decimalFormat.format(left))
+        )
+      )
       return
     }
 
@@ -84,9 +88,11 @@ class SonarCommand : SimpleCommand {
       // Check permissions for subcommands
       if (subCommand.isPresent) {
         if (!invocation.source().hasPermission(subCommand.get().permission)) {
-          invocation.source().sendMessage(Component.text(
-            "§cYou do not have permission to execute this subcommand. §7(${subCommand.get().permission})"
-          ))
+          invocation.source().sendMessage(
+            Component.text(
+              "§cYou do not have permission to execute this subcommand. §7(${subCommand.get().permission})"
+            )
+          )
         }
       }
     }
@@ -106,11 +112,14 @@ class SonarCommand : SimpleCommand {
 
       // The subcommands has arguments which are not present in the executed command
       if (sub.info.arguments.isNotEmpty()
-        && commandInvocation.arguments.size <= 1) {
-        invocation.source().sendMessage(Component.text(
-          Sonar.get().config.INCORRECT_COMMAND_USAGE
-            .replace("%usage%", sub.info.name + " (" + sub.arguments + ")")
-        ))
+        && commandInvocation.arguments.size <= 1
+      ) {
+        invocation.source().sendMessage(
+          Component.text(
+            Sonar.get().config.INCORRECT_COMMAND_USAGE
+              .replace("%usage%", sub.info.name + " (" + sub.arguments + ")")
+          )
+        )
         return@ifPresentOrElse
       }
 
@@ -125,32 +134,37 @@ class SonarCommand : SimpleCommand {
           + " on "
           + Sonar.get().platform.displayName
       )
-      invocation.source().sendMessage(Component.text(
-        " §7Need help?§b discord.jonesdev.xyz"
-      ).hoverEvent(
-        HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("§7Click to open Discord"))
-      ).clickEvent(
-        ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://discord.jonesdev.xyz/")
-      ))
+      invocation.source().sendMessage(
+        Component.text(
+          " §7Need help?§b discord.jonesdev.xyz"
+        ).hoverEvent(
+          HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("§7Click to open Discord"))
+        ).clickEvent(
+          ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://discord.jonesdev.xyz/")
+        )
+      )
       invocationSender.sendMessage()
 
       SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
         var component = Component.text(
           " §a▪ §7/sonar "
-          + sub.info.name
-          + " §f"
-          + sub.info.description)
+            + sub.info.name
+            + " §f"
+            + sub.info.description
+        )
 
         if (invocation.source() is Player) {
           component = component.clickEvent(
             ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.info.name + " ")
           ).hoverEvent(
-            HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
-              "§7Only players: §f" + (if (sub.info.onlyPlayers) "§a✔" else "§c✗")
-                + "\n§7Require console: §f" + (if (sub.info.onlyConsole) "§a✔" else "§c✗")
-                + "\n§7Permission: §f" + sub.permission
-                + "\n§7Aliases: §f" + sub.aliases
-            ))
+            HoverEvent.hoverEvent(
+              HoverEvent.Action.SHOW_TEXT, Component.text(
+                "§7Only players: §f" + (if (sub.info.onlyPlayers) "§a✔" else "§c✗")
+                  + "\n§7Require console: §f" + (if (sub.info.onlyConsole) "§a✔" else "§c✗")
+                  + "\n§7Permission: §f" + sub.permission
+                  + "\n§7Aliases: §f" + sub.aliases
+              )
+            )
           )
         }
 
