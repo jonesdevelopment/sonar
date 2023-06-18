@@ -35,13 +35,12 @@ class StatisticsCommand : SubCommand() {
     val verified = Sonar.get().fallback.verified.size
     val blacklisted = Sonar.get().fallback.blacklisted.size
 
-    invocation.invocationSender.sendMessage("§a● §fSonar session statistics")
     invocation.invocationSender.sendMessage()
-    invocation.invocationSender.sendMessage(" Verified IP addresses §7${Sonar.get().formatter.format(verified)}")
-    invocation.invocationSender.sendMessage(" Verifying IP addresses §7${Sonar.get().formatter.format(verifying)}")
-    invocation.invocationSender.sendMessage(" Blacklisted IP addresses §7${Sonar.get().formatter.format(blacklisted)}")
-    invocation.invocationSender.sendMessage(" Queued connections (logins) §7${Sonar.get().formatter.format(queued)}")
-    invocation.invocationSender.sendMessage(" Total connections (traffic) §7${Sonar.get().formatter.format(total)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Verified IP addresses: §f${Sonar.get().formatter.format(verified)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Verifying IP addresses: §f${Sonar.get().formatter.format(verifying)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Blacklisted IP addresses: §f${Sonar.get().formatter.format(blacklisted)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Queued connections: §f${Sonar.get().formatter.format(queued)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Total connections: §f${Sonar.get().formatter.format(total)}")
     invocation.invocationSender.sendMessage()
   }
 }
