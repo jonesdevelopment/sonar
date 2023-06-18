@@ -43,6 +43,7 @@ class FallbackPacketDecoder(
 
       // Clients can throw an IOException if the connection is interrupted unexpectedly
       // Velocity can throw an IllegalStateException if Sonar messed something up
+      // TODO: check if there are more exceptions we need to exempt
       if (cause is IOException || cause is IllegalStateException) return
 
       // Blacklist the IP address
@@ -57,10 +58,12 @@ class FallbackPacketDecoder(
     if (msg is MinecraftPacket) {
       val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive || msg is ResourcePackResponse
 
+      // Check if the client is sending packets we don't want them to send
       FallbackSessionHandler.checkFrame(fallbackPlayer, legalPacket, "bad packet: " + msg.javaClass.simpleName)
 
       val hasFallbackHandler = fallbackPlayer.connection.sessionHandler!! is FallbackSessionHandler
 
+      // KeepAlive received, start verification
       if (msg is KeepAlive && msg.randomId == startKeepAliveId) {
         if (hasFallbackHandler) {
           fallbackPlayer.fail("handler already initialized")
