@@ -132,7 +132,7 @@ public final class SonarCommand extends Command implements TabExecutor {
       invocationSender.sendMessage();
 
       SubCommandRegistry.getSubCommands().forEach(sub -> {
-        final TextComponent component = new TextComponent(" §e● §7/sonar "
+        final TextComponent component = new TextComponent(" §a▪ §7/sonar "
           + sub.getInfo().name()
           + " §f"
           + sub.getInfo().description());

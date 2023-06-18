@@ -134,7 +134,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
 
       SubCommandRegistry.getSubCommands().forEach(sub -> {
         final String rawText =
-          " §e● §7/sonar "
+          " §a▪ §7/sonar "
             + sub.getInfo().name()
             + " §f"
             + sub.getInfo().description();
