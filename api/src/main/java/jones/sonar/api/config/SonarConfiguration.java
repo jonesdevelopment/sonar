@@ -115,7 +115,7 @@ public final class SonarConfiguration {
     ));
 
     INCORRECT_COMMAND_ARG = formatString(yamlConfig.getString("messages.incorrect-command-argument",
-      "%prefix%&cIncorrect command usage. &7Try &f/sonar %subcommand%&7."
+      "%prefix%&cYou must use /sonar %argument%"
     ));
     INCORRECT_COMMAND_USAGE = formatString(yamlConfig.getString("messages.incorrect-command-usage",
       "%prefix%Usage: /sonar %subcommand%"

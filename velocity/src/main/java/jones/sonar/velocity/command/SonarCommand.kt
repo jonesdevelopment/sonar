@@ -23,7 +23,6 @@ import com.velocitypowered.api.command.SimpleCommand
 import com.velocitypowered.api.proxy.Player
 import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
-import jones.sonar.common.command.CommandInvocation.printSubNotFound
 import jones.sonar.common.command.InvocationSender
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandRegistry
@@ -108,7 +107,10 @@ class SonarCommand : SimpleCommand {
       // The subcommands has arguments which are not present in the executed command
       if (sub.info.arguments.isNotEmpty()
         && commandInvocation.arguments.size <= 1) {
-        printSubNotFound(invocationSender, sub)
+        invocation.source().sendMessage(Component.text(
+          Sonar.get().config.INCORRECT_COMMAND_ARG
+            .replace("%argument%", sub.info.name + " " + sub.arguments)
+        ))
         return@ifPresentOrElse
       }
 
@@ -116,17 +118,25 @@ class SonarCommand : SimpleCommand {
       sub.execute(commandInvocation)
     }) {
       // No subcommand was found
+      invocationSender.sendMessage()
       invocationSender.sendMessage(
-        "§fThis server is running §6§lSonar §7"
+        " §eRunning §lSonar §e"
           + Sonar.get().version
-          + "§f on §7"
+          + " on "
           + Sonar.get().platform.displayName
       )
+      invocation.source().sendMessage(Component.text(
+        " §7Need help?§b discord.jonesdev.xyz"
+      ).hoverEvent(
+        HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("§7Click to open Discord"))
+      ).clickEvent(
+        ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://discord.jonesdev.xyz/")
+      ))
       invocationSender.sendMessage()
 
       SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
         var component = Component.text(
-          " §e● §7/sonar "
+          " §a▪ §7/sonar "
           + sub.info.name
           + " §f"
           + sub.info.description)
@@ -137,9 +147,9 @@ class SonarCommand : SimpleCommand {
           ).hoverEvent(
             HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
               "§7Only players: §f" + (if (sub.info.onlyPlayers) "§a✔" else "§c✗")
-                + "\n§7Only console: §f" + (if (sub.info.onlyConsole) "§a✔" else "§c✗")
+                + "\n§7Require console: §f" + (if (sub.info.onlyConsole) "§a✔" else "§c✗")
                 + "\n§7Permission: §f" + sub.permission
-                + "\n§7(Click to run)"
+                + "\n§7Aliases: §f" + sub.aliases
             ))
           )
         }

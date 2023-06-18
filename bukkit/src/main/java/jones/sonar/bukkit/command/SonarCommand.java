@@ -39,8 +39,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static jones.sonar.common.command.CommandInvocation.printSubNotFound;
-
 @SuppressWarnings("UnstableApiUsage")
 public final class SonarCommand implements CommandExecutor, TabExecutor {
   private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
@@ -113,10 +111,25 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
 
     // No subcommand was found
     if (!subCommand.isPresent()) {
-      invocationSender.sendMessage("§fThis server is running §6§lSonar §7"
-        + Sonar.get().getVersion()
-        + "§f on §7"
-        + Sonar.get().getPlatform().getDisplayName());
+      invocationSender.sendMessage();
+
+      final String rawDiscordText = " §7Need help?§b discord.jonesdev.xyz";
+
+      if (sender instanceof Player) {
+        final TextComponent discordComponent = new TextComponent(rawDiscordText);
+
+        discordComponent.setHoverEvent(new HoverEvent(
+          HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to open Discord").create()
+        ));
+        discordComponent.setClickEvent(new ClickEvent(
+          ClickEvent.Action.OPEN_URL, "https://discord.jonesdev.xyz/"
+        ));
+
+        ((Player) sender).spigot().sendMessage(discordComponent);
+      } else {
+        sender.sendMessage(rawDiscordText);
+      }
+
       invocationSender.sendMessage();
 
       SubCommandRegistry.getSubCommands().forEach(sub -> {
@@ -167,7 +180,10 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
       // The subcommands has arguments which are not present in the executed command
       if (sub.getInfo().arguments().length > 0
         && commandInvocation.getArguments().length <= 1) {
-        printSubNotFound(invocationSender, sub);
+        invocationSender.sendMessage(
+          Sonar.get().getConfig().INCORRECT_COMMAND_ARG
+            .replace("%argument%", sub.getInfo().name() + " " + sub.getArguments())
+        );
         return;
       }
 

@@ -18,16 +18,27 @@
 package jones.sonar.common.command.subcommand;
 
 import jones.sonar.common.command.CommandInvocation;
+import jones.sonar.common.command.subcommand.argument.Argument;
 import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Getter
 public abstract class SubCommand {
   private final SubCommandInfo info;
-  private final String permission;
+  private final String permission, aliases, arguments;
 
   public SubCommand() {
     info = getClass().getAnnotation(SubCommandInfo.class);
     permission = "sonar." + info.name();
+    aliases = info.aliases().length == 0 ? "No aliases."
+      : String.join(", ", info.aliases());
+
+    arguments = info.arguments().length == 0 ? ""
+      : Arrays.stream(info.arguments())
+      .map(Argument::name)
+      .collect(Collectors.joining(", "));
   }
 
   public abstract void execute(final CommandInvocation invocation);

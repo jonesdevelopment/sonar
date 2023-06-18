@@ -18,7 +18,6 @@
 package jones.sonar.common.command;
 
 import jones.sonar.common.command.subcommand.SubCommand;
-import jones.sonar.common.command.subcommand.argument.Argument;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -45,23 +44,5 @@ public final class CommandInvocation {
 
   public String[] getArguments() {
     return arguments;
-  }
-
-  public static void printSubNotFound(final InvocationSender<?> invocationSender, final SubCommand subCommand) {
-    invocationSender.sendMessage("§fAvailable command arguments for §e/sonar " + subCommand.getInfo().name() + "§f:");
-    invocationSender.sendMessage();
-
-    for (final Argument argument : subCommand.getInfo().arguments()) {
-      invocationSender.sendMessage(
-        " §e● §7/sonar "
-          + subCommand.getInfo().name()
-          + " "
-          + argument.name()
-          + " §f"
-          + argument.description()
-      );
-    }
-
-    invocationSender.sendMessage();
   }
 }

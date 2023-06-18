@@ -27,10 +27,10 @@ import java.net.InetAddress
 @SubCommandInfo(
   name = "blacklist", description = "Manage blacklisted IP addresses",
   arguments = [
-    Argument(name = "add", description = "Add an IP to the blacklist"),
-    Argument(name = "remove", description = "Remove an IP from the blacklist"),
-    Argument(name = "clear", description = "Remove all IP addresses from the blacklist"),
-    Argument(name = "size", description = "View the current size of the blacklist"),
+    Argument(name = "add"),
+    Argument(name = "remove"),
+    Argument(name = "clear"),
+    Argument(name = "size"),
   ],
 )
 class BlacklistCommand : SubCommand() {
@@ -146,7 +146,7 @@ class BlacklistCommand : SubCommand() {
 
       else -> invocation.invocationSender.sendMessage(
         Sonar.get().config.INCORRECT_COMMAND_ARG
-          .replace("%subcommand%", "blacklist")
+          .replace("%argument%", "blacklist")
       )
     }
   }
