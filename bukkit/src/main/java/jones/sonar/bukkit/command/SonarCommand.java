@@ -181,8 +181,8 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
       if (sub.getInfo().arguments().length > 0
         && commandInvocation.getArguments().length <= 1) {
         invocationSender.sendMessage(
-          Sonar.get().getConfig().INCORRECT_COMMAND_ARG
-            .replace("%argument%", sub.getInfo().name() + " " + sub.getArguments())
+          Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
+            .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
         );
         return;
       }

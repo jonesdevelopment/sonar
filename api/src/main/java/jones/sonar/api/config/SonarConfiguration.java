@@ -56,7 +56,6 @@ public final class SonarConfiguration {
   public String BLACKLISTED;
   public String UNEXPECTED_ERROR;
 
-  public String INCORRECT_COMMAND_ARG;
   public String INCORRECT_COMMAND_USAGE;
   public String INCORRECT_IP_ADDRESS;
   public String ILLEGAL_IP_ADDRESS;
@@ -114,11 +113,8 @@ public final class SonarConfiguration {
       "%prefix%You are no longer viewing Sonar verbose."
     ));
 
-    INCORRECT_COMMAND_ARG = formatString(yamlConfig.getString("messages.incorrect-command-argument",
-      "%prefix%&cYou must use /sonar %argument%"
-    ));
     INCORRECT_COMMAND_USAGE = formatString(yamlConfig.getString("messages.incorrect-command-usage",
-      "%prefix%Usage: /sonar %subcommand%"
+      "%prefix%&cUsage: /sonar %usage%"
     ));
     INCORRECT_IP_ADDRESS = formatString(yamlConfig.getString("messages.invalid-ip-address",
       "%prefix%The IP address you provided seems to be invalid."

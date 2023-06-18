@@ -49,7 +49,7 @@ class BlacklistCommand : SubCommand() {
         if (invocation.arguments.size <= 2) {
           invocation.invocationSender.sendMessage(
             Sonar.get().config.INCORRECT_COMMAND_USAGE
-              .replace("%subcommand%", "blacklist add <IP address>")
+              .replace("%usage%", "blacklist add <IP address>")
           )
           return
         }
@@ -86,7 +86,7 @@ class BlacklistCommand : SubCommand() {
         if (invocation.arguments.size <= 2) {
           invocation.invocationSender.sendMessage(
             Sonar.get().config.INCORRECT_COMMAND_USAGE
-              .replace("%subcommand%", "blacklist remove <IP address>")
+              .replace("%usage%", "blacklist remove <IP address>")
           )
           return
         }
@@ -145,8 +145,8 @@ class BlacklistCommand : SubCommand() {
       }
 
       else -> invocation.invocationSender.sendMessage(
-        Sonar.get().config.INCORRECT_COMMAND_ARG
-          .replace("%argument%", "blacklist")
+        Sonar.get().config.INCORRECT_COMMAND_USAGE
+          .replace("%usage%", "blacklist")
       )
     }
   }

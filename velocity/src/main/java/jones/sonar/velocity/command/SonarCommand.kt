@@ -108,8 +108,8 @@ class SonarCommand : SimpleCommand {
       if (sub.info.arguments.isNotEmpty()
         && commandInvocation.arguments.size <= 1) {
         invocation.source().sendMessage(Component.text(
-          Sonar.get().config.INCORRECT_COMMAND_ARG
-            .replace("%argument%", sub.info.name + " " + sub.arguments)
+          Sonar.get().config.INCORRECT_COMMAND_USAGE
+            .replace("%usage%", sub.info.name + " (" + sub.arguments + ")")
         ))
         return@ifPresentOrElse
       }
