@@ -20,12 +20,12 @@ package jones.sonar.api;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum SonarPlatform {
   BUKKIT("Bukkit"),
   BUNGEE("BungeeCord"),
   VELOCITY("Velocity");
 
-  @Getter
   private final String displayName;
 }

@@ -22,6 +22,7 @@ import jones.sonar.api.util.Pair;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
 import java.util.Collection;
@@ -33,11 +34,11 @@ public final class FallbackQueue {
   @Getter
   private final List<Pair<InetAddress, Runnable>> queuedPlayers = new Vector<>();
 
-  public void queue(final InetAddress inetAddress, final Runnable runnable) {
+  public void queue(final @NotNull InetAddress inetAddress, final @NotNull Runnable runnable) {
     queuedPlayers.add(new Pair<>(inetAddress, runnable));
   }
 
-  public void remove(final InetAddress inetAddress) {
+  public void remove(final @NotNull InetAddress inetAddress) {
     queuedPlayers.removeIf(pair -> pair.getFirst() == inetAddress);
   }
 

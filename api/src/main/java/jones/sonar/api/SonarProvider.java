@@ -18,6 +18,7 @@
 package jones.sonar.api;
 
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -25,12 +26,12 @@ import java.util.Objects;
 public class SonarProvider {
   private Sonar cached;
 
-  public void set(final Sonar sonar) {
+  public void set(final @NotNull Sonar sonar) {
     assert cached == null;
     cached = Objects.requireNonNull(sonar);
   }
 
-  public Sonar get() {
+  public @NotNull Sonar get() {
     return cached;
   }
 }

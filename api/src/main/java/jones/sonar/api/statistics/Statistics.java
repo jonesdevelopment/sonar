@@ -17,10 +17,12 @@
 
 package jones.sonar.api.statistics;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 public interface Statistics {
-  Map<String, Integer> getRawMap();
+  @NotNull Map<String, Integer> getRawMap();
 
   default void increment(final String key) {
     increment(key, 0);

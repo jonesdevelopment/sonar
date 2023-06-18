@@ -17,9 +17,11 @@
 
 package jones.sonar.api.fallback;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.InetAddress;
 
 @FunctionalInterface
 public interface FallbackFilter {
-  boolean attempt(final InetAddress inetAddress);
+  boolean attempt(final @NotNull InetAddress inetAddress);
 }

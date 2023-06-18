@@ -17,20 +17,22 @@
 
 package jones.sonar.api.verbose;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 
 public interface Verbose {
-  Collection<String> getSubscribers();
+  @NotNull Collection<String> getSubscribers();
 
-  default boolean isSubscribed(final String subscriber) {
+  default boolean isSubscribed(final @NotNull String subscriber) {
     return getSubscribers().contains(subscriber);
   }
 
-  default void subscribe(final String username) {
+  default void subscribe(final @NotNull String username) {
     getSubscribers().add(username);
   }
 
-  default void unsubscribe(final String subscriber) {
+  default void unsubscribe(final @NotNull String subscriber) {
     getSubscribers().remove(subscriber);
   }
 }

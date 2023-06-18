@@ -20,32 +20,36 @@ package jones.sonar.api.fallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import jones.sonar.api.Sonar;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.InetAddress;
 
 public interface FallbackConnection<Player, Connection> {
-  Fallback getFallback();
+  @NotNull Fallback getFallback();
 
-  Player getPlayer();
+  @NotNull Player getPlayer();
 
-  Connection getConnection();
+  @NotNull Connection getConnection();
 
-  Channel getChannel();
+  @NotNull Channel getChannel();
 
-  ChannelPipeline getPipeline();
+  @NotNull ChannelPipeline getPipeline();
 
-  InetAddress getInetAddress();
+  @NotNull InetAddress getInetAddress();
 
   int getProtocolVersion();
 
-  default void fail(final String reason) {
+  default void fail(final @Nullable String reason) {
     if (getChannel().isActive()) {
       getChannel().close();
     }
 
     getFallback().getBlacklisted().add(getInetAddress());
 
-    Sonar.get().getLogger().info("[Fallback] {} ({}) has failed the bot check for: {}",
-      getInetAddress(), getProtocolVersion(), reason);
+    if (reason != null) {
+      Sonar.get().getLogger().info("[Fallback] {} ({}) has failed the bot check for: {}",
+        getInetAddress(), getProtocolVersion(), reason);
+    }
   }
 }

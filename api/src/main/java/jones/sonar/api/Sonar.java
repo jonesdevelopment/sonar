@@ -23,33 +23,34 @@ import jones.sonar.api.fallback.FallbackHolder;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.api.statistics.Statistics;
 import jones.sonar.api.verbose.Verbose;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 
 public interface Sonar {
   SonarPlatform getPlatform();
 
-  SonarConfiguration getConfig();
+  @NotNull SonarConfiguration getConfig();
 
-  DecimalFormat getFormatter();
+  @NotNull DecimalFormat getFormatter();
 
-  default String getVersion() {
+  @NotNull default String getVersion() {
     return "2.0.0"; // TODO: automatic version
   }
 
-  default Fallback getFallback() {
+  @NotNull default Fallback getFallback() {
     return FallbackHolder.INSTANCE;
   }
 
-  Verbose getActionBarVerbose();
+  @NotNull Verbose getActionBarVerbose();
 
-  Logger getLogger();
+  @NotNull Logger getLogger();
 
-  Statistics getStatistics();
+  @NotNull Statistics getStatistics();
 
   void reload();
 
-  static Sonar get() {
+  @NotNull static Sonar get() {
     return SonarProvider.get();
   }
 }
