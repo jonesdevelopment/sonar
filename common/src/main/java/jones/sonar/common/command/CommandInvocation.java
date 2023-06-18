@@ -17,9 +17,7 @@
 
 package jones.sonar.common.command;
 
-import jones.sonar.api.Sonar;
 import jones.sonar.common.command.subcommand.SubCommand;
-import jones.sonar.common.command.subcommand.SubCommandRegistry;
 import jones.sonar.common.command.subcommand.argument.Argument;
 import lombok.RequiredArgsConstructor;
 
@@ -63,24 +61,6 @@ public final class CommandInvocation {
           + argument.description()
       );
     }
-
-    invocationSender.sendMessage();
-  }
-
-  public static void printHelp(final InvocationSender<?> invocationSender) {
-    invocationSender.sendMessage("§fThis server is running §6§lSonar §7"
-      + Sonar.get().getVersion()
-      + "§f on §7"
-      + Sonar.get().getPlatform().getDisplayName());
-    invocationSender.sendMessage();
-
-    SubCommandRegistry.getSubCommands().forEach(sub -> {
-      invocationSender.sendMessage(" §e● §7/sonar "
-        + sub.getInfo().name()
-        + " §f"
-        + sub.getInfo().description()
-      );
-    });
 
     invocationSender.sendMessage();
   }

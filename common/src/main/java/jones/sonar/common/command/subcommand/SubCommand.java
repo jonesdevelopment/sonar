@@ -20,12 +20,14 @@ package jones.sonar.common.command.subcommand;
 import jones.sonar.common.command.CommandInvocation;
 import lombok.Getter;
 
+@Getter
 public abstract class SubCommand {
-  @Getter
   private final SubCommandInfo info;
+  private final String permission;
 
   public SubCommand() {
     info = getClass().getAnnotation(SubCommandInfo.class);
+    permission = "sonar." + info.name();
   }
 
   public abstract void execute(final CommandInvocation invocation);

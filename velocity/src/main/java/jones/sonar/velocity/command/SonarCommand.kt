@@ -23,15 +23,17 @@ import com.velocitypowered.api.command.SimpleCommand
 import com.velocitypowered.api.proxy.Player
 import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
-import jones.sonar.common.command.CommandInvocation.printHelp
 import jones.sonar.common.command.CommandInvocation.printSubNotFound
 import jones.sonar.common.command.InvocationSender
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandRegistry
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.event.HoverEvent
 import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
 class SonarCommand : SimpleCommand {
   override fun execute(invocation: SimpleCommand.Invocation) {
@@ -82,15 +84,10 @@ class SonarCommand : SimpleCommand {
 
       // Check permissions for subcommands
       if (subCommand.isPresent) {
-        val permission = "sonar." + subCommand.get().info.name
-
-        if (!invocation.source().hasPermission(permission)) {
-          invocation.source().sendMessage(
-            Component.text(
-              "§cYou do not have permission to execute this subcommand. §7($permission)"
-            )
-          )
-          return
+        if (!invocation.source().hasPermission(subCommand.get().permission)) {
+          invocation.source().sendMessage(Component.text(
+            "§cYou do not have permission to execute this subcommand. §7(${subCommand.get().permission})"
+          ))
         }
       }
     }
@@ -119,7 +116,38 @@ class SonarCommand : SimpleCommand {
       sub.execute(commandInvocation)
     }) {
       // No subcommand was found
-      printHelp(invocationSender)
+      invocationSender.sendMessage(
+        "§fThis server is running §6§lSonar §7"
+          + Sonar.get().version
+          + "§f on §7"
+          + Sonar.get().platform.displayName
+      )
+      invocationSender.sendMessage()
+
+      SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
+        var component = Component.text(
+          " §e● §7/sonar "
+          + sub.info.name
+          + " §f"
+          + sub.info.description)
+
+        if (invocation.source() is Player) {
+          component = component.clickEvent(
+            ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.info.name + " ")
+          ).hoverEvent(
+            HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
+              "§7Only players: §f" + (if (sub.info.onlyPlayers) "§a✔" else "§c✗")
+                + "\n§7Only console: §f" + (if (sub.info.onlyConsole) "§a✔" else "§c✗")
+                + "\n§7Permission: §f" + sub.permission
+                + "\n§7(Click to run)"
+            ))
+          )
+        }
+
+        invocation.source().sendMessage(component)
+      })
+
+      invocationSender.sendMessage()
     }
   }
 

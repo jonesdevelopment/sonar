@@ -36,4 +36,6 @@ public @interface SubCommandInfo {
   Argument[] arguments() default {};
 
   boolean onlyPlayers() default false;
+
+  boolean onlyConsole() default false;
 }

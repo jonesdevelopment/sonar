@@ -26,6 +26,9 @@ import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandRegistry;
 import lombok.var;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -35,7 +38,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static jones.sonar.common.command.CommandInvocation.printHelp;
 import static jones.sonar.common.command.CommandInvocation.printSubNotFound;
 
 public final class SonarCommand extends Command implements TabExecutor {
@@ -110,7 +112,35 @@ public final class SonarCommand extends Command implements TabExecutor {
 
     // No subcommand was found
     if (!subCommand.isPresent()) {
-      printHelp(invocationSender);
+      invocationSender.sendMessage("§fThis server is running §6§lSonar §7"
+        + Sonar.get().getVersion()
+        + "§f on §7"
+        + Sonar.get().getPlatform().getDisplayName());
+      invocationSender.sendMessage();
+
+      SubCommandRegistry.getSubCommands().forEach(sub -> {
+        final TextComponent component = new TextComponent(" §e● §7/sonar "
+          + sub.getInfo().name()
+          + " §f"
+          + sub.getInfo().description());
+
+        if (sender instanceof ProxiedPlayer) {
+          component.setClickEvent(
+            new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
+          );
+
+          component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
+            "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
+              + "\n§7Only console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
+              + "\n§7Permission: §f" + sub.getPermission()
+              + "\n§7(Click to run)"
+          ).create()));
+        }
+
+        sender.sendMessage(component);
+      });
+
+      invocationSender.sendMessage();
       return;
     }
 

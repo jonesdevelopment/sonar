@@ -25,6 +25,10 @@ import jones.sonar.common.command.InvocationSender;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandRegistry;
 import lombok.var;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,7 +39,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static jones.sonar.common.command.CommandInvocation.printHelp;
 import static jones.sonar.common.command.CommandInvocation.printSubNotFound;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -110,7 +113,40 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
 
     // No subcommand was found
     if (!subCommand.isPresent()) {
-      printHelp(invocationSender);
+      invocationSender.sendMessage("§fThis server is running §6§lSonar §7"
+        + Sonar.get().getVersion()
+        + "§f on §7"
+        + Sonar.get().getPlatform().getDisplayName());
+      invocationSender.sendMessage();
+
+      SubCommandRegistry.getSubCommands().forEach(sub -> {
+        final String rawText =
+          " §e● §7/sonar "
+            + sub.getInfo().name()
+            + " §f"
+            + sub.getInfo().description();
+
+        if (sender instanceof Player) {
+          final TextComponent component = new TextComponent(rawText);
+
+          component.setClickEvent(
+            new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
+          );
+
+          component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
+            "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
+              + "\n§7Only console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
+              + "\n§7Permission: §f" + sub.getPermission()
+              + "\n§7(Click to run)"
+          ).create()));
+
+          ((Player) sender).spigot().sendMessage(component);
+        } else {
+          sender.sendMessage(rawText);
+        }
+      });
+
+      invocationSender.sendMessage();
       return false;
     }
 
