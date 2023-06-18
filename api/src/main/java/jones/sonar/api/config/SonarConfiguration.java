@@ -96,7 +96,7 @@ public final class SonarConfiguration {
     LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
     ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4000);
-    MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 4096);
+    MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 1024);
     VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
 
     RELOADING = formatString(yamlConfig.getString("messages.reload.start",
