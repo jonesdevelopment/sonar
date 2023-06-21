@@ -58,7 +58,7 @@ class FallbackPacketDecoder(
   override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
 
     // Check if the client is not sending a crap ton of packets to the server
-    val checkPackets = ++packets <= fallbackPlayer.fallback.sonar.config.MAXIMUM_LOGIN_PACKETS;
+    val checkPackets = ++packets <= fallbackPlayer.fallback.sonar.config.MAXIMUM_LOGIN_PACKETS
     FallbackSessionHandler.checkFrame(fallbackPlayer, checkPackets, "too many packets")
 
     if (msg is MinecraftPacket) {
