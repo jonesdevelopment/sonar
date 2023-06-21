@@ -24,7 +24,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
-import java.util.List;
+import java.util.Collection;
 import java.util.Vector;
 
 public final class FallbackHolder implements Fallback {
@@ -32,13 +32,13 @@ public final class FallbackHolder implements Fallback {
 
   @Getter
   @NotNull
-  private final List<InetAddress> connected = new Vector<>();
+  private final Collection<InetAddress> connected = new Vector<>();
   @Getter
   @NotNull
-  private final List<InetAddress> verified = new Vector<>();
+  private final Collection<InetAddress> verified = new Vector<>();
   @Getter
   @NotNull
-  private final List<InetAddress> blacklisted = new Vector<>();
+  private final Collection<InetAddress> blacklisted = new Vector<>();
   @Getter
   @NotNull
   private final FallbackQueue queue = new FallbackQueue();
