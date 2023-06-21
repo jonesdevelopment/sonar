@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+import static jones.sonar.api.util.Formatting.formatMemory;
+
 @RequiredArgsConstructor
 public final class ActionBarVerbose implements Verbose {
   private final ProxyServer server;
@@ -57,18 +59,5 @@ public final class ActionBarVerbose implements Verbose {
         });
       }
     }
-  }
-
-  private String formatMemory(long memory) {
-    memory /= 1000; // kB
-
-    String suffix = "kB";
-
-    if (memory >= 1000) {
-      suffix = "MB";
-      memory /= 1000;
-    }
-
-    return Sonar.get().getFormatter().format(memory) + suffix;
   }
 }

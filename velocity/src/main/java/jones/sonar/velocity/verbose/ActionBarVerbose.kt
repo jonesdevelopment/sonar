@@ -20,6 +20,7 @@ package jones.sonar.velocity.verbose
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import jones.sonar.api.Sonar
+import jones.sonar.api.util.Formatting.formatMemory
 import jones.sonar.api.verbose.Verbose
 import jones.sonar.common.verbose.VerboseAnimation
 import net.kyori.adventure.text.Component
@@ -52,20 +53,5 @@ class ActionBarVerbose(private val server: ProxyServer) : Verbose {
         }
       }
     }
-  }
-
-  private fun formatMemory(mem: Long): String {
-    var memory = mem
-
-    memory /= 1000 // kB
-
-    var suffix = "kB"
-
-    if (memory >= 1000) {
-      suffix = "MB"
-      memory /= 1000
-    }
-
-    return Sonar.get().formatter.format(memory) + suffix
   }
 }
