@@ -209,10 +209,11 @@ public final class SonarConfiguration {
         "  &fVerifying &7%verifying%" +
         "  &fBlacklisted &7%blacklisted%" +
         "  &fTotal &7%total%" +
-        "  &a%animation%"
+        "  &fMemory &7≅ %used-memory%" +
+        "  &a&l%animation%"
     ));
     ANIMATION = yamlConfig.getStringList("messages.action-bar.animation",
-      Arrays.asList("▙", "▛", "▜", "▟")
+      Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
     );
   }
 
