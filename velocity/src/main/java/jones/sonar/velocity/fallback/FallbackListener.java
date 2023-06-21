@@ -223,6 +223,12 @@ public final class FallbackListener {
     // We don't want to check players that have already been verified
     if (fallback.getVerified().contains(inetAddress)) return;
 
+    if (event.getConnection() instanceof InitialInboundConnection) {
+      Sonar.get().getLogger().error("Could not inject into GameProfileRequestEvent!");
+      Sonar.get().getLogger().error("Make sure to remove any other plugin that interferes with this event!");
+      return;
+    }
+
     final var inboundConnection = (LoginInboundConnection) event.getConnection();
     final var initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
 
