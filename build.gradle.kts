@@ -37,7 +37,7 @@ subprojects {
   apply(plugin = "com.github.johnrengelman.shadow")
 
   dependencies {
-    compileOnly("io.netty:netty-all:4.1.93.Final") // Netty
+    compileOnly("io.netty:netty-all:4.1.94.Final") // netty
 
     compileOnly("org.projectlombok:lombok:1.18.28")
     annotationProcessor("org.projectlombok:lombok:1.18.28")
