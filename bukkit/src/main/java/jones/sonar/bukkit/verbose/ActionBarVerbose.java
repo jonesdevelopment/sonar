@@ -41,6 +41,7 @@ public final class ActionBarVerbose implements Verbose {
       .replace("%queued%",
         Sonar.get().getFormatter().format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
       .replace("%verifying%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getConnected().size()))
+      .replace("%verified%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getVerified().size()))
       .replace("%blacklisted%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getBlacklisted().size()))
       .replace("%total%", Sonar.get().getFormatter().format(Sonar.get().getStatistics().get("total", 0)))
       .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
