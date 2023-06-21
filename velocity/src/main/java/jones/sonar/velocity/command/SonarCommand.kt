@@ -100,12 +100,12 @@ class SonarCommand : SimpleCommand {
 
     subCommand.ifPresentOrElse({ sub: SubCommand ->
       if (sub.info.onlyPlayers && invocation.source() !is Player) {
-        invocation.source().sendMessage(Component.text(Sonar.get().config.PLAYERS_ONLY))
+        invocationSender.sendMessage(Sonar.get().config.PLAYERS_ONLY)
         return@ifPresentOrElse
       }
 
       if (sub.info.onlyConsole && invocation.source() !is ConsoleCommandSource) {
-        invocation.source().sendMessage(Component.text(Sonar.get().config.CONSOLE_ONLY))
+        invocationSender.sendMessage(Sonar.get().config.CONSOLE_ONLY)
         return@ifPresentOrElse
       }
 
@@ -120,12 +120,8 @@ class SonarCommand : SimpleCommand {
       if (sub.info.arguments.isNotEmpty()
         && commandInvocation.arguments.size <= 1
       ) {
-        invocation.source().sendMessage(
-          Component.text(
-            Sonar.get().config.INCORRECT_COMMAND_USAGE
-              .replace("%usage%", sub.info.name + " (" + sub.arguments + ")")
-          )
-        )
+        invocationSender.sendMessage(Sonar.get().config.INCORRECT_COMMAND_USAGE
+          .replace("%usage%", sub.info.name + " (" + sub.arguments + ")"))
         return@ifPresentOrElse
       }
 
