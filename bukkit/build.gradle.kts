@@ -1,38 +1,38 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
+  id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
 }
 
 apply(plugin = "net.minecrell.plugin-yml.bukkit")
 
 bukkit {
-    name = rootProject.name
-    version = rootProject.version.toString()
-    main = "jones.sonar.bukkit.SonarBukkitPlugin"
-    author = "jonesdev.xyz"
-    website = "https://discord.jonesdev.xyz/"
-    description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
-    load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+  name = rootProject.name
+  version = rootProject.version.toString()
+  main = "jones.sonar.bukkit.SonarBukkitPlugin"
+  author = "jonesdev.xyz"
+  website = "https://discord.jonesdev.xyz/"
+  description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
+  load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
-    commands {
-        register("sonar") {
-            permission = "sonar.command"
-        }
+  commands {
+    register("sonar") {
+      permission = "sonar.command"
     }
+  }
 }
 
 repositories {
-    maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/") // BungeeCord Chat API
+  maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
+  maven(url = "https://oss.sonatype.org/content/repositories/snapshots/") // BungeeCord Chat API
 }
 
 dependencies {
-    compileOnly(project(":sonar-api"))
-    compileOnly(project(":sonar-common"))
+  compileOnly(project(":sonar-api"))
+  compileOnly(project(":sonar-common"))
 
-    // use 1.8 for backwards compatibility
-    compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
+  // use 1.8 for backwards compatibility
+  compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8

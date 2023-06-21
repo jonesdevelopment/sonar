@@ -1,9 +1,9 @@
 rootProject.name = "Sonar"
 
 sequenceOf("api", "bukkit", "bungee", "common", "velocity").forEach {
-    val project = ":sonar-$it"
+  val project = ":sonar-$it"
 
-    include(project)
+  include(project)
 
-    project(project).projectDir = file(it)
+  project(project).projectDir = file(it)
 }
