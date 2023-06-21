@@ -29,10 +29,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
@@ -101,7 +98,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
         final String permission = "sonar." + subCommand.get().getInfo().name();
 
         if (!sender.hasPermission(permission)) {
-          sender.sendMessage(
+          invocationSender.sendMessage(
             "§cYou do not have permission to execute this subcommand. §7(" + permission + ")"
           );
           return false;
@@ -166,7 +163,12 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
     // ifPresentOrElse() doesn't exist yet... (version compatibility)
     subCommand.ifPresent(sub -> {
       if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
-        sender.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
+        invocationSender.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
+        return;
+      }
+
+      if (sub.getInfo().onlyConsole() && !(sender instanceof ConsoleCommandSender)) {
+        invocationSender.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
         return;
       }
 

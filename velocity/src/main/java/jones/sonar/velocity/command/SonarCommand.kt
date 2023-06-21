@@ -20,6 +20,7 @@ package jones.sonar.velocity.command
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.command.SimpleCommand
+import com.velocitypowered.api.proxy.ConsoleCommandSource
 import com.velocitypowered.api.proxy.Player
 import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
@@ -100,6 +101,11 @@ class SonarCommand : SimpleCommand {
     subCommand.ifPresentOrElse({ sub: SubCommand ->
       if (sub.info.onlyPlayers && invocation.source() !is Player) {
         invocation.source().sendMessage(Component.text(Sonar.get().config.PLAYERS_ONLY))
+        return@ifPresentOrElse
+      }
+
+      if (sub.info.onlyConsole && invocation.source() !is ConsoleCommandSource) {
+        invocation.source().sendMessage(Component.text(Sonar.get().config.CONSOLE_ONLY))
         return@ifPresentOrElse
       }
 

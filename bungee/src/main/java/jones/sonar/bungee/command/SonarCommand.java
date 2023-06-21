@@ -100,9 +100,9 @@ public final class SonarCommand extends Command implements TabExecutor {
         final String permission = "sonar." + subCommand.get().getInfo().name();
 
         if (!sender.hasPermission(permission)) {
-          sender.sendMessage(new TextComponent(
+          invocationSender.sendMessage(
             "§cYou do not have permission to execute this subcommand. §7(" + permission + ")"
-          ));
+          );
           return;
         }
       }
@@ -160,7 +160,12 @@ public final class SonarCommand extends Command implements TabExecutor {
     // ifPresentOrElse() doesn't exist yet... (version compatibility)
     subCommand.ifPresent(sub -> {
       if (sub.getInfo().onlyPlayers() && !(sender instanceof ProxiedPlayer)) {
-        sender.sendMessage(new TextComponent(Sonar.get().getConfig().PLAYERS_ONLY));
+        invocationSender.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
+        return;
+      }
+
+      if (sub.getInfo().onlyConsole() && sender instanceof ProxiedPlayer) {
+        invocationSender.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
         return;
       }
 

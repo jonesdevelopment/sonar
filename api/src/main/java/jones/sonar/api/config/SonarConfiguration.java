@@ -62,6 +62,7 @@ public final class SonarConfiguration {
   public String INCORRECT_IP_ADDRESS;
   public String ILLEGAL_IP_ADDRESS;
   public String PLAYERS_ONLY;
+  public String CONSOLE_ONLY;
   public String COMMAND_COOL_DOWN;
   public String COMMAND_COOL_DOWN_LEFT;
 
@@ -127,6 +128,9 @@ public final class SonarConfiguration {
     ));
     PLAYERS_ONLY = formatString(yamlConfig.getString("messages.players-only",
       "%prefix%&cYou can only execute this command as a player."
+    ));
+    CONSOLE_ONLY = formatString(yamlConfig.getString("messages.console-only",
+      "%prefix%&cFor security reasons, you can only execute this command through console."
     ));
     COMMAND_COOL_DOWN = formatString(yamlConfig.getString("messages.command-cool-down",
       "%prefix%&cYou can only execute this command every 0.5 seconds."
