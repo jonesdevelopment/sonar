@@ -203,7 +203,7 @@ public final class FallbackListener {
     // Check if the player is already queued
     if (fallback.getQueue().getQueuedPlayers().stream()
       .anyMatch(pair -> Objects.equals(pair.getFirst(), inetAddress))) {
-      event.setResult(ALREADY_VERIFYING);
+      event.setResult(ALREADY_QUEUED);
       return;
     }
 
