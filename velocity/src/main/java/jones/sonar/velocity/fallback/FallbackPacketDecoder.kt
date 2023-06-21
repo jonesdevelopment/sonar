@@ -34,6 +34,7 @@ class FallbackPacketDecoder(
   private val fallbackPlayer: FallbackPlayer,
   private val startKeepAliveId: Long
 ) : ChannelInboundHandlerAdapter() {
+  private var packets = 0
 
   @Throws(Exception::class)
   @Deprecated("Deprecated in Java")
@@ -55,6 +56,11 @@ class FallbackPacketDecoder(
 
   @Throws(Exception::class)
   override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
+
+    // Check if the client is not sending a crap ton of packets to the server
+    val checkPackets = ++packets <= fallbackPlayer.fallback.sonar.config.MAXIMUM_LOGIN_PACKETS;
+    FallbackSessionHandler.checkFrame(fallbackPlayer, checkPackets, "too many packets")
+
     if (msg is MinecraftPacket) {
       val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive || msg is ResourcePackResponse
 

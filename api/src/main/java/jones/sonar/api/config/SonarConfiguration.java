@@ -41,6 +41,7 @@ public final class SonarConfiguration {
   public int MAXIMUM_ONLINE_PER_IP;
   public int MAXIMUM_QUEUED_PLAYERS;
   public int MAXIMUM_QUEUE_POLLS;
+  public int MAXIMUM_LOGIN_PACKETS;
   public int VERIFICATION_TIMEOUT;
   public int VERIFICATIONS_PER_MINUTE;
 
@@ -96,6 +97,7 @@ public final class SonarConfiguration {
     LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
     ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4000);
+    MAXIMUM_LOGIN_PACKETS = yamlConfig.getInt("general.verification.max-login-packets", 8);
     MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 1024);
     VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
 
