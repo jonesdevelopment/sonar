@@ -22,7 +22,7 @@ val semanticVersion = "2.0.0"
 
 versioner {
   pattern {
-    pattern = "$semanticVersion-%h"
+    pattern = "$semanticVersion-%h(-%c)"
   }
 }
 
