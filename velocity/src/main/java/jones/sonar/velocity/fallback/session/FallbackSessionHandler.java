@@ -68,7 +68,8 @@ import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
  * (for 1.7-1.8) Mojang decided to send a {@link com.velocitypowered.proxy.protocol.packet.KeepAlive} packet with the
  * ID 0 every 20 ticks (= one second) while the player is in the GuiDownloadTerrain screen.<br>
  * ↓<br>
- * (for 1.8+) Send a {@link com.velocitypowered.proxy.protocol.packet.ResourcePackRequest} to check if the client responds correctly<br>
+ * (for 1.8+) Send a {@link com.velocitypowered.proxy.protocol.packet.ResourcePackRequest} to check if the client
+ * responds correctly<br>
  */
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @Nullable MinecraftSessionHandler previousHandler;
@@ -197,6 +198,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // The hash and URL have to be invalid for this check to work
     // since we don't want to client to actually download a resource pack
     // or override the server resource packets option (prompt)
+    //
+    // Generate a random hash as a placeholder and method of verification
     resourcePackHash = Integer.toHexString(random.nextInt());
     resourcePackRequest.setHash(resourcePackHash);
     resourcePackRequest.setUrl(resourcePackHash);
@@ -243,14 +246,11 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
    */
   private void finish() {
 
-    // Remove Sonar pipelines to avoid issues
+    // Sonar doesn't care about the player anymore
     player.getPipeline().remove(DECODER);
     player.getPipeline().remove(HANDLER);
 
-    // Add the player to the list of verified players
     player.getFallback().getVerified().add(player.getInetAddress());
-
-    // Remove player from the list of connected players
     player.getFallback().getConnected().remove(player.getInetAddress());
 
     // Replace timeout handler with the old one to let Velocity handle timeouts again
@@ -263,6 +263,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       )
     );
 
+    // Continue the initial connection to the backend server
     initialConnection((AuthSessionHandler) previousHandler);
 
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
