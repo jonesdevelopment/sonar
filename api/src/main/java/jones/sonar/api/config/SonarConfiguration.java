@@ -54,6 +54,7 @@ public final class SonarConfiguration {
   public String TOO_MANY_VERIFICATIONS;
   public String TOO_MANY_ONLINE_PER_IP;
   public String ALREADY_VERIFYING;
+  public String ALREADY_QUEUED;
   public String BLACKLISTED;
   public String UNEXPECTED_ERROR;
 
@@ -178,6 +179,13 @@ public final class SonarConfiguration {
         "%footer%"
       )));
     ALREADY_VERIFYING = fromList(yamlConfig.getStringList("messages.verification.already-verifying",
+      Arrays.asList(
+        "%header%",
+        "&cYour IP address is currently being verified.",
+        "&cPlease wait a few seconds before trying to verify again.",
+        "%footer%"
+      )));
+    ALREADY_QUEUED = fromList(yamlConfig.getStringList("messages.verification.already-queued",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently queued for verification.",

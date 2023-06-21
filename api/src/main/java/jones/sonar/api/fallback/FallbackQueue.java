@@ -26,13 +26,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
 import java.util.Collection;
-import java.util.List;
 import java.util.Vector;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
   @Getter
-  private final List<Pair<InetAddress, Runnable>> queuedPlayers = new Vector<>();
+  private final Collection<Pair<InetAddress, Runnable>> queuedPlayers = new Vector<>();
 
   public void queue(final @NotNull InetAddress inetAddress, final @NotNull Runnable runnable) {
     queuedPlayers.add(new Pair<>(inetAddress, runnable));

@@ -79,6 +79,7 @@ public final class FallbackListener {
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS;
     static PreLoginEvent.PreLoginComponentResult BLACKLISTED;
     static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
+    static PreLoginEvent.PreLoginComponentResult ALREADY_QUEUED;
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_ONLINE_PER_IP;
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_VERIFICATIONS;
     public static Component UNEXPECTED_ERROR;
@@ -86,6 +87,9 @@ public final class FallbackListener {
     public static void update() {
       ALREADY_VERIFYING = PreLoginEvent.PreLoginComponentResult.denied(
         Component.text(Sonar.get().getConfig().ALREADY_VERIFYING)
+      );
+      ALREADY_QUEUED = PreLoginEvent.PreLoginComponentResult.denied(
+        Component.text(Sonar.get().getConfig().ALREADY_QUEUED)
       );
       TOO_MANY_PLAYERS = PreLoginEvent.PreLoginComponentResult.denied(
         Component.text(Sonar.get().getConfig().TOO_MANY_PLAYERS)
@@ -193,6 +197,13 @@ public final class FallbackListener {
     // Check if the IP address had too many verifications or is rejoining too quickly
     if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
       event.setResult(TOO_MANY_VERIFICATIONS);
+      return;
+    }
+
+    // Check if the player is already queued
+    if (fallback.getQueue().getQueuedPlayers().stream()
+      .anyMatch(pair -> Objects.equals(pair.getFirst(), inetAddress))) {
+      event.setResult(ALREADY_VERIFYING);
       return;
     }
 
