@@ -32,6 +32,11 @@ public class Formatting {
       memory /= 1000;
     }
 
+    if (memory >= 1000) {
+      suffix = "GB";
+      memory /= 1000;
+    }
+
     return Sonar.get().getFormatter().format(memory) + suffix;
   }
 }
