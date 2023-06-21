@@ -43,6 +43,10 @@ public final class ActionBarVerbose implements Verbose {
       .replace("%verifying%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getBlacklisted().size()))
       .replace("%total%", Sonar.get().getFormatter().format(Sonar.get().getStatistics().get("total", 0)))
+      .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
+      .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
+      .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))
+      .replace("%max-memory%", formatMemory(Runtime.getRuntime().maxMemory()))
       .replace("%animation%", VerboseAnimation.Companion.nextState())
     );
 
@@ -53,5 +57,18 @@ public final class ActionBarVerbose implements Verbose {
         });
       }
     }
+  }
+
+  private String formatMemory(long memory) {
+    memory /= 1000; // kB
+
+    String suffix = "kB";
+
+    if (memory >= 1000) {
+      suffix = "MB";
+      memory /= 1000;
+    }
+
+    return Sonar.get().getFormatter().format(memory) + suffix;
   }
 }

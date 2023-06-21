@@ -38,6 +38,10 @@ class ActionBarVerbose(private val server: ProxyServer) : Verbose {
         .replace("%verifying%", Sonar.get().formatter.format(Sonar.get().fallback.connected.size))
         .replace("%blacklisted%", Sonar.get().formatter.format(Sonar.get().fallback.blacklisted.size))
         .replace("%total%", Sonar.get().formatter.format(Sonar.get().statistics.get("total", 0)))
+        .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
+        .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
+        .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))
+        .replace("%max-memory%", formatMemory(Runtime.getRuntime().maxMemory()))
         .replace("%animation%", VerboseAnimation.nextState())
     )
 
@@ -48,5 +52,20 @@ class ActionBarVerbose(private val server: ProxyServer) : Verbose {
         }
       }
     }
+  }
+
+  private fun formatMemory(mem: Long): String {
+    var memory = mem
+
+    memory /= 1000 // kB
+
+    var suffix = "kB"
+
+    if (memory >= 1000) {
+      suffix = "MB"
+      memory /= 1000
+    }
+
+    return Sonar.get().formatter.format(memory) + suffix
   }
 }
