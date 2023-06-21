@@ -204,7 +204,7 @@ public final class FallbackListener {
     if (!SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
       && !event.getResult().isOnlineModeAllowed()) return;
 
-    // TODO: test with jPremium or nLogin
+    // TODO: test with /premium
     premium.add(event.getUsername());
   }
 
