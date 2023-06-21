@@ -108,6 +108,12 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final ClientSettings clientSettings) {
+
+    // The client sends the PluginMessage packet and then the ClientSettings packet
+    // The player cannot send the ClientSettings packet twice since the world hasn't
+    // loaded yet, therefore, the player cannot change any in-game settings
+    // This can actually false (for some odd reason) during client lag or fast reconnects,
+    // so we just kick the player and not actually punish them
     if (hasSentClientBrand || hasSentClientSettings) {
       player.getPlayer().disconnect0(FallbackListener.CachedMessages.UNEXPECTED_ERROR, true);
       return false;
@@ -119,21 +125,27 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final PluginMessage pluginMessage) {
-    if (!pluginMessage.getChannel().equals("MC|Brand") && !pluginMessage.getChannel().equals("minecraft:brand")) {
+
+    // Only MC|Brand for 1.7-1.12.2 and minecraft:brand for 1.13+ are important
+    if (!pluginMessage.getChannel().equals("MC|Brand")
+      && !pluginMessage.getChannel().equals("minecraft:brand")) {
       return false; // Ignore all other channels
     }
 
     final boolean valid = player.getProtocolVersion() >= MINECRAFT_1_13.getProtocol();
 
+    // Validate the client brand
     checkFrame(pluginMessage.getChannel().equals("MC|Brand") || valid, "invalid channel");
     // TODO: actually implement a client brand check?
     checkFrame(pluginMessage.content().readableBytes() > 1, "invalid client brand");
+
+    // Check for illegal packet timing
     checkFrame(!hasSentClientBrand, "unexpected timing (P1)");
     checkFrame(hasSentClientSettings, "unexpected timing (P2)");
 
     hasSentClientBrand = true;
 
-    // We use a different verification method for 1.7-1.8
+    // We use an additional verification method for 1.7-1.8
     if (!v1_8or1_7) {
       sendResourcePackRequest();
     }
