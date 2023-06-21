@@ -54,6 +54,22 @@ import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
 import static jones.sonar.api.fallback.FallbackPipelines.*;
 import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
+/**
+ * <h3>Concept</h3>
+ * Player joining<br>
+ * ↓<br>
+ * Send a {@link com.velocitypowered.proxy.protocol.packet.KeepAlive} packet and check for a valid response<br>
+ * ↓<br>
+ * Send the JoinGame packet to the client to make them unable to disconnect<br>
+ * ↓<br>
+ * Wait and check if the client sends a {@link com.velocitypowered.proxy.protocol.packet.ClientSettings} packet
+ * and then a {@link com.velocitypowered.proxy.protocol.packet.PluginMessage}<br>
+ * ↓<br>
+ * (for 1.7-1.8) Mojang decided to send a {@link com.velocitypowered.proxy.protocol.packet.KeepAlive} packet with the
+ * ID 0 every 20 ticks (= one second) while the player is in the GuiDownloadTerrain screen.<br>
+ * ↓<br>
+ * (for 1.8+) Send a {@link com.velocitypowered.proxy.protocol.packet.ResourcePackRequest} to check if the client responds correctly<br>
+ */
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @Nullable MinecraftSessionHandler previousHandler;
   private final @NotNull FallbackPlayer player;
