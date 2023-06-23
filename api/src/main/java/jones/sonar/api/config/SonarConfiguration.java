@@ -43,7 +43,7 @@ public final class SonarConfiguration {
   public int MAXIMUM_QUEUE_POLLS;
   public int MAXIMUM_LOGIN_PACKETS;
   public int VERIFICATION_TIMEOUT;
-  public int VERIFICATIONS_PER_MINUTE;
+  public int VERIFICATION_DELAY;
 
   public boolean ENABLE_COMPRESSION;
   public boolean ENABLE_VERIFICATION;
@@ -51,7 +51,7 @@ public final class SonarConfiguration {
 
   public String HEADER, FOOTER;
   public String TOO_MANY_PLAYERS;
-  public String TOO_MANY_VERIFICATIONS;
+  public String TOO_FAST_RECONNECT;
   public String TOO_MANY_ONLINE_PER_IP;
   public String ALREADY_VERIFYING;
   public String ALREADY_QUEUED;
@@ -108,7 +108,7 @@ public final class SonarConfiguration {
     VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4000);
     MAXIMUM_LOGIN_PACKETS = yamlConfig.getInt("general.verification.max-login-packets", 20);
     MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 1024);
-    VERIFICATIONS_PER_MINUTE = yamlConfig.getInt("general.verification.max-per-minute", 3);
+    VERIFICATION_DELAY = yamlConfig.getInt("general.verification.rejoin-delay", 8000);
 
     RELOADING = formatString(yamlConfig.getString("messages.reload.start",
       "%prefix%Reloading Sonar..."
@@ -198,14 +198,15 @@ public final class SonarConfiguration {
     TOO_MANY_PLAYERS = fromList(yamlConfig.getStringList("messages.verification.too-many-players",
       Arrays.asList(
         "%header%",
-        "&cToo many players are currently trying to log in.",
-        "&7Please try again in a few seconds.",
+        "&6Too many players are currently trying to log in, try again later.",
+        "&7Please wait a few seconds before trying to join again.",
         "%footer%"
       )));
-    TOO_MANY_VERIFICATIONS = fromList(yamlConfig.getStringList("messages.verification.too-many-verifications",
+    TOO_FAST_RECONNECT = fromList(yamlConfig.getStringList("messages.verification.too-fast-reconnect",
       Arrays.asList(
         "%header%",
-        "&cYour IP address is denied from logging into the server.",
+        "&6You reconnected too fast, try again later.",
+        "&7Please wait a few seconds before trying to verify again.",
         "%footer%"
       )));
     ALREADY_VERIFYING = fromList(yamlConfig.getStringList("messages.verification.already-verifying",
@@ -227,6 +228,7 @@ public final class SonarConfiguration {
         "%header%",
         "&cYour IP address is temporarily denied from verifying.",
         "&cPlease wait a few minutes before trying to verify again.",
+        "&6False positive? &7https://discord.jonesdev.xyz/",
         "%footer%"
       )));
     UNEXPECTED_ERROR = fromList(yamlConfig.getStringList("messages.verification.unexpected-error",

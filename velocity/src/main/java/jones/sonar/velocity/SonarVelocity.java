@@ -17,6 +17,7 @@
 
 package jones.sonar.velocity;
 
+import com.velocitypowered.proxy.util.ratelimit.Ratelimiters;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
@@ -26,7 +27,6 @@ import jones.sonar.api.statistics.Statistics;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.common.statistics.SonarStatistics;
 import jones.sonar.velocity.command.SonarCommand;
-import jones.sonar.velocity.fallback.FallbackAttemptLimiter;
 import jones.sonar.velocity.fallback.FallbackListener;
 import jones.sonar.velocity.verbose.ActionBarVerbose;
 import lombok.Getter;
@@ -101,9 +101,6 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     // Register Fallback listener
     plugin.getServer().getEventManager().register(plugin, new FallbackListener(getFallback()));
 
-    // Apply filter (connection limiter) to Fallback
-    getFallback().setAttemptLimiter(FallbackAttemptLimiter::shouldAllow);
-
     // Register Fallback queue task
     plugin.getServer().getScheduler().buildTask(plugin, getFallback().getQueue()::poll)
       .repeat(500L, TimeUnit.MILLISECONDS)
@@ -132,5 +129,8 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
   public void reload() {
     getConfig().load();
     FallbackListener.CachedMessages.update();
+
+    // Apply filter (connection limiter) to Fallback
+    getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);
   }
 }

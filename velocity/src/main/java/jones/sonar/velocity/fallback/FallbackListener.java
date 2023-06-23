@@ -82,7 +82,7 @@ public final class FallbackListener {
     static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
     static PreLoginEvent.PreLoginComponentResult ALREADY_QUEUED;
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_ONLINE_PER_IP;
-    static PreLoginEvent.PreLoginComponentResult TOO_MANY_VERIFICATIONS;
+    static PreLoginEvent.PreLoginComponentResult TOO_FAST_RECONNECT;
     public static Component UNEXPECTED_ERROR;
 
     public static void update() {
@@ -101,8 +101,8 @@ public final class FallbackListener {
       TOO_MANY_ONLINE_PER_IP = PreLoginEvent.PreLoginComponentResult.denied(
         Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP)
       );
-      TOO_MANY_VERIFICATIONS = PreLoginEvent.PreLoginComponentResult.denied(
-        Component.text(Sonar.get().getConfig().TOO_MANY_VERIFICATIONS)
+      TOO_FAST_RECONNECT = PreLoginEvent.PreLoginComponentResult.denied(
+        Component.text(Sonar.get().getConfig().TOO_FAST_RECONNECT)
       );
       UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
     }
@@ -195,9 +195,9 @@ public final class FallbackListener {
       return;
     }
 
-    // Check if the IP address had too many verifications or is rejoining too quickly
+    // Check if the IP address is reconnecting too quickly while being unverified
     if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
-      event.setResult(TOO_MANY_VERIFICATIONS);
+      event.setResult(TOO_FAST_RECONNECT);
       return;
     }
 
