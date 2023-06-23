@@ -24,6 +24,7 @@ import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.InvocationSender;
 import jones.sonar.common.command.subcommand.SubCommand;
 import jones.sonar.common.command.subcommand.SubCommandRegistry;
+import jones.sonar.common.command.subcommand.argument.Argument;
 import lombok.var;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -37,6 +38,9 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 public final class SonarCommand extends Command implements TabExecutor {
   private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
@@ -189,25 +193,35 @@ public final class SonarCommand extends Command implements TabExecutor {
   }
 
   private static final Collection<String> TAB_SUGGESTIONS = new ArrayList<>();
+  private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
 
   // Tab completion handling
   @Override
   public Iterable<String> onTabComplete(final CommandSender sender, final String[] args) {
-    return args.length <= 1
-      ? getSuggestions()
-      : Collections.emptyList();
-  }
+    if (args.length <= 1) {
+      if (TAB_SUGGESTIONS.isEmpty()) {
+        for (final SubCommand subCommand : SubCommandRegistry.getSubCommands()) {
+          TAB_SUGGESTIONS.add(subCommand.getInfo().name());
 
-  private static Collection<String> getSuggestions() {
-    if (TAB_SUGGESTIONS.isEmpty()) {
-      for (final SubCommand subCommand : SubCommandRegistry.getSubCommands()) {
-        TAB_SUGGESTIONS.add(subCommand.getInfo().name());
-
-        if (subCommand.getInfo().aliases().length > 0) {
-          TAB_SUGGESTIONS.addAll(Arrays.asList(subCommand.getInfo().aliases()));
+          if (subCommand.getInfo().aliases().length > 0) {
+            TAB_SUGGESTIONS.addAll(Arrays.asList(subCommand.getInfo().aliases()));
+          }
         }
       }
-    }
-    return TAB_SUGGESTIONS;
+      return TAB_SUGGESTIONS;
+    } else if (args.length == 2) {
+      if (ARG_TAB_SUGGESTIONS.isEmpty()) {
+        for (final SubCommand subCommand : SubCommandRegistry.getSubCommands()) {
+          ARG_TAB_SUGGESTIONS.put(subCommand.getInfo().name(),
+            Arrays.stream(subCommand.getInfo().arguments())
+              .map(Argument::name)
+              .collect(Collectors.toList())
+          );
+        }
+      }
+
+      final String subCommandName = args[0].toLowerCase();
+      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
+    } else return emptyList();
   }
 }

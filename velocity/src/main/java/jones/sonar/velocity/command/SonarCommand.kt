@@ -191,7 +191,18 @@ class SonarCommand : SimpleCommand {
         }
       }
       return TAB_SUGGESTIONS
-    } else Collections.emptyList()
+    } else if (invocation.arguments().size == 2) {
+      if (ARG_TAB_SUGGESTIONS.isEmpty()) {
+        for (subCommand in SubCommandRegistry.getSubCommands()) {
+          ARG_TAB_SUGGESTIONS[subCommand.info.name] = subCommand.info.arguments
+            .map { argument -> argument.name }
+            .toList()
+        }
+      }
+
+      val subCommandName = invocation.arguments()[0].lowercase()
+      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList())
+    } else emptyList()
   }
 
   // Permission handling
@@ -201,6 +212,7 @@ class SonarCommand : SimpleCommand {
 
   companion object {
     private val TAB_SUGGESTIONS = ArrayList<String>()
+    private val ARG_TAB_SUGGESTIONS = HashMap<String, List<String>>()
     private val DELAY = Caffeine.newBuilder()
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSource, Long>()
