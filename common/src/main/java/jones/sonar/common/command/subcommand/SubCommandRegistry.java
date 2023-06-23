@@ -31,10 +31,10 @@ public class SubCommandRegistry {
   @Getter
   private final Collection<SubCommand> subCommands = Arrays.asList(
     new BlacklistCommand(),
+    new WhitelistCommand(),
     new StatisticsCommand(),
     new VerboseCommand(),
-    new ReloadCommand(),
-    new WhitelistCommand()
+    new ReloadCommand()
   );
 
   public void register(final SubCommand... commands) {
