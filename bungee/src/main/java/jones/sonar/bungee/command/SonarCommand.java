@@ -49,6 +49,7 @@ public final class SonarCommand extends Command implements TabExecutor {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void execute(final CommandSender sender, final String[] args) {
     // Checking if it contains will only break more since it can throw
     // a NullPointerException if the cache is being accessed from parallel threads
