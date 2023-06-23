@@ -45,7 +45,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
   private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
     .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
     .build();
-  private static final DecimalFormat decimalFormat = new DecimalFormat("#.#");
+  private static final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
   @Override
   public boolean onCommand(final CommandSender sender,

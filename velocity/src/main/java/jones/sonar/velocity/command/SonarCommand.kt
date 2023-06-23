@@ -216,6 +216,6 @@ class SonarCommand : SimpleCommand {
     private val DELAY = Caffeine.newBuilder()
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSource, Long>()
-    private val decimalFormat = DecimalFormat("#.#")
+    private val decimalFormat = DecimalFormat("#.##")
   }
 }
