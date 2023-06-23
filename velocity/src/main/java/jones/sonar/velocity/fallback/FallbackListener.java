@@ -162,7 +162,7 @@ public final class FallbackListener {
       return;
     }
 
-    // Check if the amount of online players using the same IP address as
+    // Check if the number of online players using the same IP address as
     // the connecting player is greater than the configured amount
     final int maxOnlinePerIp = fallback.getSonar().getConfig().MAXIMUM_ONLINE_PER_IP;
 
