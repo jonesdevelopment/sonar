@@ -86,7 +86,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     // Set the API to this class
     SonarProvider.set(this);
 
-    plugin.getLogger().info("Initializing Sonar...");
+    logger.info("Initializing Sonar...");
 
     // Initialize statistics
     statistics = new SonarStatistics();
@@ -120,7 +120,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     // Done
     final long startDelay = System.currentTimeMillis() - start;
 
-    plugin.getLogger().info("Done ({}s)!", String.format("%.3f", startDelay / 1000D));
+    logger.info("Done ({}s)!", String.format("%.3f", startDelay / 1000D));
   }
 
   @Override

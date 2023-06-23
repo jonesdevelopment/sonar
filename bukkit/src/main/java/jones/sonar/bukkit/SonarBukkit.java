@@ -85,7 +85,7 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     // Set the API to this class
     SonarProvider.set(this);
 
-    plugin.getLogger().info("Initializing Sonar...");
+    logger.info("Initializing Sonar...");
 
     // Initialize statistics
     statistics = new SonarStatistics();
@@ -107,7 +107,7 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     // Done
     final long startDelay = System.currentTimeMillis() - start;
 
-    plugin.getLogger().info("Done (" + String.format("%.3f", startDelay / 1000D) + "s)!");
+    logger.info("Done (" + String.format("%.3f", startDelay / 1000D) + "s)!");
   }
 
   @Override
