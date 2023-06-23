@@ -17,7 +17,6 @@
 
 package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
@@ -48,7 +47,7 @@ class BlacklistCommand : SubCommand() {
       "add" -> {
         if (invocation.arguments.size <= 2) {
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.INCORRECT_COMMAND_USAGE
+            sonar.config.INCORRECT_COMMAND_USAGE
               .replace("%usage%", "blacklist add <IP address>")
           )
           return
@@ -57,26 +56,26 @@ class BlacklistCommand : SubCommand() {
         val rawInetAddress = invocation.arguments[2]
 
         if (!rawInetAddress.matches(IP_REGEX)) {
-          invocation.invocationSender.sendMessage(Sonar.get().config.INCORRECT_IP_ADDRESS)
+          invocation.invocationSender.sendMessage(sonar.config.INCORRECT_IP_ADDRESS)
           return
         }
 
         val inetAddress = InetAddress.getByName(rawInetAddress)
 
         if (inetAddress.isAnyLocalAddress || inetAddress.isLoopbackAddress) {
-          invocation.invocationSender.sendMessage(Sonar.get().config.ILLEGAL_IP_ADDRESS)
+          invocation.invocationSender.sendMessage(sonar.config.ILLEGAL_IP_ADDRESS)
           return
         }
 
-        synchronized(Sonar.get().fallback.blacklisted) {
-          if (Sonar.get().fallback.blacklisted.contains(inetAddress)) {
-            invocation.invocationSender.sendMessage(Sonar.get().config.BLACKLIST_DUPLICATE)
+        synchronized(sonar.fallback.blacklisted) {
+          if (sonar.fallback.blacklisted.contains(inetAddress)) {
+            invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_DUPLICATE)
             return
           }
 
-          Sonar.get().fallback.blacklisted.add(inetAddress)
+          sonar.fallback.blacklisted.add(inetAddress)
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.BLACKLIST_ADD
+            sonar.config.BLACKLIST_ADD
               .replace("%ip%", rawInetAddress)
           )
         }
@@ -85,7 +84,7 @@ class BlacklistCommand : SubCommand() {
       "remove" -> {
         if (invocation.arguments.size <= 2) {
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.INCORRECT_COMMAND_USAGE
+            sonar.config.INCORRECT_COMMAND_USAGE
               .replace("%usage%", "blacklist remove <IP address>")
           )
           return
@@ -94,58 +93,58 @@ class BlacklistCommand : SubCommand() {
         val rawInetAddress = invocation.arguments[2]
 
         if (!rawInetAddress.matches(IP_REGEX)) {
-          invocation.invocationSender.sendMessage(Sonar.get().config.INCORRECT_IP_ADDRESS)
+          invocation.invocationSender.sendMessage(sonar.config.INCORRECT_IP_ADDRESS)
           return
         }
 
         val inetAddress = InetAddress.getByName(rawInetAddress)
 
         if (inetAddress.isAnyLocalAddress || inetAddress.isLoopbackAddress) {
-          invocation.invocationSender.sendMessage(Sonar.get().config.ILLEGAL_IP_ADDRESS)
+          invocation.invocationSender.sendMessage(sonar.config.ILLEGAL_IP_ADDRESS)
           return
         }
 
-        synchronized(Sonar.get().fallback.blacklisted) {
-          if (!Sonar.get().fallback.blacklisted.contains(inetAddress)) {
-            invocation.invocationSender.sendMessage(Sonar.get().config.BLACKLIST_NOT_FOUND)
+        synchronized(sonar.fallback.blacklisted) {
+          if (!sonar.fallback.blacklisted.contains(inetAddress)) {
+            invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_NOT_FOUND)
             return
           }
 
-          Sonar.get().fallback.blacklisted.remove(inetAddress)
+          sonar.fallback.blacklisted.remove(inetAddress)
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.BLACKLIST_REMOVE
+            sonar.config.BLACKLIST_REMOVE
               .replace("%ip%", rawInetAddress)
           )
         }
       }
 
       "clear" -> {
-        synchronized(Sonar.get().fallback.blacklisted) {
-          val blacklisted = Sonar.get().fallback.blacklisted.size
+        synchronized(sonar.fallback.blacklisted) {
+          val blacklisted = sonar.fallback.blacklisted.size
 
           if (blacklisted == 0) {
-            invocation.invocationSender.sendMessage(Sonar.get().config.BLACKLIST_EMPTY)
+            invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_EMPTY)
             return
           }
 
-          Sonar.get().fallback.blacklisted.clear()
+          sonar.fallback.blacklisted.clear()
 
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.BLACKLIST_CLEARED
-              .replace("%removed%", Sonar.get().formatter.format(blacklisted))
+            sonar.config.BLACKLIST_CLEARED
+              .replace("%removed%", sonar.formatter.format(blacklisted))
           )
         }
       }
 
       "size" -> {
         invocation.invocationSender.sendMessage(
-          Sonar.get().config.BLACKLIST_SIZE
-            .replace("%amount%", Sonar.get().formatter.format(Sonar.get().fallback.blacklisted.size))
+          sonar.config.BLACKLIST_SIZE
+            .replace("%amount%", sonar.formatter.format(sonar.fallback.blacklisted.size))
         )
       }
 
       else -> invocation.invocationSender.sendMessage(
-        Sonar.get().config.INCORRECT_COMMAND_USAGE
+        sonar.config.INCORRECT_COMMAND_USAGE
           .replace("%usage%", "blacklist")
       )
     }

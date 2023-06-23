@@ -17,7 +17,6 @@
 
 package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
@@ -47,7 +46,7 @@ class WhitelistCommand : SubCommand() {
       "add" -> {
         if (invocation.arguments.size <= 2) {
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.INCORRECT_COMMAND_USAGE
+            sonar.config.INCORRECT_COMMAND_USAGE
               .replace("%usage%", "whitelist add <IP address>")
           )
           return
@@ -56,26 +55,26 @@ class WhitelistCommand : SubCommand() {
         val rawInetAddress = invocation.arguments[2]
 
         if (!rawInetAddress.matches(IP_REGEX)) {
-          invocation.invocationSender.sendMessage(Sonar.get().config.INCORRECT_IP_ADDRESS)
+          invocation.invocationSender.sendMessage(sonar.config.INCORRECT_IP_ADDRESS)
           return
         }
 
         val inetAddress = InetAddress.getByName(rawInetAddress)
 
         if (inetAddress.isAnyLocalAddress || inetAddress.isLoopbackAddress) {
-          invocation.invocationSender.sendMessage(Sonar.get().config.ILLEGAL_IP_ADDRESS)
+          invocation.invocationSender.sendMessage(sonar.config.ILLEGAL_IP_ADDRESS)
           return
         }
 
-        synchronized(Sonar.get().fallback.verified) {
-          if (Sonar.get().fallback.verified.contains(inetAddress)) {
-            invocation.invocationSender.sendMessage(Sonar.get().config.WHITELIST_DUPLICATE)
+        synchronized(sonar.fallback.verified) {
+          if (sonar.fallback.verified.contains(inetAddress)) {
+            invocation.invocationSender.sendMessage(sonar.config.WHITELIST_DUPLICATE)
             return
           }
 
-          Sonar.get().fallback.verified.add(inetAddress)
+          sonar.fallback.verified.add(inetAddress)
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.WHITELIST_ADD
+            sonar.config.WHITELIST_ADD
               .replace("%ip%", rawInetAddress)
           )
         }
@@ -84,7 +83,7 @@ class WhitelistCommand : SubCommand() {
       "remove" -> {
         if (invocation.arguments.size <= 2) {
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.INCORRECT_COMMAND_USAGE
+            sonar.config.INCORRECT_COMMAND_USAGE
               .replace("%usage%", "whitelist remove <IP address>")
           )
           return
@@ -93,26 +92,26 @@ class WhitelistCommand : SubCommand() {
         val rawInetAddress = invocation.arguments[2]
 
         if (!rawInetAddress.matches(IP_REGEX)) {
-          invocation.invocationSender.sendMessage(Sonar.get().config.INCORRECT_IP_ADDRESS)
+          invocation.invocationSender.sendMessage(sonar.config.INCORRECT_IP_ADDRESS)
           return
         }
 
         val inetAddress = InetAddress.getByName(rawInetAddress)
 
         if (inetAddress.isAnyLocalAddress || inetAddress.isLoopbackAddress) {
-          invocation.invocationSender.sendMessage(Sonar.get().config.ILLEGAL_IP_ADDRESS)
+          invocation.invocationSender.sendMessage(sonar.config.ILLEGAL_IP_ADDRESS)
           return
         }
 
-        synchronized(Sonar.get().fallback.verified) {
-          if (!Sonar.get().fallback.verified.contains(inetAddress)) {
-            invocation.invocationSender.sendMessage(Sonar.get().config.WHITELIST_NOT_FOUND)
+        synchronized(sonar.fallback.verified) {
+          if (!sonar.fallback.verified.contains(inetAddress)) {
+            invocation.invocationSender.sendMessage(sonar.config.WHITELIST_NOT_FOUND)
             return
           }
 
-          Sonar.get().fallback.verified.remove(inetAddress)
+          sonar.fallback.verified.remove(inetAddress)
           invocation.invocationSender.sendMessage(
-            Sonar.get().config.WHITELIST_REMOVE
+            sonar.config.WHITELIST_REMOVE
               .replace("%ip%", rawInetAddress)
           )
         }
@@ -120,13 +119,13 @@ class WhitelistCommand : SubCommand() {
 
       "size" -> {
         invocation.invocationSender.sendMessage(
-          Sonar.get().config.WHITELIST_SIZE
-            .replace("%amount%", Sonar.get().formatter.format(Sonar.get().fallback.verified.size))
+          sonar.config.WHITELIST_SIZE
+            .replace("%amount%", sonar.formatter.format(sonar.fallback.verified.size))
         )
       }
 
       else -> invocation.invocationSender.sendMessage(
-        Sonar.get().config.INCORRECT_COMMAND_USAGE
+        sonar.config.INCORRECT_COMMAND_USAGE
           .replace("%usage%", "whitelist")
       )
     }

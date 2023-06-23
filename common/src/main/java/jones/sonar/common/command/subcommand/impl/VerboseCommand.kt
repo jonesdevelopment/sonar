@@ -17,7 +17,6 @@
 
 package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
@@ -31,13 +30,13 @@ class VerboseCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {
     val verboseSubscriber = invocation.executorName
 
-    if (Sonar.get().actionBarVerbose.isSubscribed(verboseSubscriber)) {
-      Sonar.get().actionBarVerbose.unsubscribe(verboseSubscriber)
-      invocation.invocationSender.sendMessage(Sonar.get().config.VERBOSE_UNSUBSCRIBED)
+    if (sonar.actionBarVerbose.isSubscribed(verboseSubscriber)) {
+      sonar.actionBarVerbose.unsubscribe(verboseSubscriber)
+      invocation.invocationSender.sendMessage(sonar.config.VERBOSE_UNSUBSCRIBED)
       return
     }
 
-    invocation.invocationSender.sendMessage(Sonar.get().config.VERBOSE_SUBSCRIBED)
-    Sonar.get().actionBarVerbose.subscribe(verboseSubscriber)
+    invocation.invocationSender.sendMessage(sonar.config.VERBOSE_SUBSCRIBED)
+    sonar.actionBarVerbose.subscribe(verboseSubscriber)
   }
 }

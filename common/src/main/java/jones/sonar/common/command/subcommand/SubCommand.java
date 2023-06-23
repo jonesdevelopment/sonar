@@ -17,6 +17,7 @@
 
 package jones.sonar.common.command.subcommand;
 
+import jones.sonar.api.Sonar;
 import jones.sonar.common.command.CommandInvocation;
 import jones.sonar.common.command.subcommand.argument.Argument;
 import lombok.Getter;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public abstract class SubCommand {
   private final SubCommandInfo info;
   private final String permission, aliases, arguments;
+  protected static final Sonar sonar = Sonar.get();
 
   public SubCommand() {
     info = getClass().getAnnotation(SubCommandInfo.class);

@@ -17,7 +17,6 @@
 
 package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
@@ -29,24 +28,24 @@ import jones.sonar.common.command.subcommand.SubCommandInfo
 )
 class StatisticsCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {
-    val total = Sonar.get().statistics.get("total", 0)
-    val queued = Sonar.get().fallback.queue.queuedPlayers.size
-    val verifying = Sonar.get().fallback.connected.size
-    val verified = Sonar.get().fallback.verified.size
-    val blacklisted = Sonar.get().fallback.blacklisted.size
+    val total = sonar.statistics.get("total", 0)
+    val queued = sonar.fallback.queue.queuedPlayers.size
+    val verifying = sonar.fallback.connected.size
+    val verified = sonar.fallback.verified.size
+    val blacklisted = sonar.fallback.blacklisted.size
 
     invocation.invocationSender.sendMessage()
-    invocation.invocationSender.sendMessage(" §a▪ §7Verified IP addresses: §f${Sonar.get().formatter.format(verified)}")
-    invocation.invocationSender.sendMessage(" §a▪ §7Verifying IP addresses: §f${Sonar.get().formatter.format(verifying)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Verified IP addresses: §f${sonar.formatter.format(verified)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Verifying IP addresses: §f${sonar.formatter.format(verifying)}")
     invocation.invocationSender.sendMessage(
       " §a▪ §7Blacklisted IP addresses: §f${
-        Sonar.get().formatter.format(
+        sonar.formatter.format(
           blacklisted
         )
       }"
     )
-    invocation.invocationSender.sendMessage(" §a▪ §7Queued connections: §f${Sonar.get().formatter.format(queued)}")
-    invocation.invocationSender.sendMessage(" §a▪ §7Total connections: §f${Sonar.get().formatter.format(total)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Queued connections: §f${sonar.formatter.format(queued)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Total connections: §f${sonar.formatter.format(total)}")
     invocation.invocationSender.sendMessage()
   }
 }

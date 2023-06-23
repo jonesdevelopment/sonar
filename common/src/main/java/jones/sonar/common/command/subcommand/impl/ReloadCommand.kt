@@ -17,7 +17,6 @@
 
 package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.Sonar
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
@@ -30,12 +29,12 @@ class ReloadCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {
     val startTime = System.currentTimeMillis()
 
-    invocation.invocationSender.sendMessage(Sonar.get().config.RELOADING)
-    Sonar.get().reload()
+    invocation.invocationSender.sendMessage(sonar.config.RELOADING)
+    sonar.reload()
 
     val timeTaken = System.currentTimeMillis() - startTime;
     invocation.invocationSender.sendMessage(
-      Sonar.get().config.RELOADED
+      sonar.config.RELOADED
         .replace("%taken%", timeTaken.toString())
     )
   }
