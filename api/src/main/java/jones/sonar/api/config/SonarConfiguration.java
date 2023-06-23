@@ -162,7 +162,7 @@ public final class SonarConfiguration {
       "%prefix%Successfully added %ip% to the blacklist."
     ));
     BLACKLIST_REMOVE = formatString(yamlConfig.getString("messages.blacklist.removed",
-      "%prefix%Successfully remove %ip% from the blacklist."
+      "%prefix%Successfully removed %ip% from the blacklist."
     ));
     BLACKLIST_DUPLICATE = formatString(yamlConfig.getString("messages.blacklist.duplicate-ip",
       "%prefix%The IP address you provided is already blacklisted."
@@ -178,7 +178,7 @@ public final class SonarConfiguration {
       "%prefix%Successfully added %ip% to the whitelist."
     ));
     WHITELIST_REMOVE = formatString(yamlConfig.getString("messages.whitelist.removed",
-      "%prefix%Successfully remove %ip% from the whitelist."
+      "%prefix%Successfully removed %ip% from the whitelist."
     ));
     WHITELIST_DUPLICATE = formatString(yamlConfig.getString("messages.whitelist.duplicate-ip",
       "%prefix%The IP address you provided is already whitelisted."
