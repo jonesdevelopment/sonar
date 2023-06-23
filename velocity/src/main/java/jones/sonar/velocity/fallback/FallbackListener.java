@@ -253,7 +253,7 @@ public final class FallbackListener {
     // a dummy connection
     CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
-    // We need to determine if the player is premium before we queue the connection
+    // We need to determine if the player is premium before we queue the connection,
     // and before we run everything in the event loop to avoid potential memory leaks
     final boolean isPremium = premium.contains(event.getUsername());
 

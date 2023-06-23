@@ -89,8 +89,10 @@ class SonarCommand : SimpleCommand {
       // Check permissions for subcommands
       subCommand.ifPresent {
         if (!invocation.source().hasPermission(it.permission)) {
-          invocationSender.sendMessage(Sonar.get().config.SUB_COMMAND_NO_PERM
-            .replace("%permission%", it.permission))
+          invocationSender.sendMessage(
+            Sonar.get().config.SUB_COMMAND_NO_PERM
+              .replace("%permission%", it.permission)
+          )
         }
       }
     }
@@ -117,8 +119,10 @@ class SonarCommand : SimpleCommand {
       if (sub.info.arguments.isNotEmpty()
         && commandInvocation.arguments.size <= 1
       ) {
-        invocationSender.sendMessage(Sonar.get().config.INCORRECT_COMMAND_USAGE
-          .replace("%usage%", sub.info.name + " (" + sub.arguments + ")"))
+        invocationSender.sendMessage(
+          Sonar.get().config.INCORRECT_COMMAND_USAGE
+            .replace("%usage%", sub.info.name + " (" + sub.arguments + ")")
+        )
         return@ifPresentOrElse
       }
 
