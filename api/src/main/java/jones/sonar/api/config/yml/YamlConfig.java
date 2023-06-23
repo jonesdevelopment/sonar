@@ -29,6 +29,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@SuppressWarnings({
+  "rawtypes",
+  "ResultOfMethodCallIgnored",
+  "unused"
+})
 public final class YamlConfig {
   private final Yaml yaml;
   private final File folder, file;
