@@ -253,6 +253,15 @@ public final class FallbackListener {
     // a dummy connection
     CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
+    // We need to determine if the player is premium before we queue the connection
+    // and before we run everything in the event loop to avoid potential memory leaks
+    final boolean isPremium = premium.contains(event.getUsername());
+
+    // Remove the player from the premium list in order to prevent memory leaks
+    // We cannot rely on the DisconnectEvent since the server will not call it
+    // -> we are intercepting the packets!
+    premium.remove(event.getUsername());
+
     // Run in the channel's event loop
     channel.eventLoop().execute(() -> {
 
@@ -271,15 +280,6 @@ public final class FallbackListener {
           TimeUnit.MILLISECONDS
         )
       );
-
-      // We need to determine if the player is premium before we queue the connection
-      // to avoid potential memory leaks
-      final boolean isPremium = premium.contains(event.getUsername());
-
-      // Remove the player from the premium list in order to prevent memory leaks
-      // We cannot rely on the DisconnectEvent since the server will not call it
-      // -> we are intercepting the packets!
-      premium.remove(event.getUsername());
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
