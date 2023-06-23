@@ -75,6 +75,12 @@ public final class SonarConfiguration {
   public String BLACKLIST_CLEARED;
   public String BLACKLIST_SIZE;
 
+  public String WHITELIST_ADD;
+  public String WHITELIST_DUPLICATE;
+  public String WHITELIST_NOT_FOUND;
+  public String WHITELIST_REMOVE;
+  public String WHITELIST_SIZE;
+
   public String VERBOSE_SUBSCRIBED;
   public String VERBOSE_UNSUBSCRIBED;
   public String RELOADING;
@@ -163,6 +169,22 @@ public final class SonarConfiguration {
     ));
     BLACKLIST_NOT_FOUND = formatString(yamlConfig.getString("messages.blacklist.ip-not-found",
       "%prefix%The IP address you provided is not blacklisted."
+    ));
+
+    WHITELIST_SIZE = formatString(yamlConfig.getString("messages.whitelist.size",
+      "%prefix%The whitelist currently contains %amount% IP address(es)."
+    ));
+    WHITELIST_ADD = formatString(yamlConfig.getString("messages.whitelist.added",
+      "%prefix%Successfully added %ip% to the whitelist."
+    ));
+    WHITELIST_REMOVE = formatString(yamlConfig.getString("messages.whitelist.removed",
+      "%prefix%Successfully remove %ip% from the whitelist."
+    ));
+    WHITELIST_DUPLICATE = formatString(yamlConfig.getString("messages.whitelist.duplicate-ip",
+      "%prefix%The IP address you provided is already whitelisted."
+    ));
+    WHITELIST_NOT_FOUND = formatString(yamlConfig.getString("messages.whitelist.ip-not-found",
+      "%prefix%The IP address you provided is not whitelisted."
     ));
 
     HEADER = fromList(yamlConfig.getStringList("messages.verification.header",

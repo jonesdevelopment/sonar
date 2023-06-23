@@ -17,10 +17,7 @@
 
 package jones.sonar.common.command.subcommand;
 
-import jones.sonar.common.command.subcommand.impl.BlacklistCommand;
-import jones.sonar.common.command.subcommand.impl.ReloadCommand;
-import jones.sonar.common.command.subcommand.impl.StatisticsCommand;
-import jones.sonar.common.command.subcommand.impl.VerboseCommand;
+import jones.sonar.common.command.subcommand.impl.*;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
@@ -36,7 +33,8 @@ public class SubCommandRegistry {
     new BlacklistCommand(),
     new StatisticsCommand(),
     new VerboseCommand(),
-    new ReloadCommand()
+    new ReloadCommand(),
+    new WhitelistCommand()
   );
 
   public void register(final SubCommand... commands) {
