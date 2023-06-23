@@ -64,16 +64,7 @@ class SonarCommand : SimpleCommand {
 
     var subCommand = Optional.empty<SubCommand>()
 
-    val invocationSender: InvocationSender<CommandSource?> = object : InvocationSender<CommandSource?> {
-
-      override fun sendMessage(message: String) {
-        invocation.source().sendMessage(Component.text(message))
-      }
-
-      override fun getPlayer(): CommandSource {
-        return invocation.source()
-      }
-    }
+    val invocationSender = InvocationSender { message -> invocation.source().sendMessage(Component.text(message)) }
 
     if (invocation.arguments().isNotEmpty()) {
       // Search subcommand if command arguments are present

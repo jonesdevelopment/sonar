@@ -17,12 +17,10 @@
 
 package jones.sonar.common.command;
 
-public interface InvocationSender<T> {
+public interface InvocationSender {
   void sendMessage(final String message);
 
   default void sendMessage() {
     sendMessage("");
   }
-
-  T getPlayer();
 }

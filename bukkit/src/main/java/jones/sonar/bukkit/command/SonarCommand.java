@@ -75,16 +75,11 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
 
     Optional<SubCommand> subCommand = Optional.empty();
 
-    var invocationSender = new InvocationSender<CommandSender>() {
+    var invocationSender = new InvocationSender() {
 
       @Override
       public void sendMessage(final String message) {
         sender.sendMessage(message);
-      }
-
-      @Override
-      public CommandSender getPlayer() {
-        return sender;
       }
     };
 

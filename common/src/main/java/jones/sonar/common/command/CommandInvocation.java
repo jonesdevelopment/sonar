@@ -28,9 +28,9 @@ public final class CommandInvocation {
     return executorName;
   }
 
-  private final InvocationSender<?> invocationSender;
+  private final InvocationSender invocationSender;
 
-  public InvocationSender<?> getInvocationSender() {
+  public InvocationSender getInvocationSender() {
     return invocationSender;
   }
 
