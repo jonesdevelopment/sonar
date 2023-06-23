@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @UtilityClass
+// The methods are accessible externally
+@SuppressWarnings("unused")
 public class SubCommandRegistry {
   @Getter
   private final Collection<SubCommand> subCommands = Arrays.asList(
