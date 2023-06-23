@@ -87,13 +87,10 @@ class SonarCommand : SimpleCommand {
         .findFirst()
 
       // Check permissions for subcommands
-      if (subCommand.isPresent) {
-        if (!invocation.source().hasPermission(subCommand.get().permission)) {
-          invocation.source().sendMessage(
-            Component.text(
-              "§cYou do not have permission to execute this subcommand. §7(${subCommand.get().permission})"
-            )
-          )
+      subCommand.ifPresent {
+        if (!invocation.source().hasPermission(it.permission)) {
+          invocationSender.sendMessage(Sonar.get().config.SUB_COMMAND_NO_PERM
+            .replace("%permission%", it.permission))
         }
       }
     }

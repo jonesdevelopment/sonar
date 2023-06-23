@@ -94,16 +94,12 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
         .findFirst();
 
       // Check permissions for subcommands
-      if (subCommand.isPresent()) {
-        final String permission = "sonar." + subCommand.get().getInfo().name();
-
-        if (!sender.hasPermission(permission)) {
-          invocationSender.sendMessage(
-            "§cYou do not have permission to execute this subcommand. §7(" + permission + ")"
-          );
-          return false;
+      subCommand.ifPresent(it -> {
+        if (!sender.hasPermission(it.getPermission())) {
+          invocationSender.sendMessage(Sonar.get().getConfig().SUB_COMMAND_NO_PERM
+            .replace("%permission%", it.getPermission()));
         }
-      }
+      });
     }
 
     // No subcommand was found

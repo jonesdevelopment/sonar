@@ -60,6 +60,7 @@ public final class SonarConfiguration {
 
   public String INCORRECT_COMMAND_USAGE;
   public String INCORRECT_IP_ADDRESS;
+  public String SUB_COMMAND_NO_PERM;
   public String ILLEGAL_IP_ADDRESS;
   public String PLAYERS_ONLY;
   public String CONSOLE_ONLY;
@@ -137,6 +138,9 @@ public final class SonarConfiguration {
     ));
     COMMAND_COOL_DOWN_LEFT = formatString(yamlConfig.getString("messages.command-cool-down-left",
       "%prefix%&cPlease wait another &l%time-left%s&r&c."
+    ));
+    SUB_COMMAND_NO_PERM = formatString(yamlConfig.getString("messages.sub-command-no-permission",
+      "%prefix%&cYou do not have permission to execute this subcommand. &7(%permission%)"
     ));
 
     BLACKLIST_EMPTY = formatString(yamlConfig.getString("messages.blacklist.empty",
