@@ -109,6 +109,12 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
     // No subcommand was found
     if (!subCommand.isPresent()) {
       invocationSender.sendMessage();
+      invocationSender.sendMessage(
+        " §eRunning §lSonar §e"
+          + Sonar.get().getVersion()
+          + " on "
+          + Sonar.get().getPlatform().getDisplayName()
+      );
 
       final String rawDiscordText = " §7Need help?§b discord.jonesdev.xyz";
 
