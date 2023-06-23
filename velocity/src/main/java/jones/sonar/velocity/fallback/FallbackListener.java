@@ -47,6 +47,7 @@ import jones.sonar.velocity.fallback.session.dummy.DummyConnection;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -69,7 +70,7 @@ import static jones.sonar.velocity.fallback.FallbackPackets.LEGACY_JOIN_GAME;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
-  private final Fallback fallback;
+  private final @NotNull Fallback fallback;
 
   // We need to cache if the joining player is a premium player or not
   // If we don't do that, many authentication plugins can potentially break
