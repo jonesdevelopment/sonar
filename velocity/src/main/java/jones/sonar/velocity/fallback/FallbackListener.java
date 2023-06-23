@@ -45,6 +45,7 @@ import jones.sonar.velocity.fallback.session.FallbackPlayer;
 import jones.sonar.velocity.fallback.session.FallbackSessionHandler;
 import jones.sonar.velocity.fallback.session.dummy.DummyConnection;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +54,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Objects;
@@ -155,7 +157,7 @@ public final class FallbackListener {
   public void handle(final PreLoginEvent event) {
     fallback.getSonar().getStatistics().increment("total");
 
-    final var inetAddress = event.getConnection().getRemoteAddress().getAddress();
+    final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     if (fallback.getBlacklisted().contains(inetAddress)) {
       event.setResult(BLACKLISTED);
@@ -231,7 +233,7 @@ public final class FallbackListener {
   public void handle(final GameProfileRequestEvent event) throws Throwable {
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
-    final var inetAddress = event.getConnection().getRemoteAddress().getAddress();
+    final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     // We don't want to check players that have already been verified
     if (fallback.getVerified().contains(inetAddress)) return;
@@ -242,8 +244,8 @@ public final class FallbackListener {
       return;
     }
 
-    final var inboundConnection = (LoginInboundConnection) event.getConnection();
-    final var initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
+    val inboundConnection = (LoginInboundConnection) event.getConnection();
+    val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
 
     final MinecraftConnection mcConnection = initialConnection.getConnection();
     final Channel channel = mcConnection.getChannel();
