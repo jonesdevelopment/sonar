@@ -45,11 +45,14 @@ public interface Sonar {
     return FallbackHolder.INSTANCE;
   }
 
+  @NotNull
+  default Statistics getStatistics() {
+    return Statistics.INSTANCE;
+  }
+
   @NotNull Verbose getActionBarVerbose();
 
   @NotNull Logger getLogger();
-
-  @NotNull Statistics getStatistics();
 
   void reload();
 

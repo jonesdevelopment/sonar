@@ -22,11 +22,9 @@ import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.logger.Logger;
-import jones.sonar.api.statistics.Statistics;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
-import jones.sonar.common.statistics.SonarStatistics;
 import lombok.Getter;
 
 import java.text.DecimalFormat;
@@ -66,9 +64,6 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
   };
 
   @Getter
-  private Statistics statistics;
-
-  @Getter
   private final DecimalFormat formatter = new DecimalFormat("#,###");
 
   @Override
@@ -86,9 +81,6 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     SonarProvider.set(this);
 
     logger.info("Initializing Sonar...");
-
-    // Initialize statistics
-    statistics = new SonarStatistics();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());

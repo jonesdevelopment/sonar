@@ -17,12 +17,15 @@
 
 package jones.sonar.api.statistics;
 
-import org.jetbrains.annotations.NotNull;
-
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public interface Statistics {
-  @NotNull Map<String, Integer> getRawMap();
+  Map<String, Integer> map = Collections.synchronizedMap(new HashMap<>());
+
+  Statistics INSTANCE = new Statistics() {};
 
   default void increment(final String key) {
     increment(key, 0);
@@ -33,12 +36,12 @@ public interface Statistics {
   }
 
   default int get(final String key, final int fallback) {
-    return getRawMap().getOrDefault(key, fallback);
+    return map.getOrDefault(key, fallback);
   }
 
   default void set(final String key, final int value) {
-    if (!has(key)) getRawMap().put(key, value);
-    else getRawMap().replace(key, value);
+    if (!has(key)) map.put(key, value);
+    else map.replace(key, value);
   }
 
   default void reset(final String key) {
@@ -46,10 +49,10 @@ public interface Statistics {
   }
 
   default void remove(final String key) {
-    getRawMap().remove(key);
+    map.remove(key);
   }
 
   default boolean has(final String key) {
-    return getRawMap().containsKey(key);
+    return map.containsKey(key);
   }
 }

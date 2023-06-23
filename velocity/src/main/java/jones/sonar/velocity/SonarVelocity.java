@@ -23,9 +23,7 @@ import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.logger.Logger;
-import jones.sonar.api.statistics.Statistics;
 import jones.sonar.common.SonarPlugin;
-import jones.sonar.common.statistics.SonarStatistics;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackListener;
 import jones.sonar.velocity.verbose.ActionBarVerbose;
@@ -67,9 +65,6 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
   };
 
   @Getter
-  private Statistics statistics;
-
-  @Getter
   private final DecimalFormat formatter = new DecimalFormat("#,###");
 
   @Override
@@ -87,9 +82,6 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     SonarProvider.set(this);
 
     logger.info("Initializing Sonar...");
-
-    // Initialize statistics
-    statistics = new SonarStatistics();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());
