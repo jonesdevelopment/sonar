@@ -34,7 +34,7 @@ public final class SonarVersion {
     this.semanticVersion = versionString.split("-")[0];
     this.commitSHA = versionString.split("-")[1];
     this.build = Integer.parseInt(versionString.split("-")[2]);
-    this.formatted = semanticVersion + " (" + build + ")";
+    this.formatted = semanticVersion + " (" + commitSHA + ")";
   }
 
   @Override
