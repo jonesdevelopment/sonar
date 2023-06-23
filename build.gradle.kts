@@ -54,6 +54,12 @@ dependencies {
 }
 
 tasks {
+  jar {
+    manifest {
+      attributes["Implementation-Version"] = version
+    }
+  }
+
   compileJava {
     options.encoding = "UTF-8"
   }

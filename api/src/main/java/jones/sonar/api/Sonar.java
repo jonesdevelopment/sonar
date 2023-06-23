@@ -23,6 +23,7 @@ import jones.sonar.api.fallback.FallbackHolder;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.api.statistics.Statistics;
 import jones.sonar.api.verbose.Verbose;
+import jones.sonar.api.version.SonarVersion;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
@@ -35,8 +36,8 @@ public interface Sonar {
   @NotNull DecimalFormat getFormatter();
 
   @NotNull
-  default String getVersion() {
-    return "2.0.0"; // TODO: automatic version
+  default SonarVersion getVersion() {
+    return SonarVersion.GET;
   }
 
   @NotNull

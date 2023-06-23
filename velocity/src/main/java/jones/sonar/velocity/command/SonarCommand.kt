@@ -139,7 +139,7 @@ class SonarCommand : SimpleCommand {
       )
       invocation.source().sendMessage(
         Component.text(
-          " §7Need help?§b discord.jonesdev.xyz"
+          " §7Need help?§b https://discord.jonesdev.xyz/"
         ).hoverEvent(
           HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("§7Click to open Discord"))
         ).clickEvent(
