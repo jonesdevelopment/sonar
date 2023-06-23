@@ -272,18 +272,21 @@ public final class FallbackListener {
         )
       );
 
+      // We need to determine if the player is premium before we queue the connection
+      // to avoid potential memory leaks
+      final boolean isPremium = premium.contains(event.getUsername());
+
+      // Remove the player from the premium list in order to prevent memory leaks
+      // We cannot rely on the DisconnectEvent since the server will not call it
+      // -> we are intercepting the packets!
+      premium.remove(event.getUsername());
+
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
       pipeline.addFirst(HANDLER, FallbackChannelHandler.INSTANCE);
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
-        final boolean isPremium = premium.contains(event.getUsername());
-
-        // Remove the player from the premium list in order to prevent memory leaks
-        // We cannot rely on the DisconnectEvent since the server will not call it
-        // -> we are intercepting the packets!
-        premium.remove(event.getUsername());
 
         // Do not continue if the connection is closed
         if (mcConnection.isClosed()) return;
