@@ -22,32 +22,17 @@ import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
 
 @SubCommandInfo(
-  name = "statistics",
-  aliases = ["stats"],
-  description = "Show session statistics of this server"
+  name = "version", description = "Show version information",
 )
-class StatisticsCommand : SubCommand() {
+class VersionCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {
-    val total = sonar.statistics.get("total", 0)
-    val queued = sonar.fallback.queue.queuedPlayers.size
-    val verifying = sonar.fallback.connected.size
-    val verified = sonar.fallback.verified.size
-    val blacklisted = sonar.fallback.blacklisted.size
-
     invocation.invocationSender.sendMessage()
-    invocation.invocationSender.sendMessage(" §eStatistics (this session)")
+    invocation.invocationSender.sendMessage(" §eVersion information")
     invocation.invocationSender.sendMessage()
-    invocation.invocationSender.sendMessage(" §a▪ §7Verified IP addresses: §f${sonar.formatter.format(verified)}")
-    invocation.invocationSender.sendMessage(" §a▪ §7Verifying IP addresses: §f${sonar.formatter.format(verifying)}")
-    invocation.invocationSender.sendMessage(
-      " §a▪ §7Blacklisted IP addresses: §f${
-        sonar.formatter.format(
-          blacklisted
-        )
-      }"
-    )
-    invocation.invocationSender.sendMessage(" §a▪ §7Queued connections: §f${sonar.formatter.format(queued)}")
-    invocation.invocationSender.sendMessage(" §a▪ §7Total connections: §f${sonar.formatter.format(total)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Sonar version: §f${sonar.version.semanticVersion}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Commit SHA: §f${sonar.version.commitSHA}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Build number: §f${sonar.version.build}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Platform: §f${sonar.platform.displayName}")
     invocation.invocationSender.sendMessage()
   }
 }

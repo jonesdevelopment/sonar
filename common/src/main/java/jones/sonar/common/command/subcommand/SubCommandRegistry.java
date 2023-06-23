@@ -34,7 +34,8 @@ public class SubCommandRegistry {
     new WhitelistCommand(),
     new StatisticsCommand(),
     new VerboseCommand(),
-    new ReloadCommand()
+    new ReloadCommand(),
+    new VersionCommand()
   );
 
   public void register(final SubCommand... commands) {
