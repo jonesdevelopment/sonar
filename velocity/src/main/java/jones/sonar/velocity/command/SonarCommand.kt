@@ -42,8 +42,8 @@ class SonarCommand : SimpleCommand {
     val timestamp = DELAY.asMap().getOrDefault(invocation.source(), -1L)
     val currentTimestamp = System.currentTimeMillis()
 
-    // There were some exploits with spamming commands in the past
-    // Spamming should be prevented especially if some heavy operations are done
+    // There were some exploits with spamming commands in the past,
+    // Spamming should be prevented, especially if some heavy operations are done,
     // which is not the case here but let's still stay safe!
     if (timestamp > 0L) {
       invocation.source().sendMessage(Component.text(Sonar.get().config.COMMAND_COOL_DOWN))

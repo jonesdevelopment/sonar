@@ -57,8 +57,8 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
     final long timestamp = delay.asMap().getOrDefault(sender, -1L);
     final long currentTimestamp = System.currentTimeMillis();
 
-    // There were some exploits with spamming commands in the past
-    // Spamming should be prevented especially if some heavy operations are done
+    // There were some exploits with spamming commands in the past,
+    // Spamming should be prevented, especially if some heavy operations are done,
     // which is not the case here but let's still stay safe!
     if (timestamp > 0L) {
       sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN);
