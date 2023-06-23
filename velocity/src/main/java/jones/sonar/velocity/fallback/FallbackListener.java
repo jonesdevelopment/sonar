@@ -236,8 +236,8 @@ public final class FallbackListener {
     if (fallback.getVerified().contains(inetAddress)) return;
 
     if (event.getConnection() instanceof InitialInboundConnection) {
-      Sonar.get().getLogger().error("Could not inject into GameProfileRequestEvent!");
-      Sonar.get().getLogger().error("Make sure to remove any other plugin that interferes with this event!");
+      fallback.getLogger().error("Could not inject into GameProfileRequestEvent!");
+      fallback.getLogger().error("Make sure to remove any other plugin that interferes with this event!");
       return;
     }
 
