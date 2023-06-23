@@ -248,9 +248,9 @@ public final class FallbackListener {
     final MinecraftConnection mcConnection = initialConnection.getConnection();
     final Channel channel = mcConnection.getChannel();
 
-    // The AuthSessionHandler isn't supposed to continue the connection process
+    // The AuthSessionHandler isn't supposed to continue the connection process,
     // which is why we override the field value for the MinecraftConnection with
-    // a dummy connection
+    // a fake connection
     CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
     // We need to determine if the player is premium before we queue the connection,
@@ -374,7 +374,7 @@ public final class FallbackListener {
         if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
           // The first step of the verification is a simple KeepAlive packet
           // We don't want to waste resources by directly sending all packets to
-          // the client which is why we first send a KeepAlive packet and then
+          // the client, which is why we first send a KeepAlive packet and then
           // wait for a valid response to continue the verification process
           final KeepAlive keepAlive = new KeepAlive();
 
@@ -382,7 +382,7 @@ public final class FallbackListener {
 
           mcConnection.write(keepAlive);
         } else {
-          // KeepAlive packets do not exist during the login process on 1.7
+          // KeepAlive packets do not exist during the login process on 1.7.
           // We have to fall back to the regular method of verification
 
           // Set session handler to custom fallback handler to intercept all incoming packets

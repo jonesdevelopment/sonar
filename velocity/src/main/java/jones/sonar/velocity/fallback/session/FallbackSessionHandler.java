@@ -275,7 +275,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       .fire(new PermissionsSetupEvent(player.getPlayer(), DEFAULT_PERMISSION))
       .thenAcceptAsync(permissionEvent -> {
         if (!player.getConnection().isClosed()) {
-          // wait for permissions to load, then set the players permission function
+          // wait for permissions to load, then set the player permission function
           final PermissionFunction function = permissionEvent.createFunction(player.getPlayer());
 
           if (function == null) {

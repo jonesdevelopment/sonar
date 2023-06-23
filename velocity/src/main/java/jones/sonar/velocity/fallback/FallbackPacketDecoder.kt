@@ -47,7 +47,7 @@ class FallbackPacketDecoder(
       // TODO: check if there are more exceptions we need to exempt
       if (cause is IOException || cause is IllegalStateException) return
 
-      // Blacklist the IP address
+      // Block the IP address
       val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
       fallbackPlayer.fallback.blacklisted.add(inetAddress)
@@ -57,7 +57,7 @@ class FallbackPacketDecoder(
   @Throws(Exception::class)
   override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
 
-    // Check if the client is not sending a crap ton of packets to the server
+    // Check if the client is not sending a ton of packets to the server
     val checkPackets = ++packets <= fallbackPlayer.fallback.sonar.config.MAXIMUM_LOGIN_PACKETS
     FallbackSessionHandler.checkFrame(fallbackPlayer, checkPackets, "too many packets")
 

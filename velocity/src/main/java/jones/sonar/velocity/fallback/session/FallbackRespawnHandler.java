@@ -63,7 +63,7 @@ final class FallbackRespawnHandler extends ChannelOutboundHandlerAdapter {
     // In order to handle switching to another server, you will need to send two packets:
     //
     // - The join game packet from the backend server, with a different dimension
-    // - A respawn with the correct dimension
+    // - A respawn with the correct dimension,
     //
     // Most notably, by having the client accept the join game packet, we can work around the need
     // to perform entity ID rewrites, eliminating potential issues from rewriting packets and
@@ -83,7 +83,7 @@ final class FallbackRespawnHandler extends ChannelOutboundHandlerAdapter {
 
   // Taken from Velocity
   private void doSafeClientServerSwitch(final JoinGame joinGame) {
-    // Some clients do not behave well with the "fast" respawn sequence. In this case we will use
+    // Some clients do not behave well with the "fast" respawn sequence. In this case, we will use
     // a "safe" respawn sequence that involves sending three packets to the client. They have the
     // same effect but tend to work better with buggier clients (Forge 1.8 in particular).
 
