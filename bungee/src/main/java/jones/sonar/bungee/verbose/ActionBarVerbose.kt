@@ -18,7 +18,7 @@
 package jones.sonar.bungee.verbose
 
 import jones.sonar.api.Sonar
-import jones.sonar.api.util.Formatting.formatMemory
+import jones.sonar.api.util.Formatting.Companion.formatMemory
 import jones.sonar.api.verbose.Verbose
 import jones.sonar.common.verbose.VerboseAnimation
 import net.md_5.bungee.api.ChatMessageType
@@ -35,7 +35,7 @@ class ActionBarVerbose(private val server: ProxyServer) : Verbose {
   fun update() {
     val component = TextComponent(
       Sonar.get().config.ACTION_BAR_LAYOUT
-        .replace("%queued%", Sonar.get().formatter.format(Sonar.get().fallback.queue.queuedPlayers.size))
+        .replace("%queued%", Sonar.get().formatter.format(Sonar.get().fallback.queue.getQueuedPlayers().size))
         .replace("%verifying%", Sonar.get().formatter.format(Sonar.get().fallback.connected.size))
         .replace("%verified%", Sonar.get().formatter.format(Sonar.get().fallback.verified.size))
         .replace("%blacklisted%", Sonar.get().formatter.format(Sonar.get().fallback.blacklisted.size))

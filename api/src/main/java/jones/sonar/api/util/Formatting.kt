@@ -15,28 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.util;
+package jones.sonar.api.util
 
-import jones.sonar.api.Sonar;
-import lombok.experimental.UtilityClass;
+import jones.sonar.api.Sonar
 
-@UtilityClass
-public class Formatting {
-  public String formatMemory(long memory) {
-    memory /= 1000; // kB
+class Formatting {
+  companion object {
+    fun formatMemory(memory: Long): String {
+      var bytes = memory
 
-    String suffix = "kB";
+      bytes /= 1000 // kB
+      var suffix = "kB"
 
-    if (memory >= 1000) {
-      suffix = "MB";
-      memory /= 1000;
+      if (bytes >= 1000) {
+        suffix = "MB"
+        bytes /= 1000
+      }
+
+      if (bytes >= 1000) {
+        suffix = "GB"
+        bytes /= 1000
+      }
+      return Sonar.get().formatter.format(bytes) + suffix
     }
-
-    if (memory >= 1000) {
-      suffix = "GB";
-      memory /= 1000;
-    }
-
-    return Sonar.get().getFormatter().format(memory) + suffix;
   }
 }

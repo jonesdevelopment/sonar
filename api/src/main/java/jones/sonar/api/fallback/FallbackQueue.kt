@@ -18,7 +18,6 @@
 package jones.sonar.api.fallback
 
 import jones.sonar.api.Sonar
-import jones.sonar.api.util.Pair
 import lombok.AccessLevel
 import lombok.RequiredArgsConstructor
 import java.net.InetAddress
