@@ -14,6 +14,8 @@ plugins {
   id("java")
   id("com.github.johnrengelman.shadow") version "8.1.1"
   id("io.toolebox.git-versioner") version "1.6.7"
+
+  kotlin("jvm") version "1.8.22"
 }
 
 apply(plugin = "io.toolebox.git-versioner")
@@ -34,16 +36,25 @@ allprojects {
 
 subprojects {
   apply(plugin = "java")
+  apply(plugin = "kotlin")
   apply(plugin = "com.github.johnrengelman.shadow")
 
   dependencies {
-    compileOnly("io.netty:netty-all:4.1.94.Final") // netty
-
     compileOnly("org.projectlombok:lombok:1.18.28")
     annotationProcessor("org.projectlombok:lombok:1.18.28")
 
     testCompileOnly("org.projectlombok:lombok:1.18.28")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.28")
+
+    compileOnly("io.netty:netty-all:4.1.94.Final") // netty
+
+    implementation(kotlin("stdlib-jdk8")) // kotlin
+    implementation("net.kyori:adventure-nbt:4.14.0") // nbt
+  }
+
+  kotlin {
+    // We use 8 for every project except for Velocity
+    jvmToolchain(8)
   }
 }
 
