@@ -58,9 +58,9 @@ class FallbackQueue {
     synchronized(queuedPlayers) {
       queuedPlayers.parallelStream()
         .limit(Sonar.get().config.MAXIMUM_QUEUE_POLLS.toLong())
-        .forEach { pair: Pair<InetAddress, Runnable> ->
-          pair.second.run()
-          toRemove.add(pair)
+        .forEach {
+          it.second.run()
+          toRemove.add(it)
         }
 
       queuedPlayers.removeAll(toRemove.toSet())
