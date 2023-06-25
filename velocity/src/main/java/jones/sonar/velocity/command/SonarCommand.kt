@@ -88,13 +88,13 @@ class SonarCommand : SimpleCommand {
       }
     }
 
-    subCommand.ifPresentOrElse({ sub: SubCommand ->
-      if (sub.info.onlyPlayers && invocation.source() !is Player) {
+    subCommand.ifPresentOrElse({
+      if (it.info.onlyPlayers && invocation.source() !is Player) {
         invocationSender.sendMessage(Sonar.get().config.PLAYERS_ONLY)
         return@ifPresentOrElse
       }
 
-      if (sub.info.onlyConsole && invocation.source() !is ConsoleCommandSource) {
+      if (it.info.onlyConsole && invocation.source() !is ConsoleCommandSource) {
         invocationSender.sendMessage(Sonar.get().config.CONSOLE_ONLY)
         return@ifPresentOrElse
       }
@@ -102,23 +102,23 @@ class SonarCommand : SimpleCommand {
       val commandInvocation = CommandInvocation(
         if (invocation.source() is Player) (invocation.source() as Player).username else "Console",
         invocationSender,
-        sub,
+        it,
         invocation.arguments()
       )
 
       // The subcommands has arguments which are not present in the executed command
-      if (sub.info.arguments.isNotEmpty()
+      if (it.info.arguments.isNotEmpty()
         && commandInvocation.arguments.size <= 1
       ) {
         invocationSender.sendMessage(
           Sonar.get().config.INCORRECT_COMMAND_USAGE
-            .replace("%usage%", sub.info.name + " (" + sub.arguments + ")")
+            .replace("%usage%", "${it.info.name} (${it.arguments})")
         )
         return@ifPresentOrElse
       }
 
       // Execute the sub command with the custom invocation properties
-      sub.execute(commandInvocation)
+      it.execute(commandInvocation)
     }) {
       // No subcommand was found
       invocationSender.sendMessage()
@@ -181,7 +181,7 @@ class SonarCommand : SimpleCommand {
           }
         }
       }
-      return TAB_SUGGESTIONS
+      TAB_SUGGESTIONS
     } else if (invocation.arguments().size == 2) {
       if (ARG_TAB_SUGGESTIONS.isEmpty()) {
         for (subCommand in SubCommandRegistry.getSubCommands()) {
@@ -192,7 +192,7 @@ class SonarCommand : SimpleCommand {
       }
 
       val subCommandName = invocation.arguments()[0].lowercase()
-      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList())
+      ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList())
     } else emptyList()
   }
 

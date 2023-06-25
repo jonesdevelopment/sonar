@@ -14,209 +14,193 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package jones.sonar.bungee.command
 
-package jones.sonar.bungee.command;
+import com.google.common.cache.CacheBuilder
+import jones.sonar.api.Sonar
+import jones.sonar.common.command.CommandInvocation
+import jones.sonar.common.command.InvocationSender
+import jones.sonar.common.command.subcommand.SubCommand
+import jones.sonar.common.command.subcommand.SubCommandRegistry
+import net.md_5.bungee.api.CommandSender
+import net.md_5.bungee.api.chat.ClickEvent
+import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.HoverEvent
+import net.md_5.bungee.api.chat.TextComponent
+import net.md_5.bungee.api.connection.ProxiedPlayer
+import net.md_5.bungee.api.plugin.Command
+import net.md_5.bungee.api.plugin.TabExecutor
+import java.text.DecimalFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import jones.sonar.api.Sonar;
-import jones.sonar.common.command.CommandInvocation;
-import jones.sonar.common.command.InvocationSender;
-import jones.sonar.common.command.subcommand.SubCommand;
-import jones.sonar.common.command.subcommand.SubCommandRegistry;
-import jones.sonar.common.command.subcommand.argument.Argument;
-import lombok.var;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.api.plugin.TabExecutor;
-
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
-
-public final class SonarCommand extends Command implements TabExecutor {
-  private static final Cache<CommandSender, Long> delay = CacheBuilder.newBuilder()
-    .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
-    .build();
-  private static final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-
-  public SonarCommand() {
-    super("sonar", "sonar.command");
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void execute(final CommandSender sender, final String[] args) {
+class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
+  @Suppress("deprecation", "redundantSuppression")
+  override fun execute(sender: CommandSender, args: Array<String>) {
     // Checking if it contains will only break more since it can throw
     // a NullPointerException if the cache is being accessed from parallel threads
-    final long timestamp = delay.asMap().getOrDefault(sender, -1L);
-    final long currentTimestamp = System.currentTimeMillis();
+    val timestamp = delay.asMap().getOrDefault(sender, -1L)
+    val currentTimestamp = System.currentTimeMillis()
 
     // There were some exploits with spamming commands in the past,
     // Spamming should be prevented, especially if some heavy operations are done,
     // which is not the case here but let's still stay safe!
     if (timestamp > 0L) {
-      sender.sendMessage(new TextComponent(Sonar.get().getConfig().COMMAND_COOL_DOWN));
+      sender.sendMessage(TextComponent(Sonar.get().config.COMMAND_COOL_DOWN))
 
       // Format delay
-      final double left = 0.5D - ((currentTimestamp - (double) timestamp) / 1000D);
-
-      sender.sendMessage(new TextComponent(Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
-        .replace("%time-left%", decimalFormat.format(left))));
-      return;
+      val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
+      sender.sendMessage(
+        TextComponent(
+          Sonar.get().config.COMMAND_COOL_DOWN_LEFT
+            .replace("%time-left%", decimalFormat.format(left))
+        )
+      )
+      return
     }
+    delay.put(sender, currentTimestamp)
+    var subCommand = Optional.empty<SubCommand>()
+    val invocationSender = InvocationSender { message -> sender.sendMessage(TextComponent(message)) }
 
-    delay.put(sender, currentTimestamp);
-
-    Optional<SubCommand> subCommand = Optional.empty();
-
-    final var invocationSender = new InvocationSender() {
-
-      @Override
-      public void sendMessage(final String message) {
-        sender.sendMessage(new TextComponent(message));
-      }
-    };
-
-    if (args.length > 0) {
+    if (args.isNotEmpty()) {
       // Search subcommand if command arguments are present
       subCommand = SubCommandRegistry.getSubCommands().stream()
-        .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
-          || (sub.getInfo().aliases().length > 0
-          && Arrays.stream(sub.getInfo().aliases())
-          .anyMatch(alias -> alias.equalsIgnoreCase(args[0]))))
-        .findFirst();
+        .filter { sub: SubCommand ->
+          (sub.info.name.equals(args[0], ignoreCase = true)
+            || (sub.info.aliases.isNotEmpty()
+            && Arrays.stream(sub.info.aliases)
+            .anyMatch { alias: String -> alias.equals(args[0], ignoreCase = true) }))
+        }
+        .findFirst()
 
       // Check permissions for subcommands
-      subCommand.ifPresent(it -> {
-        if (!sender.hasPermission(it.getPermission())) {
-          invocationSender.sendMessage(Sonar.get().getConfig().SUB_COMMAND_NO_PERM
-            .replace("%permission%", it.getPermission()));
+      subCommand.ifPresent { it: SubCommand ->
+        if (!sender.hasPermission(it.permission)) {
+          invocationSender.sendMessage(
+            Sonar.get().config.SUB_COMMAND_NO_PERM
+              .replace("%permission%", it.permission)
+          )
         }
-      });
+      }
     }
 
     // No subcommand was found
-    if (!subCommand.isPresent()) {
-      invocationSender.sendMessage();
+    if (!subCommand.isPresent) {
+      invocationSender.sendMessage()
       invocationSender.sendMessage(
         " §eRunning §lSonar §e"
-          + Sonar.get().getVersion()
+          + Sonar.get().version
           + " on "
-          + Sonar.get().getPlatform().getDisplayName()
-      );
-
-      final TextComponent discordComponent = new TextComponent(
+          + Sonar.get().platform.displayName
+      )
+      val discordComponent = TextComponent(
         " §7Need help?§b discord.jonesdev.xyz"
-      );
-      discordComponent.setHoverEvent(new HoverEvent(
-        HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to open Discord").create()
-      ));
-      discordComponent.setClickEvent(new ClickEvent(
+      )
+      discordComponent.hoverEvent = HoverEvent(
+        HoverEvent.Action.SHOW_TEXT, ComponentBuilder("§7Click to open Discord").create()
+      )
+      discordComponent.clickEvent = ClickEvent(
         ClickEvent.Action.OPEN_URL, "https://discord.jonesdev.xyz/"
-      ));
-      sender.sendMessage(discordComponent);
+      )
+      sender.sendMessage(discordComponent)
+      invocationSender.sendMessage()
 
-      invocationSender.sendMessage();
-
-      SubCommandRegistry.getSubCommands().forEach(sub -> {
-        final TextComponent component = new TextComponent(" §a▪ §7/sonar "
-          + sub.getInfo().name()
-          + " §f"
-          + sub.getInfo().description());
-
-        if (sender instanceof ProxiedPlayer) {
-          component.setClickEvent(
-            new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
-          );
-
-          component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
-            "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-              + "\n§7Only console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-              + "\n§7Permission: §f" + sub.getPermission()
-              + "\n§7(Click to run)"
-          ).create()));
+      SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
+        val component = TextComponent(
+          " §a▪ §7/sonar "
+            + sub.info.name
+            + " §f"
+            + sub.info.description
+        )
+        if (sender is ProxiedPlayer) {
+          component.clickEvent =
+            ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.info.name + " ")
+          component.hoverEvent = HoverEvent(
+            HoverEvent.Action.SHOW_TEXT, ComponentBuilder(
+              """
+                        §7Only players: §f${if (sub.info.onlyPlayers) "§a✔" else "§c✗"}
+                        §7Only console: §f${if (sub.info.onlyConsole) "§a✔" else "§c✗"}
+                        §7Permission: §f${sub.permission}
+                        §7(Click to run)
+                        """.trimIndent()
+            ).create()
+          )
         }
+        sender.sendMessage(component)
+      })
 
-        sender.sendMessage(component);
-      });
-
-      invocationSender.sendMessage();
-      return;
+      invocationSender.sendMessage()
+      return
     }
 
     // ifPresentOrElse() doesn't exist yet... (version compatibility)
-    subCommand.ifPresent(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(sender instanceof ProxiedPlayer)) {
-        invocationSender.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
-        return;
+    subCommand.ifPresent {
+      if (it.info.onlyPlayers && sender !is ProxiedPlayer) {
+        invocationSender.sendMessage(Sonar.get().config.PLAYERS_ONLY)
+        return@ifPresent
       }
 
-      if (sub.getInfo().onlyConsole() && sender instanceof ProxiedPlayer) {
-        invocationSender.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
-        return;
+      if (it.info.onlyConsole && sender is ProxiedPlayer) {
+        invocationSender.sendMessage(Sonar.get().config.CONSOLE_ONLY)
+        return@ifPresent
       }
 
-      final CommandInvocation commandInvocation = new CommandInvocation(
-        sender.getName(),
+      val commandInvocation = CommandInvocation(
+        sender.name,
         invocationSender,
-        sub,
+        it,
         args
-      );
+      )
 
       // The subcommands has arguments which are not present in the executed command
-      if (sub.getInfo().arguments().length > 0
-        && commandInvocation.getArguments().length <= 1) {
+      if (it.info.arguments.isNotEmpty()
+        && commandInvocation.arguments.size <= 1
+      ) {
         invocationSender.sendMessage(
-          Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
-            .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
-        );
-        return;
+          Sonar.get().config.INCORRECT_COMMAND_USAGE
+            .replace("%usage%", "${it.info.name} (${it.arguments})")
+        )
+        return@ifPresent
       }
 
       // Execute the sub command with the custom invocation properties
-      sub.execute(commandInvocation);
-    });
+      it.execute(commandInvocation)
+    }
   }
 
-  private static final Collection<String> TAB_SUGGESTIONS = new ArrayList<>();
-  private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
-
   // Tab completion handling
-  @Override
-  public Iterable<String> onTabComplete(final CommandSender sender, final String[] args) {
-    if (args.length <= 1) {
+  override fun onTabComplete(sender: CommandSender, args: Array<String>): Iterable<String> {
+    return if (args.size <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
-        for (final SubCommand subCommand : SubCommandRegistry.getSubCommands()) {
-          TAB_SUGGESTIONS.add(subCommand.getInfo().name());
-
-          if (subCommand.getInfo().aliases().length > 0) {
-            TAB_SUGGESTIONS.addAll(Arrays.asList(subCommand.getInfo().aliases()));
+        for (subCommand in SubCommandRegistry.getSubCommands()) {
+          TAB_SUGGESTIONS.add(subCommand.info.name)
+          if (subCommand.info.aliases.isNotEmpty()) {
+            TAB_SUGGESTIONS.addAll(listOf(*subCommand.info.aliases))
           }
         }
       }
-      return TAB_SUGGESTIONS;
-    } else if (args.length == 2) {
+      TAB_SUGGESTIONS
+    } else if (args.size == 2) {
       if (ARG_TAB_SUGGESTIONS.isEmpty()) {
-        for (final SubCommand subCommand : SubCommandRegistry.getSubCommands()) {
-          ARG_TAB_SUGGESTIONS.put(subCommand.getInfo().name(),
-            Arrays.stream(subCommand.getInfo().arguments())
-              .map(Argument::name)
-              .collect(Collectors.toList())
-          );
+        for (subCommand in SubCommandRegistry.getSubCommands()) {
+          ARG_TAB_SUGGESTIONS[subCommand.info.name] = subCommand.info.arguments
+            .map { argument -> argument.name }
+            .toList()
         }
       }
 
-      final String subCommandName = args[0].toLowerCase();
-      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
-    } else return emptyList();
+      val subCommandName = args[0].lowercase(Locale.getDefault())
+      ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList())
+    } else emptyList()
+  }
+
+  companion object {
+    private val delay = CacheBuilder.newBuilder()
+      .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
+      .build<CommandSender, Long>()
+    private val decimalFormat = DecimalFormat("#.##")
+    private val TAB_SUGGESTIONS: MutableCollection<String> = ArrayList()
+    private val ARG_TAB_SUGGESTIONS: MutableMap<String, List<String>> = HashMap()
   }
 }
