@@ -28,9 +28,18 @@ class FallbackQueue {
   private val queuedPlayers = Vector<Pair<InetAddress, Runnable>>(8) // pre-allocate 8 entries
 
   fun getQueuedPlayers(): Collection<Pair<InetAddress, Runnable>> {
-    return queuedPlayers
+    return queuedPlayers // TODO: sync here?
   }
 
+  /**
+   * Creates a pair of InetAddress and Runnable (action to be run after the queue entry
+   * has been polled) since we cannot store the Runnable for the InetAddress here because
+   * of concurrency and accessibility issues.
+   *
+   * @param inetAddress IP address of the player
+   * @param runnable queued action on the netty thread
+   * @see remove
+   */
   fun queue(inetAddress: InetAddress, runnable: Runnable) {
     queuedPlayers.add(Pair(inetAddress, runnable))
   }
