@@ -15,45 +15,47 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.fallback;
+package jones.sonar.api.fallback
 
-import jones.sonar.api.Sonar;
-import jones.sonar.api.util.Pair;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-
-import java.net.InetAddress;
-import java.util.Collection;
-import java.util.Vector;
+import jones.sonar.api.Sonar
+import jones.sonar.api.util.Pair
+import lombok.AccessLevel
+import lombok.RequiredArgsConstructor
+import java.net.InetAddress
+import java.util.*
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public final class FallbackQueue {
-  @Getter
-  private final Collection<Pair<InetAddress, Runnable>> queuedPlayers = new Vector<>();
+class FallbackQueue {
+  private val queuedPlayers = Vector<Pair<InetAddress, Runnable>>(8) // pre-allocate 8 entries
 
-  public void queue(final @NotNull InetAddress inetAddress, final @NotNull Runnable runnable) {
-    queuedPlayers.add(new Pair<>(inetAddress, runnable));
+  fun getQueuedPlayers(): Collection<Pair<InetAddress, Runnable>> {
+    return queuedPlayers
   }
 
-  public void remove(final @NotNull InetAddress inetAddress) {
-    queuedPlayers.removeIf(pair -> pair.getFirst() == inetAddress);
+  fun queue(inetAddress: InetAddress, runnable: Runnable) {
+    queuedPlayers.add(Pair(inetAddress, runnable))
   }
 
-  public void poll() {
-    synchronized (queuedPlayers) {
-      final Collection<Pair<InetAddress, Runnable>> toRemove = new Vector<>();
+  fun remove(inetAddress: InetAddress) {
+    // Since every entry is a Pair<>, we cannot just remove an InetAddress from the map.
+    // Therefore, we check for each pair and see if the InetAddress matches the one that
+    // has to be removed. Furthermore, we remove the entry (Pair<>)
+    queuedPlayers.removeIf { pair: Pair<InetAddress, Runnable> -> pair.first === inetAddress }
+  }
 
+  fun poll() {
+    val toRemove = Vector<Pair<InetAddress, Runnable>>()
+
+    // We need to be very careful here since we don't want any concurrency issues.
+    synchronized(queuedPlayers) {
       queuedPlayers.parallelStream()
-        .limit(Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS)
-        .forEach(pair -> {
-          pair.getSecond().run();
+        .limit(Sonar.get().config.MAXIMUM_QUEUE_POLLS.toLong())
+        .forEach { pair: Pair<InetAddress, Runnable> ->
+          pair.second.run()
+          toRemove.add(pair)
+        }
 
-          toRemove.add(pair);
-        });
-
-      queuedPlayers.removeAll(toRemove);
+      queuedPlayers.removeAll(toRemove.toSet())
     }
   }
 }
