@@ -15,49 +15,42 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.bungee.verbose;
+package jones.sonar.bungee.verbose
 
-import jones.sonar.api.Sonar;
-import jones.sonar.api.verbose.Verbose;
-import jones.sonar.common.verbose.VerboseAnimation;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
+import jones.sonar.api.Sonar
+import jones.sonar.api.util.Formatting.formatMemory
+import jones.sonar.api.verbose.Verbose
+import jones.sonar.common.verbose.VerboseAnimation
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.ProxyServer
+import net.md_5.bungee.api.chat.TextComponent
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+class ActionBarVerbose(private val server: ProxyServer) : Verbose {
+  private val subscribers: MutableCollection<String> = ArrayList()
 
-import static jones.sonar.api.util.Formatting.formatMemory;
+  override fun getSubscribers(): MutableCollection<String> {
+    return subscribers
+  }
 
-@RequiredArgsConstructor
-public final class ActionBarVerbose implements Verbose {
-  private final ProxyServer server;
-  @Getter
-  private final Collection<String> subscribers = new ArrayList<>();
+  fun update() {
+    val component = TextComponent(
+      Sonar.get().config.ACTION_BAR_LAYOUT
+        .replace("%queued%", Sonar.get().formatter.format(Sonar.get().fallback.queue.queuedPlayers.size))
+        .replace("%verifying%", Sonar.get().formatter.format(Sonar.get().fallback.connected.size))
+        .replace("%verified%", Sonar.get().formatter.format(Sonar.get().fallback.verified.size))
+        .replace("%blacklisted%", Sonar.get().formatter.format(Sonar.get().fallback.blacklisted.size))
+        .replace("%total%", Sonar.get().formatter.format(Sonar.get().statistics.get("total", 0)))
+        .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
+        .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
+        .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))
+        .replace("%max-memory%", formatMemory(Runtime.getRuntime().maxMemory()))
+        .replace("%animation%", VerboseAnimation.nextState())
+    )
 
-  public void update() {
-    final TextComponent component = new TextComponent(Sonar.get().getConfig().ACTION_BAR_LAYOUT
-      .replace("%queued%",
-        Sonar.get().getFormatter().format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-      .replace("%verifying%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getConnected().size()))
-      .replace("%verified%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getVerified().size()))
-      .replace("%blacklisted%", Sonar.get().getFormatter().format(Sonar.get().getFallback().getBlacklisted().size()))
-      .replace("%total%", Sonar.get().getFormatter().format(Sonar.get().getStatistics().get("total", 0)))
-      .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
-      .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
-      .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))
-      .replace("%max-memory%", formatMemory(Runtime.getRuntime().maxMemory()))
-      .replace("%animation%", VerboseAnimation.Companion.nextState())
-    );
-
-    synchronized (subscribers) {
-      for (final String subscriber : subscribers) {
-        Optional.ofNullable(server.getPlayer(subscriber)).ifPresent(player -> {
-          player.sendMessage(ChatMessageType.ACTION_BAR, component);
-        });
+    synchronized(subscribers) {
+      for (subscriber in subscribers) {
+        val player = server.getPlayer(subscriber) ?: continue
+        player.sendMessage(ChatMessageType.ACTION_BAR, component)
       }
     }
   }

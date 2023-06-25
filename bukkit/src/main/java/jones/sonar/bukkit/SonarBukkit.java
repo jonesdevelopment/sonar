@@ -90,7 +90,7 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());
 
     // Initialize action bar verbose
-    actionBarVerbose = new ActionBarVerbose();
+    actionBarVerbose = new ActionBarVerbose(plugin.getServer());
 
     // Register action bar verbose task
     plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, actionBarVerbose::update,

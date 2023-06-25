@@ -33,7 +33,7 @@ class ActionBarVerbose(private val server: ProxyServer) : Verbose {
   }
 
   fun update() {
-    val component: Component = Component.text(
+    val component = Component.text(
       Sonar.get().config.ACTION_BAR_LAYOUT
         .replace("%queued%", Sonar.get().formatter.format(Sonar.get().fallback.queue.queuedPlayers.size))
         .replace("%verifying%", Sonar.get().formatter.format(Sonar.get().fallback.connected.size))
