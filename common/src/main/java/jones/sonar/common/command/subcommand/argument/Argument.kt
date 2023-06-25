@@ -15,27 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.common.command.subcommand;
+package jones.sonar.common.command.subcommand.argument
 
-import jones.sonar.common.command.subcommand.argument.Argument;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface SubCommandInfo {
-  String name();
-
-  String description();
-
-  String[] aliases() default {};
-
-  Argument[] arguments() default {};
-
-  boolean onlyPlayers() default false;
-
-  boolean onlyConsole() default false;
-}
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class Argument(val name: String)

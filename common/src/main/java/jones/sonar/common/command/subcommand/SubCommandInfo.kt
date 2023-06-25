@@ -15,15 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.common.command.subcommand.argument;
+package jones.sonar.common.command.subcommand
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import jones.sonar.common.command.subcommand.argument.Argument
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Argument {
-  String name();
-}
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class SubCommandInfo(
+    val name: String,
+    val description: String,
+    val aliases: Array<String> = [],
+    val arguments: Array<Argument> = [],
+    val onlyPlayers: Boolean = false,
+    val onlyConsole: Boolean = false
+)

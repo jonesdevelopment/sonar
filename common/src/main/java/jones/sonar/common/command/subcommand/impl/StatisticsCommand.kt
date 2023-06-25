@@ -29,7 +29,7 @@ import jones.sonar.common.command.subcommand.SubCommandInfo
 class StatisticsCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {
     val total = sonar.statistics.get("total", 0)
-fi    val queued = sonar.fallback.queue.getQueuedPlayers().size
+    val queued = sonar.fallback.queue.getQueuedPlayers().size
     val verifying = sonar.fallback.connected.size
     val verified = sonar.fallback.verified.size
     val blacklisted = sonar.fallback.blacklisted.size
