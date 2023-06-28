@@ -35,7 +35,8 @@ public class SubCommandRegistry {
     new StatisticsCommand(),
     new VerboseCommand(),
     new ReloadCommand(),
-    new VersionCommand()
+    new VersionCommand(),
+    new DumpCommand()
   );
 
   public void register(final SubCommand... commands) {
