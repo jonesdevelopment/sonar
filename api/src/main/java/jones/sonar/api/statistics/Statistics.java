@@ -25,7 +25,8 @@ import java.util.Map;
 public interface Statistics {
   Map<String, Integer> map = Collections.synchronizedMap(new HashMap<>());
 
-  Statistics INSTANCE = new Statistics() {};
+  Statistics INSTANCE = new Statistics() {
+  };
 
   default void increment(final String key) {
     increment(key, 0);

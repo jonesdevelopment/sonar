@@ -22,10 +22,10 @@ import jones.sonar.common.command.subcommand.argument.Argument
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 annotation class SubCommandInfo(
-    val name: String,
-    val description: String,
-    val aliases: Array<String> = [],
-    val arguments: Array<Argument> = [],
-    val onlyPlayers: Boolean = false,
-    val onlyConsole: Boolean = false
+  val name: String,
+  val description: String,
+  val aliases: Array<String> = [],
+  val arguments: Array<Argument> = [],
+  val onlyPlayers: Boolean = false,
+  val onlyConsole: Boolean = false
 )

@@ -17,7 +17,7 @@
 
 package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.util.Formatting
+import jones.sonar.api.util.Formatting.Companion.formatMemory
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
@@ -47,10 +47,10 @@ class DumpCommand : SubCommand() {
     sonar.logger.info("JVM args: ${runtimeMxBean.inputArguments.joinToString(", ")}")
     sonar.logger.info("Java version: ${runtimeMxBean.vmVersion}")
     sonar.logger.info("Operating system: ${System.getProperty("os.name")}; ${System.getProperty("os.arch")}")
-    sonar.logger.info("Total memory: ${Formatting.formatMemory(totalMemory)}")
-    sonar.logger.info("Max memory: ${Formatting.formatMemory(maxMemory)}")
-    sonar.logger.info("Free memory: ${Formatting.formatMemory(freeMemory)}")
-    sonar.logger.info("Used Memory: ${Formatting.formatMemory(usedMemory)}")
+    sonar.logger.info("Total memory: ${formatMemory(totalMemory)}")
+    sonar.logger.info("Max memory: ${formatMemory(maxMemory)}")
+    sonar.logger.info("Free memory: ${formatMemory(freeMemory)}")
+    sonar.logger.info("Used Memory: ${formatMemory(usedMemory)}")
     sonar.logger.info("Platform: $platform")
     sonar.logger.info("Version: $fullVersion")
   }
