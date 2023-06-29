@@ -18,7 +18,8 @@
 package jones.sonar.bungee.compress
 
 import com.velocitypowered.natives.compression.VelocityCompressor
-import com.velocitypowered.natives.util.MoreByteBufUtils
+import com.velocitypowered.natives.util.MoreByteBufUtils.ensureCompatible
+import com.velocitypowered.natives.util.MoreByteBufUtils.preferredBuffer
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.CorruptedFrameException
@@ -63,7 +64,7 @@ class PacketCompressor(
     write21BitVarInt(out, 0)
     writeVarInt(out, uncompressed)
 
-    val compatibleIn = MoreByteBufUtils.ensureCompatible(ctx.alloc(), velocityCompressor, msg)
+    val compatibleIn = ensureCompatible(ctx.alloc(), velocityCompressor, msg)
 
     val startCompressed = out.writerIndex()
     try {
@@ -100,6 +101,6 @@ class PacketCompressor(
 
     // (maximum data length after compression) + packet length varint + uncompressed data varint
     val initialBufferSize: Int = uncompressed - 1 + 3 + varIntBytes(uncompressed)
-    return MoreByteBufUtils.preferredBuffer(ctx.alloc(), velocityCompressor, initialBufferSize)
+    return preferredBuffer(ctx.alloc(), velocityCompressor, initialBufferSize)
   }
 }
