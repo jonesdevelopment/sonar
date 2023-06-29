@@ -93,12 +93,16 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     // Register Fallback listener
     plugin.getServer().getPluginManager().registerListener(plugin, new FallbackListener(getFallback()));
 
+    // Register Fallback queue task
+    plugin.getServer().getScheduler().schedule(plugin, getFallback().getQueue()::poll,
+      500L, 500L, TimeUnit.MILLISECONDS);
+
     // Initialize action bar verbose
     actionBarVerbose = new ActionBarVerbose(plugin.getServer());
 
     // Register action bar verbose task
     plugin.getServer().getScheduler().schedule(plugin, actionBarVerbose::update,
-      100L, TimeUnit.MILLISECONDS);
+      100L, 100L, TimeUnit.MILLISECONDS);
 
     // Done
     final long startDelay = System.currentTimeMillis() - start;
@@ -114,5 +118,6 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
   @Override
   public void reload() {
     getConfig().load();
+    FallbackListener.CachedMessages.update();
   }
 }

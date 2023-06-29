@@ -63,7 +63,7 @@ class FallbackQueue {
           toRemove.add(it)
         }
 
-      queuedPlayers.removeAll(toRemove.toSet())
+      queuedPlayers.removeAll(toRemove)
     }
   }
 }
