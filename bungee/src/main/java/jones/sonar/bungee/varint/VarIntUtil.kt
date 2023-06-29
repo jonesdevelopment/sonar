@@ -18,10 +18,36 @@
 package jones.sonar.bungee.varint
 
 import io.netty.buffer.ByteBuf
+import io.netty.handler.codec.CorruptedFrameException
 import kotlin.math.ceil
 
 class VarIntUtil {
   companion object {
+    fun readVarInt(buf: ByteBuf): Int {
+      return readVarInt0(buf, 5)
+    }
+
+    private fun readVarInt0(buf: ByteBuf, maxBytes: Int): Int {
+      val read = readVarIntSafely(buf, maxBytes)
+      if (read == Int.MIN_VALUE) {
+        throw CorruptedFrameException("Bad VarInt decoded")
+      }
+      return read
+    }
+
+    private fun readVarIntSafely(buf: ByteBuf, maxBytes: Int): Int {
+      var i = 0
+      val maxRead = maxBytes.coerceAtMost(buf.readableBytes())
+      for (j in 0 until maxRead) {
+        val k = buf.readByte().toInt()
+        i = i or (k and 0x7F shl j * 7)
+        if (k and 0x80 != 128) {
+          return i
+        }
+      }
+      return Int.MIN_VALUE
+    }
+
     private val EXACT_BYTE_LENGTHS = IntArray(33)
 
     init {
