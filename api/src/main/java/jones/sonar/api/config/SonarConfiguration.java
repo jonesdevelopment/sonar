@@ -86,6 +86,13 @@ public final class SonarConfiguration {
   public String RELOADING;
   public String RELOADED;
 
+  public boolean DATABASE_ENABLED;
+  public String DATABASE_URL;
+  public String DATABASE_NAME;
+  public String DATABASE_USERNAME;
+  public String DATABASE_PASSWORD;
+  public int DATABASE_PORT;
+
   public void load() {
     Objects.requireNonNull(yamlConfig);
 
@@ -96,8 +103,14 @@ public final class SonarConfiguration {
 
     // General options
     MAXIMUM_ONLINE_PER_IP = yamlConfig.getInt("general.max-online-per-ip", 3);
-
     MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
+
+    DATABASE_ENABLED = yamlConfig.getBoolean("general.database.enabled", false);
+    DATABASE_NAME = yamlConfig.getString("general.database.name", "sonar");
+    DATABASE_URL = yamlConfig.getString("general.database.url", "localhost");
+    DATABASE_PORT = yamlConfig.getInt("general.database.port", 3306);
+    DATABASE_USERNAME = yamlConfig.getString("general.database.username", "root");
+    DATABASE_PASSWORD = yamlConfig.getString("general.database.password", "");
 
     MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.queue.max-players", 8192);
     MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);

@@ -159,7 +159,7 @@ public final class FallbackListener {
 
     final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
-    if (fallback.getBlacklisted().contains(inetAddress)) {
+    if (fallback.getBlacklisted().contains(inetAddress.toString())) {
       event.setResult(BLACKLISTED);
       return;
     }
@@ -180,12 +180,12 @@ public final class FallbackListener {
       }
     }
 
-    if (fallback.getVerified().contains(inetAddress)) return;
+    if (fallback.getVerified().contains(inetAddress.toString())) return;
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
-    if (fallback.getConnected().contains(inetAddress)) {
+    if (fallback.getConnected().contains(inetAddress.toString())) {
       event.setResult(ALREADY_VERIFYING);
       return;
     }
@@ -236,7 +236,7 @@ public final class FallbackListener {
     final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     // We don't want to check players that have already been verified
-    if (fallback.getVerified().contains(inetAddress)) return;
+    if (fallback.getVerified().contains(inetAddress.toString())) return;
 
     if (event.getConnection() instanceof InitialInboundConnection) {
       fallback.getLogger().error("Could not inject into GameProfileRequestEvent!");
@@ -335,7 +335,7 @@ public final class FallbackListener {
         }
 
         // Mark the player as connected → verifying players
-        fallback.getConnected().add(inetAddress);
+        fallback.getConnected().add(inetAddress.toString());
 
         // Check if compression is enabled in the Sonar configuration
         if (fallback.getSonar().getConfig().ENABLE_COMPRESSION) {

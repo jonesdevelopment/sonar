@@ -250,8 +250,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     player.getPipeline().remove(DECODER);
     player.getPipeline().remove(HANDLER);
 
-    player.getFallback().getVerified().add(player.getInetAddress());
-    player.getFallback().getConnected().remove(player.getInetAddress());
+    player.getFallback().getVerified().add(player.getInetAddress().toString());
+    player.getFallback().getConnected().remove(player.getInetAddress().toString());
 
     // Replace timeout handler with the old one to let Velocity handle timeouts again
     player.getPipeline().replace(

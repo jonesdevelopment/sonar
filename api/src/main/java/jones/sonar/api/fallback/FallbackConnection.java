@@ -45,7 +45,7 @@ public interface FallbackConnection<Player, Connection> {
       getChannel().close();
     }
 
-    getFallback().getBlacklisted().add(getInetAddress());
+    getFallback().getBlacklisted().add(getInetAddress().toString());
 
     if (reason != null) {
       Sonar.get().getLogger().info("[Fallback] {} ({}) has failed the bot check for: {}",

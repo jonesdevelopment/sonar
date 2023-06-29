@@ -45,9 +45,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.net.InetAddress;
-import java.util.Collection;
 import java.util.Objects;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
@@ -69,10 +67,6 @@ public final class FallbackListener implements Listener {
       throw new IllegalStateException(throwable);
     }
   }
-
-  // We need to cache if the joining player is a premium player or not
-  // If we don't do that, many authentication plugins can potentially break
-  private final Collection<String> premium = new Vector<>(1);
 
   public static class CachedMessages {
     static TextComponent TOO_MANY_PLAYERS;
@@ -140,7 +134,7 @@ public final class FallbackListener implements Listener {
 
     final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
 
-    if (fallback.getBlacklisted().contains(inetAddress)) {
+    if (fallback.getBlacklisted().contains(inetAddress.toString())) {
       event.setCancelled(true);
       event.setCancelReason(BLACKLISTED);
       return;
@@ -166,12 +160,12 @@ public final class FallbackListener implements Listener {
       }
     }
 
-    if (fallback.getVerified().contains(inetAddress)) return;
+    if (fallback.getVerified().contains(inetAddress.toString())) return;
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
-    if (fallback.getConnected().contains(inetAddress)) {
+    if (fallback.getConnected().contains(inetAddress.toString())) {
       event.setCancelled(true);
       event.setCancelReason(ALREADY_VERIFYING);
       return;
@@ -210,7 +204,7 @@ public final class FallbackListener implements Listener {
     final InetAddress inetAddress = initialHandler.getAddress().getAddress();
 
     // We don't want to check players that have already been verified
-    if (fallback.getVerified().contains(inetAddress)) return;
+    if (fallback.getVerified().contains(inetAddress.toString())) return;
 
     // Run in the channel's event loop
     channelWrapper.getHandle().eventLoop().execute(() -> {

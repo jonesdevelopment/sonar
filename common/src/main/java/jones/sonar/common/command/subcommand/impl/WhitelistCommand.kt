@@ -67,12 +67,12 @@ class WhitelistCommand : SubCommand() {
         }
 
         synchronized(sonar.fallback.verified) {
-          if (sonar.fallback.verified.contains(inetAddress)) {
+          if (sonar.fallback.verified.contains(inetAddress.toString())) {
             invocation.invocationSender.sendMessage(sonar.config.WHITELIST_DUPLICATE)
             return
           }
 
-          sonar.fallback.verified.add(inetAddress)
+          sonar.fallback.verified.add(inetAddress.toString())
           invocation.invocationSender.sendMessage(
             sonar.config.WHITELIST_ADD
               .replace("%ip%", rawInetAddress)
@@ -104,12 +104,12 @@ class WhitelistCommand : SubCommand() {
         }
 
         synchronized(sonar.fallback.verified) {
-          if (!sonar.fallback.verified.contains(inetAddress)) {
+          if (!sonar.fallback.verified.contains(inetAddress.toString())) {
             invocation.invocationSender.sendMessage(sonar.config.WHITELIST_NOT_FOUND)
             return
           }
 
-          sonar.fallback.verified.remove(inetAddress)
+          sonar.fallback.verified.remove(inetAddress.toString())
           invocation.invocationSender.sendMessage(
             sonar.config.WHITELIST_REMOVE
               .replace("%ip%", rawInetAddress)

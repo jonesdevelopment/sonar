@@ -22,6 +22,7 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.MySQLDataStorage;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
@@ -106,6 +107,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
       .repeat(100L, TimeUnit.MILLISECONDS)
       .schedule();
 
+    getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME));
+    getFallback().getVerified().addAll(getDatabase().getListFromTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME));
+
     // Done
     final long startDelay = System.currentTimeMillis() - start;
 
@@ -114,7 +118,8 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
   @Override
   public void disable() {
-    // Do nothing
+    // Disconnect the MySQL database
+    getDatabase().disconnect();
   }
 
   @Override

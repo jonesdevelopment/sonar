@@ -68,12 +68,12 @@ class BlacklistCommand : SubCommand() {
         }
 
         synchronized(sonar.fallback.blacklisted) {
-          if (sonar.fallback.blacklisted.contains(inetAddress)) {
+          if (sonar.fallback.blacklisted.contains(inetAddress.toString())) {
             invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_DUPLICATE)
             return
           }
 
-          sonar.fallback.blacklisted.add(inetAddress)
+          sonar.fallback.blacklisted.add(inetAddress.toString())
           invocation.invocationSender.sendMessage(
             sonar.config.BLACKLIST_ADD
               .replace("%ip%", rawInetAddress)
@@ -105,12 +105,12 @@ class BlacklistCommand : SubCommand() {
         }
 
         synchronized(sonar.fallback.blacklisted) {
-          if (!sonar.fallback.blacklisted.contains(inetAddress)) {
+          if (!sonar.fallback.blacklisted.contains(inetAddress.toString())) {
             invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_NOT_FOUND)
             return
           }
 
-          sonar.fallback.blacklisted.remove(inetAddress)
+          sonar.fallback.blacklisted.remove(inetAddress.toString())
           invocation.invocationSender.sendMessage(
             sonar.config.BLACKLIST_REMOVE
               .replace("%ip%", rawInetAddress)

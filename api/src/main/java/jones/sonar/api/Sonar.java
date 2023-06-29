@@ -18,6 +18,8 @@
 package jones.sonar.api;
 
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.Database;
+import jones.sonar.api.database.MySQLDataStorage;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.fallback.FallbackHolder;
 import jones.sonar.api.logger.Logger;
@@ -48,6 +50,11 @@ public interface Sonar {
   @NotNull
   default Statistics getStatistics() {
     return Statistics.INSTANCE;
+  }
+
+  @NotNull
+  default Database getDatabase() {
+    return MySQLDataStorage.INSTANCE;
   }
 
   @NotNull Verbose getActionBarVerbose();

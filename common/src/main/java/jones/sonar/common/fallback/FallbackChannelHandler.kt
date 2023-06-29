@@ -34,7 +34,7 @@ class FallbackChannelHandler(private val fallback: Fallback) : ChannelInboundHan
     val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
     // Remove the IP address from the queue
-    fallback.connected.remove(inetAddress)
+    fallback.connected.remove(inetAddress.toString())
     fallback.queue.remove(inetAddress)
   }
 

@@ -50,7 +50,7 @@ class FallbackPacketDecoder(
       // Block the IP address
       val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
-      fallbackPlayer.fallback.blacklisted.add(inetAddress)
+      fallbackPlayer.fallback.blacklisted.add(inetAddress.toString())
     }
   }
 

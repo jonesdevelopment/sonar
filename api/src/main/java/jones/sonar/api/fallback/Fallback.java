@@ -21,15 +21,14 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.logger.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetAddress;
 import java.util.Collection;
 
 public interface Fallback {
-  @NotNull Collection<InetAddress> getConnected();
+  @NotNull Collection<String> getConnected();
 
-  @NotNull Collection<InetAddress> getVerified();
+  @NotNull Collection<String> getVerified();
 
-  @NotNull Collection<InetAddress> getBlacklisted();
+  @NotNull Collection<String> getBlacklisted();
 
   @NotNull FallbackQueue getQueue();
 
