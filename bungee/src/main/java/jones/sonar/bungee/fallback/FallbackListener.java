@@ -62,13 +62,18 @@ public final class FallbackListener implements Listener {
 
     final int compressionThreshold = BungeeCord.getInstance().getConfig().getCompressionThreshold();
 
+    if (compressionThreshold <= 0) return;
+
     final VelocityCompressor velocityCompressor = Natives.compress.get().create(-1);
 
-    // Replace compression handlers
-    if (compressionThreshold != -1
-      && pipeline.get(PacketCompressor.class) != null
-      && pipeline.get(PacketDecompressor.class) != null) {
+    // You don't need the frame decoder anymore
+    if (pipeline.get(FRAME_PREPENDER) != null) {
       pipeline.remove(FRAME_PREPENDER);
+    }
+
+    // Replace compression handlers
+    if (pipeline.get(PacketCompressor.class) != null
+      && pipeline.get(PacketDecompressor.class) != null) {
       pipeline.replace(
         PacketCompressor.class,
         "compress",
