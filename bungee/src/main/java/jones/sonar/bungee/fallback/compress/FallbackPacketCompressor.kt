@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.bungee.compress
+package jones.sonar.bungee.fallback.compress
 
 import com.velocitypowered.natives.compression.VelocityCompressor
 import com.velocitypowered.natives.util.MoreByteBufUtils.ensureCompatible
@@ -23,17 +23,17 @@ import com.velocitypowered.natives.util.MoreByteBufUtils.preferredBuffer
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.CorruptedFrameException
-import io.netty.handler.codec.MessageToByteEncoder
 import jones.sonar.bungee.varint.VarIntUtil.Companion.varIntBytes
 import jones.sonar.bungee.varint.VarIntUtil.Companion.write21BitVarInt
 import jones.sonar.bungee.varint.VarIntUtil.Companion.writeVarInt
+import net.md_5.bungee.compress.PacketCompressor
 import java.util.zip.DataFormatException
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftCompressorAndLengthEncoder.java
-class PacketCompressor(
+class FallbackPacketCompressor(
   private var compressionThreshold: Int,
   private val velocityCompressor: VelocityCompressor
-) : MessageToByteEncoder<ByteBuf>() {
+) : PacketCompressor() {
 
   companion object {
     private const val PROTOCOL_MAXIMUM = 1 shl 21

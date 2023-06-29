@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.bungee.compress
+package jones.sonar.bungee.fallback.compress
 
 import com.velocitypowered.natives.compression.VelocityCompressor
 import com.velocitypowered.natives.util.MoreByteBufUtils.ensureCompatible
@@ -23,14 +23,19 @@ import com.velocitypowered.natives.util.MoreByteBufUtils.preferredBuffer
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.CorruptedFrameException
-import io.netty.handler.codec.MessageToMessageDecoder
 import jones.sonar.bungee.varint.VarIntUtil.Companion.readVarInt
+import net.md_5.bungee.compress.PacketDecompressor
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftCompressDecoder.java
-class PacketDecompressor(
+class FallbackPacketDecompressor(
   private var compressionThreshold: Int,
   private val velocityCompressor: VelocityCompressor
-) : MessageToMessageDecoder<ByteBuf>() {
+) : PacketDecompressor(compressionThreshold) {
+
+  @Throws(Exception::class)
+  override fun handlerAdded(ctx: ChannelHandlerContext) {
+    // Don't let the PacketDecompressor handle this
+  }
 
   companion object {
     private const val MAXIMUM_UNCOMPRESSED_SIZE = 8 * 1024 * 1024 // 8MiB
@@ -41,6 +46,7 @@ class PacketDecompressor(
     this.compressionThreshold = compressionThreshold
   }
 
+  @Throws(Exception::class)
   override fun decode(ctx: ChannelHandlerContext, msg: ByteBuf, out: MutableList<Any>) {
     val claimedUncompressedSize: Int = readVarInt(msg)
     if (claimedUncompressedSize == 0) {

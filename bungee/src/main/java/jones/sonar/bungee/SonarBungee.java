@@ -23,6 +23,7 @@ import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.bungee.command.SonarCommand;
+import jones.sonar.bungee.fallback.FallbackListener;
 import jones.sonar.bungee.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
@@ -88,6 +89,9 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
     // Register Sonar command
     plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());
+
+    // Register Fallback listener
+    plugin.getServer().getPluginManager().registerListener(plugin, new FallbackListener(getFallback()));
 
     // Initialize action bar verbose
     actionBarVerbose = new ActionBarVerbose(plugin.getServer());
