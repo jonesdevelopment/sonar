@@ -81,7 +81,7 @@ class SonarCommand : CommandExecutor, TabExecutor {
 
       // Check permissions for subcommands
       subCommand.ifPresent { it: SubCommand ->
-        if (!sender.hasPermission(it.permission)) {
+        if (!it.info.onlyConsole && !sender.hasPermission(it.permission)) {
           invocationSender.sendMessage(
             Sonar.get().config.SUB_COMMAND_NO_PERM
               .replace("%permission%", it.permission)
