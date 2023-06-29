@@ -66,7 +66,7 @@
           Analyzes if the player is sending legitimate packets
         </li>
         <li>
-          Checks if the player is obeying client gravity
+          <s>Checks if the player is obeying client gravity</s> (planned for a future update)
         </li>
         <li>
           Redirect the player to the backend server without them actually noticing that they
