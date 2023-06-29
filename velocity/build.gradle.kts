@@ -1,5 +1,4 @@
 repositories {
-  maven(url = "https://repo.papermc.io/repository/maven-public/") // Velocity
   maven(url = "https://maven.elytrium.net/repo/") // Velocity proxy module // TODO: set up own repo
 }
 

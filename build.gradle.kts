@@ -31,6 +31,7 @@ versioner {
 allprojects {
   repositories {
     mavenCentral() // Lombok
+    maven(url = "https://repo.papermc.io/repository/maven-public") // Velocity natives
   }
 }
 
