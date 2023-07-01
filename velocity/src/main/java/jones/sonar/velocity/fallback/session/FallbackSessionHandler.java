@@ -263,13 +263,13 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     );
 
     // Continue the initial connection to the backend server
-    initialConnection((AuthSessionHandler) previousHandler);
+    initialConnection(previousHandler);
 
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
   }
 
   // Mostly taken from Velocity
-  private void initialConnection(final AuthSessionHandler sessionHandler) {
+  private void initialConnection(final MinecraftSessionHandler sessionHandler) {
     player.getConnection().server.getEventManager()
       .fire(new PermissionsSetupEvent(player.getPlayer(), DEFAULT_PERMISSION))
       .thenAcceptAsync(permissionEvent -> {
