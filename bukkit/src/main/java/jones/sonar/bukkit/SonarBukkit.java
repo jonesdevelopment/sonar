@@ -21,6 +21,7 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.MySQLDataStorage;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
@@ -96,6 +97,10 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, actionBarVerbose::update,
       100L, 100L);
 
+    // Initialize database
+    getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME));
+    getFallback().getVerified().addAll(getDatabase().getListFromTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME));
+
     // Done
     final long startDelay = System.currentTimeMillis() - start;
 
@@ -104,6 +109,12 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
   @Override
   public void disable() {
+    // Save blacklisted and verified IP addresses
+    getDatabase().addListToTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME, getFallback().getBlacklisted());
+    getDatabase().addListToTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME, getFallback().getVerified());
+
+    // Disconnect the MySQL database
+    getDatabase().disconnect();
   }
 
   @Override

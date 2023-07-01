@@ -107,6 +107,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
       .repeat(100L, TimeUnit.MILLISECONDS)
       .schedule();
 
+    // Initialize database
     getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME));
     getFallback().getVerified().addAll(getDatabase().getListFromTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME));
 
@@ -118,6 +119,10 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
   @Override
   public void disable() {
+    // Save blacklisted and verified IP addresses
+    getDatabase().addListToTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME, getFallback().getBlacklisted());
+    getDatabase().addListToTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME, getFallback().getVerified());
+
     // Disconnect the MySQL database
     getDatabase().disconnect();
   }
