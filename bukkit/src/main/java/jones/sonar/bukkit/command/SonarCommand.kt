@@ -101,14 +101,14 @@ class SonarCommand : CommandExecutor, TabExecutor {
           + " on "
           + Sonar.get().platform.displayName
       )
-      val rawDiscordText = " §7Need help?§b discord.jonesdev.xyz"
+      val rawDiscordText = " §7Need help?§b jonesdev.xyz/discord"
       if (sender is Player) {
         val discordComponent = TextComponent(rawDiscordText)
         discordComponent.hoverEvent = HoverEvent(
           HoverEvent.Action.SHOW_TEXT, ComponentBuilder("§7Click to open Discord").create()
         )
         discordComponent.clickEvent = ClickEvent(
-          ClickEvent.Action.OPEN_URL, "https://discord.jonesdev.xyz/"
+          ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/"
         )
         sender.spigot().sendMessage(discordComponent)
       } else {

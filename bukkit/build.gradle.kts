@@ -11,7 +11,7 @@ bukkit {
   version = rootProject.version.toString()
   main = "jones.sonar.bukkit.SonarBukkitPlugin"
   author = "jonesdev.xyz"
-  website = "https://discord.jonesdev.xyz/"
+  website = "https://jonesdev.xyz/discord/"
   description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
   load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 

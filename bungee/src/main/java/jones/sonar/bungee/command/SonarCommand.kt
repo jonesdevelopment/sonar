@@ -98,13 +98,13 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
           + Sonar.get().platform.displayName
       )
       val discordComponent = TextComponent(
-        " §7Need help?§b discord.jonesdev.xyz"
+        " §7Need help?§b jonesdev.xyz/discord"
       )
       discordComponent.hoverEvent = HoverEvent(
         HoverEvent.Action.SHOW_TEXT, ComponentBuilder("§7Click to open Discord").create()
       )
       discordComponent.clickEvent = ClickEvent(
-        ClickEvent.Action.OPEN_URL, "https://discord.jonesdev.xyz/"
+        ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/"
       )
       sender.sendMessage(discordComponent)
       invocationSender.sendMessage()

@@ -277,7 +277,7 @@ public final class SonarConfiguration {
         "%header%",
         "&cYour IP address is permanently denied from verifying.",
         "&cPlease wait a few minutes before trying to verify again.",
-        "&6False positive? &7https://discord.jonesdev.xyz/",
+        "&6False positive? &7https://jonesdev.xyz/discord/",
         "%footer%"
       )));
     UNEXPECTED_ERROR = fromList(yamlConfig.getStringList("messages.verification.unexpected-error",

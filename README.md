@@ -11,9 +11,9 @@
     <p>
       Please note that this version is still in development and may have bugs and issues.
       <br>
-      If you want to report a bug or issue, please open a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or ticket on the <a href="https://discord.jonesdev.xyz/">Discord</a>.
+      If you want to report a bug or issue, please open a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or ticket on the <a href="https://jonesdev.xyz/discord/">Discord</a>.
       If you encounter a false positive, please read <a href="https://github.com/jonesdevelopment/sonar-antibot/#22-false-positives">this</a>.
-      Make sure to join the <a href="https://discord.jonesdev.xyz/">Discord</a> in order to receive update notifications.
+      Make sure to join the <a href="https://jonesdev.xyz/discord/">Discord</a> in order to receive update notifications.
     </p>
     <h2>1.1 Design</h2>
     <ul>
@@ -101,7 +101,7 @@
       cases in order to prevent false positives.
       <br>
       If you or one of your players experiences a false positive, make sure to report them
-      by opening a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or a ticket on the <a href="https://discord.jonesdev.xyz/">Discord</a>.
+      by opening a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or a ticket on the <a href="https://jonesdev.xyz/discord/">Discord</a>.
     </p>
     <h2>3.0 Building</h2>
     <p>
@@ -143,6 +143,6 @@
       <a href="https://github.com/jonesdevelopment/sonar-antibot/blob/main/velocity/src/main/java/jones/sonar/velocity/fallback/dimension/Biome.java">Biome</a> was taken from <a href="https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/material/Biome.java">LimboAPI/Biome</a>
       <br>
       Parts of the Yaml configuration system used by the <a href="https://github.com/jonesdevelopment/sonar-antibot/tree/main/api">api</a> module were taken from <a href="https://github.com/SpigotMC">SpigotMC</a>'s Yaml configuration system.
-    </p> 
+    </p>
   </body>
 </html>
