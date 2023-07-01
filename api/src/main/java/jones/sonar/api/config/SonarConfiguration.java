@@ -138,6 +138,16 @@ public final class SonarConfiguration {
     MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 1024);
     VERIFICATION_DELAY = yamlConfig.getInt("general.verification.rejoin-delay", 8000);
 
+    // load this here otherwise it could cause issues
+    HEADER = fromList(yamlConfig.getStringList("messages.header",
+      Arrays.asList(
+        "&e&lSonar"
+      )));
+    FOOTER = fromList(yamlConfig.getStringList("messages.footer",
+      Arrays.asList(
+        "&7If you believe that this is an error, contact an administrator."
+      )));
+
     LOCKDOWN_ACTIVATED = formatString(yamlConfig.getString("messages.lockdown.enabled",
       "%prefix%The server is now in lockdown mode."
     ));
@@ -234,14 +244,6 @@ public final class SonarConfiguration {
       "%prefix%The IP address you provided is not whitelisted."
     ));
 
-    HEADER = fromList(yamlConfig.getStringList("messages.verification.header",
-      Arrays.asList(
-        "&e&lSonar"
-      )));
-    FOOTER = fromList(yamlConfig.getStringList("messages.verification.footer",
-      Arrays.asList(
-        "&7If you believe that this is an error, contact an administrator."
-      )));
     TOO_MANY_PLAYERS = fromList(yamlConfig.getStringList("messages.verification.too-many-players",
       Arrays.asList(
         "%header%",
