@@ -59,6 +59,7 @@ public final class FallbackListener implements Listener {
   private final Fallback fallback;
 
   private static final Field CHANNEL_WRAPPER;
+
   static {
     try {
       CHANNEL_WRAPPER = InitialHandler.class.getDeclaredField("ch");

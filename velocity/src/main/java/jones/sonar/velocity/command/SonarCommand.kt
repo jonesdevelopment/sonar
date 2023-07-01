@@ -80,7 +80,8 @@ class SonarCommand : SimpleCommand {
       // Check permissions for subcommands
       if (subCommand.isPresent) {
         if (!subCommand.get().info.onlyConsole
-          && !invocation.source().hasPermission(subCommand.get().permission)) {
+          && !invocation.source().hasPermission(subCommand.get().permission)
+        ) {
           invocationSender.sendMessage(
             Sonar.get().config.SUB_COMMAND_NO_PERM
               .replace("%permission%", subCommand.get().permission)

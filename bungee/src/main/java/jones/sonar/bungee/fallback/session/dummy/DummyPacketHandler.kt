@@ -26,7 +26,7 @@ class DummyPacketHandler(
   private val inetAddress: InetAddress
 ) : PacketHandler() {
 
-    override fun toString(): String {
-        return "[sonar/fallback] $username ($inetAddress)"
-    }
+  override fun toString(): String {
+    return "[sonar/fallback] $username ($inetAddress)"
+  }
 }

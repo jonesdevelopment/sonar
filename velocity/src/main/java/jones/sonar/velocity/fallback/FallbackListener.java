@@ -230,6 +230,7 @@ public final class FallbackListener {
 
   /**
    * Handles lockdown mode
+   *
    * @param event LoginEvent
    */
   @Subscribe(order = PostOrder.LAST)

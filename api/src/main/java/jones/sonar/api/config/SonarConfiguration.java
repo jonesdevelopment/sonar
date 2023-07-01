@@ -155,7 +155,8 @@ public final class SonarConfiguration {
       "%prefix%The server is no longer in lockdown mode."
     ));
     LOCKDOWN_NOTIFICATION = formatString(yamlConfig.getString("messages.lockdown.notification",
-      "%prefix%&aHey, the server is currently in lockdown mode. If you want turn the lockdown mode off, type &f/sonar lockdown&a."
+      "%prefix%&aHey, the server is currently in lockdown mode. If you want turn the lockdown mode off, type &f/sonar" +
+        " lockdown&a."
     ));
     LOCKDOWN_CONSOLE_LOG = yamlConfig.getString("messages.lockdown.console-log",
       "%player% (%ip%, %protocol%) tried to join during lockdown mode."
