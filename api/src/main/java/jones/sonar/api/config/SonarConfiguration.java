@@ -18,6 +18,7 @@
 package jones.sonar.api.config;
 
 import jones.sonar.api.config.yml.YamlConfig;
+import lombok.Getter;
 
 import java.io.File;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 public final class SonarConfiguration {
+  @Getter
   private final YamlConfig yamlConfig;
 
   public SonarConfiguration(final File folder) {
@@ -86,6 +88,15 @@ public final class SonarConfiguration {
   public String RELOADING;
   public String RELOADED;
 
+  public boolean LOCKDOWN_ENABLED;
+  public boolean LOCKDOWN_ENABLE_NOTIFY;
+  public boolean LOCKDOWN_LOG_ATTEMPT;
+  public String LOCKDOWN_DISCONNECT;
+  public String LOCKDOWN_ACTIVATED;
+  public String LOCKDOWN_DEACTIVATED;
+  public String LOCKDOWN_NOTIFICATION;
+  public String LOCKDOWN_CONSOLE_LOG;
+
   public boolean DATABASE_ENABLED;
   public String DATABASE_URL;
   public String DATABASE_NAME;
@@ -105,6 +116,10 @@ public final class SonarConfiguration {
     MAXIMUM_ONLINE_PER_IP = yamlConfig.getInt("general.max-online-per-ip", 3);
     MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
 
+    LOCKDOWN_ENABLED = yamlConfig.getBoolean("general.lockdown.enabled", false);
+    LOCKDOWN_LOG_ATTEMPT = yamlConfig.getBoolean("general.lockdown.log-attempt", true);
+    LOCKDOWN_ENABLE_NOTIFY = yamlConfig.getBoolean("general.lockdown.notify-admins", true);
+
     DATABASE_ENABLED = yamlConfig.getBoolean("general.database.enabled", false);
     DATABASE_NAME = yamlConfig.getString("general.database.name", "sonar");
     DATABASE_URL = yamlConfig.getString("general.database.url", "localhost");
@@ -122,6 +137,25 @@ public final class SonarConfiguration {
     MAXIMUM_LOGIN_PACKETS = yamlConfig.getInt("general.verification.max-login-packets", 20);
     MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 1024);
     VERIFICATION_DELAY = yamlConfig.getInt("general.verification.rejoin-delay", 8000);
+
+    LOCKDOWN_ACTIVATED = formatString(yamlConfig.getString("messages.lockdown.enabled",
+      "%prefix%The server is now in lockdown mode."
+    ));
+    LOCKDOWN_DEACTIVATED = formatString(yamlConfig.getString("messages.lockdown.disabled",
+      "%prefix%The server is no longer in lockdown mode."
+    ));
+    LOCKDOWN_NOTIFICATION = formatString(yamlConfig.getString("messages.lockdown.notification",
+      "%prefix%&aHey, the server is currently in lockdown mode. If you want turn the lockdown mode off, type &f/sonar lockdown&a."
+    ));
+    LOCKDOWN_CONSOLE_LOG = formatString(yamlConfig.getString("messages.lockdown.console-log",
+      "%player% (%ip%, %protocol%) tried to join during lockdown mode."
+    ));
+    LOCKDOWN_DISCONNECT = fromList(yamlConfig.getStringList("messages.lockdown.disconnect-message",
+      Arrays.asList(
+        "%header%",
+        "&cThe server is currently locked down, please try again later.",
+        "%footer%"
+      )));
 
     RELOADING = formatString(yamlConfig.getString("messages.reload.start",
       "%prefix%Reloading Sonar..."

@@ -19,6 +19,7 @@ package jones.sonar.velocity.fallback;
 
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
@@ -85,6 +86,7 @@ public final class FallbackListener {
     static PreLoginEvent.PreLoginComponentResult ALREADY_QUEUED;
     static PreLoginEvent.PreLoginComponentResult TOO_MANY_ONLINE_PER_IP;
     static PreLoginEvent.PreLoginComponentResult TOO_FAST_RECONNECT;
+    static LoginEvent.ComponentResult LOCKDOWN_DISCONNECT;
     public static Component UNEXPECTED_ERROR;
 
     public static void update() {
@@ -105,6 +107,9 @@ public final class FallbackListener {
       );
       TOO_FAST_RECONNECT = PreLoginEvent.PreLoginComponentResult.denied(
         Component.text(Sonar.get().getConfig().TOO_FAST_RECONNECT)
+      );
+      LOCKDOWN_DISCONNECT = LoginEvent.ComponentResult.denied(
+        Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT)
       );
       UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
     }
@@ -221,6 +226,31 @@ public final class FallbackListener {
 
     // TODO: test with /premium
     premium.add(event.getUsername());
+  }
+
+  /**
+   * Handles lockdown mode
+   * @param event LoginEvent
+   */
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final LoginEvent event) {
+    if (!fallback.getSonar().getConfig().LOCKDOWN_ENABLED) return;
+
+    if (!event.getPlayer().hasPermission("sonar.lockdown")) {
+      event.setResult(LOCKDOWN_DISCONNECT);
+      if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPT) {
+        fallback.getSonar().getLogger().info(
+          fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
+            .replace("%player%", event.getPlayer().getUsername())
+            .replace("%ip%", event.getPlayer().getRemoteAddress().getAddress().toString())
+            .replace("%protocol%", String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
+        );
+      }
+    } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
+      event.getPlayer().sendMessage(
+        Component.text(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
+      );
+    }
   }
 
   /**
