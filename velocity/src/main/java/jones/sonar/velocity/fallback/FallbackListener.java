@@ -238,7 +238,7 @@ public final class FallbackListener {
 
     if (!event.getPlayer().hasPermission("sonar.lockdown")) {
       event.setResult(LOCKDOWN_DISCONNECT);
-      if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPT) {
+      if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
         fallback.getSonar().getLogger().info(
           fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
             .replace("%player%", event.getPlayer().getUsername())

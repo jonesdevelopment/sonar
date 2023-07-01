@@ -90,7 +90,7 @@ public final class SonarConfiguration {
 
   public boolean LOCKDOWN_ENABLED;
   public boolean LOCKDOWN_ENABLE_NOTIFY;
-  public boolean LOCKDOWN_LOG_ATTEMPT;
+  public boolean LOCKDOWN_LOG_ATTEMPTS;
   public String LOCKDOWN_DISCONNECT;
   public String LOCKDOWN_ACTIVATED;
   public String LOCKDOWN_DEACTIVATED;
@@ -117,7 +117,7 @@ public final class SonarConfiguration {
     MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
 
     LOCKDOWN_ENABLED = yamlConfig.getBoolean("general.lockdown.enabled", false);
-    LOCKDOWN_LOG_ATTEMPT = yamlConfig.getBoolean("general.lockdown.log-attempt", true);
+    LOCKDOWN_LOG_ATTEMPTS = yamlConfig.getBoolean("general.lockdown.log-attempts", true);
     LOCKDOWN_ENABLE_NOTIFY = yamlConfig.getBoolean("general.lockdown.notify-admins", true);
 
     DATABASE_ENABLED = yamlConfig.getBoolean("general.database.enabled", false);
