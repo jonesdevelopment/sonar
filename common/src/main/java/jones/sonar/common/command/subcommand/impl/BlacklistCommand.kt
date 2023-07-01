@@ -24,7 +24,8 @@ import jones.sonar.common.command.subcommand.argument.Argument
 import java.net.InetAddress
 
 @SubCommandInfo(
-  name = "blacklist", description = "Manage blacklisted IP addresses",
+  name = "blacklist",
+  description = "Manage blacklisted IP addresses",
   arguments = [
     Argument(name = "add"),
     Argument(name = "remove"),

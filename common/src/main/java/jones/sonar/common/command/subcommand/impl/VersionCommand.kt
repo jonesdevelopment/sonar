@@ -22,7 +22,8 @@ import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
 
 @SubCommandInfo(
-  name = "version", description = "Show version information",
+  name = "version",
+  description = "Show version information",
 )
 class VersionCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {

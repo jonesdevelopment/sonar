@@ -24,7 +24,8 @@ import jones.sonar.common.command.subcommand.argument.Argument
 import java.net.InetAddress
 
 @SubCommandInfo(
-  name = "whitelist", description = "Manage verified IP addresses",
+  name = "whitelist",
+  description = "Manage verified IP addresses",
   arguments = [
     Argument(name = "add"),
     Argument(name = "remove"),
