@@ -36,7 +36,6 @@ import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.Fallback;
@@ -303,9 +302,6 @@ public final class FallbackListener {
 
       final ChannelPipeline pipeline = channel.pipeline();
 
-      // Store previous read timeout handler
-      final ChannelHandler previousTimeoutHandler = pipeline.get(READ_TIMEOUT);
-
       // Replace timeout handler to avoid known exploits or issues
       // We also want to timeout bots quickly to avoid flooding
       pipeline.replace(
@@ -405,8 +401,7 @@ public final class FallbackListener {
           DECODER,
           new FallbackPacketDecoder(
             fallbackPlayer,
-            keepAliveId,
-            previousTimeoutHandler
+            keepAliveId
           )
         );
 
@@ -427,7 +422,7 @@ public final class FallbackListener {
 
           // Set session handler to custom fallback handler to intercept all incoming packets
           mcConnection.setSessionHandler(new FallbackSessionHandler(
-            mcConnection.getSessionHandler(), fallbackPlayer, previousTimeoutHandler
+            mcConnection.getSessionHandler(), fallbackPlayer
           ));
 
           // Send JoinGame packet

@@ -30,8 +30,8 @@ import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialConnectSessionHandler;
 import com.velocitypowered.proxy.protocol.packet.*;
-import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
 import jones.sonar.velocity.fallback.FallbackListener;
 import net.kyori.adventure.text.Component;
@@ -46,6 +46,7 @@ import java.security.SecureRandom;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
@@ -75,15 +76,12 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @NotNull FallbackPlayer player;
   private final boolean v1_8or1_7;
   private @Nullable String resourcePackHash;
-  private final ChannelHandler previousTimeoutHandler;
   private static final Random random = new SecureRandom();
 
   public FallbackSessionHandler(final @Nullable MinecraftSessionHandler previousHandler,
-                                final @NotNull FallbackPlayer player,
-                                final @NotNull ChannelHandler previousTimeoutHandler) {
+                                final @NotNull FallbackPlayer player) {
     this.previousHandler = previousHandler;
     this.player = player;
-    this.previousTimeoutHandler = previousTimeoutHandler;
     this.v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
   }
 
@@ -259,7 +257,10 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     player.getPipeline().replace(
       READ_TIMEOUT,
       READ_TIMEOUT,
-      previousTimeoutHandler
+      new ReadTimeoutHandler(
+        player.getConnection().server.getConfiguration().getConnectTimeout(),
+        TimeUnit.MILLISECONDS
+      )
     );
 
     // Continue the initial connection to the backend server

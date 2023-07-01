@@ -22,7 +22,6 @@ import com.velocitypowered.proxy.protocol.packet.ClientSettings
 import com.velocitypowered.proxy.protocol.packet.KeepAlive
 import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import com.velocitypowered.proxy.protocol.packet.ResourcePackResponse
-import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import jones.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion
@@ -34,7 +33,6 @@ import java.net.InetSocketAddress
 class FallbackPacketDecoder(
   private val fallbackPlayer: FallbackPlayer,
   private val startKeepAliveId: Long,
-  private val previousTimeoutHandler: ChannelHandler
 ) : ChannelInboundHandlerAdapter() {
   private var packets = 0
 
@@ -80,7 +78,7 @@ class FallbackPacketDecoder(
 
         // Set session handler to custom fallback handler to intercept all incoming packets
         fallbackPlayer.connection.sessionHandler = FallbackSessionHandler(
-          fallbackPlayer.connection.sessionHandler, fallbackPlayer, previousTimeoutHandler
+          fallbackPlayer.connection.sessionHandler, fallbackPlayer
         )
 
         // Create JoinGame packet for the client's version
