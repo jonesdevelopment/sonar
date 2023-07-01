@@ -32,7 +32,7 @@ allprojects {
   repositories {
     mavenCentral() // Lombok
     maven(url = "https://repo.papermc.io/repository/maven-public") // Velocity natives
-    maven(url = "https://jonesdev.xyz/#/releases/") // Velocity natives
+    maven(url = "https://jonesdev.xyz/releases/") // Velocity natives
   }
 }
 
