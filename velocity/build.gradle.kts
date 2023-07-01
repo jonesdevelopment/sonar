@@ -1,7 +1,3 @@
-repositories {
-  maven(url = "https://maven.elytrium.net/repo/") // Velocity proxy module // TODO: set up own repo
-}
-
 val velocityVersion = "3.2.0-SNAPSHOT"
 
 dependencies {

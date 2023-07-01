@@ -1,7 +1,3 @@
-repositories {
-  maven(url = "https://oss.sonatype.org/content/repositories/snapshots/") // BungeeCord
-}
-
 dependencies {
   compileOnly(project(":sonar-api"))
   compileOnly(project(":sonar-common"))
@@ -12,8 +8,7 @@ dependencies {
     exclude(group = "org.checkerframework")
   }
 
-  compileOnly("net.md-5:bungeecord-api:1.20-R0.1-SNAPSHOT")
-  compileOnly(files("waterfall-1.19-504.jar"))
+  compileOnly("io.papermc:waterfall-proxy:1.20-R0.1-SNAPSHOT")
 }
 
 tasks {

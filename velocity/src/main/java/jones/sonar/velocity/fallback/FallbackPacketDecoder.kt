@@ -42,7 +42,7 @@ class FallbackPacketDecoder(
     if (ctx.channel().isActive) {
       ctx.close()
 
-      // Clients can throw an IOException if the connection is interrupted unexpectedly
+      // Clients can throw an IOException if the connection is interrupted unexpected
       // Velocity can throw an IllegalStateException if Sonar messed something up
       // TODO: check if there are more exceptions we need to exempt
       if (cause is IOException || cause is IllegalStateException) return
