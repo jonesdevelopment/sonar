@@ -47,17 +47,17 @@ class DatabaseCommand : SubCommand() {
         invocation.invocationSender.sendMessage()
         invocation.invocationSender.sendMessage(" §eData storage information")
         invocation.invocationSender.sendMessage()
-        invocation.invocationSender.sendMessage(" §a▪ §7Current data storage type: §f" + sonar.config.DATABASE)
+        invocation.invocationSender.sendMessage(" §a▪ §7Current data storage type: §f${sonar.config.DATABASE}")
 
         when (sonar.config.DATABASE) {
           DatabaseType.MYSQL -> {
-            invocation.invocationSender.sendMessage(" §a▪ §7Database URL: §f" + sonar.config.DATABASE_URL)
-            invocation.invocationSender.sendMessage(" §a▪ §7Database name: §f" + sonar.config.DATABASE_NAME)
-            invocation.invocationSender.sendMessage(" §a▪ §7Query limit: §f" + sonar.formatter.format(sonar.config.DATABASE_QUERY_LIMIT))
+            invocation.invocationSender.sendMessage(" §a▪ §7Database URL: §f${sonar.config.DATABASE_URL}")
+            invocation.invocationSender.sendMessage(" §a▪ §7Database name: §f${sonar.config.DATABASE_NAME}")
+            invocation.invocationSender.sendMessage(" §a▪ §7Query limit: §f${sonar.formatter.format(sonar.config.DATABASE_QUERY_LIMIT)}")
           }
 
           DatabaseType.YAML -> {
-            invocation.invocationSender.sendMessage(" §a▪ §7File name: §f" + sonar.config.DATABASE_FILE_NAME)
+            invocation.invocationSender.sendMessage(" §a▪ §7File name: §f${sonar.config.DATABASE_FILE_NAME}.yml")
           }
 
           else -> throw IllegalStateException("Invalid argument")
