@@ -137,13 +137,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
   public void reload() {
     getConfig().load();
     FallbackListener.CachedMessages.update();
-
-    // Initialize database
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      getDatabase().initialize(config);
-      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
-      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
-    }
+    reloadDatabases();
 
     // Apply filter (connection limiter) to Fallback
     getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);

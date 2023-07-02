@@ -29,6 +29,7 @@ import jones.sonar.common.command.subcommand.argument.Argument
   arguments = [
     Argument("info"),
     Argument("purge"),
+    Argument("update"),
   ]
 )
 class DatabaseCommand : SubCommand() {
@@ -69,6 +70,19 @@ class DatabaseCommand : SubCommand() {
 
         sonar.database.purge()
         invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE)
+      }
+
+      "update" -> {
+        val startTime = System.currentTimeMillis()
+
+        invocation.invocationSender.sendMessage(sonar.config.DATABASE_RELOADING)
+        sonar.reloadDatabases()
+
+        val timeTaken = System.currentTimeMillis() - startTime;
+        invocation.invocationSender.sendMessage(
+          sonar.config.DATABASE_RELOADED
+            .replace("%taken%", timeTaken.toString())
+        )
       }
 
       else -> incorrectUsage(invocation.invocationSender)

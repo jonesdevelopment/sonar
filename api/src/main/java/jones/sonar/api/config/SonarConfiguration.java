@@ -110,6 +110,8 @@ public final class SonarConfiguration {
   public String DATABASE_PURGE_CONFIRM;
   public String DATABASE_PURGE;
   public String DATABASE_NOT_SELECTED;
+  public String DATABASE_RELOADING;
+  public String DATABASE_RELOADED;
 
   public void load() {
     Objects.requireNonNull(yamlConfig);
@@ -204,6 +206,12 @@ public final class SonarConfiguration {
     ));
     DATABASE_NOT_SELECTED = formatString(yamlConfig.getString("messages.database.not-selected",
       "%prefix%&cYou have not selected any data storage type."
+    ));
+    DATABASE_RELOADING = formatString(yamlConfig.getString("messages.database.reload.start",
+      "%prefix%Reloading all databases..."
+    ));
+    DATABASE_RELOADED = formatString(yamlConfig.getString("messages.database.reload.finish",
+      "%prefix%&aSuccessfully reloaded &7(%taken%ms)"
     ));
 
     INCORRECT_COMMAND_USAGE = formatString(yamlConfig.getString("messages.incorrect-command-usage",

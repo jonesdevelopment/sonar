@@ -126,12 +126,6 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
   @Override
   public void reload() {
     getConfig().load();
-
-    // Initialize database
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      getDatabase().initialize(config);
-      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
-      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
-    }
+    reloadDatabases();
   }
 }

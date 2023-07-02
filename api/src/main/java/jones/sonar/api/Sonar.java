@@ -19,6 +19,7 @@ package jones.sonar.api;
 
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.database.Database;
+import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.fallback.FallbackHolder;
 import jones.sonar.api.logger.Logger;
@@ -29,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.text.DecimalFormat;
+
+import static jones.sonar.api.database.MySQLDatabase.*;
 
 public interface Sonar {
   SonarPlatform getPlatform();
@@ -64,6 +67,15 @@ public interface Sonar {
   @NotNull Logger getLogger();
 
   void reload();
+
+  default void reloadDatabases() {
+    // Initialize database
+    if (getConfig().DATABASE != DatabaseType.NONE) {
+      getDatabase().initialize(getConfig());
+      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
+      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
+    }
+  }
 
   @NotNull
   static Sonar get() {
