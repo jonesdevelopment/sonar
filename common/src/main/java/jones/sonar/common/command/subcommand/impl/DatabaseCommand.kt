@@ -93,12 +93,12 @@ class DatabaseCommand : SubCommand() {
         purging = true
         try {
           sonar.database.purge()
+
+          invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE)
         } catch (e: Throwable) {
           e.printStackTrace()
         }
         purging = false
-
-        invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE)
       }
 
       "update" -> {
