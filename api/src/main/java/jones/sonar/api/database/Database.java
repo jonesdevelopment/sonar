@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.storage;
+package jones.sonar.api.database;
 
 import jones.sonar.api.config.SonarConfiguration;
 import org.jetbrains.annotations.NotNull;

@@ -17,7 +17,7 @@
 
 package jones.sonar.api.config;
 
-import jones.sonar.api.storage.DatabaseType;
+import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.yaml.YamlConfig;
 import lombok.Getter;
 
@@ -99,11 +99,13 @@ public final class SonarConfiguration {
   public String LOCKDOWN_CONSOLE_LOG;
 
   public DatabaseType DATABASE;
+  public String DATABASE_FILE_NAME;
   public String DATABASE_URL;
   public String DATABASE_NAME;
   public String DATABASE_USERNAME;
   public String DATABASE_PASSWORD;
   public int DATABASE_PORT;
+  public int DATABASE_QUERY_LIMIT;
 
   public void load() {
     Objects.requireNonNull(yamlConfig);
@@ -114,30 +116,36 @@ public final class SonarConfiguration {
     PREFIX = formatString(yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
 
     // General options
-    MAXIMUM_ONLINE_PER_IP = yamlConfig.getInt("general.max-online-per-ip", 3);
-    MINIMUM_PLAYERS_FOR_ATTACK = yamlConfig.getInt("general.min-players-for-attack", 5);
+    MAXIMUM_ONLINE_PER_IP = clamp(yamlConfig.getInt("general.max-online-per-ip", 3), 1, Byte.MAX_VALUE);
+    MINIMUM_PLAYERS_FOR_ATTACK = clamp(yamlConfig.getInt("general.min-players-for-attack", 5), 2, 1024);
 
     LOCKDOWN_ENABLED = yamlConfig.getBoolean("general.lockdown.enabled", false);
     LOCKDOWN_LOG_ATTEMPTS = yamlConfig.getBoolean("general.lockdown.log-attempts", true);
     LOCKDOWN_ENABLE_NOTIFY = yamlConfig.getBoolean("general.lockdown.notify-admins", true);
 
     DATABASE = DatabaseType.valueOf(yamlConfig.getString("general.database.type", "NONE"));
-    DATABASE_NAME = yamlConfig.getString("general.database.name", "sonar");
-    DATABASE_URL = yamlConfig.getString("general.database.url", "localhost");
-    DATABASE_PORT = yamlConfig.getInt("general.database.port", 3306);
-    DATABASE_USERNAME = yamlConfig.getString("general.database.username", "root");
-    DATABASE_PASSWORD = yamlConfig.getString("general.database.password", "");
 
-    MAXIMUM_QUEUED_PLAYERS = yamlConfig.getInt("general.queue.max-players", 8192);
-    MAXIMUM_QUEUE_POLLS = yamlConfig.getInt("general.queue.max-polls", 10);
+    // YAML
+    DATABASE_FILE_NAME = yamlConfig.getString("general.database.yaml.file-name", "database");
+
+    // MySQL
+    DATABASE_NAME = yamlConfig.getString("general.database.mysql.name", "sonar");
+    DATABASE_URL = yamlConfig.getString("general.database.mysql.url", "localhost");
+    DATABASE_PORT = clamp(yamlConfig.getInt("general.database.mysql.port", 3306), 0, 65535);
+    DATABASE_USERNAME = yamlConfig.getString("general.database.mysql.username", "root");
+    DATABASE_PASSWORD = yamlConfig.getString("general.database.mysql.password", "");
+    DATABASE_QUERY_LIMIT = clamp(yamlConfig.getInt("general.database.mysql.query-limit", 100000), 1000, Integer.MAX_VALUE);
+
+    MAXIMUM_QUEUED_PLAYERS = clamp(yamlConfig.getInt("general.queue.max-players", 8192), 128, Short.MAX_VALUE);
+    MAXIMUM_QUEUE_POLLS = clamp(yamlConfig.getInt("general.queue.max-polls", 10), 1, 1000);
 
     ENABLE_VERIFICATION = yamlConfig.getBoolean("general.verification.enabled", true);
     LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
     ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
-    VERIFICATION_TIMEOUT = yamlConfig.getInt("general.verification.timeout", 4000);
-    MAXIMUM_LOGIN_PACKETS = yamlConfig.getInt("general.verification.max-login-packets", 20);
-    MAXIMUM_VERIFYING_PLAYERS = yamlConfig.getInt("general.verification.max-players", 1024);
-    VERIFICATION_DELAY = yamlConfig.getInt("general.verification.rejoin-delay", 8000);
+    VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 4000), 500, 30000);
+    MAXIMUM_LOGIN_PACKETS = clamp(yamlConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
+    MAXIMUM_VERIFYING_PLAYERS = clamp(yamlConfig.getInt("general.verification.max-players", 1024), 1, Short.MAX_VALUE);
+    VERIFICATION_DELAY = clamp(yamlConfig.getInt("general.verification.rejoin-delay", 8000), 0, 100000);
 
     // load this here otherwise it could cause issues
     HEADER = fromList(yamlConfig.getStringList("messages.header",
@@ -309,6 +317,10 @@ public final class SonarConfiguration {
     ANIMATION = yamlConfig.getStringList("messages.action-bar.animation",
       Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
     );
+  }
+
+  private static int clamp(final int v, final int max, final int min) {
+    return Math.max(Math.min(v, min), max);
   }
 
   private String fromList(final Collection<String> list) {

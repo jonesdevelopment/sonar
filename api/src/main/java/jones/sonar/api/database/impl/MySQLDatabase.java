@@ -15,12 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.storage;
+package jones.sonar.api.database.impl;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.Database;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ import java.util.Objects;
 import java.util.Vector;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class MySQLDataStorage implements Database {
+public final class MySQLDatabase implements Database {
   @Getter
   private @Nullable DataSource dataSource;
   public static final String VERIFIED_TABLE = "verified_ips";
@@ -87,7 +88,7 @@ public final class MySQLDataStorage implements Database {
     final Collection<String> output = new Vector<>();
 
     try (final PreparedStatement statement = getDataSource().getConnection().prepareStatement(
-      "select `" + column + "` from `" + table + "` limit 100000"
+      "select `" + column + "` from `" + table + "` limit " + Sonar.get().getConfig().DATABASE_QUERY_LIMIT
     )) {
       final ResultSet resultSet = statement.executeQuery();
 

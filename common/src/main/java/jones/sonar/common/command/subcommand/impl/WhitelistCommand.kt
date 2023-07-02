@@ -121,10 +121,7 @@ class WhitelistCommand : SubCommand() {
         )
       }
 
-      else -> invocation.invocationSender.sendMessage(
-        sonar.config.INCORRECT_COMMAND_USAGE
-          .replace("%usage%", "whitelist")
-      )
+      else -> incorrectUsage(invocation.invocationSender)
     }
   }
 }

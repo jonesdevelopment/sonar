@@ -19,6 +19,7 @@ package jones.sonar.common.command.subcommand;
 
 import jones.sonar.api.Sonar;
 import jones.sonar.common.command.CommandInvocation;
+import jones.sonar.common.command.InvocationSender;
 import jones.sonar.common.command.subcommand.argument.Argument;
 import lombok.Getter;
 
@@ -41,6 +42,13 @@ public abstract class SubCommand {
       : Arrays.stream(info.arguments())
       .map(Argument::name)
       .collect(Collectors.joining(", "));
+  }
+
+  protected final void incorrectUsage(final InvocationSender sender) {
+    sender.sendMessage(
+      sonar.getConfig().INCORRECT_COMMAND_USAGE
+        .replace("%usage%", "storage")
+    );
   }
 
   public abstract void execute(final CommandInvocation invocation);

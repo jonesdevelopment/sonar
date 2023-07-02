@@ -21,8 +21,8 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
-import jones.sonar.api.storage.DatabaseType;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.bungee.fallback.FallbackListener;
 import jones.sonar.bungee.verbose.ActionBarVerbose;
@@ -34,7 +34,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import static jones.sonar.api.storage.MySQLDataStorage.*;
+import static jones.sonar.api.database.impl.MySQLDatabase.*;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 

@@ -22,8 +22,8 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
-import jones.sonar.api.storage.DatabaseType;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackListener;
@@ -34,7 +34,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
-import static jones.sonar.api.storage.MySQLDataStorage.*;
+import static jones.sonar.api.database.impl.MySQLDatabase.*;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 

@@ -15,10 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.storage;
+package jones.sonar.api.database.impl;
 
 import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.Database;
 import jones.sonar.api.yaml.YamlConfig;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -30,13 +31,13 @@ import java.util.Collection;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class YamlDataStorage implements Database {
+public final class YamlDatabase implements Database {
   private @Nullable YamlConfig yamlConfig;
 
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {
     if (yamlConfig == null) {
-      yamlConfig = new YamlConfig(Sonar.get().getPluginDataFolder(), "database");
+      yamlConfig = new YamlConfig(Sonar.get().getPluginDataFolder(), config.DATABASE_FILE_NAME);
     }
     yamlConfig.load();
   }

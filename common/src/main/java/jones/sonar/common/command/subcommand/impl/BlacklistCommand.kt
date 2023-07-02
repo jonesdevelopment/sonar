@@ -140,10 +140,7 @@ class BlacklistCommand : SubCommand() {
         )
       }
 
-      else -> invocation.invocationSender.sendMessage(
-        sonar.config.INCORRECT_COMMAND_USAGE
-          .replace("%usage%", "blacklist")
-      )
+      else -> incorrectUsage(invocation.invocationSender)
     }
   }
 }

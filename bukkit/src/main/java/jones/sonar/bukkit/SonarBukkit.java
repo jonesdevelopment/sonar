@@ -21,8 +21,8 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
-import jones.sonar.api.storage.DatabaseType;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
@@ -33,7 +33,7 @@ import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.logging.Level;
 
-import static jones.sonar.api.storage.MySQLDataStorage.*;
+import static jones.sonar.api.database.impl.MySQLDatabase.*;
 
 public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 

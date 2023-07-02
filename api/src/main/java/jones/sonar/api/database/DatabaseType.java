@@ -15,16 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.storage;
+package jones.sonar.api.database;
 
+import jones.sonar.api.database.impl.MySQLDatabase;
+import jones.sonar.api.database.impl.YamlDatabase;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum DatabaseType {
   NONE(null),
-  YAML(new YamlDataStorage()),
-  MYSQL(new MySQLDataStorage());
+  YAML(new YamlDatabase()),
+  MYSQL(new MySQLDatabase());
 
   @Getter
   private final Database holder;
