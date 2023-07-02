@@ -20,6 +20,7 @@ package jones.sonar.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -54,5 +55,10 @@ public final class SonarVelocityPlugin {
   @Subscribe
   public void handle(final ProxyInitializeEvent event) {
     SonarVelocity.INSTANCE.enable(this);
+  }
+
+  @Subscribe
+  public void handle(final ProxyShutdownEvent event) {
+    SonarVelocity.INSTANCE.disable();
   }
 }
