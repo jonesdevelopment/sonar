@@ -44,8 +44,9 @@ class FallbackPacketDecoder(
 
       // Clients can throw an IOException if the connection is interrupted unexpected
       // Velocity can throw an IllegalStateException if Sonar messed something up
+      // Sonar can throw an ExceptionInInitializerError if Sonar messed something up :(
       // TODO: check if there are more exceptions we need to exempt
-      if (cause is IOException || cause is IllegalStateException) return
+      if (cause is IOException || cause is IllegalStateException || cause is ExceptionInInitializerError) return
 
       // Block the IP address
       val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
