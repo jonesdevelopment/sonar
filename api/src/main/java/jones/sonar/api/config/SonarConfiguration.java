@@ -201,11 +201,11 @@ public final class SonarConfiguration {
     ));
 
     DATABASE_PURGE_CONFIRM = formatString(yamlConfig.getString("messages.database.purge-confirm",
-      "%prefix%&cPlease confirm that you want to delete all database entries by typing &f/sonar database purge " +
+      "%prefix%&cPlease confirm that you want to delete all database entries by typing &7/sonar database purge " +
         "confirm&c."
     ));
     DATABASE_PURGE = formatString(yamlConfig.getString("messages.database.purge",
-      "%prefix%&7Successfully purged all database entries."
+      "%prefix%&aSuccessfully purged all database entries."
     ));
     DATABASE_PURGE_ALREADY = formatString(yamlConfig.getString("messages.database.purging",
       "%prefix%&cThere is already a purge currently running."
