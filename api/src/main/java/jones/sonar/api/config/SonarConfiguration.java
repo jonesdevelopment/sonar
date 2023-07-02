@@ -109,6 +109,7 @@ public final class SonarConfiguration {
 
   public String DATABASE_PURGE_CONFIRM;
   public String DATABASE_PURGE;
+  public String DATABASE_PURGE_ALREADY;
   public String DATABASE_NOT_SELECTED;
   public String DATABASE_RELOADING;
   public String DATABASE_RELOADED;
@@ -203,6 +204,9 @@ public final class SonarConfiguration {
     ));
     DATABASE_PURGE = formatString(yamlConfig.getString("messages.database.purge",
       "%prefix%&7Successfully purged all database entries."
+    ));
+    DATABASE_PURGE_ALREADY = formatString(yamlConfig.getString("messages.database.purging",
+      "%prefix%&cThere is already a purge currently running."
     ));
     DATABASE_NOT_SELECTED = formatString(yamlConfig.getString("messages.database.not-selected",
       "%prefix%&cYou have not selected any data storage type."

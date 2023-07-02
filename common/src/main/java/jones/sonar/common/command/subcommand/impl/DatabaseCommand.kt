@@ -33,6 +33,9 @@ import jones.sonar.common.command.subcommand.argument.Argument
   ]
 )
 class DatabaseCommand : SubCommand() {
+  // use this as a "lock" to prevent players from spamming purge
+  private var purging = false
+
   override fun execute(invocation: CommandInvocation) {
     if (sonar.config.DATABASE == DatabaseType.NONE) {
       invocation.invocationSender.sendMessage(sonar.config.DATABASE_NOT_SELECTED)
@@ -68,8 +71,20 @@ class DatabaseCommand : SubCommand() {
           return
         }
 
-        sonar.database.purge()
-        sonar.reloadDatabases()
+        if (purging) {
+          invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE_ALREADY)
+          return
+        }
+
+        purging = true
+        try {
+          sonar.database.purge()
+          sonar.reloadDatabases()
+        } catch (e: Throwable) {
+          e.printStackTrace()
+        }
+        purging = false
+
         invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE)
       }
 
