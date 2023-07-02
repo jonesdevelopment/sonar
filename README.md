@@ -126,6 +126,9 @@
       <li>
         Try to avoid bloat - Sonar is supposed to be lightweight
       </li>
+      <li>
+        Never push to the <code>main</code> branch. You can create a feature branch or push to <code>dev</code>.
+      </li>
     </ul>
     <h2>3.2 License</h2>
     <p>
