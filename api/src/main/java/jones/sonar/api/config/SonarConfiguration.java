@@ -141,7 +141,8 @@ public final class SonarConfiguration {
     DATABASE_PORT = clamp(yamlConfig.getInt("general.database.mysql.port", 3306), 0, 65535);
     DATABASE_USERNAME = yamlConfig.getString("general.database.mysql.username", "root");
     DATABASE_PASSWORD = yamlConfig.getString("general.database.mysql.password", "");
-    DATABASE_QUERY_LIMIT = clamp(yamlConfig.getInt("general.database.mysql.query-limit", 100000), 1000, Integer.MAX_VALUE);
+    DATABASE_QUERY_LIMIT = clamp(yamlConfig.getInt("general.database.mysql.query-limit", 100000), 1000,
+      Integer.MAX_VALUE);
 
     MAXIMUM_QUEUED_PLAYERS = clamp(yamlConfig.getInt("general.queue.max-players", 8192), 128, Short.MAX_VALUE);
     MAXIMUM_QUEUE_POLLS = clamp(yamlConfig.getInt("general.queue.max-polls", 10), 1, 1000);
@@ -200,7 +201,8 @@ public final class SonarConfiguration {
     ));
 
     DATABASE_PURGE_CONFIRM = formatString(yamlConfig.getString("messages.database.purge-confirm",
-      "%prefix%&cPlease confirm that you want to delete all database entries by typing &f/sonar database purge confirm&c."
+      "%prefix%&cPlease confirm that you want to delete all database entries by typing &f/sonar database purge " +
+        "confirm&c."
     ));
     DATABASE_PURGE = formatString(yamlConfig.getString("messages.database.purge",
       "%prefix%&7Successfully purged all database entries."
