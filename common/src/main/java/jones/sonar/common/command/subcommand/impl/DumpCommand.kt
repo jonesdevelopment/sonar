@@ -17,7 +17,7 @@
 
 package jones.sonar.common.command.subcommand.impl
 
-import jones.sonar.api.util.Formatting.Companion.formatMemory
+import jones.sonar.api.format.Formatting.Companion.formatMemory
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo

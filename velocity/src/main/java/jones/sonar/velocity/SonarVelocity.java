@@ -22,8 +22,8 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.database.MySQLDataStorage;
 import jones.sonar.api.logger.Logger;
+import jones.sonar.api.storage.DataStorageType;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackListener;
@@ -33,6 +33,8 @@ import lombok.Getter;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
+
+import static jones.sonar.api.storage.MySQLDataStorage.*;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
@@ -121,13 +123,13 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
   @Override
   public void disable() {
-    if (getConfig().DATABASE_ENABLED) {
+    if (getConfig().DATABASE != DataStorageType.NONE) {
       // Save blacklisted and verified IP addresses
-      getDatabase().addListToTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME, getFallback().getBlacklisted());
-      getDatabase().addListToTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME, getFallback().getVerified());
+      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
+      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
 
-      // Disconnect the MySQL database
-      getDatabase().disconnect();
+      // Dispose the database instance
+      getDatabase().dispose();
     }
   }
 
@@ -137,12 +139,10 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     FallbackListener.CachedMessages.update();
 
     // Initialize database
-    if (getConfig().DATABASE_ENABLED) {
-      getDatabase().initialize(this);
-      getFallback().getBlacklisted().clear();
-      getFallback().getVerified().clear();
-      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME));
-      getFallback().getVerified().addAll(getDatabase().getListFromTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME));
+    if (getConfig().DATABASE != DataStorageType.NONE) {
+      getDatabase().initialize(config);
+      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
+      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
     }
 
     // Apply filter (connection limiter) to Fallback

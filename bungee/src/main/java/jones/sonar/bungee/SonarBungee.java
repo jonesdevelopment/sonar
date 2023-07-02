@@ -21,8 +21,8 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.database.MySQLDataStorage;
 import jones.sonar.api.logger.Logger;
+import jones.sonar.api.storage.DataStorageType;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.bungee.fallback.FallbackListener;
 import jones.sonar.bungee.verbose.ActionBarVerbose;
@@ -33,6 +33,8 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import static jones.sonar.api.storage.MySQLDataStorage.*;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
@@ -111,10 +113,6 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     plugin.getServer().getScheduler().schedule(plugin, actionBarVerbose::update,
       100L, 100L, TimeUnit.MILLISECONDS);
 
-    // Initialize database
-    getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME));
-    getFallback().getVerified().addAll(getDatabase().getListFromTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME));
-
     // Done
     final long startDelay = System.currentTimeMillis() - start;
 
@@ -123,17 +121,26 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
   @Override
   public void disable() {
-    // Save blacklisted and verified IP addresses
-    getDatabase().addListToTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME, getFallback().getBlacklisted());
-    getDatabase().addListToTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME, getFallback().getVerified());
+    if (getConfig().DATABASE != DataStorageType.NONE) {
+      // Save blacklisted and verified IP addresses
+      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
+      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
 
-    // Disconnect the MySQL database
-    getDatabase().disconnect();
+      // Dispose the database instance
+      getDatabase().dispose();
+    }
   }
 
   @Override
   public void reload() {
     getConfig().load();
     FallbackListener.CachedMessages.update();
+
+    // Initialize database
+    if (getConfig().DATABASE != DataStorageType.NONE) {
+      getDatabase().initialize(config);
+      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
+      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
+    }
   }
 }

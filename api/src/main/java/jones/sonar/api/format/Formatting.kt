@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.util
+package jones.sonar.api.format
 
 import jones.sonar.api.Sonar
 

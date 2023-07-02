@@ -18,12 +18,11 @@
 package jones.sonar.api;
 
 import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.database.Database;
-import jones.sonar.api.database.MySQLDataStorage;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.fallback.FallbackHolder;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.api.statistics.Statistics;
+import jones.sonar.api.storage.Database;
 import jones.sonar.api.verbose.Verbose;
 import jones.sonar.api.version.SonarVersion;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +56,7 @@ public interface Sonar {
 
   @NotNull
   default Database getDatabase() {
-    return MySQLDataStorage.INSTANCE;
+    return getConfig().DATABASE.getHolder();
   }
 
   @NotNull Verbose getActionBarVerbose();

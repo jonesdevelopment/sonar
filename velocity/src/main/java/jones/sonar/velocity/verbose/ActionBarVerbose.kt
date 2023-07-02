@@ -20,7 +20,7 @@ package jones.sonar.velocity.verbose
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import jones.sonar.api.Sonar
-import jones.sonar.api.util.Formatting.Companion.formatMemory
+import jones.sonar.api.format.Formatting.Companion.formatMemory
 import jones.sonar.api.verbose.Verbose
 import jones.sonar.common.verbose.VerboseAnimation
 import net.kyori.adventure.text.Component
