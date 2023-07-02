@@ -73,6 +73,16 @@ tasks {
     }
   }
 
+  // relocation for all libraries to avoid issues
+  // with other plugins using the same libraries
+  shadowJar {
+    relocate("com.zaxxer.hikari", "jones.sonar.lib.hikari")
+    relocate("com.mysql.cj", "jones.sonar.lib.mysql")
+    relocate("com.mysql.jdbc", "jones.sonar.lib.jdbc")
+    relocate("org.yaml.snakeyaml", "jones.sonar.lib.snakeyaml")
+    relocate("net.kyori.adventure.nbt", "jones.sonar.lib.nbt")
+  }
+
   compileJava {
     options.encoding = "UTF-8"
   }
