@@ -18,10 +18,13 @@
 package jones.sonar.common.command.subcommand.impl
 
 import jones.sonar.api.database.DatabaseType
+import jones.sonar.api.format.Formatting
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
 import jones.sonar.common.command.subcommand.argument.Argument
+import java.io.File
+import java.nio.file.Files
 
 @SubCommandInfo(
   name = "database",
@@ -58,7 +61,18 @@ class DatabaseCommand : SubCommand() {
           }
 
           DatabaseType.YAML -> {
+            val file = File(sonar.pluginDataFolder, sonar.config.DATABASE_FILE_NAME + ".yml")
+
+            if (!file.exists()) {
+              invocation.invocationSender.sendMessage(" §c▪ §7File does not exist?!")
+              return
+            }
+
             invocation.invocationSender.sendMessage(" §a▪ §7File name: §f${sonar.config.DATABASE_FILE_NAME}.yml")
+
+            val fileSize = Files.size(file.toPath())
+            println(fileSize)
+            invocation.invocationSender.sendMessage(" §a▪ §7File size: §f${Formatting.formatMemory(fileSize)}")
           }
 
           else -> throw IllegalStateException("Invalid argument")
