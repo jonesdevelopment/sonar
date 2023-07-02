@@ -24,8 +24,8 @@ class Formatting {
     fun formatMemory(memory: Long): String {
       var bytes = memory
 
-      bytes /= 1000 // kB
-      var suffix = "kB"
+      bytes /= 1000 // KB
+      var suffix = "KB"
 
       if (bytes >= 1000) {
         suffix = "MB"
