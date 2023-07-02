@@ -33,6 +33,7 @@ public class SubCommandRegistry {
     new BlacklistCommand(),
     new WhitelistCommand(),
     new StatisticsCommand(),
+    new DatabaseCommand(),
     new LockdownCommand(),
     new VerboseCommand(),
     new ReloadCommand(),
