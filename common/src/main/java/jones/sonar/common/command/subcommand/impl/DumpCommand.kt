@@ -47,6 +47,7 @@ class DumpCommand : SubCommand() {
     sonar.logger.info("JVM args: ${runtimeMxBean.inputArguments.joinToString(", ")}")
     sonar.logger.info("Java version: ${runtimeMxBean.vmVersion}")
     sonar.logger.info("Operating system: ${System.getProperty("os.name")}; ${System.getProperty("os.arch")}")
+    sonar.logger.info("Data storage type: ${sonar.config.DATABASE}")
     sonar.logger.info("Total memory: ${formatMemory(totalMemory)}")
     sonar.logger.info("Max memory: ${formatMemory(maxMemory)}")
     sonar.logger.info("Free memory: ${formatMemory(freeMemory)}")
