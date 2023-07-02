@@ -25,10 +25,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @SuppressWarnings({
@@ -73,9 +70,9 @@ public final class YamlConfig {
       }
 
       if (config == null) {
-        config = new HashMap<>();
+        config = Collections.synchronizedMap(new HashMap<>());
       } else {
-        config = new HashMap<>(config);
+        config = Collections.synchronizedMap(new HashMap<>(config));
       }
     } catch (IOException exception) {
       throw new RuntimeException("Could not load configuration!", exception);
