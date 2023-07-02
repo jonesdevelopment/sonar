@@ -52,6 +52,7 @@ class DatabaseCommand : SubCommand() {
         when (sonar.config.DATABASE) {
           DatabaseType.MYSQL -> {
             invocation.invocationSender.sendMessage(" §a▪ §7Database URL: §f${sonar.config.DATABASE_URL}")
+            invocation.invocationSender.sendMessage(" §a▪ §7Database port: §f${sonar.config.DATABASE_PORT}")
             invocation.invocationSender.sendMessage(" §a▪ §7Database name: §f${sonar.config.DATABASE_NAME}")
             invocation.invocationSender.sendMessage(" §a▪ §7Query limit: §f${sonar.formatter.format(sonar.config.DATABASE_QUERY_LIMIT)}")
           }
