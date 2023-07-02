@@ -22,7 +22,6 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.common.SonarPlugin;
 import jones.sonar.velocity.command.SonarCommand;
@@ -33,8 +32,6 @@ import lombok.Getter;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
-
-import static jones.sonar.api.database.MySQLDatabase.*;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
@@ -95,6 +92,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());
     reload();
+    loadFromDatabase();
 
     // Register Sonar command
     plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
@@ -123,21 +121,14 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
   @Override
   public void disable() {
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      // Save blacklisted and verified IP addresses
-      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
-      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
-
-      // Dispose the database instance
-      getDatabase().dispose();
-    }
+    saveDatabase();
   }
 
   @Override
   public void reload() {
     getConfig().load();
     FallbackListener.CachedMessages.update();
-    reloadDatabases();
+    reloadDatabase();
 
     // Apply filter (connection limiter) to Fallback
     getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);

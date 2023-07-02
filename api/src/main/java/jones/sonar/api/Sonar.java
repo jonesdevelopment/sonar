@@ -68,12 +68,40 @@ public interface Sonar {
 
   void reload();
 
-  default void reloadDatabases() {
-    // Initialize database
+  default void saveDatabase() {
+    if (getConfig().DATABASE != DatabaseType.NONE) {
+      // Clear existing databases
+      getDatabase().clear(BLACKLIST_TABLE);
+      getDatabase().clear(VERIFIED_TABLE);
+
+      // Save everything to the database on server stop
+      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
+      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
+
+      // Dispose the database instance
+      getDatabase().dispose();
+    }
+  }
+
+  default void loadFromDatabase() {
     if (getConfig().DATABASE != DatabaseType.NONE) {
       getDatabase().initialize(getConfig());
       getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
       getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
+    }
+  }
+
+  default void reloadDatabase() {
+    if (getConfig().DATABASE != DatabaseType.NONE) {
+      getDatabase().initialize(getConfig());
+
+      // Clear existing databases
+      getDatabase().clear(BLACKLIST_TABLE);
+      getDatabase().clear(VERIFIED_TABLE);
+
+      // Save everything to the database on reload
+      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
+      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
     }
   }
 

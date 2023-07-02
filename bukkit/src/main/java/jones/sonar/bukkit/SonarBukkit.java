@@ -21,7 +21,6 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
@@ -32,8 +31,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.logging.Level;
-
-import static jones.sonar.api.database.MySQLDatabase.*;
 
 public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
@@ -94,6 +91,7 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
+    loadFromDatabase();
 
     // Register Sonar command
     Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());
@@ -113,19 +111,12 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
   @Override
   public void disable() {
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      // Save blacklisted and verified IP addresses
-      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
-      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
-
-      // Dispose the database instance
-      getDatabase().dispose();
-    }
+    saveDatabase();
   }
 
   @Override
   public void reload() {
     getConfig().load();
-    reloadDatabases();
+    reloadDatabase();
   }
 }

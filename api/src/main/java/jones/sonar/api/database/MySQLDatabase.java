@@ -35,6 +35,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class MySQLDatabase implements Database {
@@ -74,23 +76,8 @@ public final class MySQLDatabase implements Database {
   public void purge() {
     Objects.requireNonNull(dataSource);
 
-    try {
-      prepareRawStatement(dataSource.getConnection(), "drop table `" + VERIFIED_TABLE + "`;");
-      prepareRawStatement(dataSource.getConnection(), "drop table `" + BLACKLIST_TABLE + "`;");
-
-      createTable(IP_COLUMN, VERIFIED_TABLE);
-      createTable(IP_COLUMN, BLACKLIST_TABLE);
-    } catch (SQLException exception) {
-      throw new IllegalStateException(exception);
-    }
-  }
-
-  private static void prepareRawStatement(final @NotNull Connection connection, final @NotNull String sql) {
-    try (final PreparedStatement statement = connection.prepareStatement(sql)) {
-      statement.execute();
-    } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
-    }
+    clear(VERIFIED_TABLE);
+    clear(BLACKLIST_TABLE);
   }
 
   @Override
@@ -143,6 +130,39 @@ public final class MySQLDatabase implements Database {
     }
   }
 
+  private static final ExecutorService queuedService = Executors.newSingleThreadExecutor();
+
+  @Override
+  public void remove(final @NotNull String table,
+                     final @NotNull String column,
+                     final @NotNull String entry) {
+    Objects.requireNonNull(dataSource);
+
+    queuedService.execute(() -> {
+      try (final PreparedStatement statement = dataSource.getConnection().prepareStatement(
+        "delete from `" + table + "` where `" + column + "` = ?"
+      )) {
+        statement.setObject(1, entry);
+        statement.execute();
+      } catch (SQLException exception) {
+        throw new IllegalStateException(exception);
+      }
+    });
+  }
+
+  @Override
+  public void clear(final @NotNull String table) {
+    Objects.requireNonNull(dataSource);
+
+    queuedService.execute(() -> {
+      try {
+        prepareRawStatement(dataSource.getConnection(), "truncate table `" + table + "`");
+      } catch (SQLException exception) {
+        throw new IllegalStateException(exception);
+      }
+    });
+  }
+
   @SuppressWarnings("SameParameterValue")
   private void createTable(final String column, final String @NotNull ... tables) throws SQLException {
     Objects.requireNonNull(dataSource);
@@ -153,6 +173,14 @@ public final class MySQLDatabase implements Database {
       )) {
         statement.execute();
       }
+    }
+  }
+
+  private static void prepareRawStatement(final @NotNull Connection connection, final @NotNull String sql) {
+    try (final PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.execute();
+    } catch (Throwable throwable) {
+      throw new IllegalStateException(throwable);
     }
   }
 }

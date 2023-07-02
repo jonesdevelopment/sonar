@@ -28,6 +28,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static jones.sonar.api.database.MySQLDatabase.BLACKLIST_TABLE;
+import static jones.sonar.api.database.MySQLDatabase.VERIFIED_TABLE;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class YamlDatabase implements Database {
@@ -45,11 +50,8 @@ public final class YamlDatabase implements Database {
   public void purge() {
     Objects.requireNonNull(yamlConfig);
 
-    for (final String key : yamlConfig.getConfig().keySet()) {
-      if (yamlConfig.getConfig().get(key) instanceof Collection) {
-        yamlConfig.set(key, new ArrayList<>());
-      }
-    }
+    clear(VERIFIED_TABLE);
+    clear(BLACKLIST_TABLE);
   }
 
   @Override
@@ -68,5 +70,25 @@ public final class YamlDatabase implements Database {
                              final @NotNull String column,
                              final @NotNull Collection<String> collection) {
     Objects.requireNonNull(yamlConfig).set(table, collection);
+  }
+
+  private static final ExecutorService queuedService = Executors.newSingleThreadExecutor();
+
+  @Override
+  public void remove(final @NotNull String table,
+                     final @NotNull String column,
+                     final @NotNull String entry) {
+    queuedService.execute(() -> {
+      Objects.requireNonNull(yamlConfig);
+
+      final Collection<String> got = getListFromTable(table, "");
+      got.remove(entry);
+      yamlConfig.set(table, got);
+    });
+  }
+
+  @Override
+  public void clear(final @NotNull String table) {
+    queuedService.execute(() -> Objects.requireNonNull(yamlConfig).set(table, new ArrayList<>()));
   }
 }

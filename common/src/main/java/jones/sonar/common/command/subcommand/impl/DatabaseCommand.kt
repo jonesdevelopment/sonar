@@ -93,7 +93,6 @@ class DatabaseCommand : SubCommand() {
         purging = true
         try {
           sonar.database.purge()
-          sonar.reloadDatabases()
         } catch (e: Throwable) {
           e.printStackTrace()
         }
@@ -106,7 +105,7 @@ class DatabaseCommand : SubCommand() {
         val startTime = System.currentTimeMillis()
 
         invocation.invocationSender.sendMessage(sonar.config.DATABASE_RELOADING)
-        sonar.reloadDatabases()
+        sonar.reloadDatabase()
 
         val timeTaken = System.currentTimeMillis() - startTime
         invocation.invocationSender.sendMessage(
