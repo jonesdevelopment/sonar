@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum DataStorageType {
+public enum DatabaseType {
   NONE(null),
   YAML(new YamlDataStorage()),
   MYSQL(new MySQLDataStorage());

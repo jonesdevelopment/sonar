@@ -17,7 +17,7 @@
 
 package jones.sonar.api.config;
 
-import jones.sonar.api.storage.DataStorageType;
+import jones.sonar.api.storage.DatabaseType;
 import jones.sonar.api.yaml.YamlConfig;
 import lombok.Getter;
 
@@ -98,7 +98,7 @@ public final class SonarConfiguration {
   public String LOCKDOWN_NOTIFICATION;
   public String LOCKDOWN_CONSOLE_LOG;
 
-  public DataStorageType DATABASE;
+  public DatabaseType DATABASE;
   public String DATABASE_URL;
   public String DATABASE_NAME;
   public String DATABASE_USERNAME;
@@ -121,7 +121,7 @@ public final class SonarConfiguration {
     LOCKDOWN_LOG_ATTEMPTS = yamlConfig.getBoolean("general.lockdown.log-attempts", true);
     LOCKDOWN_ENABLE_NOTIFY = yamlConfig.getBoolean("general.lockdown.notify-admins", true);
 
-    DATABASE = DataStorageType.valueOf(yamlConfig.getString("general.database.type", "NONE"));
+    DATABASE = DatabaseType.valueOf(yamlConfig.getString("general.database.type", "NONE"));
     DATABASE_NAME = yamlConfig.getString("general.database.name", "sonar");
     DATABASE_URL = yamlConfig.getString("general.database.url", "localhost");
     DATABASE_PORT = yamlConfig.getInt("general.database.port", 3306);

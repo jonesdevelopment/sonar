@@ -36,7 +36,8 @@ public final class YamlDataStorage implements Database {
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {
     if (yamlConfig == null) {
-      yamlConfig = new YamlConfig(Sonar.get().getPluginDataFolder(), "storage");
+      System.out.println("new yaml config");
+      yamlConfig = new YamlConfig(Sonar.get().getPluginDataFolder(), "database");
     }
     yamlConfig.load();
   }

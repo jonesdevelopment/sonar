@@ -22,7 +22,7 @@ import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.logger.Logger;
-import jones.sonar.api.storage.DataStorageType;
+import jones.sonar.api.storage.DatabaseType;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.bungee.fallback.FallbackListener;
 import jones.sonar.bungee.verbose.ActionBarVerbose;
@@ -121,7 +121,7 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
   @Override
   public void disable() {
-    if (getConfig().DATABASE != DataStorageType.NONE) {
+    if (getConfig().DATABASE != DatabaseType.NONE) {
       // Save blacklisted and verified IP addresses
       getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
       getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
@@ -137,7 +137,7 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     FallbackListener.CachedMessages.update();
 
     // Initialize database
-    if (getConfig().DATABASE != DataStorageType.NONE) {
+    if (getConfig().DATABASE != DatabaseType.NONE) {
       getDatabase().initialize(config);
       getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
       getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
