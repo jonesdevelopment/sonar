@@ -69,6 +69,7 @@ class DatabaseCommand : SubCommand() {
         }
 
         sonar.database.purge()
+        sonar.reloadDatabases()
         invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE)
       }
 
