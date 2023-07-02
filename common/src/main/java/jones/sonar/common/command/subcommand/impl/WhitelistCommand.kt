@@ -27,9 +27,9 @@ import java.net.InetAddress
   name = "whitelist",
   description = "Manage verified IP addresses",
   arguments = [
-    Argument(name = "add"),
-    Argument(name = "remove"),
-    Argument(name = "size"),
+    Argument("add"),
+    Argument("remove"),
+    Argument("size"),
   ],
 )
 class WhitelistCommand : SubCommand() {

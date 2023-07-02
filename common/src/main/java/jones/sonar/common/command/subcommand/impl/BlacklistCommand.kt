@@ -27,10 +27,10 @@ import java.net.InetAddress
   name = "blacklist",
   description = "Manage blacklisted IP addresses",
   arguments = [
-    Argument(name = "add"),
-    Argument(name = "remove"),
-    Argument(name = "clear"),
-    Argument(name = "size"),
+    Argument("add"),
+    Argument("remove"),
+    Argument("clear"),
+    Argument("size"),
   ],
 )
 class BlacklistCommand : SubCommand() {

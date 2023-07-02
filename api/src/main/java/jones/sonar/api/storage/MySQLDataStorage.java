@@ -53,9 +53,9 @@ public final class MySQLDataStorage implements Database {
 
       hikariConfig.setJdbcUrl(
         "jdbc:mysql://"
-        + config.DATABASE_URL
-        + ":" + config.DATABASE_PORT
-        + "/" + config.DATABASE_NAME
+          + config.DATABASE_URL
+          + ":" + config.DATABASE_PORT
+          + "/" + config.DATABASE_NAME
       );
       hikariConfig.setUsername(config.DATABASE_USERNAME);
       hikariConfig.setPassword(config.DATABASE_PASSWORD);
