@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,6 +67,29 @@ public final class MySQLDatabase implements Database {
       createTable(IP_COLUMN, BLACKLIST_TABLE);
     } catch (Throwable throwable) {
       Sonar.get().getLogger().error("Failed to connect to database: {}", throwable);
+    }
+  }
+
+  @Override
+  public void purge() {
+    Objects.requireNonNull(dataSource);
+
+    try {
+      prepareRawStatement(dataSource.getConnection(), "drop table `" + VERIFIED_TABLE + "`;");
+      prepareRawStatement(dataSource.getConnection(), "drop table `" + BLACKLIST_TABLE + "`;");
+
+      createTable(IP_COLUMN, VERIFIED_TABLE);
+      createTable(IP_COLUMN, BLACKLIST_TABLE);
+    } catch (SQLException exception) {
+      throw new IllegalStateException(exception);
+    }
+  }
+
+  private static void prepareRawStatement(final @NotNull Connection connection, final @NotNull String sql) {
+    try (final PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.execute();
+    } catch (Throwable throwable) {
+      throw new IllegalStateException(throwable);
     }
   }
 

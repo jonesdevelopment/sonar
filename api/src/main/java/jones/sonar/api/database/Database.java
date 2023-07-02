@@ -25,6 +25,8 @@ import java.util.Collection;
 public interface Database {
   void initialize(final @NotNull SonarConfiguration config);
 
+  void purge();
+
   void dispose();
 
   Collection<String> getListFromTable(final @NotNull String table,

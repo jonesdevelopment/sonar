@@ -33,33 +33,42 @@ import jones.sonar.common.command.subcommand.argument.Argument
 )
 class DatabaseCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {
+    if (sonar.config.DATABASE == DatabaseType.NONE) {
+      invocation.invocationSender.sendMessage(sonar.config.DATABASE_NOT_SELECTED)
+      return
+    }
+
     when (invocation.arguments[1]!!.lowercase()) {
       "info" -> {
         invocation.invocationSender.sendMessage()
         invocation.invocationSender.sendMessage(" §eData storage information")
         invocation.invocationSender.sendMessage()
-        invocation.invocationSender.sendMessage(" §a▪ §7Current database type: §f" + sonar.config.DATABASE)
+        invocation.invocationSender.sendMessage(" §a▪ §7Current data storage type: §f" + sonar.config.DATABASE)
 
         when (sonar.config.DATABASE) {
           DatabaseType.MYSQL -> {
-            invocation.invocationSender.sendMessage(" §a▪ §7Database URL: " + sonar.config.DATABASE_URL)
-            invocation.invocationSender.sendMessage(" §a▪ §7Database name: " + sonar.config.DATABASE_NAME)
-            invocation.invocationSender.sendMessage(" §a▪ §7Query limit: " + sonar.formatter.format(sonar.config.DATABASE_QUERY_LIMIT))
+            invocation.invocationSender.sendMessage(" §a▪ §7Database URL: §f" + sonar.config.DATABASE_URL)
+            invocation.invocationSender.sendMessage(" §a▪ §7Database name: §f" + sonar.config.DATABASE_NAME)
+            invocation.invocationSender.sendMessage(" §a▪ §7Query limit: §f" + sonar.formatter.format(sonar.config.DATABASE_QUERY_LIMIT))
           }
 
           DatabaseType.YAML -> {
-            invocation.invocationSender.sendMessage(" §a▪ §7File name: " + sonar.config.DATABASE_FILE_NAME)
+            invocation.invocationSender.sendMessage(" §a▪ §7File name: §f" + sonar.config.DATABASE_FILE_NAME)
           }
 
-          else -> {
-            invocation.invocationSender.sendMessage(" §c▪ §7You haven't selected any database yet")
-          }
+          else -> throw IllegalStateException("Invalid argument")
         }
         invocation.invocationSender.sendMessage()
       }
 
       "purge" -> {
-        println(invocation.arguments.size)
+        if (invocation.arguments.size == 2) {
+          invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE_CONFIRM)
+          return
+        }
+
+        sonar.database.purge()
+        invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE)
       }
 
       else -> incorrectUsage(invocation.invocationSender)

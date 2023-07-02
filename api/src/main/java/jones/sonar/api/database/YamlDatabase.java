@@ -42,6 +42,17 @@ public final class YamlDatabase implements Database {
   }
 
   @Override
+  public void purge() {
+    Objects.requireNonNull(yamlConfig);
+
+    for (final String key : yamlConfig.getConfig().keySet()) {
+      if (yamlConfig.getConfig().get(key) instanceof Collection) {
+        yamlConfig.set(key, new ArrayList<>());
+      }
+    }
+  }
+
+  @Override
   public void dispose() {
     yamlConfig = null;
   }

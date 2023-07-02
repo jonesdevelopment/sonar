@@ -107,6 +107,10 @@ public final class SonarConfiguration {
   public int DATABASE_PORT;
   public int DATABASE_QUERY_LIMIT;
 
+  public String DATABASE_PURGE_CONFIRM;
+  public String DATABASE_PURGE;
+  public String DATABASE_NOT_SELECTED;
+
   public void load() {
     Objects.requireNonNull(yamlConfig);
 
@@ -190,6 +194,16 @@ public final class SonarConfiguration {
     ));
     VERBOSE_UNSUBSCRIBED = formatString(yamlConfig.getString("messages.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."
+    ));
+
+    DATABASE_PURGE_CONFIRM = formatString(yamlConfig.getString("messages.database.purge-confirm",
+      "%prefix%&cPlease confirm that you want to delete all database entries by typing &f/sonar database purge confirm&c."
+    ));
+    DATABASE_PURGE = formatString(yamlConfig.getString("messages.database.purge",
+      "%prefix%&7Successfully purged all database entries."
+    ));
+    DATABASE_NOT_SELECTED = formatString(yamlConfig.getString("messages.database.not-selected",
+      "%prefix%&cYou have not selected any data storage type."
     ));
 
     INCORRECT_COMMAND_USAGE = formatString(yamlConfig.getString("messages.incorrect-command-usage",
