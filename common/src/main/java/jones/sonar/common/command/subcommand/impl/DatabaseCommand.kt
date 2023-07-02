@@ -71,7 +71,6 @@ class DatabaseCommand : SubCommand() {
             invocation.invocationSender.sendMessage(" §a▪ §7File name: §f${sonar.config.DATABASE_FILE_NAME}.yml")
 
             val fileSize = Files.size(file.toPath())
-            println(fileSize)
             invocation.invocationSender.sendMessage(" §a▪ §7File size: §f${Formatting.formatMemory(fileSize)}")
           }
 
