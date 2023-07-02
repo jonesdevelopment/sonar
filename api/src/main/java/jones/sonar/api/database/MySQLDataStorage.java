@@ -26,8 +26,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -51,8 +49,7 @@ public final class MySQLDataStorage implements Database {
 
       try {
         // Register MySQL driver
-        final Driver driver = null; // TODO
-        DriverManager.registerDriver(driver);
+        Class.forName("com.mysql.cj.jdbc.Driver");
 
         // Load Hikari
         final HikariConfig config = new HikariConfig();
