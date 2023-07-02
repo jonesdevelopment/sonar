@@ -15,13 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.database.impl;
+package jones.sonar.api.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.database.Database;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -15,11 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.api.database.impl;
+package jones.sonar.api.database;
 
 import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
-import jones.sonar.api.database.Database;
 import jones.sonar.api.yaml.YamlConfig;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

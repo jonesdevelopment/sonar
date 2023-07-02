@@ -34,7 +34,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
-import static jones.sonar.api.database.impl.MySQLDatabase.*;
+import static jones.sonar.api.database.MySQLDatabase.*;
 
 public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 

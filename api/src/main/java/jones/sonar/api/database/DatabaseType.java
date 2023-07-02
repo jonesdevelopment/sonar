@@ -17,8 +17,6 @@
 
 package jones.sonar.api.database;
 
-import jones.sonar.api.database.impl.MySQLDatabase;
-import jones.sonar.api.database.impl.YamlDatabase;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
