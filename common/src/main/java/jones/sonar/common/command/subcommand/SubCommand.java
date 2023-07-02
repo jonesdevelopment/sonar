@@ -47,7 +47,7 @@ public abstract class SubCommand {
   protected final void incorrectUsage(final InvocationSender sender) {
     sender.sendMessage(
       sonar.getConfig().INCORRECT_COMMAND_USAGE
-        .replace("%usage%", info.name())
+        .replace("%usage%", info.name() + " (" + arguments + ")")
     );
   }
 
