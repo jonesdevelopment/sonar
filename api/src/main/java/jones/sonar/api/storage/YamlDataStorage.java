@@ -25,8 +25,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,7 +36,6 @@ public final class YamlDataStorage implements Database {
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {
     if (yamlConfig == null) {
-      System.out.println("new yaml config");
       yamlConfig = new YamlConfig(Sonar.get().getPluginDataFolder(), "database");
     }
     yamlConfig.load();
@@ -50,7 +49,7 @@ public final class YamlDataStorage implements Database {
   @Override
   public Collection<String> getListFromTable(final @NotNull String table,
                                              final @NotNull String column) {
-    return Objects.requireNonNull(yamlConfig).getStringList(table, Collections.emptyList());
+    return Objects.requireNonNull(yamlConfig).getStringList(table, new ArrayList<>());
   }
 
   @Override
