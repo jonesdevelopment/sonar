@@ -21,20 +21,26 @@ import jones.sonar.api.Sonar
 
 class Formatting {
   companion object {
+    private const val MIN = 1024
+
     fun formatMemory(memory: Long): String {
       var bytes = memory
 
-      bytes /= 1000 // KB
-      var suffix = "KB"
-
-      if (bytes >= 1000) {
-        suffix = "MB"
-        bytes /= 1000
+      if (bytes < MIN) {
+        return "$bytes B"
       }
 
-      if (bytes >= 1000) {
+      bytes /= MIN // KB
+      var suffix = "KB"
+
+      if (bytes >= MIN) {
+        suffix = "MB"
+        bytes /= MIN
+      }
+
+      if (bytes >= MIN) {
         suffix = "GB"
-        bytes /= 1000
+        bytes /= MIN
       }
       return Sonar.get().formatter.format(bytes) + suffix
     }
