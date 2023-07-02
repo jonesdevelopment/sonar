@@ -28,8 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static jones.sonar.api.database.MySQLDatabase.BLACKLIST_TABLE;
 import static jones.sonar.api.database.MySQLDatabase.VERIFIED_TABLE;
@@ -72,23 +70,23 @@ public final class YamlDatabase implements Database {
     Objects.requireNonNull(yamlConfig).set(table, collection);
   }
 
-  private static final ExecutorService queuedService = Executors.newSingleThreadExecutor();
-
   @Override
   public void remove(final @NotNull String table,
                      final @NotNull String column,
                      final @NotNull String entry) {
-    queuedService.execute(() -> {
-      Objects.requireNonNull(yamlConfig);
+    Objects.requireNonNull(yamlConfig);
 
-      final Collection<String> got = getListFromTable(table, "");
-      got.remove(entry);
-      yamlConfig.set(table, got);
-    });
+    final Collection<String> got = getListFromTable(table, "");
+    got.remove(entry);
+    yamlConfig.set(table, got);
   }
 
   @Override
   public void clear(final @NotNull String table) {
-    queuedService.execute(() -> Objects.requireNonNull(yamlConfig).set(table, new ArrayList<>()));
+    Objects.requireNonNull(yamlConfig);
+
+    if (yamlConfig.getConfig().containsKey(table)) {
+      yamlConfig.set(table, new ArrayList<>());
+    }
   }
 }

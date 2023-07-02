@@ -105,7 +105,7 @@ class DatabaseCommand : SubCommand() {
         val startTime = System.currentTimeMillis()
 
         invocation.invocationSender.sendMessage(sonar.config.DATABASE_RELOADING)
-        sonar.reloadDatabase()
+        sonar.updateDatabase()
 
         val timeTaken = System.currentTimeMillis() - startTime
         invocation.invocationSender.sendMessage(

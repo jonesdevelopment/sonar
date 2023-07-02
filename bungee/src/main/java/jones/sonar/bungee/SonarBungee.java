@@ -21,6 +21,7 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.bungee.fallback.FallbackListener;
@@ -32,6 +33,8 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import static jones.sonar.api.database.MySQLDatabase.*;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
@@ -92,7 +95,6 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
-    loadFromDatabase();
 
     // Register Sonar command
     plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());
@@ -119,13 +121,33 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
   @Override
   public void disable() {
-    saveDatabase();
+    if (getConfig().DATABASE != DatabaseType.NONE) {
+      getDatabase().initialize(getConfig());
+      getLogger().info("Saving entries to database...");
+      updateDatabase();
+
+      // Dispose the database instance
+      getDatabase().dispose();
+    }
   }
+
+  private static boolean hasLoadedDatabase;
 
   @Override
   public void reload() {
     getConfig().load();
     FallbackListener.CachedMessages.update();
-    reloadDatabase();
+
+    if (getConfig().DATABASE != DatabaseType.NONE) {
+      getDatabase().initialize(getConfig());
+      // Load values from database
+      if (!hasLoadedDatabase) {
+        hasLoadedDatabase = true;
+        getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
+        getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
+      }
+
+      updateDatabase();
+    }
   }
 }

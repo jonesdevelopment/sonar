@@ -21,6 +21,7 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
 import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
+import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
@@ -31,6 +32,8 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.logging.Level;
+
+import static jones.sonar.api.database.MySQLDatabase.*;
 
 public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
@@ -91,7 +94,6 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
-    loadFromDatabase();
 
     // Register Sonar command
     Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());
@@ -111,12 +113,32 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
   @Override
   public void disable() {
-    saveDatabase();
+    if (getConfig().DATABASE != DatabaseType.NONE) {
+      getDatabase().initialize(getConfig());
+      getLogger().info("Saving entries to database...");
+      updateDatabase();
+
+      // Dispose the database instance
+      getDatabase().dispose();
+    }
   }
+
+  private static boolean hasLoadedDatabase;
 
   @Override
   public void reload() {
     getConfig().load();
-    reloadDatabase();
+
+    if (getConfig().DATABASE != DatabaseType.NONE) {
+      getDatabase().initialize(getConfig());
+      // Load values from database
+      if (!hasLoadedDatabase) {
+        hasLoadedDatabase = true;
+        getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
+        getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
+      }
+
+      updateDatabase();
+    }
   }
 }

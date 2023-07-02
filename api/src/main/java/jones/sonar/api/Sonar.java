@@ -19,7 +19,6 @@ package jones.sonar.api;
 
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.database.Database;
-import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.api.fallback.FallbackHolder;
 import jones.sonar.api.logger.Logger;
@@ -68,41 +67,15 @@ public interface Sonar {
 
   void reload();
 
-  default void saveDatabase() {
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      // Clear existing databases
-      getDatabase().clear(BLACKLIST_TABLE);
-      getDatabase().clear(VERIFIED_TABLE);
+  default void updateDatabase() {
 
-      // Save everything to the database on server stop
-      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
-      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
+    // Clear existing databases
+    getDatabase().clear(BLACKLIST_TABLE);
+    getDatabase().clear(VERIFIED_TABLE);
 
-      // Dispose the database instance
-      getDatabase().dispose();
-    }
-  }
-
-  default void loadFromDatabase() {
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      getDatabase().initialize(getConfig());
-      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
-      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
-    }
-  }
-
-  default void reloadDatabase() {
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      getDatabase().initialize(getConfig());
-
-      // Clear existing databases
-      getDatabase().clear(BLACKLIST_TABLE);
-      getDatabase().clear(VERIFIED_TABLE);
-
-      // Save everything to the database on reload
-      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
-      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
-    }
+    // Save everything to the database on reload
+    getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
+    getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
   }
 
   @NotNull
