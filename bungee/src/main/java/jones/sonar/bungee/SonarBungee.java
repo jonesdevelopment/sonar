@@ -29,6 +29,7 @@ import jones.sonar.bungee.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -45,6 +46,9 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 
   @Getter
   private SonarConfiguration config;
+
+  @Getter
+  private File pluginDataFolder;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -83,6 +87,8 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     SonarProvider.set(this);
 
     logger.info("Initializing Sonar...");
+
+    pluginDataFolder = plugin.getDataFolder();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());

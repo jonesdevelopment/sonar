@@ -28,6 +28,7 @@ import jones.sonar.bukkit.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -44,6 +45,9 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
   @Getter
   private SonarConfiguration config;
+
+  @Getter
+  private File pluginDataFolder;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -82,6 +86,8 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     SonarProvider.set(this);
 
     logger.info("Initializing Sonar...");
+
+    pluginDataFolder = plugin.getDataFolder();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());

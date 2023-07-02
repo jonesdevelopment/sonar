@@ -30,6 +30,7 @@ import jones.sonar.velocity.fallback.FallbackListener;
 import jones.sonar.velocity.verbose.ActionBarVerbose;
 import lombok.Getter;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +46,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
   @Getter
   private SonarConfiguration config;
+
+  @Getter
+  private File pluginDataFolder;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -84,6 +88,8 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
     logger.info("Initializing Sonar...");
 
+    pluginDataFolder = plugin.getDataDirectory().toFile();
+
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());
     reload();
@@ -107,10 +113,6 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
       .repeat(100L, TimeUnit.MILLISECONDS)
       .schedule();
 
-    // Initialize database
-    getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME));
-    getFallback().getVerified().addAll(getDatabase().getListFromTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME));
-
     // Done
     final long startDelay = System.currentTimeMillis() - start;
 
@@ -119,18 +121,29 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
   @Override
   public void disable() {
-    // Save blacklisted and verified IP addresses
-    getDatabase().addListToTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME, getFallback().getBlacklisted());
-    getDatabase().addListToTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME, getFallback().getVerified());
+    if (getConfig().DATABASE_ENABLED) {
+      // Save blacklisted and verified IP addresses
+      getDatabase().addListToTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME, getFallback().getBlacklisted());
+      getDatabase().addListToTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME, getFallback().getVerified());
 
-    // Disconnect the MySQL database
-    getDatabase().disconnect();
+      // Disconnect the MySQL database
+      getDatabase().disconnect();
+    }
   }
 
   @Override
   public void reload() {
     getConfig().load();
     FallbackListener.CachedMessages.update();
+
+    // Initialize database
+    if (getConfig().DATABASE_ENABLED) {
+      getDatabase().initialize(this);
+      getFallback().getBlacklisted().clear();
+      getFallback().getVerified().clear();
+      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(MySQLDataStorage.BLACKLISTED_IPS_TABLE_NAME));
+      getFallback().getVerified().addAll(getDatabase().getListFromTable(MySQLDataStorage.VERIFIED_IPS_TABLE_NAME));
+    }
 
     // Apply filter (connection limiter) to Fallback
     getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);
