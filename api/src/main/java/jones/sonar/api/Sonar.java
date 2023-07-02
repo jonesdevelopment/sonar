@@ -28,10 +28,13 @@ import jones.sonar.api.verbose.Verbose;
 import jones.sonar.api.version.SonarVersion;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.text.DecimalFormat;
 
 public interface Sonar {
   SonarPlatform getPlatform();
+
+  @NotNull File getPluginDataFolder();
 
   @NotNull SonarConfiguration getConfig();
 

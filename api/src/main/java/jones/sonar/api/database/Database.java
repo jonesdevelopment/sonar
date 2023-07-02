@@ -17,6 +17,7 @@
 
 package jones.sonar.api.database;
 
+import jones.sonar.api.Sonar;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +31,8 @@ import java.util.concurrent.Executors;
 public interface Database {
   ExecutorService service = Executors.newSingleThreadExecutor();
 
+  void initialize(final @NotNull Sonar sonar);
+
   @SneakyThrows
   default void disconnect() {
     Objects.requireNonNull(getConnection());
@@ -38,11 +41,11 @@ public interface Database {
     }
   }
 
-  default void createTable(final String name) {
+  default void createTable(final @NotNull String name) {
     prepareStatement("create table if not exists " + name + " (value varchar(16))");
   }
 
-  default void prepareStatement(final String query,
+  default void prepareStatement(final @NotNull String query,
                                 final Object @NotNull ... arguments) {
     service.execute(() -> {
       try (final PreparedStatement stmt = getConnection().prepareStatement(query)) {
@@ -56,7 +59,7 @@ public interface Database {
     });
   }
 
-  default PreparedStatement prepareStatement(final String query,
+  default PreparedStatement prepareStatement(final @NotNull String query,
                                              final boolean close,
                                              final Object @NotNull ... arguments) throws Throwable {
     final PreparedStatement stmt = getConnection().prepareStatement(query);

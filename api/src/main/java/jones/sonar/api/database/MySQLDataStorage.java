@@ -17,42 +17,57 @@
 
 package jones.sonar.api.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import jones.sonar.api.Sonar;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 
 public final class MySQLDataStorage implements Database {
-  public static final MySQLDataStorage INSTANCE = new MySQLDataStorage(Objects.requireNonNull(Sonar.get()));
+  public static final Database INSTANCE = new MySQLDataStorage();
+  private @Nullable DataSource dataSource;
   @Getter
   private @Nullable Connection connection;
   public static final String VERIFIED_IPS_TABLE_NAME = "verified_ips";
   public static final String BLACKLISTED_IPS_TABLE_NAME = "blacklisted_ips";
 
-  public MySQLDataStorage(final Sonar sonar) {
+  @Override
+  public void initialize(final @NotNull Sonar sonar) {
     if (!sonar.getConfig().DATABASE_ENABLED) return;
 
     service.execute(() -> {
-      final String formattedURL = sonar.getConfig().DATABASE_URL
+      final String formattedURL = "jdbc:mysql://"
+        + sonar.getConfig().DATABASE_URL
         + ":" + sonar.getConfig().DATABASE_PORT
         + "/" + sonar.getConfig().DATABASE_NAME;
 
       try {
-        connection = DriverManager.getConnection(
-          formattedURL,
-          sonar.getConfig().DATABASE_USERNAME,
-          sonar.getConfig().DATABASE_PASSWORD
-        );
+        // Register MySQL driver
+        final Driver driver = null; // TODO
+        DriverManager.registerDriver(driver);
+
+        // Load Hikari
+        final HikariConfig config = new HikariConfig();
+
+        config.setJdbcUrl(formattedURL);
+        config.setUsername(sonar.getConfig().DATABASE_USERNAME);
+        config.setPassword(sonar.getConfig().DATABASE_PASSWORD);
+
+        dataSource = new HikariDataSource(config);
+        connection = dataSource.getConnection();
 
         createTable(VERIFIED_IPS_TABLE_NAME);
         createTable(BLACKLISTED_IPS_TABLE_NAME);
       } catch (Throwable throwable) {
-        sonar.getLogger().error("Failed to connect to database {}", formattedURL);
+        sonar.getLogger().error("Failed to connect to database: {}", throwable);
       }
     });
   }

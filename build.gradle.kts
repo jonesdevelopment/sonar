@@ -73,6 +73,10 @@ tasks {
     }
   }
 
+  shadowJar {
+    relocate("com.zaxxer.hikari", "sonar.libs")
+  }
+
   compileJava {
     options.encoding = "UTF-8"
   }
