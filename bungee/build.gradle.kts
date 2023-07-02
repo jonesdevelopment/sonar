@@ -11,11 +11,5 @@ dependencies {
   compileOnly("io.papermc:waterfall-proxy:1.20-R0.1-SNAPSHOT")
 }
 
-tasks {
-  shadowJar {
-    minimize()
-  }
-}
-
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 java.targetCompatibility = JavaVersion.VERSION_1_8
