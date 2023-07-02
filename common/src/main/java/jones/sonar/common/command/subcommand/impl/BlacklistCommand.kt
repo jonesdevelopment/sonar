@@ -40,10 +40,6 @@ class BlacklistCommand : SubCommand() {
   }
 
   override fun execute(invocation: CommandInvocation) {
-    if (invocation.arguments.size <= 1) {
-      return
-    }
-
     when (invocation.arguments[1]!!.lowercase()) {
       "add" -> {
         if (invocation.arguments.size <= 2) {
