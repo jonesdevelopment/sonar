@@ -24,6 +24,7 @@ import jones.sonar.api.config.SonarConfiguration;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +46,9 @@ public final class MySQLDatabase implements Database {
   public static final String VERIFIED_TABLE = "verified_ips";
   public static final String BLACKLIST_TABLE = "blacklisted_ips";
   public static final String IP_COLUMN = "ip_address";
+  @Getter
+  @Setter
+  private boolean loadedFromDatabase;
 
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {

@@ -21,7 +21,9 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.yaml.YamlConfig;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +37,9 @@ import static jones.sonar.api.database.MySQLDatabase.VERIFIED_TABLE;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class YamlDatabase implements Database {
   private @Nullable YamlConfig yamlConfig;
+  @Getter
+  @Setter
+  private boolean loadedFromDatabase;
 
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {

@@ -18,6 +18,7 @@
 package jones.sonar.common.command.subcommand.impl
 
 import jones.sonar.api.database.DatabaseType
+import jones.sonar.api.database.MySQLDatabase
 import jones.sonar.api.format.Formatting
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
@@ -105,6 +106,15 @@ class DatabaseCommand : SubCommand() {
         val startTime = System.currentTimeMillis()
 
         invocation.invocationSender.sendMessage(sonar.config.DATABASE_RELOADING)
+
+        sonar.database.initialize(sonar.config)
+        if (!sonar.database.isLoadedFromDatabase) {
+          sonar.database.isLoadedFromDatabase = true
+          sonar.fallback.blacklisted
+            .addAll(sonar.database.getListFromTable(MySQLDatabase.BLACKLIST_TABLE, MySQLDatabase.IP_COLUMN))
+          sonar.fallback.verified
+            .addAll(sonar.database.getListFromTable(MySQLDatabase.VERIFIED_TABLE, MySQLDatabase.IP_COLUMN))
+        }
         sonar.updateDatabase()
 
         val timeTaken = System.currentTimeMillis() - startTime

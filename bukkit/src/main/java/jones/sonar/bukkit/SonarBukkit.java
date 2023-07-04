@@ -123,8 +123,6 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     }
   }
 
-  private static boolean hasLoadedDatabase;
-
   @Override
   public void reload() {
     getConfig().load();
@@ -132,8 +130,8 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     if (getConfig().DATABASE != DatabaseType.NONE) {
       getDatabase().initialize(getConfig());
       // Load values from database
-      if (!hasLoadedDatabase) {
-        hasLoadedDatabase = true;
+      if (!getDatabase().isLoadedFromDatabase()) {
+        getDatabase().setLoadedFromDatabase(true);
         getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
         getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
       }
