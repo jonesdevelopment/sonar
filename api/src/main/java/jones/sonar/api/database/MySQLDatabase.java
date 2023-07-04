@@ -119,6 +119,7 @@ public final class MySQLDatabase implements Database {
                              final @NotNull Collection<String> collection) {
     Objects.requireNonNull(getDataSource());
 
+    // Disallow query if the collection of IPs is empty
     if (collection.isEmpty()) return;
 
     try (final PreparedStatement insertStatement = getDataSource().getConnection().prepareStatement(
@@ -128,11 +129,13 @@ public final class MySQLDatabase implements Database {
     ) {
       for (final String v : collection) {
         selectStatement.setString(1, v);
-        ResultSet resultSet = selectStatement.executeQuery();
-        resultSet.next();
-        int count = resultSet.getInt(1);
 
-        if (count == 0) {
+        final ResultSet resultSet = selectStatement.executeQuery();
+        resultSet.next();
+
+        // We have to check if the IP address is already in the list
+        // since we don't want any duplicates
+        if (resultSet.getInt(1) == 0) {
           insertStatement.setString(1, v);
           insertStatement.addBatch();
         }
