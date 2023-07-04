@@ -46,7 +46,7 @@
     </ul>
     <h2>2.0 Checks</h2>
     <p>
-      Sonar has one main component called Fallback.
+      <b>Sonar has one main component called Fallback</b>
       <br>
       Fallback analyzes a player's behavior before joining the actual server; therefore
       stopping malicious traffic from ever getting to the backend.
@@ -82,7 +82,7 @@
       <br>
       Note: This does not block backend attacks and should not be used as a first line of defense.
     </p>
-    <h2>2.1 How Sonar operates</h2>
+    <h2>2.1 How Fallback operates</h2>
     <p>
       Sonar hooks itself into the <a href="https://netty.io/4.1/api/io/netty/channel/ChannelPipeline.html">netty channel pipeline</a> of an
       incoming connection to analyze the traffic (packets) sent by the client.
@@ -97,8 +97,10 @@
       correct order. Lag should not affect the bot check.
       <br>
       However, there are edge cases where the Sonar's Fallback might not receive a packet
-      in a necessary time period. In that case, Sonar is trying to account for those edge
-      cases in order to prevent false positives.
+      in the necessary time period. In that case, Sonar is trying to account for those edge
+      cases in order to prevent false positives. For example, some higher Minecraft versions
+      have a bug where the client sometimes sends a packet out of order. Sonar accounts
+      for that and does not falsely blacklist the client.
       <br>
       If you or one of your players experiences a false positive, make sure to report them
       by opening a <a href="https://github.com/jonesdevelopment/sonar-antibot/issues">GitHub issue</a> or a ticket on the <a href="https://jonesdev.xyz/discord/">Discord</a>.
