@@ -122,7 +122,6 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
   @Override
   public void disable() {
     if (getConfig().DATABASE != DatabaseType.NONE) {
-      getDatabase().initialize(getConfig());
       getLogger().info("Saving entries to database...");
       updateDatabase();
 
