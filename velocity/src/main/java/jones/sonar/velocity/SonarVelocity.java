@@ -148,16 +148,17 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
       getDatabase().initialize(getConfig());
 
       // Clear all blacklisted and verified IPs from memory
-      getLogger().info("[database] Clearing verified and blacklisted IPs...");
-      getFallback().getBlacklisted().clear();
-      getFallback().getVerified().clear();
+      if (!getFallback().getVerified().isEmpty()
+        && !getFallback().getBlacklisted().isEmpty()) {
+        getLogger().info("[database] Cleaning verified and blacklisted IPs from memory...");
+        getFallback().getBlacklisted().clear();
+        getFallback().getVerified().clear();
+      }
 
       // Load all blacklisted and verified IPs from the database
       getLogger().info("[database] Loading verified and blacklisted IPs from database...");
       getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
       getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
-
-      getLogger().info("[database] Done.");
     }
 
     // Apply filter (connection limiter) to Fallback
