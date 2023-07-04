@@ -183,7 +183,7 @@ public final class MySQLDatabase implements Database {
   }
 
   @SuppressWarnings("SameParameterValue")
-  private void createTable(final String column, final String @NotNull ... tables) throws SQLException {
+  public void createTable(final String column, final String @NotNull ... tables) {
     Objects.requireNonNull(dataSource);
 
     for (final String name : tables) {
@@ -191,6 +191,9 @@ public final class MySQLDatabase implements Database {
         "create table if not exists " + name + " (`" + column + "` varchar(16))"
       )) {
         statement.execute();
+      } catch (SQLException exception) {
+        Sonar.get().getLogger().error("Error executing createTable: {}", exception);
+        throw new IllegalStateException(exception);
       }
     }
   }
