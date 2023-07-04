@@ -149,7 +149,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
 
       // Clear all blacklisted and verified IPs from memory
       if (!getFallback().getVerified().isEmpty()
-        && !getFallback().getBlacklisted().isEmpty()) {
+        || !getFallback().getBlacklisted().isEmpty()) {
         getLogger().info("[database] Cleaning verified and blacklisted IPs from memory...");
         getFallback().getBlacklisted().clear();
         getFallback().getVerified().clear();
