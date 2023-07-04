@@ -37,30 +37,32 @@ import java.util.function.Consumer
 
 class SonarCommand : SimpleCommand {
   override fun execute(invocation: SimpleCommand.Invocation) {
-    // Checking if it contains will only break more since it can throw
-    // a NullPointerException if the cache is being accessed from parallel threads
-    val timestamp = DELAY.asMap().getOrDefault(invocation.source(), -1L)
-    val currentTimestamp = System.currentTimeMillis()
+    if (invocation.source() !is ConsoleCommandSource) {
+      // Checking if it contains will only break more since it can throw
+      // a NullPointerException if the cache is being accessed from parallel threads
+      val timestamp = DELAY.asMap().getOrDefault(invocation.source(), -1L)
+      val currentTimestamp = System.currentTimeMillis()
 
-    // There were some exploits with spamming commands in the past,
-    // Spamming should be prevented, especially if some heavy operations are done,
-    // which is not the case here but let's still stay safe!
-    if (timestamp > 0L) {
-      invocation.source().sendMessage(Component.text(Sonar.get().config.COMMAND_COOL_DOWN))
+      // There were some exploits with spamming commands in the past,
+      // Spamming should be prevented, especially if some heavy operations are done,
+      // which is not the case here but let's still stay safe!
+      if (timestamp > 0L) {
+        invocation.source().sendMessage(Component.text(Sonar.get().config.COMMAND_COOL_DOWN))
 
-      // Format delay
-      val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
+        // Format delay
+        val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
 
-      invocation.source().sendMessage(
-        Component.text(
-          Sonar.get().config.COMMAND_COOL_DOWN_LEFT
-            .replace("%time-left%", decimalFormat.format(left))
+        invocation.source().sendMessage(
+          Component.text(
+            Sonar.get().config.COMMAND_COOL_DOWN_LEFT
+              .replace("%time-left%", decimalFormat.format(left))
+          )
         )
-      )
-      return
-    }
+        return
+      }
 
-    DELAY.put(invocation.source(), currentTimestamp)
+      DELAY.put(invocation.source(), currentTimestamp)
+    }
 
     var subCommand = Optional.empty<SubCommand>()
 
