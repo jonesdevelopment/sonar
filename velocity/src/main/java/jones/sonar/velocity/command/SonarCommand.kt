@@ -128,23 +128,23 @@ class SonarCommand : SimpleCommand {
       // Re-use the old, cached help message since we don't want to scan
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
-      if (cachedHelpResult.isEmpty()) {
-        cachedHelpResult.add(Component.empty())
-        cachedHelpResult.add(Component.text(
+      if (CACHED_HELP.isEmpty()) {
+        CACHED_HELP.add(Component.empty())
+        CACHED_HELP.add(Component.text(
           " §eRunning §lSonar §e"
           + Sonar.get().version
           + " on "
           + Sonar.get().platform.displayName
         ))
-        cachedHelpResult.add(Component.empty())
-        cachedHelpResult.add(Component.text(
+        CACHED_HELP.add(Component.empty())
+        CACHED_HELP.add(Component.text(
           " §7Need help?§b https://jonesdev.xyz/discord/"
         ).hoverEvent(
           HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("§7Click to open Discord"))
         ).clickEvent(
           ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")
         ))
-        cachedHelpResult.add(Component.empty())
+        CACHED_HELP.add(Component.empty())
 
         SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
           var component = Component.text(
@@ -166,13 +166,13 @@ class SonarCommand : SimpleCommand {
               )
             )
           )
-          cachedHelpResult.add(component)
+          CACHED_HELP.add(component)
         })
 
-        cachedHelpResult.add(Component.empty())
+        CACHED_HELP.add(Component.empty())
       }
 
-      cachedHelpResult.forEach {
+      CACHED_HELP.forEach {
         invocation.source().sendMessage(it)
       }
     }
@@ -217,6 +217,6 @@ class SonarCommand : SimpleCommand {
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSource, Long>()
     private val decimalFormat = DecimalFormat("#.##")
-    private val cachedHelpResult = Vector<Component>()
+    private val CACHED_HELP = Vector<Component>()
   }
 }

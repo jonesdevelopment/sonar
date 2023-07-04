@@ -44,26 +44,28 @@ class SonarCommand : CommandExecutor, TabExecutor {
     label: String,
     args: Array<String>
   ): Boolean {
-    // Checking if it contains will only break more since it can throw
-    // a NullPointerException if the cache is being accessed from parallel threads
-    val timestamp = delay.asMap().getOrDefault(sender, -1L)
-    val currentTimestamp = System.currentTimeMillis()
+    if (sender !is ConsoleCommandSender) {
+      // Checking if it contains will only break more since it can throw
+      // a NullPointerException if the cache is being accessed from parallel threads
+      val timestamp = DELAY.asMap().getOrDefault(sender, -1L)
+      val currentTimestamp = System.currentTimeMillis()
 
-    // There were some exploits with spamming commands in the past,
-    // Spamming should be prevented, especially if some heavy operations are done,
-    // which is not the case here but let's still stay safe!
-    if (timestamp > 0L) {
-      sender.sendMessage(Sonar.get().config.COMMAND_COOL_DOWN)
+      // There were some exploits with spamming commands in the past,
+      // Spamming should be prevented, especially if some heavy operations are done,
+      // which is not the case here but let's still stay safe!
+      if (timestamp > 0L) {
+        sender.sendMessage(Sonar.get().config.COMMAND_COOL_DOWN)
 
-      // Format delay
-      val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
-      sender.sendMessage(
-        Sonar.get().config.COMMAND_COOL_DOWN_LEFT
-          .replace("%time-left%", decimalFormat.format(left))
-      )
-      return false
+        // Format delay
+        val left = 0.5 - (currentTimestamp - timestamp.toDouble()) / 1000.0
+        sender.sendMessage(
+          Sonar.get().config.COMMAND_COOL_DOWN_LEFT
+            .replace("%time-left%", DECIMAL_FORMAT.format(left))
+        )
+        return false
+      }
+      DELAY.put(sender, currentTimestamp)
     }
-    delay.put(sender, currentTimestamp)
 
     var subCommand = Optional.empty<SubCommand>()
     val invocationSender = InvocationSender { message -> sender.sendMessage(message) }
@@ -93,57 +95,58 @@ class SonarCommand : CommandExecutor, TabExecutor {
       }
     }
 
-    // No subcommand was found
     if (!subCommand.isPresent) {
-      invocationSender.sendMessage()
-      invocationSender.sendMessage(
-        " §eRunning §lSonar §e"
-          + Sonar.get().version
-          + " on "
-          + Sonar.get().platform.displayName
-      )
-      val rawDiscordText = " §7Need help?§b jonesdev.xyz/discord"
-      if (sender is Player) {
-        val discordComponent = TextComponent(rawDiscordText)
-        discordComponent.hoverEvent = HoverEvent(
-          HoverEvent.Action.SHOW_TEXT, ComponentBuilder("§7Click to open Discord").create()
+      // Re-use the old, cached help message since we don't want to scan
+      // for each subcommand and it's arguments/attributes every time
+      // someone runs /sonar since the subcommand don't change
+      if (CACHED_HELP.isEmpty()) {
+        CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
+        CACHED_HELP.add(
+          TextComponent(
+          " §eRunning §lSonar §e"
+            + Sonar.get().version
+            + " on "
+            + Sonar.get().platform.displayName
         )
-        discordComponent.clickEvent = ClickEvent(
-          ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/"
         )
-        sender.spigot().sendMessage(discordComponent)
-      } else {
-        sender.sendMessage(rawDiscordText)
-      }
-      invocationSender.sendMessage()
+        CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
+        val helpComponent = TextComponent(
+          " §7Need help?§b https://jonesdev.xyz/discord/"
+        )
+        helpComponent.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT,
+          ComponentBuilder("§7Click to open Discord").create()
+        )
+        helpComponent.clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")
+        CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
 
-      SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
-        val rawText = (" §a▪ §7/sonar "
-          + sub.info.name
-          + " §f"
-          + sub.info.description)
-        if (sender is Player) {
-          val component = TextComponent(rawText)
-          component.clickEvent =
-            ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.info.name + " ")
-
-          component.hoverEvent = HoverEvent(
-            HoverEvent.Action.SHOW_TEXT, ComponentBuilder(
-              """
-              §7Only players: §f${if (sub.info.onlyPlayers) "§a✔" else "§c✗"}
-              §7Only console: §f${if (sub.info.onlyConsole) "§a✔" else "§c✗"}
-              §7Permission: §f${sub.permission}
-              §7(Click to run)
-              """.trimIndent()
-            ).create()
+        SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
+          val component = TextComponent(
+            " §a▪ §7/sonar "
+              + sub.info.name
+              + " §f"
+              + sub.info.description
           )
-          sender.spigot().sendMessage(component)
-        } else {
-          sender.sendMessage(rawText)
-        }
-      })
 
-      invocationSender.sendMessage()
+          component.clickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.info.name + " ")
+          component.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentBuilder(
+            "§7Only players: §f" + (if (sub.info.onlyPlayers) "§a✔" else "§c✗")
+              + "\n§7Require console: §f" + (if (sub.info.onlyConsole) "§a✔" else "§c✗")
+              + "\n§7Permission: §f" + sub.permission
+              + "\n§7Aliases: §f" + sub.aliases
+          ).create())
+          CACHED_HELP.add(component)
+        })
+
+        CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
+      }
+
+      CACHED_HELP.forEach {
+        if (sender is Player) {
+          sender.spigot().sendMessage(it)
+        } else {
+          sender.sendMessage(it.toLegacyText())
+        }
+      }
       return false
     }
 
@@ -213,11 +216,13 @@ class SonarCommand : CommandExecutor, TabExecutor {
   }
 
   companion object {
-    private val delay = CacheBuilder.newBuilder()
+    private val DELAY = CacheBuilder.newBuilder()
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSender, Long>()
-    private val decimalFormat = DecimalFormat("#.##")
+    private val DECIMAL_FORMAT = DecimalFormat("#.##")
     private val TAB_SUGGESTIONS: MutableList<String> = ArrayList()
     private val ARG_TAB_SUGGESTIONS: MutableMap<String, List<String>> = HashMap()
+    private val CACHED_HELP = Vector<TextComponent>()
+    private val EMPTY_TEXT_COMPONENT = TextComponent(" ")
   }
 }
