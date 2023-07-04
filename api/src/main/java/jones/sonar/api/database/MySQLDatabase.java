@@ -108,8 +108,9 @@ public final class MySQLDatabase implements Database {
       while (resultSet.next()) {
         output.add(resultSet.getString(column));
       }
-    } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
+    } catch (SQLException exception) {
+      Sonar.get().getLogger().error("Error executing getListFromTable: {}", exception);
+      throw new IllegalStateException(exception);
     }
     return output;
   }
@@ -142,10 +143,9 @@ public final class MySQLDatabase implements Database {
       }
 
       insertStatement.executeBatch();
-    } catch (Throwable throwable) {
-      Sonar.get().getLogger().error("Error executing addListToTable:");
-      throwable.printStackTrace();
-      throw new IllegalStateException(throwable);
+    } catch (SQLException exception) {
+      Sonar.get().getLogger().error("Error executing addListToTable: {}", exception);
+      throw new IllegalStateException(exception);
     }
   }
 
@@ -161,6 +161,7 @@ public final class MySQLDatabase implements Database {
       statement.setObject(1, entry);
       statement.execute();
     } catch (SQLException exception) {
+      Sonar.get().getLogger().error("Error executing remove: {}", exception);
       throw new IllegalStateException(exception);
     }
   }
@@ -172,6 +173,7 @@ public final class MySQLDatabase implements Database {
     try {
       prepareRawStatement(dataSource.getConnection(), "truncate table `" + table + "`");
     } catch (SQLException exception) {
+      Sonar.get().getLogger().error("Error executing clear: {}", exception);
       throw new IllegalStateException(exception);
     }
   }
@@ -192,8 +194,9 @@ public final class MySQLDatabase implements Database {
   private static void prepareRawStatement(final @NotNull Connection connection, final @NotNull String sql) {
     try (final PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.execute();
-    } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
+    } catch (SQLException exception) {
+      Sonar.get().getLogger().error("Error executing prepareRawStatement: {}", exception);
+      throw new IllegalStateException(exception);
     }
   }
 }
