@@ -21,28 +21,21 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.sql.*;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Vector;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class MySQLDatabase implements Database {
   @Getter
-  private @Nullable DataSource dataSource;
+  private @Nullable HikariDataSource dataSource;
   public static final String VERIFIED_TABLE = "verified_ips";
   public static final String BLACKLIST_TABLE = "blacklisted_ips";
   public static final String IP_COLUMN = "ip_address";
@@ -54,23 +47,32 @@ public final class MySQLDatabase implements Database {
   public void initialize(final @NotNull SonarConfiguration config) {
     try {
       // Register MySQL driver
-      Class.forName("com.mysql.cj.jdbc.Driver");
+      final URL[] url = new URL[] {
+        new URL("https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar"),
+        new URL("https://repo1.maven.org/maven2/com/zaxxer/HikariCP/4.0.3/HikariCP-4.0.3.jar")
+      };
 
-      final HikariConfig hikariConfig = new HikariConfig();
+      try (final URLClassLoader classLoader = new URLClassLoader(url, getClass().getClassLoader())) {
+        val driverClass = (Class<? extends Driver>) classLoader.loadClass("com.mysql.cj.jdbc.Driver");
+        DriverManager.registerDriver(driverClass.newInstance());
 
-      hikariConfig.setJdbcUrl(
-        "jdbc:mysql://"
-          + config.DATABASE_URL
-          + ":" + config.DATABASE_PORT
-          + "/" + config.DATABASE_NAME
-      );
-      hikariConfig.setUsername(config.DATABASE_USERNAME);
-      hikariConfig.setPassword(config.DATABASE_PASSWORD);
+        val configClass = (Class<HikariConfig>) classLoader.loadClass("com.zaxxer.hikari.HikariConfig");
+        final HikariConfig hikariConfig = configClass.newInstance();
 
-      dataSource = new HikariDataSource(hikariConfig);
+        hikariConfig.setJdbcUrl(
+          "jdbc:mysql://"
+            + config.DATABASE_URL
+            + ":" + config.DATABASE_PORT
+            + "/" + config.DATABASE_NAME
+        );
+        hikariConfig.setUsername(config.DATABASE_USERNAME);
+        hikariConfig.setPassword(config.DATABASE_PASSWORD);
 
-      createTable(IP_COLUMN, VERIFIED_TABLE);
-      createTable(IP_COLUMN, BLACKLIST_TABLE);
+        dataSource = new HikariDataSource(hikariConfig);
+
+        createTable(IP_COLUMN, VERIFIED_TABLE);
+        createTable(IP_COLUMN, BLACKLIST_TABLE);
+      }
     } catch (Throwable throwable) {
       Sonar.get().getLogger().error("Failed to connect to database: {}", throwable);
     }
@@ -88,11 +90,8 @@ public final class MySQLDatabase implements Database {
   public void dispose() {
     Objects.requireNonNull(dataSource);
 
-    try {
-      dataSource.getConnection().close();
-    } catch (SQLException exception) {
-      throw new IllegalStateException(exception);
-    }
+    dataSource.close();
+    dataSource = null;
   }
 
   public Collection<String> getListFromTable(final @NotNull String table,
@@ -120,21 +119,32 @@ public final class MySQLDatabase implements Database {
                              final @NotNull Collection<String> collection) {
     Objects.requireNonNull(getDataSource());
 
-    try (final PreparedStatement statement = getDataSource().getConnection().prepareStatement(
-      "insert ignore into `" + table + "` (" + column + ") values (?)"
-    )) {
+    if (collection.isEmpty()) return;
+
+    try (final PreparedStatement insertStatement = getDataSource().getConnection().prepareStatement(
+      "insert ignore into `" + table + "` (" + column + ") values (?)");
+         final PreparedStatement selectStatement = getDataSource().getConnection().prepareStatement(
+           "select count(*) from `" + table + "` where `" + column + "` = ?")
+    ) {
       for (final String v : collection) {
-        statement.setString(1, v);
-        statement.addBatch();
+        selectStatement.setString(1, v);
+        ResultSet resultSet = selectStatement.executeQuery();
+        resultSet.next();
+        int count = resultSet.getInt(1);
+
+        if (count == 0) {
+          insertStatement.setString(1, v);
+          insertStatement.addBatch();
+        }
       }
 
-      statement.executeBatch();
+      insertStatement.executeBatch();
     } catch (Throwable throwable) {
+      Sonar.get().getLogger().error("Error executing addListToTable:");
+      throwable.printStackTrace();
       throw new IllegalStateException(throwable);
     }
   }
-
-  private static final ExecutorService queuedService = Executors.newSingleThreadExecutor();
 
   @Override
   public void remove(final @NotNull String table,
@@ -142,29 +152,25 @@ public final class MySQLDatabase implements Database {
                      final @NotNull String entry) {
     Objects.requireNonNull(dataSource);
 
-    queuedService.execute(() -> {
-      try (final PreparedStatement statement = dataSource.getConnection().prepareStatement(
-        "delete from `" + table + "` where `" + column + "` = ?"
-      )) {
-        statement.setObject(1, entry);
-        statement.execute();
-      } catch (SQLException exception) {
-        throw new IllegalStateException(exception);
-      }
-    });
+    try (final PreparedStatement statement = dataSource.getConnection().prepareStatement(
+      "delete from `" + table + "` where `" + column + "` = ?"
+    )) {
+      statement.setObject(1, entry);
+      statement.execute();
+    } catch (SQLException exception) {
+      throw new IllegalStateException(exception);
+    }
   }
 
   @Override
   public void clear(final @NotNull String table) {
     Objects.requireNonNull(dataSource);
 
-    queuedService.execute(() -> {
-      try {
-        prepareRawStatement(dataSource.getConnection(), "truncate table `" + table + "`");
-      } catch (SQLException exception) {
-        throw new IllegalStateException(exception);
-      }
-    });
+    try {
+      prepareRawStatement(dataSource.getConnection(), "truncate table `" + table + "`");
+    } catch (SQLException exception) {
+      throw new IllegalStateException(exception);
+    }
   }
 
   @SuppressWarnings("SameParameterValue")
