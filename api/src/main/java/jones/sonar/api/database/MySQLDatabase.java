@@ -46,7 +46,7 @@ public final class MySQLDatabase implements Database {
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {
     try {
-      // Register MySQL driver
+      // TODO: fix this class loader so we don't have to implement JDBC and Hikari
       final URL[] url = new URL[] {
         new URL("https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar"),
         new URL("https://repo1.maven.org/maven2/com/zaxxer/HikariCP/4.0.3/HikariCP-4.0.3.jar")
@@ -54,9 +54,11 @@ public final class MySQLDatabase implements Database {
 
       try (final URLClassLoader classLoader = new URLClassLoader(url, getClass().getClassLoader())) {
         val driverClass = (Class<? extends Driver>) classLoader.loadClass("com.mysql.cj.jdbc.Driver");
+        // Register MySQL driver
         DriverManager.registerDriver(driverClass.newInstance());
 
         val configClass = (Class<HikariConfig>) classLoader.loadClass("com.zaxxer.hikari.HikariConfig");
+        // Create Hikari config
         final HikariConfig hikariConfig = configClass.newInstance();
 
         hikariConfig.setJdbcUrl(
@@ -68,8 +70,10 @@ public final class MySQLDatabase implements Database {
         hikariConfig.setUsername(config.DATABASE_USERNAME);
         hikariConfig.setPassword(config.DATABASE_PASSWORD);
 
+        // Connect to the server
         dataSource = new HikariDataSource(hikariConfig);
 
+        // Create necessary tables and columns
         createTable(IP_COLUMN, VERIFIED_TABLE);
         createTable(IP_COLUMN, BLACKLIST_TABLE);
       }
