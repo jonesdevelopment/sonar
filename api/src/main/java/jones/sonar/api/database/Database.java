@@ -25,10 +25,6 @@ import java.util.Collection;
 public interface Database {
   void initialize(final @NotNull SonarConfiguration config);
 
-  // Helpers to avoid duplicate loads
-  boolean isLoadedFromDatabase();
-  void setLoadedFromDatabase(final boolean v);
-
   void purge();
 
   void dispose();
@@ -39,8 +35,6 @@ public interface Database {
   void addListToTable(final @NotNull String table,
                       final @NotNull String column,
                       final @NotNull Collection<String> collection);
-
-  void remove(final @NotNull String table, final @NotNull String column, final @NotNull String entry);
 
   void clear(final @NotNull String table);
 }

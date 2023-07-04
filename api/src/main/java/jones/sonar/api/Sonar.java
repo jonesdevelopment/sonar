@@ -30,8 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.text.DecimalFormat;
 
-import static jones.sonar.api.database.MySQLDatabase.*;
-
 public interface Sonar {
   SonarPlatform getPlatform();
 
@@ -66,17 +64,6 @@ public interface Sonar {
   @NotNull Logger getLogger();
 
   void reload();
-
-  default void updateDatabase() {
-
-    // Clear existing databases
-    getDatabase().clear(BLACKLIST_TABLE);
-    getDatabase().clear(VERIFIED_TABLE);
-
-    // Save everything to the database on reload
-    getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
-    getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
-  }
 
   @NotNull
   static Sonar get() {

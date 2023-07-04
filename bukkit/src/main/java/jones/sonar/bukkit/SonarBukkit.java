@@ -114,8 +114,14 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
   @Override
   public void disable() {
     if (getConfig().DATABASE != DatabaseType.NONE) {
-      getLogger().info("Saving entries to database...");
-      updateDatabase();
+      getLogger().info("[database] Saving entries to database...");
+
+      // We need to clear the table because we don't want any IPs which aren't present
+      // or have been manually removed to still be present in the database
+      getDatabase().clear(BLACKLIST_TABLE);
+      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
+      getDatabase().clear(VERIFIED_TABLE);
+      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
 
       // Dispose the database instance
       getDatabase().dispose();
@@ -127,15 +133,20 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     getConfig().load();
 
     if (getConfig().DATABASE != DatabaseType.NONE) {
+      getLogger().info("[database] Initializing database...");
       getDatabase().initialize(getConfig());
-      // Load values from database
-      if (!getDatabase().isLoadedFromDatabase()) {
-        getDatabase().setLoadedFromDatabase(true);
-        getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
-        getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
-      }
 
-      updateDatabase();
+      // Clear all blacklisted and verified IPs from memory
+      getLogger().info("[database] Clearing verified and blacklisted IPs...");
+      getFallback().getBlacklisted().clear();
+      getFallback().getVerified().clear();
+
+      // Load all blacklisted and verified IPs from the database
+      getLogger().info("[database] Loading verified and blacklisted IPs from database...");
+      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
+      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
+
+      getLogger().info("[database] Done.");
     }
   }
 }

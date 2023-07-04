@@ -21,7 +21,10 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,9 +42,6 @@ public final class MySQLDatabase implements Database {
   public static final String VERIFIED_TABLE = "verified_ips";
   public static final String BLACKLIST_TABLE = "blacklisted_ips";
   public static final String IP_COLUMN = "ip_address";
-  @Getter
-  @Setter
-  private boolean loadedFromDatabase;
 
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {
@@ -100,11 +100,11 @@ public final class MySQLDatabase implements Database {
 
   public Collection<String> getListFromTable(final @NotNull String table,
                                              final @NotNull String column) {
-    Objects.requireNonNull(getDataSource());
+    Objects.requireNonNull(dataSource);
 
     final Collection<String> output = new Vector<>();
 
-    try (final PreparedStatement statement = getDataSource().getConnection().prepareStatement(
+    try (final PreparedStatement statement = dataSource.getConnection().prepareStatement(
       "select `" + column + "` from `" + table + "` limit " + Sonar.get().getConfig().DATABASE_QUERY_LIMIT
     )) {
       final ResultSet resultSet = statement.executeQuery();
@@ -119,53 +119,27 @@ public final class MySQLDatabase implements Database {
     return output;
   }
 
+  @Override
   public void addListToTable(final @NotNull String table,
                              final @NotNull String column,
                              final @NotNull Collection<String> collection) {
-    Objects.requireNonNull(getDataSource());
-
-    // Disallow query if the collection of IPs is empty
-    if (collection.isEmpty()) return;
-
-    try (final PreparedStatement insertStatement = getDataSource().getConnection().prepareStatement(
-      "insert ignore into `" + table + "` (" + column + ") values (?)");
-         final PreparedStatement selectStatement = getDataSource().getConnection().prepareStatement(
-           "select count(*) from `" + table + "` where `" + column + "` = ?")
-    ) {
-      for (final String v : collection) {
-        selectStatement.setString(1, v);
-
-        final ResultSet resultSet = selectStatement.executeQuery();
-        resultSet.next();
-
-        // We have to check if the IP address is already in the list
-        // since we don't want any duplicates
-        if (resultSet.getInt(1) == 0) {
-          insertStatement.setString(1, v);
-          insertStatement.addBatch();
-        }
-      }
-
-      insertStatement.executeBatch();
-    } catch (SQLException exception) {
-      Sonar.get().getLogger().error("Error executing addListToTable: {}", exception);
-      throw new IllegalStateException(exception);
-    }
-  }
-
-  @Override
-  public void remove(final @NotNull String table,
-                     final @NotNull String column,
-                     final @NotNull String entry) {
     Objects.requireNonNull(dataSource);
 
-    try (final PreparedStatement statement = dataSource.getConnection().prepareStatement(
-      "delete from `" + table + "` where `" + column + "` = ?"
-    )) {
-      statement.setObject(1, entry);
-      statement.execute();
+    try (final PreparedStatement selectStatement = dataSource.getConnection().prepareStatement("select 1 from `" + table + "` where `" + column + "` = ?");
+         final PreparedStatement insertStatement = dataSource.getConnection().prepareStatement("insert into `" + table + "` (`" + column + "`) values (?)")) {
+      for (final String v : collection) {
+        selectStatement.setString(1, v);
+        final ResultSet resultSet = selectStatement.executeQuery();
+
+        if (!resultSet.next()) {
+          insertStatement.setString(1, v);
+          insertStatement.executeUpdate();
+        }
+
+        resultSet.close();
+      }
     } catch (SQLException exception) {
-      Sonar.get().getLogger().error("Error executing remove: {}", exception);
+      Sonar.get().getLogger().error("Error executing addListToTable: {}", exception);
       throw new IllegalStateException(exception);
     }
   }
@@ -174,10 +148,12 @@ public final class MySQLDatabase implements Database {
   public void clear(final @NotNull String table) {
     Objects.requireNonNull(dataSource);
 
-    try {
-      prepareRawStatement(dataSource.getConnection(), "truncate table `" + table + "`");
+    try (final PreparedStatement statement = dataSource.getConnection().prepareStatement(
+      "delete from `" + table + "`"
+    )) {
+      statement.execute();
     } catch (SQLException exception) {
-      Sonar.get().getLogger().error("Error executing clear: {}", exception);
+      Sonar.get().getLogger().error("Error executing prepareRawStatement: {}", exception);
       throw new IllegalStateException(exception);
     }
   }
@@ -195,15 +171,6 @@ public final class MySQLDatabase implements Database {
         Sonar.get().getLogger().error("Error executing createTable: {}", exception);
         throw new IllegalStateException(exception);
       }
-    }
-  }
-
-  private static void prepareRawStatement(final @NotNull Connection connection, final @NotNull String sql) {
-    try (final PreparedStatement statement = connection.prepareStatement(sql)) {
-      statement.execute();
-    } catch (SQLException exception) {
-      Sonar.get().getLogger().error("Error executing prepareRawStatement: {}", exception);
-      throw new IllegalStateException(exception);
     }
   }
 }
