@@ -33,9 +33,9 @@ import java.nio.file.Path;
 @Plugin(id = "sonar",
   name = "Sonar",
   version = "2.0.0",
-  authors = "jonesdev.xyz",
-  url = "https://jonesdev.xyz/",
-  description = "Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.8-latest)"
+  authors = {"Jones Development", "Sonar Contributors"},
+  url = "https://jonesdev.xyz/discord/",
+  description = "Effective Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.7-latest)"
 )
 @SuppressWarnings("all")
 public final class SonarVelocityPlugin {
