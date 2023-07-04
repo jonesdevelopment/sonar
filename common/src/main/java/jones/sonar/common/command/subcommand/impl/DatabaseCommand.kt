@@ -93,6 +93,8 @@ class DatabaseCommand : SubCommand() {
         try {
           sonar.database.purge()
 
+          sonar.fallback.blacklisted.clear()
+          sonar.fallback.verified.clear()
           invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE)
         } catch (e: Throwable) {
           e.printStackTrace()
