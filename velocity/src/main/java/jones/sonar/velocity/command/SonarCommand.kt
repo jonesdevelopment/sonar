@@ -123,34 +123,35 @@ class SonarCommand : SimpleCommand {
       // Execute the sub command with the custom invocation properties
       it.execute(commandInvocation)
     }) {
-      // No subcommand was found
-      invocationSender.sendMessage()
-      invocationSender.sendMessage(
-        " §eRunning §lSonar §e"
+      // Re-use the old, cached help message since we don't want to scan
+      // for each subcommand and it's arguments/attributes every time
+      // someone runs /sonar since the subcommand don't change
+      if (cachedHelpResult.isEmpty()) {
+        cachedHelpResult.add(Component.empty())
+        cachedHelpResult.add(Component.text(
+          " §eRunning §lSonar §e"
           + Sonar.get().version
           + " on "
           + Sonar.get().platform.displayName
-      )
-      invocation.source().sendMessage(
-        Component.text(
+        ))
+        cachedHelpResult.add(Component.empty())
+        cachedHelpResult.add(Component.text(
           " §7Need help?§b https://jonesdev.xyz/discord/"
         ).hoverEvent(
           HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("§7Click to open Discord"))
         ).clickEvent(
           ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")
-        )
-      )
-      invocationSender.sendMessage()
+        ))
+        cachedHelpResult.add(Component.empty())
 
-      SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
-        var component = Component.text(
-          " §a▪ §7/sonar "
-            + sub.info.name
-            + " §f"
-            + sub.info.description
-        )
+        SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
+          var component = Component.text(
+            " §a▪ §7/sonar "
+              + sub.info.name
+              + " §f"
+              + sub.info.description
+          )
 
-        if (invocation.source() is Player) {
           component = component.clickEvent(
             ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.info.name + " ")
           ).hoverEvent(
@@ -163,12 +164,15 @@ class SonarCommand : SimpleCommand {
               )
             )
           )
-        }
+          cachedHelpResult.add(component)
+        })
 
-        invocation.source().sendMessage(component)
-      })
+        cachedHelpResult.add(Component.empty())
+      }
 
-      invocationSender.sendMessage()
+      cachedHelpResult.forEach {
+        invocation.source().sendMessage(it)
+      }
     }
   }
 
@@ -211,5 +215,6 @@ class SonarCommand : SimpleCommand {
       .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
       .build<CommandSource, Long>()
     private val decimalFormat = DecimalFormat("#.##")
+    private val cachedHelpResult = Vector<Component>()
   }
 }
