@@ -7,8 +7,8 @@ This version features more advanced checks and fewer bloated features, and is de
 
 Please note that this version is still in development and may have bugs and other issues.
 If you want to report a bug or issue, please open a [GitHub issue](https://github.com/jonesdevelopment/sonar-antibot/issues) or ticket on [Discord](https://jonesdev.xyz/discord/).
-If you encounter a false positive, please read [this](https://github.com/jonesdevelopment/sonar-antibot/#22-false-positives).
-Make sure to join the [Discord](https://jonesdev.xyz/discord/) in order to receive update notifications.
+If you encounter a false positive, please read [this](https://github.com/jonesdevelopment/sonar-antibot/tree/main#false-positives).
+Make sure to join the Jones Development [Discord](https://jonesdev.xyz/discord/) in order to receive update notifications.
 
 ## Design
 * Effective and lightweight
@@ -43,7 +43,7 @@ Fallback also protects from huge spam bot attacks since it queues the incoming c
 
 Fallback is unlikely to ever falsely prevent a player from joining the server since Minecraft uses the TCP protocol which means that packets are always sent in the correct order. Lag should not affect the bot check.
 However, there are some edge cases where Fallback might not receive packets within the necessary time period. In that case, Sonar tries to account for these edge cases in order to prevent false positives. For example, some higher Minecraft versions have a bug where the client sometimes sends a packet out of order. Sonar accounts for that and does not falsely blacklist clients.
-If you or one of your players experiences a false positive, make sure to report it by opening a [GitHub issue](https://github.com/jonesdevelopment/sonar-antibot/issues) or a ticket on the [Discord](https://jonesdev.xyz/discord/).
+If you or one of your players experiences a false positive, make sure to report it by opening a [GitHub issue](https://github.com/jonesdevelopment/sonar-antibot/issues) or a ticket on [Discord](https://jonesdev.xyz/discord/).
 
 ## Building
 
@@ -55,7 +55,7 @@ You can also take a look at the [gradle documentation](https://docs.gradle.org/c
 
 ## Contributing
 
-If you are interested in contributing, you can check out the [CONTRIBUTING.md]([https://github.com/jonesdevelopment/sonar-antibot](https://github.com/jonesdevelopment/sonar-antibot/blob/main/CONTRIBUTING.md)) file for detailed guidelines and instructions.
+If you are interested in contributing, you can check out the [Contributing Guidelines](https://github.com/jonesdevelopment/sonar-antibot/blob/main/CONTRIBUTING.md) for detailed instructions.
 
 ## License
 
@@ -68,3 +68,4 @@ Sonar is licensed under the GNU General Public License 3.0.
 - Some parts of the Java reflections used by Sonar are taken from [LimboAPI](https://github.com/Elytrium/LimboAPI).
   - [PacketDimension](https://github.com/jonesdevelopment/sonar-antibot/blob/main/common/src/main/java/jones/sonar/common/fallback/dimension/PacketDimension.java) was taken from [LimboAPI](https://github.com/Elytrium/LimboAPI/blob/master/api/src/main/java/net/elytrium/limboapi/api/chunk/Dimension.java).
   - [Biome](https://github.com/jonesdevelopment/sonar-antibot/blob/main/velocity/src/main/java/jones/sonar/velocity/fallback/dimension/Biome.java) was taken from [LimboAPI](https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/material/Biome.java).
+- The Velocity compression and Varint decoding was taken from [Velocity](https://github.com/PaperMC/Velocity).
