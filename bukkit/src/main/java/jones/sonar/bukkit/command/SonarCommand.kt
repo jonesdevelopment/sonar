@@ -101,22 +101,20 @@ class SonarCommand : CommandExecutor, TabExecutor {
       // someone runs /sonar since the subcommand don't change
       if (CACHED_HELP.isEmpty()) {
         CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
-        CACHED_HELP.add(
-          TextComponent(
+        CACHED_HELP.add(TextComponent(
           " §eRunning §lSonar §e"
             + Sonar.get().version
             + " on "
             + Sonar.get().platform.displayName
-        )
-        )
+        ))
         CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
-        val helpComponent = TextComponent(
-          " §7Need help?§b https://jonesdev.xyz/discord/"
-        )
+
+        val helpComponent = TextComponent(" §7Need help?§b https://jonesdev.xyz/discord/")
         helpComponent.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT,
           ComponentBuilder("§7Click to open Discord").create()
         )
         helpComponent.clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")
+        CACHED_HELP.add(helpComponent)
         CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
 
         SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
