@@ -141,7 +141,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   }
 
   @Override
-  public boolean handle(final PluginMessage pluginMessage) {
+  public boolean handle(final @NotNull PluginMessage pluginMessage) {
 
     // Only MC|Brand for 1.7-1.12.2 and minecraft:brand for 1.13+ are important
     if (!pluginMessage.getChannel().equals("MC|Brand")
@@ -170,7 +170,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   }
 
   @Override
-  public boolean handle(final KeepAlive keepAlive) {
+  public boolean handle(final @NotNull KeepAlive keepAlive) {
     if (keepAlive.getRandomId() == 0 && v1_8or1_7) {
 
       // First, let's validate if the packet could actually be sent at this point
