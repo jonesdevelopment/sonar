@@ -24,6 +24,7 @@ import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import com.velocitypowered.proxy.protocol.packet.ResourcePackResponse
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
+import io.netty.handler.timeout.ReadTimeoutException
 import jones.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion
 import jones.sonar.velocity.fallback.session.FallbackPlayer
 import jones.sonar.velocity.fallback.session.FallbackSessionHandler
@@ -46,6 +47,11 @@ class FallbackPacketDecoder(
       // Clients can throw an ExceptionInInitializerError if Sonar messed something up :(
       // TODO: check if there are more exceptions we need to exempt
       if (cause is IOException || cause is ExceptionInInitializerError) return
+
+      // A client can for any reason (usually lag)
+      // throw a timeout in the login process making the connection blacklisted.
+      // https://github.com/jonesdevelopment/sonar/pull/9
+      if (cause is ReadTimeoutException) return
 
       // Block the IP address
       val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
