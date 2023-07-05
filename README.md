@@ -55,7 +55,7 @@ You can also take a look at the [gradle documentation](https://docs.gradle.org/c
 
 ## Contributing
 
-If you are interested in contributing, you can check out the [CONTRIBUTING.md]([https://github.com/jonesdevelopment/sonar-antibot](https://github.com/jonesdevelopment/sonar-antibot/blob/main/CONTRIBUTING.md)) file for detailed guidelines and instructions.
+If you are interested in contributing, you can check out the [Contributing Guidelines](https://github.com/jonesdevelopment/sonar-antibot/blob/main/CONTRIBUTING.md) for detailed instructions.
 
 ## License
 
