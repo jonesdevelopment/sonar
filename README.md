@@ -7,7 +7,7 @@ This version features more advanced checks and fewer bloated features, and is de
 
 Please note that this version is still in development and may have bugs and other issues.
 If you want to report a bug or issue, please open a [GitHub issue](https://github.com/jonesdevelopment/sonar-antibot/issues) or ticket on [Discord](https://jonesdev.xyz/discord/).
-If you encounter a false positive, please read [this](https://github.com/jonesdevelopment/sonar-antibot/#22-false-positives).
+If you encounter a false positive, please read [this](https://github.com/jonesdevelopment/sonar-antibot/tree/main#false-positives).
 Make sure to join the [Discord](https://jonesdev.xyz/discord/) in order to receive update notifications.
 
 ## Design
