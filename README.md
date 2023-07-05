@@ -1,5 +1,12 @@
 <html lang="en">
   <body>
+    <!-- Badges -->
+    <div>
+      <img src="https://img.shields.io/github/v/release/jonesdevelopment/sonar-antibot"/>
+      <img src="https://img.shields.io/github/issues/jonesdevelopment/sonar-antibot"/>
+      <img src="https://img.shields.io/github/downloads/jonesdevelopment/sonar-antibot/total"/>
+    </div>
+    <!-- Content -->
     <h2>1.0 Introduction</h2>
     <p>
       The old version of Sonar had a ton of features, but it never really protected
