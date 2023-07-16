@@ -43,7 +43,7 @@ class ActionBarVerbose(private val server: Server) : Verbose {
         .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
         .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))
         .replace("%max-memory%", formatMemory(Runtime.getRuntime().maxMemory()))
-        .replace("%animation%", VerboseAnimation.nextState())
+        .replace("%animation%", VerboseAnimation.nextAnimation())
     )
 
     synchronized(subscribers) {

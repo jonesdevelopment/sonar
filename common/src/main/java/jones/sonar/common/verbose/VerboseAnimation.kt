@@ -21,11 +21,12 @@ import jones.sonar.api.Sonar
 
 class VerboseAnimation {
   companion object {
-    private var stateIndex = 0
+    private var index = 0
 
-    fun nextState(): String {
-      val nextIndex = ++stateIndex % Sonar.get().config.ANIMATION.size
-      return Sonar.get().config.ANIMATION.toTypedArray()[nextIndex].toString()
+    fun nextAnimation(): String {
+      return Sonar.get().config.ANIMATION.toTypedArray()[
+        ++index % Sonar.get().config.ANIMATION.size
+      ]
     }
   }
 }
