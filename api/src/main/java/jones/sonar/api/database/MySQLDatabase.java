@@ -30,7 +30,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Vector;
@@ -53,9 +55,8 @@ public final class MySQLDatabase implements Database {
       };
 
       try (final URLClassLoader classLoader = new URLClassLoader(url, getClass().getClassLoader())) {
-        val driverClass = (Class<? extends Driver>) classLoader.loadClass("com.mysql.cj.jdbc.Driver");
         // Register MySQL driver
-        DriverManager.registerDriver(driverClass.newInstance());
+        classLoader.loadClass("com.mysql.cj.jdbc.Driver");
 
         val configClass = (Class<HikariConfig>) classLoader.loadClass("com.zaxxer.hikari.HikariConfig");
         // Create Hikari config
