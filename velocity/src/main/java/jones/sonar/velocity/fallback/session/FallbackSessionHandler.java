@@ -129,8 +129,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // The client sends the PluginMessage packet and then the ClientSettings packet
     // The player cannot send the ClientSettings packet twice since the world hasn't
     // loaded yet, therefore, the player cannot change any in-game settings
-    // This can actually false (for some odd reason) during client lag or fast reconnects,
-    // so we just kick the player and not actually punish them
+    // This can actually false (for some odd reason) when the client reconnects too fast,
+    // so we just kick the player for safety and not actually punish them
     if (hasSentClientBrand || hasSentClientSettings) {
       player.getPlayer().disconnect0(FallbackListener.CachedMessages.UNEXPECTED_ERROR, true);
       return false;
@@ -162,7 +162,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     hasSentClientBrand = true;
 
-    // We use an additional verification method for 1.7-1.8
+    // Anything below 1.9 doesn't handle resource pack requests properly,
+    // so we just want the client to send a KeepAlive packet with the id 0
+    // since the client sends KeepAlive packets with the id 0 every 20 ticks
     if (!v1_8or1_7) {
       sendResourcePackRequest();
     }
