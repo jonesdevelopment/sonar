@@ -96,6 +96,9 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());
     reload();
 
+    // Initialize bStats.org metrics
+    plugin.getMetricsFactory().make(plugin, getServiceId());
+
     // Register Sonar command
     plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
 

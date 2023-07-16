@@ -33,6 +33,9 @@ dependencies {
 
   // use 1.8 for backwards compatibility
   compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
+
+  // bStats.org
+  implementation("org.bstats:bstats-bukkit:3.0.2")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8

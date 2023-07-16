@@ -9,6 +9,9 @@ dependencies {
   }
 
   compileOnly("io.papermc:waterfall-proxy:1.20-R0.1-SNAPSHOT")
+
+  // bStats.org
+  implementation("org.bstats:bstats-bungeecord:3.0.2")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8

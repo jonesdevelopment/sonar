@@ -28,6 +28,7 @@ import jones.sonar.bungee.fallback.FallbackListener;
 import jones.sonar.bungee.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
+import org.bstats.bungeecord.Metrics;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -95,6 +96,9 @@ public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
+
+    // Initialize bStats.org metrics
+    new Metrics(plugin, getServiceId());
 
     // Register Sonar command
     plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());

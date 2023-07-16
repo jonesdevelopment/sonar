@@ -33,6 +33,11 @@ import java.text.DecimalFormat;
 public interface Sonar {
   SonarPlatform getPlatform();
 
+  // used for bStats metrics
+  default int getServiceId() {
+    return 19107;
+  }
+
   @NotNull File getPluginDataFolder();
 
   @NotNull SonarConfiguration getConfig();

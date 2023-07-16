@@ -11,6 +11,9 @@ dependencies {
 
   testCompileOnly("com.velocitypowered:velocity-api:$velocityVersion")
   testAnnotationProcessor("com.velocitypowered:velocity-api:$velocityVersion")
+
+  // bStats.org
+  implementation("org.bstats:bstats-velocity:3.0.2")
 }
 
 kotlin {

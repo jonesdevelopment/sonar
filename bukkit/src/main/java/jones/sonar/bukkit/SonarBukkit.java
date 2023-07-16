@@ -27,6 +27,7 @@ import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
 import jones.sonar.common.SonarPlugin;
 import lombok.Getter;
+import org.bstats.bukkit.Metrics;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -94,6 +95,9 @@ public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
+
+    // Initialize bStats.org metrics
+    new Metrics(plugin, getServiceId());
 
     // Register Sonar command
     Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());

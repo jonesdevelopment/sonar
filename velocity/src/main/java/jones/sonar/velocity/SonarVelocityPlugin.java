@@ -25,6 +25,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
+import org.bstats.velocity.Metrics;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -42,14 +43,17 @@ public final class SonarVelocityPlugin {
   private final ProxyServer server;
   private final Logger logger;
   private final Path dataDirectory;
+  private final Metrics.Factory metricsFactory;
 
   @Inject
   public SonarVelocityPlugin(final ProxyServer server,
                              final Logger logger,
-                             final @DataDirectory Path dataDirectory) {
+                             final @DataDirectory Path dataDirectory,
+                             final Metrics.Factory metricsFactory) {
     this.server = server;
     this.logger = logger;
     this.dataDirectory = dataDirectory;
+    this.metricsFactory = metricsFactory;
   }
 
   @Subscribe
