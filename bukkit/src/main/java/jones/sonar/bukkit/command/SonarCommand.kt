@@ -101,16 +101,19 @@ class SonarCommand : CommandExecutor, TabExecutor {
       // someone runs /sonar since the subcommand don't change
       if (CACHED_HELP.isEmpty()) {
         CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
-        CACHED_HELP.add(TextComponent(
-          " §eRunning §lSonar §e"
-            + Sonar.get().version
-            + " on "
-            + Sonar.get().platform.displayName
-        ))
+        CACHED_HELP.add(
+          TextComponent(
+            " §eRunning §lSonar §e"
+              + Sonar.get().version
+              + " on "
+              + Sonar.get().platform.displayName
+          )
+        )
         CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
 
         val helpComponent = TextComponent(" §7Need help?§b https://jonesdev.xyz/discord/")
-        helpComponent.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT,
+        helpComponent.hoverEvent = HoverEvent(
+          HoverEvent.Action.SHOW_TEXT,
           ComponentBuilder("§7Click to open Discord").create()
         )
         helpComponent.clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")
@@ -126,12 +129,14 @@ class SonarCommand : CommandExecutor, TabExecutor {
           )
 
           component.clickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.info.name + " ")
-          component.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentBuilder(
-            "§7Only players: §f" + (if (sub.info.onlyPlayers) "§a✔" else "§c✗")
-              + "\n§7Require console: §f" + (if (sub.info.onlyConsole) "§a✔" else "§c✗")
-              + "\n§7Permission: §f" + sub.permission
-              + "\n§7Aliases: §f" + sub.aliases
-          ).create())
+          component.hoverEvent = HoverEvent(
+            HoverEvent.Action.SHOW_TEXT, ComponentBuilder(
+              "§7Only players: §f" + (if (sub.info.onlyPlayers) "§a✔" else "§c✗")
+                + "\n§7Require console: §f" + (if (sub.info.onlyConsole) "§a✔" else "§c✗")
+                + "\n§7Permission: §f" + sub.permission
+                + "\n§7Aliases: §f" + sub.aliases
+            ).create()
+          )
           CACHED_HELP.add(component)
         })
 

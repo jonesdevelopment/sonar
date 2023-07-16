@@ -49,7 +49,7 @@ public final class MySQLDatabase implements Database {
   public void initialize(final @NotNull SonarConfiguration config) {
     try {
       // TODO: fix this class loader so we don't have to implement JDBC and Hikari
-      final URL[] url = new URL[] {
+      final URL[] url = new URL[]{
         new URL("https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar"),
         new URL("https://repo1.maven.org/maven2/com/zaxxer/HikariCP/4.0.3/HikariCP-4.0.3.jar")
       };
@@ -126,8 +126,10 @@ public final class MySQLDatabase implements Database {
                              final @NotNull Collection<String> collection) {
     Objects.requireNonNull(dataSource);
 
-    try (final PreparedStatement selectStatement = dataSource.getConnection().prepareStatement("select 1 from `" + table + "` where `" + column + "` = ?");
-         final PreparedStatement insertStatement = dataSource.getConnection().prepareStatement("insert into `" + table + "` (`" + column + "`) values (?)")) {
+    try (final PreparedStatement selectStatement =
+           dataSource.getConnection().prepareStatement("select 1 from `" + table + "` where `" + column + "` = ?");
+         final PreparedStatement insertStatement =
+           dataSource.getConnection().prepareStatement("insert into `" + table + "` (`" + column + "`) values (?)")) {
       for (final String v : collection) {
         selectStatement.setString(1, v);
         final ResultSet resultSet = selectStatement.executeQuery();
