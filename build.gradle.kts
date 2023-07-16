@@ -15,7 +15,7 @@ plugins {
   id("com.github.johnrengelman.shadow") version "8.1.1"
   id("io.toolebox.git-versioner") version "1.6.7"
 
-  kotlin("jvm") version "1.8.22"
+  kotlin("jvm") version "1.9.0"
 }
 
 apply(plugin = "io.toolebox.git-versioner")
