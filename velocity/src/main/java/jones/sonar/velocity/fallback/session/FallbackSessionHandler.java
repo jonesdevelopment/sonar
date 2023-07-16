@@ -128,11 +128,11 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   @Override
   public boolean handle(final ClientSettings clientSettings) {
 
-    // The client sends the PluginMessage packet and then the ClientSettings packet
+    // The client sends the PluginMessage packet and then the ClientSettings packet.
     // The player cannot send the ClientSettings packet twice since the world hasn't
-    // loaded yet, therefore, the player cannot change any in-game settings
-    // This can actually false (for some odd reason) when the client reconnects too fast,
-    // so we just kick the player for safety and not actually punish them
+    // loaded yet, therefore, the player cannot change any in-game settings.
+    // This can actually be false (for some odd reason) when the client reconnects
+    // too fast, so we just kick the player for safety and not actually punish them.
     if (hasSentClientBrand || hasSentClientSettings) {
       player.getPlayer().disconnect0(FallbackListener.CachedMessages.UNEXPECTED_ERROR, true);
       return false;
@@ -149,21 +149,21 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     return !read.equals("Vanilla") // The normal brand is always lowercase
       // We want to allow client brands that have a URL in them
       // (e.g., CheatBreaker)
-      && read.matches("^[a-zA-Z/.:_-]+$"); // normal regex validation
+      && read.matches("^[a-zA-Z/.:_-]+$"); // Normal regex validation
   }
 
   @Override
   public boolean handle(final @NotNull PluginMessage pluginMessage) {
-    // Only MC|Brand for 1.7-1.12.2 and minecraft:brand for 1.13+ are important
-    // TODO: No other channel should be possible?
+    // Only MC|Brand for 1.7-1.12.2 and minecraft:brand for 1.13+ are important.
     if (!pluginMessage.getChannel().equals("MC|Brand")
       && !pluginMessage.getChannel().equals("minecraft:brand")) {
+      // TODO: No other channel should be possible?
       return false; // Ignore all other channels
     }
 
     // Check if the channel is correct - 1.13 uses the new namespace
     // system ('minecraft:' + channel) and anything below 1.13 uses
-    // the legacy namespace system ('MC|' + channel)
+    // the legacy namespace system ('MC|' + channel).
     final boolean exempt = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
 
     checkFrame(pluginMessage.getChannel().equals("MC|Brand") || exempt, "invalid channel");
@@ -177,7 +177,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     // Anything below 1.9 doesn't handle resource pack requests properly,
     // so we just want the client to send a KeepAlive packet with the id 0
-    // since the client sends KeepAlive packets with the id 0 every 20 ticks
+    // since the client sends KeepAlive packets with the id 0 every 20 ticks.
     if (!v1_8or1_7) {
       sendResourcePackRequest();
     }
@@ -188,15 +188,16 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   public boolean handle(final @NotNull KeepAlive keepAlive) {
     if (keepAlive.getRandomId() == 0 && v1_8or1_7) {
 
-      // First, let's validate if the packet could actually be sent at this point
+      // First, let's validate if the packet could actually be sent at this point.
       checkFrame(hasSentClientBrand, "unexpected timing (K1): " + keepAlive.getRandomId());
       checkFrame(hasSentClientSettings, "unexpected timing (K2): " + keepAlive.getRandomId());
 
-      // versions below 1.9 do not support resource pack prompts, verify the connection
+      // Versions below 1.9 do not check the resource pack URL and hash.
+      // We have to skip this check and verify the connection.
       finish();
     } else {
 
-      // On non-1.8 clients there isn't any other KeepAlive packet that can be sent now
+      // On non-1.8 clients, there is no KeepAlive packet that can be sent at this stage.
       player.fail("unexpected timing (K3): " + keepAlive.getRandomId());
     }
     return false;
@@ -207,9 +208,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     // The hash and URL have to be invalid for this check to work
     // since we don't want to client to actually download a resource pack
-    // or override the server resource packets option (prompt)
+    // or override the server resource packets option (prompt).
     //
-    // Generate a random hash as a placeholder and method of verification
+    // Generate a random hash as a placeholder and method of verification.
     resourcePackHash = Integer.toHexString(random.nextInt());
     resourcePackRequest.setHash(resourcePackHash);
     resourcePackRequest.setUrl(resourcePackHash);
@@ -222,16 +223,21 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   public boolean handle(final ResourcePackResponse resourcePackResponse) {
     checkFrame(resourcePackHash != null, "hash has not been set");
 
-    // 1.10+ clients do not send the hash back to the server if the download fails
+    // 1.10+ clients do not send the hash back to the server if the download fails.
+    // That means that we can validate the hash sent by the client and compare
+    // it with the hash we set on the server side.
     if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_10) >= 0) {
+      // Check if the hash is empty
       checkFrame(resourcePackResponse.getHash().isEmpty(), "invalid hash (1.10+)");
     } else {
+      // Check if the hash is the same as on the server
       checkFrame(Objects.equals(resourcePackResponse.getHash(), resourcePackHash), "invalid hash");
     }
 
-    checkFrame(resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD, "invalid" +
-      " " +
-      "status");
+    checkFrame( // The download will always fail because we never provided a real URL
+      resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD,
+      "invalid status"
+    );
 
     finish();
     return false;
