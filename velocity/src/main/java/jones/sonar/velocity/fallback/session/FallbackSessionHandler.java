@@ -29,7 +29,9 @@ import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialConnectSessionHandler;
+import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import com.velocitypowered.proxy.protocol.packet.*;
+import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.fallback.FallbackConnection;
@@ -140,6 +142,16 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     return false;
   }
 
+  private static boolean validateClientBrand(final ByteBuf content) {
+    // No need to check for empty or too long client brands since
+    // ProtocolUtils#readString already does exactly that.
+    final String read = ProtocolUtils.readString(content, 64);
+    return !read.equals("Vanilla") // The normal brand is always lowercase
+      // We want to allow client brands that have a URL in them
+      // (e.g., CheatBreaker)
+      && read.matches("^[a-zA-Z/.:_-]+$"); // normal regex validation
+  }
+
   @Override
   public boolean handle(final @NotNull PluginMessage pluginMessage) {
 
@@ -153,8 +165,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
     // Validate the client brand
     checkFrame(pluginMessage.getChannel().equals("MC|Brand") || valid, "invalid channel");
-    // TODO: actually implement a client brand check?
-    checkFrame(pluginMessage.content().readableBytes() > 1, "invalid client brand");
+    checkFrame(validateClientBrand(pluginMessage.content()), "invalid client brand");
 
     // Check for illegal packet timing
     checkFrame(!hasSentClientBrand, "unexpected timing (P1)");
