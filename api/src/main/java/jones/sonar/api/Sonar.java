@@ -35,7 +35,18 @@ public interface Sonar {
 
   // used for bStats metrics
   default int getServiceId() {
-    return 19107;
+    switch (getPlatform()) {
+      case BUKKIT: {
+        return 19110;
+      }
+      case BUNGEE: {
+        return 19109;
+      }
+      default:
+      case VELOCITY: {
+        return 19107;
+      }
+    }
   }
 
   @NotNull File getPluginDataFolder();
