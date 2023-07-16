@@ -244,7 +244,8 @@ public final class FallbackListener {
           fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
             .replace("%player%", event.getPlayer().getUsername())
             .replace("%ip%", event.getPlayer().getRemoteAddress().getAddress().toString())
-            .replace("%protocol%", String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
+            .replace("%protocol%",
+              String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
         );
       }
     } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {

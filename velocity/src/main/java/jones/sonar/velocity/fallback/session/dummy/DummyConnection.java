@@ -190,13 +190,15 @@ public final class DummyConnection extends MinecraftConnection {
 
           @NotNull
           @Override
-          public <T> List<java.util.concurrent.Future<T>> invokeAll(@NotNull Collection<? extends Callable<T>> tasks) throws InterruptedException {
+          public <T> List<java.util.concurrent.Future<T>> invokeAll(@NotNull Collection<?
+            extends Callable<T>> tasks) throws InterruptedException {
             return null;
           }
 
           @NotNull
           @Override
-          public <T> List<java.util.concurrent.Future<T>> invokeAll(@NotNull Collection<? extends Callable<T>> tasks,
+          public <T> List<java.util.concurrent.Future<T>> invokeAll(@NotNull Collection<?
+            extends Callable<T>> tasks,
                                                                     long timeout, @NotNull TimeUnit unit) throws InterruptedException {
             return null;
           }
@@ -348,7 +350,8 @@ public final class DummyConnection extends MinecraftConnection {
       }
 
       @Override
-      public ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
+      public ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress,
+                                   ChannelPromise promise) {
         return null;
       }
 

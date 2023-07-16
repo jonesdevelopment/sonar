@@ -1,7 +1,16 @@
-[*]
+root = true
+
+[**]
+charset = UTF-8
 indent_style = space
 indent_size = 2
+insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.java]
+[{*.java,*.kt}]
 ij_java_wrap_long_lines = true
+
+[{*.md,*.yml}]
+indent_style = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset

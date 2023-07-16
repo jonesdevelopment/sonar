@@ -219,7 +219,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       checkFrame(Objects.equals(resourcePackResponse.getHash(), resourcePackHash), "invalid hash");
     }
 
-    checkFrame(resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD, "invalid " +
+    checkFrame(resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD, "invalid" +
+      " " +
       "status");
 
     finish();
@@ -301,7 +302,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
               // The player was disconnected
               if (player.getConnection().isClosed()) {
                 final var disconnectEvent = new DisconnectEvent(
-                  player.getPlayer(), DisconnectEvent.LoginStatus.CANCELLED_BY_USER_BEFORE_COMPLETE
+                  player.getPlayer(),
+                  DisconnectEvent.LoginStatus.CANCELLED_BY_USER_BEFORE_COMPLETE
                 );
 
                 player.getConnection().server.getEventManager().fireAndForget(disconnectEvent);
@@ -313,8 +315,10 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
               }, () -> {
                 if (player.getConnection().server.registerConnection(player.getPlayer())) {
                   try {
-                    final var initialConnection = (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
-                      .invokeExact(player.getPlayer(), (VelocityServer) player.getConnection().server);
+                    final var initialConnection =
+                      (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
+                        .invokeExact(player.getPlayer(),
+                          (VelocityServer) player.getConnection().server);
 
                     player.getConnection().setSessionHandler(initialConnection);
 
@@ -322,7 +326,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                       .fire(new PostLoginEvent(player.getPlayer()))
                       .thenAcceptAsync(ignored -> {
                         try {
-                          CONNECTION_FIELD.set(sessionHandler, player.getConnection());
+                          CONNECTION_FIELD.set(sessionHandler,
+                            player.getConnection());
 
                           // It works. We'll leave it at that
                           player.getPipeline().addAfter(
@@ -331,7 +336,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                             new FallbackRespawnHandler(player)
                           );
 
-                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
+                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler,
+                            player.getPlayer());
                         } catch (Throwable throwable) {
                           throw new RuntimeException(throwable);
                         }
@@ -341,13 +347,15 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                   }
                 } else {
                   player.getPlayer().disconnect0(
-                    Component.translatable("velocity.error.already-connected-proxy"), true
+                    Component.translatable("velocity.error.already-connected-proxy"),
+                    true
                   );
                 }
               });
             }, player.getChannel().eventLoop()).exceptionally(throwable -> {
               player.getFallback().getLogger().error(
-                "Exception while completing login initialisation phase for {}", player, throwable
+                "Exception while completing login initialisation phase for {}", player,
+                throwable
               );
               return null;
             });

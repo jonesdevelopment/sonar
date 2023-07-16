@@ -152,7 +152,8 @@ public final class SonarConfiguration {
     ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
     VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 4000), 500, 30000);
     MAXIMUM_LOGIN_PACKETS = clamp(yamlConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
-    MAXIMUM_VERIFYING_PLAYERS = clamp(yamlConfig.getInt("general.verification.max-players", 1024), 1, Short.MAX_VALUE);
+    MAXIMUM_VERIFYING_PLAYERS = clamp(yamlConfig.getInt("general.verification.max-players", 1024), 1,
+      Short.MAX_VALUE);
     VERIFICATION_DELAY = clamp(yamlConfig.getInt("general.verification.rejoin-delay", 8000), 0, 100000);
 
     // load this here otherwise it could cause issues
@@ -172,7 +173,8 @@ public final class SonarConfiguration {
       "%prefix%The server is no longer in lockdown mode."
     ));
     LOCKDOWN_NOTIFICATION = formatString(yamlConfig.getString("messages.lockdown.notification",
-      "%prefix%&aHey, the server is currently in lockdown mode. If you want to disable the lockdown mode, type " +
+      "%prefix%&aHey, the server is currently in lockdown mode. If you want to disable the lockdown mode, " +
+        "type " +
         "&f/sonar" +
         " lockdown&a."
     ));
@@ -201,7 +203,8 @@ public final class SonarConfiguration {
     ));
 
     DATABASE_PURGE_CONFIRM = formatString(yamlConfig.getString("messages.database.purge-confirm",
-      "%prefix%&cPlease confirm that you want to delete all database entries by typing &7/sonar database purge " +
+      "%prefix%&cPlease confirm that you want to delete all database entries by typing &7/sonar database " +
+        "purge " +
         "confirm&c."
     ));
     DATABASE_PURGE = formatString(yamlConfig.getString("messages.database.purge",
