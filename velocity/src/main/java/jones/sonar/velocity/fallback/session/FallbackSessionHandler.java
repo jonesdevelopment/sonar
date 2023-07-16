@@ -177,13 +177,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       checkFrame(hasSentClientBrand, "unexpected timing (K1): " + keepAlive.getRandomId());
       checkFrame(hasSentClientSettings, "unexpected timing (K2): " + keepAlive.getRandomId());
 
-      // 1.7 does not support resource pack prompts, verify the connection
-      if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_7_6) <= 0) {
-        finish();
-      } else {
-        // We already ran the other checks, let's go to the next stage
-        sendResourcePackRequest();
-      }
+      // versions below 1.9 do not support resource pack prompts, verify the connection
+      finish();
     } else {
 
       // On non-1.8 clients there isn't any other KeepAlive packet that can be sent now
