@@ -73,6 +73,10 @@ tasks {
     }
   }
 
+  shadowJar {
+    relocate("org.bstats", "jones.sonar.bstats")
+  }
+
   compileJava {
     options.encoding = "UTF-8"
   }
