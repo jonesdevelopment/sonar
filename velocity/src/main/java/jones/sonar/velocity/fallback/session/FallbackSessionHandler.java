@@ -154,14 +154,14 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final @NotNull PluginMessage pluginMessage) {
-
     // Only MC|Brand for 1.7-1.12.2 and minecraft:brand for 1.13+ are important
+    // TODO: No other channel should be possible?
     if (!pluginMessage.getChannel().equals("MC|Brand")
       && !pluginMessage.getChannel().equals("minecraft:brand")) {
       return false; // Ignore all other channels
     }
 
-    final boolean valid = player.getProtocolVersion() >= MINECRAFT_1_13.getProtocol();
+    final boolean valid = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
 
     // Validate the client brand
     checkFrame(pluginMessage.getChannel().equals("MC|Brand") || valid, "invalid channel");
