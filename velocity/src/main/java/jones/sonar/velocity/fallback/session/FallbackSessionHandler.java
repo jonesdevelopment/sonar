@@ -161,10 +161,12 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       return false; // Ignore all other channels
     }
 
-    final boolean valid = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
+    // Check if the channel is correct - 1.13 uses the new namespace
+    // system ('minecraft:' + channel) and anything below 1.13 uses
+    // the legacy namespace system ('MC|' + channel)
+    final boolean exempt = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
 
-    // Validate the client brand
-    checkFrame(pluginMessage.getChannel().equals("MC|Brand") || valid, "invalid channel");
+    checkFrame(pluginMessage.getChannel().equals("MC|Brand") || exempt, "invalid channel");
     checkFrame(validateClientBrand(pluginMessage.content()), "invalid client brand");
 
     // Check for illegal packet timing
