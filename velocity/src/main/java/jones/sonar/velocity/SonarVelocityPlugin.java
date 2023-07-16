@@ -32,7 +32,7 @@ import java.nio.file.Path;
 @Getter
 @Plugin(id = "sonar",
   name = "Sonar",
-  version = "2.0.0",
+  version = "2.0",
   authors = {"Jones Development", "Sonar Contributors"},
   url = "https://jonesdev.xyz/discord/",
   description = "Effective Anti-bot plugin for Velocity, BungeeCord and Bukkit (1.7-latest)"
