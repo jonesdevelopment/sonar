@@ -76,6 +76,7 @@ public final class FallbackListener implements Listener {
     static TextComponent ALREADY_QUEUED;
     static TextComponent TOO_MANY_ONLINE_PER_IP;
     static TextComponent TOO_FAST_RECONNECT;
+    static TextComponent LOCKDOWN_DISCONNECT;
     public static TextComponent UNEXPECTED_ERROR;
 
     public static void update() {
@@ -85,12 +86,30 @@ public final class FallbackListener implements Listener {
       BLACKLISTED = new TextComponent(Sonar.get().getConfig().BLACKLISTED);
       TOO_MANY_ONLINE_PER_IP = new TextComponent(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP);
       TOO_FAST_RECONNECT = new TextComponent(Sonar.get().getConfig().TOO_FAST_RECONNECT);
+      LOCKDOWN_DISCONNECT = new TextComponent(Sonar.get().getConfig().LOCKDOWN_DISCONNECT);
       UNEXPECTED_ERROR = new TextComponent(Sonar.get().getConfig().UNEXPECTED_ERROR);
     }
   }
 
   @EventHandler
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
+    if (fallback.getSonar().getConfig().LOCKDOWN_ENABLED) {
+      if (!event.getPlayer().hasPermission("sonar.lockdown")) {
+        event.getPlayer().disconnect(LOCKDOWN_DISCONNECT);
+        if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
+          fallback.getSonar().getLogger().info(
+            fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
+              .replace("%player%", event.getPlayer().getName())
+              .replace("%ip%", event.getPlayer().getAddress().getAddress().toString())
+              .replace("%protocol%",
+                String.valueOf(event.getPlayer().getPendingConnection().getVersion()))
+          );
+        }
+      } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
+        event.getPlayer().sendMessage(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION);
+      }
+    }
+
     final InitialHandler initialHandler = (InitialHandler) event.getPlayer().getPendingConnection();
     final ChannelWrapper channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER.get(initialHandler);
 
