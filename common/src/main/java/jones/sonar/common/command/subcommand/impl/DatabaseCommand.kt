@@ -84,6 +84,12 @@ class DatabaseCommand : SubCommand() {
           return
         }
 
+        // This is a security feature
+        if (!sonar.config.ALLOW_PURGING) {
+          invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE_DISALLOWED)
+          return
+        }
+
         if (purging) {
           invocation.invocationSender.sendMessage(sonar.config.DATABASE_PURGE_ALREADY)
           return

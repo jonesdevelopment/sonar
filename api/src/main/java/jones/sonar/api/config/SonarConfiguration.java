@@ -103,6 +103,7 @@ public final class SonarConfiguration {
   public String LOCKDOWN_CONSOLE_LOG;
 
   public DatabaseType DATABASE;
+  public boolean ALLOW_PURGING;
   public String DATABASE_FILE_NAME;
   public String DATABASE_URL;
   public String DATABASE_NAME;
@@ -111,6 +112,7 @@ public final class SonarConfiguration {
   public int DATABASE_PORT;
   public int DATABASE_QUERY_LIMIT;
 
+  public String DATABASE_PURGE_DISALLOWED;
   public String DATABASE_PURGE_CONFIRM;
   public String DATABASE_PURGE;
   public String DATABASE_PURGE_ALREADY;
@@ -135,6 +137,7 @@ public final class SonarConfiguration {
     LOCKDOWN_ENABLE_NOTIFY = yamlConfig.getBoolean("general.lockdown.notify-admins", true);
 
     DATABASE = DatabaseType.valueOf(yamlConfig.getString("general.database.type", "NONE"));
+    ALLOW_PURGING = yamlConfig.getBoolean("general.database.allow-purging", true);
 
     // YAML
     DATABASE_FILE_NAME = yamlConfig.getString("general.database.yaml.file-name", "database");
@@ -212,6 +215,9 @@ public final class SonarConfiguration {
       "%prefix%You are no longer viewing Sonar verbose."
     ));
 
+    DATABASE_PURGE_DISALLOWED = formatString(yamlConfig.getString("messages.database.disallowed",
+      "%prefix%&cPurging the database is currently disallowed. Therefore, your action has been cancelled."
+    ));
     DATABASE_PURGE_CONFIRM = formatString(yamlConfig.getString("messages.database.purge-confirm",
       "%prefix%&cPlease confirm that you want to delete all database entries by typing &7/sonar database " +
         "purge " +
