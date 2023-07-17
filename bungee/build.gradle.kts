@@ -10,7 +10,7 @@ dependencies {
 
   compileOnly("io.papermc:waterfall-proxy:1.20-R0.1-SNAPSHOT")
 
-  // bStats.org
+  // Implement bStats.org for metrics
   implementation("org.bstats:bstats-bungeecord:3.0.2")
 }
 

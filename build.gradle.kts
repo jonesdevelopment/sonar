@@ -1,10 +1,4 @@
 buildscript {
-  repositories {
-    maven {
-      url = uri("https://plugins.gradle.org/m2/")
-    }
-  }
-
   dependencies {
     classpath("gradle.plugin.io.toolebox:gradle-git-versioner:1.6.7")
   }
@@ -55,13 +49,15 @@ subprojects {
   }
 
   kotlin {
-    // We use 8 for every project except for Velocity
+    // We use 8 for every project for backwards compatibility.
+    // This is replaced in the velocity module as Velocity supports Java 17+
     jvmToolchain(8)
   }
 }
 
 dependencies {
   sequenceOf("api", "bukkit", "bungee", "common", "velocity").forEach {
+    // We want the jar to actually contain our modules
     implementation(project(":sonar-$it"))
   }
 }
@@ -69,11 +65,14 @@ dependencies {
 tasks {
   jar {
     manifest {
+      // Set the implementation version, so we can create exact version
+      // information in-game and make it accessible to the user.
       attributes["Implementation-Version"] = version
     }
   }
 
   shadowJar {
+    // bStats has to be relocated to the Sonar package otherwise it throws an exception.
     relocate("org.bstats", "jones.sonar.bstats")
   }
 
@@ -81,6 +80,7 @@ tasks {
     options.encoding = "UTF-8"
   }
 
+  // This is a small wrapper tasks to simplify the building process
   register("build-sonar") {
     dependsOn("clean", "shadowJar")
   }

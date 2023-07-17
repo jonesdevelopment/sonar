@@ -12,10 +12,11 @@ dependencies {
   testCompileOnly("com.velocitypowered:velocity-api:$velocityVersion")
   testAnnotationProcessor("com.velocitypowered:velocity-api:$velocityVersion")
 
-  // bStats.org
+  // Implement bStats.org for metrics
   implementation("org.bstats:bstats-velocity:3.0.2")
 }
 
+// Velocity supports Java 17
 kotlin {
   jvmToolchain(17)
 }
