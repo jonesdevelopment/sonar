@@ -135,6 +135,11 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // too fast, so we just kick the player for safety and not actually punish them.
     if (hasSentClientBrand || hasSentClientSettings) {
       player.getPlayer().disconnect0(FallbackListener.CachedMessages.UNEXPECTED_ERROR, true);
+
+      // Log this incident to make sure an administrator knows what happened
+      player.getFallback().getLogger().warn(
+        "Disconnecting {} for an unexpected error (lag?)", player.getPlayer().getUsername()
+      );
       return false;
     }
 
