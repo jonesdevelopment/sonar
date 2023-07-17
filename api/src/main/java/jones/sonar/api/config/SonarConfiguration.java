@@ -20,6 +20,7 @@ package jones.sonar.api.config;
 import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.yaml.YamlConfig;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Arrays;
@@ -31,7 +32,11 @@ public final class SonarConfiguration {
   @Getter
   private final YamlConfig yamlConfig;
 
-  public SonarConfiguration(final File folder) {
+  public SonarConfiguration(final @NotNull File folder) {
+    if (!folder.exists()) {
+      throw new IllegalStateException("Configuration folder does not exist");
+    }
+
     yamlConfig = new YamlConfig(folder, "config");
   }
 

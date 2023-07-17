@@ -19,6 +19,7 @@ package jones.sonar.api.database;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public enum DatabaseType {
   @Getter
   private final Database holder;
 
-  public static Optional<DatabaseType> getFromString(final String v) {
+  public static @NotNull Optional<DatabaseType> getFromString(final String v) {
     return Arrays.stream(values())
       .filter(value -> value.name().equalsIgnoreCase(v))
       .findFirst();
