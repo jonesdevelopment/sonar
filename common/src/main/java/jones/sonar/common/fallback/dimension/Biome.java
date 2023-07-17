@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.stream.Collectors;
 
-// Taken from
 // https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/material/Biome.java
 @Getter
 public enum Biome {

@@ -25,7 +25,9 @@ import jones.sonar.api.fallback.Fallback
 import java.net.InetSocketAddress
 
 @Sharable
-class FallbackChannelHandler(private val fallback: Fallback) : ChannelInboundHandlerAdapter() {
+class FallbackChannelHandler(
+  private val fallback: Fallback
+) : ChannelInboundHandlerAdapter() {
 
   @Throws(Exception::class)
   override fun channelInactive(ctx: ChannelHandlerContext) {
