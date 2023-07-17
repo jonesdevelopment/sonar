@@ -149,7 +149,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     return !read.equals("Vanilla") // The normal brand is always lowercase
       // We want to allow client brands that have a URL in them
       // (e.g., CheatBreaker)
-      && read.matches("^[a-zA-Z/.:_-]+$"); // Normal regex validation
+      && read.matches("^[a-zA-Z0-9/.:_-]+$"); // Normal regex validation
   }
 
   @Override
