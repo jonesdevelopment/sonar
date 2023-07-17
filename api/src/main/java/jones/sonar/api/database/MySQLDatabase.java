@@ -89,7 +89,7 @@ final class MySQLDatabase implements Database {
     final Collection<String> output = new Vector<>();
 
     try (final PreparedStatement statement = connection.prepareStatement(
-      "select `" + column + "` from `" + table + "` limit " + Sonar.get().getConfig().DATABASE_QUERY_LIMIT
+      "select distinct `" + column + "` from `" + table + "` limit " + Sonar.get().getConfig().DATABASE_QUERY_LIMIT
     )) {
       final ResultSet resultSet = statement.executeQuery();
 
