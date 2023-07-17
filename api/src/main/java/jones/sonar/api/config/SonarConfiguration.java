@@ -350,16 +350,16 @@ public final class SonarConfiguration {
         "&7Please wait a few seconds before trying to verify again.",
         "%footer%"
       )));
+    INVALID_USERNAME = fromList(yamlConfig.getStringList("messages.verification.invalid-username",
+      Arrays.asList(
+        "%header%",
+        "&cYour username contains invalid characters.",
+        "%footer%"
+      )));
     TOO_MANY_ONLINE_PER_IP = fromList(yamlConfig.getStringList("messages.too-many-online-per-ip",
       Arrays.asList(
         "%header%",
         "&cThere are too many players online with your IP address.",
-        "%footer%"
-      )));
-    INVALID_USERNAME = fromList(yamlConfig.getStringList("messages.invalid-username",
-      Arrays.asList(
-        "%header%",
-        "&cYour username contains invalid characters.",
         "%footer%"
       )));
 
