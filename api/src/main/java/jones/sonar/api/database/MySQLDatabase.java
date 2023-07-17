@@ -21,9 +21,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,14 +33,10 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Vector;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class MySQLDatabase implements Database {
+final class MySQLDatabase implements Database {
   @Getter
   private @Nullable HikariDataSource dataSource;
   private Connection connection;
-  public static final String VERIFIED_TABLE = "verified_ips";
-  public static final String BLACKLIST_TABLE = "blacklisted_ips";
-  public static final String IP_COLUMN = "ip_address";
 
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {

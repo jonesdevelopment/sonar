@@ -20,8 +20,6 @@ package jones.sonar.api.database;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.yaml.YamlConfig;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,11 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
-import static jones.sonar.api.database.MySQLDatabase.BLACKLIST_TABLE;
-import static jones.sonar.api.database.MySQLDatabase.VERIFIED_TABLE;
-
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class YamlDatabase implements Database {
+final class YamlDatabase implements Database {
   private @Nullable YamlConfig yamlConfig;
 
   @Override

@@ -35,7 +35,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import static jones.sonar.api.database.MySQLDatabase.*;
+import static jones.sonar.api.database.Database.*;
 
 public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
 

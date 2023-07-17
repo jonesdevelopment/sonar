@@ -34,7 +34,7 @@ import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.logging.Level;
 
-import static jones.sonar.api.database.MySQLDatabase.*;
+import static jones.sonar.api.database.Database.*;
 
 public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
 
