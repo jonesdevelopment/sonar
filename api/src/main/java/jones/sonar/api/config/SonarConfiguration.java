@@ -317,8 +317,7 @@ public final class SonarConfiguration {
     BLACKLISTED = fromList(yamlConfig.getStringList("messages.verification.blacklisted",
       Arrays.asList(
         "%header%",
-        "&cYour IP address is permanently denied from verifying.",
-        "&cPlease wait a few minutes before trying to verify again.",
+        "&cYour IP address is currently denied from entering the server.",
         "&6False positive? &7https://jonesdev.xyz/discord/",
         "%footer%"
       )));
