@@ -7,6 +7,8 @@ vscode/
 .fleet/
 gradlew
 *.bat
+*.cmd
+*.sh
 *.jar
 *.class
 *.iml
@@ -19,3 +21,4 @@ gradlew
 .editorconfig
 HEADER
 LICENSE
+.gitignore
