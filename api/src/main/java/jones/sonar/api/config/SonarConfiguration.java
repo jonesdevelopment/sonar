@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public final class SonarConfiguration {
   @Getter
@@ -39,6 +40,7 @@ public final class SonarConfiguration {
   public String ACTION_BAR_LAYOUT;
   public Collection<String> ANIMATION;
 
+  public Pattern VALID_NAME_REGEX;
   public int MINIMUM_PLAYERS_FOR_ATTACK;
   public int MAXIMUM_VERIFYING_PLAYERS;
   public int MAXIMUM_ONLINE_PER_IP;
@@ -56,6 +58,7 @@ public final class SonarConfiguration {
   public String TOO_MANY_PLAYERS;
   public String TOO_FAST_RECONNECT;
   public String TOO_MANY_ONLINE_PER_IP;
+  public String INVALID_USERNAME;
   public String ALREADY_VERIFYING;
   public String ALREADY_QUEUED;
   public String BLACKLISTED;
@@ -148,6 +151,9 @@ public final class SonarConfiguration {
     MAXIMUM_QUEUE_POLLS = clamp(yamlConfig.getInt("general.queue.max-polls", 10), 1, 1000);
 
     ENABLE_VERIFICATION = yamlConfig.getBoolean("general.verification.enabled", true);
+    VALID_NAME_REGEX = Pattern.compile(yamlConfig.getString(
+      "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"
+    ));
     LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
     ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
     VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 4000), 500, 30000);
@@ -332,6 +338,12 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "&cThere are too many players online with your IP address.",
+        "%footer%"
+      )));
+    INVALID_USERNAME = fromList(yamlConfig.getStringList("messages.invalid-username",
+      Arrays.asList(
+        "%header%",
+        "&cYour username contains invalid characters.",
         "%footer%"
       )));
 
