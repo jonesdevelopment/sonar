@@ -67,7 +67,8 @@ on [Discord](https://jonesdev.xyz/discord/).
 
 ## Building
 
-- You can build the jar file using `gradle shadowJar` in the main project.
+- You can build the jar file using `gradle build-sonar` in the main project.
+  - If this does not work, try `gradle shadowJar` as a fallback option.
 - To clean temporary files and build files, use `gradle clean`.
 - If there are any issues, you can also try `gradle shadowJar --stacktrace` to see exceptions.
 

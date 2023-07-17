@@ -80,4 +80,8 @@ tasks {
   compileJava {
     options.encoding = "UTF-8"
   }
+
+  register("build-sonar") {
+    dependsOn("clean", "shadowJar")
+  }
 }
