@@ -33,14 +33,11 @@ public final class SonarConfiguration {
   private final YamlConfig yamlConfig;
 
   public SonarConfiguration(final @NotNull File folder) {
-    if (!folder.exists()) {
-      throw new IllegalStateException("Configuration folder does not exist");
-    }
-
     yamlConfig = new YamlConfig(folder, "config");
   }
 
   public String PREFIX;
+  public String SUPPORT_URL;
 
   public String ACTION_BAR_LAYOUT;
   public Collection<String> ANIMATION;
@@ -132,6 +129,7 @@ public final class SonarConfiguration {
 
     // Message settings
     PREFIX = formatString(yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
+    SUPPORT_URL = yamlConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
 
     // General options
     MAXIMUM_ONLINE_PER_IP = clamp(yamlConfig.getInt("general.max-online-per-ip", 3), 1, Byte.MAX_VALUE);
@@ -340,7 +338,7 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently denied from entering the server.",
-        "&6False positive? &7https://jonesdev.xyz/discord/",
+        "&6False positive? &7%support-url%",
         "%footer%"
       )));
     UNEXPECTED_ERROR = fromList(yamlConfig.getStringList("messages.verification.unexpected-error",
@@ -348,6 +346,7 @@ public final class SonarConfiguration {
         "%header%",
         "&6An unexpected error occurred when trying to process your connection.",
         "&7Please wait a few seconds before trying to verify again.",
+        "&6Need help? &7%support-url%",
         "%footer%"
       )));
     INVALID_USERNAME = fromList(yamlConfig.getStringList("messages.verification.invalid-username",
@@ -388,6 +387,7 @@ public final class SonarConfiguration {
   private String formatString(final String string) {
     return translateAlternateColorCodes(Objects.requireNonNull(string))
       .replace("%prefix%", PREFIX == null ? "" : PREFIX)
+      .replace("%support-url%", SUPPORT_URL == null ? "" : SUPPORT_URL)
       .replace("%header%", HEADER == null ? "" : HEADER)
       .replace("%footer%", FOOTER == null ? "" : FOOTER);
   }
