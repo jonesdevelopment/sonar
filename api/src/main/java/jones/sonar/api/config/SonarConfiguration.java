@@ -41,6 +41,7 @@ public final class SonarConfiguration {
   public Collection<String> ANIMATION;
 
   public Pattern VALID_NAME_REGEX;
+  public Pattern VALID_BRAND_REGEX;
   public int MINIMUM_PLAYERS_FOR_ATTACK;
   public int MAXIMUM_VERIFYING_PLAYERS;
   public int MAXIMUM_ONLINE_PER_IP;
@@ -153,6 +154,9 @@ public final class SonarConfiguration {
     ENABLE_VERIFICATION = yamlConfig.getBoolean("general.verification.enabled", true);
     VALID_NAME_REGEX = Pattern.compile(yamlConfig.getString(
       "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"
+    ));
+    VALID_BRAND_REGEX = Pattern.compile(yamlConfig.getString(
+      "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:_()\\[\\]{}!?' *]+$"
     ));
     LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
     ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);

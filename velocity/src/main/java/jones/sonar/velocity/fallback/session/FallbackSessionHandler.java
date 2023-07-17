@@ -34,6 +34,7 @@ import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.FallbackConnection;
 import jones.sonar.velocity.fallback.FallbackListener;
 import net.kyori.adventure.text.Component;
@@ -154,7 +155,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     return !read.equals("Vanilla") // The normal brand is always lowercase
       // We want to allow client brands that have a URL in them
       // (e.g., CheatBreaker)
-      && read.matches("^[a-zA-Z0-9/.,:_-]+$"); // Normal regex validation
+      && Sonar.get().getConfig().VALID_BRAND_REGEX.matcher(read).matches(); // Normal regex validation
   }
 
   @Override
