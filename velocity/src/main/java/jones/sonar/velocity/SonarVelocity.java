@@ -129,7 +129,7 @@ public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
     if (getConfig().DATABASE != DatabaseType.NONE) {
       getLogger().info("[database] Saving entries to database...");
 
-      // We need to clear the table because we don't want any IPs which aren't present
+      // We need to clear the table because we don't want any IPs that aren't present
       // or have been manually removed to still be present in the database
       getDatabase().clear(BLACKLIST_TABLE);
       getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
