@@ -25,7 +25,7 @@ import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
 import jones.sonar.bukkit.command.SonarCommand;
 import jones.sonar.bukkit.verbose.ActionBarVerbose;
-import jones.sonar.common.SonarPlugin;
+import jones.sonar.common.SonarBootstrap;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
 
@@ -36,7 +36,7 @@ import java.util.logging.Level;
 
 import static jones.sonar.api.database.Database.*;
 
-public enum SonarBukkit implements Sonar, SonarPlugin<SonarBukkitPlugin> {
+public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
   INSTANCE;
 

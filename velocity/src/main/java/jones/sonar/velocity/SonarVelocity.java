@@ -24,7 +24,7 @@ import jones.sonar.api.SonarProvider;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
-import jones.sonar.common.SonarPlugin;
+import jones.sonar.common.SonarBootstrap;
 import jones.sonar.velocity.command.SonarCommand;
 import jones.sonar.velocity.fallback.FallbackListener;
 import jones.sonar.velocity.verbose.ActionBarVerbose;
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import static jones.sonar.api.database.Database.*;
 
-public enum SonarVelocity implements Sonar, SonarPlugin<SonarVelocityPlugin> {
+public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> {
 
   INSTANCE;
 

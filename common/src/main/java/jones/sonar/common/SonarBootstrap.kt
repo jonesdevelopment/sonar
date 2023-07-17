@@ -17,10 +17,8 @@
 
 package jones.sonar.common
 
-interface SonarPlugin<T> {
+interface SonarBootstrap<T> {
   fun enable(plugin: T)
 
   fun disable()
-
-  fun reload()
 }

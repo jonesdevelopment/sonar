@@ -26,7 +26,7 @@ import jones.sonar.api.logger.Logger;
 import jones.sonar.bungee.command.SonarCommand;
 import jones.sonar.bungee.fallback.FallbackListener;
 import jones.sonar.bungee.verbose.ActionBarVerbose;
-import jones.sonar.common.SonarPlugin;
+import jones.sonar.common.SonarBootstrap;
 import lombok.Getter;
 import org.bstats.bungeecord.Metrics;
 
@@ -37,7 +37,7 @@ import java.util.logging.Level;
 
 import static jones.sonar.api.database.Database.*;
 
-public enum SonarBungee implements Sonar, SonarPlugin<SonarBungeePlugin> {
+public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
   INSTANCE;
 
