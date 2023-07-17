@@ -136,7 +136,8 @@ public final class SonarConfiguration {
     LOCKDOWN_LOG_ATTEMPTS = yamlConfig.getBoolean("general.lockdown.log-attempts", true);
     LOCKDOWN_ENABLE_NOTIFY = yamlConfig.getBoolean("general.lockdown.notify-admins", true);
 
-    DATABASE = DatabaseType.valueOf(yamlConfig.getString("general.database.type", "NONE"));
+    DATABASE = DatabaseType.getFromString(yamlConfig.getString("general.database.type", "NONE"))
+      .orElse(DatabaseType.NONE);
     ALLOW_PURGING = yamlConfig.getBoolean("general.database.allow-purging", true);
 
     // YAML

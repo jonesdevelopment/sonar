@@ -20,6 +20,9 @@ package jones.sonar.api.database;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 @RequiredArgsConstructor
 public enum DatabaseType {
   NONE(null),
@@ -28,4 +31,10 @@ public enum DatabaseType {
 
   @Getter
   private final Database holder;
+
+  public static Optional<DatabaseType> getFromString(final String v) {
+    return Arrays.stream(values())
+      .filter(value -> value.name().equalsIgnoreCase(v))
+      .findFirst();
+  }
 }
