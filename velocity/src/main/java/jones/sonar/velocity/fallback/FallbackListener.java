@@ -370,11 +370,13 @@ public final class FallbackListener {
           player.getProtocolVersion().getProtocol()
         );
 
-        // Only log the processing message if the server isn't under attack.
-        // We let the user override this through the configuration.
-        if (!fallback.isUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
-          fallback.getLogger().info("Processing: {}{} ({})",
-            event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
+        if (fallback.getSonar().getConfig().LOG_CONNECTIONS) {
+          // Only log the processing message if the server isn't under attack.
+          // We let the user override this through the configuration.
+          if (!fallback.isUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
+            fallback.getLogger().info("Processing: {}{} ({})",
+              event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
+          }
         }
 
         // Mark the player as connected → verifying players

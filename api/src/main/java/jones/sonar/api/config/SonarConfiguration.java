@@ -42,6 +42,8 @@ public final class SonarConfiguration {
   public String ACTION_BAR_LAYOUT;
   public Collection<String> ANIMATION;
 
+  public boolean LOG_CONNECTIONS;
+  public boolean LOG_DISCONNECTS;
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
   public int MINIMUM_PLAYERS_FOR_ATTACK;
@@ -159,19 +161,21 @@ public final class SonarConfiguration {
     MAXIMUM_QUEUE_POLLS = clamp(yamlConfig.getInt("general.queue.max-polls", 10), 1, 1000);
 
     ENABLE_VERIFICATION = yamlConfig.getBoolean("general.verification.enabled", true);
+    LOG_CONNECTIONS = yamlConfig.getBoolean("general.verification.log-connections", true);
+    LOG_DISCONNECTS = yamlConfig.getBoolean("general.verification.log-disconnects", true);
+    LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
     VALID_NAME_REGEX = Pattern.compile(yamlConfig.getString(
       "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"
     ));
     VALID_BRAND_REGEX = Pattern.compile(yamlConfig.getString(
       "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:_()\\[\\]{}!?' *]+$"
     ));
-    LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
-    ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
     VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 4000), 500, 30000);
     MAXIMUM_LOGIN_PACKETS = clamp(yamlConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
     MAXIMUM_VERIFYING_PLAYERS = clamp(yamlConfig.getInt("general.verification.max-players", 1024), 1,
       Short.MAX_VALUE);
     VERIFICATION_DELAY = clamp(yamlConfig.getInt("general.verification.rejoin-delay", 8000), 0, 100000);
+    ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
 
     // load this here otherwise it could cause issues
     HEADER = fromList(yamlConfig.getStringList("messages.header",

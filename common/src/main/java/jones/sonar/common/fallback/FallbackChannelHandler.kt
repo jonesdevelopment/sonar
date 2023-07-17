@@ -35,11 +35,13 @@ class FallbackChannelHandler(
 
     val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
-    // Only log the disconnect message if the server isn't under attack.
-    // We let the user override this through the configuration.
-    if (!fallback.isUnderAttack || fallback.sonar.config.LOG_DURING_ATTACK) {
-      if (fallback.connected.contains(inetAddress.toString())) {
-        fallback.logger.info("$inetAddress has disconnected")
+    if (fallback.sonar.config.LOG_DISCONNECTS) {
+      // Only log the disconnect message if the server isn't under attack.
+      // We let the user override this through the configuration.
+      if (!fallback.isUnderAttack || fallback.sonar.config.LOG_DURING_ATTACK) {
+        if (fallback.connected.contains(inetAddress.toString())) {
+          fallback.logger.info("$inetAddress has disconnected")
+        }
       }
     }
 
