@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.stream.Collectors;
 
+// Taken from
 // https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/material/Biome.java
 @Getter
 public enum Biome {
@@ -174,34 +175,6 @@ public enum Biome {
 
       return tagBuilder.build();
     }
-
-    public boolean hasPrecipitation() {
-      return this.hasPrecipitation;
-    }
-
-    public float getDepth() {
-      return this.depth;
-    }
-
-    public float getTemperature() {
-      return this.temperature;
-    }
-
-    public float getScale() {
-      return this.scale;
-    }
-
-    public float getDownfall() {
-      return this.downfall;
-    }
-
-    public String getCategory() {
-      return this.category;
-    }
-
-    public Effects getEffects() {
-      return this.effects;
-    }
   }
 
   @ToString
@@ -284,50 +257,6 @@ public enum Biome {
         .waterColor(waterColor);
     }
 
-    public int getSkyColor() {
-      return this.skyColor;
-    }
-
-    public int getWaterFogColor() {
-      return this.waterFogColor;
-    }
-
-    public int getFogColor() {
-      return this.fogColor;
-    }
-
-    public int getWaterColor() {
-      return this.waterColor;
-    }
-
-    public Integer getFoliageColor() {
-      return this.foliageColor;
-    }
-
-    public String getGrassColorModifier() {
-      return this.grassColorModifier;
-    }
-
-    public Music getMusic() {
-      return this.music;
-    }
-
-    public String getAmbientSound() {
-      return this.ambientSound;
-    }
-
-    public AdditionsSound getAdditionsSound() {
-      return this.additionsSound;
-    }
-
-    public MoodSound getMoodSound() {
-      return this.moodSound;
-    }
-
-    public Particle getParticle() {
-      return this.particle;
-    }
-
     @ToString
     public static final class MoodSound {
       private final int tickDelay;
@@ -353,22 +282,6 @@ public enum Biome {
           .putInt("block_search_extent", this.blockSearchExtent)
           .putString("sound", this.sound)
           .build();
-      }
-
-      public int getTickDelay() {
-        return this.tickDelay;
-      }
-
-      public double getOffset() {
-        return this.offset;
-      }
-
-      public int getBlockSearchExtent() {
-        return this.blockSearchExtent;
-      }
-
-      public String getSound() {
-        return this.sound;
       }
     }
 
@@ -398,22 +311,6 @@ public enum Biome {
           .putInt("min_delay", this.minDelay)
           .build();
       }
-
-      public boolean isReplaceCurrentMusic() {
-        return this.replaceCurrentMusic;
-      }
-
-      public String getSound() {
-        return this.sound;
-      }
-
-      public int getMaxDelay() {
-        return this.maxDelay;
-      }
-
-      public int getMinDelay() {
-        return this.minDelay;
-      }
     }
 
     @ToString
@@ -435,14 +332,6 @@ public enum Biome {
           .putString("sound", this.sound)
           .putDouble("tick_chance", this.tickChance)
           .build();
-      }
-
-      public String getSound() {
-        return this.sound;
-      }
-
-      public double getTickChance() {
-        return this.tickChance;
       }
     }
 
@@ -467,14 +356,6 @@ public enum Biome {
           .build();
       }
 
-      public float getProbability() {
-        return this.probability;
-      }
-
-      public ParticleOptions getOptions() {
-        return this.options;
-      }
-
       @ToString
       public static class ParticleOptions {
         private final String type;
@@ -488,16 +369,12 @@ public enum Biome {
             .putString("type", this.type)
             .build();
         }
-
-        public String getType() {
-          return this.type;
-        }
       }
     }
 
     @ToString
+    @SuppressWarnings("unused")
     public static class EffectsBuilder {
-
       private int skyColor;
       private int waterFogColor;
       private int fogColor;
