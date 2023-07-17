@@ -74,10 +74,10 @@ class SonarCommand : CommandExecutor, TabExecutor {
       // Search subcommand if command arguments are present
       subCommand = SubCommandRegistry.getSubCommands().stream()
         .filter { sub: SubCommand ->
-          (sub.info.name.equals(args[0], ignoreCase = true)
+          (sub.info.name.equals(args[0], true)
             || (sub.info.aliases.isNotEmpty()
             && Arrays.stream(sub.info.aliases)
-            .anyMatch { alias: String -> alias.equals(args[0], ignoreCase = true) }))
+            .anyMatch { alias: String -> alias.equals(args[0], true) }))
         }
         .findFirst()
 
