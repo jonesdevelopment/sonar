@@ -19,7 +19,7 @@ package jones.sonar.bukkit;
 
 import jones.sonar.api.Sonar;
 import jones.sonar.api.SonarPlatform;
-import jones.sonar.api.SonarProvider;
+import jones.sonar.api.SonarSupplier;
 import jones.sonar.api.config.SonarConfiguration;
 import jones.sonar.api.database.DatabaseType;
 import jones.sonar.api.logger.Logger;
@@ -86,7 +86,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     final long start = System.currentTimeMillis();
 
     // Set the API to this class
-    SonarProvider.set(this);
+    SonarSupplier.set(this);
 
     logger.info("Initializing Sonar...");
 

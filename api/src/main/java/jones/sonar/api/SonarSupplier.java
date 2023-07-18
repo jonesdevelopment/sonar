@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 @UtilityClass
-public class SonarProvider {
+public class SonarSupplier {
   private Sonar cached;
 
   public void set(final @NotNull Sonar sonar) {

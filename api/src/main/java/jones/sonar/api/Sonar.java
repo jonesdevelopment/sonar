@@ -83,6 +83,6 @@ public interface Sonar {
 
   @NotNull
   static Sonar get() {
-    return SonarProvider.get();
+    return SonarSupplier.get();
   }
 }
