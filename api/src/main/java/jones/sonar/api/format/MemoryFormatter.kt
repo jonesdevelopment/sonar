@@ -19,7 +19,7 @@ package jones.sonar.api.format
 
 import jones.sonar.api.Sonar
 
-class Formatting {
+class MemoryFormatter {
   companion object {
     private const val MIN = 1024
 

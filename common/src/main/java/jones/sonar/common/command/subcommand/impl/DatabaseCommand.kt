@@ -18,7 +18,7 @@
 package jones.sonar.common.command.subcommand.impl
 
 import jones.sonar.api.database.DatabaseType
-import jones.sonar.api.format.Formatting
+import jones.sonar.api.format.MemoryFormatter
 import jones.sonar.common.command.CommandInvocation
 import jones.sonar.common.command.subcommand.SubCommand
 import jones.sonar.common.command.subcommand.SubCommandInfo
@@ -70,7 +70,7 @@ class DatabaseCommand : SubCommand() {
             invocation.invocationSender.sendMessage(" §a▪ §7File name: §f${sonar.config.DATABASE_FILE_NAME}.yml")
 
             val fileSize = Files.size(file.toPath())
-            invocation.invocationSender.sendMessage(" §a▪ §7File size: §f${Formatting.formatMemory(fileSize)}")
+            invocation.invocationSender.sendMessage(" §a▪ §7File size: §f${MemoryFormatter.formatMemory(fileSize)}")
           }
 
           else -> throw IllegalStateException("Invalid argument")

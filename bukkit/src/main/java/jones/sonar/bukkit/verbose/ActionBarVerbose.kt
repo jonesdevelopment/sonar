@@ -18,7 +18,7 @@
 package jones.sonar.bukkit.verbose
 
 import jones.sonar.api.Sonar
-import jones.sonar.api.format.Formatting.Companion.formatMemory
+import jones.sonar.api.format.MemoryFormatter.Companion.formatMemory
 import jones.sonar.api.verbose.Verbose
 import jones.sonar.common.verbose.VerboseAnimation
 import net.md_5.bungee.api.chat.TextComponent
