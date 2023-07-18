@@ -26,7 +26,7 @@ allprojects {
   repositories {
     mavenCentral() // Lombok
     maven(url = "https://repo.papermc.io/repository/maven-public") // Velocity natives
-    maven(url = "https://jonesdev.xyz/releases/") // Bungee & Velocity proxy module
+    maven(url = "https://repo.jonesdev.xyz/releases/") // Bungee & Velocity proxy module
   }
 }
 
