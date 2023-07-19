@@ -44,6 +44,13 @@ final class MySQLDatabase implements Database {
       // Register MySQL driver
       Class.forName("com.mysql.cj.jdbc.Driver");
 
+      /*
+       * TODO: Load classes dynamically using a classloader:
+       *  * JDBC
+       *  * hikari
+       *  * snakeyaml (?)
+       */
+
       // Set up hikari
       final HikariConfig hikariConfig = new HikariConfig();
 
