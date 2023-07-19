@@ -27,6 +27,7 @@ import jones.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
 import jones.sonar.bungee.fallback.session.dummy.DummyPacketHandler;
 import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.common.fallback.FallbackTimeoutHandler;
+import jones.sonar.common.geyser.GeyserValidator;
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ProxyServer;
@@ -214,6 +215,14 @@ public final class FallbackListener implements Listener {
       .anyMatch(pair -> Objects.equals(pair.getFirst(), inetAddress))) {
       event.setCancelled(true);
       event.setCancelReason(ALREADY_QUEUED);
+      return;
+    }
+
+    // Completely skip Geyser connections
+    // TODO: different handling?
+    if (GeyserValidator.isGeyser(channelWrapper.getHandle())) {
+      // TODO: Do we need to log this?
+      fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
       return;
     }
 
