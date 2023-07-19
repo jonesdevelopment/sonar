@@ -42,6 +42,7 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.Fallback;
 import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.common.fallback.FallbackTimeoutHandler;
+import jones.sonar.common.geyser.GeyserValidator;
 import jones.sonar.velocity.SonarVelocity;
 import jones.sonar.velocity.fallback.session.FallbackPlayer;
 import jones.sonar.velocity.fallback.session.FallbackSessionHandler;
@@ -284,6 +285,14 @@ public final class FallbackListener {
 
     final MinecraftConnection mcConnection = initialConnection.getConnection();
     final Channel channel = mcConnection.getChannel();
+
+    // Completely skip Geyser connections
+    // TODO: different handling?
+    if (GeyserValidator.isGeyser(channel)) {
+      // TODO: Do we need to log this?
+      fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
+      return;
+    }
 
     // The AuthSessionHandler isn't supposed to continue the connection process,
     // which is why we override the field value for the MinecraftConnection with
