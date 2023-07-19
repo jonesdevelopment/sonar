@@ -23,7 +23,10 @@ import io.netty.handler.timeout.IdleStateEvent
 import io.netty.handler.timeout.IdleStateHandler
 import java.util.concurrent.TimeUnit
 
-class FallbackTimeoutHandler(timeout: Long, timeUnit: TimeUnit?) : IdleStateHandler(timeout, 0L, 0L, timeUnit) {
+class FallbackTimeoutHandler(
+  timeout: Long,
+  timeUnit: TimeUnit
+) : IdleStateHandler(timeout, 0L, 0L, timeUnit) {
   private var closed = false
 
   @Throws(Exception::class)
