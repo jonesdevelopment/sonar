@@ -360,8 +360,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                             new FallbackRespawnHandler(player)
                           );
 
-                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler,
-                            player.getPlayer());
+                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
                         } catch (Throwable throwable) {
                           throw new RuntimeException(throwable);
                         }
