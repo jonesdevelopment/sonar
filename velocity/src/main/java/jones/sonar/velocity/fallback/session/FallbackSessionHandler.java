@@ -135,7 +135,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // This can actually be false (for some odd reason) when the client reconnects
     // too fast, so we just kick the player for safety and not actually punish them.
     if (hasSentClientBrand || hasSentClientSettings) {
-      player.getPlayer().disconnect0(FallbackListener.CachedMessages.UNEXPECTED_ERROR, true);
+      player.getConnection().closeWith(
+        Disconnect.create(FallbackListener.CachedMessages.UNEXPECTED_ERROR, player.getPlayer().getProtocolVersion()
+      ));
 
       // Log this incident to make sure an administrator knows what happened
       player.getFallback().getLogger().warn(
@@ -358,8 +360,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                             new FallbackRespawnHandler(player)
                           );
 
-                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler,
-                            player.getPlayer());
+                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
                         } catch (Throwable throwable) {
                           throw new RuntimeException(throwable);
                         }

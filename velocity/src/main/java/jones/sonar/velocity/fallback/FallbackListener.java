@@ -82,38 +82,26 @@ public final class FallbackListener {
   private final Collection<String> premium = new Vector<>(1);
 
   public static class CachedMessages {
-    static PreLoginEvent.PreLoginComponentResult TOO_MANY_PLAYERS;
-    static PreLoginEvent.PreLoginComponentResult BLACKLISTED;
-    static PreLoginEvent.PreLoginComponentResult ALREADY_VERIFYING;
-    static PreLoginEvent.PreLoginComponentResult ALREADY_QUEUED;
-    static PreLoginEvent.PreLoginComponentResult TOO_MANY_ONLINE_PER_IP;
-    static PreLoginEvent.PreLoginComponentResult TOO_FAST_RECONNECT;
     static LoginEvent.ComponentResult LOCKDOWN_DISCONNECT;
+    static Component TOO_MANY_PLAYERS;
+    static Component BLACKLISTED;
+    static Component ALREADY_VERIFYING;
+    static Component ALREADY_QUEUED;
+    static Component TOO_MANY_ONLINE_PER_IP;
+    static Component TOO_FAST_RECONNECT;
     public static Component UNEXPECTED_ERROR;
     public static Component INVALID_USERNAME;
 
     public static void update() {
-      ALREADY_VERIFYING = PreLoginEvent.PreLoginComponentResult.denied(
-        Component.text(Sonar.get().getConfig().ALREADY_VERIFYING)
-      );
-      ALREADY_QUEUED = PreLoginEvent.PreLoginComponentResult.denied(
-        Component.text(Sonar.get().getConfig().ALREADY_QUEUED)
-      );
-      TOO_MANY_PLAYERS = PreLoginEvent.PreLoginComponentResult.denied(
-        Component.text(Sonar.get().getConfig().TOO_MANY_PLAYERS)
-      );
-      BLACKLISTED = PreLoginEvent.PreLoginComponentResult.denied(
-        Component.text(Sonar.get().getConfig().BLACKLISTED)
-      );
-      TOO_MANY_ONLINE_PER_IP = PreLoginEvent.PreLoginComponentResult.denied(
-        Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP)
-      );
-      TOO_FAST_RECONNECT = PreLoginEvent.PreLoginComponentResult.denied(
-        Component.text(Sonar.get().getConfig().TOO_FAST_RECONNECT)
-      );
+      ALREADY_VERIFYING = Component.text(Sonar.get().getConfig().ALREADY_VERIFYING);
+      ALREADY_QUEUED = Component.text(Sonar.get().getConfig().ALREADY_QUEUED);
+      TOO_MANY_PLAYERS = Component.text(Sonar.get().getConfig().TOO_MANY_PLAYERS);
+      BLACKLISTED = Component.text(Sonar.get().getConfig().BLACKLISTED);
+      TOO_MANY_ONLINE_PER_IP = Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP);
+      TOO_FAST_RECONNECT = Component.text(Sonar.get().getConfig().TOO_FAST_RECONNECT);
       LOCKDOWN_DISCONNECT = LoginEvent.ComponentResult.denied(
-        Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT)
-      );
+        Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT
+      ));
       UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
       INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
     }
@@ -163,13 +151,19 @@ public final class FallbackListener {
    * @param event PreLoginEvent
    */
   @Subscribe(order = PostOrder.LAST)
-  public void handle(final PreLoginEvent event) {
+  public void handle(final PreLoginEvent event) throws Throwable {
     fallback.getSonar().getStatistics().increment("total");
 
     final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
+    val inboundConnection = (LoginInboundConnection) event.getConnection();
+    val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
+
     if (fallback.getBlacklisted().contains(inetAddress.toString())) {
-      event.setResult(BLACKLISTED);
+      initialConnection.getConnection().closeWith(Disconnect.create(
+        BLACKLISTED,
+        inboundConnection.getProtocolVersion()
+      ));
       return;
     }
 
@@ -184,7 +178,10 @@ public final class FallbackListener {
 
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
-        event.setResult(TOO_MANY_ONLINE_PER_IP);
+        initialConnection.getConnection().closeWith(Disconnect.create(
+          TOO_MANY_ONLINE_PER_IP,
+          inboundConnection.getProtocolVersion()
+        ));
         return;
       }
     }
@@ -195,20 +192,29 @@ public final class FallbackListener {
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
     if (fallback.getConnected().contains(inetAddress.toString())) {
-      event.setResult(ALREADY_VERIFYING);
+      initialConnection.getConnection().closeWith(Disconnect.create(
+        ALREADY_VERIFYING,
+        inboundConnection.getProtocolVersion()
+      ));
       return;
     }
 
     // We cannot allow too many players on our Fallback server
     if (fallback.getQueue().getQueuedPlayers().size() > fallback.getSonar().getConfig().MAXIMUM_QUEUED_PLAYERS
       || fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
-      event.setResult(TOO_MANY_PLAYERS);
+      initialConnection.getConnection().closeWith(Disconnect.create(
+        TOO_MANY_PLAYERS,
+        inboundConnection.getProtocolVersion()
+      ));
       return;
     }
 
     // Check if the IP address is reconnecting too quickly while being unverified
     if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
-      event.setResult(TOO_FAST_RECONNECT);
+      initialConnection.getConnection().closeWith(Disconnect.create(
+        TOO_FAST_RECONNECT,
+        inboundConnection.getProtocolVersion()
+      ));
       return;
     }
 
@@ -216,7 +222,10 @@ public final class FallbackListener {
     // TODO: do some performance testing
     if (fallback.getQueue().getQueuedPlayers().stream()
       .anyMatch(pair -> Objects.equals(pair.getFirst(), inetAddress))) {
-      event.setResult(ALREADY_QUEUED);
+      initialConnection.getConnection().closeWith(Disconnect.create(
+        ALREADY_QUEUED,
+        inboundConnection.getProtocolVersion()
+      ));
       return;
     }
 
@@ -366,9 +375,10 @@ public final class FallbackListener {
         // Check if the player is already connected to the proxy
         // We use the default Velocity method for this to avoid incompatibilities
         if (!mcConnection.server.canRegisterConnection(player)) {
-          player.disconnect0( // TODO: Cache translations?
-            Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED), true
-          );
+          mcConnection.closeWith(Disconnect.create(
+            Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
+            mcConnection.getProtocolVersion()
+          ));
           return;
         }
 

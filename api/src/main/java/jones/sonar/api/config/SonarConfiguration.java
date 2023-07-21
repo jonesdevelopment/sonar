@@ -43,7 +43,6 @@ public final class SonarConfiguration {
   public Collection<String> ANIMATION;
 
   public boolean LOG_CONNECTIONS;
-  public boolean LOG_DISCONNECTS;
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
   public int MINIMUM_PLAYERS_FOR_ATTACK;
@@ -162,7 +161,6 @@ public final class SonarConfiguration {
 
     ENABLE_VERIFICATION = yamlConfig.getBoolean("general.verification.enabled", true);
     LOG_CONNECTIONS = yamlConfig.getBoolean("general.verification.log-connections", true);
-    LOG_DISCONNECTS = yamlConfig.getBoolean("general.verification.log-disconnects", true);
     LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
     VALID_NAME_REGEX = Pattern.compile(yamlConfig.getString(
       "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"
