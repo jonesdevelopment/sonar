@@ -366,9 +366,10 @@ public final class FallbackListener {
         // Check if the player is already connected to the proxy
         // We use the default Velocity method for this to avoid incompatibilities
         if (!mcConnection.server.canRegisterConnection(player)) {
-          player.disconnect0( // TODO: Cache translations?
-            Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED), true
-          );
+          mcConnection.closeWith(Disconnect.create(
+            Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
+            mcConnection.getProtocolVersion()
+          ));
           return;
         }
 
