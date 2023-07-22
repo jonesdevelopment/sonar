@@ -325,17 +325,6 @@ public final class FallbackListener {
 
       final ChannelPipeline pipeline = channel.pipeline();
 
-      // Replace timeout handler to avoid known exploits or issues
-      // We also want to timeout bots quickly to avoid flooding
-      pipeline.replace(
-        READ_TIMEOUT,
-        READ_TIMEOUT,
-        new FallbackTimeoutHandler(
-          fallback.getSonar().getConfig().VERIFICATION_READ_TIMEOUT,
-          TimeUnit.MILLISECONDS
-        )
-      );
-
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
       pipeline.addFirst(HANDLER, FallbackChannelHandler.INSTANCE);
@@ -353,6 +342,17 @@ public final class FallbackListener {
           mcConnection.closeWith(Disconnect.create(INVALID_USERNAME, mcConnection.getProtocolVersion()));
           return;
         }
+
+        // Replace timeout handler to avoid known exploits or issues
+        // We also want to timeout bots quickly to avoid flooding
+        pipeline.replace(
+          READ_TIMEOUT,
+          READ_TIMEOUT,
+          new FallbackTimeoutHandler(
+            fallback.getSonar().getConfig().VERIFICATION_READ_TIMEOUT,
+            TimeUnit.MILLISECONDS
+          )
+        );
 
         // Create an instance for the connected player
         final ConnectedPlayer player;
