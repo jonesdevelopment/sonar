@@ -125,6 +125,8 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
   @Override
   public void disable() {
+    getLogger().info("Shutting down...");
+
     if (getConfig().DATABASE != DatabaseType.NONE) {
       getLogger().info("[database] Saving entries to database...");
 
@@ -138,6 +140,8 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
       // Dispose the database instance
       getDatabase().dispose();
     }
+
+    getLogger().info("Successfully shut down.");
   }
 
   @Override
