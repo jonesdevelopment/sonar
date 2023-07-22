@@ -320,8 +320,8 @@ public final class FallbackListener {
     // Run in the channel's event loop
     channel.eventLoop().execute(() -> {
 
-      // Do not continue if the connection is closed
-      if (mcConnection.isClosed()) return;
+      // Do not continue if the connection is closed or marked as disconnected
+      if (mcConnection.isClosed() || mcConnection.isKnownDisconnect()) return;
 
       final ChannelPipeline pipeline = channel.pipeline();
 
@@ -343,8 +343,8 @@ public final class FallbackListener {
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
 
-        // Do not continue if the connection is closed
-        if (mcConnection.isClosed()) return;
+        // Do not continue if the connection is closed or marked as disconnected
+        if (mcConnection.isClosed() || mcConnection.isKnownDisconnect()) return;
 
         // Check if the username matches the valid name regex in order to prevent
         // UTF-16 names or other types of flood attacks
