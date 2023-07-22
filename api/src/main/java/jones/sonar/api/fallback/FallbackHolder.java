@@ -32,7 +32,7 @@ public final class FallbackHolder implements Fallback {
 
   @Getter
   @NotNull
-  private final Collection<String> connected = new Vector<>();
+  private final Collection<String> connected = new Vector<>(5);
   @Getter
   @NotNull
   private final Collection<String> verified = Collections.synchronizedCollection(new Vector<>());
