@@ -251,7 +251,7 @@ public final class FallbackListener implements Listener {
         TIMEOUT_HANDLER,
         TIMEOUT_HANDLER,
         new FallbackTimeoutHandler(
-          fallback.getSonar().getConfig().VERIFICATION_TIMEOUT,
+          fallback.getSonar().getConfig().VERIFICATION_READ_TIMEOUT,
           TimeUnit.MILLISECONDS
         )
       );

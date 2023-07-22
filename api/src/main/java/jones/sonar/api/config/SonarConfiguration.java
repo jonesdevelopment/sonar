@@ -52,6 +52,7 @@ public final class SonarConfiguration {
   public int MAXIMUM_QUEUE_POLLS;
   public int MAXIMUM_LOGIN_PACKETS;
   public int VERIFICATION_TIMEOUT;
+  public int VERIFICATION_READ_TIMEOUT;
   public int VERIFICATION_DELAY;
 
   public boolean ENABLE_COMPRESSION;
@@ -168,7 +169,8 @@ public final class SonarConfiguration {
     VALID_BRAND_REGEX = Pattern.compile(yamlConfig.getString(
       "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:;_()\\[\\]{}!?' *]+$"
     ));
-    VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 4000), 500, 30000);
+    VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 10000), 1500, 30000);
+    VERIFICATION_READ_TIMEOUT = clamp(yamlConfig.getInt("general.verification.read-timeout", 4000), 500, 30000);
     MAXIMUM_LOGIN_PACKETS = clamp(yamlConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
     MAXIMUM_VERIFYING_PLAYERS = clamp(yamlConfig.getInt("general.verification.max-players", 1024), 1,
       Short.MAX_VALUE);

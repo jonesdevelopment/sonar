@@ -331,7 +331,7 @@ public final class FallbackListener {
         READ_TIMEOUT,
         READ_TIMEOUT,
         new FallbackTimeoutHandler(
-          fallback.getSonar().getConfig().VERIFICATION_TIMEOUT,
+          fallback.getSonar().getConfig().VERIFICATION_READ_TIMEOUT,
           TimeUnit.MILLISECONDS
         )
       );
