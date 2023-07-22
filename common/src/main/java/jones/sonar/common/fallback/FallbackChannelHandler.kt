@@ -30,8 +30,8 @@ class FallbackChannelHandler(
 ) : ChannelInboundHandlerAdapter() {
 
   @Throws(Exception::class)
-  override fun channelInactive(ctx: ChannelHandlerContext) {
-    ctx.fireChannelInactive()
+  override fun channelUnregistered(ctx: ChannelHandlerContext) {
+    ctx.fireChannelUnregistered()
 
     val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
