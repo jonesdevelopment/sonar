@@ -36,13 +36,6 @@ class FallbackPacketDecoder(
   private val loginTimestamp = System.currentTimeMillis()
 
   @Throws(Exception::class)
-  override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-    if (ctx.channel().isActive) {
-      ctx.close()
-    }
-  }
-
-  @Throws(Exception::class)
   override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
 
     // Check if the client is not sending a ton of packets to the server
