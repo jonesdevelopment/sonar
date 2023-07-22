@@ -88,7 +88,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     this.v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
   }
 
-  private boolean hasSentClientBrand, hasSentClientSettings;
+  private boolean hasSentClientBrand, hasSentClientSettings, verified;
 
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private static final MethodHandle CONNECT_TO_INITIAL_SERVER;
@@ -128,6 +128,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final ClientSettings clientSettings) {
+    if (verified) return false; // Skip verified players so we don't run into issues
 
     // The client sends the PluginMessage packet and then the ClientSettings packet.
     // The player cannot send the ClientSettings packet twice since the world hasn't
@@ -169,6 +170,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       return false; // Ignore all other channels
     }
 
+    if (verified) return false; // Skip verified players so we don't run into issues
+
     // Check if the channel is correct - 1.13 uses the new namespace
     // system ('minecraft:' + channel) and anything below 1.13 uses
     // the legacy namespace system ('MC|' + channel).
@@ -194,6 +197,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final @NotNull KeepAlive keepAlive) {
+    if (verified) return false; // Skip verified players so we don't run into issues
+
     if (keepAlive.getRandomId() == 0 && v1_8or1_7) {
 
       // First, let's validate if the packet could actually be sent at this point.
@@ -229,6 +234,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final ResourcePackResponse resourcePackResponse) {
+    if (verified) return false; // Skip verified players so we don't run into issues
+
     checkFrame(resourcePackHash != null, "hash has not been set");
 
     // 1.10+ clients do not send the hash back to the server if the download fails.
@@ -272,6 +279,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private synchronized void finish() {
     player.getFallback().getVerified().add(player.getInetAddress().toString());
     player.getFallback().getConnected().remove(player.getPlayer().getUsername());
+
+    // We need this to prevent some packets from flagging bad packet checks
+    verified = true;
 
     // Remove the Sonar decoder - we don't care about the player anymore
     // Leave the `sonar-handler` pipeline, so we don't run into any issues
