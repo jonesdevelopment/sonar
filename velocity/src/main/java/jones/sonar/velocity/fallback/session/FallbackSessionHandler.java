@@ -243,8 +243,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     }
 
     checkFrame( // The download will always fail because we never provided a real URL
-      resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD
-      || resourcePackResponse.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED, // ???
+      resourcePackResponse.getStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFUL,
       "invalid status: " + resourcePackResponse.getStatus()
     );
 
