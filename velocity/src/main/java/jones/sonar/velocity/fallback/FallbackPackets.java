@@ -95,6 +95,7 @@ public class FallbackPackets {
   }
 
   public static final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
+  public final JoinGame JOIN_GAME_1_16 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16);
   public final JoinGame JOIN_GAME_1_16_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16_2);
   public final JoinGame JOIN_GAME_1_18_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_18_2);
   public final JoinGame JOIN_GAME_1_19_1 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_1);
@@ -102,18 +103,28 @@ public class FallbackPackets {
   public final JoinGame JOIN_GAME_1_20 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_20);
 
   static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_20) >= 0) {
-      return JOIN_GAME_1_20;
-    } else if (protocolVersion.compareTo(MINECRAFT_1_19_4) == 0) {
-      return JOIN_GAME_1_19_4;
-    } else if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-      return JOIN_GAME_1_19_1;
-    } else if (protocolVersion.compareTo(MINECRAFT_1_18_2) >= 0) {
-      return JOIN_GAME_1_18_2;
-    } else if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
-      return JOIN_GAME_1_16_2;
+    if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
+      return LEGACY_JOIN_GAME; // 1.7-1.15.2
     }
-    return LEGACY_JOIN_GAME;
+    if (protocolVersion.compareTo(MINECRAFT_1_16_1) <= 0) {
+      return JOIN_GAME_1_16; // 1.16-1.16.1
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_18) <= 0) {
+      return JOIN_GAME_1_16_2; // 1.16.2-1.18
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19) <= 0) {
+      return JOIN_GAME_1_18_2; // 1.18.1-1.19
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+      return JOIN_GAME_1_19_1; // 1.19.1-1.19.3
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_4) <= 0) {
+      return JOIN_GAME_1_19_4; // 1.19.4
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_20) <= 0) {
+      return JOIN_GAME_1_20; // 1.20-1.20.1
+    }
+    throw new IllegalStateException("Unsupported protocol version");
   }
 
   private @NotNull JoinGame createLegacyJoinGamePacket() {
