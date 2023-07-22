@@ -50,7 +50,7 @@ subprojects {
 
   kotlin {
     // We use 8 for every project for backwards compatibility.
-    // This is replaced in the velocity module as Velocity supports Java 17+
+    // This is replaced in the velocity module as Velocity supports Java 16+
     jvmToolchain(8)
   }
 }
