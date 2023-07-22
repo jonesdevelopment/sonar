@@ -67,9 +67,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
-import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
-import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
-import static jones.sonar.api.fallback.FallbackPipelines.HANDLER;
+import static jones.sonar.api.fallback.FallbackPipelines.*;
 import static jones.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 import static jones.sonar.velocity.fallback.FallbackPackets.LEGACY_JOIN_GAME;
 
@@ -344,11 +342,10 @@ public final class FallbackListener {
           return;
         }
 
-        // Replace timeout handler to avoid known exploits or issues
+        // Add better timeout handler to avoid known exploits or issues
         // We also want to timeout bots quickly to avoid flooding
-        pipeline.replace(
-          READ_TIMEOUT,
-          READ_TIMEOUT,
+        pipeline.addFirst(
+          TIMEOUT,
           new FallbackTimeoutHandler(
             fallback.getSonar().getConfig().VERIFICATION_READ_TIMEOUT,
             TimeUnit.MILLISECONDS

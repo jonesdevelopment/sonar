@@ -21,4 +21,5 @@ public interface FallbackPipelines {
   String HANDLER = "sonar-handler";
   String RESPAWN = "sonar-respawn";
   String DECODER = "sonar-decoder";
+  String TIMEOUT = "sonar-timeout";
 }

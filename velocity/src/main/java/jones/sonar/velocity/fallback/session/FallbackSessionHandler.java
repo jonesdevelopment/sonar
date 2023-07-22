@@ -33,7 +33,6 @@ import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.FallbackConnection;
 import jones.sonar.velocity.fallback.FallbackListener;
@@ -49,11 +48,9 @@ import java.security.SecureRandom;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
-import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
 import static jones.sonar.api.fallback.FallbackPipelines.*;
 import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
@@ -283,6 +280,11 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // We need this to prevent some packets from flagging bad packet checks
     verified = true;
 
+    // Remove the Sonar timeout handler - all checks have been passed
+    if (player.getPipeline().get(TIMEOUT) != null) {
+      player.getPipeline().remove(TIMEOUT);
+    }
+
     // Remove the Sonar decoder - we don't care about the player anymore
     // Leave the `sonar-handler` pipeline, so we don't run into any issues
     if (player.getPipeline().get(DECODER) != null) {
@@ -364,16 +366,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                             MINECRAFT_ENCODER,
                             RESPAWN,
                             new FallbackRespawnHandler(player)
-                          );
-
-                          // Replace timeout handler with the old one to let Velocity handle timeouts again
-                          player.getPipeline().replace(
-                            READ_TIMEOUT,
-                            READ_TIMEOUT,
-                            new ReadTimeoutHandler(
-                              player.getConnection().server.getConfiguration().getConnectTimeout(),
-                              TimeUnit.MILLISECONDS
-                            )
                           );
 
                           CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
