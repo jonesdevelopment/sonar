@@ -371,7 +371,7 @@ public final class SonarConfiguration {
       "%prefix%&fQueued &7%queued%" +
         "  &fVerifying &7%verifying%" +
         "  &fBlacklisted &7%blacklisted%" +
-        "  &fTotal &7%total%" +
+        "  &fTraffic &7%total%" +
         "  &fMemory &7≅ %used-memory%" +
         "  &a&l%animation%"
     ));
