@@ -24,6 +24,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Vector;
 
 public final class FallbackHolder implements Fallback {
@@ -34,10 +35,10 @@ public final class FallbackHolder implements Fallback {
   private final Collection<String> connected = new Vector<>();
   @Getter
   @NotNull
-  private final Collection<String> verified = new Vector<>();
+  private final Collection<String> verified = Collections.synchronizedCollection(new Vector<>());
   @Getter
   @NotNull
-  private final Collection<String> blacklisted = new Vector<>();
+  private final Collection<String> blacklisted = Collections.synchronizedCollection(new Vector<>());
   @Getter
   @NotNull
   private final FallbackQueue queue = new FallbackQueue();
