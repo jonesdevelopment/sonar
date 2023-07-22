@@ -166,7 +166,7 @@ public final class SonarConfiguration {
       "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"
     ));
     VALID_BRAND_REGEX = Pattern.compile(yamlConfig.getString(
-      "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:_()\\[\\]{}!?' *]+$"
+      "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:;_()\\[\\]{}!?' *]+$"
     ));
     VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 4000), 500, 30000);
     MAXIMUM_LOGIN_PACKETS = clamp(yamlConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
