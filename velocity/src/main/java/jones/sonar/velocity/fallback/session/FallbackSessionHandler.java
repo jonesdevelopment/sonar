@@ -54,7 +54,8 @@ import java.util.concurrent.TimeUnit;
 import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
-import static jones.sonar.api.fallback.FallbackPipelines.*;
+import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
+import static jones.sonar.api.fallback.FallbackPipelines.RESPAWN;
 import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 /**
@@ -271,9 +272,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
    */
   private synchronized void finish() {
 
-    // Sonar doesn't care about the player anymore
+    // Dispose the Sonar decoder - we don't care about the player anymore
+    // Leave the `sonar-handler` pipeline, so we don't run into any issues
     player.getPipeline().remove(DECODER);
-    player.getPipeline().remove(HANDLER);
 
     player.getFallback().getVerified().add(player.getInetAddress().toString());
     player.getFallback().getConnected().remove(player.getInetAddress().toString());
@@ -352,6 +353,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                         try {
                           CONNECTION_FIELD.set(sessionHandler,
                             player.getConnection());
+
+                          // Now we can safely dispose the `sonar-handler` pipeline
+                          player.getPipeline().remove(DECODER);
 
                           // It works. We'll leave it at that
                           player.getPipeline().addAfter(
