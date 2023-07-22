@@ -23,16 +23,19 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class FallbackHolder implements Fallback {
   public static final @NotNull FallbackHolder INSTANCE = new FallbackHolder();
 
   @Getter
   @NotNull
-  private final Collection<String> connected = new Vector<>(5);
+  private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
   @Getter
   @NotNull
   private final Collection<String> verified = Collections.synchronizedCollection(new Vector<>());

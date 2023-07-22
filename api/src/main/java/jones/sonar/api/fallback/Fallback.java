@@ -21,10 +21,12 @@ import jones.sonar.api.Sonar;
 import jones.sonar.api.logger.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.InetAddress;
 import java.util.Collection;
+import java.util.Map;
 
 public interface Fallback {
-  @NotNull Collection<String> getConnected();
+  @NotNull Map<String, InetAddress> getConnected();
 
   @NotNull Collection<String> getVerified();
 

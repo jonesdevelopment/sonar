@@ -25,7 +25,6 @@ import jones.sonar.api.fallback.Fallback;
 import jones.sonar.bungee.fallback.compress.FallbackPacketCompressor;
 import jones.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
 import jones.sonar.bungee.fallback.session.dummy.DummyPacketHandler;
-import jones.sonar.common.fallback.FallbackChannelHandler;
 import jones.sonar.common.fallback.FallbackTimeoutHandler;
 import jones.sonar.common.geyser.GeyserValidator;
 import lombok.RequiredArgsConstructor;
@@ -188,7 +187,8 @@ public final class FallbackListener implements Listener {
 
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
-    if (fallback.getConnected().contains(inetAddress.toString())) {
+    if (fallback.getConnected().containsKey(event.getConnection().getName())
+      || fallback.getConnected().containsValue(inetAddress)) {
       event.setCancelled(true);
       event.setCancelReason(ALREADY_VERIFYING);
       return;
@@ -263,7 +263,7 @@ public final class FallbackListener implements Listener {
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
-      pipeline.addFirst(HANDLER, FallbackChannelHandler.INSTANCE);
+      pipeline.addFirst(HANDLER, null);
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channelWrapper.getHandle().eventLoop().execute(() -> {

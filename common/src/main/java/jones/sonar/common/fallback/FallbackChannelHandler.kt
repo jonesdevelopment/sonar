@@ -17,16 +17,13 @@
 
 package jones.sonar.common.fallback
 
-import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import jones.sonar.api.Sonar
-import jones.sonar.api.fallback.Fallback
 import java.net.InetSocketAddress
 
-@Sharable
 class FallbackChannelHandler(
-  private val fallback: Fallback
+  private val username: String
 ) : ChannelInboundHandlerAdapter() {
 
   @Throws(Exception::class)
@@ -36,13 +33,7 @@ class FallbackChannelHandler(
     val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
 
     // Remove the IP address from the queue
-    fallback.connected.remove(inetAddress.toString())
-    fallback.queue.remove(inetAddress)
-  }
-
-  companion object {
-
-    @JvmField
-    val INSTANCE = FallbackChannelHandler(Sonar.get().fallback)
+    Sonar.get().fallback.connected.remove(username)
+    Sonar.get().fallback.queue.remove(inetAddress)
   }
 }

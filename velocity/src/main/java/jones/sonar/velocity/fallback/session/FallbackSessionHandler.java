@@ -270,16 +270,22 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
    * Restore old pipelines and send the player to the actual server
    */
   private synchronized void finish() {
+    player.getFallback().getVerified().add(player.getInetAddress().toString());
+    player.getFallback().getConnected().remove(player.getPlayer().getUsername());
 
     // Remove the Sonar decoder - we don't care about the player anymore
     // Leave the `sonar-handler` pipeline, so we don't run into any issues
-    player.getPipeline().remove(DECODER);
-
-    player.getFallback().getVerified().add(player.getInetAddress().toString());
-    player.getFallback().getConnected().remove(player.getInetAddress().toString());
+    if (player.getPipeline().get(DECODER) != null) {
+      player.getPipeline().remove(DECODER);
+    }
 
     // Continue the initial connection to the backend server
     initialConnection(previousHandler);
+
+    // Now we can safely remove the `sonar-handler` pipeline
+    if (player.getPipeline().get(HANDLER) != null) {
+      player.getPipeline().remove(HANDLER);
+    }
 
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
   }
@@ -341,9 +347,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                       .thenAcceptAsync(ignored -> {
                         try {
                           CONNECTION_FIELD.set(sessionHandler, player.getConnection());
-
-                          // Now we can safely remove the `sonar-handler` pipeline
-                          player.getPipeline().remove(HANDLER);
 
                           // It works. We'll leave it at that
                           // We have to add our own Respawn packet by scanning for the JoinGame packet

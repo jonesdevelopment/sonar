@@ -191,7 +191,8 @@ public final class FallbackListener {
 
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
-    if (fallback.getConnected().contains(inetAddress.toString())) {
+    if (fallback.getConnected().containsKey(event.getUsername())
+      || fallback.getConnected().containsValue(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         ALREADY_VERIFYING,
         inboundConnection.getProtocolVersion()
@@ -327,7 +328,7 @@ public final class FallbackListener {
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
-      pipeline.addFirst(HANDLER, FallbackChannelHandler.INSTANCE);
+      pipeline.addFirst(HANDLER, new FallbackChannelHandler(event.getUsername()));
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
@@ -399,7 +400,7 @@ public final class FallbackListener {
         }
 
         // Mark the player as connected → verifying players
-        fallback.getConnected().add(inetAddress.toString());
+        fallback.getConnected().put(event.getUsername(), inetAddress);
 
         // Check if compression is enabled in the Sonar configuration
         if (fallback.getSonar().getConfig().ENABLE_COMPRESSION) {
