@@ -54,8 +54,7 @@ import java.util.concurrent.TimeUnit;
 import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
-import static jones.sonar.api.fallback.FallbackPipelines.DECODER;
-import static jones.sonar.api.fallback.FallbackPipelines.RESPAWN;
+import static jones.sonar.api.fallback.FallbackPipelines.*;
 import static jones.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 /**
@@ -272,22 +271,12 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
    */
   private synchronized void finish() {
 
-    // Dispose the Sonar decoder - we don't care about the player anymore
+    // Remove the Sonar decoder - we don't care about the player anymore
     // Leave the `sonar-handler` pipeline, so we don't run into any issues
     player.getPipeline().remove(DECODER);
 
     player.getFallback().getVerified().add(player.getInetAddress().toString());
     player.getFallback().getConnected().remove(player.getInetAddress().toString());
-
-    // Replace timeout handler with the old one to let Velocity handle timeouts again
-    player.getPipeline().replace(
-      READ_TIMEOUT,
-      READ_TIMEOUT,
-      new ReadTimeoutHandler(
-        player.getConnection().server.getConfiguration().getConnectTimeout(),
-        TimeUnit.MILLISECONDS
-      )
-    );
 
     // Continue the initial connection to the backend server
     initialConnection(previousHandler);
@@ -351,17 +340,27 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                       .fire(new PostLoginEvent(player.getPlayer()))
                       .thenAcceptAsync(ignored -> {
                         try {
-                          CONNECTION_FIELD.set(sessionHandler,
-                            player.getConnection());
+                          CONNECTION_FIELD.set(sessionHandler, player.getConnection());
 
-                          // Now we can safely dispose the `sonar-handler` pipeline
-                          player.getPipeline().remove(DECODER);
+                          // Now we can safely remove the `sonar-handler` pipeline
+                          player.getPipeline().remove(HANDLER);
 
                           // It works. We'll leave it at that
+                          // We have to add our own Respawn packet by scanning for the JoinGame packet
                           player.getPipeline().addAfter(
                             MINECRAFT_ENCODER,
                             RESPAWN,
                             new FallbackRespawnHandler(player)
+                          );
+
+                          // Replace timeout handler with the old one to let Velocity handle timeouts again
+                          player.getPipeline().replace(
+                            READ_TIMEOUT,
+                            READ_TIMEOUT,
+                            new ReadTimeoutHandler(
+                              player.getConnection().server.getConfiguration().getConnectTimeout(),
+                              TimeUnit.MILLISECONDS
+                            )
                           );
 
                           CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
