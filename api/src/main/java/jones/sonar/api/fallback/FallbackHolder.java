@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,10 +37,10 @@ public final class FallbackHolder implements Fallback {
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
   @Getter
   @NotNull
-  private final Collection<String> verified = Collections.synchronizedCollection(new Vector<>());
+  private final Collection<String> verified = new Vector<>();
   @Getter
   @NotNull
-  private final Collection<String> blacklisted = Collections.synchronizedCollection(new Vector<>());
+  private final Collection<String> blacklisted = new Vector<>();
   @Getter
   @NotNull
   private final FallbackQueue queue = new FallbackQueue();
