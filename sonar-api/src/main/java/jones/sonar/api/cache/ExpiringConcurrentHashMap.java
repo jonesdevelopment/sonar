@@ -51,7 +51,6 @@ public final class ExpiringConcurrentHashMap<K> extends ConcurrentHashMap<K, Lon
 
   @Override
   public boolean has(final K key) {
-    cleanUp();
     return containsKey(key);
   }
 
