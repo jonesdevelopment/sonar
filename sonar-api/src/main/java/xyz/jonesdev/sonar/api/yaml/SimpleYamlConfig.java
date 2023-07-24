@@ -63,30 +63,22 @@ public final class SimpleYamlConfig {
   }
 
   public int getInt(final String path, final int def) {
-    if (!yaml.contains(path)) {
-      yaml.set(path, def);
-    }
+    yaml.addDefault(path, def);
     return yaml.getInt(path, def);
   }
 
   public boolean getBoolean(final String path, final boolean def) {
-    if (!yaml.contains(path)) {
-      yaml.set(path, def);
-    }
+    yaml.addDefault(path, def);
     return yaml.getBoolean(path, def);
   }
 
   public String getString(final String path, final String def) {
-    if (!yaml.contains(path)) {
-      yaml.set(path, def);
-    }
+    yaml.addDefault(path, def);
     return yaml.getString(path, def);
   }
 
   public List<String> getStringList(final String path, final List<String> def) {
-    if (!yaml.contains(path)) {
-      yaml.set(path, def);
-    }
+    yaml.addDefault(path, def);
     return yaml.getStringList(path);
   }
 }
