@@ -20,14 +20,24 @@ package xyz.jonesdev.sonar.api.yaml;
 import lombok.Getter;
 import org.simpleyaml.configuration.comments.format.YamlCommentFormat;
 import org.simpleyaml.configuration.file.YamlFile;
+import xyz.jonesdev.sonar.api.Sonar;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public final class SimpleYamlConfig {
   @Getter
   private final YamlFile yaml;
+
+  private static final List<String> HEADER = Arrays.asList(
+    "",
+    "Sonar anti-bot version " + Sonar.get().getVersion().getFormatted(),
+    " Currently running on: " + Sonar.get().getServer().getPlatform().getDisplayName(),
+    " Need help? https://jonesdev.xyz/discord",
+    ""
+  );
 
   public SimpleYamlConfig(final File dataFolder, final String fileName) {
     this(new File(dataFolder, fileName + ".yml"), dataFolder);
@@ -53,6 +63,9 @@ public final class SimpleYamlConfig {
     try {
       yaml.setCommentFormat(YamlCommentFormat.PRETTY);
       yaml.createOrLoadWithComments();
+
+      yaml.options().headerFormatter().commentPrefix("# ");
+      yaml.setHeader(String.join("\n", HEADER));
     } catch (IOException exception) {
       exception.printStackTrace();
     }
