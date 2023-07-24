@@ -155,27 +155,6 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   }
 
   @Override
-  public void disable() {
-    getLogger().info("Starting shutdown process...");
-
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      getLogger().info("[database] Saving entries to database...");
-
-      // We need to clear the table because we don't want any IPs that aren't present
-      // or have been manually removed to still be present in the database
-      getDatabase().clear(VERIFIED_TABLE);
-      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
-
-      // Dispose the database instance
-      getDatabase().dispose();
-
-      getLogger().info("[database] Done.");
-    }
-
-    getLogger().info("Successfully shut down. Goodbye!");
-  }
-
-  @Override
   public void reload() {
     getConfig().load();
     FallbackListener.CachedMessages.update();
