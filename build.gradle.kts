@@ -58,7 +58,7 @@ subprojects {
 dependencies {
   sequenceOf("api", "bukkit", "bungee", "common", "velocity").forEach {
     // We want the jar to actually contain our modules
-    implementation(project(":sonar-$it"))
+    implementation(project(":$it"))
   }
 }
 

@@ -28,8 +28,8 @@ repositories {
 }
 
 dependencies {
-  compileOnly(project(":sonar-api"))
-  compileOnly(project(":sonar-common"))
+  compileOnly(project(":api"))
+  compileOnly(project(":common"))
 
   // We have to use 1.8 for backwards compatibility
   compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")

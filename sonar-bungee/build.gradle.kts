@@ -1,6 +1,6 @@
 dependencies {
-  compileOnly(project(":sonar-api"))
-  compileOnly(project(":sonar-common"))
+  compileOnly(project(":api"))
+  compileOnly(project(":common"))
 
   implementation("com.velocitypowered:velocity-native:1.1.9") {
     exclude(group = "com.google.guava")

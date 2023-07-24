@@ -1,8 +1,8 @@
 val velocityVersion = "3.2.0-SNAPSHOT"
 
 dependencies {
-  compileOnly(project(":sonar-api"))
-  compileOnly(project(":sonar-common"))
+  compileOnly(project(":api"))
+  compileOnly(project(":common"))
 
   compileOnly("com.velocitypowered:velocity-proxy:$velocityVersion") // Proxy module
 
