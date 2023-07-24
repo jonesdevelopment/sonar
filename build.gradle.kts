@@ -74,6 +74,8 @@ tasks {
   shadowJar {
     // bStats has to be relocated to the Sonar package otherwise it throws an exception.
     relocate("org.bstats", "jones.sonar.bstats")
+    // Set the file name of the shadowed jar
+    archiveFileName.set("${rootProject.name}.jar")
   }
 
   compileJava {
