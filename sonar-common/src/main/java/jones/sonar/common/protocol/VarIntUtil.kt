@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jones.sonar.bungee.varint
+package jones.sonar.common.protocol
 
 import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.CorruptedFrameException
@@ -23,6 +23,7 @@ import kotlin.math.ceil
 
 class VarIntUtil {
   companion object {
+    @JvmStatic
     fun readVarInt(buf: ByteBuf): Int {
       return readVarInt0(buf, 5)
     }
@@ -57,16 +58,19 @@ class VarIntUtil {
       EXACT_BYTE_LENGTHS[32] = 1; // Special case for the number 0.
     }
 
+    @JvmStatic
     fun varIntBytes(value: Int): Int {
       return EXACT_BYTE_LENGTHS[Integer.numberOfLeadingZeros(value)]
     }
 
+    @JvmStatic
     fun write21BitVarInt(buf: ByteBuf, value: Int) {
       // See https://steinborn.me/posts/performance/how-fast-can-you-write-a-varint/
       val w = value and 0x7F or 0x80 shl 16 or (value ushr 7 and 0x7F or 0x80 shl 8) or (value ushr 14)
       buf.writeMedium(w)
     }
 
+    @JvmStatic
     fun writeVarInt(buf: ByteBuf, value: Int) {
       // Peel the one and two byte count cases explicitly as they are the most common VarInt sizes
       // that the proxy will write, to improve inlining.

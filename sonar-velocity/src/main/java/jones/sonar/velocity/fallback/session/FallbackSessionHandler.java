@@ -29,12 +29,13 @@ import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialConnectSessionHandler;
-import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.DecoderException;
 import jones.sonar.api.Sonar;
 import jones.sonar.api.fallback.FallbackConnection;
+import jones.sonar.common.protocol.ProtocolUtil;
 import jones.sonar.velocity.fallback.FallbackListener;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -139,7 +140,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
       // Log this incident to make sure an administrator knows what happened
       player.getFallback().getLogger().warn(
-        "Disconnecting {} for an unexpected error (lag?)", player.getPlayer().getUsername()
+        "Disconnecting {} due to an unexpected error (lag?)", player.getPlayer().getUsername()
       );
       return false;
     }
@@ -148,34 +149,43 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     return false;
   }
 
-  private static boolean validateClientBrand(final ByteBuf content) {
+  private static boolean validateClientBrand(final FallbackPlayer player, final ByteBuf content) {
     // No need to check for empty or too long client brands since
     // ProtocolUtils#readString already does exactly that.
-    final String read = ProtocolUtils.readString(content, 64);
-    return !read.equals("Vanilla") // The normal brand is always lowercase
-      // We want to allow client brands that have a URL in them
-      // (e.g., CheatBreaker)
-      && Sonar.get().getConfig().VALID_BRAND_REGEX.matcher(read).matches(); // Normal regex validation
+    try {
+      final boolean legacy = player.getConnection().getProtocolVersion().compareTo(MINECRAFT_1_8) < 0;
+      final String read = ProtocolUtil.readString(content, 64, legacy);
+      return !read.equals("Vanilla") // The normal brand is always lowercase
+        // We want to allow client brands that have a URL in them
+        // (e.g., CheatBreaker)
+        && Sonar.get().getConfig().VALID_BRAND_REGEX.matcher(read).matches(); // Normal regex validation
+    } catch (DecoderException exception) {
+      exception.printStackTrace();
+      // Fail if the string (client brand) could not be decoded properly
+      player.fail("could not decode string");
+      // Throw the exception so we don't continue checking
+      throw exception;
+    }
   }
 
   @Override
   public boolean handle(final @NotNull PluginMessage pluginMessage) {
-    // Only MC|Brand for 1.7-1.12.2 and minecraft:brand for 1.13+ are important.
+    if (verified) return false; // Skip verified players so we don't run into issues
+
+    // Only 'MC|Brand' for 1.7-1.12.2 and 'minecraft:brand' for 1.13+ are important.
     if (!pluginMessage.getChannel().equals("MC|Brand")
       && !pluginMessage.getChannel().equals("minecraft:brand")) {
-      // TODO: No other channel should be possible?
       return false; // Ignore all other channels
     }
-
-    if (verified) return false; // Skip verified players so we don't run into issues
 
     // Check if the channel is correct - 1.13 uses the new namespace
     // system ('minecraft:' + channel) and anything below 1.13 uses
     // the legacy namespace system ('MC|' + channel).
-    final boolean exempt = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
+    final boolean v1_13 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
+    checkFrame(pluginMessage.getChannel().equals("MC|Brand") || v1_13, "invalid channel");
 
-    checkFrame(pluginMessage.getChannel().equals("MC|Brand") || exempt, "invalid channel");
-    checkFrame(validateClientBrand(pluginMessage.content()), "invalid client brand");
+    // Validate the client branding using a regex to filter unwanted characters.
+    checkFrame(validateClientBrand(player, pluginMessage.content()), "invalid client brand");
 
     // Check for illegal packet timing
     checkFrame(!hasSentClientBrand, "unexpected timing (P1)");
@@ -280,7 +290,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // We need this to prevent some packets from flagging bad packet checks
     verified = true;
 
-    // Remove the Sonar timeout handler - all checks have been passed
+    // Remove the Sonar timeout handler - all checks have passed
     if (player.getPipeline().get(TIMEOUT) != null) {
       player.getPipeline().remove(TIMEOUT);
     }

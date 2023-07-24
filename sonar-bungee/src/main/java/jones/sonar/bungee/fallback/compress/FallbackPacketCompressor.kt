@@ -23,9 +23,9 @@ import com.velocitypowered.natives.util.MoreByteBufUtils.preferredBuffer
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.CorruptedFrameException
-import jones.sonar.bungee.varint.VarIntUtil.Companion.varIntBytes
-import jones.sonar.bungee.varint.VarIntUtil.Companion.write21BitVarInt
-import jones.sonar.bungee.varint.VarIntUtil.Companion.writeVarInt
+import jones.sonar.common.protocol.VarIntUtil.Companion.varIntBytes
+import jones.sonar.common.protocol.VarIntUtil.Companion.write21BitVarInt
+import jones.sonar.common.protocol.VarIntUtil.Companion.writeVarInt
 import net.md_5.bungee.compress.PacketCompressor
 import java.util.zip.DataFormatException
 

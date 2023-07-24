@@ -23,7 +23,7 @@ import com.velocitypowered.natives.util.MoreByteBufUtils.preferredBuffer
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.CorruptedFrameException
-import jones.sonar.bungee.varint.VarIntUtil.Companion.readVarInt
+import jones.sonar.common.protocol.VarIntUtil.Companion.readVarInt
 import net.md_5.bungee.compress.PacketDecompressor
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftCompressDecoder.java
