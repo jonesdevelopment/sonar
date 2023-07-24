@@ -140,48 +140,156 @@ public final class SonarConfiguration {
     SUPPORT_URL = messagesConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
 
     // General options
+    generalConfig.getYaml().setComment("general.max-online-per-ip",
+      "Maximum number of players online with the same IP address"
+    );
     MAXIMUM_ONLINE_PER_IP = clamp(generalConfig.getInt("general.max-online-per-ip", 3), 1, Byte.MAX_VALUE);
+
+    generalConfig.getYaml().setComment("general.min-players-for-attack",
+      "Minimum number of new players in order for an attack to be detected"
+    );
     MINIMUM_PLAYERS_FOR_ATTACK = clamp(generalConfig.getInt("general.min-players-for-attack", 5), 2, 1024);
 
+    // Lockdown
+    generalConfig.getYaml().setComment("general.lockdown.enabled",
+      "Should Sonar prevent players from joining the server?"
+    );
     LOCKDOWN_ENABLED = generalConfig.getBoolean("general.lockdown.enabled", false);
+
+    generalConfig.getYaml().setComment("general.lockdown.log-attempts",
+      "Should Sonar should log login attempts during lockdown?"
+    );
     LOCKDOWN_LOG_ATTEMPTS = generalConfig.getBoolean("general.lockdown.log-attempts", true);
+
+    generalConfig.getYaml().setComment("general.lockdown.notify-admins",
+      "Should Sonar notify admins when they join the server during lockdown?"
+    );
     LOCKDOWN_ENABLE_NOTIFY = generalConfig.getBoolean("general.lockdown.notify-admins", true);
 
-    generalConfig.getYaml().setComment("general.database.type", "This value can either be NONE, MYSQL or YAML");
+    // Database
+    generalConfig.getYaml().setComment("general.database.type",
+      "The database can either be NONE, MYSQL or YAML"
+    );
     DATABASE = DatabaseType.valueOf(generalConfig.getString("general.database.type", "NONE"));
+
+    generalConfig.getYaml().setComment("general.database.allow-purging",
+      "Should Sonar allow database purges?"
+    );
     ALLOW_PURGING = generalConfig.getBoolean("general.database.allow-purging", true);
 
     // YAML
+    generalConfig.getYaml().setComment("general.database.yaml.file-name",
+      "YAML database file name"
+    );
     DATABASE_FILE_NAME = generalConfig.getString("general.database.yaml.file-name", "database");
 
     // MySQL
+    generalConfig.getYaml().setComment("general.database.mysql.name",
+      "MySQL database name"
+    );
     DATABASE_NAME = generalConfig.getString("general.database.mysql.name", "sonar");
+
+    generalConfig.getYaml().setComment("general.database.mysql.url",
+      "MySQL database URL"
+    );
     DATABASE_URL = generalConfig.getString("general.database.mysql.url", "localhost");
+
+    generalConfig.getYaml().setComment("general.database.mysql.port",
+      "MySQL database port"
+    );
     DATABASE_PORT = clamp(generalConfig.getInt("general.database.mysql.port", 3306), 0, 65535);
+
+    generalConfig.getYaml().setComment("general.database.mysql.username",
+      "MySQL database username"
+    );
     DATABASE_USERNAME = generalConfig.getString("general.database.mysql.username", "root");
+
+    generalConfig.getYaml().setComment("general.database.mysql.password",
+      "MySQL database password"
+    );
     DATABASE_PASSWORD = generalConfig.getString("general.database.mysql.password", "");
+
+    generalConfig.getYaml().setComment("general.database.mysql.query-limit",
+      "Maximum number of database entries"
+    );
     DATABASE_QUERY_LIMIT = clamp(generalConfig.getInt("general.database.mysql.query-limit", 100000), 1000,
       Integer.MAX_VALUE);
 
+    // Queue
+    generalConfig.getYaml().setComment("general.queue.max-players",
+      "Maximum number of players on the queue"
+    );
     MAXIMUM_QUEUED_PLAYERS = clamp(generalConfig.getInt("general.queue.max-players", 8192), 128, Short.MAX_VALUE);
+
+    generalConfig.getYaml().setComment("general.queue.max-polls",
+      "Maximum number of queue polls per 500 milliseconds"
+    );
     MAXIMUM_QUEUE_POLLS = clamp(generalConfig.getInt("general.queue.max-polls", 10), 1, 1000);
 
+    // Verification
+    generalConfig.getYaml().setComment("general.verification.enabled",
+      "Should Sonar verify new players? (Recommended)"
+    );
     ENABLE_VERIFICATION = generalConfig.getBoolean("general.verification.enabled", true);
+
+    generalConfig.getYaml().setComment("general.verification.log-connections",
+      "Should Sonar log new connections?"
+    );
     LOG_CONNECTIONS = generalConfig.getBoolean("general.verification.log-connections", true);
+
+    generalConfig.getYaml().setComment("general.verification.log-during-attack",
+      "Should Sonar log new connections during an attack?"
+    );
     LOG_DURING_ATTACK = generalConfig.getBoolean("general.verification.log-during-attack", false);
+
+    generalConfig.getYaml().setComment("general.verification.valid-name-regex",
+      "Regex for validating usernames during verification"
+    );
     VALID_NAME_REGEX = Pattern.compile(generalConfig.getString(
       "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"
     ));
+
+    generalConfig.getYaml().setComment("general.verification.valid-brand-regex",
+      "Regex for validating client brands during verification"
+    );
     VALID_BRAND_REGEX = Pattern.compile(generalConfig.getString(
       "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:;_()\\[\\]{}!?' *]+$"
     ));
+
+    generalConfig.getYaml().setComment("general.verification.max-brand-length",
+      "Maximum client brand length during verification"
+    );
     MAXIMUM_BRAND_LENGTH = generalConfig.getInt("general.verification.max-brand-length", 64);
+
+    generalConfig.getYaml().setComment("general.verification.timeout",
+      "Amount of time that has to pass before a player is disconnected"
+    );
     VERIFICATION_TIMEOUT = clamp(generalConfig.getInt("general.verification.timeout", 10000), 1500, 30000);
+
+    generalConfig.getYaml().setComment("general.verification.read-timeout",
+      "Amount of time that has to pass before a player times out"
+    );
     VERIFICATION_READ_TIMEOUT = clamp(generalConfig.getInt("general.verification.read-timeout", 4000), 500, 30000);
+
+    generalConfig.getYaml().setComment("general.verification.max-login-packets",
+      "Maximum number of login packets the player has to send in order to be kicked"
+    );
     MAXIMUM_LOGIN_PACKETS = clamp(generalConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
+
+    generalConfig.getYaml().setComment("general.verification.max-players",
+      "Maximum number of players verifying at the same time"
+    );
     MAXIMUM_VERIFYING_PLAYERS = clamp(generalConfig.getInt("general.verification.max-players", 1024), 1,
       Short.MAX_VALUE);
+
+    generalConfig.getYaml().setComment("general.verification.rejoin-delay",
+      "Minimum number of rejoin delay during verification"
+    );
     VERIFICATION_DELAY = clamp(generalConfig.getInt("general.verification.rejoin-delay", 8000), 0, 100000);
+
+    generalConfig.getYaml().setComment("general.verification.enable-compression",
+      "Should Sonar enable compression for new players? (Recommended)"
+    );
     ENABLE_COMPRESSION = generalConfig.getBoolean("general.verification.enable-compression", true);
 
     // load this here otherwise it could cause issues
