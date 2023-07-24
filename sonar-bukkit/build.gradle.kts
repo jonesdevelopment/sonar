@@ -9,7 +9,7 @@ apply(plugin = "net.minecrell.plugin-yml.bukkit")
 bukkit {
   name = rootProject.name
   version = rootProject.version.toString()
-  main = "jones.sonar.bukkit.SonarBukkitPlugin"
+  main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
   authors = listOf("Jones Development", "Sonar Contributors")
   website = "https://jonesdev.xyz/discord/"
   description = "Effective Anti-bot plugin for Velocity, BungeeCord, and Bukkit (1.7-latest)"
