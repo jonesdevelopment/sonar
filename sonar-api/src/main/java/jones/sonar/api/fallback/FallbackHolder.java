@@ -37,7 +37,7 @@ public final class FallbackHolder implements Fallback {
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
   @Getter
   @NotNull
-  private final Collection<String> verified = new Vector<>();
+  private final Collection<String> verified = new Vector<>(1);
   @Getter
   @NotNull
   private final Collection<String> blacklisted = new Vector<>();
