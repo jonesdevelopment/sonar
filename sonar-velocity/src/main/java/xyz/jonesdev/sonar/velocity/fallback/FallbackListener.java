@@ -67,6 +67,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor

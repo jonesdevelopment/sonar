@@ -52,6 +52,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 /**
@@ -68,7 +69,7 @@ import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CONNECTION_F
  * (for 1.7-1.8) Mojang decided to send a {@link com.velocitypowered.proxy.protocol.packet.KeepAlive} packet with the
  * ID 0 every 20 ticks (= one second) while the player is in the GuiDownloadTerrain screen.<br>
  * ↓<br>
- * (for 1.8+) Send a {@link com.velocitypowered.proxy.protocol.packet.ResourcePackRequest} to check if the client
+ * (for 1.9+) Send a {@link com.velocitypowered.proxy.protocol.packet.ResourcePackRequest} to check if the client
  * responds correctly<br>
  */
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
