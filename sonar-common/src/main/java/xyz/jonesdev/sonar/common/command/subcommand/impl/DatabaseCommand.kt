@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.command.subcommand.impl
 
+import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.api.database.DatabaseType
 import xyz.jonesdev.sonar.api.format.MemoryFormatter
 import xyz.jonesdev.sonar.common.command.CommandInvocation
@@ -56,7 +57,7 @@ class DatabaseCommand : SubCommand() {
             invocation.invocationSender.sendMessage(" §a▪ §7Database URL: §f${sonar.config.DATABASE_URL}")
             invocation.invocationSender.sendMessage(" §a▪ §7Database port: §f${sonar.config.DATABASE_PORT}")
             invocation.invocationSender.sendMessage(" §a▪ §7Database name: §f${sonar.config.DATABASE_NAME}")
-            invocation.invocationSender.sendMessage(" §a▪ §7Query limit: §f${sonar.formatter.format(sonar.config.DATABASE_QUERY_LIMIT)}")
+            invocation.invocationSender.sendMessage(" §a▪ §7Query limit: §f${Sonar.DECIMAL_FORMAT.format(sonar.config.DATABASE_QUERY_LIMIT)}")
           }
 
           DatabaseType.YAML -> {

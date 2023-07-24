@@ -34,11 +34,11 @@ class ActionBarVerbose(private val server: Server) : Verbose {
   fun update() {
     val component = TextComponent(
       Sonar.get().config.ACTION_BAR_LAYOUT
-        .replace("%queued%", Sonar.get().formatter.format(Sonar.get().fallback.queue.getQueuedPlayers().size))
-        .replace("%verifying%", Sonar.get().formatter.format(Sonar.get().fallback.connected.size))
-        .replace("%verified%", Sonar.get().formatter.format(Sonar.get().fallback.verified.size))
-        .replace("%blacklisted%", Sonar.get().formatter.format(Sonar.get().fallback.blacklisted.estimatedSize()))
-        .replace("%total%", Sonar.get().formatter.format(Sonar.get().statistics.get("total", 0)))
+        .replace("%queued%", Sonar.DECIMAL_FORMAT.format(Sonar.get().fallback.queue.getQueuedPlayers().size))
+        .replace("%verifying%", Sonar.DECIMAL_FORMAT.format(Sonar.get().fallback.connected.size))
+        .replace("%verified%", Sonar.DECIMAL_FORMAT.format(Sonar.get().fallback.verified.size))
+        .replace("%blacklisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().fallback.blacklisted.estimatedSize()))
+        .replace("%total%", Sonar.DECIMAL_FORMAT.format(Sonar.get().statistics.get("total", 0)))
         .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
         .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
         .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))

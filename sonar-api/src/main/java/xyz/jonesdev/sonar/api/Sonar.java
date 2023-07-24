@@ -32,6 +32,8 @@ import java.io.File;
 import java.text.DecimalFormat;
 
 public interface Sonar {
+  DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###");
+
   ServerWrapper getServer();
 
   // used for bStats metrics
@@ -53,8 +55,6 @@ public interface Sonar {
   @NotNull File getPluginDataFolder();
 
   @NotNull SonarConfiguration getConfig();
-
-  @NotNull DecimalFormat getFormatter();
 
   @NotNull
   default SonarVersion getVersion() {

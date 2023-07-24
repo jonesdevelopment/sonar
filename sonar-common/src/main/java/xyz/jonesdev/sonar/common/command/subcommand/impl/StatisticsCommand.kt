@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.command.subcommand.impl
 
+import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.common.command.CommandInvocation
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
@@ -37,17 +38,17 @@ class StatisticsCommand : SubCommand() {
     invocation.invocationSender.sendMessage()
     invocation.invocationSender.sendMessage(" §eStatistics (this session)")
     invocation.invocationSender.sendMessage()
-    invocation.invocationSender.sendMessage(" §a▪ §7Verified IP addresses: §f${sonar.formatter.format(verified)}")
-    invocation.invocationSender.sendMessage(" §a▪ §7Verifying IP addresses: §f${sonar.formatter.format(verifying)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Verified IP addresses: §f${Sonar.DECIMAL_FORMAT.format(verified)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Verifying IP addresses: §f${Sonar.DECIMAL_FORMAT.format(verifying)}")
     invocation.invocationSender.sendMessage(
       " §a▪ §7Blacklisted IP addresses: §f${
-        sonar.formatter.format(
+        Sonar.DECIMAL_FORMAT.format(
           blacklisted
         )
       }"
     )
-    invocation.invocationSender.sendMessage(" §a▪ §7Queued connections: §f${sonar.formatter.format(queued)}")
-    invocation.invocationSender.sendMessage(" §a▪ §7Total connections: §f${sonar.formatter.format(total)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Queued connections: §f${Sonar.DECIMAL_FORMAT.format(queued)}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Total connections: §f${Sonar.DECIMAL_FORMAT.format(total)}")
     invocation.invocationSender.sendMessage()
   }
 }

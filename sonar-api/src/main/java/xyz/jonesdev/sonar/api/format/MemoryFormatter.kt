@@ -42,7 +42,7 @@ class MemoryFormatter {
         suffix = "GB"
         bytes /= MIN
       }
-      return Sonar.get().formatter.format(bytes) + suffix
+      return Sonar.DECIMAL_FORMAT.format(bytes) + suffix
     }
   }
 }

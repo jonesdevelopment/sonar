@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.command.subcommand.impl
 
+import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.common.command.CommandInvocation
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
@@ -117,7 +118,7 @@ class WhitelistCommand : SubCommand() {
       "size" -> {
         invocation.invocationSender.sendMessage(
           sonar.config.WHITELIST_SIZE
-            .replace("%amount%", sonar.formatter.format(sonar.fallback.verified.size))
+            .replace("%amount%", Sonar.DECIMAL_FORMAT.format(sonar.fallback.verified.size))
         )
       }
 

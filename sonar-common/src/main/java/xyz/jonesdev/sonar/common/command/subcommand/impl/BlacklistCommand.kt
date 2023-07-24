@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.command.subcommand.impl
 
+import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.common.command.CommandInvocation
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
@@ -128,7 +129,7 @@ class BlacklistCommand : SubCommand() {
 
           invocation.invocationSender.sendMessage(
             sonar.config.BLACKLIST_CLEARED
-              .replace("%removed%", sonar.formatter.format(blacklisted))
+              .replace("%removed%", Sonar.DECIMAL_FORMAT.format(blacklisted))
           )
         }
       }
@@ -136,7 +137,7 @@ class BlacklistCommand : SubCommand() {
       "size" -> {
         invocation.invocationSender.sendMessage(
           sonar.config.BLACKLIST_SIZE
-            .replace("%amount%", sonar.formatter.format(sonar.fallback.blacklisted.estimatedSize()))
+            .replace("%amount%", Sonar.DECIMAL_FORMAT.format(sonar.fallback.blacklisted.estimatedSize()))
         )
       }
 

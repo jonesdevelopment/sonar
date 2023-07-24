@@ -34,7 +34,6 @@ import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -76,9 +75,6 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
       plugin.getLogger().log(Level.SEVERE, message, args);
     }
   };
-
-  @Getter
-  private final DecimalFormat formatter = new DecimalFormat("#,###");
 
   /**
    * Create a wrapper object for our server, so we can use it outside

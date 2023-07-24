@@ -34,7 +34,6 @@ import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.verbose.ActionBarVerbose;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -75,9 +74,6 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
       plugin.getLogger().error(message, args);
     }
   };
-
-  @Getter
-  private final DecimalFormat formatter = new DecimalFormat("#,###");
 
   /**
    * Create a wrapper object for our server, so we can use it outside
