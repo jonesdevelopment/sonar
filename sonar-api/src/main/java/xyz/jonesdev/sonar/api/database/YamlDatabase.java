@@ -23,9 +23,9 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.yaml.YamlConfig;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Vector;
 
 final class YamlDatabase implements Database {
   private @Nullable YamlConfig yamlConfig;
@@ -53,7 +53,7 @@ final class YamlDatabase implements Database {
   @Override
   public Collection<String> getListFromTable(final @NotNull String table,
                                              final @NotNull String column) {
-    return Objects.requireNonNull(yamlConfig).getStringList(table, new ArrayList<>());
+    return Objects.requireNonNull(yamlConfig).getStringList(table, new Vector<>());
   }
 
   @Override
@@ -67,8 +67,6 @@ final class YamlDatabase implements Database {
   public void clear(final @NotNull String table) {
     Objects.requireNonNull(yamlConfig);
 
-    if (yamlConfig.getConfig().containsKey(table)) {
-      yamlConfig.set(table, new ArrayList<>());
-    }
+    yamlConfig.set(table, new Vector<>());
   }
 }
