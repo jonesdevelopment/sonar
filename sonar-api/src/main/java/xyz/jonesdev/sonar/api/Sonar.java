@@ -23,6 +23,7 @@ import xyz.jonesdev.sonar.api.database.Database;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackHolder;
 import xyz.jonesdev.sonar.api.logger.Logger;
+import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.api.version.SonarVersion;
@@ -31,11 +32,11 @@ import java.io.File;
 import java.text.DecimalFormat;
 
 public interface Sonar {
-  SonarPlatform getPlatform();
+  ServerWrapper getServer();
 
   // used for bStats metrics
   default int getServiceId() {
-    switch (getPlatform()) {
+    switch (getServer().getPlatform()) {
       case BUKKIT: {
         return 19110;
       }

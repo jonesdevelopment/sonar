@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.bungee;
 
 import lombok.Getter;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bstats.bungeecord.Metrics;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
@@ -25,6 +26,7 @@ import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.logger.Logger;
+import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
@@ -32,6 +34,7 @@ import xyz.jonesdev.sonar.common.SonarBootstrap;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -76,10 +79,22 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   @Getter
   private final DecimalFormat formatter = new DecimalFormat("#,###");
 
-  @Override
-  public SonarPlatform getPlatform() {
-    return SonarPlatform.BUNGEE;
-  }
+  @Getter
+  public final ServerWrapper server = new ServerWrapper() {
+
+    @Override
+    public SonarPlatform getPlatform() {
+      return SonarPlatform.BUNGEE;
+    }
+
+    @Override
+    public Optional<String> getOnlinePlayer(final String username) {
+      return getPlugin().getServer().getPlayers().stream()
+        .map(ProxiedPlayer::getName)
+        .filter(name -> name.equalsIgnoreCase(username))
+        .findFirst();
+    }
+  };
 
   @Override
   public void enable(final SonarBungeePlugin plugin) {

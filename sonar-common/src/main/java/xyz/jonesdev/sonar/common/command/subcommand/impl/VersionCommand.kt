@@ -33,7 +33,7 @@ class VersionCommand : SubCommand() {
     invocation.invocationSender.sendMessage(" §a▪ §7Sonar version: §f${sonar.version.semanticVersion}")
     invocation.invocationSender.sendMessage(" §a▪ §7Commit SHA: §f${sonar.version.commitSHA}")
     invocation.invocationSender.sendMessage(" §a▪ §7Build number: §f${sonar.version.build}")
-    invocation.invocationSender.sendMessage(" §a▪ §7Platform: §f${sonar.platform.displayName}")
+    invocation.invocationSender.sendMessage(" §a▪ §7Platform: §f${sonar.server.platform.displayName}")
     invocation.invocationSender.sendMessage()
   }
 }

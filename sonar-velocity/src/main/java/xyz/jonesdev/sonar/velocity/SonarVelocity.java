@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.velocity;
 
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.util.ratelimit.Ratelimiters;
 import lombok.Getter;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -25,6 +26,7 @@ import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.logger.Logger;
+import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.velocity.command.SonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
@@ -32,6 +34,7 @@ import xyz.jonesdev.sonar.velocity.verbose.ActionBarVerbose;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static xyz.jonesdev.sonar.api.database.Database.IP_COLUMN;
@@ -75,10 +78,22 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   @Getter
   private final DecimalFormat formatter = new DecimalFormat("#,###");
 
-  @Override
-  public SonarPlatform getPlatform() {
-    return SonarPlatform.VELOCITY;
-  }
+  @Getter
+  public final ServerWrapper server = new ServerWrapper() {
+
+    @Override
+    public SonarPlatform getPlatform() {
+      return SonarPlatform.VELOCITY;
+    }
+
+    @Override
+    public Optional<String> getOnlinePlayer(final String username) {
+      return getPlugin().getServer().getAllPlayers().stream()
+        .map(Player::getUsername)
+        .filter(name -> name.equalsIgnoreCase(username))
+        .findFirst();
+    }
+  };
 
   @Override
   public void enable(final SonarVelocityPlugin plugin) {

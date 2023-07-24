@@ -19,12 +19,14 @@ package xyz.jonesdev.sonar.bukkit;
 
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.entity.Player;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.logger.Logger;
+import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
 import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
@@ -32,6 +34,7 @@ import xyz.jonesdev.sonar.common.SonarBootstrap;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import static xyz.jonesdev.sonar.api.database.Database.IP_COLUMN;
@@ -75,10 +78,22 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   @Getter
   private final DecimalFormat formatter = new DecimalFormat("#,###");
 
-  @Override
-  public SonarPlatform getPlatform() {
-    return SonarPlatform.BUKKIT;
-  }
+  @Getter
+  public final ServerWrapper server = new ServerWrapper() {
+
+    @Override
+    public SonarPlatform getPlatform() {
+      return SonarPlatform.VELOCITY;
+    }
+
+    @Override
+    public Optional<String> getOnlinePlayer(final String username) {
+      return getPlugin().getServer().getOnlinePlayers().stream()
+        .map(Player::getName)
+        .filter(name -> name.equalsIgnoreCase(username))
+        .findFirst();
+    }
+  };
 
   @Override
   public void enable(final SonarBukkitPlugin plugin) {

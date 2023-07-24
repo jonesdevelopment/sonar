@@ -135,7 +135,7 @@ class SonarCommand : SimpleCommand {
             " §eRunning §lSonar §e"
               + Sonar.get().version
               + " on "
-              + Sonar.get().platform.displayName
+              + Sonar.get().server.platform.displayName
           )
         )
         CACHED_HELP.add(Component.empty())

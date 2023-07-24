@@ -106,7 +106,7 @@ class SonarCommand : CommandExecutor, TabExecutor {
             " §eRunning §lSonar §e"
               + Sonar.get().version
               + " on "
-              + Sonar.get().platform.displayName
+              + Sonar.get().server.platform.displayName
           )
         )
         CACHED_HELP.add(EMPTY_TEXT_COMPONENT)

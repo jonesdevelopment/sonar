@@ -40,7 +40,7 @@ class DumpCommand : SubCommand() {
     val totalMemory = runtime.totalMemory()
     val maxMemory = runtime.maxMemory()
     val usedMemory = totalMemory - freeMemory
-    val platform = sonar.platform.displayName
+    val platform = sonar.server.platform.displayName
     val fullVersion = sonar.version.full
 
     sonar.logger.info("Virtual cores: $virtualCores")
