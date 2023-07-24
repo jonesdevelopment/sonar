@@ -31,9 +31,11 @@ import java.util.regex.Pattern;
 public final class SonarConfiguration {
   @Getter
   private final SimpleYamlConfig generalConfig;
+  private final SimpleYamlConfig messagesConfig;
 
   public SonarConfiguration(final @NotNull File folder) {
     generalConfig = new SimpleYamlConfig(folder, "config");
+    messagesConfig = new SimpleYamlConfig(folder, "messages");
   }
 
   public String PREFIX;
@@ -131,10 +133,11 @@ public final class SonarConfiguration {
     Objects.requireNonNull(generalConfig);
 
     generalConfig.load();
+    messagesConfig.load();
 
     // Message settings
-    PREFIX = formatString(generalConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
-    SUPPORT_URL = generalConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
+    PREFIX = formatString(messagesConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
+    SUPPORT_URL = messagesConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
 
     // General options
     MAXIMUM_ONLINE_PER_IP = clamp(generalConfig.getInt("general.max-online-per-ip", 3), 1, Byte.MAX_VALUE);
@@ -182,173 +185,173 @@ public final class SonarConfiguration {
     ENABLE_COMPRESSION = generalConfig.getBoolean("general.verification.enable-compression", true);
 
     // load this here otherwise it could cause issues
-    HEADER = fromList(generalConfig.getStringList("messages.header",
+    HEADER = fromList(messagesConfig.getStringList("messages.header",
       Arrays.asList(
         "&e&lSonar"
       )));
-    FOOTER = fromList(generalConfig.getStringList("messages.footer",
+    FOOTER = fromList(messagesConfig.getStringList("messages.footer",
       Arrays.asList(
         "&7If you believe that this is an error, contact an administrator."
       )));
 
-    LOCKDOWN_ACTIVATED = formatString(generalConfig.getString("messages.lockdown.enabled",
+    LOCKDOWN_ACTIVATED = formatString(messagesConfig.getString("messages.lockdown.enabled",
       "%prefix%The server is now in lockdown mode."
     ));
-    LOCKDOWN_DEACTIVATED = formatString(generalConfig.getString("messages.lockdown.disabled",
+    LOCKDOWN_DEACTIVATED = formatString(messagesConfig.getString("messages.lockdown.disabled",
       "%prefix%The server is no longer in lockdown mode."
     ));
-    LOCKDOWN_NOTIFICATION = formatString(generalConfig.getString("messages.lockdown.notification",
+    LOCKDOWN_NOTIFICATION = formatString(messagesConfig.getString("messages.lockdown.notification",
       "%prefix%&aHey, the server is currently in lockdown mode. If you want to disable the lockdown mode, " +
         "type " +
         "&f/sonar" +
         " lockdown&a."
     ));
-    LOCKDOWN_CONSOLE_LOG = generalConfig.getString("messages.lockdown.console-log",
+    LOCKDOWN_CONSOLE_LOG = messagesConfig.getString("messages.lockdown.console-log",
       "%player% (%ip%, %protocol%) tried to join during lockdown mode."
     );
-    LOCKDOWN_DISCONNECT = fromList(generalConfig.getStringList("messages.lockdown.disconnect-message",
+    LOCKDOWN_DISCONNECT = fromList(messagesConfig.getStringList("messages.lockdown.disconnect-message",
       Arrays.asList(
         "%header%",
         "&cThe server is currently locked down, please try again later.",
         "%footer%"
       )));
 
-    RELOADING = formatString(generalConfig.getString("messages.reload.start",
+    RELOADING = formatString(messagesConfig.getString("messages.reload.start",
       "%prefix%Reloading Sonar..."
     ));
-    RELOADED = formatString(generalConfig.getString("messages.reload.finish",
+    RELOADED = formatString(messagesConfig.getString("messages.reload.finish",
       "%prefix%&aSuccessfully reloaded &7(%taken%ms)"
     ));
 
-    VERBOSE_SUBSCRIBED = formatString(generalConfig.getString("messages.verbose.subscribed",
+    VERBOSE_SUBSCRIBED = formatString(messagesConfig.getString("messages.verbose.subscribed",
       "%prefix%You are now viewing Sonar verbose."
     ));
-    VERBOSE_UNSUBSCRIBED = formatString(generalConfig.getString("messages.verbose.unsubscribed",
+    VERBOSE_UNSUBSCRIBED = formatString(messagesConfig.getString("messages.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."
     ));
-    VERBOSE_SUBSCRIBED_OTHER = formatString(generalConfig.getString("messages.verbose.subscribed-other",
+    VERBOSE_SUBSCRIBED_OTHER = formatString(messagesConfig.getString("messages.verbose.subscribed-other",
       "%prefix%%player% is now viewing Sonar verbose."
     ));
-    VERBOSE_UNSUBSCRIBED_OTHER = formatString(generalConfig.getString("messages.verbose.unsubscribed-other",
+    VERBOSE_UNSUBSCRIBED_OTHER = formatString(messagesConfig.getString("messages.verbose.unsubscribed-other",
       "%prefix%%player% is no longer viewing Sonar verbose."
     ));
 
-    DATABASE_PURGE_DISALLOWED = formatString(generalConfig.getString("messages.database.disallowed",
+    DATABASE_PURGE_DISALLOWED = formatString(messagesConfig.getString("messages.database.disallowed",
       "%prefix%&cPurging the database is currently disallowed. Therefore, your action has been cancelled."
     ));
-    DATABASE_PURGE_CONFIRM = formatString(generalConfig.getString("messages.database.purge-confirm",
+    DATABASE_PURGE_CONFIRM = formatString(messagesConfig.getString("messages.database.purge-confirm",
       "%prefix%&cPlease confirm that you want to delete all database entries by typing &7/sonar database " +
         "purge " +
         "confirm&c."
     ));
-    DATABASE_PURGE = formatString(generalConfig.getString("messages.database.purge",
+    DATABASE_PURGE = formatString(messagesConfig.getString("messages.database.purge",
       "%prefix%&aSuccessfully purged all database entries."
     ));
-    DATABASE_PURGE_ALREADY = formatString(generalConfig.getString("messages.database.purging",
+    DATABASE_PURGE_ALREADY = formatString(messagesConfig.getString("messages.database.purging",
       "%prefix%&cThere is already a purge currently running."
     ));
-    DATABASE_NOT_SELECTED = formatString(generalConfig.getString("messages.database.not-selected",
+    DATABASE_NOT_SELECTED = formatString(messagesConfig.getString("messages.database.not-selected",
       "%prefix%&cYou have not selected any data storage type."
     ));
-    DATABASE_RELOADING = formatString(generalConfig.getString("messages.database.reload.start",
+    DATABASE_RELOADING = formatString(messagesConfig.getString("messages.database.reload.start",
       "%prefix%Reloading all databases..."
     ));
-    DATABASE_RELOADED = formatString(generalConfig.getString("messages.database.reload.finish",
+    DATABASE_RELOADED = formatString(messagesConfig.getString("messages.database.reload.finish",
       "%prefix%&aSuccessfully reloaded &7(%taken%ms)"
     ));
 
-    INCORRECT_COMMAND_USAGE = formatString(generalConfig.getString("messages.incorrect-command-usage",
+    INCORRECT_COMMAND_USAGE = formatString(messagesConfig.getString("messages.incorrect-command-usage",
       "%prefix%&cUsage: /sonar %usage%"
     ));
-    INCORRECT_IP_ADDRESS = formatString(generalConfig.getString("messages.invalid-ip-address",
+    INCORRECT_IP_ADDRESS = formatString(messagesConfig.getString("messages.invalid-ip-address",
       "%prefix%The IP address you provided seems to be invalid."
     ));
-    ILLEGAL_IP_ADDRESS = formatString(generalConfig.getString("messages.illegal-ip-address",
+    ILLEGAL_IP_ADDRESS = formatString(messagesConfig.getString("messages.illegal-ip-address",
       "%prefix%The IP address you provided seems to be either a local or loopback IP."
     ));
-    PLAYERS_ONLY = formatString(generalConfig.getString("messages.players-only",
+    PLAYERS_ONLY = formatString(messagesConfig.getString("messages.players-only",
       "%prefix%&cYou can only execute this command as a player."
     ));
-    CONSOLE_ONLY = formatString(generalConfig.getString("messages.console-only",
+    CONSOLE_ONLY = formatString(messagesConfig.getString("messages.console-only",
       "%prefix%&cFor security reasons, you can only execute this command through console."
     ));
-    COMMAND_COOL_DOWN = formatString(generalConfig.getString("messages.command-cool-down",
+    COMMAND_COOL_DOWN = formatString(messagesConfig.getString("messages.command-cool-down",
       "%prefix%&cYou can only execute this command every 0.5 seconds."
     ));
-    COMMAND_COOL_DOWN_LEFT = formatString(generalConfig.getString("messages.command-cool-down-left",
+    COMMAND_COOL_DOWN_LEFT = formatString(messagesConfig.getString("messages.command-cool-down-left",
       "%prefix%&cPlease wait another &l%time-left%s&r&c."
     ));
-    SUB_COMMAND_NO_PERM = formatString(generalConfig.getString("messages.sub-command-no-permission",
+    SUB_COMMAND_NO_PERM = formatString(messagesConfig.getString("messages.sub-command-no-permission",
       "%prefix%&cYou do not have permission to execute this subcommand. &7(%permission%)"
     ));
 
-    BLACKLIST_EMPTY = formatString(generalConfig.getString("messages.blacklist.empty",
+    BLACKLIST_EMPTY = formatString(messagesConfig.getString("messages.blacklist.empty",
       "%prefix%The blacklist is currently empty. Therefore, no IP addresses were removed from the blacklist."
     ));
-    BLACKLIST_CLEARED = formatString(generalConfig.getString("messages.blacklist.cleared",
+    BLACKLIST_CLEARED = formatString(messagesConfig.getString("messages.blacklist.cleared",
       "%prefix%You successfully removed a total of %removed% IP address(es) from the blacklist."
     ));
-    BLACKLIST_SIZE = formatString(generalConfig.getString("messages.blacklist.size",
+    BLACKLIST_SIZE = formatString(messagesConfig.getString("messages.blacklist.size",
       "%prefix%The blacklist currently contains %amount% IP address(es)."
     ));
-    BLACKLIST_ADD = formatString(generalConfig.getString("messages.blacklist.added",
+    BLACKLIST_ADD = formatString(messagesConfig.getString("messages.blacklist.added",
       "%prefix%Successfully added %ip% to the blacklist."
     ));
-    BLACKLIST_REMOVE = formatString(generalConfig.getString("messages.blacklist.removed",
+    BLACKLIST_REMOVE = formatString(messagesConfig.getString("messages.blacklist.removed",
       "%prefix%Successfully removed %ip% from the blacklist."
     ));
-    BLACKLIST_DUPLICATE = formatString(generalConfig.getString("messages.blacklist.duplicate-ip",
+    BLACKLIST_DUPLICATE = formatString(messagesConfig.getString("messages.blacklist.duplicate-ip",
       "%prefix%The IP address you provided is already blacklisted."
     ));
-    BLACKLIST_NOT_FOUND = formatString(generalConfig.getString("messages.blacklist.ip-not-found",
+    BLACKLIST_NOT_FOUND = formatString(messagesConfig.getString("messages.blacklist.ip-not-found",
       "%prefix%The IP address you provided is not blacklisted."
     ));
 
-    WHITELIST_SIZE = formatString(generalConfig.getString("messages.whitelist.size",
+    WHITELIST_SIZE = formatString(messagesConfig.getString("messages.whitelist.size",
       "%prefix%The whitelist currently contains %amount% IP address(es)."
     ));
-    WHITELIST_ADD = formatString(generalConfig.getString("messages.whitelist.added",
+    WHITELIST_ADD = formatString(messagesConfig.getString("messages.whitelist.added",
       "%prefix%Successfully added %ip% to the whitelist."
     ));
-    WHITELIST_REMOVE = formatString(generalConfig.getString("messages.whitelist.removed",
+    WHITELIST_REMOVE = formatString(messagesConfig.getString("messages.whitelist.removed",
       "%prefix%Successfully removed %ip% from the whitelist."
     ));
-    WHITELIST_DUPLICATE = formatString(generalConfig.getString("messages.whitelist.duplicate-ip",
+    WHITELIST_DUPLICATE = formatString(messagesConfig.getString("messages.whitelist.duplicate-ip",
       "%prefix%The IP address you provided is already whitelisted."
     ));
-    WHITELIST_NOT_FOUND = formatString(generalConfig.getString("messages.whitelist.ip-not-found",
+    WHITELIST_NOT_FOUND = formatString(messagesConfig.getString("messages.whitelist.ip-not-found",
       "%prefix%The IP address you provided is not whitelisted."
     ));
 
-    TOO_MANY_PLAYERS = fromList(generalConfig.getStringList("messages.verification.too-many-players",
+    TOO_MANY_PLAYERS = fromList(messagesConfig.getStringList("messages.verification.too-many-players",
       Arrays.asList(
         "%header%",
         "&6Too many players are currently trying to log in, try again later.",
         "&7Please wait a few seconds before trying to join again.",
         "%footer%"
       )));
-    TOO_FAST_RECONNECT = fromList(generalConfig.getStringList("messages.verification.too-fast-reconnect",
+    TOO_FAST_RECONNECT = fromList(messagesConfig.getStringList("messages.verification.too-fast-reconnect",
       Arrays.asList(
         "%header%",
         "&6You reconnected too fast, try again later.",
         "&7Please wait a few seconds before trying to verify again.",
         "%footer%"
       )));
-    ALREADY_VERIFYING = fromList(generalConfig.getStringList("messages.verification.already-verifying",
+    ALREADY_VERIFYING = fromList(messagesConfig.getStringList("messages.verification.already-verifying",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently being verified.",
         "&cPlease wait a few seconds before trying to verify again.",
         "%footer%"
       )));
-    ALREADY_QUEUED = fromList(generalConfig.getStringList("messages.verification.already-queued",
+    ALREADY_QUEUED = fromList(messagesConfig.getStringList("messages.verification.already-queued",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently queued for verification.",
         "&cPlease wait a few minutes before trying to verify again.",
         "%footer%"
       )));
-    BLACKLISTED = fromList(generalConfig.getStringList("messages.verification.blacklisted",
+    BLACKLISTED = fromList(messagesConfig.getStringList("messages.verification.blacklisted",
       Arrays.asList(
         "%header%",
         "&cYou are currently denied from entering the server.",
@@ -356,7 +359,7 @@ public final class SonarConfiguration {
         "&6False positive? &7%support-url%",
         "%footer%"
       )));
-    UNEXPECTED_ERROR = fromList(generalConfig.getStringList("messages.verification.unexpected-error",
+    UNEXPECTED_ERROR = fromList(messagesConfig.getStringList("messages.verification.unexpected-error",
       Arrays.asList(
         "%header%",
         "&6An unexpected error occurred when trying to process your connection.",
@@ -364,20 +367,20 @@ public final class SonarConfiguration {
         "&6Need help? &7%support-url%",
         "%footer%"
       )));
-    INVALID_USERNAME = fromList(generalConfig.getStringList("messages.verification.invalid-username",
+    INVALID_USERNAME = fromList(messagesConfig.getStringList("messages.verification.invalid-username",
       Arrays.asList(
         "%header%",
         "&cYour username contains invalid characters.",
         "%footer%"
       )));
-    TOO_MANY_ONLINE_PER_IP = fromList(generalConfig.getStringList("messages.too-many-online-per-ip",
+    TOO_MANY_ONLINE_PER_IP = fromList(messagesConfig.getStringList("messages.too-many-online-per-ip",
       Arrays.asList(
         "%header%",
         "&cThere are too many players online with your IP address.",
         "%footer%"
       )));
 
-    ACTION_BAR_LAYOUT = formatString(generalConfig.getString(
+    ACTION_BAR_LAYOUT = formatString(messagesConfig.getString(
       "messages.action-bar.layout",
       "%prefix%&fQueued &7%queued%" +
         "  &fVerifying &7%verifying%" +
@@ -386,11 +389,12 @@ public final class SonarConfiguration {
         "  &fMemory &7≅ %used-memory%" +
         "  &a&l%animation%"
     ));
-    ANIMATION = generalConfig.getStringList("messages.action-bar.animation",
+    ANIMATION = messagesConfig.getStringList("messages.action-bar.animation",
       Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
     );
 
     generalConfig.save();
+    messagesConfig.save();
   }
 
   private static int clamp(final int v, final int max, final int min) {

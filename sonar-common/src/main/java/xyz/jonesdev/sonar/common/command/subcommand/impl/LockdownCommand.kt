@@ -28,7 +28,7 @@ import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
 class LockdownCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {
     sonar.config.LOCKDOWN_ENABLED = !sonar.config.LOCKDOWN_ENABLED
-    sonar.config.yamlConfig.set("general.lockdown.enabled", sonar.config.LOCKDOWN_ENABLED)
+    sonar.config.generalConfig.set("general.lockdown.enabled", sonar.config.LOCKDOWN_ENABLED)
 
     invocation.invocationSender.sendMessage(
       if (sonar.config.LOCKDOWN_ENABLED) sonar.config.LOCKDOWN_ACTIVATED
