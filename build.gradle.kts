@@ -25,6 +25,7 @@ versioner {
 allprojects {
   repositories {
     mavenCentral() // Lombok
+    maven(url = "https://jitpack.io") // simple-yaml
     maven(url = "https://repo.papermc.io/repository/maven-public") // Velocity natives
     maven(url = "https://repo.jonesdev.xyz/releases/") // Bungee & Velocity proxy module
   }

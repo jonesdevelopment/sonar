@@ -21,19 +21,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.api.yaml.YamlConfig;
+import xyz.jonesdev.sonar.api.yaml.SimpleYamlConfig;
 
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Vector;
 
 final class YamlDatabase implements Database {
-  private @Nullable YamlConfig yamlConfig;
+  private @Nullable SimpleYamlConfig yamlConfig;
 
   @Override
   public void initialize(final @NotNull SonarConfiguration config) {
     if (yamlConfig == null) {
-      yamlConfig = new YamlConfig(Sonar.get().getPluginDataFolder(), config.DATABASE_FILE_NAME);
+      yamlConfig = new SimpleYamlConfig(Sonar.get().getPluginDataFolder(), config.DATABASE_FILE_NAME);
     }
     yamlConfig.load();
   }

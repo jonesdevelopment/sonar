@@ -48,7 +48,7 @@ final class MySQLDatabase implements Database {
        * TODO: Load classes dynamically using a classloader:
        *  * JDBC
        *  * hikari
-       *  * snakeyaml (?)
+       *  * simple-yaml (?)
        */
 
       // Set up hikari

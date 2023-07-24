@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.api.config;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
-import xyz.jonesdev.sonar.api.yaml.YamlConfig;
+import xyz.jonesdev.sonar.api.yaml.SimpleYamlConfig;
 
 import java.io.File;
 import java.util.Arrays;
@@ -30,10 +30,10 @@ import java.util.regex.Pattern;
 
 public final class SonarConfiguration {
   @Getter
-  private final YamlConfig yamlConfig;
+  private final SimpleYamlConfig generalConfig;
 
   public SonarConfiguration(final @NotNull File folder) {
-    yamlConfig = new YamlConfig(folder, "config");
+    generalConfig = new SimpleYamlConfig(folder, "config");
   }
 
   public String PREFIX;
@@ -128,226 +128,227 @@ public final class SonarConfiguration {
   public String DATABASE_RELOADED;
 
   public void load() {
-    Objects.requireNonNull(yamlConfig);
+    Objects.requireNonNull(generalConfig);
 
-    yamlConfig.load();
+    generalConfig.load();
 
     // Message settings
-    PREFIX = formatString(yamlConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
-    SUPPORT_URL = yamlConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
+    PREFIX = formatString(generalConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
+    SUPPORT_URL = generalConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
 
     // General options
-    MAXIMUM_ONLINE_PER_IP = clamp(yamlConfig.getInt("general.max-online-per-ip", 3), 1, Byte.MAX_VALUE);
-    MINIMUM_PLAYERS_FOR_ATTACK = clamp(yamlConfig.getInt("general.min-players-for-attack", 5), 2, 1024);
+    MAXIMUM_ONLINE_PER_IP = clamp(generalConfig.getInt("general.max-online-per-ip", 3), 1, Byte.MAX_VALUE);
+    MINIMUM_PLAYERS_FOR_ATTACK = clamp(generalConfig.getInt("general.min-players-for-attack", 5), 2, 1024);
 
-    LOCKDOWN_ENABLED = yamlConfig.getBoolean("general.lockdown.enabled", false);
-    LOCKDOWN_LOG_ATTEMPTS = yamlConfig.getBoolean("general.lockdown.log-attempts", true);
-    LOCKDOWN_ENABLE_NOTIFY = yamlConfig.getBoolean("general.lockdown.notify-admins", true);
+    LOCKDOWN_ENABLED = generalConfig.getBoolean("general.lockdown.enabled", false);
+    LOCKDOWN_LOG_ATTEMPTS = generalConfig.getBoolean("general.lockdown.log-attempts", true);
+    LOCKDOWN_ENABLE_NOTIFY = generalConfig.getBoolean("general.lockdown.notify-admins", true);
 
-    DATABASE = DatabaseType.valueOf(yamlConfig.getString("general.database.type", "NONE"));
-    ALLOW_PURGING = yamlConfig.getBoolean("general.database.allow-purging", true);
+    generalConfig.getYaml().setComment("general.database.type", "This value can either be NONE, MYSQL or YAML");
+    DATABASE = DatabaseType.valueOf(generalConfig.getString("general.database.type", "NONE"));
+    ALLOW_PURGING = generalConfig.getBoolean("general.database.allow-purging", true);
 
     // YAML
-    DATABASE_FILE_NAME = yamlConfig.getString("general.database.yaml.file-name", "database");
+    DATABASE_FILE_NAME = generalConfig.getString("general.database.yaml.file-name", "database");
 
     // MySQL
-    DATABASE_NAME = yamlConfig.getString("general.database.mysql.name", "sonar");
-    DATABASE_URL = yamlConfig.getString("general.database.mysql.url", "localhost");
-    DATABASE_PORT = clamp(yamlConfig.getInt("general.database.mysql.port", 3306), 0, 65535);
-    DATABASE_USERNAME = yamlConfig.getString("general.database.mysql.username", "root");
-    DATABASE_PASSWORD = yamlConfig.getString("general.database.mysql.password", "");
-    DATABASE_QUERY_LIMIT = clamp(yamlConfig.getInt("general.database.mysql.query-limit", 100000), 1000,
+    DATABASE_NAME = generalConfig.getString("general.database.mysql.name", "sonar");
+    DATABASE_URL = generalConfig.getString("general.database.mysql.url", "localhost");
+    DATABASE_PORT = clamp(generalConfig.getInt("general.database.mysql.port", 3306), 0, 65535);
+    DATABASE_USERNAME = generalConfig.getString("general.database.mysql.username", "root");
+    DATABASE_PASSWORD = generalConfig.getString("general.database.mysql.password", "");
+    DATABASE_QUERY_LIMIT = clamp(generalConfig.getInt("general.database.mysql.query-limit", 100000), 1000,
       Integer.MAX_VALUE);
 
-    MAXIMUM_QUEUED_PLAYERS = clamp(yamlConfig.getInt("general.queue.max-players", 8192), 128, Short.MAX_VALUE);
-    MAXIMUM_QUEUE_POLLS = clamp(yamlConfig.getInt("general.queue.max-polls", 10), 1, 1000);
+    MAXIMUM_QUEUED_PLAYERS = clamp(generalConfig.getInt("general.queue.max-players", 8192), 128, Short.MAX_VALUE);
+    MAXIMUM_QUEUE_POLLS = clamp(generalConfig.getInt("general.queue.max-polls", 10), 1, 1000);
 
-    ENABLE_VERIFICATION = yamlConfig.getBoolean("general.verification.enabled", true);
-    LOG_CONNECTIONS = yamlConfig.getBoolean("general.verification.log-connections", true);
-    LOG_DURING_ATTACK = yamlConfig.getBoolean("general.verification.log-during-attack", false);
-    VALID_NAME_REGEX = Pattern.compile(yamlConfig.getString(
+    ENABLE_VERIFICATION = generalConfig.getBoolean("general.verification.enabled", true);
+    LOG_CONNECTIONS = generalConfig.getBoolean("general.verification.log-connections", true);
+    LOG_DURING_ATTACK = generalConfig.getBoolean("general.verification.log-during-attack", false);
+    VALID_NAME_REGEX = Pattern.compile(generalConfig.getString(
       "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"
     ));
-    VALID_BRAND_REGEX = Pattern.compile(yamlConfig.getString(
+    VALID_BRAND_REGEX = Pattern.compile(generalConfig.getString(
       "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:;_()\\[\\]{}!?' *]+$"
     ));
-    MAXIMUM_BRAND_LENGTH = yamlConfig.getInt("general.verification.max-brand-length", 64);
-    VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 10000), 1500, 30000);
-    VERIFICATION_READ_TIMEOUT = clamp(yamlConfig.getInt("general.verification.read-timeout", 4000), 500, 30000);
-    MAXIMUM_LOGIN_PACKETS = clamp(yamlConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
-    MAXIMUM_VERIFYING_PLAYERS = clamp(yamlConfig.getInt("general.verification.max-players", 1024), 1,
+    MAXIMUM_BRAND_LENGTH = generalConfig.getInt("general.verification.max-brand-length", 64);
+    VERIFICATION_TIMEOUT = clamp(generalConfig.getInt("general.verification.timeout", 10000), 1500, 30000);
+    VERIFICATION_READ_TIMEOUT = clamp(generalConfig.getInt("general.verification.read-timeout", 4000), 500, 30000);
+    MAXIMUM_LOGIN_PACKETS = clamp(generalConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
+    MAXIMUM_VERIFYING_PLAYERS = clamp(generalConfig.getInt("general.verification.max-players", 1024), 1,
       Short.MAX_VALUE);
-    VERIFICATION_DELAY = clamp(yamlConfig.getInt("general.verification.rejoin-delay", 8000), 0, 100000);
-    ENABLE_COMPRESSION = yamlConfig.getBoolean("general.verification.enable-compression", true);
+    VERIFICATION_DELAY = clamp(generalConfig.getInt("general.verification.rejoin-delay", 8000), 0, 100000);
+    ENABLE_COMPRESSION = generalConfig.getBoolean("general.verification.enable-compression", true);
 
     // load this here otherwise it could cause issues
-    HEADER = fromList(yamlConfig.getStringList("messages.header",
+    HEADER = fromList(generalConfig.getStringList("messages.header",
       Arrays.asList(
         "&e&lSonar"
       )));
-    FOOTER = fromList(yamlConfig.getStringList("messages.footer",
+    FOOTER = fromList(generalConfig.getStringList("messages.footer",
       Arrays.asList(
         "&7If you believe that this is an error, contact an administrator."
       )));
 
-    LOCKDOWN_ACTIVATED = formatString(yamlConfig.getString("messages.lockdown.enabled",
+    LOCKDOWN_ACTIVATED = formatString(generalConfig.getString("messages.lockdown.enabled",
       "%prefix%The server is now in lockdown mode."
     ));
-    LOCKDOWN_DEACTIVATED = formatString(yamlConfig.getString("messages.lockdown.disabled",
+    LOCKDOWN_DEACTIVATED = formatString(generalConfig.getString("messages.lockdown.disabled",
       "%prefix%The server is no longer in lockdown mode."
     ));
-    LOCKDOWN_NOTIFICATION = formatString(yamlConfig.getString("messages.lockdown.notification",
+    LOCKDOWN_NOTIFICATION = formatString(generalConfig.getString("messages.lockdown.notification",
       "%prefix%&aHey, the server is currently in lockdown mode. If you want to disable the lockdown mode, " +
         "type " +
         "&f/sonar" +
         " lockdown&a."
     ));
-    LOCKDOWN_CONSOLE_LOG = yamlConfig.getString("messages.lockdown.console-log",
+    LOCKDOWN_CONSOLE_LOG = generalConfig.getString("messages.lockdown.console-log",
       "%player% (%ip%, %protocol%) tried to join during lockdown mode."
     );
-    LOCKDOWN_DISCONNECT = fromList(yamlConfig.getStringList("messages.lockdown.disconnect-message",
+    LOCKDOWN_DISCONNECT = fromList(generalConfig.getStringList("messages.lockdown.disconnect-message",
       Arrays.asList(
         "%header%",
         "&cThe server is currently locked down, please try again later.",
         "%footer%"
       )));
 
-    RELOADING = formatString(yamlConfig.getString("messages.reload.start",
+    RELOADING = formatString(generalConfig.getString("messages.reload.start",
       "%prefix%Reloading Sonar..."
     ));
-    RELOADED = formatString(yamlConfig.getString("messages.reload.finish",
+    RELOADED = formatString(generalConfig.getString("messages.reload.finish",
       "%prefix%&aSuccessfully reloaded &7(%taken%ms)"
     ));
 
-    VERBOSE_SUBSCRIBED = formatString(yamlConfig.getString("messages.verbose.subscribed",
+    VERBOSE_SUBSCRIBED = formatString(generalConfig.getString("messages.verbose.subscribed",
       "%prefix%You are now viewing Sonar verbose."
     ));
-    VERBOSE_UNSUBSCRIBED = formatString(yamlConfig.getString("messages.verbose.unsubscribed",
+    VERBOSE_UNSUBSCRIBED = formatString(generalConfig.getString("messages.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."
     ));
-    VERBOSE_SUBSCRIBED_OTHER = formatString(yamlConfig.getString("messages.verbose.subscribed-other",
+    VERBOSE_SUBSCRIBED_OTHER = formatString(generalConfig.getString("messages.verbose.subscribed-other",
       "%prefix%%player% is now viewing Sonar verbose."
     ));
-    VERBOSE_UNSUBSCRIBED_OTHER = formatString(yamlConfig.getString("messages.verbose.unsubscribed-other",
+    VERBOSE_UNSUBSCRIBED_OTHER = formatString(generalConfig.getString("messages.verbose.unsubscribed-other",
       "%prefix%%player% is no longer viewing Sonar verbose."
     ));
 
-    DATABASE_PURGE_DISALLOWED = formatString(yamlConfig.getString("messages.database.disallowed",
+    DATABASE_PURGE_DISALLOWED = formatString(generalConfig.getString("messages.database.disallowed",
       "%prefix%&cPurging the database is currently disallowed. Therefore, your action has been cancelled."
     ));
-    DATABASE_PURGE_CONFIRM = formatString(yamlConfig.getString("messages.database.purge-confirm",
+    DATABASE_PURGE_CONFIRM = formatString(generalConfig.getString("messages.database.purge-confirm",
       "%prefix%&cPlease confirm that you want to delete all database entries by typing &7/sonar database " +
         "purge " +
         "confirm&c."
     ));
-    DATABASE_PURGE = formatString(yamlConfig.getString("messages.database.purge",
+    DATABASE_PURGE = formatString(generalConfig.getString("messages.database.purge",
       "%prefix%&aSuccessfully purged all database entries."
     ));
-    DATABASE_PURGE_ALREADY = formatString(yamlConfig.getString("messages.database.purging",
+    DATABASE_PURGE_ALREADY = formatString(generalConfig.getString("messages.database.purging",
       "%prefix%&cThere is already a purge currently running."
     ));
-    DATABASE_NOT_SELECTED = formatString(yamlConfig.getString("messages.database.not-selected",
+    DATABASE_NOT_SELECTED = formatString(generalConfig.getString("messages.database.not-selected",
       "%prefix%&cYou have not selected any data storage type."
     ));
-    DATABASE_RELOADING = formatString(yamlConfig.getString("messages.database.reload.start",
+    DATABASE_RELOADING = formatString(generalConfig.getString("messages.database.reload.start",
       "%prefix%Reloading all databases..."
     ));
-    DATABASE_RELOADED = formatString(yamlConfig.getString("messages.database.reload.finish",
+    DATABASE_RELOADED = formatString(generalConfig.getString("messages.database.reload.finish",
       "%prefix%&aSuccessfully reloaded &7(%taken%ms)"
     ));
 
-    INCORRECT_COMMAND_USAGE = formatString(yamlConfig.getString("messages.incorrect-command-usage",
+    INCORRECT_COMMAND_USAGE = formatString(generalConfig.getString("messages.incorrect-command-usage",
       "%prefix%&cUsage: /sonar %usage%"
     ));
-    INCORRECT_IP_ADDRESS = formatString(yamlConfig.getString("messages.invalid-ip-address",
+    INCORRECT_IP_ADDRESS = formatString(generalConfig.getString("messages.invalid-ip-address",
       "%prefix%The IP address you provided seems to be invalid."
     ));
-    ILLEGAL_IP_ADDRESS = formatString(yamlConfig.getString("messages.illegal-ip-address",
+    ILLEGAL_IP_ADDRESS = formatString(generalConfig.getString("messages.illegal-ip-address",
       "%prefix%The IP address you provided seems to be either a local or loopback IP."
     ));
-    PLAYERS_ONLY = formatString(yamlConfig.getString("messages.players-only",
+    PLAYERS_ONLY = formatString(generalConfig.getString("messages.players-only",
       "%prefix%&cYou can only execute this command as a player."
     ));
-    CONSOLE_ONLY = formatString(yamlConfig.getString("messages.console-only",
+    CONSOLE_ONLY = formatString(generalConfig.getString("messages.console-only",
       "%prefix%&cFor security reasons, you can only execute this command through console."
     ));
-    COMMAND_COOL_DOWN = formatString(yamlConfig.getString("messages.command-cool-down",
+    COMMAND_COOL_DOWN = formatString(generalConfig.getString("messages.command-cool-down",
       "%prefix%&cYou can only execute this command every 0.5 seconds."
     ));
-    COMMAND_COOL_DOWN_LEFT = formatString(yamlConfig.getString("messages.command-cool-down-left",
+    COMMAND_COOL_DOWN_LEFT = formatString(generalConfig.getString("messages.command-cool-down-left",
       "%prefix%&cPlease wait another &l%time-left%s&r&c."
     ));
-    SUB_COMMAND_NO_PERM = formatString(yamlConfig.getString("messages.sub-command-no-permission",
+    SUB_COMMAND_NO_PERM = formatString(generalConfig.getString("messages.sub-command-no-permission",
       "%prefix%&cYou do not have permission to execute this subcommand. &7(%permission%)"
     ));
 
-    BLACKLIST_EMPTY = formatString(yamlConfig.getString("messages.blacklist.empty",
+    BLACKLIST_EMPTY = formatString(generalConfig.getString("messages.blacklist.empty",
       "%prefix%The blacklist is currently empty. Therefore, no IP addresses were removed from the blacklist."
     ));
-    BLACKLIST_CLEARED = formatString(yamlConfig.getString("messages.blacklist.cleared",
+    BLACKLIST_CLEARED = formatString(generalConfig.getString("messages.blacklist.cleared",
       "%prefix%You successfully removed a total of %removed% IP address(es) from the blacklist."
     ));
-    BLACKLIST_SIZE = formatString(yamlConfig.getString("messages.blacklist.size",
+    BLACKLIST_SIZE = formatString(generalConfig.getString("messages.blacklist.size",
       "%prefix%The blacklist currently contains %amount% IP address(es)."
     ));
-    BLACKLIST_ADD = formatString(yamlConfig.getString("messages.blacklist.added",
+    BLACKLIST_ADD = formatString(generalConfig.getString("messages.blacklist.added",
       "%prefix%Successfully added %ip% to the blacklist."
     ));
-    BLACKLIST_REMOVE = formatString(yamlConfig.getString("messages.blacklist.removed",
+    BLACKLIST_REMOVE = formatString(generalConfig.getString("messages.blacklist.removed",
       "%prefix%Successfully removed %ip% from the blacklist."
     ));
-    BLACKLIST_DUPLICATE = formatString(yamlConfig.getString("messages.blacklist.duplicate-ip",
+    BLACKLIST_DUPLICATE = formatString(generalConfig.getString("messages.blacklist.duplicate-ip",
       "%prefix%The IP address you provided is already blacklisted."
     ));
-    BLACKLIST_NOT_FOUND = formatString(yamlConfig.getString("messages.blacklist.ip-not-found",
+    BLACKLIST_NOT_FOUND = formatString(generalConfig.getString("messages.blacklist.ip-not-found",
       "%prefix%The IP address you provided is not blacklisted."
     ));
 
-    WHITELIST_SIZE = formatString(yamlConfig.getString("messages.whitelist.size",
+    WHITELIST_SIZE = formatString(generalConfig.getString("messages.whitelist.size",
       "%prefix%The whitelist currently contains %amount% IP address(es)."
     ));
-    WHITELIST_ADD = formatString(yamlConfig.getString("messages.whitelist.added",
+    WHITELIST_ADD = formatString(generalConfig.getString("messages.whitelist.added",
       "%prefix%Successfully added %ip% to the whitelist."
     ));
-    WHITELIST_REMOVE = formatString(yamlConfig.getString("messages.whitelist.removed",
+    WHITELIST_REMOVE = formatString(generalConfig.getString("messages.whitelist.removed",
       "%prefix%Successfully removed %ip% from the whitelist."
     ));
-    WHITELIST_DUPLICATE = formatString(yamlConfig.getString("messages.whitelist.duplicate-ip",
+    WHITELIST_DUPLICATE = formatString(generalConfig.getString("messages.whitelist.duplicate-ip",
       "%prefix%The IP address you provided is already whitelisted."
     ));
-    WHITELIST_NOT_FOUND = formatString(yamlConfig.getString("messages.whitelist.ip-not-found",
+    WHITELIST_NOT_FOUND = formatString(generalConfig.getString("messages.whitelist.ip-not-found",
       "%prefix%The IP address you provided is not whitelisted."
     ));
 
-    TOO_MANY_PLAYERS = fromList(yamlConfig.getStringList("messages.verification.too-many-players",
+    TOO_MANY_PLAYERS = fromList(generalConfig.getStringList("messages.verification.too-many-players",
       Arrays.asList(
         "%header%",
         "&6Too many players are currently trying to log in, try again later.",
         "&7Please wait a few seconds before trying to join again.",
         "%footer%"
       )));
-    TOO_FAST_RECONNECT = fromList(yamlConfig.getStringList("messages.verification.too-fast-reconnect",
+    TOO_FAST_RECONNECT = fromList(generalConfig.getStringList("messages.verification.too-fast-reconnect",
       Arrays.asList(
         "%header%",
         "&6You reconnected too fast, try again later.",
         "&7Please wait a few seconds before trying to verify again.",
         "%footer%"
       )));
-    ALREADY_VERIFYING = fromList(yamlConfig.getStringList("messages.verification.already-verifying",
+    ALREADY_VERIFYING = fromList(generalConfig.getStringList("messages.verification.already-verifying",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently being verified.",
         "&cPlease wait a few seconds before trying to verify again.",
         "%footer%"
       )));
-    ALREADY_QUEUED = fromList(yamlConfig.getStringList("messages.verification.already-queued",
+    ALREADY_QUEUED = fromList(generalConfig.getStringList("messages.verification.already-queued",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently queued for verification.",
         "&cPlease wait a few minutes before trying to verify again.",
         "%footer%"
       )));
-    BLACKLISTED = fromList(yamlConfig.getStringList("messages.verification.blacklisted",
+    BLACKLISTED = fromList(generalConfig.getStringList("messages.verification.blacklisted",
       Arrays.asList(
         "%header%",
         "&cYou are currently denied from entering the server.",
@@ -355,7 +356,7 @@ public final class SonarConfiguration {
         "&6False positive? &7%support-url%",
         "%footer%"
       )));
-    UNEXPECTED_ERROR = fromList(yamlConfig.getStringList("messages.verification.unexpected-error",
+    UNEXPECTED_ERROR = fromList(generalConfig.getStringList("messages.verification.unexpected-error",
       Arrays.asList(
         "%header%",
         "&6An unexpected error occurred when trying to process your connection.",
@@ -363,20 +364,20 @@ public final class SonarConfiguration {
         "&6Need help? &7%support-url%",
         "%footer%"
       )));
-    INVALID_USERNAME = fromList(yamlConfig.getStringList("messages.verification.invalid-username",
+    INVALID_USERNAME = fromList(generalConfig.getStringList("messages.verification.invalid-username",
       Arrays.asList(
         "%header%",
         "&cYour username contains invalid characters.",
         "%footer%"
       )));
-    TOO_MANY_ONLINE_PER_IP = fromList(yamlConfig.getStringList("messages.too-many-online-per-ip",
+    TOO_MANY_ONLINE_PER_IP = fromList(generalConfig.getStringList("messages.too-many-online-per-ip",
       Arrays.asList(
         "%header%",
         "&cThere are too many players online with your IP address.",
         "%footer%"
       )));
 
-    ACTION_BAR_LAYOUT = formatString(yamlConfig.getString(
+    ACTION_BAR_LAYOUT = formatString(generalConfig.getString(
       "messages.action-bar.layout",
       "%prefix%&fQueued &7%queued%" +
         "  &fVerifying &7%verifying%" +
@@ -385,9 +386,11 @@ public final class SonarConfiguration {
         "  &fMemory &7≅ %used-memory%" +
         "  &a&l%animation%"
     ));
-    ANIMATION = yamlConfig.getStringList("messages.action-bar.animation",
+    ANIMATION = generalConfig.getStringList("messages.action-bar.animation",
       Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
     );
+
+    generalConfig.save();
   }
 
   private static int clamp(final int v, final int max, final int min) {
