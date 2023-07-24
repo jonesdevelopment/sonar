@@ -177,7 +177,7 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.database.type",
       "The database can either be NONE, MYSQL or YAML"
     );
-    DATABASE = DatabaseType.valueOf(generalConfig.getString("general.database.type", "NONE"));
+    DATABASE = DatabaseType.valueOf(generalConfig.getString("general.database.type", "NONE").toUpperCase());
 
     generalConfig.getYaml().setComment("general.database.allow-purging",
       "Should Sonar allow database purges?"
