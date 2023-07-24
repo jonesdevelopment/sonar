@@ -29,6 +29,7 @@ import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
+import xyz.jonesdev.sonar.common.timer.DelayTimer;
 import xyz.jonesdev.sonar.velocity.command.SonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.verbose.ActionBarVerbose;
@@ -114,7 +115,7 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   public void enable(final SonarVelocityPlugin plugin) {
     this.plugin = plugin;
 
-    final long start = System.currentTimeMillis();
+    final DelayTimer timer = new DelayTimer();
 
     // Set the API to this class
     SonarSupplier.set(this);
@@ -150,9 +151,7 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
       .schedule();
 
     // Done
-    final long startDelay = System.currentTimeMillis() - start;
-
-    logger.info("Done ({}s)!", String.format("%.3f", startDelay / 1000D));
+    logger.info("Done ({}s)!", timer.formattedDelay());
   }
 
   @Override

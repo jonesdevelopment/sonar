@@ -32,6 +32,7 @@ import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
+import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import java.io.File;
 import java.util.Optional;
@@ -115,7 +116,7 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   public void enable(final SonarBungeePlugin plugin) {
     this.plugin = plugin;
 
-    final long start = System.currentTimeMillis();
+    final DelayTimer timer = new DelayTimer();
 
     // Set the API to this class
     SonarSupplier.set(this);
@@ -149,9 +150,7 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
       100L, 100L, TimeUnit.MILLISECONDS);
 
     // Done
-    final long startDelay = System.currentTimeMillis() - start;
-
-    logger.info("Done (" + String.format("%.3f", startDelay / 1000D) + "s)!");
+    logger.info("Done ({}s)!", timer.formattedDelay());
   }
 
   @Override

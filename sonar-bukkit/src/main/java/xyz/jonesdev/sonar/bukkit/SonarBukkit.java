@@ -30,6 +30,7 @@ import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
 import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
+import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import java.io.File;
 import java.util.Objects;
@@ -113,7 +114,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   public void enable(final SonarBukkitPlugin plugin) {
     this.plugin = plugin;
 
-    final long start = System.currentTimeMillis();
+    final DelayTimer timer = new DelayTimer();
 
     // Set the API to this class
     SonarSupplier.set(this);
@@ -140,9 +141,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
       100L, 100L);
 
     // Done
-    final long startDelay = System.currentTimeMillis() - start;
-
-    logger.info("Done (" + String.format("%.3f", startDelay / 1000D) + "s)!");
+    logger.info("Done ({}s)!", timer.formattedDelay());
   }
 
   @Override
