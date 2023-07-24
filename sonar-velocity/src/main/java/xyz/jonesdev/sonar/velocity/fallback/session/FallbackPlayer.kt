@@ -33,7 +33,7 @@ class FallbackPlayer(
   private val pipeline: ChannelPipeline,
   private val inetAddress: InetAddress,
   private val protocolVersion: Int,
-) : FallbackConnection<ConnectedPlayer?, MinecraftConnection?> {
+) : FallbackConnection<ConnectedPlayer, MinecraftConnection> {
 
   override fun getFallback(): Fallback {
     return fallback

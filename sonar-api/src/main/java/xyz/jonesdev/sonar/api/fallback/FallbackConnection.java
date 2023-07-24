@@ -25,12 +25,12 @@ import xyz.jonesdev.sonar.api.Sonar;
 
 import java.net.InetAddress;
 
-public interface FallbackConnection<Player, Connection> {
+public interface FallbackConnection<X, Y> {
   @NotNull Fallback getFallback();
 
-  @NotNull Player getPlayer();
+  @NotNull X getPlayer();
 
-  @NotNull Connection getConnection();
+  @NotNull Y getConnection();
 
   @NotNull Channel getChannel();
 
