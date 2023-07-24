@@ -150,17 +150,23 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   }
 
   private static boolean validateClientBrand(final FallbackPlayer player, final ByteBuf content) {
-    // No need to check for empty or too long client brands since
-    // ProtocolUtils#readString already does exactly that.
+    // We have to catch every DecoderException, so we can fail and punish
+    // the player instead of only disconnecting them due to an exception.
     try {
       final boolean legacy = player.getConnection().getProtocolVersion().compareTo(MINECRAFT_1_8) < 0;
-      final String read = ProtocolUtil.readString(content, 64, legacy);
+      // 1.7 has some very weird issues when trying to decode the client brand
+      final int cap = player.getFallback().getSonar().getConfig().MAXIMUM_BRAND_LENGTH;
+      // Read the client brand using our custom readString method that supports 1.7.
+      // The legacy version of readString does not compare the string length
+      // with the VarInt sent by the client.
+      final String read = ProtocolUtil.readString(content, cap, legacy);
+      // No need to check for empty or too long client brands since
+      // ProtocolUtil#readString already does exactly that.
       return !read.equals("Vanilla") // The normal brand is always lowercase
         // We want to allow client brands that have a URL in them
         // (e.g., CheatBreaker)
         && Sonar.get().getConfig().VALID_BRAND_REGEX.matcher(read).matches(); // Normal regex validation
     } catch (DecoderException exception) {
-      exception.printStackTrace();
       // Fail if the string (client brand) could not be decoded properly
       player.fail("could not decode string");
       // Throw the exception so we don't continue checking

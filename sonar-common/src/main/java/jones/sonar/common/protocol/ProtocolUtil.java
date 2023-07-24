@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static jones.sonar.common.protocol.VarIntUtil.readVarInt;
 
-// Taken from Velocity
+// Mostly taken from Velocity
 @UtilityClass
 public class ProtocolUtil {
   public @NotNull String readString(final ByteBuf buf,
@@ -37,7 +37,8 @@ public class ProtocolUtil {
     checkFrame(length <= cap * 3, "Bad string size");
     String str;
     if (legacy) {
-      str = buf.toString(Charsets.UTF_8); // TODO: length checking?
+      // TODO: length checking?
+      str = buf.toString(Charsets.UTF_8);
       buf.skipBytes(buf.readableBytes());
     } else {
       checkFrame(buf.isReadable(length), "Got an invalid string length");

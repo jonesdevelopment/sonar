@@ -45,6 +45,7 @@ public final class SonarConfiguration {
   public boolean LOG_CONNECTIONS;
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
+  public int MAXIMUM_BRAND_LENGTH;
   public int MINIMUM_PLAYERS_FOR_ATTACK;
   public int MAXIMUM_VERIFYING_PLAYERS;
   public int MAXIMUM_ONLINE_PER_IP;
@@ -168,6 +169,7 @@ public final class SonarConfiguration {
     VALID_BRAND_REGEX = Pattern.compile(yamlConfig.getString(
       "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:;_()\\[\\]{}!?' *]+$"
     ));
+    MAXIMUM_BRAND_LENGTH = yamlConfig.getInt("general.verification.max-brand-length", 64);
     VERIFICATION_TIMEOUT = clamp(yamlConfig.getInt("general.verification.timeout", 10000), 1500, 30000);
     VERIFICATION_READ_TIMEOUT = clamp(yamlConfig.getInt("general.verification.read-timeout", 4000), 500, 30000);
     MAXIMUM_LOGIN_PACKETS = clamp(yamlConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
