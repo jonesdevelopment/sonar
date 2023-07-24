@@ -127,7 +127,7 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
   @Override
   public void disable() {
-    getLogger().info("Shutting down...");
+    getLogger().info("Starting shutdown process...");
 
     if (getConfig().DATABASE != DatabaseType.NONE) {
       getLogger().info("[database] Saving entries to database...");
@@ -139,6 +139,8 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
       // Dispose the database instance
       getDatabase().dispose();
+
+      getLogger().info("[database] Done.");
     }
 
     getLogger().info("Successfully shut down.");

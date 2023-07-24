@@ -118,7 +118,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
   @Override
   public void disable() {
-    getLogger().info("Shutting down...");
+    getLogger().info("Starting shutdown process...");
 
     if (getConfig().DATABASE != DatabaseType.NONE) {
       getLogger().info("[database] Saving entries to database...");
@@ -130,6 +130,8 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
       // Dispose the database instance
       getDatabase().dispose();
+
+      getLogger().info("[database] Done.");
     }
 
     getLogger().info("Successfully shut down.");
