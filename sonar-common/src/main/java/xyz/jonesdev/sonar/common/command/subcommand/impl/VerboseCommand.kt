@@ -40,16 +40,20 @@ class VerboseCommand : SubCommand() {
     if (sonar.actionBarVerbose.isSubscribed(verboseSubscriber.name)) {
       sonar.actionBarVerbose.unsubscribe(verboseSubscriber.name)
       if (verboseSubscriber != invocation.invocationSender) {
-        verboseSubscriber.sendMessage(sonar.config.VERBOSE_UNSUBSCRIBED_OTHER
-          .replace("%player%", verboseSubscriber.name))
+        verboseSubscriber.sendMessage(
+          sonar.config.VERBOSE_UNSUBSCRIBED_OTHER
+            .replace("%player%", verboseSubscriber.name)
+        )
       }
       verboseSubscriber.sendMessage(sonar.config.VERBOSE_UNSUBSCRIBED)
       return
     }
 
     if (verboseSubscriber != invocation.invocationSender) {
-      verboseSubscriber.sendMessage(sonar.config.VERBOSE_SUBSCRIBED_OTHER
-        .replace("%player%", verboseSubscriber.name))
+      verboseSubscriber.sendMessage(
+        sonar.config.VERBOSE_SUBSCRIBED_OTHER
+          .replace("%player%", verboseSubscriber.name)
+      )
     }
     verboseSubscriber.sendMessage(sonar.config.VERBOSE_SUBSCRIBED)
     sonar.actionBarVerbose.subscribe(verboseSubscriber.name)
