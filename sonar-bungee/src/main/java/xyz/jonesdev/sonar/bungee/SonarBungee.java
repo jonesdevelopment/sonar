@@ -163,6 +163,8 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
       // Load all blacklisted and verified IPs from the database
       getLogger().info("[database] Loading verified IPs from the database...");
       getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
+
+      getLogger().info("[database] Done.");
     }
   }
 }
