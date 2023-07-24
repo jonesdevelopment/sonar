@@ -26,6 +26,25 @@ import static xyz.jonesdev.sonar.api.database.Database.VERIFIED_TABLE;
 public interface SonarBootstrap<T> extends Sonar {
   void enable(final T plugin);
 
+  default void reload() {
+    if (getConfig().DATABASE != DatabaseType.NONE) {
+      getLogger().info("[database] Initializing database...");
+      getDatabase().initialize(getConfig());
+
+      // Clear all verified IPs from memory to avoid issues with the database
+      if (!getFallback().getVerified().isEmpty()) {
+        getLogger().info("[database] Cleaning verified IPs from memory...");
+        getFallback().getVerified().clear();
+      }
+
+      // Load all blacklisted and verified IPs from the database
+      getLogger().info("[database] Loading verified IPs from the database...");
+      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
+
+      getLogger().info("[database] Done.");
+    }
+  }
+
   default void disable() {
     getLogger().info("Starting shutdown process...");
 

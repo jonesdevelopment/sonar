@@ -24,7 +24,6 @@ import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
@@ -36,9 +35,6 @@ import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
-
-import static xyz.jonesdev.sonar.api.database.Database.IP_COLUMN;
-import static xyz.jonesdev.sonar.api.database.Database.VERIFIED_TABLE;
 
 public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
@@ -148,21 +144,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   public void reload() {
     getConfig().load();
 
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      getLogger().info("[database] Initializing database...");
-      getDatabase().initialize(getConfig());
-
-      // Clear all verified IPs from memory to avoid issues with the database
-      if (!getFallback().getVerified().isEmpty()) {
-        getLogger().info("[database] Cleaning verified IPs from memory...");
-        getFallback().getVerified().clear();
-      }
-
-      // Load all blacklisted and verified IPs from the database
-      getLogger().info("[database] Loading verified IPs from the database...");
-      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
-
-      getLogger().info("[database] Done.");
-    }
+    // Run the shared reload process
+    SonarBootstrap.super.reload();
   }
 }
