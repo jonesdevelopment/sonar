@@ -44,9 +44,9 @@ subprojects {
 
     compileOnly("io.netty:netty-all:4.1.95.Final") // netty
 
-    implementation("xyz.jonesdev:cappuchino:0.1.0-SNAPSHOT")
     implementation(kotlin("stdlib-jdk8")) // kotlin
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
+    implementation("xyz.jonesdev:cappuchino:0.1.2-SNAPSHOT") // expiring cache
   }
 
   kotlin {
