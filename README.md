@@ -89,11 +89,5 @@ Sonar is licensed under the GNU General Public License 3.0.
 ## Credits
 
 - Special thanks to the [contributors of Sonar](https://github.com/jonesdevelopment/sonar-antibot/graphs/contributors).
-- Some parts of the Java reflections used by Sonar are taken from [LimboAPI](https://github.com/Elytrium/LimboAPI).
-  - [PacketDimension](https://github.com/jonesdevelopment/sonar-antibot/blob/main/common/src/main/java/jones/sonar/common/fallback/dimension/PacketDimension.java)
-    was taken
-    from [LimboAPI](https://github.com/Elytrium/LimboAPI/blob/master/api/src/main/java/net/elytrium/limboapi/api/chunk/Dimension.java).
-  - [Biome](https://github.com/jonesdevelopment/sonar-antibot/blob/main/velocity/src/main/java/jones/sonar/velocity/fallback/dimension/Biome.java)
-    was taken
-    from [LimboAPI](https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/material/Biome.java).
+- The nbt mappings for the JoinGame packets were taken from [LimboAPI](https://github.com/Elytrium/LimboAPI).
 - The Velocity compression and Varint decoding was taken from [Velocity](https://github.com/PaperMC/Velocity).

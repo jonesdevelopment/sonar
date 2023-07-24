@@ -22,7 +22,6 @@ import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.registry.DimensionInfo;
 import com.velocitypowered.proxy.protocol.packet.JoinGame;
 import jones.sonar.api.Sonar;
-import jones.sonar.common.fallback.dimension.Biome;
 import jones.sonar.common.fallback.dimension.PacketDimension;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTagIO;
@@ -34,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Objects;
 
 import static com.velocitypowered.api.network.ProtocolVersion.*;
@@ -134,7 +134,6 @@ public class FallbackPackets {
     joinGame.setGamemode((short) 3);
     joinGame.setReducedDebugInfo(true);
     joinGame.setDimension(USED_DIMENSION.getLegacyID());
-
     return joinGame;
   }
 
@@ -168,7 +167,37 @@ public class FallbackPackets {
       dimensionRegistryEntry.put("value", encodedDimensionRegistry);
 
       registryContainer.put("minecraft:dimension_type", dimensionRegistryEntry.build());
-      registryContainer.put("minecraft:worldgen/biome", Biome.getRegistry(protocolVersion.getProtocol()));
+
+      final CompoundBinaryTag.Builder effectsTagBuilder = CompoundBinaryTag.builder()
+        .putInt("sky_color", 7907327)
+        .putInt("water_fog_color", 329011)
+        .putInt("fog_color", 12638463)
+        .putInt("water_color", 415920);
+
+      final CompoundBinaryTag.Builder elementTagBuilder = CompoundBinaryTag.builder()
+        .putFloat("depth", 0.125F)
+        .putFloat("temperature", 0.8F)
+        .putFloat("scale", 0.05F)
+        .putFloat("downfall", 0.4F)
+        .putString("category", "plains")
+        .put("effects", effectsTagBuilder.build());
+
+      if (protocolVersion.compareTo(MINECRAFT_1_19_4) >= 0) {
+        elementTagBuilder.putBoolean("has_precipitation", false);
+      } else {
+        elementTagBuilder.putString("precipitation", "rain");
+      }
+
+      registryContainer.put("minecraft:worldgen/biome", CompoundBinaryTag.builder()
+        .putString("type", "minecraft:worldgen/biome")
+        .put("value", ListBinaryTag.from(Collections.singletonList(
+          CompoundBinaryTag.builder()
+            .putString("name", "minecraft:plains")
+            .putInt("id", 1)
+            .put("element", elementTagBuilder.build())
+            .build()
+        ))).build()
+      );
 
       if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) == 0) {
         registryContainer.put("minecraft:chat_type", CHAT_TYPE_119);
@@ -205,7 +234,7 @@ public class FallbackPackets {
   // https://github.com/Elytrium/LimboAPI/blob/91bedd5dad5e659092fbb0a7411bd00d67044d01/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L552
   private @NotNull CompoundBinaryTag createDimensionData(final @NotNull PacketDimension dimension,
                                                          final @NotNull ProtocolVersion version) {
-    CompoundBinaryTag details = CompoundBinaryTag.builder()
+    final CompoundBinaryTag details = CompoundBinaryTag.builder()
       .putBoolean("natural", false)
       .putFloat("ambient_light", 0.0F)
       .putBoolean("shrunk", false)
