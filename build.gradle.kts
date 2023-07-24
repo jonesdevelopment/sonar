@@ -76,6 +76,8 @@ tasks {
   shadowJar {
     // bStats has to be relocated to the Sonar package otherwise it throws an exception.
     relocate("org.bstats", "xyz.jonesdev.sonar.bstats")
+    // We also relocate snakeyaml to its official package
+    relocate("org.simpleyaml.configuration.implementation.snakeyaml.lib", "org.yaml.snakeyaml")
     // Set the file name of the shadowed jar
     archiveFileName.set("${rootProject.name}.jar")
   }
