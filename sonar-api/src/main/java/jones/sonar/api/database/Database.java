@@ -23,8 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 public interface Database {
-  String VERIFIED_TABLE = "verified_ips";
-  String BLACKLIST_TABLE = "blacklisted_ips";
+  String VERIFIED_TABLE = "verified";
   String IP_COLUMN = "ip_address";
 
   void initialize(final @NotNull SonarConfiguration config);

@@ -43,7 +43,6 @@ final class YamlDatabase implements Database {
     Objects.requireNonNull(yamlConfig);
 
     clear(VERIFIED_TABLE);
-    clear(BLACKLIST_TABLE);
   }
 
   @Override

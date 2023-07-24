@@ -66,7 +66,6 @@ final class MySQLDatabase implements Database {
 
       // Create necessary tables and columns
       createTable(IP_COLUMN, VERIFIED_TABLE);
-      createTable(IP_COLUMN, BLACKLIST_TABLE);
     } catch (Throwable throwable) {
       Sonar.get().getLogger().error("Failed to connect to database: {}", throwable);
       throwable.printStackTrace();
@@ -78,7 +77,6 @@ final class MySQLDatabase implements Database {
     Objects.requireNonNull(dataSource);
 
     clear(VERIFIED_TABLE);
-    clear(BLACKLIST_TABLE);
   }
 
   @Override

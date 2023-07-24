@@ -34,7 +34,8 @@ import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.logging.Level;
 
-import static jones.sonar.api.database.Database.*;
+import static jones.sonar.api.database.Database.IP_COLUMN;
+import static jones.sonar.api.database.Database.VERIFIED_TABLE;
 
 public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
@@ -122,10 +123,8 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     if (getConfig().DATABASE != DatabaseType.NONE) {
       getLogger().info("[database] Saving entries to database...");
 
-      // We need to clear the table because we don't want any IPs which aren't present
+      // We need to clear the table because we don't want any IPs that aren't present
       // or have been manually removed to still be present in the database
-      getDatabase().clear(BLACKLIST_TABLE);
-      getDatabase().addListToTable(BLACKLIST_TABLE, IP_COLUMN, getFallback().getBlacklisted());
       getDatabase().clear(VERIFIED_TABLE);
       getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
 
@@ -144,17 +143,15 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
       getLogger().info("[database] Initializing database...");
       getDatabase().initialize(getConfig());
 
-      // Clear all blacklisted and verified IPs from memory
+      // Clear all verified IPs from memory to avoid issues with the database
       if (!getFallback().getVerified().isEmpty()
         || !getFallback().getBlacklisted().isEmpty()) {
-        getLogger().info("[database] Cleaning verified and blacklisted IPs from memory...");
-        getFallback().getBlacklisted().clear();
+        getLogger().info("[database] Cleaning verified IPs from memory...");
         getFallback().getVerified().clear();
       }
 
       // Load all blacklisted and verified IPs from the database
-      getLogger().info("[database] Loading verified and blacklisted IPs from database...");
-      getFallback().getBlacklisted().addAll(getDatabase().getListFromTable(BLACKLIST_TABLE, IP_COLUMN));
+      getLogger().info("[database] Loading verified IPs from the database...");
       getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
     }
   }
