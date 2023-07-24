@@ -17,12 +17,13 @@
 
 package xyz.jonesdev.sonar.velocity;
 
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.util.ratelimit.Ratelimiters;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
+import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.logger.Logger;
@@ -87,11 +88,22 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
     }
 
     @Override
-    public Optional<String> getOnlinePlayer(final String username) {
+    public Optional<InvocationSender> getOnlinePlayer(final String username) {
       return getPlugin().getServer().getAllPlayers().stream()
-        .map(Player::getUsername)
-        .filter(name -> name.equalsIgnoreCase(username))
-        .findFirst();
+        .filter(player -> player.getUsername().equalsIgnoreCase(username))
+        .findFirst()
+        .map(player -> new InvocationSender() {
+
+          @Override
+          public String getName() {
+            return player.getUsername();
+          }
+
+          @Override
+          public void sendMessage(final String message) {
+            player.sendMessage(Component.text(message));
+          }
+        });
     }
   };
 

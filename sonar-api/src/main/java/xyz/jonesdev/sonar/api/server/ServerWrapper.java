@@ -18,11 +18,12 @@
 package xyz.jonesdev.sonar.api.server;
 
 import xyz.jonesdev.sonar.api.SonarPlatform;
+import xyz.jonesdev.sonar.api.command.InvocationSender;
 
 import java.util.Optional;
 
 public interface ServerWrapper {
   SonarPlatform getPlatform();
 
-  Optional<String> getOnlinePlayer(final String username);
+  Optional<InvocationSender> getOnlinePlayer(final String username);
 }

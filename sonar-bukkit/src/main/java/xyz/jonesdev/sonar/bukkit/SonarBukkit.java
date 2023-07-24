@@ -19,10 +19,10 @@ package xyz.jonesdev.sonar.bukkit;
 
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.entity.Player;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
+import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.logger.Logger;
@@ -87,11 +87,22 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     }
 
     @Override
-    public Optional<String> getOnlinePlayer(final String username) {
+    public Optional<InvocationSender> getOnlinePlayer(final String username) {
       return getPlugin().getServer().getOnlinePlayers().stream()
-        .map(Player::getName)
-        .filter(name -> name.equalsIgnoreCase(username))
-        .findFirst();
+        .filter(player -> player.getName().equalsIgnoreCase(username))
+        .findFirst()
+        .map(player -> new InvocationSender() {
+
+          @Override
+          public String getName() {
+            return player.getName();
+          }
+
+          @Override
+          public void sendMessage(final String message) {
+            player.sendMessage(message);
+          }
+        });
     }
   };
 

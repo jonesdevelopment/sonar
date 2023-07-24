@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.command.subcommand.impl
 
+import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.common.command.CommandInvocation
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
@@ -28,15 +29,29 @@ import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
 )
 class VerboseCommand : SubCommand() {
   override fun execute(invocation: CommandInvocation) {
-    val verboseSubscriber = invocation.executorName
+    var verboseSubscriber = invocation.invocationSender
 
-    if (sonar.actionBarVerbose.isSubscribed(verboseSubscriber)) {
-      sonar.actionBarVerbose.unsubscribe(verboseSubscriber)
-      invocation.invocationSender.sendMessage(sonar.config.VERBOSE_UNSUBSCRIBED)
+    // Support for '/sonar verbose [username]'
+    if (invocation.arguments.size >= 2) {
+      val optional = Sonar.get().server.getOnlinePlayer(invocation.arguments[1])
+      if (optional.isPresent) verboseSubscriber = optional.get()
+    }
+
+    if (sonar.actionBarVerbose.isSubscribed(verboseSubscriber.name)) {
+      sonar.actionBarVerbose.unsubscribe(verboseSubscriber.name)
+      if (verboseSubscriber != invocation.invocationSender) {
+        verboseSubscriber.sendMessage(sonar.config.VERBOSE_UNSUBSCRIBED_OTHER
+          .replace("%player%", verboseSubscriber.name))
+      }
+      verboseSubscriber.sendMessage(sonar.config.VERBOSE_UNSUBSCRIBED)
       return
     }
 
-    invocation.invocationSender.sendMessage(sonar.config.VERBOSE_SUBSCRIBED)
-    sonar.actionBarVerbose.subscribe(verboseSubscriber)
+    if (verboseSubscriber != invocation.invocationSender) {
+      verboseSubscriber.sendMessage(sonar.config.VERBOSE_SUBSCRIBED_OTHER
+        .replace("%player%", verboseSubscriber.name))
+    }
+    verboseSubscriber.sendMessage(sonar.config.VERBOSE_SUBSCRIBED)
+    sonar.actionBarVerbose.subscribe(verboseSubscriber.name)
   }
 }

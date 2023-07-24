@@ -26,8 +26,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import xyz.jonesdev.sonar.api.Sonar
+import xyz.jonesdev.sonar.api.command.InvocationSender
 import xyz.jonesdev.sonar.common.command.CommandInvocation
-import xyz.jonesdev.sonar.common.command.InvocationSender
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommandRegistry
 import java.text.DecimalFormat
@@ -66,7 +66,17 @@ class SonarCommand : SimpleCommand {
 
     var subCommand = Optional.empty<SubCommand>()
 
-    val invocationSender = InvocationSender { message -> invocation.source().sendMessage(Component.text(message)) }
+    val invocationSender = object : InvocationSender {
+      override fun getName(): String {
+        return if (invocation.source() is Player) {
+          return (invocation.source() as Player).username
+        } else "Console"
+      }
+
+      override fun sendMessage(message: String) {
+        invocation.source().sendMessage(Component.text(message))
+      }
+    }
 
     if (invocation.arguments().isNotEmpty()) {
       // Search subcommand if command arguments are present

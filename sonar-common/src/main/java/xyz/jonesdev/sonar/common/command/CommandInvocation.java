@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.command;
 
 import lombok.RequiredArgsConstructor;
+import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommand;
 
 @RequiredArgsConstructor

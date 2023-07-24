@@ -18,11 +18,12 @@
 package xyz.jonesdev.sonar.bungee;
 
 import lombok.Getter;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bstats.bungeecord.Metrics;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
+import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.logger.Logger;
@@ -88,11 +89,22 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
     }
 
     @Override
-    public Optional<String> getOnlinePlayer(final String username) {
+    public Optional<InvocationSender> getOnlinePlayer(final String username) {
       return getPlugin().getServer().getPlayers().stream()
-        .map(ProxiedPlayer::getName)
-        .filter(name -> name.equalsIgnoreCase(username))
-        .findFirst();
+        .filter(player -> player.getName().equalsIgnoreCase(username))
+        .findFirst()
+        .map(player -> new InvocationSender() {
+
+          @Override
+          public String getName() {
+            return player.getName();
+          }
+
+          @Override
+          public void sendMessage(final String message) {
+            player.sendMessage(new TextComponent(message));
+          }
+        });
     }
   };
 

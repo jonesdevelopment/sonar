@@ -28,8 +28,8 @@ import net.md_5.bungee.api.plugin.Command
 import net.md_5.bungee.api.plugin.TabExecutor
 import net.md_5.bungee.command.ConsoleCommandSender
 import xyz.jonesdev.sonar.api.Sonar
+import xyz.jonesdev.sonar.api.command.InvocationSender
 import xyz.jonesdev.sonar.common.command.CommandInvocation
-import xyz.jonesdev.sonar.common.command.InvocationSender
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.common.command.subcommand.SubCommandRegistry
 import java.text.DecimalFormat
@@ -66,7 +66,15 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
     }
 
     var subCommand = Optional.empty<SubCommand>()
-    val invocationSender = InvocationSender { message -> sender.sendMessage(TextComponent(message)) }
+    val invocationSender = object : InvocationSender {
+      override fun getName(): String {
+        return sender.name
+      }
+
+      override fun sendMessage(message: String) {
+        sender.sendMessage(TextComponent(message))
+      }
+    }
 
     if (args.isNotEmpty()) {
       // Search subcommand if command arguments are present

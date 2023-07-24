@@ -19,8 +19,8 @@ package xyz.jonesdev.sonar.common.command.subcommand;
 
 import lombok.Getter;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.common.command.CommandInvocation;
-import xyz.jonesdev.sonar.common.command.InvocationSender;
 import xyz.jonesdev.sonar.common.command.subcommand.argument.Argument;
 
 import java.util.Arrays;

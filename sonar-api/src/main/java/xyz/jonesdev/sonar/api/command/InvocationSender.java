@@ -15,10 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command;
+package xyz.jonesdev.sonar.api.command;
 
-@FunctionalInterface
 public interface InvocationSender {
+  String getName();
+
   void sendMessage(final String message);
 
   default void sendMessage() {

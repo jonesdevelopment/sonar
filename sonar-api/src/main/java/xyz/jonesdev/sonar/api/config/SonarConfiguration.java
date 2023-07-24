@@ -95,6 +95,8 @@ public final class SonarConfiguration {
 
   public String VERBOSE_SUBSCRIBED;
   public String VERBOSE_UNSUBSCRIBED;
+  public String VERBOSE_SUBSCRIBED_OTHER;
+  public String VERBOSE_UNSUBSCRIBED_OTHER;
   public String RELOADING;
   public String RELOADED;
 
@@ -222,6 +224,12 @@ public final class SonarConfiguration {
     ));
     VERBOSE_UNSUBSCRIBED = formatString(yamlConfig.getString("messages.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."
+    ));
+    VERBOSE_SUBSCRIBED_OTHER = formatString(yamlConfig.getString("messages.verbose.subscribed-other",
+      "%prefix%%player% is now viewing Sonar verbose."
+    ));
+    VERBOSE_UNSUBSCRIBED_OTHER = formatString(yamlConfig.getString("messages.verbose.unsubscribed-other",
+      "%prefix%%player% is no longer viewing Sonar verbose."
     ));
 
     DATABASE_PURGE_DISALLOWED = formatString(yamlConfig.getString("messages.database.disallowed",
