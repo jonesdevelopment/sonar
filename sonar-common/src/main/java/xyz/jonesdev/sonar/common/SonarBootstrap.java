@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common;
 
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
+import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import static xyz.jonesdev.sonar.api.database.Database.IP_COLUMN;
 import static xyz.jonesdev.sonar.api.database.Database.VERIFIED_TABLE;
@@ -28,6 +29,8 @@ public interface SonarBootstrap<T> extends Sonar {
 
   default void reload() {
     if (getConfig().DATABASE != DatabaseType.NONE) {
+      final DelayTimer timer = new DelayTimer();
+
       getLogger().info("[database] Initializing database...");
       getDatabase().initialize(getConfig());
 
@@ -41,7 +44,7 @@ public interface SonarBootstrap<T> extends Sonar {
       getLogger().info("[database] Loading verified IPs from the database...");
       getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
 
-      getLogger().info("[database] Done.");
+      getLogger().info("[database] Done ({}s)!", timer.formattedDelay());
     }
   }
 
@@ -49,6 +52,8 @@ public interface SonarBootstrap<T> extends Sonar {
     getLogger().info("Starting shutdown process...");
 
     if (getConfig().DATABASE != DatabaseType.NONE) {
+      final DelayTimer timer = new DelayTimer();
+
       getLogger().info("[database] Saving entries to database...");
 
       // We need to clear the table because we don't want any IPs that aren't present
@@ -59,7 +64,7 @@ public interface SonarBootstrap<T> extends Sonar {
       // Dispose the database instance
       getDatabase().dispose();
 
-      getLogger().info("[database] Done.");
+      getLogger().info("[database] Done ({}s)!", timer.formattedDelay());
     }
 
     getLogger().info("Successfully shut down. Goodbye!");
