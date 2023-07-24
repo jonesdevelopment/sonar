@@ -134,7 +134,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
       getLogger().info("[database] Done.");
     }
 
-    getLogger().info("Successfully shut down.");
+    getLogger().info("Successfully shut down. Goodbye!");
   }
 
   @Override

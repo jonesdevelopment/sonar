@@ -136,7 +136,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     if (hasSentClientBrand || hasSentClientSettings) {
       player.getConnection().closeWith(
         Disconnect.create(FallbackListener.CachedMessages.UNEXPECTED_ERROR, player.getPlayer().getProtocolVersion()
-      ));
+        ));
 
       // Log this incident to make sure an administrator knows what happened
       player.getFallback().getLogger().warn(

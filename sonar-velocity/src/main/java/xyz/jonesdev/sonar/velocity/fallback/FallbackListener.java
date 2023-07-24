@@ -98,7 +98,7 @@ public final class FallbackListener {
       TOO_FAST_RECONNECT = Component.text(Sonar.get().getConfig().TOO_FAST_RECONNECT);
       LOCKDOWN_DISCONNECT = LoginEvent.ComponentResult.denied(
         Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT
-      ));
+        ));
       UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
       INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
     }

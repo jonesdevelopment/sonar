@@ -143,7 +143,7 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
       getLogger().info("[database] Done.");
     }
 
-    getLogger().info("Successfully shut down.");
+    getLogger().info("Successfully shut down. Goodbye!");
   }
 
   @Override
