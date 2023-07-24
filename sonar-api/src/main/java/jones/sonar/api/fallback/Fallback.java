@@ -18,6 +18,7 @@
 package jones.sonar.api.fallback;
 
 import jones.sonar.api.Sonar;
+import jones.sonar.api.cache.ExpiringConcurrentMap;
 import jones.sonar.api.logger.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ public interface Fallback {
 
   @NotNull Collection<String> getVerified();
 
-  @NotNull Collection<String> getBlacklisted();
+  @NotNull ExpiringConcurrentMap<String> getBlacklisted();
 
   @NotNull FallbackQueue getQueue();
 

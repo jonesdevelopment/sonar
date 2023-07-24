@@ -156,7 +156,7 @@ public final class FallbackListener implements Listener {
 
     final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
 
-    if (fallback.getBlacklisted().contains(inetAddress.toString())) {
+    if (fallback.getBlacklisted().has(inetAddress.toString())) {
       event.setCancelled(true);
       event.setCancelReason(BLACKLISTED);
       return;

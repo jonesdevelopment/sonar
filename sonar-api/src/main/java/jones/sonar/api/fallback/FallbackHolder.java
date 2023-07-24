@@ -18,6 +18,8 @@
 package jones.sonar.api.fallback;
 
 import jones.sonar.api.Sonar;
+import jones.sonar.api.cache.ExpiringConcurrentHashMap;
+import jones.sonar.api.cache.ExpiringConcurrentMap;
 import jones.sonar.api.logger.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +30,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public final class FallbackHolder implements Fallback {
   public static final @NotNull FallbackHolder INSTANCE = new FallbackHolder();
@@ -40,7 +43,9 @@ public final class FallbackHolder implements Fallback {
   private final Collection<String> verified = new Vector<>(1);
   @Getter
   @NotNull
-  private final Collection<String> blacklisted = new Vector<>();
+  private final ExpiringConcurrentMap<String> blacklisted = new ExpiringConcurrentHashMap<>(
+    10L, TimeUnit.MINUTES // Only block the player for a few minutes to avoid issues
+  );
   @Getter
   @NotNull
   private final FallbackQueue queue = new FallbackQueue();

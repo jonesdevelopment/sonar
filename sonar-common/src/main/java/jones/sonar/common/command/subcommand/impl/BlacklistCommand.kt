@@ -65,12 +65,12 @@ class BlacklistCommand : SubCommand() {
         }
 
         synchronized(sonar.fallback.blacklisted) {
-          if (sonar.fallback.blacklisted.contains(inetAddress.toString())) {
+          if (sonar.fallback.blacklisted.has(inetAddress.toString())) {
             invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_DUPLICATE)
             return
           }
 
-          sonar.fallback.blacklisted.add(inetAddress.toString())
+          sonar.fallback.blacklisted.put(inetAddress.toString())
           invocation.invocationSender.sendMessage(
             sonar.config.BLACKLIST_ADD
               .replace("%ip%", rawInetAddress)
@@ -102,12 +102,12 @@ class BlacklistCommand : SubCommand() {
         }
 
         synchronized(sonar.fallback.blacklisted) {
-          if (!sonar.fallback.blacklisted.contains(inetAddress.toString())) {
+          if (!sonar.fallback.blacklisted.has(inetAddress.toString())) {
             invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_NOT_FOUND)
             return
           }
 
-          sonar.fallback.blacklisted.remove(inetAddress.toString())
+          sonar.fallback.blacklisted.invalidate(inetAddress.toString())
           invocation.invocationSender.sendMessage(
             sonar.config.BLACKLIST_REMOVE
               .replace("%ip%", rawInetAddress)
@@ -117,14 +117,14 @@ class BlacklistCommand : SubCommand() {
 
       "clear" -> {
         synchronized(sonar.fallback.blacklisted) {
-          val blacklisted = sonar.fallback.blacklisted.size
+          val blacklisted = sonar.fallback.blacklisted.estimatedSize()
 
-          if (blacklisted == 0) {
+          if (blacklisted == 0L) {
             invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_EMPTY)
             return
           }
 
-          sonar.fallback.blacklisted.clear()
+          sonar.fallback.blacklisted.invalidateAll()
 
           invocation.invocationSender.sendMessage(
             sonar.config.BLACKLIST_CLEARED
@@ -136,7 +136,7 @@ class BlacklistCommand : SubCommand() {
       "size" -> {
         invocation.invocationSender.sendMessage(
           sonar.config.BLACKLIST_SIZE
-            .replace("%amount%", sonar.formatter.format(sonar.fallback.blacklisted.size))
+            .replace("%amount%", sonar.formatter.format(sonar.fallback.blacklisted.estimatedSize()))
         )
       }
 

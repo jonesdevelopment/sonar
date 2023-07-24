@@ -144,8 +144,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
       getDatabase().initialize(getConfig());
 
       // Clear all verified IPs from memory to avoid issues with the database
-      if (!getFallback().getVerified().isEmpty()
-        || !getFallback().getBlacklisted().isEmpty()) {
+      if (!getFallback().getVerified().isEmpty()) {
         getLogger().info("[database] Cleaning verified IPs from memory...");
         getFallback().getVerified().clear();
       }

@@ -32,7 +32,7 @@ class StatisticsCommand : SubCommand() {
     val queued = sonar.fallback.queue.getQueuedPlayers().size
     val verifying = sonar.fallback.connected.size
     val verified = sonar.fallback.verified.size
-    val blacklisted = sonar.fallback.blacklisted.size
+    val blacklisted = sonar.fallback.blacklisted.estimatedSize()
 
     invocation.invocationSender.sendMessage()
     invocation.invocationSender.sendMessage(" §eStatistics (this session)")

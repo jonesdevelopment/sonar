@@ -157,7 +157,7 @@ public final class FallbackListener {
     val inboundConnection = (LoginInboundConnection) event.getConnection();
     val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
 
-    if (fallback.getBlacklisted().contains(inetAddress.toString())) {
+    if (fallback.getBlacklisted().has(inetAddress.toString())) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         BLACKLISTED,
         inboundConnection.getProtocolVersion()

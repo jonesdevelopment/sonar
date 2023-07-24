@@ -342,7 +342,8 @@ public final class SonarConfiguration {
     BLACKLISTED = fromList(yamlConfig.getStringList("messages.verification.blacklisted",
       Arrays.asList(
         "%header%",
-        "&cYour IP address is currently denied from entering the server.",
+        "&cYou are currently denied from entering the server.",
+        "&cPlease wait a few minutes to be able to join the server again.",
         "&6False positive? &7%support-url%",
         "%footer%"
       )));
