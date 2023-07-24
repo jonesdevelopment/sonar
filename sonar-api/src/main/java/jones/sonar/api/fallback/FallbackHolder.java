@@ -18,12 +18,12 @@
 package jones.sonar.api.fallback;
 
 import jones.sonar.api.Sonar;
-import jones.sonar.api.cache.ExpiringConcurrentHashMap;
-import jones.sonar.api.cache.ExpiringConcurrentMap;
 import jones.sonar.api.logger.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.cappuchino.Cache;
+import xyz.jonesdev.cappuchino.Cappuchino;
 
 import java.net.InetAddress;
 import java.util.Collection;
@@ -43,7 +43,7 @@ public final class FallbackHolder implements Fallback {
   private final Collection<String> verified = new Vector<>(1);
   @Getter
   @NotNull
-  private final ExpiringConcurrentMap<String> blacklisted = new ExpiringConcurrentHashMap<>(
+  private final Cache<String> blacklisted = Cappuchino.buildExpiring(
     10L, TimeUnit.MINUTES // Only block the player for a few minutes to avoid issues
   );
   @Getter
