@@ -67,16 +67,18 @@ class FallbackPacketDecoder(
           return
         }
 
-        // Set session handler to custom fallback handler to intercept all incoming packets
-        fallbackPlayer.connection.sessionHandler = FallbackSessionHandler(
-          fallbackPlayer.connection.sessionHandler, fallbackPlayer
-        )
+        fallbackPlayer.channel.eventLoop().execute {
+          // Set session handler to custom fallback handler to intercept all incoming packets
+          fallbackPlayer.connection.sessionHandler = FallbackSessionHandler(
+            fallbackPlayer.connection.sessionHandler, fallbackPlayer
+          )
 
-        // Create JoinGame packet for the client's version
-        val joinGame = getJoinPacketForVersion(fallbackPlayer.player.protocolVersion)
+          // Create JoinGame packet for the client's version
+          val joinGame = getJoinPacketForVersion(fallbackPlayer.player.protocolVersion)
 
-        // Send JoinGame packet
-        fallbackPlayer.connection.write(joinGame)
+          // Send JoinGame packet
+          fallbackPlayer.connection.write(joinGame)
+        }
         return // Don't read this packet twice
       } else if (!hasFallbackHandler) {
         fallbackPlayer.fail("handler not initialized yet")
