@@ -67,13 +67,12 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
   private final boolean v1_8or1_7;
   private final long loginTimestamp = System.currentTimeMillis();
   private int packets;
+  private boolean hasSentClientBrand, hasSentClientSettings;
 
   public FallbackSessionHandler(final @NotNull FallbackPlayer player) {
     this.player = player;
     this.v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
   }
-
-  private boolean hasSentClientBrand, hasSentClientSettings, verified;
 
   private static final Field CONNECTION_FIELD;
 
@@ -104,8 +103,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
 
   @Override
   public boolean handle(final ClientSettings clientSettings) {
-    if (verified) return false; // Skip verified players so we don't run into issues
-
     // The client sends the PluginMessage packet and then the ClientSettings packet.
     // The player cannot send the ClientSettings packet twice since the world hasn't
     // loaded yet, therefore, the player cannot change any in-game settings.
@@ -154,8 +151,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
 
   @Override
   public boolean handle(final @NotNull PluginMessage pluginMessage) {
-    if (verified) return false; // Skip verified players so we don't run into issues
-
     // Only 'MC|Brand' for 1.7-1.12.2 and 'minecraft:brand' for 1.13+ are important.
     if (!pluginMessage.getChannel().equals("MC|Brand")
       && !pluginMessage.getChannel().equals("minecraft:brand")) {
@@ -188,8 +183,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
 
   @Override
   public boolean handle(final @NotNull KeepAlive keepAlive) {
-    if (verified) return false; // Skip verified players so we don't run into issues
-
     if (keepAlive.getRandomId() == 0 && v1_8or1_7) {
 
       // First, let's validate if the packet could actually be sent at this point.
@@ -207,18 +200,15 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
     return false;
   }
 
-  /**
-   * Restore old pipelines and send the player to the actual server
-   */
   private synchronized void nextStage() {
-    // We need this to prevent some packets from flagging bad packet checks
-    verified = true;
-
+    // Replace normal encoder to allow custom packets
     player.getPipeline().replace(
       MINECRAFT_ENCODER,
       FALLBACK_PACKET_ENCODER,
       new FallbackPacketEncoder(player.getProtocolId())
     );
+
+    // Replace normal decoder to allow custom packets
     player.getPipeline().replace(
       MINECRAFT_DECODER,
       FALLBACK_PACKET_DECODER,

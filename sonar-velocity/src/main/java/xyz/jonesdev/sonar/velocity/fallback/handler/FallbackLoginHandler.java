@@ -182,10 +182,10 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
         )
       );
 
-      // The first step of the verification is a simple KeepAlive packet
+      // The first step of the verification is a simple KeepAlive packet.
       // We don't want to waste resources by directly sending all packets to
       // the client, which is why we first send a KeepAlive packet and then
-      // wait for a valid response to continue the verification process
+      // wait for a valid response to continue the verification process.
       final KeepAlive keepAlive = new KeepAlive();
 
       keepAlive.setRandomId(keepAliveId);
@@ -193,9 +193,9 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       mcConnection.write(keepAlive);
     } else {
       // KeepAlive packets do not exist during the login process on 1.7.
-      // We have to fall back to the regular method of verification
+      // We have to fall back to the regular method of verification.
 
-      // We have to add this session handler to monitor all incoming packets
+      // We have to add this session handler to monitor all incoming packets.
       mcConnection.setSessionHandler(new FallbackSessionHandler(fallbackPlayer));
 
       // Send JoinGame packet
