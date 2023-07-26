@@ -32,6 +32,7 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import xyz.jonesdev.sonar.velocity.fallback.session.FallbackPlayer;
 import xyz.jonesdev.sonar.velocity.fallback.session.FallbackSessionHandler;
@@ -81,7 +82,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       LOGIN_PACKET = InitialLoginSessionHandler.class.getDeclaredField("login");
       LOGIN_PACKET.setAccessible(true);
     } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
+      throw new ReflectionException(throwable);
     }
   }
 

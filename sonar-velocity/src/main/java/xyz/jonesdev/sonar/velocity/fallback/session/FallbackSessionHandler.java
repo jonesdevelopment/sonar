@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
+import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 
@@ -96,7 +97,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       CONNECTION_FIELD = AuthSessionHandler.class.getDeclaredField("mcConnection");
       CONNECTION_FIELD.setAccessible(true);
     } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
+      throw new ReflectionException(throwable);
     }
   }
 

@@ -34,6 +34,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
@@ -104,7 +105,7 @@ public final class FallbackListener {
           InitialInboundConnection.class
         );
     } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
+      throw new ReflectionException(throwable);
     }
   }
 

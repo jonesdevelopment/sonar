@@ -28,6 +28,7 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.dimension.PacketDimension;
 
 import java.io.InputStream;
@@ -82,7 +83,7 @@ public class FallbackPackets {
       DAMAGE_TYPE_1194 = getMapping("damage_1_19_4.nbt");
       DAMAGE_TYPE_120 = getMapping("damage_type_1_20.nbt");
     } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
+      throw new ReflectionException(throwable);
     }
   }
 
@@ -225,7 +226,7 @@ public class FallbackPackets {
       LEVEL_NAMES.invokeExact(joinGame, LEVELS);
       REGISTRY.invokeExact(joinGame, registryContainer.build());
     } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
+      throw new ReflectionException(throwable);
     }
 
     return joinGame;

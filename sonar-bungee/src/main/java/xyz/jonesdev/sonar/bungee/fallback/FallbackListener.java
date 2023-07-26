@@ -40,6 +40,7 @@ import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketCompressor;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
 import xyz.jonesdev.sonar.bungee.fallback.session.dummy.DummyPacketHandler;
+import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
 
@@ -65,7 +66,7 @@ public final class FallbackListener implements Listener {
       CHANNEL_WRAPPER = InitialHandler.class.getDeclaredField("ch");
       CHANNEL_WRAPPER.setAccessible(true);
     } catch (Throwable throwable) {
-      throw new IllegalStateException(throwable);
+      throw new ReflectionException(throwable);
     }
   }
 
