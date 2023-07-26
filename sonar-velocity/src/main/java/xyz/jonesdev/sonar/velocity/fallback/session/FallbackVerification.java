@@ -50,6 +50,7 @@ public final class FallbackVerification implements FallbackPacketListener, Fallb
     if (packet instanceof Transaction) {
       final Transaction transaction = (Transaction) packet;
 
+      checkFrame(transaction.isAccepted(), "transaction not accepted?!");
       checkFrame(transaction.getId() == transactionId, "invalid transaction id");
 
       finish();
