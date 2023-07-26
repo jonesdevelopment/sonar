@@ -75,17 +75,22 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(transaction.isAccepted(), "transaction not accepted?!");
       checkFrame(transaction.getId() == transactionId, "invalid transaction id");
 
+      // Teleport player into the fake lobby by sending an empty chunk
       player.getConnection().write(EMPTY_CHUNK_DATA);
       player.getConnection().write(SPAWN_TELEPORT);
+      // Make sure the player is unable to fly (the player is in spectator mode)
       player.getConnection().write(DEFAULT_ABILITIES);
     }
 
     if (packet instanceof Position) {
       final Position position = (Position) packet;
 
+      // The onGround property can never be true
       checkFrame(!position.isOnGround(), "invalid ground state");
 
+      // Only check after the teleport packet was sent
       if (hasReceivedTransaction) {
+        // Now check the new position
         handlePositionUpdate(position.getY());
       }
     }
@@ -93,9 +98,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (packet instanceof PositionLook) {
       final PositionLook position = (PositionLook) packet;
 
+      // The onGround property can never be true
       checkFrame(!position.isOnGround(), "invalid ground state");
 
+      // Only check after the teleport packet was sent
       if (hasReceivedTransaction) {
+        // Now check the new position
         handlePositionUpdate(position.getY());
       }
     }
@@ -114,6 +122,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Check if the y motion is similar to the predicted value
       checkFrame(offset < 0.01, "too high y offset");
 
+      // Verify the player if they sent correct movement packets
       if (movementTick >= MAX_MOVEMENT_TICK) {
         finish();
       }
