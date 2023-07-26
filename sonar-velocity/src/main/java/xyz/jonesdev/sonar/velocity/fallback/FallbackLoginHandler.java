@@ -195,7 +195,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       // KeepAlive packets do not exist during the login process on 1.7.
       // We have to fall back to the regular method of verification
 
-      // Set session handler to custom fallback handler to intercept all incoming packets
+      // We have to add this session handler to monitor all incoming packets
       mcConnection.setSessionHandler(new FallbackSessionHandler(fallbackPlayer));
 
       // Send JoinGame packet

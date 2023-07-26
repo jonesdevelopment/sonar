@@ -21,7 +21,6 @@ import com.velocitypowered.proxy.protocol.MinecraftPacket
 import com.velocitypowered.proxy.protocol.packet.ClientSettings
 import com.velocitypowered.proxy.protocol.packet.KeepAlive
 import com.velocitypowered.proxy.protocol.packet.PluginMessage
-import com.velocitypowered.proxy.protocol.packet.ResourcePackResponse
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import xyz.jonesdev.sonar.velocity.fallback.FallbackHandler.checkFrame
@@ -54,7 +53,7 @@ class FallbackPacketHandler(
     }
 
     if (msg is MinecraftPacket) {
-      val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive || msg is ResourcePackResponse
+      val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive
 
       // Check if the client is sending packets we don't want them to send
       checkFrame(fallbackPlayer, legalPacket, "bad packet: " + msg.javaClass.simpleName)
