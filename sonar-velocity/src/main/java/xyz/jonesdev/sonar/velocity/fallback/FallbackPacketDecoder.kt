@@ -43,10 +43,10 @@ class FallbackPacketDecoder(
     FallbackSessionHandler.checkFrame(fallbackPlayer, checkPackets, "too many packets")
 
     // Check for timeout since the player could be sending packets but not important ones
-    val delay = System.currentTimeMillis() - loginTimestamp
+    val duration = System.currentTimeMillis() - loginTimestamp
     val timeout = fallbackPlayer.fallback.sonar.config.VERIFICATION_TIMEOUT
     // Check if the time limit has exceeded
-    if (delay > timeout) {
+    if (duration > timeout) {
       // TODO: Can we fail the verification?
       fallbackPlayer.connection.close()
       return
