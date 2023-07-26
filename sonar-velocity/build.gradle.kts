@@ -16,10 +16,10 @@ dependencies {
   implementation("org.bstats:bstats-velocity:3.0.2")
 }
 
-// Velocity supports Java 16
+// Velocity supports Java 11
 kotlin {
-  jvmToolchain(16)
+  jvmToolchain(11)
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_16
-java.targetCompatibility = JavaVersion.VERSION_16
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11

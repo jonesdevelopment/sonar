@@ -112,7 +112,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       );
     } catch (Throwable throwable) {
       // This should not happen
-      fallback.getLogger().error("Error while processing {}: {}", username, throwable);
+      fallback.getLogger().error("Error processing {}: {}", username, throwable);
       mcConnection.close(true);
       return;
     }

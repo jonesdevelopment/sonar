@@ -39,7 +39,8 @@ final class FallbackRespawnHandler extends ChannelOutboundHandlerAdapter {
   public void write(final ChannelHandlerContext ctx,
                     final Object msg,
                     final ChannelPromise promise) throws Exception {
-    if (msg instanceof JoinGame joinGame) {
+    if (msg instanceof JoinGame) {
+      final JoinGame joinGame = (JoinGame) msg;
 
       // Fix the chunks
       if (player.getConnection().getType() == ConnectionTypes.LEGACY_FORGE) {

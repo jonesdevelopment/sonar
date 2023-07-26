@@ -89,5 +89,5 @@ Sonar is licensed under the GNU General Public License 3.0.
 ## Credits
 
 - Special thanks to the [contributors of Sonar](https://github.com/jonesdevelopment/sonar-antibot/graphs/contributors).
-- The nbt mappings for the JoinGame packets were taken from [LimboAPI](https://github.com/Elytrium/LimboAPI).
-- The Velocity compression and Varint decoding was taken from [Velocity](https://github.com/PaperMC/Velocity).
+- The nbt mappings were taken from [LimboAPI](https://github.com/Elytrium/LimboAPI).
+- The compression and Varint decoding was taken from [Velocity](https://github.com/PaperMC/Velocity).
