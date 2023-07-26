@@ -28,7 +28,7 @@ import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVers
 import xyz.jonesdev.sonar.velocity.fallback.session.FallbackPlayer
 import xyz.jonesdev.sonar.velocity.fallback.session.FallbackSessionHandler
 
-class FallbackPacketHandler(
+class FallbackPostLoginHandler(
   private val fallbackPlayer: FallbackPlayer,
   private val startKeepAliveId: Long,
 ) : ChannelInboundHandlerAdapter() {

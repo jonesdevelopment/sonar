@@ -47,7 +47,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_HANDLER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_POST_LOGIN;
 
 @Getter
 public final class FallbackLoginHandler implements MinecraftSessionHandler {
@@ -173,8 +173,8 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
     // the packets to be processed and decoded already
     fallbackPlayer.getPipeline().addAfter(
       MINECRAFT_DECODER,
-      FALLBACK_PACKET_HANDLER,
-      new FallbackPacketHandler(
+      FALLBACK_POST_LOGIN,
+      new FallbackPostLoginHandler(
         fallbackPlayer,
         keepAliveId
       )
