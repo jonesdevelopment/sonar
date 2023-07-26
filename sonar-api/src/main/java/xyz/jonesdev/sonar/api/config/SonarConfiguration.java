@@ -58,7 +58,6 @@ public final class SonarConfiguration {
   public int VERIFICATION_READ_TIMEOUT;
   public int VERIFICATION_DELAY;
 
-  public boolean ENABLE_COMPRESSION;
   public boolean ENABLE_VERIFICATION;
   public boolean LOG_DURING_ATTACK;
 
@@ -293,11 +292,6 @@ public final class SonarConfiguration {
       "Minimum number of rejoin delay during verification"
     );
     VERIFICATION_DELAY = clamp(generalConfig.getInt("general.verification.rejoin-delay", 8000), 0, 100000);
-
-    generalConfig.getYaml().setComment("general.verification.enable-compression",
-      "Should Sonar enable compression for new players? (Recommended)"
-    );
-    ENABLE_COMPRESSION = generalConfig.getBoolean("general.verification.enable-compression", true);
 
     // load this here otherwise it could cause issues
     messagesConfig.getYaml().setComment("messages.header",

@@ -17,29 +17,24 @@
 
 package xyz.jonesdev.sonar.velocity.fallback.session;
 
-import com.velocitypowered.api.event.connection.DisconnectEvent;
-import com.velocitypowered.api.event.connection.LoginEvent;
-import com.velocitypowered.api.event.connection.PostLoginEvent;
-import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
-import com.velocitypowered.api.permission.PermissionFunction;
-import com.velocitypowered.api.permission.PermissionProvider;
+import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.connection.client.InitialConnectSessionHandler;
+import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
+import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackLoginHandler;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -48,12 +43,10 @@ import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 
 import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
-import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CONNECTION_FIELD;
 
 /**
  * <h3>Concept</h3>
@@ -73,15 +66,15 @@ import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CONNECTION_F
  * responds correctly<br>
  */
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
-  private final @Nullable MinecraftSessionHandler previousHandler;
   private final @NotNull FallbackPlayer player;
+  private final @NotNull FallbackLoginHandler loginHandler;
   private final boolean v1_8or1_7;
   private @Nullable String resourcePackHash;
   private static final Random random = new SecureRandom();
 
-  public FallbackSessionHandler(final @Nullable MinecraftSessionHandler previousHandler,
+  public FallbackSessionHandler(final @NotNull FallbackLoginHandler loginHandler,
                                 final @NotNull FallbackPlayer player) {
-    this.previousHandler = previousHandler;
+    this.loginHandler = loginHandler;
     this.player = player;
     this.v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
   }
@@ -89,36 +82,25 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private boolean hasSentClientBrand, hasSentClientSettings, verified;
 
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
-  private static final MethodHandle CONNECT_TO_INITIAL_SERVER;
-  private static final MethodHandle CONNECT_SESSION_HANDLER;
-  private static final MethodHandle SET_PERMISSION_FUNCTION;
-  private static final PermissionProvider DEFAULT_PERMISSION;
+  private static final MethodHandle NEW_AUTH_HANDLER;
+  private static final Field CONNECTION_FIELD;
 
   static {
     try {
-      CONNECT_TO_INITIAL_SERVER = MethodHandles.privateLookupIn(
+      NEW_AUTH_HANDLER = MethodHandles.privateLookupIn(
           AuthSessionHandler.class, LOOKUP)
-        .findVirtual(AuthSessionHandler.class,
-          "connectToInitialServer",
-          MethodType.methodType(CompletableFuture.class, ConnectedPlayer.class)
+        .findConstructor(AuthSessionHandler.class,
+          MethodType.methodType(
+            void.class,
+            VelocityServer.class,
+            LoginInboundConnection.class,
+            GameProfile.class,
+            boolean.class
+          )
         );
 
-      CONNECT_SESSION_HANDLER = MethodHandles.privateLookupIn(
-          InitialConnectSessionHandler.class, LOOKUP)
-        .findConstructor(InitialConnectSessionHandler.class,
-          MethodType.methodType(void.class, ConnectedPlayer.class, VelocityServer.class)
-        );
-
-      final Field PERMISSIONS_FIELD = ConnectedPlayer.class.getDeclaredField("DEFAULT_PERMISSIONS");
-      PERMISSIONS_FIELD.setAccessible(true);
-
-      DEFAULT_PERMISSION = (PermissionProvider) PERMISSIONS_FIELD.get(PermissionProvider.class);
-
-      SET_PERMISSION_FUNCTION = MethodHandles.privateLookupIn(AuthSessionHandler.class, LOOKUP)
-        .findVirtual(ConnectedPlayer.class,
-          "setPermissionFunction",
-          MethodType.methodType(void.class, PermissionFunction.class)
-        );
+      CONNECTION_FIELD = AuthSessionHandler.class.getDeclaredField("mcConnection");
+      CONNECTION_FIELD.setAccessible(true);
     } catch (Throwable throwable) {
       throw new IllegalStateException(throwable);
     }
@@ -307,8 +289,33 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       player.getPipeline().remove(DECODER);
     }
 
+    // We have to add our own Respawn packet by scanning for the JoinGame
+    // packet sent by the backend server when we connect the player
+    player.getPipeline().addAfter(
+      MINECRAFT_ENCODER,
+      RESPAWN,
+      new FallbackRespawnHandler(player)
+    );
+
     // Continue the initial connection to the backend server
-    initialConnection(previousHandler);
+    final AuthSessionHandler authSessionHandler;
+    try {
+      authSessionHandler = (AuthSessionHandler) NEW_AUTH_HANDLER.invokeExact(
+        loginHandler.getServer(),
+        loginHandler.getInboundConnection(),
+        loginHandler.getGameProfile(),
+        loginHandler.isPremium()
+      );
+
+      CONNECTION_FIELD.set(authSessionHandler, player.getConnection());
+    } catch (Throwable throwable) {
+      throwable.printStackTrace();
+      player.getConnection().close(true);
+      return;
+    }
+
+    player.getConnection().setState(StateRegistry.LOGIN);
+    player.getConnection().setSessionHandler(authSessionHandler);
 
     // Now we can safely remove the `sonar-handler` pipeline
     if (player.getPipeline().get(HANDLER) != null) {
@@ -316,97 +323,5 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     }
 
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
-  }
-
-  // Mostly taken from Velocity
-  private void initialConnection(final MinecraftSessionHandler sessionHandler) {
-    player.getConnection().server.getEventManager()
-      .fire(new PermissionsSetupEvent(player.getPlayer(), DEFAULT_PERMISSION))
-      .thenAcceptAsync(permissionEvent -> {
-        if (!player.getConnection().isClosed()) {
-          // wait for permissions to load, then set the player permission function
-          final PermissionFunction function = permissionEvent.createFunction(player.getPlayer());
-
-          if (function == null) {
-            player.getFallback().getLogger().error(
-              "A plugin permission provider {} provided an invalid permission function"
-                + " for player {}. This is a bug in the plugin, not in Velocity. Falling"
-                + " back to the default permission function.",
-              permissionEvent.getProvider().getClass().getName(),
-              player.getPlayer().getUsername());
-          } else {
-            try {
-              SET_PERMISSION_FUNCTION.invokeExact(player.getPlayer(), function);
-            } catch (Throwable throwable) {
-              throwable.printStackTrace();
-              throw new RuntimeException(throwable);
-            }
-          }
-
-          player.getConnection().server.getEventManager()
-            .fire(new LoginEvent(player.getPlayer()))
-            .thenAcceptAsync(event -> {
-
-              // The player was disconnected
-              if (player.getConnection().isClosed()) {
-                final var disconnectEvent = new DisconnectEvent(
-                  player.getPlayer(),
-                  DisconnectEvent.LoginStatus.CANCELLED_BY_USER_BEFORE_COMPLETE
-                );
-
-                player.getConnection().server.getEventManager().fireAndForget(disconnectEvent);
-                return;
-              }
-
-              event.getResult().getReasonComponent().ifPresentOrElse(reason -> {
-                player.getPlayer().disconnect0(reason, true);
-              }, () -> {
-                if (player.getConnection().server.registerConnection(player.getPlayer())) {
-                  try {
-                    final var initialConnection =
-                      (InitialConnectSessionHandler) CONNECT_SESSION_HANDLER
-                        .invokeExact(player.getPlayer(),
-                          (VelocityServer) player.getConnection().server);
-
-                    player.getConnection().setSessionHandler(initialConnection);
-
-                    player.getConnection().server.getEventManager()
-                      .fire(new PostLoginEvent(player.getPlayer()))
-                      .thenAcceptAsync(ignored -> {
-                        try {
-                          CONNECTION_FIELD.set(sessionHandler, player.getConnection());
-
-                          // It works. We'll leave it at that
-                          // We have to add our own Respawn packet by scanning for the JoinGame packet
-                          player.getPipeline().addAfter(
-                            MINECRAFT_ENCODER,
-                            RESPAWN,
-                            new FallbackRespawnHandler(player)
-                          );
-
-                          CONNECT_TO_INITIAL_SERVER.invoke(sessionHandler, player.getPlayer());
-                        } catch (Throwable throwable) {
-                          throw new RuntimeException(throwable);
-                        }
-                      });
-                  } catch (Throwable throwable) {
-                    throw new RuntimeException(throwable);
-                  }
-                } else {
-                  player.getPlayer().disconnect0(
-                    Component.translatable("velocity.error.already-connected-proxy"),
-                    true
-                  );
-                }
-              });
-            }, player.getChannel().eventLoop()).exceptionally(throwable -> {
-              player.getFallback().getLogger().error(
-                "Exception while completing login initialisation phase for {}", player,
-                throwable
-              );
-              return null;
-            });
-        }
-      }, player.getConnection().eventLoop());
   }
 }

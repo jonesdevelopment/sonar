@@ -21,27 +21,16 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
-import com.velocitypowered.api.event.player.GameProfileRequestEvent;
-import com.velocitypowered.api.network.ProtocolVersion;
-import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
-import com.velocitypowered.api.util.GameProfile;
-import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
+import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
-import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.Disconnect;
-import com.velocitypowered.proxy.protocol.packet.KeepAlive;
-import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
-import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
@@ -49,34 +38,22 @@ import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
-import xyz.jonesdev.sonar.velocity.fallback.session.FallbackPlayer;
-import xyz.jonesdev.sonar.velocity.fallback.session.FallbackSessionHandler;
 import xyz.jonesdev.sonar.velocity.fallback.session.dummy.DummyConnection;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.Collection;
 import java.util.Objects;
-import java.util.Vector;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
-import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.HANDLER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.TIMEOUT;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
   private final @NotNull Fallback fallback;
-
-  // We need to cache if the joining player is a premium player or not
-  // If we don't do that, many authentication plugins can potentially break
-  private final Collection<String> premium = new Vector<>(1);
 
   public static class CachedMessages {
     static LoginEvent.ComponentResult LOCKDOWN_DISCONNECT;
@@ -108,29 +85,14 @@ public final class FallbackListener {
 
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private static final MethodHandle INITIAL_CONNECTION;
-  private static final MethodHandle CONNECTED_PLAYER;
-  public static final Field CONNECTION_FIELD;
+  private static final Field CONNECTION_FIELD;
 
   static {
     CLOSED_MINECRAFT_CONNECTION = new DummyConnection(null);
 
-    // https://github.com/Elytrium/LimboAPI/blob/ca6eb7155740bf3ff32596412a48e537fe55606d/plugin/src/main/java/net/elytrium/limboapi/injection/login/LoginListener.java#L239
     try {
-      CONNECTION_FIELD = AuthSessionHandler.class.getDeclaredField("mcConnection");
+      CONNECTION_FIELD = InitialLoginSessionHandler.class.getDeclaredField("mcConnection");
       CONNECTION_FIELD.setAccessible(true);
-
-      CONNECTED_PLAYER = MethodHandles.privateLookupIn(ConnectedPlayer.class, MethodHandles.lookup())
-        .findConstructor(ConnectedPlayer.class,
-          MethodType.methodType(
-            void.class,
-            VelocityServer.class,
-            GameProfile.class,
-            MinecraftConnection.class,
-            InetSocketAddress.class,
-            boolean.class,
-            IdentifiedKey.class
-          )
-        );
 
       INITIAL_CONNECTION = MethodHandles.privateLookupIn(LoginInboundConnection.class, LOOKUP)
         .findGetter(LoginInboundConnection.class,
@@ -169,6 +131,7 @@ public final class FallbackListener {
     final int maxOnlinePerIp = fallback.getSonar().getConfig().MAXIMUM_ONLINE_PER_IP;
 
     if (maxOnlinePerIp > 0) {
+      // TODO: Move to LoginEvent
       final long onlinePerIp = SonarVelocity.INSTANCE.getPlugin().getServer().getAllPlayers().stream()
         .filter(player -> Objects.equals(player.getRemoteAddress().getAddress(), inetAddress))
         .count();
@@ -227,69 +190,6 @@ public final class FallbackListener {
       return;
     }
 
-    /*
-     * If we don't handle online/offline mode players correctly,
-     * many plugins (especially Auth-related) will have issues
-     */
-    if (event.getResult().isForceOfflineMode()) return;
-    if (!SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
-      && !event.getResult().isOnlineModeAllowed()) return;
-
-    // TODO: test with /premium
-    premium.add(event.getUsername());
-  }
-
-  /**
-   * Handles lockdown mode
-   *
-   * @param event LoginEvent
-   */
-  @Subscribe(order = PostOrder.LAST)
-  public void handle(final LoginEvent event) {
-    if (!fallback.getSonar().getConfig().LOCKDOWN_ENABLED) return;
-
-    if (!event.getPlayer().hasPermission("sonar.lockdown")) {
-      event.setResult(LOCKDOWN_DISCONNECT);
-      if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
-        fallback.getSonar().getLogger().info(
-          fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
-            .replace("%player%", event.getPlayer().getUsername())
-            .replace("%ip%", event.getPlayer().getRemoteAddress().getAddress().toString())
-            .replace("%protocol%",
-              String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
-        );
-      }
-    } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
-      event.getPlayer().sendMessage(
-        Component.text(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
-      );
-    }
-  }
-
-  /**
-   * Handles inbound connections
-   *
-   * @param event GameProfileRequestEvent
-   * @throws java.lang.Throwable Unexpected error
-   */
-  @Subscribe(order = PostOrder.LAST)
-  public void handle(final GameProfileRequestEvent event) throws Throwable {
-    if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
-
-    final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
-
-    // We don't want to check players that have already been verified
-    if (fallback.getVerified().contains(inetAddress.toString())) return;
-
-    if (event.getConnection() instanceof InitialInboundConnection) {
-      fallback.getLogger().error("Could not inject into GameProfileRequestEvent!");
-      fallback.getLogger().error("Make sure to remove any other plugin that interferes with this event!");
-      return;
-    }
-
-    val inboundConnection = (LoginInboundConnection) event.getConnection();
-    val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
-
     final MinecraftConnection mcConnection = initialConnection.getConnection();
     final Channel channel = mcConnection.getChannel();
 
@@ -301,19 +201,21 @@ public final class FallbackListener {
       return;
     }
 
+    final InitialLoginSessionHandler sessionHandler = (InitialLoginSessionHandler) mcConnection.getSessionHandler();
+
     // The AuthSessionHandler isn't supposed to continue the connection process,
     // which is why we override the field value for the MinecraftConnection with
     // a fake connection
-    CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
+    CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
 
+    // If we don't handle online/offline mode players correctly,
+    // many plugins (especially Auth-related) will have issues
+    //
     // We need to determine if the player is premium before we queue the connection,
     // and before we run everything in the event loop to avoid potential memory leaks
-    final boolean isPremium = premium.contains(event.getUsername());
-
-    // Remove the player from the premium list in order to prevent memory leaks
-    // We cannot rely on the DisconnectEvent since the server will not call it
-    // -> we are intercepting the packets!
-    premium.remove(event.getUsername());
+    final boolean isPremium = !event.getResult().isForceOfflineMode()
+      && (SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
+      || event.getResult().isOnlineModeAllowed());
 
     // Run in the channel's event loop
     channel.eventLoop().execute(() -> {
@@ -351,116 +253,38 @@ public final class FallbackListener {
           )
         );
 
-        // Create an instance for the connected player
-        final ConnectedPlayer player;
-        try {
-          player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
-            mcConnection.server,
-            event.getGameProfile(),
-            mcConnection,
-            inboundConnection.getVirtualHost().orElse(null),
-            isPremium,
-            inboundConnection.getIdentifiedKey()
-          );
-        } catch (Throwable throwable) {
-          // This should not happen
-          fallback.getLogger().error("Error while processing {}: {}", event.getUsername(), throwable);
-          mcConnection.close(true);
-          return;
-        }
-
-        // Check if the player is already connected to the proxy
-        // We use the default Velocity method for this to avoid incompatibilities
-        if (!mcConnection.server.canRegisterConnection(player)) {
-          mcConnection.closeWith(Disconnect.create(
-            Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
-            mcConnection.getProtocolVersion()
-          ));
-          return;
-        }
-
-        // Create an instance for the Fallback connection
-        final FallbackPlayer fallbackPlayer = new FallbackPlayer(
-          fallback,
-          player, mcConnection, channel, pipeline, inetAddress,
-          player.getProtocolVersion().getProtocol()
-        );
-
-        if (fallback.getSonar().getConfig().LOG_CONNECTIONS) {
-          // Only log the processing message if the server isn't under attack.
-          // We let the user override this through the configuration.
-          if (!fallback.isUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
-            fallback.getLogger().info("Processing: {}{} ({})",
-              event.getUsername(), inetAddress, fallbackPlayer.getProtocolVersion());
-          }
-        }
-
-        // Mark the player as connected → verifying players
-        fallback.getConnected().put(event.getUsername(), inetAddress);
-
-        // Check if compression is enabled in the Sonar configuration
-        if (fallback.getSonar().getConfig().ENABLE_COMPRESSION) {
-          final int threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
-
-          // Set compression
-          if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
-            mcConnection.write(new SetCompression(threshold));
-            mcConnection.setCompressionThreshold(threshold);
-          }
-        }
-
-        // Send LoginSuccess packet to spoof our fake lobby
-        final ServerLoginSuccess success = new ServerLoginSuccess();
-
-        success.setUsername(player.getUsername());
-        success.setProperties(player.getGameProfileProperties());
-        success.setUuid(player.getUniqueId());
-
-        mcConnection.write(success);
-
-        // Set the state to a custom one, so we can receive and send more packets
-        mcConnection.setAssociation(player);
-        mcConnection.setState(StateRegistry.PLAY);
-
-        final long keepAliveId = ThreadLocalRandom.current().nextInt();
-
-        // We have to add this pipeline to monitor all incoming traffic
-        // We add the pipeline after the MinecraftDecoder since we want
-        // the packets to be processed and decoded already
-        fallbackPlayer.getPipeline().addAfter(
-          MINECRAFT_DECODER,
-          DECODER,
-          new FallbackPacketDecoder(
-            fallbackPlayer,
-            keepAliveId
-          )
-        );
-
-        // ==================================================================
-        if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
-          // The first step of the verification is a simple KeepAlive packet
-          // We don't want to waste resources by directly sending all packets to
-          // the client, which is why we first send a KeepAlive packet and then
-          // wait for a valid response to continue the verification process
-          final KeepAlive keepAlive = new KeepAlive();
-
-          keepAlive.setRandomId(keepAliveId);
-
-          mcConnection.write(keepAlive);
-        } else {
-          // KeepAlive packets do not exist during the login process on 1.7.
-          // We have to fall back to the regular method of verification
-
-          // Set session handler to custom fallback handler to intercept all incoming packets
-          mcConnection.setSessionHandler(new FallbackSessionHandler(
-            mcConnection.getSessionHandler(), fallbackPlayer
-          ));
-
-          // Send JoinGame packet
-          mcConnection.write(FallbackPackets.LEGACY_JOIN_GAME);
-        }
-        // ==================================================================
+        mcConnection.setSessionHandler(new FallbackLoginHandler(
+          fallback, mcConnection, inboundConnection, sessionHandler,
+          event.getUsername(), inetAddress, isPremium
+        ));
       }));
     });
+  }
+
+  /**
+   * Handles lockdown mode
+   *
+   * @param event LoginEvent
+   */
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final LoginEvent event) {
+    if (!fallback.getSonar().getConfig().LOCKDOWN_ENABLED) return;
+
+    if (!event.getPlayer().hasPermission("sonar.lockdown")) {
+      event.setResult(LOCKDOWN_DISCONNECT);
+      if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
+        fallback.getSonar().getLogger().info(
+          fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
+            .replace("%player%", event.getPlayer().getUsername())
+            .replace("%ip%", event.getPlayer().getRemoteAddress().getAddress().toString())
+            .replace("%protocol%",
+              String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
+        );
+      }
+    } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
+      event.getPlayer().sendMessage(
+        Component.text(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
+      );
+    }
   }
 }
