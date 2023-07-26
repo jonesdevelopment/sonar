@@ -39,7 +39,8 @@ import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
-import xyz.jonesdev.sonar.velocity.fallback.session.dummy.DummyConnection;
+import xyz.jonesdev.sonar.velocity.fallback.dummy.DummyConnection;
+import xyz.jonesdev.sonar.velocity.fallback.handler.FallbackLoginHandler;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback.session;
+package xyz.jonesdev.sonar.velocity.fallback.handler;
 
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
@@ -32,8 +32,8 @@ import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackHandler;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.lang.reflect.Field;
 
@@ -205,7 +205,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
       FALLBACK_PACKET_DECODER,
       new FallbackPacketDecoder(
         player.getProtocolId(),
-        new FallbackVerification(player)
+        new FallbackVerificationHandler(player)
       )
     );
   }

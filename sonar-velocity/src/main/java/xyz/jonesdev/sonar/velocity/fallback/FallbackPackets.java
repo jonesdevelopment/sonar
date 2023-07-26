@@ -103,7 +103,7 @@ public class FallbackPackets {
   public final JoinGame JOIN_GAME_1_19_4 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_4);
   public final JoinGame JOIN_GAME_1_20 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_20);
 
-  static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
+  public static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
       return LEGACY_JOIN_GAME; // 1.7-1.15.2
     }

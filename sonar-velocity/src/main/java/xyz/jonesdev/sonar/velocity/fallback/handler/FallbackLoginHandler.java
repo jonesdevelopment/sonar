@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback;
+package xyz.jonesdev.sonar.velocity.fallback.handler;
 
 import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.api.util.GameProfile;
@@ -34,8 +34,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
-import xyz.jonesdev.sonar.velocity.fallback.session.FallbackPlayer;
-import xyz.jonesdev.sonar.velocity.fallback.session.FallbackSessionHandler;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback.session;
+package xyz.jonesdev.sonar.velocity.fallback.handler;
 
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import lombok.Getter;
@@ -24,19 +24,19 @@ import xyz.jonesdev.sonar.common.fallback.packets.Disconnect;
 import xyz.jonesdev.sonar.common.fallback.packets.Transaction;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackHandler;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.util.Random;
 
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.VERIFICATION_SUCCESS;
 
-public final class FallbackVerification implements FallbackPacketListener, FallbackHandler {
+public final class FallbackVerificationHandler implements FallbackPacketListener, FallbackHandler {
   @Getter
   private final @NotNull FallbackPlayer player;
   private final short transactionId;
   private static final Random random = new Random();
 
-  public FallbackVerification(final @NotNull FallbackPlayer player) {
+  public FallbackVerificationHandler(final @NotNull FallbackPlayer player) {
     this.player = player;
     this.transactionId = (short) random.nextInt();
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback
+package xyz.jonesdev.sonar.velocity.fallback.handler
 
 import com.velocitypowered.proxy.protocol.MinecraftPacket
 import com.velocitypowered.proxy.protocol.packet.ClientSettings
@@ -23,10 +23,9 @@ import com.velocitypowered.proxy.protocol.packet.KeepAlive
 import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
-import xyz.jonesdev.sonar.velocity.fallback.FallbackHandler.checkFrame
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion
-import xyz.jonesdev.sonar.velocity.fallback.session.FallbackPlayer
-import xyz.jonesdev.sonar.velocity.fallback.session.FallbackSessionHandler
+import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer
+import xyz.jonesdev.sonar.velocity.fallback.handler.FallbackHandler.checkFrame
 
 class FallbackPostLoginHandler(
   private val fallbackPlayer: FallbackPlayer,
@@ -69,7 +68,8 @@ class FallbackPostLoginHandler(
 
         fallbackPlayer.channel.eventLoop().execute {
           // Set session handler to custom fallback handler to intercept all incoming packets
-          fallbackPlayer.connection.sessionHandler = FallbackSessionHandler(fallbackPlayer)
+          fallbackPlayer.connection.sessionHandler =
+            FallbackSessionHandler(fallbackPlayer)
 
           // Create JoinGame packet for the client's version
           val joinGame = getJoinPacketForVersion(fallbackPlayer.player.protocolVersion)

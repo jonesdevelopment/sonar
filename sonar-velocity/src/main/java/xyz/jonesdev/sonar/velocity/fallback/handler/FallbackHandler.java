@@ -15,12 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback;
+package xyz.jonesdev.sonar.velocity.fallback.handler;
 
 import com.velocitypowered.proxy.protocol.packet.Disconnect;
 import io.netty.handler.codec.CorruptedFrameException;
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
-import xyz.jonesdev.sonar.velocity.fallback.session.FallbackPlayer;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 public interface FallbackHandler {
   FallbackPlayer getPlayer();
