@@ -47,6 +47,7 @@ import java.util.Random;
 import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
+import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.VERIFICATION_SUCCESS;
 
 /**
  * <h3>Concept</h3>
@@ -278,48 +279,56 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // We need this to prevent some packets from flagging bad packet checks
     verified = true;
 
-    // Remove the Sonar timeout handler - all checks have passed
-    if (player.getPipeline().get(TIMEOUT) != null) {
-      player.getPipeline().remove(TIMEOUT);
-    }
+    if (player.getFallback().getSonar().getConfig().DISCONNECT_AFTER_SUCCESS) {
+      player.getConnection().closeWith(Disconnect.create(
+        VERIFICATION_SUCCESS,
+        player.getConnection().getProtocolVersion()
+      ));
+    } else {
 
-    // Remove the Sonar decoder - we don't care about the player anymore
-    // Leave the `sonar-handler` pipeline, so we don't run into any issues
-    if (player.getPipeline().get(DECODER) != null) {
-      player.getPipeline().remove(DECODER);
-    }
+      // Remove the Sonar timeout handler - all checks have passed
+      if (player.getPipeline().get(TIMEOUT) != null) {
+        player.getPipeline().remove(TIMEOUT);
+      }
 
-    // We have to add our own Respawn packet by scanning for the JoinGame
-    // packet sent by the backend server when we connect the player
-    player.getPipeline().addAfter(
-      MINECRAFT_ENCODER,
-      RESPAWN,
-      new FallbackRespawnHandler(player)
-    );
+      // Remove the Sonar decoder - we don't care about the player anymore
+      // Leave the `sonar-handler` pipeline, so we don't run into any issues
+      if (player.getPipeline().get(DECODER) != null) {
+        player.getPipeline().remove(DECODER);
+      }
 
-    // Continue the initial connection to the backend server
-    final AuthSessionHandler authSessionHandler;
-    try {
-      authSessionHandler = (AuthSessionHandler) NEW_AUTH_HANDLER.invokeExact(
-        loginHandler.getServer(),
-        loginHandler.getInboundConnection(),
-        loginHandler.getGameProfile(),
-        loginHandler.isPremium()
+      // We have to add our own Respawn packet by scanning for the JoinGame
+      // packet sent by the backend server when we connect the player
+      player.getPipeline().addAfter(
+        MINECRAFT_ENCODER,
+        RESPAWN,
+        new FallbackRespawnHandler(player)
       );
 
-      CONNECTION_FIELD.set(authSessionHandler, player.getConnection());
-    } catch (Throwable throwable) {
-      throwable.printStackTrace();
-      player.getConnection().close(true);
-      return;
-    }
+      // Continue the initial connection to the backend server
+      final AuthSessionHandler authSessionHandler;
+      try {
+        authSessionHandler = (AuthSessionHandler) NEW_AUTH_HANDLER.invokeExact(
+          loginHandler.getServer(),
+          loginHandler.getInboundConnection(),
+          loginHandler.getGameProfile(),
+          loginHandler.isPremium()
+        );
 
-    player.getConnection().setState(StateRegistry.LOGIN);
-    player.getConnection().setSessionHandler(authSessionHandler);
+        CONNECTION_FIELD.set(authSessionHandler, player.getConnection());
+      } catch (Throwable throwable) {
+        throwable.printStackTrace();
+        player.getConnection().close(true);
+        return;
+      }
 
-    // Now we can safely remove the `sonar-handler` pipeline
-    if (player.getPipeline().get(HANDLER) != null) {
-      player.getPipeline().remove(HANDLER);
+      player.getConnection().setState(StateRegistry.LOGIN);
+      player.getConnection().setSessionHandler(authSessionHandler);
+
+      // Now we can safely remove the `sonar-handler` pipeline
+      if (player.getPipeline().get(HANDLER) != null) {
+        player.getPipeline().remove(HANDLER);
+      }
     }
 
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());

@@ -45,6 +45,7 @@ public final class SonarConfiguration {
   public Collection<String> ANIMATION;
 
   public boolean LOG_CONNECTIONS;
+  public boolean DISCONNECT_AFTER_SUCCESS;
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
   public int MAXIMUM_BRAND_LENGTH;
@@ -66,6 +67,7 @@ public final class SonarConfiguration {
   public String TOO_FAST_RECONNECT;
   public String TOO_MANY_ONLINE_PER_IP;
   public String INVALID_USERNAME;
+  public String VERIFICATION_SUCCESS;
   public String ALREADY_VERIFYING;
   public String ALREADY_QUEUED;
   public String BLACKLISTED;
@@ -237,6 +239,11 @@ public final class SonarConfiguration {
       "Should Sonar verify new players? (Recommended)"
     );
     ENABLE_VERIFICATION = generalConfig.getBoolean("general.verification.enabled", true);
+
+    generalConfig.getYaml().setComment("general.verification.disconnect-after",
+      "Should Sonar disconnect players after verification? (Not recommended)"
+    );
+    DISCONNECT_AFTER_SUCCESS = generalConfig.getBoolean("general.verification.disconnect-after", false);
 
     generalConfig.getYaml().setComment("general.verification.log-connections",
       "Should Sonar log new connections?"
@@ -655,6 +662,17 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "&cYour username contains invalid characters.",
+        "%footer%"
+      )));
+
+    messagesConfig.getYaml().setComment("messages.verification.success",
+      "Disconnect message that is shown when someone verifies successfully"
+    );
+    VERIFICATION_SUCCESS = fromList(messagesConfig.getStringList("messages.verification.success",
+      Arrays.asList(
+        "%header%",
+        "&aYour connection was successfully verified.",
+        "&7You are now able to play on the server when you reconnect.",
         "%footer%"
       )));
 

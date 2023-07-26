@@ -65,6 +65,7 @@ public final class FallbackListener {
     static Component TOO_FAST_RECONNECT;
     public static Component UNEXPECTED_ERROR;
     public static Component INVALID_USERNAME;
+    public static Component VERIFICATION_SUCCESS;
 
     public static void update() {
       ALREADY_VERIFYING = Component.text(Sonar.get().getConfig().ALREADY_VERIFYING);
@@ -78,6 +79,7 @@ public final class FallbackListener {
         ));
       UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
       INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
+      VERIFICATION_SUCCESS = Component.text(Sonar.get().getConfig().VERIFICATION_SUCCESS);
     }
   }
 
