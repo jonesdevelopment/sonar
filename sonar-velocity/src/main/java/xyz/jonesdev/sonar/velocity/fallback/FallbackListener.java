@@ -57,11 +57,11 @@ public final class FallbackListener {
 
   public static class CachedMessages {
     static LoginEvent.ComponentResult LOCKDOWN_DISCONNECT;
+    static LoginEvent.ComponentResult TOO_MANY_ONLINE_PER_IP;
     static Component TOO_MANY_PLAYERS;
     static Component BLACKLISTED;
     static Component ALREADY_VERIFYING;
     static Component ALREADY_QUEUED;
-    static Component TOO_MANY_ONLINE_PER_IP;
     static Component TOO_FAST_RECONNECT;
     public static Component UNEXPECTED_ERROR;
     public static Component INVALID_USERNAME;
@@ -72,14 +72,16 @@ public final class FallbackListener {
       ALREADY_QUEUED = Component.text(Sonar.get().getConfig().ALREADY_QUEUED);
       TOO_MANY_PLAYERS = Component.text(Sonar.get().getConfig().TOO_MANY_PLAYERS);
       BLACKLISTED = Component.text(Sonar.get().getConfig().BLACKLISTED);
-      TOO_MANY_ONLINE_PER_IP = Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP);
       TOO_FAST_RECONNECT = Component.text(Sonar.get().getConfig().TOO_FAST_RECONNECT);
-      LOCKDOWN_DISCONNECT = LoginEvent.ComponentResult.denied(
-        Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT
-        ));
       UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
       INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
       VERIFICATION_SUCCESS = Component.text(Sonar.get().getConfig().VERIFICATION_SUCCESS);
+      TOO_MANY_ONLINE_PER_IP = LoginEvent.ComponentResult.denied(
+        Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP
+      ));
+      LOCKDOWN_DISCONNECT = LoginEvent.ComponentResult.denied(
+        Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT
+      ));
     }
   }
 
@@ -111,7 +113,7 @@ public final class FallbackListener {
    *
    * @param event PreLoginEvent
    */
-  @Subscribe(order = PostOrder.LAST)
+  @Subscribe(order = PostOrder.FIRST)
   public void handle(final PreLoginEvent event) throws Throwable {
     fallback.getSonar().getStatistics().increment("total");
 
@@ -126,26 +128,6 @@ public final class FallbackListener {
         inboundConnection.getProtocolVersion()
       ));
       return;
-    }
-
-    // Check if the number of online players using the same IP address as
-    // the connecting player is greater than the configured amount
-    final int maxOnlinePerIp = fallback.getSonar().getConfig().MAXIMUM_ONLINE_PER_IP;
-
-    if (maxOnlinePerIp > 0) {
-      // TODO: Move to LoginEvent
-      final long onlinePerIp = SonarVelocity.INSTANCE.getPlugin().getServer().getAllPlayers().stream()
-        .filter(player -> Objects.equals(player.getRemoteAddress().getAddress(), inetAddress))
-        .count();
-
-      // We use '>=' because the player connecting to the server hasn't joined yet
-      if (onlinePerIp >= maxOnlinePerIp) {
-        initialConnection.getConnection().closeWith(Disconnect.create(
-          TOO_MANY_ONLINE_PER_IP,
-          inboundConnection.getProtocolVersion()
-        ));
-        return;
-      }
     }
 
     if (fallback.getVerified().contains(inetAddress.toString())) return;
@@ -283,7 +265,28 @@ public final class FallbackListener {
               String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
         );
       }
-    } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
+      return;
+    }
+
+    final InetAddress inetAddress = event.getPlayer().getRemoteAddress().getAddress();
+
+    // Check if the number of online players using the same IP address as
+    // the connecting player is greater than the configured amount
+    final int maxOnlinePerIp = fallback.getSonar().getConfig().MAXIMUM_ONLINE_PER_IP;
+
+    if (maxOnlinePerIp > 0) {
+      final long onlinePerIp = SonarVelocity.INSTANCE.getPlugin().getServer().getAllPlayers().stream()
+        .filter(player -> Objects.equals(player.getRemoteAddress().getAddress(), inetAddress))
+        .count();
+
+      // We use '>=' because the player connecting to the server hasn't joined yet
+      if (onlinePerIp >= maxOnlinePerIp) {
+        event.setResult(TOO_MANY_ONLINE_PER_IP);
+        return;
+      }
+    }
+
+    if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
       event.getPlayer().sendMessage(
         Component.text(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
       );

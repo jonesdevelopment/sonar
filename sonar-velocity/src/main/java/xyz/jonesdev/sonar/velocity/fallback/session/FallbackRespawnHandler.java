@@ -22,8 +22,6 @@ import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.packet.JoinGame;
 import com.velocitypowered.proxy.protocol.packet.Respawn;
-import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
-import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -32,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_16;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.RESPAWN;
 
 @RequiredArgsConstructor
 final class FallbackRespawnHandler extends ChannelOutboundHandlerAdapter {
@@ -42,21 +39,7 @@ final class FallbackRespawnHandler extends ChannelOutboundHandlerAdapter {
   public void write(final ChannelHandlerContext ctx,
                     final Object msg,
                     final ChannelPromise promise) throws Exception {
-    System.out.println(msg);
-    if (msg instanceof ServerLoginSuccess loginSuccess) {
-      System.out.println("PREVENT ServerLoginSuccess");
-      System.out.println(loginSuccess);
-      return;
-    }
-    if (msg instanceof SetCompression setCompression) {
-      System.out.println("PREVENT SetCompression");
-      System.out.println(setCompression);
-      return;
-    }
     if (msg instanceof JoinGame joinGame) {
-
-      // Remove the pipeline to avoid issues
-      player.getPipeline().remove(RESPAWN);
 
       // Fix the chunks
       if (player.getConnection().getType() == ConnectionTypes.LEGACY_FORGE) {
@@ -64,6 +47,9 @@ final class FallbackRespawnHandler extends ChannelOutboundHandlerAdapter {
       } else {
         doFastClientServerSwitch(joinGame);
       }
+
+      // Remove the pipeline to avoid issues
+      player.getPipeline().remove(this);
       return;
     }
 

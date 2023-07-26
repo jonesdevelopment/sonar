@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.velocity.fallback;
 
 import com.google.common.primitives.Longs;
-import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.VelocityServer;
@@ -221,13 +220,12 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       DECODER,
       new FallbackPacketDecoder(
         fallbackPlayer,
-        this,
         keepAliveId
       )
     );
 
     // ==================================================================
-    if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
+    if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
       // The first step of the verification is a simple KeepAlive packet
       // We don't want to waste resources by directly sending all packets to
       // the client, which is why we first send a KeepAlive packet and then
@@ -242,7 +240,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       // We have to fall back to the regular method of verification
 
       // Set session handler to custom fallback handler to intercept all incoming packets
-      mcConnection.setSessionHandler(new FallbackSessionHandler(this, fallbackPlayer));
+      mcConnection.setSessionHandler(new FallbackSessionHandler(fallbackPlayer));
 
       // Send JoinGame packet
       mcConnection.write(FallbackPackets.LEGACY_JOIN_GAME);

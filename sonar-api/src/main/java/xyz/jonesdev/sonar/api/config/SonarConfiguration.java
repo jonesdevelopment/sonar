@@ -45,7 +45,6 @@ public final class SonarConfiguration {
   public Collection<String> ANIMATION;
 
   public boolean LOG_CONNECTIONS;
-  public boolean DISCONNECT_AFTER_SUCCESS;
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
   public int MAXIMUM_BRAND_LENGTH;
@@ -239,11 +238,6 @@ public final class SonarConfiguration {
       "Should Sonar verify new players? (Recommended)"
     );
     ENABLE_VERIFICATION = generalConfig.getBoolean("general.verification.enabled", true);
-
-    generalConfig.getYaml().setComment("general.verification.disconnect-after",
-      "Should Sonar disconnect players after verification? (Not recommended)"
-    );
-    DISCONNECT_AFTER_SUCCESS = generalConfig.getBoolean("general.verification.disconnect-after", false);
 
     generalConfig.getYaml().setComment("general.verification.log-connections",
       "Should Sonar log new connections?"
@@ -671,9 +665,8 @@ public final class SonarConfiguration {
     VERIFICATION_SUCCESS = fromList(messagesConfig.getStringList("messages.verification.success",
       Arrays.asList(
         "%header%",
-        "&aYour connection was successfully verified.",
-        "&7You are now able to play on the server when you reconnect.",
-        "%footer%"
+        "&aYou have successfully passed the verification.",
+        "&fYou are now able to play on the server when you reconnect."
       )));
 
     messagesConfig.getYaml().setComment("messages.verification.too-many-online-per-ip",

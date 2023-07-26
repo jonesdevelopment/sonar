@@ -23,7 +23,6 @@ import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
-import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
@@ -34,7 +33,6 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackLoginHandler;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -45,8 +43,6 @@ import java.util.Objects;
 import java.util.Random;
 
 import static com.velocitypowered.api.network.ProtocolVersion.*;
-import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.VERIFICATION_SUCCESS;
 
 /**
@@ -68,14 +64,11 @@ import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessag
  */
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final @NotNull FallbackPlayer player;
-  private final @NotNull FallbackLoginHandler loginHandler;
   private final boolean v1_8or1_7;
   private @Nullable String resourcePackHash;
   private static final Random random = new SecureRandom();
 
-  public FallbackSessionHandler(final @NotNull FallbackLoginHandler loginHandler,
-                                final @NotNull FallbackPlayer player) {
-    this.loginHandler = loginHandler;
+  public FallbackSessionHandler(final @NotNull FallbackPlayer player) {
     this.player = player;
     this.v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
   }
@@ -279,57 +272,10 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // We need this to prevent some packets from flagging bad packet checks
     verified = true;
 
-    if (player.getFallback().getSonar().getConfig().DISCONNECT_AFTER_SUCCESS) {
-      player.getConnection().closeWith(Disconnect.create(
-        VERIFICATION_SUCCESS,
-        player.getConnection().getProtocolVersion()
-      ));
-    } else {
-
-      // Remove the Sonar timeout handler - all checks have passed
-      if (player.getPipeline().get(TIMEOUT) != null) {
-        player.getPipeline().remove(TIMEOUT);
-      }
-
-      // Remove the Sonar decoder - we don't care about the player anymore
-      // Leave the `sonar-handler` pipeline, so we don't run into any issues
-      if (player.getPipeline().get(DECODER) != null) {
-        player.getPipeline().remove(DECODER);
-      }
-
-      // We have to add our own Respawn packet by scanning for the JoinGame
-      // packet sent by the backend server when we connect the player
-      player.getPipeline().addAfter(
-        MINECRAFT_ENCODER,
-        RESPAWN,
-        new FallbackRespawnHandler(player)
-      );
-
-      // Continue the initial connection to the backend server
-      final AuthSessionHandler authSessionHandler;
-      try {
-        authSessionHandler = (AuthSessionHandler) NEW_AUTH_HANDLER.invokeExact(
-          loginHandler.getServer(),
-          loginHandler.getInboundConnection(),
-          loginHandler.getGameProfile(),
-          loginHandler.isPremium()
-        );
-
-        CONNECTION_FIELD.set(authSessionHandler, player.getConnection());
-      } catch (Throwable throwable) {
-        throwable.printStackTrace();
-        player.getConnection().close(true);
-        return;
-      }
-
-      player.getConnection().setState(StateRegistry.LOGIN);
-      player.getConnection().setSessionHandler(authSessionHandler);
-
-      // Now we can safely remove the `sonar-handler` pipeline
-      if (player.getPipeline().get(HANDLER) != null) {
-        player.getPipeline().remove(HANDLER);
-      }
-    }
+    player.getConnection().closeWith(Disconnect.create(
+      VERIFICATION_SUCCESS,
+      player.getConnection().getProtocolVersion()
+    ));
 
     player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
   }

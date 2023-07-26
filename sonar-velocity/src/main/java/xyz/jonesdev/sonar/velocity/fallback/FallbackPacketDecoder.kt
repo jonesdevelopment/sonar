@@ -30,7 +30,6 @@ import xyz.jonesdev.sonar.velocity.fallback.session.FallbackSessionHandler
 
 class FallbackPacketDecoder(
   private val fallbackPlayer: FallbackPlayer,
-  private val loginHandler: FallbackLoginHandler,
   private val startKeepAliveId: Long,
 ) : ChannelInboundHandlerAdapter() {
   private var packets = 0
@@ -70,7 +69,7 @@ class FallbackPacketDecoder(
 
         fallbackPlayer.channel.eventLoop().execute {
           // Set session handler to custom fallback handler to intercept all incoming packets
-          fallbackPlayer.connection.sessionHandler = FallbackSessionHandler(loginHandler, fallbackPlayer)
+          fallbackPlayer.connection.sessionHandler = FallbackSessionHandler(fallbackPlayer)
 
           // Create JoinGame packet for the client's version
           val joinGame = getJoinPacketForVersion(fallbackPlayer.player.protocolVersion)
