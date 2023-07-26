@@ -60,6 +60,12 @@ public class ProtocolUtil {
     return str;
   }
 
+  public static void writeArray(final ByteBuf byteBuf, final byte[] bytes) {
+    checkFrame(bytes.length < Short.MAX_VALUE, "Too long array");
+    writeVarInt(byteBuf, bytes.length);
+    byteBuf.writeBytes(bytes);
+  }
+
   public void writeString(ByteBuf buf, CharSequence str) {
     final int size = ByteBufUtil.utf8Bytes(str);
     writeVarInt(buf, size);

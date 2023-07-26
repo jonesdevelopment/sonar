@@ -20,7 +20,10 @@ package xyz.jonesdev.sonar.velocity.fallback.handler;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.fallback.packets.Disconnect;
+import xyz.jonesdev.sonar.common.fallback.packets.Position;
+import xyz.jonesdev.sonar.common.fallback.packets.PositionLook;
 import xyz.jonesdev.sonar.common.fallback.packets.Transaction;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
@@ -29,12 +32,28 @@ import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 import java.util.Random;
 
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.VERIFICATION_SUCCESS;
+import static xyz.jonesdev.sonar.velocity.fallback.FallbackPackets.*;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener, FallbackHandler {
   @Getter
   private final @NotNull FallbackPlayer player;
   private final short transactionId;
   private static final Random random = new Random();
+  private boolean hasReceivedTransaction;
+  private int movementTick;
+  private double lastY;
+
+  private static int MAX_MOVEMENT_TICK = 5;
+  private static double[] PREPARED_MOVEMENT_PACKETS;
+
+  public static void update() {
+    MAX_MOVEMENT_TICK = Sonar.get().getConfig().MAXIMUM_MOVEMENT_TICKS;
+    PREPARED_MOVEMENT_PACKETS = new double[MAX_MOVEMENT_TICK + 2];
+
+    for (int i = 0; i < MAX_MOVEMENT_TICK + 1; i++) {
+      PREPARED_MOVEMENT_PACKETS[i] = -((Math.pow(0.98, i) - 1) * 3.92);
+    }
+  }
 
   public FallbackVerificationHandler(final @NotNull FallbackPlayer player) {
     this.player = player;
@@ -48,12 +67,56 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Override
   public void handle(final FallbackPacket packet) {
     if (packet instanceof Transaction) {
+      checkFrame(!hasReceivedTransaction, "unexpected timing (T1)");
+      hasReceivedTransaction = true;
+
       final Transaction transaction = (Transaction) packet;
 
       checkFrame(transaction.isAccepted(), "transaction not accepted?!");
       checkFrame(transaction.getId() == transactionId, "invalid transaction id");
 
-      finish();
+      player.getConnection().write(EMPTY_CHUNK_DATA);
+      player.getConnection().write(SPAWN_TELEPORT);
+      player.getConnection().write(DEFAULT_ABILITIES);
+    }
+
+    if (packet instanceof Position) {
+      final Position position = (Position) packet;
+
+      checkFrame(!position.isOnGround(), "invalid ground state");
+
+      if (hasReceivedTransaction) {
+        handlePositionUpdate(position.getY());
+      }
+    }
+
+    if (packet instanceof PositionLook) {
+      final PositionLook position = (PositionLook) packet;
+
+      checkFrame(!position.isOnGround(), "invalid ground state");
+
+      if (hasReceivedTransaction) {
+        handlePositionUpdate(position.getY());
+      }
+    }
+  }
+
+  private void handlePositionUpdate(final double y) {
+    final double deltaY = lastY - y;
+    lastY = y;
+
+    // Skip teleport packets using this check
+    if (deltaY > 0) {
+      // Predict the next y motion
+      final double predicted = PREPARED_MOVEMENT_PACKETS[++movementTick];
+      final double offset = Math.abs(deltaY - predicted);
+
+      // Check if the y motion is similar to the predicted value
+      checkFrame(offset < 0.01, "too high y offset");
+
+      if (movementTick >= MAX_MOVEMENT_TICK) {
+        finish();
+      }
     }
   }
 

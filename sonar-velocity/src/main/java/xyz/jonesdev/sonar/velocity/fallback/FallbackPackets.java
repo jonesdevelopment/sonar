@@ -30,6 +30,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.dimension.PacketDimension;
+import xyz.jonesdev.sonar.common.fallback.packets.Abilities;
+import xyz.jonesdev.sonar.common.fallback.packets.EmptyChunkData;
+import xyz.jonesdev.sonar.common.fallback.packets.PositionLook;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -94,6 +97,12 @@ public class FallbackPackets {
       );
     }
   }
+
+  public static final Abilities DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
+  public static final PositionLook SPAWN_TELEPORT = new PositionLook(
+    8, 1337, 8, 0f, 0f, 1, true
+  );
+  public static final EmptyChunkData EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
 
   public static final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
   public final JoinGame JOIN_GAME_1_16 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16);

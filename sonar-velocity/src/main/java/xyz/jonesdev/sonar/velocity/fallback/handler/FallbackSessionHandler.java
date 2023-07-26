@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.velocity.fallback.handler;
 
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
+import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.ClientSettings;
 import com.velocitypowered.proxy.protocol.packet.Disconnect;
 import com.velocitypowered.proxy.protocol.packet.KeepAlive;
@@ -64,6 +65,8 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
   @Getter
   private final @NotNull FallbackPlayer player;
   private final boolean v1_8or1_7;
+  private final long loginTimestamp = System.currentTimeMillis();
+  private int packets;
 
   public FallbackSessionHandler(final @NotNull FallbackPlayer player) {
     this.player = player;
@@ -80,6 +83,22 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
       CONNECTION_FIELD.setAccessible(true);
     } catch (Throwable throwable) {
       throw new ReflectionException(throwable);
+    }
+  }
+
+  @Override
+  public void handleGeneric(final MinecraftPacket packet) {
+
+    // Check if the player is not sending a ton of packets to the server
+    final int maxLoginPackets = player.getFallback().getSonar().getConfig().MAXIMUM_LOGIN_PACKETS;
+    checkFrame(++packets < maxLoginPackets, "too many packets");
+
+    // Check for timeout since the player could be sending packets but not important ones
+    final long elapsed = System.currentTimeMillis() - loginTimestamp;
+    final long timeout = player.getFallback().getSonar().getConfig().VERIFICATION_TIMEOUT;
+    // Check if the time limit has exceeded
+    if (elapsed > timeout) {
+      player.getConnection().close(true);
     }
   }
 

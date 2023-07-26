@@ -47,8 +47,7 @@ advanced types of bots.
 * Sends the player to a lightweight fake server when they connect for the first time.
 * Analyzes if the player is sending the necessary packets.
 * Analyzes if the player is sending legitimate packets.
-* ~~Checks if the player is obeying client gravity.~~ (planned for a future update)
-* Redirects the player to the backend server without them actually noticing that they were checked for being a bot.
+* Checks if the player is obeying client gravity.
 
 Fallback also protects from huge spam bot attacks since it queues the incoming connections, therefore making it
 technically impossible to have a ton of bots join the server at the same time.

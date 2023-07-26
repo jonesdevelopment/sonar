@@ -22,33 +22,40 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
+
+import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.MINECRAFT_1_14;
+import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Disconnect implements FallbackPacket {
-  private @Nullable String reason;
-
-  @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    reason = ProtocolUtil.readString(byteBuf);
-  }
+public class DefaultSpawnPosition implements FallbackPacket {
+  private int posX;
+  private int posY;
+  private int posZ;
+  private float angle;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    if (reason == null) {
-      throw new IllegalStateException("No reason specified");
+    long location;
+    if (protocolVersion.compareTo(MINECRAFT_1_14) < 0) {
+      location = ((posX & 0x3FFFFFFL) << 38) | ((posY & 0xFFFL) << 26) | (posZ & 0x3FFFFFFL);
+    } else {
+      location = ((posX & 0x3FFFFFFL) << 38) | ((posZ & 0x3FFFFFFL) << 12) | (posY & 0xFFFL);
     }
 
-    ProtocolUtil.writeString(byteBuf, reason);
+    byteBuf.writeLong(location);
+
+    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
+      byteBuf.writeFloat(angle);
+    }
   }
 
-  public static Disconnect create(final String serialized) {
-    return new Disconnect(serialized);
+  @Override
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 }

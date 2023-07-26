@@ -20,8 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import lombok.Data;
-import xyz.jonesdev.sonar.common.fallback.packets.Disconnect;
-import xyz.jonesdev.sonar.common.fallback.packets.Transaction;
+import xyz.jonesdev.sonar.common.fallback.packets.*;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -34,18 +33,73 @@ public enum FallbackPacketRegistry {
       clientbound.fallback = false;
       serverbound.fallback = false;
       clientbound.register(Disconnect.class, Disconnect::new,
-        map(64, MINECRAFT_1_7_2, false),
-        map(26, MINECRAFT_1_9, false),
-        map(27, MINECRAFT_1_13, false),
-        map(26, MINECRAFT_1_14, false),
-        map(27, MINECRAFT_1_15, false),
-        map(26, MINECRAFT_1_16, false),
-        map(25, MINECRAFT_1_16_2, false),
-        map(26, MINECRAFT_1_17, false),
-        map(23, MINECRAFT_1_19, false),
-        map(25, MINECRAFT_1_19_1, false),
-        map(23, MINECRAFT_1_19_3, false),
-        map(26, MINECRAFT_1_19_4, false));
+        map(64, MINECRAFT_1_7_2, true),
+        map(26, MINECRAFT_1_9, true),
+        map(27, MINECRAFT_1_13, true),
+        map(26, MINECRAFT_1_14, true),
+        map(27, MINECRAFT_1_15, true),
+        map(26, MINECRAFT_1_16, true),
+        map(25, MINECRAFT_1_16_2, true),
+        map(26, MINECRAFT_1_17, true),
+        map(23, MINECRAFT_1_19, true),
+        map(25, MINECRAFT_1_19_1, true),
+        map(23, MINECRAFT_1_19_3, true),
+        map(26, MINECRAFT_1_19_4, true));
+      clientbound.register(PositionLook.class, PositionLook::new,
+        map(0x08, MINECRAFT_1_7_2, true),
+        map(0x2E, MINECRAFT_1_9, true),
+        map(0x2F, MINECRAFT_1_12_1, true),
+        map(0x32, MINECRAFT_1_13, true),
+        map(0x35, MINECRAFT_1_14, true),
+        map(0x36, MINECRAFT_1_15, true),
+        map(0x35, MINECRAFT_1_16, true),
+        map(0x34, MINECRAFT_1_16_2, true),
+        map(0x38, MINECRAFT_1_17, true),
+        map(0x36, MINECRAFT_1_19, true),
+        map(0x39, MINECRAFT_1_19_1, true),
+        map(0x38, MINECRAFT_1_19_3, true),
+        map(0x3C, MINECRAFT_1_19_4, true));
+      clientbound.register(Abilities.class, Abilities::new,
+        map(0x39, MINECRAFT_1_7_2, true),
+        map(0x2B, MINECRAFT_1_9, true),
+        map(0x2C, MINECRAFT_1_12_1, true),
+        map(0x2E, MINECRAFT_1_13, true),
+        map(0x31, MINECRAFT_1_14, true),
+        map(0x32, MINECRAFT_1_15, true),
+        map(0x31, MINECRAFT_1_16, true),
+        map(0x30, MINECRAFT_1_16_2, true),
+        map(0x32, MINECRAFT_1_17, true),
+        map(0x2f, MINECRAFT_1_19, true),
+        map(0x31, MINECRAFT_1_19_1, true),
+        map(0x30, MINECRAFT_1_19_3, true),
+        map(0x34, MINECRAFT_1_19_4, true));
+      clientbound.register(EmptyChunkData.class, EmptyChunkData::new,
+        map(0x21, MINECRAFT_1_7_2, true),
+        map(0x20, MINECRAFT_1_9, true),
+        map(0x22, MINECRAFT_1_13, true),
+        map(0x21, MINECRAFT_1_14, true),
+        map(0x22, MINECRAFT_1_15, true),
+        map(0x21, MINECRAFT_1_16, true),
+        map(0x20, MINECRAFT_1_16_2, true),
+        map(0x22, MINECRAFT_1_17, true),
+        map(0x1F, MINECRAFT_1_19, true),
+        map(0x21, MINECRAFT_1_19_1, true),
+        map(0x20, MINECRAFT_1_19_3, true),
+        map(0x24, MINECRAFT_1_19_4, true));
+      clientbound.register(DefaultSpawnPosition.class, DefaultSpawnPosition::new,
+        map(0x05, MINECRAFT_1_7_2, true),
+        map(0x43, MINECRAFT_1_9, true),
+        map(0x45, MINECRAFT_1_12, true),
+        map(0x46, MINECRAFT_1_12_1, true),
+        map(0x49, MINECRAFT_1_13, true),
+        map(0x4D, MINECRAFT_1_14, true),
+        map(0x4E, MINECRAFT_1_15, true),
+        map(0x42, MINECRAFT_1_16, true),
+        map(0x4B, MINECRAFT_1_17, true),
+        map(0x4A, MINECRAFT_1_19, true),
+        map(0x4D, MINECRAFT_1_19_1, true),
+        map(0x4C, MINECRAFT_1_19_3, true),
+        map(0x50, MINECRAFT_1_19_4, true));
       clientbound.register(Transaction.class, Transaction::new,
         map(0x32, MINECRAFT_1_7_2, true),
         map(0x11, MINECRAFT_1_9, true),
@@ -58,6 +112,32 @@ public enum FallbackPacketRegistry {
         map(0x2F, MINECRAFT_1_19_1, true),
         map(0x2E, MINECRAFT_1_19_3, true),
         map(0x32, MINECRAFT_1_19_4, true));
+      serverbound.register(PositionLook.class, PositionLook::new,
+        map(0x06, MINECRAFT_1_7_2, false),
+        map(0x0D, MINECRAFT_1_9, false),
+        map(0x0F, MINECRAFT_1_12, false),
+        map(0x0E, MINECRAFT_1_12_1, false),
+        map(0x11, MINECRAFT_1_13, false),
+        map(0x12, MINECRAFT_1_14, false),
+        map(0x13, MINECRAFT_1_16, false),
+        map(0x12, MINECRAFT_1_17, false),
+        map(0x14, MINECRAFT_1_19, false),
+        map(0x15, MINECRAFT_1_19_1, false),
+        map(0x14, MINECRAFT_1_19_3, false),
+        map(0x15, MINECRAFT_1_19_4, false));
+      serverbound.register(Position.class, Position::new,
+        map(0x04, MINECRAFT_1_7_2, false),
+        map(0x0C, MINECRAFT_1_9, false),
+        map(0x0E, MINECRAFT_1_12, false),
+        map(0x0D, MINECRAFT_1_12_1, false),
+        map(0x10, MINECRAFT_1_13, false),
+        map(0x11, MINECRAFT_1_14, false),
+        map(0x12, MINECRAFT_1_16, false),
+        map(0x11, MINECRAFT_1_17, false),
+        map(0x13, MINECRAFT_1_19, false),
+        map(0x14, MINECRAFT_1_19_1, false),
+        map(0x13, MINECRAFT_1_19_3, false),
+        map(0x14, MINECRAFT_1_19_4, false));
       serverbound.register(Transaction.class, Transaction::new,
         map(0x0F, MINECRAFT_1_7_2, false),
         map(0x05, MINECRAFT_1_9, false),
@@ -82,7 +162,7 @@ public enum FallbackPacketRegistry {
   }
 
   public FallbackPacketRegistry.ProtocolRegistry getProtocolRegistry(final Direction direction,
-                                                                   final ProtocolVersion version) {
+                                                                     final ProtocolVersion version) {
     return (direction == Direction.SERVERBOUND ? serverbound : clientbound).getProtocolRegistry(version);
   }
 

@@ -48,6 +48,7 @@ public final class SonarConfiguration {
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
   public int MAXIMUM_BRAND_LENGTH;
+  public int MAXIMUM_MOVEMENT_TICKS;
   public int MINIMUM_PLAYERS_FOR_ATTACK;
   public int MAXIMUM_VERIFYING_PLAYERS;
   public int MAXIMUM_ONLINE_PER_IP;
@@ -283,6 +284,11 @@ public final class SonarConfiguration {
       "Maximum number of login packets the player has to send in order to be kicked"
     );
     MAXIMUM_LOGIN_PACKETS = clamp(generalConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
+
+    generalConfig.getYaml().setComment("general.verification.max-movement-ticks",
+      "Maximum number of movement packets the player has to send in order to be verified"
+    );
+    MAXIMUM_MOVEMENT_TICKS = clamp(generalConfig.getInt("general.verification.max-movement-ticks", 8), 2, 100);
 
     generalConfig.getYaml().setComment("general.verification.max-players",
       "Maximum number of players verifying at the same time"

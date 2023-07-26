@@ -168,20 +168,20 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
 
     final long keepAliveId = ThreadLocalRandom.current().nextInt();
 
-    // We have to add this pipeline to monitor all incoming traffic
-    // We add the pipeline after the MinecraftDecoder since we want
-    // the packets to be processed and decoded already
-    fallbackPlayer.getPipeline().addAfter(
-      MINECRAFT_DECODER,
-      FALLBACK_POST_LOGIN,
-      new FallbackPostLoginHandler(
-        fallbackPlayer,
-        keepAliveId
-      )
-    );
-
     // ==================================================================
     if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+      // We have to add this pipeline to monitor all incoming traffic
+      // We add the pipeline after the MinecraftDecoder since we want
+      // the packets to be processed and decoded already
+      fallbackPlayer.getPipeline().addAfter(
+        MINECRAFT_DECODER,
+        FALLBACK_POST_LOGIN,
+        new FallbackPostLoginHandler(
+          fallbackPlayer,
+          keepAliveId
+        )
+      );
+
       // The first step of the verification is a simple KeepAlive packet
       // We don't want to waste resources by directly sending all packets to
       // the client, which is why we first send a KeepAlive packet and then

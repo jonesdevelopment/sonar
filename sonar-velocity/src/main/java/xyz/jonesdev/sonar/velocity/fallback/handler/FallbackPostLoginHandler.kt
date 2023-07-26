@@ -31,26 +31,9 @@ class FallbackPostLoginHandler(
   private val fallbackPlayer: FallbackPlayer,
   private val startKeepAliveId: Long,
 ) : ChannelInboundHandlerAdapter() {
-  private var packets = 0
-  private val loginTimestamp = System.currentTimeMillis()
 
   @Throws(Exception::class)
   override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
-
-    // Check if the client is not sending a ton of packets to the server
-    val checkPackets = ++packets <= fallbackPlayer.fallback.sonar.config.MAXIMUM_LOGIN_PACKETS
-    checkFrame(fallbackPlayer, checkPackets, "too many packets")
-
-    // Check for timeout since the player could be sending packets but not important ones
-    val duration = System.currentTimeMillis() - loginTimestamp
-    val timeout = fallbackPlayer.fallback.sonar.config.VERIFICATION_TIMEOUT
-    // Check if the time limit has exceeded
-    if (duration > timeout) {
-      // TODO: Can we fail the verification?
-      fallbackPlayer.connection.close()
-      return
-    }
-
     if (msg is MinecraftPacket) {
       val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive
 

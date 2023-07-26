@@ -22,33 +22,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Disconnect implements FallbackPacket {
-  private @Nullable String reason;
-
-  @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    reason = ProtocolUtil.readString(byteBuf);
-  }
+public class Abilities implements FallbackPacket {
+  private byte flags;
+  private float flySpeed, walkSpeed;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    if (reason == null) {
-      throw new IllegalStateException("No reason specified");
-    }
-
-    ProtocolUtil.writeString(byteBuf, reason);
+    byteBuf.writeByte(flags);
+    byteBuf.writeFloat(flySpeed);
+    byteBuf.writeFloat(walkSpeed);
   }
 
-  public static Disconnect create(final String serialized) {
-    return new Disconnect(serialized);
+  @Override
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    flags = byteBuf.readByte();
+    flySpeed = byteBuf.readFloat();
+    walkSpeed = byteBuf.readFloat();
   }
 }

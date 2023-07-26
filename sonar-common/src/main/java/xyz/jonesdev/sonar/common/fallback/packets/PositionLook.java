@@ -22,33 +22,47 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
+
+import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.*;
+import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Disconnect implements FallbackPacket {
-  private @Nullable String reason;
+public final class PositionLook implements FallbackPacket {
+  private double x, y, z;
+  private float yaw, pitch;
+  private int teleportId;
+  private boolean onGround;
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    reason = ProtocolUtil.readString(byteBuf);
+    x = byteBuf.readDouble();
+    y = byteBuf.readDouble();
+    z = byteBuf.readDouble();
+    yaw = byteBuf.readFloat();
+    pitch = byteBuf.readFloat();
+    onGround = byteBuf.readBoolean();
   }
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    if (reason == null) {
-      throw new IllegalStateException("No reason specified");
+    byteBuf.writeDouble(x);
+    byteBuf.writeDouble(y);
+    byteBuf.writeDouble(z);
+    byteBuf.writeFloat(yaw);
+    byteBuf.writeFloat(pitch);
+    byteBuf.writeByte(0x00);
+
+    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
+      writeVarInt(byteBuf, teleportId);
     }
 
-    ProtocolUtil.writeString(byteBuf, reason);
-  }
-
-  public static Disconnect create(final String serialized) {
-    return new Disconnect(serialized);
+    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0 && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+      byteBuf.writeBoolean(true); // Dismount vehicle
+    }
   }
 }
