@@ -59,7 +59,7 @@ class FallbackPlayer(
     return inetAddress
   }
 
-  override fun getProtocolVersion(): Int {
+  override fun getProtocolId(): Int {
     return protocolVersion
   }
 }

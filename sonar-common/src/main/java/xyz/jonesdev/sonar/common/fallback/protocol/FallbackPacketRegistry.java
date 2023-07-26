@@ -1,0 +1,235 @@
+/*
+ * Copyright (C) 2023 Sonar Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package xyz.jonesdev.sonar.common.fallback.protocol;
+
+import io.netty.util.collection.IntObjectHashMap;
+import io.netty.util.collection.IntObjectMap;
+import lombok.Data;
+import xyz.jonesdev.sonar.common.fallback.packets.Disconnect;
+import xyz.jonesdev.sonar.common.fallback.packets.Transaction;
+
+import java.util.*;
+import java.util.function.Supplier;
+
+import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.*;
+
+public enum FallbackPacketRegistry {
+  SONAR {
+    {
+      clientbound.fallback = false;
+      serverbound.fallback = false;
+      clientbound.register(Disconnect.class, Disconnect::new,
+        map(64, MINECRAFT_1_7_2, false),
+        map(26, MINECRAFT_1_9, false),
+        map(27, MINECRAFT_1_13, false),
+        map(26, MINECRAFT_1_14, false),
+        map(27, MINECRAFT_1_15, false),
+        map(26, MINECRAFT_1_16, false),
+        map(25, MINECRAFT_1_16_2, false),
+        map(26, MINECRAFT_1_17, false),
+        map(23, MINECRAFT_1_19, false),
+        map(25, MINECRAFT_1_19_1, false),
+        map(23, MINECRAFT_1_19_3, false),
+        map(26, MINECRAFT_1_19_4, false));
+      clientbound.register(Transaction.class, Transaction::new,
+        map(0x32, MINECRAFT_1_7_2, true),
+        map(0x11, MINECRAFT_1_9, true),
+        map(0x12, MINECRAFT_1_13, true),
+        map(0x13, MINECRAFT_1_15, true),
+        map(0x12, MINECRAFT_1_16, true),
+        map(0x11, MINECRAFT_1_16_2, true),
+        map(0x30, MINECRAFT_1_17, true),
+        map(0x2D, MINECRAFT_1_19, true),
+        map(0x2F, MINECRAFT_1_19_1, true),
+        map(0x2E, MINECRAFT_1_19_3, true),
+        map(0x32, MINECRAFT_1_19_4, true));
+      serverbound.register(Transaction.class, Transaction::new,
+        map(0x0F, MINECRAFT_1_7_2, false),
+        map(0x05, MINECRAFT_1_9, false),
+        map(0x06, MINECRAFT_1_12, false),
+        map(0x05, MINECRAFT_1_12_1, false),
+        map(0x06, MINECRAFT_1_13, false),
+        map(0x07, MINECRAFT_1_14, false),
+        map(0x1D, MINECRAFT_1_17, false),
+        map(0x1F, MINECRAFT_1_19, false),
+        map(0x20, MINECRAFT_1_19_1, false),
+        map(0x1F, MINECRAFT_1_19_3, false),
+        map(0x20, MINECRAFT_1_19_4, false));
+    }
+  };
+
+  protected final PacketRegistry clientbound = new PacketRegistry();
+  protected final PacketRegistry serverbound = new PacketRegistry();
+
+  public enum Direction {
+    SERVERBOUND,
+    CLIENTBOUND
+  }
+
+  public FallbackPacketRegistry.ProtocolRegistry getProtocolRegistry(final Direction direction,
+                                                                   final ProtocolVersion version) {
+    return (direction == Direction.SERVERBOUND ? serverbound : clientbound).getProtocolRegistry(version);
+  }
+
+  public static class PacketRegistry {
+    private final Map<ProtocolVersion, ProtocolRegistry> versions;
+    private boolean fallback = true;
+
+    PacketRegistry() {
+      Map<ProtocolVersion, ProtocolRegistry> mutableVersions = new EnumMap<>(ProtocolVersion.class);
+      for (ProtocolVersion version : ProtocolVersion.values()) {
+        if (!version.isLegacy() && !version.isUnknown()) {
+          mutableVersions.put(version, new ProtocolRegistry(version));
+        }
+      }
+
+      versions = Collections.unmodifiableMap(mutableVersions);
+    }
+
+    ProtocolRegistry getProtocolRegistry(final ProtocolVersion version) {
+      final ProtocolRegistry registry = versions.get(version);
+      if (registry == null) {
+        if (fallback) {
+          return getProtocolRegistry(MINIMUM_VERSION);
+        }
+        throw new IllegalArgumentException("Could not find data for protocol version " + version);
+      }
+      return registry;
+    }
+
+    <P extends FallbackPacket> void register(final Class<P> clazz,
+                                             final Supplier<P> packetSupplier,
+                                             final PacketMapping... mappings) {
+      if (mappings.length == 0) {
+        throw new IllegalArgumentException("At least one mapping must be provided.");
+      }
+
+      for (int i = 0; i < mappings.length; i++) {
+        final PacketMapping current = mappings[i];
+        final PacketMapping next = (i + 1 < mappings.length) ? mappings[i + 1] : current;
+
+        final ProtocolVersion from = current.protocolVersion;
+        final ProtocolVersion lastValid = current.lastValidProtocolVersion;
+
+        if (lastValid != null) {
+          if (next != current) {
+            throw new IllegalArgumentException("Cannot add a mapping after last valid mapping");
+          }
+
+          if (from.compareTo(lastValid) > 0) {
+            throw new IllegalArgumentException(
+              "Last mapping version cannot be higher than highest mapping version");
+          }
+        }
+
+        final ProtocolVersion last = (ProtocolVersion) SUPPORTED_VERSIONS.toArray()[SUPPORTED_VERSIONS.size() - 1];
+        final ProtocolVersion to = current == next ? lastValid != null
+          ? lastValid : last : next.protocolVersion;
+
+        final ProtocolVersion lastInList = lastValid != null ? lastValid : last;
+
+        if (from.compareTo(to) >= 0 && from != lastInList) {
+          throw new IllegalArgumentException(String.format(
+            "Next mapping version (%s) should be lower then current (%s)", to, from));
+        }
+
+        for (final ProtocolVersion protocol : EnumSet.range(from, to)) {
+          if (protocol == to && next != current) {
+            break;
+          }
+
+          final ProtocolRegistry registry = this.versions.get(protocol);
+          if (registry == null) {
+            throw new IllegalArgumentException("Unknown protocol version "
+              + current.protocolVersion);
+          }
+
+          if (registry.packetIdToSupplier.containsKey(current.id)) {
+            throw new IllegalArgumentException("Can not register class " + clazz.getSimpleName()
+              + " with id " + current.id + " for " + registry.version
+              + " because another packet is already registered");
+          }
+
+          if (registry.packetClassToId.containsKey(clazz)) {
+            throw new IllegalArgumentException(clazz.getSimpleName()
+              + " is already registered for version " + registry.version);
+          }
+
+          if (!current.encodeOnly) {
+            registry.packetIdToSupplier.put(current.id, packetSupplier);
+          }
+          registry.packetClassToId.put(clazz, current.id);
+        }
+      }
+    }
+  }
+
+  public static class ProtocolRegistry {
+    public final ProtocolVersion version;
+    private final IntObjectMap<Supplier<? extends FallbackPacket>> packetIdToSupplier =
+      new IntObjectHashMap<>(16, 0.5f);
+    private final Map<Class<? extends FallbackPacket>, Integer> packetClassToId =
+      new HashMap<>(16, 0.5f);
+
+    ProtocolRegistry(final ProtocolVersion version) {
+      this.version = version;
+    }
+
+    public FallbackPacket createPacket(final int id) {
+      final Supplier<? extends FallbackPacket> supplier = this.packetIdToSupplier.get(id);
+
+      if (supplier == null) {
+        return null;
+      }
+      return supplier.get();
+    }
+
+    public int getPacketId(final FallbackPacket packet) {
+      final int id = packetClassToId.getOrDefault(packet.getClass(), Integer.MIN_VALUE);
+
+      if (id == Integer.MIN_VALUE) {
+        throw new IllegalArgumentException("Could not find packet");
+      }
+      return id;
+    }
+  }
+
+  @Data
+  public static final class PacketMapping {
+    private final int id;
+    private final ProtocolVersion protocolVersion;
+    private final boolean encodeOnly;
+    private final ProtocolVersion lastValidProtocolVersion;
+
+    PacketMapping(final int id,
+                  final ProtocolVersion protocolVersion,
+                  final ProtocolVersion lastValidProtocolVersion,
+                  final boolean packetDecoding) {
+      this.id = id;
+      this.protocolVersion = protocolVersion;
+      this.lastValidProtocolVersion = lastValidProtocolVersion;
+      this.encodeOnly = packetDecoding;
+    }
+  }
+
+  private static PacketMapping map(final int id,
+                                   final ProtocolVersion version,
+                                   final boolean encodeOnly) {
+    return new PacketMapping(id, version, null, encodeOnly);
+  }
+}

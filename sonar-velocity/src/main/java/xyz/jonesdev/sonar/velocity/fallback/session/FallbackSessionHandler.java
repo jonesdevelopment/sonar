@@ -17,34 +17,32 @@
 
 package xyz.jonesdev.sonar.velocity.fallback.session;
 
-import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
-import com.velocitypowered.api.util.GameProfile;
-import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.AuthSessionHandler;
-import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
-import com.velocitypowered.proxy.protocol.packet.*;
+import com.velocitypowered.proxy.protocol.packet.ClientSettings;
+import com.velocitypowered.proxy.protocol.packet.Disconnect;
+import com.velocitypowered.proxy.protocol.packet.KeepAlive;
+import com.velocitypowered.proxy.protocol.packet.PluginMessage;
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackHandler;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
-import java.security.SecureRandom;
-import java.util.Objects;
-import java.util.Random;
 
-import static com.velocitypowered.api.network.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.VERIFICATION_SUCCESS;
+import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_13;
+import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
+import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
+import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 
 /**
  * <h3>Concept</h3>
@@ -60,14 +58,12 @@ import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessag
  * (for 1.7-1.8) Mojang decided to send a {@link com.velocitypowered.proxy.protocol.packet.KeepAlive} packet with the
  * ID 0 every 20 ticks (= one second) while the player is in the GuiDownloadTerrain screen.<br>
  * ↓<br>
- * (for 1.9+) Send a {@link com.velocitypowered.proxy.protocol.packet.ResourcePackRequest} to check if the client
- * responds correctly<br>
+ * Set handler to next, movement-validating, handler
  */
-public final class FallbackSessionHandler implements MinecraftSessionHandler {
+public final class FallbackSessionHandler implements MinecraftSessionHandler, FallbackHandler {
+  @Getter
   private final @NotNull FallbackPlayer player;
   private final boolean v1_8or1_7;
-  private @Nullable String resourcePackHash;
-  private static final Random random = new SecureRandom();
 
   public FallbackSessionHandler(final @NotNull FallbackPlayer player) {
     this.player = player;
@@ -76,24 +72,10 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
   private boolean hasSentClientBrand, hasSentClientSettings, verified;
 
-  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
-  private static final MethodHandle NEW_AUTH_HANDLER;
   private static final Field CONNECTION_FIELD;
 
   static {
     try {
-      NEW_AUTH_HANDLER = MethodHandles.privateLookupIn(
-          AuthSessionHandler.class, LOOKUP)
-        .findConstructor(AuthSessionHandler.class,
-          MethodType.methodType(
-            void.class,
-            VelocityServer.class,
-            LoginInboundConnection.class,
-            GameProfile.class,
-            boolean.class
-          )
-        );
-
       CONNECTION_FIELD = AuthSessionHandler.class.getDeclaredField("mcConnection");
       CONNECTION_FIELD.setAccessible(true);
     } catch (Throwable throwable) {
@@ -113,7 +95,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     if (hasSentClientBrand || hasSentClientSettings) {
       player.getConnection().closeWith(
         Disconnect.create(FallbackListener.CachedMessages.UNEXPECTED_ERROR, player.getPlayer().getProtocolVersion()
-        ));
+      ));
 
       // Log this incident to make sure an administrator knows what happened
       player.getFallback().getLogger().warn(
@@ -180,7 +162,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // so we just want the client to send a KeepAlive packet with the id 0
     // since the client sends KeepAlive packets with the id 0 every 20 ticks.
     if (!v1_8or1_7) {
-      sendResourcePackRequest();
+      nextStage();
     }
     return false;
   }
@@ -197,7 +179,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
 
       // Versions below 1.9 do not check the resource pack URL and hash.
       // We have to skip this check and verify the connection.
-      finish();
+      nextStage();
     } else {
 
       // On non-1.8 clients, there is no KeepAlive packet that can be sent at this stage.
@@ -206,78 +188,25 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     return false;
   }
 
-  private void sendResourcePackRequest() {
-    final ResourcePackRequest resourcePackRequest = new ResourcePackRequest();
-
-    // The hash and URL have to be invalid for this check to work
-    // since we don't want to client to actually download a resource pack
-    // or override the server resource packets option (prompt).
-    //
-    // Generate a random hash as a placeholder and method of verification.
-    resourcePackHash = Integer.toHexString(random.nextInt());
-    resourcePackRequest.setHash(resourcePackHash);
-    resourcePackRequest.setUrl(resourcePackHash);
-
-    // Send the ResourcePackRequest packet
-    player.getConnection().write(resourcePackRequest);
-  }
-
-  @Override
-  public boolean handle(final ResourcePackResponse resourcePackResponse) {
-    if (verified) return false; // Skip verified players so we don't run into issues
-
-    checkFrame(resourcePackHash != null, "hash has not been set");
-
-    // 1.10+ clients do not send the hash back to the server if the download fails.
-    // That means that we can validate the hash sent by the client and compare
-    // it with the hash we set on the server side.
-    if (player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_10) >= 0) {
-      // Check if the hash is empty
-      checkFrame(resourcePackResponse.getHash().isEmpty(), "invalid hash (1.10+)");
-    } else {
-      // Check if the hash is the same as on the server
-      checkFrame(Objects.equals(resourcePackResponse.getHash(), resourcePackHash), "invalid hash");
-    }
-
-    checkFrame( // The download will always fail because we never provided a real URL
-      resourcePackResponse.getStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFUL,
-      "invalid status: " + resourcePackResponse.getStatus()
-    );
-
-    finish();
-    return false;
-  }
-
-  private static final CorruptedFrameException CORRUPTED_FRAME = new CorruptedFrameException();
-
-  private void checkFrame(final boolean condition, final String message) {
-    checkFrame(player, condition, message);
-  }
-
-  public static void checkFrame(final FallbackConnection<?, ?> player,
-                                final boolean condition,
-                                final String message) {
-    if (!condition) {
-      player.fail(message);
-      throw CORRUPTED_FRAME;
-    }
-  }
-
   /**
    * Restore old pipelines and send the player to the actual server
    */
-  private synchronized void finish() {
-    player.getFallback().getVerified().add(player.getInetAddress().toString());
-    player.getFallback().getConnected().remove(player.getPlayer().getUsername());
-
+  private synchronized void nextStage() {
     // We need this to prevent some packets from flagging bad packet checks
     verified = true;
 
-    player.getConnection().closeWith(Disconnect.create(
-      VERIFICATION_SUCCESS,
-      player.getConnection().getProtocolVersion()
-    ));
-
-    player.getFallback().getLogger().info("Successfully verified " + player.getPlayer().getUsername());
+    player.getPipeline().replace(
+      MINECRAFT_ENCODER,
+      FALLBACK_PACKET_ENCODER,
+      new FallbackPacketEncoder(player.getProtocolId())
+    );
+    player.getPipeline().replace(
+      MINECRAFT_DECODER,
+      FALLBACK_PACKET_DECODER,
+      new FallbackPacketDecoder(
+        player.getProtocolId(),
+        new FallbackVerification(player)
+      )
+    );
   }
 }

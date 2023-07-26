@@ -48,8 +48,8 @@ import java.net.InetAddress;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.HANDLER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.TIMEOUT;
+import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
@@ -65,6 +65,7 @@ public final class FallbackListener {
     static Component ALREADY_QUEUED;
     static Component TOO_FAST_RECONNECT;
     public static Component UNEXPECTED_ERROR;
+    public static Component VERIFICATION_FAILED;
     public static Component INVALID_USERNAME;
     public static Component VERIFICATION_SUCCESS;
 
@@ -77,6 +78,7 @@ public final class FallbackListener {
       UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
       INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
       VERIFICATION_SUCCESS = Component.text(Sonar.get().getConfig().VERIFICATION_SUCCESS);
+      VERIFICATION_FAILED = Component.text(Sonar.get().getConfig().VERIFICATION_FAILED);
       TOO_MANY_ONLINE_PER_IP = LoginEvent.ComponentResult.denied(
         Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP
       ));
@@ -212,7 +214,7 @@ public final class FallbackListener {
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
-      pipeline.addFirst(HANDLER, new FallbackChannelHandler(event.getUsername()));
+      pipeline.addFirst(FALLBACK_HANDLER, new FallbackChannelHandler(event.getUsername()));
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
@@ -230,8 +232,9 @@ public final class FallbackListener {
 
         // Add better timeout handler to avoid known exploits or issues
         // We also want to timeout bots quickly to avoid flooding
-        pipeline.addFirst(
-          TIMEOUT,
+        pipeline.replace(
+          READ_TIMEOUT,
+          READ_TIMEOUT,
           new FallbackTimeoutHandler(
             fallback.getSonar().getConfig().VERIFICATION_READ_TIMEOUT,
             TimeUnit.MILLISECONDS

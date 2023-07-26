@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 
 import static net.md_5.bungee.netty.PipelineUtils.FRAME_PREPENDER;
 import static net.md_5.bungee.netty.PipelineUtils.TIMEOUT_HANDLER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.HANDLER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
 import static xyz.jonesdev.sonar.bungee.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
@@ -264,7 +264,7 @@ public final class FallbackListener implements Listener {
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players
-      pipeline.addFirst(HANDLER, null);
+      pipeline.addFirst(FALLBACK_HANDLER, null);
 
       // Queue the connection for further processing
       fallback.getQueue().queue(inetAddress, () -> channelWrapper.getHandle().eventLoop().execute(() -> {

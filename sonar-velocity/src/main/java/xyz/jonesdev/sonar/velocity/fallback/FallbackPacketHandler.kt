@@ -24,11 +24,12 @@ import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import com.velocitypowered.proxy.protocol.packet.ResourcePackResponse
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
+import xyz.jonesdev.sonar.velocity.fallback.FallbackHandler.checkFrame
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion
 import xyz.jonesdev.sonar.velocity.fallback.session.FallbackPlayer
 import xyz.jonesdev.sonar.velocity.fallback.session.FallbackSessionHandler
 
-class FallbackPacketDecoder(
+class FallbackPacketHandler(
   private val fallbackPlayer: FallbackPlayer,
   private val startKeepAliveId: Long,
 ) : ChannelInboundHandlerAdapter() {
@@ -40,7 +41,7 @@ class FallbackPacketDecoder(
 
     // Check if the client is not sending a ton of packets to the server
     val checkPackets = ++packets <= fallbackPlayer.fallback.sonar.config.MAXIMUM_LOGIN_PACKETS
-    FallbackSessionHandler.checkFrame(fallbackPlayer, checkPackets, "too many packets")
+    checkFrame(fallbackPlayer, checkPackets, "too many packets")
 
     // Check for timeout since the player could be sending packets but not important ones
     val duration = System.currentTimeMillis() - loginTimestamp
@@ -56,7 +57,7 @@ class FallbackPacketDecoder(
       val legalPacket = msg is ClientSettings || msg is PluginMessage || msg is KeepAlive || msg is ResourcePackResponse
 
       // Check if the client is sending packets we don't want them to send
-      FallbackSessionHandler.checkFrame(fallbackPlayer, legalPacket, "bad packet: " + msg.javaClass.simpleName)
+      checkFrame(fallbackPlayer, legalPacket, "bad packet: " + msg.javaClass.simpleName)
 
       val hasFallbackHandler = fallbackPlayer.connection.sessionHandler!! is FallbackSessionHandler
 

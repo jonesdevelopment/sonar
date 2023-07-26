@@ -21,7 +21,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.sonar.api.Sonar;
 
 import java.net.InetAddress;
 
@@ -38,18 +37,16 @@ public interface FallbackConnection<X, Y> {
 
   @NotNull InetAddress getInetAddress();
 
-  int getProtocolVersion();
+  int getProtocolId();
 
   default void fail(final @Nullable String reason) {
     if (getChannel().isActive()) {
       getChannel().close();
     }
 
-    getFallback().getBlacklisted().put(getInetAddress().toString());
-
     if (reason != null) {
-      Sonar.get().getLogger().info("[Fallback] {} ({}) has failed the bot check for: {}",
-        getInetAddress(), getProtocolVersion(), reason);
+      getFallback().getLogger().info("{} ({}) has failed the bot check for: {}",
+        getInetAddress(), getProtocolId(), reason);
     }
   }
 }

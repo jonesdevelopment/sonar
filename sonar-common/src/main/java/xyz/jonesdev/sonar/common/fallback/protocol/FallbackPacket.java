@@ -15,11 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback;
+package xyz.jonesdev.sonar.common.fallback.protocol;
 
-public interface FallbackPipelines {
-  String FALLBACK_HANDLER         = "sonar-handler";
-  String FALLBACK_PACKET_ENCODER  = "sonar-packet-encoder";
-  String FALLBACK_PACKET_DECODER  = "sonar-packet-decoder";
-  String FALLBACK_PACKET_HANDLER  = "sonar-packet-handler";
+import io.netty.buffer.ByteBuf;
+
+public interface FallbackPacket {
+  void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
+
+  void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
+
+  default int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return -1;
+  }
+
+  default int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return -1;
+  }
 }

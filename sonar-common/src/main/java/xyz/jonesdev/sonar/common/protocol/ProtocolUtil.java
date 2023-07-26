@@ -18,16 +18,27 @@
 package xyz.jonesdev.sonar.common.protocol;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.CorruptedFrameException;
 import kotlin.text.Charsets;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
+import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
 // Mostly taken from Velocity
 @UtilityClass
 public class ProtocolUtil {
+  public @NotNull String readString(final ByteBuf buf) throws CorruptedFrameException {
+    return readString(buf, Short.MAX_VALUE);
+  }
+
+  public @NotNull String readString(final ByteBuf buf,
+                                    final int cap) throws CorruptedFrameException {
+    return readString(buf, cap, false);
+  }
+
   public @NotNull String readString(final ByteBuf buf,
                                     final int cap,
                                     final boolean legacy) throws CorruptedFrameException {
@@ -47,6 +58,12 @@ public class ProtocolUtil {
     }
     checkFrame(str.length() <= cap, "Got a too-long string");
     return str;
+  }
+
+  public void writeString(ByteBuf buf, CharSequence str) {
+    final int size = ByteBufUtil.utf8Bytes(str);
+    writeVarInt(buf, size);
+    buf.writeCharSequence(str, Charsets.UTF_8);
   }
 
   private void checkFrame(final boolean expression, final String message) {

@@ -67,6 +67,7 @@ public final class SonarConfiguration {
   public String TOO_MANY_ONLINE_PER_IP;
   public String INVALID_USERNAME;
   public String VERIFICATION_SUCCESS;
+  public String VERIFICATION_FAILED;
   public String ALREADY_VERIFYING;
   public String ALREADY_QUEUED;
   public String BLACKLISTED;
@@ -667,6 +668,17 @@ public final class SonarConfiguration {
         "%header%",
         "&aYou have successfully passed the verification.",
         "&fYou are now able to play on the server when you reconnect."
+      )));
+
+    messagesConfig.getYaml().setComment("messages.verification.failed",
+      "Disconnect message that is shown when someone fails verification"
+    );
+    VERIFICATION_FAILED = fromList(messagesConfig.getStringList("messages.verification.failed",
+      Arrays.asList(
+        "%header%",
+        "&cYou have failed the verification.",
+        "&7Please wait a few seconds before trying to verify again.",
+        "&6Need help? &7%support-url%"
       )));
 
     messagesConfig.getYaml().setComment("messages.verification.too-many-online-per-ip",

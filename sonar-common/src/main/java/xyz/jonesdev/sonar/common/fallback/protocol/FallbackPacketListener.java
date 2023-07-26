@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback;
+package xyz.jonesdev.sonar.common.fallback.protocol;
 
-public interface FallbackPipelines {
-  String FALLBACK_HANDLER         = "sonar-handler";
-  String FALLBACK_PACKET_ENCODER  = "sonar-packet-encoder";
-  String FALLBACK_PACKET_DECODER  = "sonar-packet-decoder";
-  String FALLBACK_PACKET_HANDLER  = "sonar-packet-handler";
+@FunctionalInterface
+public interface FallbackPacketListener {
+  void handle(final FallbackPacket packet);
 }
