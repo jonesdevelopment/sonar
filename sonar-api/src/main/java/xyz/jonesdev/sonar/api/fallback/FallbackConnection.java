@@ -21,8 +21,11 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.jonesdev.cappuchino.Cappuchino;
+import xyz.jonesdev.cappuchino.ExpiringCache;
 
 import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
 
 public interface FallbackConnection<X, Y> {
   @NotNull Fallback getFallback();
@@ -39,9 +42,24 @@ public interface FallbackConnection<X, Y> {
 
   int getProtocolId();
 
+  ExpiringCache<String> PREVIOUS_FAILS = Cappuchino.buildExpiring(3L, TimeUnit.MINUTES);
+
   default void fail(final @Nullable String reason) {
     if (getChannel().isActive()) {
       getChannel().close();
+    }
+
+    // Make sure old entries are removed
+    PREVIOUS_FAILS.cleanUp();
+
+    // Check if the player has too many failed attempts
+    if (PREVIOUS_FAILS.has(getInetAddress().toString())) {
+      getFallback().getBlacklisted().put(getInetAddress().toString());
+      getFallback().getLogger().info("{} ({}) was blacklisted for too many failed attempts",
+        getInetAddress(), getProtocolId());
+    } else {
+      // Cache the InetAddress for 3 minutes
+      PREVIOUS_FAILS.put(getInetAddress().toString());
     }
 
     if (reason != null) {
