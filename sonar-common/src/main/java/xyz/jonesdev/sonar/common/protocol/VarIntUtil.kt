@@ -105,5 +105,66 @@ class VarIntUtil {
         buf.writeByte(value ushr 28)
       }
     }
+
+    @JvmStatic
+    fun writeVarLong(buf: ByteBuf, value: Long) {
+      if (value and -0x80L == 0L) {
+        buf.writeByte(value.toByte().toInt())
+      } else if (value and -0x4000L == 0L) {
+        val w = (value and 0x7FL or 0x80L shl 8 or (value ushr 7)).toInt()
+        buf.writeShort(w)
+      } else {
+        writeVarLongFull(buf, value)
+      }
+    }
+
+    private fun writeVarLongFull(buf: ByteBuf, value: Long) {
+      if (value and -0x80L == 0L) {
+        buf.writeByte(value.toByte().toInt())
+      } else if (value and -0x4000L == 0L) {
+        val w = (value and 0x7FL or 0x80L shl 8 or (value ushr 7)).toInt()
+        buf.writeShort(w)
+      } else if (value and -0x200000L == 0L) {
+        val w = (value and 0x7FL or 0x80L shl 16 or (value ushr 7 and 0x7FL or 0x80L shl 8) or (value ushr 14)).toInt()
+        buf.writeMedium(w)
+      } else if (value and -0x10000000L == 0L) {
+        val w =
+          (value and 0x7FL or 0x80L shl 24 or (value ushr 7 and 0x7FL or 0x80L shl 16) or (value ushr 14 and 0x7FL or 0x80L shl 8) or (value ushr 21)).toInt()
+        buf.writeInt(w)
+      } else if (value and -0x800000000L == 0L) {
+        val w =
+          (value and 0x7FL or 0x80L shl 24 or (value ushr 7 and 0x7FL or 0x80L shl 16) or (value ushr 14 and 0x7FL or 0x80L shl 8) or (value ushr 21 and 0x7FL or 0x80L)).toInt()
+        buf.writeInt(w)
+        buf.writeByte((value ushr 28).toInt())
+      } else if (value and -0x40000000000L == 0L) {
+        val w =
+          (value and 0x7FL or 0x80L shl 24 or (value ushr 7 and 0x7FL or 0x80L shl 16) or (value ushr 14 and 0x7FL or 0x80L shl 8) or (value ushr 21 and 0x7FL or 0x80L)).toInt()
+        val w2 = (value ushr 28 and 0x7FL or 0x80L shl 8 or (value ushr 35)).toInt()
+        buf.writeInt(w)
+        buf.writeShort(w2)
+      } else if (value and -0x2000000000000L == 0L) {
+        val w =
+          (value and 0x7FL or 0x80L shl 24 or (value ushr 7 and 0x7FL or 0x80L shl 16) or (value ushr 14 and 0x7FL or 0x80L shl 8) or (value ushr 21 and 0x7FL or 0x80L)).toInt()
+        val w2 =
+          (value ushr 28 and 0x7FL or 0x80L shl 16 or (value ushr 35 and 0x7FL or 0x80L shl 8) or (value ushr 42)).toInt()
+        buf.writeInt(w)
+        buf.writeMedium(w2)
+      } else if (value and -0x100000000000000L == 0L) {
+        val w =
+          value and 0x7FL or 0x80L shl 56 or (value ushr 7 and 0x7FL or 0x80L shl 48) or (value ushr 14 and 0x7FL or 0x80L shl 40) or (value ushr 21 and 0x7FL or 0x80L shl 32) or (value ushr 28 and 0x7FL or 0x80L shl 24) or (value ushr 35 and 0x7FL or 0x80L shl 16) or (value ushr 42 and 0x7FL or 0x80L shl 8) or (value ushr 49)
+        buf.writeLong(w)
+      } else if (value and Long.MIN_VALUE == 0L) {
+        val w =
+          value and 0x7FL or 0x80L shl 56 or (value ushr 7 and 0x7FL or 0x80L shl 48) or (value ushr 14 and 0x7FL or 0x80L shl 40) or (value ushr 21 and 0x7FL or 0x80L shl 32) or (value ushr 28 and 0x7FL or 0x80L shl 24) or (value ushr 35 and 0x7FL or 0x80L shl 16) or (value ushr 42 and 0x7FL or 0x80L shl 8) or (value ushr 49)
+        buf.writeLong(w)
+        buf.writeByte((value ushr 56).toByte().toInt())
+      } else {
+        val w =
+          value and 0x7FL or 0x80L shl 56 or (value ushr 7 and 0x7FL or 0x80L shl 48) or (value ushr 14 and 0x7FL or 0x80L shl 40) or (value ushr 21 and 0x7FL or 0x80L shl 32) or (value ushr 28 and 0x7FL or 0x80L shl 24) or (value ushr 35 and 0x7FL or 0x80L shl 16) or (value ushr 42 and 0x7FL or 0x80L shl 8) or (value ushr 49)
+        val w2 = (value ushr 56 and 0x7FL or 0x80L shl 8 or (value ushr 63)).toInt()
+        buf.writeLong(w)
+        buf.writeShort(w2)
+      }
+    }
   }
 }

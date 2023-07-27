@@ -30,8 +30,12 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.dimension.PacketDimension;
+import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
+import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
+import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.Abilities;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.EmptyChunkData;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.MultiBlockChange;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.PositionLook;
 
 import java.io.InputStream;
@@ -98,11 +102,50 @@ public class FallbackPackets {
     }
   }
 
-  public static final Abilities DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
-  public static final PositionLook SPAWN_TELEPORT = new PositionLook(
-    8, 1337, 8, 0f, 0f, 1, true
-  );
-  public static final EmptyChunkData EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
+  public final Abilities DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
+  public final EmptyChunkData EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
+  private final int BLOCKS_PER_ROW = 8;
+  private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
+
+  public int MAX_MOVEMENT_TICK = 5;
+  public double[] PREPARED_MOVEMENT_PACKETS;
+
+  public final int DEFAULT_Y_SPAWN_POSITION = 260;
+  public int DYNAMIC_BLOCK_Y_POSITION = DEFAULT_Y_SPAWN_POSITION;
+  public int DYNAMIC_COLLIDE_Y_POSITION = DEFAULT_Y_SPAWN_POSITION - 10;
+  public PositionLook SPAWN_TELEPORT;
+
+  public void prepare() {
+    MAX_MOVEMENT_TICK = Sonar.get().getConfig().MAXIMUM_MOVEMENT_TICKS;
+    PREPARED_MOVEMENT_PACKETS = new double[MAX_MOVEMENT_TICK + 2];
+
+    for (int i = 0; i < MAX_MOVEMENT_TICK + 1; i++) {
+      PREPARED_MOVEMENT_PACKETS[i] = -((Math.pow(0.98, i) - 1) * 3.92);
+    }
+
+    // TODO: adjust based on max movement ticks
+    DYNAMIC_BLOCK_Y_POSITION = DEFAULT_Y_SPAWN_POSITION;
+    DYNAMIC_COLLIDE_Y_POSITION = DYNAMIC_BLOCK_Y_POSITION - 10;
+
+    SPAWN_TELEPORT = new PositionLook(
+      8, DYNAMIC_BLOCK_Y_POSITION, 8,
+      0f, 0f, 1, true
+    );
+
+    int index = 0;
+    for (int x = 0; x < BLOCKS_PER_ROW; x++) {
+      for (int z = 0; z < BLOCKS_PER_ROW; z++) {
+        final BlockPosition position = new BlockPosition(
+          x + (BLOCKS_PER_ROW / 2),
+          DYNAMIC_COLLIDE_Y_POSITION,
+          z + (BLOCKS_PER_ROW / 2),
+          0, 0
+        );
+        CHANGED_BLOCKS[index++] = new ChangedBlock(position, BlockType.STONE);
+      }
+    }
+  }
+  public static final MultiBlockChange MULTI_BLOCK_CHANGE = new MultiBlockChange(0, 0, CHANGED_BLOCKS);
 
   public static final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
   public final JoinGame JOIN_GAME_1_16 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16);
@@ -142,7 +185,7 @@ public class FallbackPackets {
 
     joinGame.setLevelType("flat");
     joinGame.setGamemode((short) 3);
-    joinGame.setReducedDebugInfo(true);
+    joinGame.setReducedDebugInfo(false);
     joinGame.setDimension(USED_DIMENSION.getLegacyID());
     return joinGame;
   }

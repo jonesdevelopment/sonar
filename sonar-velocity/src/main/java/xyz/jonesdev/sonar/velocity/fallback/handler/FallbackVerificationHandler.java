@@ -20,13 +20,9 @@ package xyz.jonesdev.sonar.velocity.fallback.handler;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.Position;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.PositionLook;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.Transaction;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.util.Random;
@@ -39,21 +35,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private final @NotNull FallbackPlayer player;
   private final short transactionId;
   private static final Random random = new Random();
-  private boolean hasReceivedTransaction;
+  private boolean hasReceivedTransaction, hasSentBlockChange;
   private int movementTick;
   private double lastY;
-
-  private static int MAX_MOVEMENT_TICK = 5;
-  private static double[] PREPARED_MOVEMENT_PACKETS;
-
-  public static void update() {
-    MAX_MOVEMENT_TICK = Sonar.get().getConfig().MAXIMUM_MOVEMENT_TICKS;
-    PREPARED_MOVEMENT_PACKETS = new double[MAX_MOVEMENT_TICK + 2];
-
-    for (int i = 0; i < MAX_MOVEMENT_TICK + 1; i++) {
-      PREPARED_MOVEMENT_PACKETS[i] = -((Math.pow(0.98, i) - 1) * 3.92);
-    }
-  }
 
   public FallbackVerificationHandler(final @NotNull FallbackPlayer player) {
     this.player = player;
@@ -87,53 +71,74 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       player.getConnection().write(DEFAULT_ABILITIES);
     }
 
-    if (packet instanceof Position) {
-      final Position position = (Position) packet;
+    // Only check after the teleport packet was sent
+    if (hasReceivedTransaction) {
+      if (packet instanceof Position) {
+        final Position position = (Position) packet;
 
-      // The onGround property can never be true
-      checkFrame(!position.isOnGround(), "invalid ground state");
-
-      // Only check after the teleport packet was sent
-      if (hasReceivedTransaction) {
-        // Now check the new position
-        handlePositionUpdate(position.getY());
+        handlePositionUpdate(position.getY(), position.isOnGround());
       }
-    }
 
-    if (packet instanceof PositionLook) {
-      final PositionLook position = (PositionLook) packet;
+      if (packet instanceof PositionLook) {
+        final PositionLook position = (PositionLook) packet;
 
-      // The onGround property can never be true
-      checkFrame(!position.isOnGround(), "invalid ground state");
+        handlePositionUpdate(position.getY(), position.isOnGround());
+      }
 
-      // Only check after the teleport packet was sent
-      if (hasReceivedTransaction) {
-        // Now check the new position
-        handlePositionUpdate(position.getY());
+      if (packet instanceof Player) {
+        final Player player = (Player) packet;
+
+        // This packet does not send any position data, just reuse the last Y
+        handlePositionUpdate(lastY, player.isOnGround());
       }
     }
   }
 
-  private void handlePositionUpdate(final double y) {
+  private void handlePositionUpdate(final double y, final boolean isOnGround) {
     final double deltaY = lastY - y;
     lastY = y;
 
+    // The onGround property can never be true when we aren't checking for collisions
+    checkFrame(!isOnGround || hasSentBlockChange, "invalid ground state");
+
     // Skip teleport packets using this check
     if (deltaY > 0) {
-      // Predict the next y motion
-      final double predicted = PREPARED_MOVEMENT_PACKETS[++movementTick];
-      final double offset = Math.abs(deltaY - predicted);
-
-      // Check if the y motion is similar to the predicted value
-      checkFrame(offset < 0.01, "too high y offset");
 
       // Verify the player if they sent correct movement packets
-      if (movementTick >= MAX_MOVEMENT_TICK) {
+      if (movementTick++ >= MAX_MOVEMENT_TICK) {
         if (player.getFallback().getSonar().getConfig().CHECK_COLLISIONS) {
-          // TODO: Check collisions
+          if (!hasSentBlockChange) {
+            // Prevent the packet from flooding the traffic by limiting
+            // the times the packet is sent to the player
+            hasSentBlockChange = true;
+            // Send a MultiBlockChange packet with our stone platform
+            // for checking if the player has valid collisions
+            player.getConnection().write(MULTI_BLOCK_CHANGE);
+          } else {
+            // Check if the player is colliding by performing a basic Y offset check
+            if (isOnGround) {
+              final double offset = DYNAMIC_COLLIDE_Y_POSITION - lastY;
+
+              // The offset cannot be 0 or greater than 0 since the blocks will
+              // not let the player fall through them
+              checkFrame(offset < 0, "invalid y on ground");
+
+              // The player is colliding, finish verification
+              finish();
+            }
+          }
         } else {
+          // Checking collisions is disabled, just finish verification
           finish();
         }
+      } else {
+        // This is a basic gravity check that predicts the next y position
+        final double predictedY = PREPARED_MOVEMENT_PACKETS[movementTick];
+        final double offsetY = Math.abs(deltaY - predictedY);
+
+        System.out.println(offsetY);
+        // Check if the y motion is similar to the predicted value
+        checkFrame(offsetY < 0.01, "too high y offset");
       }
     }
   }
