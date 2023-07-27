@@ -39,9 +39,9 @@ public class FallbackPreparer {
   public int MAX_MOVEMENT_TICK = 8;
   public double[] PREPARED_MOVEMENT_PACKETS;
 
+  private final int SPAWN_BUFFER = 10; // player spawns at 255 + 10 (10 blocks above the platform)
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is max
-  public int DYNAMIC_BLOCK_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + 10;
-  public int DYNAMIC_COLLIDE_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION;
+  public int DYNAMIC_BLOCK_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + SPAWN_BUFFER;
   public PositionLook SPAWN_TELEPORT;
 
   public void prepare() {
@@ -55,12 +55,11 @@ public class FallbackPreparer {
     // Adjust block and collide Y position based on max movement ticks
     double maxFallDistance = 0;
     for (final double motion : PREPARED_MOVEMENT_PACKETS) {
-      maxFallDistance += motion + 0.0325;
+      maxFallDistance += motion;
     }
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
-    DYNAMIC_BLOCK_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + (int) maxFallDistance;
-    DYNAMIC_COLLIDE_Y_POSITION = Math.min(DYNAMIC_BLOCK_Y_POSITION - 10, 255);
+    DYNAMIC_BLOCK_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + SPAWN_BUFFER + (int) maxFallDistance;
 
     // Prepare spawn PositionLook with the dynamic Y position
     SPAWN_TELEPORT = new PositionLook(
@@ -68,13 +67,13 @@ public class FallbackPreparer {
       0f, 0f, 1, true
     );
 
-    // Prepare
+    // Prepare collision platform positions
     int index = 0;
     for (int x = 0; x < BLOCKS_PER_ROW; x++) {
       for (int z = 0; z < BLOCKS_PER_ROW; z++) {
         final BlockPosition position = new BlockPosition(
           x + (BLOCKS_PER_ROW / 2),
-          DYNAMIC_COLLIDE_Y_POSITION,
+          DEFAULT_Y_COLLIDE_POSITION,
           z + (BLOCKS_PER_ROW / 2),
           0, 0
         );

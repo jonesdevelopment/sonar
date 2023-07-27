@@ -48,8 +48,9 @@ advanced types of bots.
 * Analyzes if the player is sending the necessary packets.
 * Analyzes if the player is sending legitimate packets.
 * Checks if the player is obeying client gravity.
+* Checks if the player is colliding with blocks correctly.
 
-Fallback also protects from huge spam bot attacks since it queues the incoming connections, therefore making it
+Fallback also protects from huge spambot attacks since it queues the incoming connections, therefore making it
 technically impossible to have a ton of bots join the server at the same time.
 
 ## False positives

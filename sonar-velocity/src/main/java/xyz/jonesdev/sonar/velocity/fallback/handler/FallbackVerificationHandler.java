@@ -117,7 +117,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           } else {
             // Check if the player is colliding by performing a basic Y offset check
             if (isOnGround) {
-              final double offset = DYNAMIC_COLLIDE_Y_POSITION - lastY;
+              final double offset = DEFAULT_Y_COLLIDE_POSITION - lastY;
 
               // The offset cannot be 0 or greater than 0 since the blocks will
               // not let the player fall through them
