@@ -27,8 +27,8 @@ import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.util.Random;
 
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.VERIFICATION_SUCCESS;
-import static xyz.jonesdev.sonar.velocity.fallback.FallbackPackets.*;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener, FallbackHandler {
   @Getter
