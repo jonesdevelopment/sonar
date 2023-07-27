@@ -112,11 +112,6 @@ public final class FallbackListener {
     }
   }
 
-  /**
-   * Pre-login
-   *
-   * @param event PreLoginEvent
-   */
   @Subscribe(order = PostOrder.FIRST)
   public void handle(final PreLoginEvent event) throws Throwable {
     fallback.getSonar().getStatistics().increment("total");
@@ -250,18 +245,13 @@ public final class FallbackListener {
     });
   }
 
-  /**
-   * Handles lockdown mode
-   *
-   * @param event LoginEvent
-   */
   @Subscribe(order = PostOrder.LAST)
   public void handle(final LoginEvent event) {
-    if (!fallback.getSonar().getConfig().LOCKDOWN_ENABLED) return;
-
-    if (!event.getPlayer().hasPermission("sonar.lockdown")) {
-      event.setResult(LOCKDOWN_DISCONNECT);
-      if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
+    if (fallback.getSonar().getConfig().LOCKDOWN_ENABLED) {
+      if (!event.getPlayer().hasPermission("sonar.lockdown")) {
+        event.setResult(LOCKDOWN_DISCONNECT);
+        return;
+      } else if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
         fallback.getSonar().getLogger().info(
           fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
             .replace("%player%", event.getPlayer().getUsername())
@@ -270,7 +260,6 @@ public final class FallbackListener {
               String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
         );
       }
-      return;
     }
 
     final InetAddress inetAddress = event.getPlayer().getRemoteAddress().getAddress();
