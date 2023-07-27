@@ -111,9 +111,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             // Prevent the packet from flooding the traffic by limiting
             // the times the packet is sent to the player
             hasSentBlockChange = true;
-            // Send a MultiBlockChange packet with our stone platform
-            // for checking if the player has valid collisions
-            player.getConnection().write(MULTI_BLOCK_CHANGE);
+            // Send an UpdateSectionBlocks packet with a platform of blocks
+            // to check if the player collides with the solid platform
+            player.getConnection().write(UPDATE_SECTION_BLOCKS);
           } else {
             // Check if the player is colliding by performing a basic Y offset check
             if (isOnGround) {

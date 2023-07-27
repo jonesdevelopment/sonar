@@ -27,24 +27,26 @@ import java.util.function.Supplier;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.*;
 
+// Most of this is taken from
+// https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/StateRegistry.java
 public enum FallbackPacketRegistry {
   SONAR {
     {
       clientbound.fallback = false;
       serverbound.fallback = false;
       clientbound.register(Disconnect.class, Disconnect::new,
-        map(64, MINECRAFT_1_7_2, true),
-        map(26, MINECRAFT_1_9, true),
-        map(27, MINECRAFT_1_13, true),
-        map(26, MINECRAFT_1_14, true),
-        map(27, MINECRAFT_1_15, true),
-        map(26, MINECRAFT_1_16, true),
-        map(25, MINECRAFT_1_16_2, true),
-        map(26, MINECRAFT_1_17, true),
-        map(23, MINECRAFT_1_19, true),
-        map(25, MINECRAFT_1_19_1, true),
-        map(23, MINECRAFT_1_19_3, true),
-        map(26, MINECRAFT_1_19_4, true));
+        map(0x40, MINECRAFT_1_7_2, false),
+        map(0x1A, MINECRAFT_1_9, false),
+        map(0x1B, MINECRAFT_1_13, false),
+        map(0x1A, MINECRAFT_1_14, false),
+        map(0x1B, MINECRAFT_1_15, false),
+        map(0x1A, MINECRAFT_1_16, false),
+        map(0x19, MINECRAFT_1_16_2, false),
+        map(0x1A, MINECRAFT_1_17, false),
+        map(0x17, MINECRAFT_1_19, false),
+        map(0x19, MINECRAFT_1_19_1, false),
+        map(0x17, MINECRAFT_1_19_3, false),
+        map(0x1A, MINECRAFT_1_19_4, false));
       clientbound.register(PositionLook.class, PositionLook::new,
         map(0x08, MINECRAFT_1_7_2, true),
         map(0x2E, MINECRAFT_1_9, true),
@@ -86,7 +88,7 @@ public enum FallbackPacketRegistry {
         map(0x21, MINECRAFT_1_19_1, true),
         map(0x20, MINECRAFT_1_19_3, true),
         map(0x24, MINECRAFT_1_19_4, true));
-      clientbound.register(MultiBlockChange.class, MultiBlockChange::new,
+      clientbound.register(UpdateSectionBlocks.class, UpdateSectionBlocks::new,
         map(34, MINECRAFT_1_7_2, true),
         map(16, MINECRAFT_1_9, true),
         map(15, MINECRAFT_1_13, true),
@@ -96,7 +98,8 @@ public enum FallbackPacketRegistry {
         map(63, MINECRAFT_1_17, true),
         map(61, MINECRAFT_1_19, true),
         map(64, MINECRAFT_1_19_1, true),
-        map(63, MINECRAFT_1_19_3, true));
+        map(63, MINECRAFT_1_19_3, true),
+        map(67, MINECRAFT_1_19_4, true));
       clientbound.register(DefaultSpawnPosition.class, DefaultSpawnPosition::new,
         map(0x05, MINECRAFT_1_7_2, true),
         map(0x43, MINECRAFT_1_9, true),

@@ -34,16 +34,16 @@ import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarLong;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class MultiBlockChange implements FallbackPacket {
-  private int chunkX;
-  private int chunkZ;
+public class UpdateSectionBlocks implements FallbackPacket {
+  private int sectionX;
+  private int sectionZ;
   private ChangedBlock[] changedBlocks;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
-      byteBuf.writeInt(chunkX);
-      byteBuf.writeInt(chunkZ);
+      byteBuf.writeInt(sectionX);
+      byteBuf.writeInt(sectionZ);
       writeVarInt(byteBuf, changedBlocks.length);
 
       for (final ChangedBlock block : changedBlocks) {
@@ -54,16 +54,24 @@ public class MultiBlockChange implements FallbackPacket {
       }
     } else {
       int blockY;
-      int chunkY = 0;
+      int sectionY = 0;
 
       for (final ChangedBlock block : changedBlocks) {
         blockY = block.getPosition().getY();
-        chunkY = blockY >> 4;
+        sectionY = blockY >> 4;
       }
 
-      final long chunkPosition = ((long) chunkX & 0x3FFFFFL) << 42 | ((long) chunkZ & 0x3FFFFFL) << 20 | (long) chunkY & 0xFFFFFL;
-      byteBuf.writeLong(chunkPosition);
-      byteBuf.writeBoolean(true); // suppress light updates
+      // Why is Mojang doing this? :(
+      byteBuf.writeLong(
+        ((long) (sectionX & 0x3FFFFF) << 42)
+        | (sectionY & 0xFFFFF)
+        | ((long) (sectionZ & 0x3FFFFF) << 20)
+      );
+
+      // 1.20+ don't have light update suppression
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20) < 0) {
+        byteBuf.writeBoolean(true); // suppress light updates
+      }
 
       writeVarInt(byteBuf, changedBlocks.length);
 
@@ -71,7 +79,7 @@ public class MultiBlockChange implements FallbackPacket {
         final int chunkPosCrammed = block.getPosition().getX()
           - (block.getPosition().getChunkX() << 4) << 8 | block.getPosition().getZ()
           - (block.getPosition().getChunkZ() << 4) << 4 | block.getPosition().getY()
-          - (chunkY << 4);
+          - (sectionY << 4);
         writeVarLong(byteBuf, (long) block.getType().getId(protocolVersion) << 12 | (long) chunkPosCrammed);
       }
     }

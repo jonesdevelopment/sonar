@@ -24,8 +24,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.Abilities;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.EmptyChunkData;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.MultiBlockChange;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.PositionLook;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.UpdateSectionBlocks;
 
 @UtilityClass
 public class FallbackPreparer {
@@ -33,7 +33,7 @@ public class FallbackPreparer {
 
   public final Abilities DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
   public final EmptyChunkData EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
-  public MultiBlockChange MULTI_BLOCK_CHANGE;
+  public UpdateSectionBlocks UPDATE_SECTION_BLOCKS;
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 
   public int MAX_MOVEMENT_TICK = 8;
@@ -81,6 +81,7 @@ public class FallbackPreparer {
       }
     }
 
-    MULTI_BLOCK_CHANGE = new MultiBlockChange(0, 0, CHANGED_BLOCKS);
+    // Prepare UpdateSectionBlocks packet
+    UPDATE_SECTION_BLOCKS = new UpdateSectionBlocks(0, 0, CHANGED_BLOCKS);
   }
 }
