@@ -26,7 +26,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class SonarConfiguration {
@@ -734,45 +733,20 @@ public final class SonarConfiguration {
     return Math.max(Math.min(v, min), max);
   }
 
-  private String fromList(final Collection<String> list) {
+  private @NotNull String fromList(final @NotNull Collection<String> list) {
     return formatString(String.join(System.lineSeparator(), list));
   }
 
-  private String formatString(final String string) {
-    return translateAlternateColorCodes(formatHex(Objects.requireNonNull(string)))
+  private @NotNull String formatString(final @NotNull String str) {
+    return translateAlternateColorCodes(str)
       .replace("%prefix%", PREFIX == null ? "" : PREFIX)
       .replace("%support-url%", SUPPORT_URL == null ? "" : SUPPORT_URL)
       .replace("%header%", HEADER == null ? "" : HEADER)
       .replace("%footer%", FOOTER == null ? "" : FOOTER);
   }
 
-  private static final Pattern HEX_PATTERN = Pattern.compile("&#[a-fA-F0-9]{6}");
-
-  // TODO: implement
-  private static String formatHex(String data) {
-    Matcher matcher = HEX_PATTERN.matcher(data);
-
-    while (matcher.find()) {
-      final String color = data.substring(matcher.start(), matcher.end());
-      /*int rgb;
-      try {
-        rgb = Integer.parseInt(data.substring(1), 16);
-      } catch (NumberFormatException exception) {
-        throw new IllegalArgumentException("Illegal hex string " + data);
-      }*/
-
-      final StringBuilder magic = new StringBuilder("§x");
-      for (final char c : data.substring(1).toCharArray()) {
-        magic.append('§').append(c);
-      }
-      data = data.replace(color, magic);
-      matcher = HEX_PATTERN.matcher(data);
-    }
-    return data;
-  }
-
-  private static String translateAlternateColorCodes(final String textToTranslate) {
-    final char[] b = textToTranslate.toCharArray();
+  private static @NotNull String translateAlternateColorCodes(final @NotNull String str) {
+    final char[] b = str.toCharArray();
 
     for (int i = 0; i < b.length - 1; i++) {
       if (b[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
