@@ -22,6 +22,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
+import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
 import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
@@ -58,8 +59,8 @@ public final class FallbackListener {
   private final @NotNull Fallback fallback;
 
   public static class CachedMessages {
-    static LoginEvent.ComponentResult LOCKDOWN_DISCONNECT;
-    static LoginEvent.ComponentResult TOO_MANY_ONLINE_PER_IP;
+    static Component LOCKDOWN_DISCONNECT;
+    static Component TOO_MANY_ONLINE_PER_IP;
     static Component TOO_MANY_PLAYERS;
     static Component BLACKLISTED;
     static Component ALREADY_VERIFYING;
@@ -80,12 +81,8 @@ public final class FallbackListener {
       INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
       VERIFICATION_SUCCESS = Component.text(Sonar.get().getConfig().VERIFICATION_SUCCESS);
       VERIFICATION_FAILED = Component.text(Sonar.get().getConfig().VERIFICATION_FAILED);
-      TOO_MANY_ONLINE_PER_IP = LoginEvent.ComponentResult.denied(
-        Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP
-      ));
-      LOCKDOWN_DISCONNECT = LoginEvent.ComponentResult.denied(
-        Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT
-      ));
+      TOO_MANY_ONLINE_PER_IP = Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP);
+      LOCKDOWN_DISCONNECT = Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT);
     }
   }
 
@@ -247,9 +244,13 @@ public final class FallbackListener {
 
   @Subscribe(order = PostOrder.LAST)
   public void handle(final LoginEvent event) {
+    val connectedPlayer = (ConnectedPlayer) event.getPlayer();
+
     if (fallback.getSonar().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
-        event.setResult(LOCKDOWN_DISCONNECT);
+        connectedPlayer.getConnection().closeWith(Disconnect.create(
+          LOCKDOWN_DISCONNECT, connectedPlayer.getProtocolVersion()
+        ));
         return;
       } else if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
         fallback.getSonar().getLogger().info(
@@ -275,7 +276,9 @@ public final class FallbackListener {
 
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
-        event.setResult(TOO_MANY_ONLINE_PER_IP);
+        connectedPlayer.getConnection().closeWith(Disconnect.create(
+          TOO_MANY_ONLINE_PER_IP, connectedPlayer.getProtocolVersion()
+        ));
         return;
       }
     }
