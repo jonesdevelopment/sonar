@@ -251,14 +251,20 @@ public final class FallbackListener {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
           LOCKDOWN_DISCONNECT, connectedPlayer.getProtocolVersion()
         ));
+
+        if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
+          fallback.getSonar().getLogger().info(
+            fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
+              .replace("%player%", event.getPlayer().getUsername())
+              .replace("%ip%", event.getPlayer().getRemoteAddress().getAddress().toString())
+              .replace("%protocol%",
+                String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
+          );
+        }
         return;
-      } else if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
-        fallback.getSonar().getLogger().info(
-          fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
-            .replace("%player%", event.getPlayer().getUsername())
-            .replace("%ip%", event.getPlayer().getRemoteAddress().getAddress().toString())
-            .replace("%protocol%",
-              String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
+      } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
+        event.getPlayer().sendMessage(
+          Component.text(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
         );
       }
     }
@@ -279,14 +285,7 @@ public final class FallbackListener {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
           TOO_MANY_ONLINE_PER_IP, connectedPlayer.getProtocolVersion()
         ));
-        return;
       }
-    }
-
-    if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
-      event.getPlayer().sendMessage(
-        Component.text(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
-      );
     }
   }
 }

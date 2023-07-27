@@ -99,6 +99,7 @@ public final class FallbackListener implements Listener {
     if (fallback.getSonar().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
         event.getPlayer().disconnect(LOCKDOWN_DISCONNECT);
+
         if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
           fallback.getSonar().getLogger().info(
             fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
@@ -108,8 +109,11 @@ public final class FallbackListener implements Listener {
                 String.valueOf(event.getPlayer().getPendingConnection().getVersion()))
           );
         }
+        return;
       } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
-        event.getPlayer().sendMessage(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION);
+        event.getPlayer().sendMessage(
+          new TextComponent(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
+        );
       }
     }
 
