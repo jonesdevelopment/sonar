@@ -49,6 +49,11 @@ public interface FallbackConnection<X, Y> {
       getChannel().close();
     }
 
+    if (reason != null) {
+      getFallback().getLogger().info("{} ({}) has failed the bot check for: {}",
+        getInetAddress(), getProtocolId(), reason);
+    }
+
     // Make sure old entries are removed
     PREVIOUS_FAILS.cleanUp();
 
@@ -60,11 +65,6 @@ public interface FallbackConnection<X, Y> {
     } else {
       // Cache the InetAddress for 3 minutes
       PREVIOUS_FAILS.put(getInetAddress().toString());
-    }
-
-    if (reason != null) {
-      getFallback().getLogger().info("{} ({}) has failed the bot check for: {}",
-        getInetAddress(), getProtocolId(), reason);
     }
   }
 }
