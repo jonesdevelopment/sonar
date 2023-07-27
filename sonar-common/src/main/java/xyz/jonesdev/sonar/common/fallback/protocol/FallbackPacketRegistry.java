@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import lombok.Data;
-import xyz.jonesdev.sonar.common.fallback.packets.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
 
 import java.util.*;
 import java.util.function.Supplier;

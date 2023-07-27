@@ -30,9 +30,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.dimension.PacketDimension;
-import xyz.jonesdev.sonar.common.fallback.packets.Abilities;
-import xyz.jonesdev.sonar.common.fallback.packets.EmptyChunkData;
-import xyz.jonesdev.sonar.common.fallback.packets.PositionLook;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.Abilities;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.EmptyChunkData;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.PositionLook;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;

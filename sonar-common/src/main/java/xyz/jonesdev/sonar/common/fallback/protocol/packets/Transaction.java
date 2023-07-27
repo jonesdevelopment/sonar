@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
@@ -25,44 +25,35 @@ import lombok.ToString;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion;
 
-import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
-
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class PositionLook implements FallbackPacket {
-  private double x, y, z;
-  private float yaw, pitch;
-  private int teleportId;
-  private boolean onGround;
-
-  @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    x = byteBuf.readDouble();
-    y = byteBuf.readDouble();
-    z = byteBuf.readDouble();
-    yaw = byteBuf.readFloat();
-    pitch = byteBuf.readFloat();
-    onGround = byteBuf.readBoolean();
-  }
+public final class Transaction implements FallbackPacket {
+  private int windowId;
+  private int id;
+  private boolean accepted;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    byteBuf.writeDouble(x);
-    byteBuf.writeDouble(y);
-    byteBuf.writeDouble(z);
-    byteBuf.writeFloat(yaw);
-    byteBuf.writeFloat(pitch);
-    byteBuf.writeByte(0x00);
-
-    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
-      writeVarInt(byteBuf, teleportId);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) <= 0) {
+      byteBuf.writeByte(windowId);
+      byteBuf.writeShort((short) id);
+      byteBuf.writeBoolean(accepted);
+    } else {
+      byteBuf.writeInt(id);
     }
+  }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0 && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
-      byteBuf.writeBoolean(true); // Dismount vehicle
+  @Override
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) <= 0) {
+      windowId = byteBuf.readByte();
+      id = byteBuf.readShort();
+      accepted = byteBuf.readBoolean();
+    } else {
+      id = byteBuf.readInt();
+      accepted = true;
     }
   }
 }

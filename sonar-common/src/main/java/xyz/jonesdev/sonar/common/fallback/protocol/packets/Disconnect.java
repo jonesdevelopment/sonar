@@ -15,47 +15,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion;
-
-import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.MINECRAFT_1_14;
-import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
+import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultSpawnPosition implements FallbackPacket {
-  private int posX;
-  private int posY;
-  private int posZ;
-  private float angle;
-
-  @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    long location;
-    if (protocolVersion.compareTo(MINECRAFT_1_14) < 0) {
-      location = ((posX & 0x3FFFFFFL) << 38) | ((posY & 0xFFFL) << 26) | (posZ & 0x3FFFFFFL);
-    } else {
-      location = ((posX & 0x3FFFFFFL) << 38) | ((posZ & 0x3FFFFFFL) << 12) | (posY & 0xFFFL);
-    }
-
-    byteBuf.writeLong(location);
-
-    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
-      byteBuf.writeFloat(angle);
-    }
-  }
+public class Disconnect implements FallbackPacket {
+  private @Nullable String reason;
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+    reason = ProtocolUtil.readString(byteBuf);
+  }
+
+  @Override
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    if (reason == null) {
+      throw new IllegalStateException("No reason specified");
+    }
+
+    ProtocolUtil.writeString(byteBuf, reason);
+  }
+
+  public static Disconnect create(final String serialized) {
+    return new Disconnect(serialized);
   }
 }

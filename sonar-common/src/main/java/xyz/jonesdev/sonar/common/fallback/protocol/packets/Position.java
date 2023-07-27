@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
@@ -29,21 +29,20 @@ import xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Abilities implements FallbackPacket {
-  private byte flags;
-  private float flySpeed, walkSpeed;
-
-  @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    byteBuf.writeByte(flags);
-    byteBuf.writeFloat(flySpeed);
-    byteBuf.writeFloat(walkSpeed);
-  }
+public final class Position implements FallbackPacket {
+  private double x, y, z;
+  private boolean onGround;
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    flags = byteBuf.readByte();
-    flySpeed = byteBuf.readFloat();
-    walkSpeed = byteBuf.readFloat();
+    x = byteBuf.readDouble();
+    y = byteBuf.readDouble();
+    z = byteBuf.readDouble();
+    onGround = byteBuf.readBoolean();
+  }
+
+  @Override
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 }

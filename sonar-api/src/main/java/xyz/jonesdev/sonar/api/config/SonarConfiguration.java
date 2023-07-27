@@ -44,6 +44,9 @@ public final class SonarConfiguration {
   public String ACTION_BAR_LAYOUT;
   public Collection<String> ANIMATION;
 
+  public boolean ENABLE_VERIFICATION;
+  public boolean CHECK_GRAVITY;
+  public boolean CHECK_COLLISIONS;
   public boolean LOG_CONNECTIONS;
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
@@ -59,7 +62,6 @@ public final class SonarConfiguration {
   public int VERIFICATION_READ_TIMEOUT;
   public int VERIFICATION_DELAY;
 
-  public boolean ENABLE_VERIFICATION;
   public boolean LOG_DURING_ATTACK;
 
   public String HEADER, FOOTER;
@@ -240,6 +242,16 @@ public final class SonarConfiguration {
       "Should Sonar verify new players? (Recommended)"
     );
     ENABLE_VERIFICATION = generalConfig.getBoolean("general.verification.enabled", true);
+
+    generalConfig.getYaml().setComment("general.verification.check-gravity",
+      "Should Sonar check for valid client gravity? (Recommended)"
+    );
+    CHECK_GRAVITY = generalConfig.getBoolean("general.verification.check-gravity", true);
+
+    generalConfig.getYaml().setComment("general.verification.check-collisions",
+      "Should Sonar check for valid client collisions? (Recommended)"
+    );
+    CHECK_COLLISIONS = generalConfig.getBoolean("general.verification.check-collisions", true);
 
     generalConfig.getYaml().setComment("general.verification.log-connections",
       "Should Sonar log new connections?"

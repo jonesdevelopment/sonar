@@ -21,12 +21,12 @@ import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.common.fallback.packets.Disconnect;
-import xyz.jonesdev.sonar.common.fallback.packets.Position;
-import xyz.jonesdev.sonar.common.fallback.packets.PositionLook;
-import xyz.jonesdev.sonar.common.fallback.packets.Transaction;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.Position;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.PositionLook;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.Transaction;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.util.Random;
@@ -74,6 +74,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       checkFrame(transaction.isAccepted(), "transaction not accepted?!");
       checkFrame(transaction.getId() == transactionId, "invalid transaction id");
+
+      if (!player.getFallback().getSonar().getConfig().CHECK_GRAVITY) {
+        finish();
+        return;
+      }
 
       // Teleport player into the fake lobby by sending an empty chunk
       player.getConnection().write(EMPTY_CHUNK_DATA);
@@ -124,7 +129,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Verify the player if they sent correct movement packets
       if (movementTick >= MAX_MOVEMENT_TICK) {
-        finish();
+        if (player.getFallback().getSonar().getConfig().CHECK_COLLISIONS) {
+          // TODO: Check collisions
+        } else {
+          finish();
+        }
       }
     }
   }
