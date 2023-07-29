@@ -41,7 +41,6 @@ import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -59,12 +58,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final InitialLoginSessionHandler sessionHandler;
   private final VelocityServer server;
 
-  private static final String MOJANG_HASJOINED_URL =
-    System.getProperty("mojang.sessionserver",
-        "https://sessionserver.mojang.com/session/minecraft/hasJoined")
-      .concat("?username=%s&serverId=%s");
   private static final MethodHandle CONNECTED_PLAYER;
-  private static final Field LOGIN_PACKET;
 
   static {
     try {
@@ -80,9 +74,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
             IdentifiedKey.class
           )
         );
-
-      LOGIN_PACKET = InitialLoginSessionHandler.class.getDeclaredField("login");
-      LOGIN_PACKET.setAccessible(true);
     } catch (Throwable throwable) {
       throw new ReflectionException(throwable);
     }
