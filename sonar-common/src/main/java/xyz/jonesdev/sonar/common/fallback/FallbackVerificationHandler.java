@@ -56,13 +56,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   public enum State {
     // LOGIN
     KEEP_ALIVE(false),
-    // 1.7-1.8 PRE KeepAlive
-    TICK_KEEP_ALIVE(false),
-    // PRE-PLAY
+    // PLAY
     CLIENT_SETTINGS(false),
     PLUGIN_MESSAGE(false),
     TRANSACTION(false),
-    // PLAY
+    // IN-GAME
     TELEPORT(true),
     POSITION(true),
     COLLISIONS(true),
@@ -136,12 +134,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (packet instanceof KeepAlive) {
       final KeepAlive keepAlive = (KeepAlive) packet;
 
-      // 1.7-1.8 tick verification method
-      if (state == State.TICK_KEEP_ALIVE && keepAlive.getId() == 0) {
-        sendTransaction();
-        return;
-      }
-
       checkFrame(state == State.KEEP_ALIVE, "wrong state: " + state);
       checkFrame(keepAlive.getId() == verifyKeepAliveId, "invalid KeepAlive ID");
 
@@ -176,12 +168,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // Validate the client branding using a regex to filter unwanted characters.
         checkFrame(validateClientBrand(player, pluginMessage.content()), "invalid client brand");
 
-        // We use the tick KeepAlive verification for 1.7-1.8
-        if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
-          state = State.TICK_KEEP_ALIVE;
-        } else {
-          sendTransaction();
-        }
+        // Send the transaction packet
+        sendTransaction();
       }
     }
 
