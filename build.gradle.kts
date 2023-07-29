@@ -40,7 +40,7 @@ subprojects {
     testCompileOnly("org.projectlombok:lombok:1.18.28")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.28")
 
-    compileOnly("io.netty:netty-all:4.1.95.Final") // netty
+    compileOnly("io.netty:netty-all:4.1.96.Final") // netty
 
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
     implementation("xyz.jonesdev:cappuchino:0.1.4-SNAPSHOT") // expiring cache
