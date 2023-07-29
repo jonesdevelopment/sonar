@@ -23,9 +23,9 @@ import com.velocitypowered.proxy.protocol.packet.KeepAlive
 import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
+import xyz.jonesdev.sonar.common.fallback.handler.FallbackHandler.checkFrame
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer
-import xyz.jonesdev.sonar.velocity.fallback.handler.FallbackHandler.checkFrame
 
 class FallbackPostLoginHandler(
   private val fallbackPlayer: FallbackPlayer,

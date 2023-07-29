@@ -41,7 +41,9 @@ public interface FallbackConnection<X, Y> {
 
   @NotNull InetAddress getInetAddress();
 
-  ProtocolVersion getProtocolVersion();
+  @NotNull ProtocolVersion getProtocolVersion();
+
+  void disconnect(final @NotNull String reason);
 
   ExpiringCache<String> PREVIOUS_FAILS = Cappuchino.buildExpiring(3L, TimeUnit.MINUTES);
 

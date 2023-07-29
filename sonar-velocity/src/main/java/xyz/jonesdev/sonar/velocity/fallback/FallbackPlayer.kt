@@ -19,11 +19,13 @@ package xyz.jonesdev.sonar.velocity.fallback
 
 import com.velocitypowered.proxy.connection.MinecraftConnection
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer
+import com.velocitypowered.proxy.protocol.ProtocolUtils
 import io.netty.channel.Channel
 import io.netty.channel.ChannelPipeline
 import xyz.jonesdev.sonar.api.fallback.Fallback
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect
 import java.net.InetAddress
 
 class FallbackPlayer(
@@ -62,5 +64,11 @@ class FallbackPlayer(
 
   override fun getProtocolVersion(): ProtocolVersion {
     return protocolVersion
+  }
+
+  override fun disconnect(reason: String) {
+    val serialized = ProtocolUtils.getJsonChatSerializer(connection.protocolVersion)
+      .serialize(FallbackListener.CachedMessages.VERIFICATION_SUCCESS)
+    connection.closeWith(Disconnect.create(serialized))
   }
 }

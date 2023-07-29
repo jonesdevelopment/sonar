@@ -30,6 +30,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
+import xyz.jonesdev.sonar.common.fallback.handler.FallbackHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;

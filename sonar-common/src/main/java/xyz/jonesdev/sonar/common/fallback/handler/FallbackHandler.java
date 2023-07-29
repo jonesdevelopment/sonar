@@ -15,22 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback.handler;
+package xyz.jonesdev.sonar.common.fallback.handler;
 
-import com.velocitypowered.proxy.protocol.packet.Disconnect;
 import io.netty.handler.codec.CorruptedFrameException;
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 public interface FallbackHandler {
-  FallbackPlayer getPlayer();
+  FallbackConnection<?, ?> getPlayer();
 
   default void checkFrame(final boolean condition, final String message) {
     if (!condition) {
-      getPlayer().getConnection().closeWith(
-        Disconnect.create(FallbackListener.CachedMessages.VERIFICATION_FAILED, getPlayer().getPlayer().getProtocolVersion()
-      ));
+      getPlayer().disconnect(getPlayer().getFallback().getSonar().getConfig().VERIFICATION_FAILED);
 
       getPlayer().fail(message);
       throw new CorruptedFrameException(message);

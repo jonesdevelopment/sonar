@@ -26,11 +26,12 @@ import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
 import com.velocitypowered.proxy.protocol.StateRegistry;
-import com.velocitypowered.proxy.protocol.packet.*;
+import com.velocitypowered.proxy.protocol.packet.KeepAlive;
+import com.velocitypowered.proxy.protocol.packet.LoginPluginResponse;
+import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
+import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
@@ -118,22 +119,18 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       return;
     }
 
-    // Check if the player is already connected to the proxy
-    // We use the default Velocity method for this to avoid incompatibilities
-    if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {
-      mcConnection.closeWith(Disconnect.create(
-        Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
-        mcConnection.getProtocolVersion()
-      ));
-      return;
-    }
-
     // Create an instance for the Fallback connection
     final FallbackPlayer fallbackPlayer = new FallbackPlayer(
       fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
       mcConnection.getChannel().pipeline(), inetAddress,
       ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
     );
+
+    // Check if the player is already connected to the proxy
+    if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {
+      fallbackPlayer.disconnect("Could not find any available servers.");
+      return;
+    }
 
     if (fallback.getSonar().getConfig().LOG_CONNECTIONS) {
       // Only log the processing message if the server isn't under attack.
