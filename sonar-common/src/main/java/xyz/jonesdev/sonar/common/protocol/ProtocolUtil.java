@@ -18,11 +18,18 @@
 package xyz.jonesdev.sonar.common.protocol;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.EncoderException;
 import kotlin.text.Charsets;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.nbt.BinaryTagIO;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
@@ -60,16 +67,31 @@ public class ProtocolUtil {
     return str;
   }
 
+  public void writeString(final ByteBuf buf, final CharSequence str) {
+    final int size = ByteBufUtil.utf8Bytes(str);
+    writeVarInt(buf, size);
+    buf.writeCharSequence(str, Charsets.UTF_8);
+  }
+
   public static void writeArray(final ByteBuf byteBuf, final byte[] bytes) {
     checkFrame(bytes.length < Short.MAX_VALUE, "Too long array");
     writeVarInt(byteBuf, bytes.length);
     byteBuf.writeBytes(bytes);
   }
 
-  public void writeString(ByteBuf buf, CharSequence str) {
-    final int size = ByteBufUtil.utf8Bytes(str);
-    writeVarInt(buf, size);
-    buf.writeCharSequence(str, Charsets.UTF_8);
+  public static void writeStringArray(final ByteBuf byteBuf, final String[] stringArray) {
+    writeVarInt(byteBuf, stringArray.length);
+    for (final String s : stringArray) {
+      writeString(byteBuf, s);
+    }
+  }
+
+  public void writeCompoundTag(final ByteBuf byteBuf, final CompoundBinaryTag compoundTag) {
+    try {
+      BinaryTagIO.writer().write(compoundTag, (DataOutput) new ByteBufOutputStream(byteBuf));
+    } catch (IOException e) {
+      throw new EncoderException("Unable to encode NBT CompoundTag");
+    }
   }
 
   private void checkFrame(final boolean expression, final String message) {

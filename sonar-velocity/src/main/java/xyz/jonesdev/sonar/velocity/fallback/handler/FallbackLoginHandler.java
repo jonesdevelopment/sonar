@@ -26,7 +26,6 @@ import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
 import com.velocitypowered.proxy.protocol.StateRegistry;
-import com.velocitypowered.proxy.protocol.packet.KeepAlive;
 import com.velocitypowered.proxy.protocol.packet.LoginPluginResponse;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
@@ -35,8 +34,8 @@ import lombok.Getter;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.lang.invoke.MethodHandle;
@@ -45,11 +44,11 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.concurrent.ThreadLocalRandom;
 
-import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_POST_LOGIN;
+import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.getJoinPacketForVersion;
 
 @Getter
 public final class FallbackLoginHandler implements MinecraftSessionHandler {
@@ -165,42 +164,24 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
     mcConnection.setAssociation(connectedPlayer);
     mcConnection.setState(StateRegistry.PLAY);
 
-    // ==================================================================
-    if (fallbackPlayer.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
-      final long keepAliveId = ThreadLocalRandom.current().nextInt();
+    // Replace normal encoder to allow custom packets
+    fallbackPlayer.getPipeline().replace(
+      MINECRAFT_ENCODER,
+      FALLBACK_PACKET_ENCODER,
+      new FallbackPacketEncoder(fallbackPlayer.getProtocolVersion())
+    );
 
-      // We have to add this pipeline to monitor all incoming traffic
-      // We add the pipeline after the MinecraftDecoder since we want
-      // the packets to be processed and decoded already
-      fallbackPlayer.getPipeline().addAfter(
-        MINECRAFT_DECODER,
-        FALLBACK_POST_LOGIN,
-        new FallbackPostLoginHandler(
-          fallbackPlayer,
-          keepAliveId
-        )
-      );
+    // Replace normal decoder to allow custom packets
+    /*fallbackPlayer.getPipeline().replace(
+      MINECRAFT_DECODER,
+      FALLBACK_PACKET_DECODER,
+      new FallbackPacketDecoder(
+        fallbackPlayer.getProtocolVersion(),
+        new FallbackVerificationHandler(fallbackPlayer)
+      )
+    );*/
 
-      // The first step of the verification is a simple KeepAlive packet.
-      // We don't want to waste resources by directly sending all packets to
-      // the client, which is why we first send a KeepAlive packet and then
-      // wait for a valid response to continue the verification process.
-      final KeepAlive keepAlive = new KeepAlive();
-
-      keepAlive.setRandomId(keepAliveId);
-
-      mcConnection.write(keepAlive);
-    } else {
-      // KeepAlive packets do not exist during the login process on 1.7.
-      // We have to fall back to the regular method of verification.
-
-      // We have to add this session handler to monitor all incoming packets.
-      mcConnection.setSessionHandler(new FallbackSessionHandler(fallbackPlayer));
-
-      // Send JoinGame packet
-      mcConnection.write(FallbackPackets.LEGACY_JOIN_GAME);
-    }
-    // ==================================================================
+    mcConnection.write(getJoinPacketForVersion(fallbackPlayer.getProtocolVersion()));
   }
 
   @Override

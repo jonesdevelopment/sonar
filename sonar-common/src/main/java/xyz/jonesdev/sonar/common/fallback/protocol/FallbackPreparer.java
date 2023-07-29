@@ -19,32 +19,36 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTagIO;
+import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.Abilities;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.EmptyChunkData;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.PositionLook;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.UpdateSectionBlocks;
+import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Random;
+
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 
 @UtilityClass
 public class FallbackPreparer {
   private final Random random = new Random();
 
   // Mappings
-  public final CompoundBinaryTag CHAT_TYPE_119;
-  public final CompoundBinaryTag CHAT_TYPE_1191;
-  public final CompoundBinaryTag DAMAGE_TYPE_1194;
-  public final CompoundBinaryTag DAMAGE_TYPE_120;
+  private final CompoundBinaryTag CHAT_TYPE_119;
+  private final CompoundBinaryTag CHAT_TYPE_1191;
+  private final CompoundBinaryTag DAMAGE_TYPE_1194;
+  private final CompoundBinaryTag DAMAGE_TYPE_120;
 
   static {
     CHAT_TYPE_119 = getMapping("chat_1_19.nbt");
@@ -52,6 +56,15 @@ public class FallbackPreparer {
     DAMAGE_TYPE_1194 = getMapping("damage_1_19_4.nbt");
     DAMAGE_TYPE_120 = getMapping("damage_type_1_20.nbt");
   }
+
+  // JoinGame
+  public final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
+  private JoinGame JOIN_GAME_1_16;
+  private JoinGame JOIN_GAME_1_16_2;
+  private JoinGame JOIN_GAME_1_18_2;
+  private JoinGame JOIN_GAME_1_19_1;
+  private JoinGame JOIN_GAME_1_19_4;
+  private JoinGame JOIN_GAME_1_20;
 
   // Abilities
   public final Abilities DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
@@ -73,6 +86,13 @@ public class FallbackPreparer {
   public int DYNAMIC_BLOCK_Y_POSITION;
 
   public void prepare() {
+    JOIN_GAME_1_16 = createJoinGamePacket(MINECRAFT_1_16);
+    JOIN_GAME_1_16_2 = createJoinGamePacket(MINECRAFT_1_16_2);
+    JOIN_GAME_1_18_2 = createJoinGamePacket(MINECRAFT_1_18_2);
+    JOIN_GAME_1_19_1 = createJoinGamePacket(MINECRAFT_1_19_1);
+    JOIN_GAME_1_19_4 = createJoinGamePacket(MINECRAFT_1_19_4);
+    JOIN_GAME_1_20 = createJoinGamePacket(MINECRAFT_1_20);
+
     MAX_MOVEMENT_TICK = Sonar.get().getConfig().MAXIMUM_MOVEMENT_TICKS;
     PREPARED_MOVEMENT_PACKETS = new double[MAX_MOVEMENT_TICK + 1];
 
@@ -125,6 +145,128 @@ public class FallbackPreparer {
       throwable.printStackTrace();
       return null;
     }
+  }
+
+  public static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
+      return LEGACY_JOIN_GAME; // 1.7-1.15.2
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_16_1) <= 0) {
+      return JOIN_GAME_1_16; // 1.16-1.16.1
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_18) <= 0) {
+      return JOIN_GAME_1_16_2; // 1.16.2-1.18
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19) <= 0) {
+      return JOIN_GAME_1_18_2; // 1.18.1-1.19
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+      return JOIN_GAME_1_19_1; // 1.19.1-1.19.3
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_4) <= 0) {
+      return JOIN_GAME_1_19_4; // 1.19.4
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_20) <= 0) {
+      return JOIN_GAME_1_20; // 1.20-1.20.1
+    }
+    throw new IllegalStateException("Unsupported protocol version");
+  }
+
+  private @NotNull JoinGame createLegacyJoinGamePacket() {
+    final JoinGame joinGame = new JoinGame();
+
+    joinGame.setLevelType("flat");
+    joinGame.setGamemode(Sonar.get().getConfig().GAMEMODE_ID);
+    joinGame.setDimension(Sonar.get().getConfig().DIMENSION_LEGACY_ID);
+    joinGame.setReducedDebugInfo(true);
+    return joinGame;
+  }
+
+  private @NotNull JoinGame createJoinGamePacket(final ProtocolVersion protocolVersion) {
+    final JoinGame joinGame = new JoinGame();
+
+    joinGame.setLevelType("flat");
+    joinGame.setGamemode(Sonar.get().getConfig().GAMEMODE_ID);
+    joinGame.setDimension(Sonar.get().getConfig().DIMENSION_MODERN_ID);
+    joinGame.setReducedDebugInfo(true);
+    joinGame.setDimensionInfo(new DimensionInfo(
+      Sonar.get().getConfig().DIMENSION_KEY,
+      "sonar", false, false
+    ));
+
+    final CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
+    final ListBinaryTag encodedDimensionRegistry = ListBinaryTag.builder(BinaryTagTypes.COMPOUND)
+      .add(createDimensionData(protocolVersion))
+      .build();
+
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+      final CompoundBinaryTag.Builder dimensionRegistryEntry = CompoundBinaryTag.builder();
+
+      dimensionRegistryEntry.putString("type", "minecraft:dimension_type");
+      dimensionRegistryEntry.put("value", encodedDimensionRegistry);
+
+      registryContainer.put("minecraft:dimension_type", dimensionRegistryEntry.build());
+
+      final CompoundBinaryTag.Builder effectsTagBuilder = CompoundBinaryTag.builder()
+        .putInt("sky_color", Sonar.get().getConfig().DIMENSION_SKY_COLOR)
+        .putInt("fog_color", Sonar.get().getConfig().DIMENSION_FOG_COLOR)
+        .putInt("water_color", 0)
+        .putInt("water_fog_color", 0);
+
+      final CompoundBinaryTag.Builder elementTagBuilder = CompoundBinaryTag.builder()
+        .putFloat("depth", 0.125f)
+        .putFloat("temperature", 0.8f)
+        .putFloat("scale", 0.05f)
+        .putFloat("downfall", 0.4f)
+        .putString("category", "plains")
+        .put("effects", effectsTagBuilder.build());
+
+      if (protocolVersion.compareTo(MINECRAFT_1_19_4) >= 0) {
+        elementTagBuilder.putBoolean("has_precipitation", false);
+      } else {
+        elementTagBuilder.putString("precipitation", "rain");
+      }
+
+      registryContainer.put("minecraft:worldgen/biome", CompoundBinaryTag.builder()
+        .putString("type", "minecraft:worldgen/biome")
+        .put("value", ListBinaryTag.from(Collections.singletonList(
+          CompoundBinaryTag.builder()
+            .putString("name", "minecraft:plains")
+            .putInt("id", 1)
+            .put("element", elementTagBuilder.build())
+            .build()
+        ))).build()
+      );
+
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) == 0) {
+        registryContainer.put("minecraft:chat_type", CHAT_TYPE_119);
+      } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
+        registryContainer.put("minecraft:chat_type", CHAT_TYPE_1191);
+      }
+
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_4) == 0) {
+        registryContainer.put("minecraft:damage_type", DAMAGE_TYPE_1194);
+      } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20) >= 0) {
+        registryContainer.put("minecraft:damage_type", DAMAGE_TYPE_120);
+      }
+    } else {
+      registryContainer.put("dimension", encodedDimensionRegistry);
+    }
+
+    try {
+      CompoundBinaryTag currentDimensionData = encodedDimensionRegistry.getCompound(0);
+
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+        currentDimensionData = currentDimensionData.getCompound("element");
+      }
+
+      joinGame.setCurrentDimensionData(currentDimensionData);
+      joinGame.setLevelNames(new String[] {Sonar.get().getConfig().DIMENSION_KEY});
+      joinGame.setRegistry(registryContainer.build());
+    } catch (Throwable throwable) {
+      throw new ReflectionException(throwable);
+    }
+    return joinGame;
   }
 
   public @NotNull CompoundBinaryTag createDimensionData(final @NotNull ProtocolVersion version) {

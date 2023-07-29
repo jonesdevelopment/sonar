@@ -31,18 +31,12 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.lang.reflect.Field;
 
-import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
-import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
@@ -202,21 +196,5 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
   }
 
   private synchronized void nextStage() {
-    // Replace normal encoder to allow custom packets
-    player.getPipeline().replace(
-      MINECRAFT_ENCODER,
-      FALLBACK_PACKET_ENCODER,
-      new FallbackPacketEncoder(player.getProtocolVersion())
-    );
-
-    // Replace normal decoder to allow custom packets
-    player.getPipeline().replace(
-      MINECRAFT_DECODER,
-      FALLBACK_PACKET_DECODER,
-      new FallbackPacketDecoder(
-        player.getProtocolVersion(),
-        new xyz.jonesdev.sonar.velocity.fallback.handler.FallbackVerificationHandler(player)
-      )
-    );
   }
 }

@@ -24,7 +24,7 @@ import com.velocitypowered.proxy.protocol.packet.PluginMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler.checkFrame
-import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets.getJoinPacketForVersion
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.getJoinPacketForVersion
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer
 
 class FallbackPostLoginHandler(
