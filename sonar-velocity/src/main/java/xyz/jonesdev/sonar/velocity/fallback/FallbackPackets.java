@@ -40,11 +40,6 @@ import static com.velocitypowered.api.network.ProtocolVersion.*;
 
 @UtilityClass
 public class FallbackPackets {
-  private final ImmutableSet<String> LEVELS = ImmutableSet.of("minecraft:overworld");
-  private final DimensionInfo DIMENSION = new DimensionInfo(
-    "minecraft:overworld", "sonar", false, false
-  );
-
   private final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
   private final MethodHandle CURRENT_DIMENSION_DATA;
@@ -92,12 +87,21 @@ public class FallbackPackets {
   }
 
   public final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
-  public final JoinGame JOIN_GAME_1_16 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16);
-  public final JoinGame JOIN_GAME_1_16_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16_2);
-  public final JoinGame JOIN_GAME_1_18_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_18_2);
-  public final JoinGame JOIN_GAME_1_19_1 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_1);
-  public final JoinGame JOIN_GAME_1_19_4 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_4);
-  public final JoinGame JOIN_GAME_1_20 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_20);
+  public JoinGame JOIN_GAME_1_16;
+  public JoinGame JOIN_GAME_1_16_2;
+  public JoinGame JOIN_GAME_1_18_2;
+  public JoinGame JOIN_GAME_1_19_1;
+  public JoinGame JOIN_GAME_1_19_4;
+  public JoinGame JOIN_GAME_1_20;
+
+  public static void prepare() {
+    JOIN_GAME_1_16 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16);
+    JOIN_GAME_1_16_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_16_2);
+    JOIN_GAME_1_18_2 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_18_2);
+    JOIN_GAME_1_19_1 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_1);
+    JOIN_GAME_1_19_4 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_19_4);
+    JOIN_GAME_1_20 = createJoinGamePacket(ProtocolVersion.MINECRAFT_1_20);
+  }
 
   public static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
@@ -141,7 +145,10 @@ public class FallbackPackets {
     joinGame.setReducedDebugInfo(true);
     joinGame.setDifficulty((short) 0);
     joinGame.setMaxPlayers(1);
-    joinGame.setDimensionInfo(DIMENSION);
+    joinGame.setDimensionInfo(new DimensionInfo(
+      Sonar.get().getConfig().DIMENSION_KEY,
+      "sonar", false, false
+    ));
 
     final CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
     final ListBinaryTag encodedDimensionRegistry = ListBinaryTag.builder(BinaryTagTypes.COMPOUND)
@@ -157,16 +164,16 @@ public class FallbackPackets {
       registryContainer.put("minecraft:dimension_type", dimensionRegistryEntry.build());
 
       final CompoundBinaryTag.Builder effectsTagBuilder = CompoundBinaryTag.builder()
-        .putInt("sky_color", 7907327)
-        .putInt("water_fog_color", 329011)
-        .putInt("fog_color", 12638463)
-        .putInt("water_color", 415920);
+        .putInt("sky_color", Sonar.get().getConfig().DIMENSION_SKY_COLOR)
+        .putInt("fog_color", Sonar.get().getConfig().DIMENSION_FOG_COLOR)
+        .putInt("water_color", 0)
+        .putInt("water_fog_color", 0);
 
       final CompoundBinaryTag.Builder elementTagBuilder = CompoundBinaryTag.builder()
-        .putFloat("depth", 0.125F)
-        .putFloat("temperature", 0.8F)
-        .putFloat("scale", 0.05F)
-        .putFloat("downfall", 0.4F)
+        .putFloat("depth", 0.125f)
+        .putFloat("temperature", 0.8f)
+        .putFloat("scale", 0.05f)
+        .putFloat("downfall", 0.4f)
         .putString("category", "plains")
         .put("effects", effectsTagBuilder.build());
 
@@ -210,7 +217,7 @@ public class FallbackPackets {
       }
 
       CURRENT_DIMENSION_DATA.invokeExact(joinGame, currentDimensionData);
-      LEVEL_NAMES.invokeExact(joinGame, LEVELS);
+      LEVEL_NAMES.invokeExact(joinGame, ImmutableSet.of(Sonar.get().getConfig().DIMENSION_KEY));
       REGISTRY.invokeExact(joinGame, registryContainer.build());
     } catch (Throwable throwable) {
       throw new ReflectionException(throwable);
@@ -223,7 +230,7 @@ public class FallbackPackets {
   private @NotNull CompoundBinaryTag createDimensionData(final @NotNull ProtocolVersion version) {
     final CompoundBinaryTag details = CompoundBinaryTag.builder()
       .putBoolean("natural", false)
-      .putFloat("ambient_light", 0.0F)
+      .putFloat("ambient_light", 0f)
       .putBoolean("shrunk", false)
       .putBoolean("ultrawarm", false)
       .putBoolean("has_ceiling", false)
@@ -236,7 +243,7 @@ public class FallbackPackets {
       .putString("infiniburn", version.compareTo(ProtocolVersion.MINECRAFT_1_18_2) >= 0 ? "#minecraft" +
         ":infiniburn_nether" : "minecraft:infiniburn_nether")
       .putDouble("coordinate_scale", 1.0)
-      .putString("effects", "minecraft:overworld")
+      .putString("effects", Sonar.get().getConfig().DIMENSION_KEY)
       .putInt("min_y", 0)
       .putInt("height", 256)
       .putInt("monster_spawn_block_light_limit", 0)
@@ -245,12 +252,12 @@ public class FallbackPackets {
 
     if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
       return CompoundBinaryTag.builder()
-        .putString("name", "minecraft:overworld")
-        .putInt("id", 0)
+        .putString("name", Sonar.get().getConfig().DIMENSION_KEY)
+        .putInt("id", Sonar.get().getConfig().DIMENSION_MODERN_ID)
         .put("element", details)
         .build();
     }
 
-    return details.putString("name", "minecraft:overworld");
+    return details.putString("name", Sonar.get().getConfig().DIMENSION_KEY);
   }
 }

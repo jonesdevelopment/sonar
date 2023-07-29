@@ -34,6 +34,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 import xyz.jonesdev.sonar.velocity.command.SonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets;
 import xyz.jonesdev.sonar.velocity.verbose.ActionBarVerbose;
 
 import java.io.File;
@@ -164,6 +165,7 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
     getConfig().load();
     FallbackListener.CachedMessages.update();
     FallbackPreparer.prepare();
+    FallbackPackets.prepare(); // TODO: merge into FallbackPreparer
 
     // Apply filter (connection limiter) to Fallback
     getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);

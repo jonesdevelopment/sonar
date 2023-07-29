@@ -52,6 +52,11 @@ public final class SonarConfiguration {
   public boolean LOG_CONNECTIONS;
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
+  public String DIMENSION_KEY;
+  public int DIMENSION_LEGACY_ID;
+  public int DIMENSION_MODERN_ID;
+  public int DIMENSION_SKY_COLOR;
+  public int DIMENSION_FOG_COLOR;
   public int MAXIMUM_BRAND_LENGTH;
   public int MAXIMUM_MOVEMENT_TICKS;
   public int MINIMUM_PLAYERS_FOR_ATTACK;
@@ -259,6 +264,31 @@ public final class SonarConfiguration {
       "Should Sonar check for valid client collisions? (Recommended)"
     );
     CHECK_COLLISIONS = generalConfig.getBoolean("general.verification.check-collisions", true);
+
+    generalConfig.getYaml().setComment("general.verification.dimension.key",
+      "Key (name) of the dimension the player spawns in when verifying"
+    );
+    DIMENSION_KEY = generalConfig.getString("general.verification.dimension.key", "minecraft:overworld");
+
+    generalConfig.getYaml().setComment("general.verification.dimension.legacy-id",
+      "Legacy ID of the dimension the player spawns in when verifying"
+    );
+    DIMENSION_LEGACY_ID = generalConfig.getInt("general.verification.dimension.legacy-id", 0);
+
+    generalConfig.getYaml().setComment("general.verification.dimension.modern-id",
+      "Modern ID of the dimension the player spawns in when verifying (1.16.2+)"
+    );
+    DIMENSION_MODERN_ID = generalConfig.getInt("general.verification.dimension.modern-id", 0);
+
+    generalConfig.getYaml().setComment("general.verification.dimension.sky-color",
+      "Color of the sky in the dimension the player spawns in when verifying (1.16.2+)"
+    );
+    DIMENSION_SKY_COLOR = generalConfig.getInt("general.verification.dimension.sky-color", 7907327);
+
+    generalConfig.getYaml().setComment("general.verification.dimension.fog-color",
+      "Color of the fog in the dimension the player spawns in when verifying (1.16.2+)"
+    );
+    DIMENSION_FOG_COLOR = generalConfig.getInt("general.verification.dimension.fog-color", 12638463);
 
     generalConfig.getYaml().setComment("general.verification.log-connections",
       "Should Sonar log new connections?"
