@@ -30,7 +30,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
-import xyz.jonesdev.sonar.common.fallback.handler.FallbackHandler;
+import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
@@ -62,7 +62,7 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
  * ↓<br>
  * Set handler to next, movement-validating, handler
  */
-public final class FallbackSessionHandler implements MinecraftSessionHandler, FallbackHandler {
+public final class FallbackSessionHandler implements MinecraftSessionHandler, FallbackVerificationHandler {
   @Getter
   private final @NotNull FallbackPlayer player;
   private final boolean v1_8or1_7;
@@ -215,7 +215,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
       FALLBACK_PACKET_DECODER,
       new FallbackPacketDecoder(
         player.getProtocolVersion(),
-        new FallbackVerificationHandler(player)
+        new xyz.jonesdev.sonar.velocity.fallback.handler.FallbackVerificationHandler(player)
       )
     );
   }

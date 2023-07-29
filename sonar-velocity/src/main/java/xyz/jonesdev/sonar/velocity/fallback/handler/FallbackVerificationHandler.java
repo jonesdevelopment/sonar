@@ -21,7 +21,6 @@ import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.handler.FallbackHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
@@ -32,7 +31,7 @@ import java.util.Random;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.VERIFICATION_SUCCESS;
 
-public final class FallbackVerificationHandler implements FallbackPacketListener, FallbackHandler {
+public final class FallbackVerificationHandler implements FallbackPacketListener, xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler {
   @Getter
   private final @NotNull FallbackPlayer player;
   private final short transactionId;

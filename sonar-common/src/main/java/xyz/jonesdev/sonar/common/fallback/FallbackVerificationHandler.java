@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.handler;
+package xyz.jonesdev.sonar.common.fallback;
 
 import io.netty.handler.codec.CorruptedFrameException;
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
 
-public interface FallbackHandler {
+public interface FallbackVerificationHandler {
   FallbackConnection<?, ?> getPlayer();
 
   default void checkFrame(final boolean condition, final String message) {

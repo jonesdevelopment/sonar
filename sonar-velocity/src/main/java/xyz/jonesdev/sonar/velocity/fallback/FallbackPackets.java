@@ -29,7 +29,7 @@ import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
-import xyz.jonesdev.sonar.common.fallback.dimension.PacketDimension;
+import xyz.jonesdev.sonar.common.fallback.protocol.dimension.PacketDimension;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
