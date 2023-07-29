@@ -33,7 +33,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 
 public interface Sonar {
-  DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###");
+  DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
 
   ServerWrapper getServer();
 

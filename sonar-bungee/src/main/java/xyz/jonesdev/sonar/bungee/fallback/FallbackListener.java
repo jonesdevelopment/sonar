@@ -32,26 +32,19 @@ import net.md_5.bungee.compress.PacketDecompressor;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
-import net.md_5.bungee.netty.HandlerBoss;
-import net.md_5.bungee.netty.PipelineUtils;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketCompressor;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
-import xyz.jonesdev.sonar.bungee.fallback.session.dummy.DummyPacketHandler;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
-import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
 
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import static net.md_5.bungee.netty.PipelineUtils.FRAME_PREPENDER;
-import static net.md_5.bungee.netty.PipelineUtils.TIMEOUT_HANDLER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
 import static xyz.jonesdev.sonar.bungee.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
@@ -250,42 +243,7 @@ public final class FallbackListener implements Listener {
 
       final ChannelPipeline pipeline = channelWrapper.getHandle().pipeline();
 
-      // Replace timeout handler to avoid known exploits or issues
-      // We also want to timeout bots quickly to avoid flooding
-      pipeline.replace(
-        TIMEOUT_HANDLER,
-        TIMEOUT_HANDLER,
-        new FallbackTimeoutHandler(
-          fallback.getSonar().getConfig().VERIFICATION_READ_TIMEOUT,
-          TimeUnit.MILLISECONDS
-        )
-      );
-
-      // TODO: fix
       // TODO: create Fallback for BungeeCord
-      final HandlerBoss handlerBoss = (HandlerBoss) pipeline.get(PipelineUtils.BOSS_HANDLER);
-      handlerBoss.setHandler(new DummyPacketHandler(initialHandler.getName(), inetAddress));
-
-      // We have to add this pipeline to monitor whenever the client disconnects
-      // to remove them from the list of connected and queued players
-      pipeline.addFirst(FALLBACK_HANDLER, null);
-
-      // Queue the connection for further processing
-      fallback.getQueue().queue(inetAddress, () -> channelWrapper.getHandle().eventLoop().execute(() -> {
-
-        // Do not continue if the connection is closed
-        if (channelWrapper.isClosed()) return;
-
-        // Check if the username matches the valid name regex in order to prevent
-        // UTF-16 names or other types of flood attacks
-        if (!fallback.getSonar().getConfig().VALID_NAME_REGEX
-          .matcher(initialHandler.getName()).matches()) {
-          initialHandler.disconnect(INVALID_USERNAME);
-          return;
-        }
-
-        // TODO: create Fallback for BungeeCord
-      }));
     });
   }
 }

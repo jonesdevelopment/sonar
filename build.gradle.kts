@@ -47,7 +47,7 @@ subprojects {
 
     implementation(kotlin("stdlib-jdk8")) // kotlin
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
-    implementation("xyz.jonesdev:cappuchino:0.1.2-SNAPSHOT") // expiring cache
+    implementation("xyz.jonesdev:cappuchino:0.1.4-SNAPSHOT") // expiring cache
   }
 
   kotlin {

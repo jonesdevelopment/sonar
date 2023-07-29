@@ -120,7 +120,7 @@ class BlacklistCommand : Subcommand() {
         synchronized(sonar.fallback.blacklisted) {
           val blacklisted = sonar.fallback.blacklisted.estimatedSize()
 
-          if (blacklisted == 0L) {
+          if (blacklisted == 0) {
             invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_EMPTY)
             return
           }

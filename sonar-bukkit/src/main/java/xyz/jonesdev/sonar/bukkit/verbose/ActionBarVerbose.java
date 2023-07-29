@@ -23,6 +23,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.verbose.VerboseAnimation;
 
 import java.util.ArrayList;
@@ -31,12 +32,15 @@ import java.util.Collection;
 import static xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory;
 
 @RequiredArgsConstructor
-public final class ActionBarVerbose {
+public final class ActionBarVerbose implements Verbose {
   private final Server server;
   @Getter
   private final Collection<String> subscribers = new ArrayList<>();
 
   public void update() {
+    // Clean up blacklisted IPs
+    Sonar.get().getFallback().getBlacklisted().cleanUp(false);
+
     final TextComponent component = new TextComponent(
       Sonar.get().getConfig().ACTION_BAR_LAYOUT
         .replace("%queued%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))

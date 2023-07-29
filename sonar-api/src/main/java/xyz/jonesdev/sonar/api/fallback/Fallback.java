@@ -18,7 +18,7 @@
 package xyz.jonesdev.sonar.api.fallback;
 
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuchino.Cache;
+import xyz.jonesdev.cappuchino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.logger.Logger;
 
@@ -31,7 +31,7 @@ public interface Fallback {
 
   @NotNull Collection<String> getVerified();
 
-  @NotNull Cache<String> getBlacklisted();
+  @NotNull ExpiringCache<String> getBlacklisted();
 
   @NotNull FallbackQueue getQueue();
 

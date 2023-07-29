@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.api.fallback;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuchino.Cache;
 import xyz.jonesdev.cappuchino.Cappuchino;
+import xyz.jonesdev.cappuchino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.logger.Logger;
 
@@ -43,8 +43,9 @@ public final class FallbackHolder implements Fallback {
   private final Collection<String> verified = new Vector<>(1);
   @Getter
   @NotNull
-  private final Cache<String> blacklisted = Cappuchino.buildExpiring(
-    10L, TimeUnit.MINUTES // Only block the player for a few minutes to avoid issues
+  // Only block the player for a few minutes to avoid issues
+  private final ExpiringCache<String> blacklisted = Cappuchino.buildExpiring(
+    10L, TimeUnit.MINUTES, 2500L
   );
   @Getter
   @NotNull

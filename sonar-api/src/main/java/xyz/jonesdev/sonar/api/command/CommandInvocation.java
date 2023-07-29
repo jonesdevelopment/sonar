@@ -22,12 +22,6 @@ import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 
 @RequiredArgsConstructor
 public final class CommandInvocation {
-  private final String executorName;
-
-  public String getExecutorName() {
-    return executorName;
-  }
-
   private final InvocationSender invocationSender;
 
   public InvocationSender getInvocationSender() {

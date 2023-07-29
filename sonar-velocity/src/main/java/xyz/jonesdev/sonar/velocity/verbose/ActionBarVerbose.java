@@ -37,6 +37,9 @@ public final class ActionBarVerbose implements Verbose {
   private final Collection<String> subscribers = new ArrayList<>();
 
   public void update() {
+    // Clean up blacklisted IPs
+    Sonar.get().getFallback().getBlacklisted().cleanUp(false);
+
     final Component component = Component.text(
       Sonar.get().getConfig().ACTION_BAR_LAYOUT
         .replace("%queued%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
