@@ -46,9 +46,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_POST_LOGIN;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 @Getter
 public final class FallbackLoginHandler implements MinecraftSessionHandler {
@@ -101,9 +101,9 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
     this.server = (VelocityServer) SonarVelocity.INSTANCE.getPlugin().getServer();
 
     // Create an instance for the connected player
-    final ConnectedPlayer player;
+    final ConnectedPlayer connectedPlayer;
     try {
-      player = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
+      connectedPlayer = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
         mcConnection.server,
         GameProfile.forOfflinePlayer(username),
         mcConnection,
@@ -120,7 +120,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
 
     // Check if the player is already connected to the proxy
     // We use the default Velocity method for this to avoid incompatibilities
-    if (!mcConnection.server.canRegisterConnection(player)) {
+    if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {
       mcConnection.closeWith(Disconnect.create(
         Component.translatable("velocity.error.already-connected-proxy", NamedTextColor.RED),
         mcConnection.getProtocolVersion()
@@ -130,9 +130,9 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
 
     // Create an instance for the Fallback connection
     final FallbackPlayer fallbackPlayer = new FallbackPlayer(
-      fallback, player, mcConnection, mcConnection.getChannel(),
+      fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
       mcConnection.getChannel().pipeline(), inetAddress,
-      ProtocolVersion.fromId(player.getProtocolVersion().getProtocol())
+      ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
     );
 
     if (fallback.getSonar().getConfig().LOG_CONNECTIONS) {
@@ -150,28 +150,28 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
 
     // Set compression
     final int threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
-    if (threshold >= 0 && mcConnection.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+    if (threshold >= 0 && fallbackPlayer.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
       mcConnection.write(new SetCompression(threshold));
       mcConnection.setCompressionThreshold(threshold);
     }
 
-    // Send LoginSuccess packet to spoof our fake lobby
-    final ServerLoginSuccess success = new ServerLoginSuccess();
+    // Send LoginSuccess packet to make the client think they successfully logged in
+    final ServerLoginSuccess loginSuccess = new ServerLoginSuccess();
 
-    success.setUsername(player.getUsername());
-    success.setProperties(player.getGameProfileProperties());
-    success.setUuid(player.getUniqueId());
+    loginSuccess.setUsername(connectedPlayer.getUsername());
+    loginSuccess.setProperties(connectedPlayer.getGameProfileProperties());
+    loginSuccess.setUuid(connectedPlayer.getUniqueId());
 
-    mcConnection.write(success);
+    mcConnection.write(loginSuccess);
 
-    // Set the state to a custom one, so we can receive and send more packets
-    mcConnection.setAssociation(player);
+    // Spoof online state
+    mcConnection.setAssociation(connectedPlayer);
     mcConnection.setState(StateRegistry.PLAY);
 
     final long keepAliveId = ThreadLocalRandom.current().nextInt();
 
     // ==================================================================
-    if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+    if (fallbackPlayer.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
       // We have to add this pipeline to monitor all incoming traffic
       // We add the pipeline after the MinecraftDecoder since we want
       // the packets to be processed and decoded already

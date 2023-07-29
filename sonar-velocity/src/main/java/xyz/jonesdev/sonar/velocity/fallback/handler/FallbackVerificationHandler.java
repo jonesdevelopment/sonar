@@ -17,10 +17,10 @@
 
 package xyz.jonesdev.sonar.velocity.fallback.handler;
 
-import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
@@ -66,7 +66,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
 
       // 1.7-1.8 clients do not have a TeleportConfirm packet
-      if (player.getConnection().getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) <= 0) {
+      if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) <= 0) {
         checkForPositions = true;
       }
 

@@ -38,12 +38,12 @@ import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.lang.reflect.Field;
 
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_13;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 /**
  * <h3>Concept</h3>
@@ -71,7 +71,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
 
   public FallbackSessionHandler(final @NotNull FallbackPlayer player) {
     this.player = player;
-    this.v1_8or1_7 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
+    this.v1_8or1_7 = player.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0;
   }
 
   private static final Field CONNECTION_FIELD;
@@ -128,7 +128,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
     try {
-      final boolean legacy = player.getConnection().getProtocolVersion().compareTo(MINECRAFT_1_8) < 0;
+      final boolean legacy = player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0;
       // 1.7 has some very weird issues when trying to decode the client brand
       final int cap = player.getFallback().getSonar().getConfig().MAXIMUM_BRAND_LENGTH;
       // Read the client brand using our custom readString method that supports 1.7.
@@ -160,7 +160,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
     // Check if the channel is correct - 1.13 uses the new namespace
     // system ('minecraft:' + channel) and anything below 1.13 uses
     // the legacy namespace system ('MC|' + channel).
-    final boolean v1_13 = player.getPlayer().getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
+    final boolean v1_13 = player.getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
     checkFrame(pluginMessage.getChannel().equals("MC|Brand") || v1_13, "invalid channel");
 
     // Validate the client branding using a regex to filter unwanted characters.
