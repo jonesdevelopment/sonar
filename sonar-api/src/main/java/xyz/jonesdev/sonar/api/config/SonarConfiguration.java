@@ -744,7 +744,7 @@ public final class SonarConfiguration {
     if (LOG_PLAYER_ADDRESSES) {
       return inetAddress.toString();
     }
-    return "<ip address withheld>";
+    return "/<ip address withheld>";
   }
 
   private @NotNull String fromList(final @NotNull Collection<String> list) {
