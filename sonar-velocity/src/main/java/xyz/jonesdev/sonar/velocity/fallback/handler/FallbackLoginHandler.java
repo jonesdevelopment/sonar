@@ -92,7 +92,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
                               final InitialLoginSessionHandler sessionHandler,
                               final String username,
                               final InetAddress inetAddress,
-                              final boolean premium) {
+                              final boolean onlineMode) {
     this.fallback = fallback;
     this.mcConnection = mcConnection;
     this.inboundConnection = inboundConnection;
@@ -107,7 +107,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
         GameProfile.forOfflinePlayer(username),
         mcConnection,
         inboundConnection.getVirtualHost().orElse(null),
-        premium,
+        onlineMode,
         inboundConnection.getIdentifiedKey()
       );
     } catch (Throwable throwable) {

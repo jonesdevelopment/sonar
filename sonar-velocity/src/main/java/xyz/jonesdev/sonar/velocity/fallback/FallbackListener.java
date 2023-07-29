@@ -188,15 +188,6 @@ public final class FallbackListener {
     // a fake connection
     CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
 
-    // If we don't handle online/offline mode players correctly,
-    // many plugins (especially Auth-related) will have issues
-    //
-    // We need to determine if the player is premium before we queue the connection,
-    // and before we run everything in the event loop to avoid potential memory leaks
-    final boolean isPremium = !event.getResult().isForceOfflineMode()
-      && (SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
-      || event.getResult().isOnlineModeAllowed());
-
     // Run in the channel's event loop
     channel.eventLoop().execute(() -> {
 
@@ -234,9 +225,15 @@ public final class FallbackListener {
           )
         );
 
+        // We need to determine if the player is premium before we handle the connection,
+        // so we can create a ConnectedPlayer instance without having to spoof this
+        final boolean onlineMode = !event.getResult().isForceOfflineMode()
+          && (SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
+          || event.getResult().isOnlineModeAllowed());
+
         mcConnection.setSessionHandler(new FallbackLoginHandler(
           fallback, mcConnection, inboundConnection, sessionHandler,
-          event.getUsername(), inetAddress, isPremium
+          event.getUsername(), inetAddress, onlineMode
         ));
       }));
     });
