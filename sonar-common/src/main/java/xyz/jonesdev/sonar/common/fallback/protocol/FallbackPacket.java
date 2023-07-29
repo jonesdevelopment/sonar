@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import io.netty.buffer.ByteBuf;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 public interface FallbackPacket {
   void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);

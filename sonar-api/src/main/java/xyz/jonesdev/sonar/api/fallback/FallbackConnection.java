@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.cappuchino.Cappuchino;
 import xyz.jonesdev.cappuchino.ExpiringCache;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,7 @@ public interface FallbackConnection<X, Y> {
 
   @NotNull InetAddress getInetAddress();
 
-  int getProtocolId();
+  ProtocolVersion getProtocolVersion();
 
   ExpiringCache<String> PREVIOUS_FAILS = Cappuchino.buildExpiring(3L, TimeUnit.MINUTES);
 
@@ -51,7 +52,7 @@ public interface FallbackConnection<X, Y> {
 
     if (reason != null) {
       getFallback().getLogger().info("{} ({}) has failed the bot check for: {}",
-        getInetAddress(), getProtocolId(), reason);
+        getInetAddress(), getProtocolVersion().getProtocol(), reason);
     }
 
     // Make sure old entries are removed
@@ -61,7 +62,7 @@ public interface FallbackConnection<X, Y> {
     if (PREVIOUS_FAILS.has(getInetAddress().toString())) {
       getFallback().getBlacklisted().put(getInetAddress().toString());
       getFallback().getLogger().info("{} ({}) was blacklisted for too many failed attempts",
-        getInetAddress(), getProtocolId());
+        getInetAddress(), getProtocolVersion().getProtocol());
     } else {
       // Cache the InetAddress for 3 minutes
       PREVIOUS_FAILS.put(getInetAddress().toString());

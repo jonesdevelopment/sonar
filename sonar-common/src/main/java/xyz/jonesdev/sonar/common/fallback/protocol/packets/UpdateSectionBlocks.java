@@ -22,11 +22,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 
-import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.MINECRAFT_1_16_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_16_2;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarLong;
 

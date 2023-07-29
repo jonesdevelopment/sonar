@@ -23,6 +23,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 
@@ -32,8 +33,8 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final FallbackPacketRegistry.ProtocolRegistry registry;
   private final FallbackPacketListener listener;
 
-  public FallbackPacketDecoder(final int protocol, final FallbackPacketListener listener) {
-    this.protocolVersion = ProtocolVersion.ID_TO_PROTOCOL_CONSTANT.get(protocol);
+  public FallbackPacketDecoder(final ProtocolVersion protocolVersion, final FallbackPacketListener listener) {
+    this.protocolVersion = protocolVersion;
     this.registry = FallbackPacketRegistry.SONAR.getProtocolRegistry(
       FallbackPacketRegistry.Direction.SERVERBOUND, protocolVersion
     );

@@ -32,6 +32,7 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackPackets;
@@ -131,7 +132,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
     final FallbackPlayer fallbackPlayer = new FallbackPlayer(
       fallback, player, mcConnection, mcConnection.getChannel(),
       mcConnection.getChannel().pipeline(), inetAddress,
-      player.getProtocolVersion().getProtocol()
+      ProtocolVersion.fromId(player.getProtocolVersion().getProtocol())
     );
 
     if (fallback.getSonar().getConfig().LOG_CONNECTIONS) {
@@ -140,7 +141,7 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       if (!fallback.isUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
         fallback.getLogger().info("Processing: {}{} ({})",
           username, fallback.getSonar().getConfig().formatAddress(inetAddress),
-          fallbackPlayer.getProtocolId());
+          fallbackPlayer.getProtocolVersion().getProtocol());
       }
     }
 

@@ -205,7 +205,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
     player.getPipeline().replace(
       MINECRAFT_ENCODER,
       FALLBACK_PACKET_ENCODER,
-      new FallbackPacketEncoder(player.getProtocolId())
+      new FallbackPacketEncoder(player.getProtocolVersion())
     );
 
     // Replace normal decoder to allow custom packets
@@ -213,7 +213,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler, Fa
       MINECRAFT_DECODER,
       FALLBACK_PACKET_DECODER,
       new FallbackPacketDecoder(
-        player.getProtocolId(),
+        player.getProtocolVersion(),
         new FallbackVerificationHandler(player)
       )
     );

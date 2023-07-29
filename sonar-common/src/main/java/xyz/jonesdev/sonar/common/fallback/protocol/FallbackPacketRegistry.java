@@ -20,12 +20,13 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import lombok.Data;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.*;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 
 // Most of this is taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/StateRegistry.java

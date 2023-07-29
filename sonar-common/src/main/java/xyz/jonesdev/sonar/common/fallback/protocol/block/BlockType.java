@@ -19,9 +19,9 @@ package xyz.jonesdev.sonar.common.fallback.protocol.block;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
-import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.MINECRAFT_1_12_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_12_2;
 
 @Getter
 @RequiredArgsConstructor

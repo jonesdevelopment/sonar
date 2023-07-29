@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
@@ -27,8 +28,8 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
   private final ProtocolVersion protocolVersion;
   private final FallbackPacketRegistry.ProtocolRegistry registry;
 
-  public FallbackPacketEncoder(final int protocol) {
-    this.protocolVersion = ProtocolVersion.ID_TO_PROTOCOL_CONSTANT.get(protocol);
+  public FallbackPacketEncoder(final ProtocolVersion protocolVersion) {
+    this.protocolVersion = protocolVersion;
     this.registry = FallbackPacketRegistry.SONAR.getProtocolRegistry(
       FallbackPacketRegistry.Direction.CLIENTBOUND, protocolVersion
     );

@@ -23,6 +23,7 @@ import io.netty.channel.Channel
 import io.netty.channel.ChannelPipeline
 import xyz.jonesdev.sonar.api.fallback.Fallback
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion
 import java.net.InetAddress
 
 class FallbackPlayer(
@@ -32,7 +33,7 @@ class FallbackPlayer(
   private val channel: Channel,
   private val pipeline: ChannelPipeline,
   private val inetAddress: InetAddress,
-  private val protocolVersion: Int,
+  private val protocolVersion: ProtocolVersion,
 ) : FallbackConnection<ConnectedPlayer, MinecraftConnection> {
 
   override fun getFallback(): Fallback {
@@ -59,7 +60,7 @@ class FallbackPlayer(
     return inetAddress
   }
 
-  override fun getProtocolId(): Int {
+  override fun getProtocolVersion(): ProtocolVersion {
     return protocolVersion
   }
 }
