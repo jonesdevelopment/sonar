@@ -67,8 +67,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     POSITION(true),
     COLLISIONS(true),
     // OTHER
-    SUCCESS(false),
-    FAIL(false);
+    SUCCESS(false);
 
     private final boolean canMove;
   }
@@ -216,8 +215,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
     }
 
-    // 1.7-1.8 clients do not have a TeleportConfirm packet,
-    // so we don't need to check the protocol version here
     if (packet instanceof TeleportConfirm) {
       // Check if the player sent the TeleportConfirm packet twice
       checkFrame(state == State.TELEPORT, "wrong state: " + state);
@@ -248,7 +245,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (packet instanceof Player) {
         final Player player = (Player) packet;
 
-        // This packet does not send any position data, just reuse the last Y
+        // This packet does not send new position data, reuse the last Y
         handlePositionUpdate(lastY, player.isOnGround());
       }
     }
@@ -313,6 +310,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
    * Restore old pipelines and send the player to the actual server
    */
   private synchronized void finish() {
+    state = State.SUCCESS;
+
     player.getFallback().getVerified().add(player.getInetAddress().toString());
     player.getFallback().getConnected().remove(username);
 
