@@ -36,7 +36,6 @@ import xyz.jonesdev.sonar.common.timer.DelayTimer;
 import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
@@ -59,17 +58,17 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
     @Override
     public void info(final String message, final Object... args) {
-      plugin.getLogger().log(Level.INFO, message, args);
+      plugin.getLog4JLogger().info(message, args);
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      plugin.getLogger().log(Level.WARNING, message, args);
+      plugin.getLog4JLogger().warn(message, args);
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      plugin.getLogger().log(Level.SEVERE, message, args);
+      plugin.getLog4JLogger().error(message, args);
     }
   };
 

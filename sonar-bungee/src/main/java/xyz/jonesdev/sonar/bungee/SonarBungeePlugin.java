@@ -20,18 +20,18 @@ package xyz.jonesdev.sonar.bungee;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
-
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Getter
 public final class SonarBungeePlugin extends Plugin {
   private ProxyServer server;
-  private Logger logger;
+  private Logger log4JLogger;
 
   @Override
   public void onEnable() {
     server = ProxyServer.getInstance();
-    logger = server.getLogger();
+    log4JLogger = LogManager.getLogger("Sonar");
 
     SonarBungee.INSTANCE.enable(this);
   }
