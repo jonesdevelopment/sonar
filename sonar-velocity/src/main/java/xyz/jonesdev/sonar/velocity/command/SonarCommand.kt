@@ -208,7 +208,7 @@ class SonarCommand : SimpleCommand {
       if (ARG_TAB_SUGGESTIONS.isEmpty()) {
         for (subCommand in Sonar.get().subcommandRegistry.subcommands) {
           ARG_TAB_SUGGESTIONS[subCommand.info.name] = subCommand.info.arguments
-            .map { argument -> argument.name }
+            .map { argument -> argument.value }
             .toList()
         }
       }

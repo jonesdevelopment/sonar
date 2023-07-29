@@ -215,7 +215,7 @@ class SonarCommand : CommandExecutor, TabExecutor {
       if (ARG_TAB_SUGGESTIONS.isEmpty()) {
         for (subCommand in Sonar.get().subcommandRegistry.subcommands) {
           ARG_TAB_SUGGESTIONS[subCommand.info.name] = Arrays.stream(subCommand.info.arguments)
-            .map { obj: Argument -> obj.name }
+            .map { obj: Argument -> obj.value }
             .collect(Collectors.toList())
         }
       }

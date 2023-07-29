@@ -19,10 +19,10 @@ package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo
 
-@SubCommandInfo(
+@SubcommandInfo(
   name = "verbose",
   description = "Enable and disable Sonar verbose",
   onlyPlayers = true

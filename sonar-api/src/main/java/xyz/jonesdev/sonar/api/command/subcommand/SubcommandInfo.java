@@ -37,5 +37,5 @@ public @interface SubcommandInfo {
 
   boolean onlyPlayers() default false;
 
-  boolean consoleOnly() default false;
+  boolean onlyConsole() default false;
 }

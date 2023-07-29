@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
 
 @Getter
 public abstract class Subcommand {
-  private final SubCommandInfo info;
+  private final SubcommandInfo info;
   private final String permission, aliases, arguments;
   protected static final Sonar sonar = Sonar.get();
 
   public Subcommand() {
-    info = getClass().getAnnotation(SubCommandInfo.class);
+    info = getClass().getAnnotation(SubcommandInfo.class);
     permission = "sonar." + info.name();
     aliases = info.aliases().length == 0 ? "No aliases."
       : String.join(", ", info.aliases());

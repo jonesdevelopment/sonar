@@ -18,14 +18,14 @@
 package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo
 import xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory
 import java.lang.management.ManagementFactory
 
 // This command is only used to display helpful information in order to help
 // the Sonar developer(s) to fix issues more quickly
-@SubCommandInfo(
+@SubcommandInfo(
   name = "dump",
   description = "Print developer information",
   onlyConsole = true

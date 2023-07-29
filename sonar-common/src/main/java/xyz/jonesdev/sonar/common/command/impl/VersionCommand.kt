@@ -18,10 +18,10 @@
 package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo
 
-@SubCommandInfo(
+@SubcommandInfo(
   name = "version",
   description = "Show version information",
 )

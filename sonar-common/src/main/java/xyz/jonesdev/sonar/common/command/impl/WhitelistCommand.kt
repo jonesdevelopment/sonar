@@ -20,11 +20,11 @@ package xyz.jonesdev.sonar.common.command.impl
 import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.api.command.CommandInvocation
 import xyz.jonesdev.sonar.api.command.argument.Argument
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo
 import java.net.InetAddress
 
-@SubCommandInfo(
+@SubcommandInfo(
   name = "whitelist",
   description = "Manage verified IP addresses",
   arguments = [
