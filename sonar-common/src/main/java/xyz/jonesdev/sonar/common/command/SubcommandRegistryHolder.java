@@ -30,7 +30,6 @@ public final class SubcommandRegistryHolder implements SubcommandRegistry {
       new LockdownCommand(),
       new VerboseCommand(),
       new ReloadCommand(),
-      new VersionCommand(),
       new DumpCommand()
     );
   }
