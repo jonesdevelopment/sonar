@@ -364,7 +364,7 @@ public enum FallbackPacketRegistry {
     }
 
     public FallbackPacket createPacket(final int id) {
-      final Supplier<? extends FallbackPacket> supplier = this.packetIdToSupplier.get(id);
+      final Supplier<? extends FallbackPacket> supplier = packetIdToSupplier.get(id);
 
       if (supplier == null) {
         return null;

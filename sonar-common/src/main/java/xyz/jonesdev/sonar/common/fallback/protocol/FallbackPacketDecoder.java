@@ -23,21 +23,21 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
-  private final ProtocolVersion protocolVersion;
+  private final FallbackConnection<?, ?> connection;
   private final FallbackPacketRegistry.ProtocolRegistry registry;
   private final FallbackPacketListener listener;
 
-  public FallbackPacketDecoder(final ProtocolVersion protocolVersion, final FallbackPacketListener listener) {
-    this.protocolVersion = protocolVersion;
+  public FallbackPacketDecoder(final FallbackConnection<?, ?> connection, final FallbackPacketListener listener) {
+    this.connection = connection;
     this.registry = FallbackPacketRegistry.SONAR.getProtocolRegistry(
-      FallbackPacketRegistry.Direction.SERVERBOUND, protocolVersion
+      FallbackPacketRegistry.Direction.SERVERBOUND, connection.getProtocolVersion()
     );
     this.listener = listener;
   }
@@ -59,40 +59,38 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
       if (packet == null) {
         byteBuf.readerIndex(originalReaderIndex);
-        ctx.fireChannelRead(byteBuf);
       } else {
         try {
           doLengthSanityChecks(byteBuf, packet);
 
           try {
-            packet.decode(byteBuf, protocolVersion);
-          } catch (Exception exception) {
-            exception.printStackTrace();
+            packet.decode(byteBuf, connection.getProtocolVersion());
+          } catch (Throwable throwable) {
+            connection.fail("could not decode packet");
             throw new CorruptedFrameException("Failed to decode packet");
           }
 
           if (byteBuf.isReadable()) {
+            connection.fail("could not read packet to end");
             throw new CorruptedFrameException("Could not read packet to end");
           }
+
           listener.handle(packet);
-          ctx.fireChannelRead(packet);
         } finally {
           byteBuf.release();
         }
       }
-    } else {
-      ctx.fireChannelRead(msg);
     }
   }
 
-  private void doLengthSanityChecks(final ByteBuf buf, final FallbackPacket packet) throws Exception {
-    final int expectedMaxLen = packet.expectedMaxLength(buf, protocolVersion);
-    if (expectedMaxLen != -1 && buf.readableBytes() > expectedMaxLen) {
+  private void doLengthSanityChecks(final ByteBuf byteBuf, final FallbackPacket packet) throws Exception {
+    final int expectedMaxLen = packet.expectedMaxLength(byteBuf, connection.getProtocolVersion());
+    if (expectedMaxLen != -1 && byteBuf.readableBytes() > expectedMaxLen) {
       throw new CorruptedFrameException("Packet too large");
     }
 
-    final int expectedMinLen = packet.expectedMinLength(buf, protocolVersion);
-    if (buf.readableBytes() < expectedMinLen) {
+    final int expectedMinLen = packet.expectedMinLength(byteBuf, connection.getProtocolVersion());
+    if (byteBuf.readableBytes() < expectedMinLen) {
       throw new CorruptedFrameException("Packet too small");
     }
   }

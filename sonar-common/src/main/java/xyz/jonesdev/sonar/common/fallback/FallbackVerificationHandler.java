@@ -246,8 +246,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // The onGround property can never be true when we aren't checking for collisions
     checkFrame(!isOnGround || state == State.COLLISIONS, "invalid ground state");
 
-    // Skip teleport packets using this check
-    if (deltaY > 0) {
+    // Skip teleports using this small check
+    if (deltaY > 0.07) {
 
       // Verify the player if they sent correct movement packets
       if (movementTick++ >= MAX_MOVEMENT_TICK) {

@@ -164,7 +164,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       MINECRAFT_DECODER,
       FALLBACK_PACKET_DECODER,
       new FallbackPacketDecoder(
-        fallbackPlayer.getProtocolVersion(),
+        fallbackPlayer,
         new FallbackVerificationHandler(fallbackPlayer, username)
       )
     );
