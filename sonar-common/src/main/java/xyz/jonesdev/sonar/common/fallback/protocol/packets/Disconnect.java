@@ -31,7 +31,7 @@ import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Disconnect implements FallbackPacket {
+public final class Disconnect implements FallbackPacket {
   private @Nullable String reason;
 
   @Override

@@ -34,7 +34,7 @@ import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarLong;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateSectionBlocks implements FallbackPacket {
+public final class UpdateSectionBlocks implements FallbackPacket {
   private int sectionX;
   private int sectionZ;
   private ChangedBlock[] changedBlocks;

@@ -32,22 +32,17 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.ProtocolVersion.MINECR
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultSpawnPosition implements FallbackPacket {
-  private int posX;
-  private int posY;
-  private int posZ;
+public final class DefaultSpawnPosition implements FallbackPacket {
+  private int x, y, z;
   private float angle;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    long location;
-    if (protocolVersion.compareTo(MINECRAFT_1_14) < 0) {
-      location = ((posX & 0x3FFFFFFL) << 38) | ((posY & 0xFFFL) << 26) | (posZ & 0x3FFFFFFL);
-    } else {
-      location = ((posX & 0x3FFFFFFL) << 38) | ((posZ & 0x3FFFFFFL) << 12) | (posY & 0xFFFL);
-    }
+    final long encoded = protocolVersion.compareTo(MINECRAFT_1_14) < 0
+      ? ((x & 0x3FFFFFFL) << 38) | ((y & 0xFFFL) << 26) | (z & 0x3FFFFFFL)
+      : ((x & 0x3FFFFFFL) << 38) | ((y & 0x3FFFFFFL) << 12) | (z & 0xFFFL);
 
-    byteBuf.writeLong(location);
+    byteBuf.writeLong(encoded);
 
     if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
       byteBuf.writeFloat(angle);
