@@ -24,7 +24,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.CorruptedFrameException
 import net.md_5.bungee.compress.PacketDecompressor
-import xyz.jonesdev.sonar.common.protocol.VarIntUtil.Companion.readVarInt
+import xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftCompressDecoder.java
 class FallbackPacketDecompressor(

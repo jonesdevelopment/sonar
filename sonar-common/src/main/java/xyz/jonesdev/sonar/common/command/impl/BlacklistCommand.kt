@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.common.command.impl
 import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.api.command.CommandInvocation
 import xyz.jonesdev.sonar.api.command.argument.Argument
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
 import java.net.InetAddress
 
 @SubCommandInfo(
@@ -34,7 +34,7 @@ import java.net.InetAddress
     Argument("size"),
   ],
 )
-class BlacklistCommand : SubCommand() {
+class BlacklistCommand : Subcommand() {
   companion object {
     private val IP_REGEX =
       Regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])([.])){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\$")

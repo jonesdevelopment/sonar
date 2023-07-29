@@ -18,7 +18,7 @@
 package xyz.jonesdev.sonar.api.command;
 
 import lombok.RequiredArgsConstructor;
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand;
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 
 @RequiredArgsConstructor
 public final class CommandInvocation {
@@ -34,9 +34,9 @@ public final class CommandInvocation {
     return invocationSender;
   }
 
-  private final SubCommand command;
+  private final Subcommand command;
 
-  public SubCommand getCommand() {
+  public Subcommand getCommand() {
     return command;
   }
 

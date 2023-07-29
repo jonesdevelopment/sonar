@@ -18,14 +18,14 @@
 package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo
 
-@SubCommandInfo(
+@SubcommandInfo(
   name = "reload",
   description = "Reload the configuration"
 )
-class ReloadCommand : SubCommand() {
+class ReloadCommand : Subcommand() {
   override fun execute(invocation: CommandInvocation) {
     val startTime = System.currentTimeMillis()
 

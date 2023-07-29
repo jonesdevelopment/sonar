@@ -48,16 +48,16 @@ public class ProtocolUtil {
   private static final String UNREGISTER_CHANNEL = "minecraft:unregister";
   private static final Pattern INVALID_IDENTIFIER_REGEX = Pattern.compile("[^a-z0-9\\-_]*");
 
-  public @NotNull String readString(final ByteBuf buf) throws CorruptedFrameException {
+  public static @NotNull String readString(final ByteBuf buf) throws CorruptedFrameException {
     return readString(buf, Short.MAX_VALUE);
   }
 
-  public @NotNull String readString(final ByteBuf buf,
+  public static @NotNull String readString(final ByteBuf buf,
                                     final int cap) throws CorruptedFrameException {
     return readString(buf, cap, false);
   }
 
-  public @NotNull String readString(final ByteBuf buf,
+  public static @NotNull String readString(final ByteBuf buf,
                                     final int cap,
                                     final boolean legacy) throws CorruptedFrameException {
     final int length = readVarInt(buf);
@@ -78,7 +78,7 @@ public class ProtocolUtil {
     return str;
   }
 
-  public void writeString(final ByteBuf buf, final CharSequence str) {
+  public static void writeString(final ByteBuf buf, final CharSequence str) {
     final int size = ByteBufUtil.utf8Bytes(str);
     writeVarInt(buf, size);
     buf.writeCharSequence(str, Charsets.UTF_8);
@@ -115,13 +115,13 @@ public class ProtocolUtil {
     return ((high & 0xFF) << 15) | low;
   }
 
-  public ByteBuf readRetainedByteBufSlice17(final ByteBuf buf) {
+  public static ByteBuf readRetainedByteBufSlice17(final ByteBuf buf) {
     final int length = readExtendedForgeShort(buf);
     checkFrame(length <= FORGE_MAX_ARRAY_LENGTH, "Too long");
     return buf.readRetainedSlice(length);
   }
 
-  public @NotNull String transformLegacyToModernChannel(@NotNull final String name) {
+  public static @NotNull String transformLegacyToModernChannel(@NotNull final String name) {
     if (name.indexOf(':') != -1) {
       return name;
     }

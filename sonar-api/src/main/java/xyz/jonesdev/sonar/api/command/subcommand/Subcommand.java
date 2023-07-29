@@ -27,12 +27,12 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Getter
-public abstract class SubCommand {
+public abstract class Subcommand {
   private final SubCommandInfo info;
   private final String permission, aliases, arguments;
   protected static final Sonar sonar = Sonar.get();
 
-  public SubCommand() {
+  public Subcommand() {
     info = getClass().getAnnotation(SubCommandInfo.class);
     permission = "sonar." + info.name();
     aliases = info.aliases().length == 0 ? "No aliases."
@@ -40,7 +40,7 @@ public abstract class SubCommand {
 
     arguments = info.arguments().length == 0 ? ""
       : Arrays.stream(info.arguments())
-      .map(Argument::name)
+      .map(Argument::value)
       .collect(Collectors.joining(", "));
   }
 

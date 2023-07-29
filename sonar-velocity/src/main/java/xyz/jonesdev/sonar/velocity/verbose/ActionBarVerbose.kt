@@ -21,7 +21,7 @@ import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import net.kyori.adventure.text.Component
 import xyz.jonesdev.sonar.api.Sonar
-import xyz.jonesdev.sonar.api.format.MemoryFormatter.Companion.formatMemory
+import xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory
 import xyz.jonesdev.sonar.api.verbose.Verbose
 import xyz.jonesdev.sonar.common.verbose.VerboseAnimation
 

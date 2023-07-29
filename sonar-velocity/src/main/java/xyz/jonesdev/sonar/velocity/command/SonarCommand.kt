@@ -28,7 +28,7 @@ import net.kyori.adventure.text.event.HoverEvent
 import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.api.command.CommandInvocation
 import xyz.jonesdev.sonar.api.command.InvocationSender
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
 import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -63,7 +63,7 @@ class SonarCommand : SimpleCommand {
       DELAY.put(invocation.source(), currentTimestamp)
     }
 
-    var subCommand = Optional.empty<SubCommand>()
+    var subCommand = Optional.empty<Subcommand>()
 
     val invocationSender = object : InvocationSender {
       override fun getName(): String {
@@ -80,7 +80,7 @@ class SonarCommand : SimpleCommand {
     if (invocation.arguments().isNotEmpty()) {
       // Search subcommand if command arguments are present
       subCommand = Sonar.get().subcommandRegistry.subcommands.parallelStream()
-        .filter { sub: SubCommand ->
+        .filter { sub: Subcommand ->
           (sub.info.name.equals(invocation.arguments()[0], true)
             || (sub.info.aliases.isNotEmpty()
             && Arrays.stream(sub.info.aliases)
@@ -159,7 +159,7 @@ class SonarCommand : SimpleCommand {
         )
         CACHED_HELP.add(Component.empty())
 
-        Sonar.get().subcommandRegistry.subcommands.forEach(Consumer { sub: SubCommand ->
+        Sonar.get().subcommandRegistry.subcommands.forEach(Consumer { sub: Subcommand ->
           var component = Component.text(
             " §a▪ §7/sonar "
               + sub.info.name

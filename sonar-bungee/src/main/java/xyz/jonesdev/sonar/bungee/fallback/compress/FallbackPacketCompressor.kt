@@ -24,9 +24,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.CorruptedFrameException
 import net.md_5.bungee.compress.PacketCompressor
-import xyz.jonesdev.sonar.common.protocol.VarIntUtil.Companion.varIntBytes
-import xyz.jonesdev.sonar.common.protocol.VarIntUtil.Companion.write21BitVarInt
-import xyz.jonesdev.sonar.common.protocol.VarIntUtil.Companion.writeVarInt
+import xyz.jonesdev.sonar.common.protocol.VarIntUtil.*
 import java.util.zip.DataFormatException
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftCompressorAndLengthEncoder.java

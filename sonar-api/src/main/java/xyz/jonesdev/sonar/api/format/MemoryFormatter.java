@@ -15,25 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback
+package xyz.jonesdev.sonar.api.format;
 
-import io.netty.channel.ChannelHandlerContext
-import io.netty.channel.ChannelInboundHandlerAdapter
-import xyz.jonesdev.sonar.api.Sonar
-import java.net.InetSocketAddress
+import lombok.experimental.UtilityClass;
+import xyz.jonesdev.sonar.api.Sonar;
 
-class FallbackChannelHandler(
-  private val username: String
-) : ChannelInboundHandlerAdapter() {
+@UtilityClass
+public class MemoryFormatter {
+  private final int MIN = 1024;
 
-  @Throws(Exception::class)
-  override fun channelUnregistered(ctx: ChannelHandlerContext) {
-    ctx.fireChannelUnregistered()
+  public String formatMemory(long memory) {
+    if (memory < MIN) {
+      return memory + " B";
+    }
 
-    val inetAddress = (ctx.channel().remoteAddress() as InetSocketAddress).address
+    memory /= MIN; // KB
+    String suffix = "KB";
 
-    // Remove the IP address from the queue
-    Sonar.get().fallback.connected.remove(username)
-    Sonar.get().fallback.queue.remove(inetAddress)
+    if (memory >= MIN) {
+      suffix = "MB";
+      memory /= MIN;
+    }
+
+    if (memory >= MIN) {
+      suffix = "GB";
+      memory /= MIN;
+    }
+    return Sonar.DECIMAL_FORMAT.format(memory) + suffix;
   }
 }

@@ -30,7 +30,7 @@ import net.md_5.bungee.command.ConsoleCommandSender
 import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.api.command.CommandInvocation
 import xyz.jonesdev.sonar.api.command.InvocationSender
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
 import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -64,7 +64,7 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
       DELAY.put(sender, currentTimestamp)
     }
 
-    var subCommand = Optional.empty<SubCommand>()
+    var subCommand = Optional.empty<Subcommand>()
     val invocationSender = object : InvocationSender {
       override fun getName(): String {
         return sender.name
@@ -78,7 +78,7 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
     if (args.isNotEmpty()) {
       // Search subcommand if command arguments are present
       subCommand = Sonar.get().subcommandRegistry.subcommands.stream()
-        .filter { sub: SubCommand ->
+        .filter { sub: Subcommand ->
           (sub.info.name.equals(args[0], true)
             || (sub.info.aliases.isNotEmpty()
             && Arrays.stream(sub.info.aliases)
@@ -126,7 +126,7 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
         CACHED_HELP.add(helpComponent)
         CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
 
-        Sonar.get().subcommandRegistry.subcommands.forEach(Consumer { sub: SubCommand ->
+        Sonar.get().subcommandRegistry.subcommands.forEach(Consumer { sub: Subcommand ->
           val component = TextComponent(
             " §a▪ §7/sonar "
               + sub.info.name

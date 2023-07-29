@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package xyz.jonesdev.sonar.bungee.fallback.session.dummy
 
-import lombok.RequiredArgsConstructor
-import net.md_5.bungee.netty.PacketHandler
-import java.net.InetAddress
+package xyz.jonesdev.sonar.common.verbose;
 
-@RequiredArgsConstructor
-class DummyPacketHandler(
-  private val username: String,
-  private val inetAddress: InetAddress
-) : PacketHandler() {
+import lombok.experimental.UtilityClass;
+import xyz.jonesdev.sonar.api.Sonar;
 
-  override fun toString(): String {
-    return "[sonar/fallback] $username ($inetAddress)"
+@UtilityClass
+public class VerboseAnimation {
+  private int index;
+
+  public String nextAnimation() {
+    return Sonar.get().getConfig().ANIMATION.toArray(new String[0])[
+      ++index % Sonar.get().getConfig().ANIMATION.size()
+    ];
   }
 }

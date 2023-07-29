@@ -15,8 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.command.argument
+package xyz.jonesdev.sonar.bungee.fallback.session.dummy;
 
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
-annotation class Argument(val name: String)
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.netty.PacketHandler;
+
+import java.net.InetAddress;
+
+@Getter
+@RequiredArgsConstructor
+public final class DummyPacketHandler extends PacketHandler {
+  private final String username;
+  private final InetAddress inetAddress;
+
+  @Override
+  public String toString() {
+    return "[sonar/fallback] " + username + " (" + inetAddress + ")";
+  }
+}

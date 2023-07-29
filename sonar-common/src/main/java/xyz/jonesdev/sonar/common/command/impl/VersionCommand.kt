@@ -18,14 +18,14 @@
 package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
 
 @SubCommandInfo(
   name = "version",
   description = "Show version information",
 )
-class VersionCommand : SubCommand() {
+class VersionCommand : Subcommand() {
   override fun execute(invocation: CommandInvocation) {
     invocation.invocationSender.sendMessage()
     invocation.invocationSender.sendMessage(" §eVersion information")

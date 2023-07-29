@@ -15,34 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.format
+package xyz.jonesdev.sonar.api.list;
 
-import xyz.jonesdev.sonar.api.Sonar
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-class MemoryFormatter {
-  companion object {
-    private const val MIN = 1024
-
-    fun formatMemory(memory: Long): String {
-      var bytes = memory
-
-      if (bytes < MIN) {
-        return "$bytes B"
-      }
-
-      bytes /= MIN // KB
-      var suffix = "KB"
-
-      if (bytes >= MIN) {
-        suffix = "MB"
-        bytes /= MIN
-      }
-
-      if (bytes >= MIN) {
-        suffix = "GB"
-        bytes /= MIN
-      }
-      return Sonar.DECIMAL_FORMAT.format(bytes) + suffix
-    }
-  }
+@Data
+@AllArgsConstructor
+public final class Pair<A, B> {
+  private A first;
+  private B second;
 }

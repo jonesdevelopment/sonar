@@ -18,9 +18,9 @@
 package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
-import xyz.jonesdev.sonar.api.format.MemoryFormatter.Companion.formatMemory
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
+import xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory
 import java.lang.management.ManagementFactory
 
 // This command is only used to display helpful information in order to help
@@ -30,7 +30,7 @@ import java.lang.management.ManagementFactory
   description = "Print developer information",
   onlyConsole = true
 )
-class DumpCommand : SubCommand() {
+class DumpCommand : Subcommand() {
   private val runtime = Runtime.getRuntime()
   private val runtimeMxBean = ManagementFactory.getRuntimeMXBean()
 

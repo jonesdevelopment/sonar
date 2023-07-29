@@ -15,17 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.command.subcommand
+package xyz.jonesdev.sonar.api.command.subcommand;
 
-import xyz.jonesdev.sonar.api.command.argument.Argument
+import xyz.jonesdev.sonar.api.command.argument.Argument;
 
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
-annotation class SubCommandInfo(
-  val name: String,
-  val description: String,
-  val aliases: Array<String> = [],
-  val arguments: Array<Argument> = [],
-  val onlyPlayers: Boolean = false,
-  val onlyConsole: Boolean = false
-)
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface SubcommandInfo {
+  String name();
+
+  String description();
+
+  String[] aliases() default {};
+
+  Argument[] arguments() default {};
+
+  boolean onlyPlayers() default false;
+
+  boolean consoleOnly() default false;
+}

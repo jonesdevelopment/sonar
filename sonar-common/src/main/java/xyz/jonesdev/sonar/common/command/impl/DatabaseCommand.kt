@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.common.command.impl
 import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.api.command.CommandInvocation
 import xyz.jonesdev.sonar.api.command.argument.Argument
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
 import xyz.jonesdev.sonar.api.database.DatabaseType
 import xyz.jonesdev.sonar.api.format.MemoryFormatter
 import java.io.File
@@ -35,7 +35,7 @@ import java.nio.file.Files
     Argument("purge"),
   ]
 )
-class DatabaseCommand : SubCommand() {
+class DatabaseCommand : Subcommand() {
   // use this as a "lock" to prevent players from spamming purge
   private var purging = false
 

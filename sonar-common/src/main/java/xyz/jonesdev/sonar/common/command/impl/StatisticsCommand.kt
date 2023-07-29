@@ -19,15 +19,15 @@ package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.Sonar
 import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo
 
-@SubCommandInfo(
+@SubcommandInfo(
   name = "statistics",
   aliases = ["stats"],
   description = "Show session statistics of this server"
 )
-class StatisticsCommand : SubCommand() {
+class StatisticsCommand : Subcommand() {
   override fun execute(invocation: CommandInvocation) {
     val total = sonar.statistics.get("total", 0)
     val queued = sonar.fallback.queue.getQueuedPlayers().size

@@ -18,14 +18,14 @@
 package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
 import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
 
 @SubCommandInfo(
   name = "lockdown",
   description = "Lock the server down"
 )
-class LockdownCommand : SubCommand() {
+class LockdownCommand : Subcommand() {
   override fun execute(invocation: CommandInvocation) {
     sonar.config.LOCKDOWN_ENABLED = !sonar.config.LOCKDOWN_ENABLED
     sonar.config.generalConfig.set("general.lockdown.enabled", sonar.config.LOCKDOWN_ENABLED)

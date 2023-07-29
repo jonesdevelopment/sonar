@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.bukkit.verbose
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Server
 import xyz.jonesdev.sonar.api.Sonar
-import xyz.jonesdev.sonar.api.format.MemoryFormatter.Companion.formatMemory
+import xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory
 import xyz.jonesdev.sonar.api.verbose.Verbose
 import xyz.jonesdev.sonar.common.verbose.VerboseAnimation
 

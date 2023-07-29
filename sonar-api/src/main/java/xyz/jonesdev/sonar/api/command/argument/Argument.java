@@ -15,18 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.verbose
+package xyz.jonesdev.sonar.api.command.argument;
 
-import xyz.jonesdev.sonar.api.Sonar
-
-class VerboseAnimation {
-  companion object {
-    private var index = 0
-
-    fun nextAnimation(): String {
-      return Sonar.get().config.ANIMATION.toTypedArray()[
-        ++index % Sonar.get().config.ANIMATION.size
-      ]
-    }
-  }
+public @interface Argument {
+  String value();
 }
