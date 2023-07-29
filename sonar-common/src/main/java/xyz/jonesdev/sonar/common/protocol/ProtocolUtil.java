@@ -22,7 +22,6 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.EncoderException;
-import kotlin.text.Charsets;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
@@ -30,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
@@ -67,11 +67,11 @@ public class ProtocolUtil {
     String str;
     if (legacy) {
       // TODO: length checking?
-      str = buf.toString(Charsets.UTF_8);
+      str = buf.toString(StandardCharsets.UTF_8);
       buf.skipBytes(buf.readableBytes());
     } else {
       checkFrame(buf.isReadable(length), "Got an invalid string length");
-      str = buf.toString(buf.readerIndex(), length, Charsets.UTF_8);
+      str = buf.toString(buf.readerIndex(), length, StandardCharsets.UTF_8);
       buf.skipBytes(length);
     }
     checkFrame(str.length() <= cap, "Got a too-long string");
@@ -81,7 +81,7 @@ public class ProtocolUtil {
   public static void writeString(final ByteBuf buf, final CharSequence str) {
     final int size = ByteBufUtil.utf8Bytes(str);
     writeVarInt(buf, size);
-    buf.writeCharSequence(str, Charsets.UTF_8);
+    buf.writeCharSequence(str, StandardCharsets.UTF_8);
   }
 
   public static void writeArray(final ByteBuf byteBuf, final byte[] bytes) {
