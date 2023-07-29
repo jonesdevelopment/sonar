@@ -49,7 +49,7 @@ public interface FallbackConnection<X, Y> {
 
   default void fail(final @Nullable String reason) {
     if (getChannel().isActive()) {
-      getChannel().close();
+      disconnect(getFallback().getSonar().getConfig().VERIFICATION_FAILED);
     }
 
     if (reason != null) {

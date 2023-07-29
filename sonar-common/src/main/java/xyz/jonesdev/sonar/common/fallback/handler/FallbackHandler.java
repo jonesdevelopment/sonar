@@ -25,8 +25,6 @@ public interface FallbackHandler {
 
   default void checkFrame(final boolean condition, final String message) {
     if (!condition) {
-      getPlayer().disconnect(getPlayer().getFallback().getSonar().getConfig().VERIFICATION_FAILED);
-
       getPlayer().fail(message);
       throw new CorruptedFrameException(message);
     }
