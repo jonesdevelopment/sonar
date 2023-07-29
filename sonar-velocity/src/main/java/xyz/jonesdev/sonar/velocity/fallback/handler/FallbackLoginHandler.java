@@ -165,10 +165,10 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
     mcConnection.setAssociation(connectedPlayer);
     mcConnection.setState(StateRegistry.PLAY);
 
-    final long keepAliveId = ThreadLocalRandom.current().nextInt();
-
     // ==================================================================
     if (fallbackPlayer.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+      final long keepAliveId = ThreadLocalRandom.current().nextInt();
+
       // We have to add this pipeline to monitor all incoming traffic
       // We add the pipeline after the MinecraftDecoder since we want
       // the packets to be processed and decoded already
