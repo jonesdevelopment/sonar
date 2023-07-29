@@ -274,7 +274,7 @@ public final class SonarConfiguration {
       "Regex for validating client brands during verification"
     );
     VALID_BRAND_REGEX = Pattern.compile(generalConfig.getString(
-      "general.verification.valid-brand-regex", "^[a-zA-Z0-9-/.,:;_()\\[\\]{}!?' *]+$"
+      "general.verification.valid-brand-regex", "^[!-~]+$"
     ));
 
     generalConfig.getYaml().setComment("general.verification.max-brand-length",
