@@ -112,7 +112,7 @@ public class FallbackPackets {
     final JoinGame joinGame = new JoinGame();
 
     joinGame.setLevelType("flat");
-    joinGame.setGamemode((short) 3);
+    joinGame.setGamemode(Sonar.get().getConfig().GAMEMODE_ID);
     joinGame.setReducedDebugInfo(true);
     return joinGame;
   }
@@ -121,9 +121,8 @@ public class FallbackPackets {
     final JoinGame joinGame = new JoinGame();
 
     joinGame.setLevelType("flat");
-    joinGame.setGamemode((short) 3);
+    joinGame.setGamemode(Sonar.get().getConfig().GAMEMODE_ID);
     joinGame.setReducedDebugInfo(true);
-    joinGame.setDifficulty((short) 0);
     joinGame.setMaxPlayers(1);
     joinGame.setDimensionInfo(new DimensionInfo(
       Sonar.get().getConfig().DIMENSION_KEY,

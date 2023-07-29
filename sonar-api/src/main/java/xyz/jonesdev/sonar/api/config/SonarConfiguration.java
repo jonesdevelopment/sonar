@@ -53,6 +53,7 @@ public final class SonarConfiguration {
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
   public String DIMENSION_KEY;
+  public short GAMEMODE_ID;
   public int DIMENSION_LEGACY_ID;
   public int DIMENSION_MODERN_ID;
   public int DIMENSION_SKY_COLOR;
@@ -264,6 +265,11 @@ public final class SonarConfiguration {
       "Should Sonar check for valid client collisions? (Recommended)"
     );
     CHECK_COLLISIONS = generalConfig.getBoolean("general.verification.check-collisions", true);
+
+    generalConfig.getYaml().setComment("general.verification.dimension.gamemode",
+      "The gamemode of the player when verifying (0, 1, 2, or 3)"
+    );
+    GAMEMODE_ID = (short) clamp(generalConfig.getInt("general.verification.dimension.gamemode", 3), 0, 3);
 
     generalConfig.getYaml().setComment("general.verification.dimension.key",
       "Key (name) of the dimension the player spawns in when verifying"
