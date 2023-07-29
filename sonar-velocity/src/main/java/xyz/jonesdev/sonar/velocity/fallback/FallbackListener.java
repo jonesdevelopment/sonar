@@ -41,7 +41,6 @@ import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import xyz.jonesdev.sonar.velocity.fallback.dummy.DummyConnection;
-import xyz.jonesdev.sonar.velocity.fallback.handler.FallbackLoginHandler;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -66,10 +65,7 @@ public final class FallbackListener {
     static Component ALREADY_VERIFYING;
     static Component ALREADY_QUEUED;
     static Component TOO_FAST_RECONNECT;
-    public static Component UNEXPECTED_ERROR;
-    public static Component VERIFICATION_FAILED;
     public static Component INVALID_USERNAME;
-    public static Component VERIFICATION_SUCCESS;
 
     public static void update() {
       ALREADY_VERIFYING = Component.text(Sonar.get().getConfig().ALREADY_VERIFYING);
@@ -77,10 +73,7 @@ public final class FallbackListener {
       TOO_MANY_PLAYERS = Component.text(Sonar.get().getConfig().TOO_MANY_PLAYERS);
       BLACKLISTED = Component.text(Sonar.get().getConfig().BLACKLISTED);
       TOO_FAST_RECONNECT = Component.text(Sonar.get().getConfig().TOO_FAST_RECONNECT);
-      UNEXPECTED_ERROR = Component.text(Sonar.get().getConfig().UNEXPECTED_ERROR);
       INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
-      VERIFICATION_SUCCESS = Component.text(Sonar.get().getConfig().VERIFICATION_SUCCESS);
-      VERIFICATION_FAILED = Component.text(Sonar.get().getConfig().VERIFICATION_FAILED);
       TOO_MANY_ONLINE_PER_IP = Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP);
       LOCKDOWN_DISCONNECT = Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT);
     }
@@ -231,7 +224,7 @@ public final class FallbackListener {
           && (SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
           || event.getResult().isOnlineModeAllowed());
 
-        mcConnection.setSessionHandler(new FallbackLoginHandler(
+        mcConnection.setSessionHandler(new FallbackSessionHandler(
           fallback, mcConnection, inboundConnection, sessionHandler,
           event.getUsername(), inetAddress, onlineMode
         ));

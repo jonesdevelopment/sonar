@@ -20,9 +20,8 @@ package xyz.jonesdev.sonar.common.fallback.protocol.packets;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
+import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.netty.DeferredByteBufHolder;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
@@ -34,7 +33,7 @@ import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.*;
 @Getter
 @ToString
 public final class PluginMessage extends DeferredByteBufHolder implements FallbackPacket {
-  private @Nullable String channel;
+  private String channel;
 
   public PluginMessage() {
     super(null);

@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.cappuchino.Cappuchino;
 import xyz.jonesdev.cappuchino.ExpiringCache;
+import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.net.InetAddress;
@@ -44,6 +45,8 @@ public interface FallbackConnection<X, Y> {
   @NotNull ProtocolVersion getProtocolVersion();
 
   void disconnect(final @NotNull String reason);
+
+  void sendPacket(final FallbackPacket packet);
 
   ExpiringCache<String> PREVIOUS_FAILS = Cappuchino.buildExpiring(3L, TimeUnit.MINUTES);
 

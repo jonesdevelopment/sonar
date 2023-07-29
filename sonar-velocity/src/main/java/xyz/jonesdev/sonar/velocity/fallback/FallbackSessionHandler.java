@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback.handler;
+package xyz.jonesdev.sonar.velocity.fallback;
 
 import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.api.util.GameProfile;
@@ -25,7 +25,6 @@ import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
-import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.LoginPluginResponse;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
@@ -34,9 +33,10 @@ import lombok.Getter;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
+import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackPlayer;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -45,13 +45,14 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.getJoinPacketForVersion;
 
 @Getter
-public final class FallbackLoginHandler implements MinecraftSessionHandler {
+public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final Fallback fallback;
   private final MinecraftConnection mcConnection;
   private final LoginInboundConnection inboundConnection;
@@ -87,13 +88,13 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
     }
   }
 
-  public FallbackLoginHandler(final Fallback fallback,
-                              final MinecraftConnection mcConnection,
-                              final LoginInboundConnection inboundConnection,
-                              final InitialLoginSessionHandler sessionHandler,
-                              final String username,
-                              final InetAddress inetAddress,
-                              final boolean onlineMode) {
+  public FallbackSessionHandler(final Fallback fallback,
+                                final MinecraftConnection mcConnection,
+                                final LoginInboundConnection inboundConnection,
+                                final InitialLoginSessionHandler sessionHandler,
+                                final String username,
+                                final InetAddress inetAddress,
+                                final boolean onlineMode) {
     this.fallback = fallback;
     this.mcConnection = mcConnection;
     this.inboundConnection = inboundConnection;
@@ -160,10 +161,6 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
 
     mcConnection.write(loginSuccess);
 
-    // Spoof online state
-    mcConnection.setAssociation(connectedPlayer);
-    mcConnection.setState(StateRegistry.PLAY);
-
     // Replace normal encoder to allow custom packets
     fallbackPlayer.getPipeline().replace(
       MINECRAFT_ENCODER,
@@ -172,16 +169,14 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
     );
 
     // Replace normal decoder to allow custom packets
-    /*fallbackPlayer.getPipeline().replace(
+    fallbackPlayer.getPipeline().replace(
       MINECRAFT_DECODER,
       FALLBACK_PACKET_DECODER,
       new FallbackPacketDecoder(
         fallbackPlayer.getProtocolVersion(),
-        new FallbackVerificationHandler(fallbackPlayer)
+        new FallbackVerificationHandler(fallbackPlayer, username)
       )
-    );*/
-
-    mcConnection.write(getJoinPacketForVersion(fallbackPlayer.getProtocolVersion()));
+    );
   }
 
   @Override

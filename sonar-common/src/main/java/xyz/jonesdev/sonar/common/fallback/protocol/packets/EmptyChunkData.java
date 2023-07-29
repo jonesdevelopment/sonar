@@ -22,8 +22,8 @@ import io.netty.buffer.ByteBufOutputStream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import java.io.IOException;
 import java.util.BitSet;

@@ -22,8 +22,10 @@ import com.velocitypowered.proxy.connection.client.ConnectedPlayer
 import com.velocitypowered.proxy.protocol.ProtocolUtils
 import io.netty.channel.Channel
 import io.netty.channel.ChannelPipeline
+import net.kyori.adventure.text.Component
 import xyz.jonesdev.sonar.api.fallback.Fallback
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection
+import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect
 import java.net.InetAddress
@@ -68,7 +70,11 @@ class FallbackPlayer(
 
   override fun disconnect(reason: String) {
     val serialized = ProtocolUtils.getJsonChatSerializer(connection.protocolVersion)
-      .serialize(FallbackListener.CachedMessages.VERIFICATION_SUCCESS)
+      .serialize(Component.text(reason))
     connection.closeWith(Disconnect.create(serialized))
+  }
+
+  override fun sendPacket(packet: FallbackPacket) {
+    connection.write(packet)
   }
 }
