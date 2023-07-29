@@ -29,7 +29,6 @@ import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
-import xyz.jonesdev.sonar.common.fallback.protocol.dimension.PacketDimension;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -41,12 +40,9 @@ import static com.velocitypowered.api.network.ProtocolVersion.*;
 
 @UtilityClass
 public class FallbackPackets {
-  private final PacketDimension USED_DIMENSION = PacketDimension.OVERWORLD;
-
-  private final ImmutableSet<String> LEVELS = ImmutableSet.of(
-    PacketDimension.OVERWORLD.getKey(),
-    PacketDimension.NETHER.getKey(),
-    PacketDimension.THE_END.getKey()
+  private final ImmutableSet<String> LEVELS = ImmutableSet.of("minecraft:overworld");
+  private final DimensionInfo DIMENSION = new DimensionInfo(
+    "minecraft:overworld", "sonar", false, false
   );
 
   private final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
@@ -134,7 +130,6 @@ public class FallbackPackets {
     joinGame.setLevelType("flat");
     joinGame.setGamemode((short) 3);
     joinGame.setReducedDebugInfo(true);
-    joinGame.setDimension(USED_DIMENSION.getLegacyID());
     return joinGame;
   }
 
@@ -143,22 +138,14 @@ public class FallbackPackets {
 
     joinGame.setLevelType("flat");
     joinGame.setGamemode((short) 3);
-    joinGame.setPreviousGamemode((short) 3);
     joinGame.setReducedDebugInfo(true);
-    joinGame.setDimension(USED_DIMENSION.getModernID());
     joinGame.setDifficulty((short) 0);
     joinGame.setMaxPlayers(1);
-
-    // https://github.com/Elytrium/LimboAPI/blob/91bedd5dad5e659092fbb0a7411bd00d67044d01/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L611
-    joinGame.setDimensionInfo(new DimensionInfo(
-      USED_DIMENSION.getKey(), USED_DIMENSION.getKey(), false, false
-    ));
+    joinGame.setDimensionInfo(DIMENSION);
 
     final CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
     final ListBinaryTag encodedDimensionRegistry = ListBinaryTag.builder(BinaryTagTypes.COMPOUND)
-      .add(createDimensionData(PacketDimension.OVERWORLD, protocolVersion))
-      .add(createDimensionData(PacketDimension.NETHER, protocolVersion))
-      .add(createDimensionData(PacketDimension.THE_END, protocolVersion))
+      .add(createDimensionData(protocolVersion))
       .build();
 
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
@@ -216,7 +203,7 @@ public class FallbackPackets {
     }
 
     try {
-      CompoundBinaryTag currentDimensionData = encodedDimensionRegistry.getCompound(USED_DIMENSION.getModernID());
+      CompoundBinaryTag currentDimensionData = encodedDimensionRegistry.getCompound(0);
 
       if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
         currentDimensionData = currentDimensionData.getCompound("element");
@@ -233,8 +220,7 @@ public class FallbackPackets {
   }
 
   // https://github.com/Elytrium/LimboAPI/blob/91bedd5dad5e659092fbb0a7411bd00d67044d01/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L552
-  private @NotNull CompoundBinaryTag createDimensionData(final @NotNull PacketDimension dimension,
-                                                         final @NotNull ProtocolVersion version) {
+  private @NotNull CompoundBinaryTag createDimensionData(final @NotNull ProtocolVersion version) {
     final CompoundBinaryTag details = CompoundBinaryTag.builder()
       .putBoolean("natural", false)
       .putFloat("ambient_light", 0.0F)
@@ -250,7 +236,7 @@ public class FallbackPackets {
       .putString("infiniburn", version.compareTo(ProtocolVersion.MINECRAFT_1_18_2) >= 0 ? "#minecraft" +
         ":infiniburn_nether" : "minecraft:infiniburn_nether")
       .putDouble("coordinate_scale", 1.0)
-      .putString("effects", dimension.getKey())
+      .putString("effects", "minecraft:overworld")
       .putInt("min_y", 0)
       .putInt("height", 256)
       .putInt("monster_spawn_block_light_limit", 0)
@@ -259,12 +245,12 @@ public class FallbackPackets {
 
     if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
       return CompoundBinaryTag.builder()
-        .putString("name", dimension.getKey())
-        .putInt("id", dimension.getModernID())
+        .putString("name", "minecraft:overworld")
+        .putInt("id", 0)
         .put("element", details)
         .build();
     }
 
-    return details.putString("name", dimension.getKey());
+    return details.putString("name", "minecraft:overworld");
   }
 }
