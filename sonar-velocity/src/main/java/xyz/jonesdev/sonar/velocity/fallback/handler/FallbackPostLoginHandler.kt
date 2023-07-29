@@ -55,7 +55,7 @@ class FallbackPostLoginHandler(
             FallbackSessionHandler(fallbackPlayer)
 
           // Create JoinGame packet for the client's version
-          val joinGame = getJoinPacketForVersion(fallbackPlayer.player.protocolVersion)
+          val joinGame = getJoinPacketForVersion(fallbackPlayer.protocolVersion)
 
           // Send JoinGame packet
           fallbackPlayer.connection.write(joinGame)
