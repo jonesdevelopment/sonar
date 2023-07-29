@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
@@ -37,6 +38,16 @@ import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 // Mostly taken from Velocity
 @UtilityClass
 public class ProtocolUtil {
+  private static final int FORGE_MAX_ARRAY_LENGTH = Integer.MAX_VALUE & 0x1FFF9A;
+
+  private static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
+  private static final String BRAND_CHANNEL = "minecraft:brand";
+  private static final String REGISTER_CHANNEL_LEGACY = "REGISTER";
+  private static final String REGISTER_CHANNEL = "minecraft:register";
+  private static final String UNREGISTER_CHANNEL_LEGACY = "UNREGISTER";
+  private static final String UNREGISTER_CHANNEL = "minecraft:unregister";
+  private static final Pattern INVALID_IDENTIFIER_REGEX = Pattern.compile("[^a-z0-9\\-_]*");
+
   public @NotNull String readString(final ByteBuf buf) throws CorruptedFrameException {
     return readString(buf, Short.MAX_VALUE);
   }
@@ -91,6 +102,42 @@ public class ProtocolUtil {
       BinaryTagIO.writer().write(compoundTag, (DataOutput) new ByteBufOutputStream(byteBuf));
     } catch (IOException e) {
       throw new EncoderException("Unable to encode NBT CompoundTag");
+    }
+  }
+
+  private static int readExtendedForgeShort(ByteBuf buf) {
+    int low = buf.readUnsignedShort();
+    int high = 0;
+    if ((low & 0x8000) != 0) {
+      low = low & 0x7FFF;
+      high = buf.readUnsignedByte();
+    }
+    return ((high & 0xFF) << 15) | low;
+  }
+
+  public ByteBuf readRetainedByteBufSlice17(final ByteBuf buf) {
+    final int length = readExtendedForgeShort(buf);
+    checkFrame(length <= FORGE_MAX_ARRAY_LENGTH, "Too long");
+    return buf.readRetainedSlice(length);
+  }
+
+  public @NotNull String transformLegacyToModernChannel(@NotNull final String name) {
+    if (name.indexOf(':') != -1) {
+      return name;
+    }
+
+    switch (name) {
+      case REGISTER_CHANNEL_LEGACY:
+        return REGISTER_CHANNEL;
+      case UNREGISTER_CHANNEL_LEGACY:
+        return UNREGISTER_CHANNEL;
+      case BRAND_CHANNEL_LEGACY:
+        return BRAND_CHANNEL;
+      case "BungeeCord":
+        return "bungeecord:main";
+      default:
+        final String lower = name.toLowerCase();
+        return "legacy:" + INVALID_IDENTIFIER_REGEX.matcher(lower).replaceAll("");
     }
   }
 
