@@ -279,12 +279,12 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.verification.dimension.legacy-id",
       "Legacy ID of the dimension the player spawns in when verifying"
     );
-    DIMENSION_LEGACY_ID = generalConfig.getInt("general.verification.dimension.legacy-id", 0);
+    DIMENSION_LEGACY_ID = clamp(generalConfig.getInt("general.verification.dimension.legacy-id", 0), -3, 3);
 
     generalConfig.getYaml().setComment("general.verification.dimension.modern-id",
       "Modern ID of the dimension the player spawns in when verifying (1.16.2+)"
     );
-    DIMENSION_MODERN_ID = generalConfig.getInt("general.verification.dimension.modern-id", 0);
+    DIMENSION_MODERN_ID = clamp(generalConfig.getInt("general.verification.dimension.modern-id", 0), -3, 3);
 
     generalConfig.getYaml().setComment("general.verification.dimension.sky-color",
       "Color of the sky in the dimension the player spawns in when verifying (1.16.2+)"
