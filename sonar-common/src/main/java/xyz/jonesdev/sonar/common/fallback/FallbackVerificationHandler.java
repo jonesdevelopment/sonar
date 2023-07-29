@@ -306,10 +306,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
-  /**
-   * Restore old pipelines and send the player to the actual server
-   */
-  private synchronized void finish() {
+  private void finish() {
     state = State.SUCCESS;
 
     player.getFallback().getVerified().add(player.getInetAddress().toString());
