@@ -18,19 +18,24 @@
 package xyz.jonesdev.sonar.api.command.subcommand;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.argument.Argument;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Getter
 public abstract class Subcommand {
-  private final SubcommandInfo info;
+  private final @NotNull SubcommandInfo info;
   private final String permission, aliases, arguments;
-  protected static final Sonar sonar = Sonar.get();
+  protected static final Sonar SONAR = Sonar.get();
+  protected static final Pattern IP_PATTERN = Pattern.compile(
+    "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])([.])){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+  );
 
   public Subcommand() {
     info = getClass().getAnnotation(SubcommandInfo.class);
@@ -44,12 +49,12 @@ public abstract class Subcommand {
       .collect(Collectors.joining(", "));
   }
 
-  protected final void incorrectUsage(final InvocationSender sender) {
+  protected final void incorrectUsage(final @NotNull InvocationSender sender) {
     sender.sendMessage(
-      sonar.getConfig().INCORRECT_COMMAND_USAGE
+      SONAR.getConfig().INCORRECT_COMMAND_USAGE
         .replace("%usage%", info.name() + " (" + arguments + ")")
     );
   }
 
-  public abstract void execute(final CommandInvocation invocation);
+  public abstract void execute(final @NotNull CommandInvocation invocation);
 }

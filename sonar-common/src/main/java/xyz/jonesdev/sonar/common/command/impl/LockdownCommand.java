@@ -15,24 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command.impl
+package xyz.jonesdev.sonar.common.command.impl;
 
-import xyz.jonesdev.sonar.api.command.CommandInvocation
-import xyz.jonesdev.sonar.api.command.subcommand.Subcommand
-import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo
+import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.command.CommandInvocation;
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
 @SubcommandInfo(
   name = "lockdown",
   description = "Lock the server down"
 )
-class LockdownCommand : Subcommand() {
-  override fun execute(invocation: CommandInvocation) {
-    sonar.config.LOCKDOWN_ENABLED = !sonar.config.LOCKDOWN_ENABLED
-    sonar.config.generalConfig.set("general.lockdown.enabled", sonar.config.LOCKDOWN_ENABLED)
+public final class LockdownCommand extends Subcommand {
 
-    invocation.invocationSender.sendMessage(
-      if (sonar.config.LOCKDOWN_ENABLED) sonar.config.LOCKDOWN_ACTIVATED
-      else sonar.config.LOCKDOWN_DEACTIVATED
-    )
+  @Override
+  public void execute(final @NotNull CommandInvocation invocation) {
+    SONAR.getConfig().LOCKDOWN_ENABLED = !SONAR.getConfig().LOCKDOWN_ENABLED;
+    SONAR.getConfig().getGeneralConfig().set("general.lockdown.enabled", SONAR.getConfig().LOCKDOWN_ENABLED);
+
+    invocation.getSender().sendMessage(
+      SONAR.getConfig().LOCKDOWN_ENABLED
+        ? SONAR.getConfig().LOCKDOWN_ACTIVATED
+        : SONAR.getConfig().LOCKDOWN_DEACTIVATED
+    );
   }
 }

@@ -17,26 +17,14 @@
 
 package xyz.jonesdev.sonar.api.command;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 
+@Getter
 @RequiredArgsConstructor
 public final class CommandInvocation {
-  private final InvocationSender invocationSender;
-
-  public InvocationSender getInvocationSender() {
-    return invocationSender;
-  }
-
+  private final InvocationSender sender;
   private final Subcommand command;
-
-  public Subcommand getCommand() {
-    return command;
-  }
-
   private final String[] arguments;
-
-  public String[] getArguments() {
-    return arguments;
-  }
 }

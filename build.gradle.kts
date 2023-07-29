@@ -8,8 +8,6 @@ plugins {
   id("java")
   id("com.github.johnrengelman.shadow") version "8.1.1"
   id("io.toolebox.git-versioner") version "1.6.7"
-
-  kotlin("jvm") version "1.9.0"
 }
 
 apply(plugin = "io.toolebox.git-versioner")
@@ -33,7 +31,6 @@ allprojects {
 
 subprojects {
   apply(plugin = "java")
-  apply(plugin = "kotlin")
   apply(plugin = "com.github.johnrengelman.shadow")
 
   dependencies {
@@ -45,15 +42,8 @@ subprojects {
 
     compileOnly("io.netty:netty-all:4.1.95.Final") // netty
 
-    implementation(kotlin("stdlib-jdk8")) // kotlin
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
     implementation("xyz.jonesdev:cappuchino:0.1.4-SNAPSHOT") // expiring cache
-  }
-
-  kotlin {
-    // We use 8 for every project for backwards compatibility.
-    // This is replaced in the velocity module as Velocity supports Java 11+
-    jvmToolchain(8)
   }
 }
 
