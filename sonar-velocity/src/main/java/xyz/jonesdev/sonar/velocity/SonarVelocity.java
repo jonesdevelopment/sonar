@@ -57,7 +57,7 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   private File pluginDataFolder;
 
   @Getter
-  private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
+  private SubcommandRegistry subcommandRegistry;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -129,6 +129,9 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());
     reload();
+
+    // Initialize sub commands
+    subcommandRegistry = new SubcommandRegistryHolder();
 
     // Initialize bStats.org metrics
     plugin.getMetricsFactory().make(plugin, getServiceId());

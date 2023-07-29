@@ -56,7 +56,7 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   private File pluginDataFolder;
 
   @Getter
-  private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
+  private SubcommandRegistry subcommandRegistry;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -128,6 +128,9 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
+
+    // Initialize sub commands
+    subcommandRegistry = new SubcommandRegistryHolder();
 
     // Initialize bStats.org metrics
     new Metrics(plugin, getServiceId());

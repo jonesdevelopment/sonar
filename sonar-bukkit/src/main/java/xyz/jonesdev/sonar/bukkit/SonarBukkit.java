@@ -55,7 +55,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   private File pluginDataFolder;
 
   @Getter
-  private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
+  private SubcommandRegistry subcommandRegistry;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -127,6 +127,9 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
+
+    // Initialize sub commands
+    subcommandRegistry = new SubcommandRegistryHolder();
 
     // Initialize bStats.org metrics
     new Metrics(plugin, getServiceId());
