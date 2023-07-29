@@ -27,8 +27,12 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.EmptyChunkData;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.PositionLook;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.UpdateSectionBlocks;
 
+import java.util.Random;
+
 @UtilityClass
 public class FallbackPreparer {
+  private final Random random = new Random();
+
   private final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (max)
 
   public final Abilities DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
@@ -64,7 +68,9 @@ public class FallbackPreparer {
     // Prepare spawn PositionLook with the dynamic Y position
     SPAWN_TELEPORT = new PositionLook(
       8, DYNAMIC_BLOCK_Y_POSITION, 8,
-      0f, 0f, 1, true
+      0f, 0f,
+      random.nextInt(Short.MAX_VALUE),
+      true
     );
 
     // Prepare collision platform positions

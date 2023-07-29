@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.velocity.fallback.handler;
 
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private final @NotNull FallbackPlayer player;
   private final short transactionId;
   private static final Random random = new Random();
-  private boolean hasReceivedTransaction, hasSentBlockChange;
+  private boolean hasReceivedTransaction, hasSentBlockChange, checkForPositions;
   private int movementTick;
   private double lastY;
 
@@ -64,6 +65,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         return;
       }
 
+      // 1.7-1.8 clients do not have a TeleportConfirm packet
+      if (player.getConnection().getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) <= 0) {
+        checkForPositions = true;
+      }
+
       // Teleport player into the fake lobby by sending an empty chunk
       player.getConnection().write(EMPTY_CHUNK_DATA);
       player.getConnection().write(SPAWN_TELEPORT);
@@ -71,8 +77,23 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       player.getConnection().write(DEFAULT_ABILITIES);
     }
 
+    // 1.7-1.8 clients do not have a TeleportConfirm packet,
+    // so we don't need to check the protocol version here
+    if (packet instanceof TeleportConfirm) {
+      // Check if the player sent the TeleportConfirm packet twice
+      checkFrame(!checkForPositions, "invalid timing (TC)");
+
+      final TeleportConfirm teleportConfirm = (TeleportConfirm) packet;
+
+      // Check if the teleport id is correct
+      final boolean teleportIdCorrect = teleportConfirm.getTeleportId() == SPAWN_TELEPORT.getTeleportId();
+      checkFrame(teleportIdCorrect, "invalid teleport id");
+
+      checkForPositions = true;
+    }
+
     // Only check after the teleport packet was sent
-    if (hasReceivedTransaction) {
+    if (checkForPositions) {
       if (packet instanceof Position) {
         final Position position = (Position) packet;
 
@@ -115,14 +136,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             // to check if the player collides with the solid platform
             player.getConnection().write(UPDATE_SECTION_BLOCKS);
           } else {
+            final double offset = DEFAULT_Y_COLLIDE_POSITION - lastY;
+
+            // The offset cannot be 0 or greater than 0 since the blocks will
+            // not let the player fall through them
+            checkFrame(offset < 0, "invalid y collision");
+
             // Check if the player is colliding by performing a basic Y offset check
             if (isOnGround) {
-              final double offset = DEFAULT_Y_COLLIDE_POSITION - lastY;
-
-              // The offset cannot be 0 or greater than 0 since the blocks will
-              // not let the player fall through them
-              checkFrame(offset < 0, "invalid y on ground");
-
               // The player is colliding, finish verification
               finish();
             }
