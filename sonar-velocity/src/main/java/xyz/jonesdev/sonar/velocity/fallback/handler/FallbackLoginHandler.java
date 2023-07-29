@@ -139,7 +139,8 @@ public final class FallbackLoginHandler implements MinecraftSessionHandler {
       // We let the user override this through the configuration.
       if (!fallback.isUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
         fallback.getLogger().info("Processing: {}{} ({})",
-          username, inetAddress, fallbackPlayer.getProtocolId());
+          username, fallback.getSonar().getConfig().formatAddress(inetAddress),
+          fallbackPlayer.getProtocolId());
       }
     }
 

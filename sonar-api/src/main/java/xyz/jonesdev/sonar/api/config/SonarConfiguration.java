@@ -23,6 +23,7 @@ import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.yaml.SimpleYamlConfig;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -45,6 +46,7 @@ public final class SonarConfiguration {
   public Collection<String> ANIMATION;
 
   public boolean ENABLE_VERIFICATION;
+  public boolean LOG_PLAYER_ADDRESSES;
   public boolean CHECK_GRAVITY;
   public boolean CHECK_COLLISIONS;
   public boolean LOG_CONNECTIONS;
@@ -160,6 +162,11 @@ public final class SonarConfiguration {
       "Minimum number of new players in order for an attack to be detected"
     );
     MINIMUM_PLAYERS_FOR_ATTACK = clamp(generalConfig.getInt("general.min-players-for-attack", 5), 2, 1024);
+
+    generalConfig.getYaml().setComment("general.log-player-addresses",
+      "Should Sonar log player IP addresses in console?"
+    );
+    LOG_PLAYER_ADDRESSES = generalConfig.getBoolean("general.log-player-addresses", true);
 
     // Lockdown
     generalConfig.getYaml().setComment("general.lockdown.enabled",
@@ -731,6 +738,13 @@ public final class SonarConfiguration {
 
   private static int clamp(final int v, final int max, final int min) {
     return Math.max(Math.min(v, min), max);
+  }
+
+  public String formatAddress(final InetAddress inetAddress) {
+    if (LOG_PLAYER_ADDRESSES) {
+      return inetAddress.toString();
+    }
+    return "<ip address withheld>";
   }
 
   private @NotNull String fromList(final @NotNull Collection<String> list) {
