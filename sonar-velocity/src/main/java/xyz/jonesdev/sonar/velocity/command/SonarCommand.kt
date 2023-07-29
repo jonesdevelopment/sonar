@@ -26,10 +26,9 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import xyz.jonesdev.sonar.api.Sonar
+import xyz.jonesdev.sonar.api.command.CommandInvocation
 import xyz.jonesdev.sonar.api.command.InvocationSender
-import xyz.jonesdev.sonar.common.command.CommandInvocation
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommandRegistry
+import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
 import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -80,7 +79,7 @@ class SonarCommand : SimpleCommand {
 
     if (invocation.arguments().isNotEmpty()) {
       // Search subcommand if command arguments are present
-      subCommand = SubCommandRegistry.getSubCommands().parallelStream()
+      subCommand = Sonar.get().subcommandRegistry.subcommands.parallelStream()
         .filter { sub: SubCommand ->
           (sub.info.name.equals(invocation.arguments()[0], true)
             || (sub.info.aliases.isNotEmpty()
@@ -160,7 +159,7 @@ class SonarCommand : SimpleCommand {
         )
         CACHED_HELP.add(Component.empty())
 
-        SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
+        Sonar.get().subcommandRegistry.subcommands.forEach(Consumer { sub: SubCommand ->
           var component = Component.text(
             " §a▪ §7/sonar "
               + sub.info.name
@@ -196,7 +195,7 @@ class SonarCommand : SimpleCommand {
   override fun suggest(invocation: SimpleCommand.Invocation): List<String> {
     return if (invocation.arguments().size <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
-        for (subCommand in SubCommandRegistry.getSubCommands()) {
+        for (subCommand in Sonar.get().subcommandRegistry.subcommands) {
           TAB_SUGGESTIONS.add(subCommand.info.name)
 
           if (subCommand.info.aliases.isNotEmpty()) {
@@ -207,7 +206,7 @@ class SonarCommand : SimpleCommand {
       TAB_SUGGESTIONS
     } else if (invocation.arguments().size == 2) {
       if (ARG_TAB_SUGGESTIONS.isEmpty()) {
-        for (subCommand in SubCommandRegistry.getSubCommands()) {
+        for (subCommand in Sonar.get().subcommandRegistry.subcommands) {
           ARG_TAB_SUGGESTIONS[subCommand.info.name] = subCommand.info.arguments
             .map { argument -> argument.name }
             .toList()

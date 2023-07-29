@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command.subcommand;
+package xyz.jonesdev.sonar.api.command.subcommand;
 
 import lombok.Getter;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.common.command.CommandInvocation;
-import xyz.jonesdev.sonar.common.command.subcommand.argument.Argument;
+import xyz.jonesdev.sonar.api.command.argument.Argument;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

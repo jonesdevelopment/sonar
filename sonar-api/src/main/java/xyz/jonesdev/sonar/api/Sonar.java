@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.api;
 
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.Database;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
@@ -55,6 +56,9 @@ public interface Sonar {
   @NotNull File getPluginDataFolder();
 
   @NotNull SonarConfiguration getConfig();
+
+  @NotNull
+  SubcommandRegistry getSubcommandRegistry();
 
   @NotNull
   default SonarVersion getVersion() {

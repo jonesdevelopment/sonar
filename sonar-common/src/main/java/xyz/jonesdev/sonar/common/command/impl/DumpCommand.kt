@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command.subcommand.impl
+package xyz.jonesdev.sonar.common.command.impl
 
+import xyz.jonesdev.sonar.api.command.CommandInvocation
+import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
 import xyz.jonesdev.sonar.api.format.MemoryFormatter.Companion.formatMemory
-import xyz.jonesdev.sonar.common.command.CommandInvocation
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
 import java.lang.management.ManagementFactory
 
 // This command is only used to display helpful information in order to help

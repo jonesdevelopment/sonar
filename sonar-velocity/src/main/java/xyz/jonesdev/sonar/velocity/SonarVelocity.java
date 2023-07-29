@@ -24,10 +24,12 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
+import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 import xyz.jonesdev.sonar.velocity.command.SonarCommand;
@@ -53,6 +55,9 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
   @Getter
   private File pluginDataFolder;
+
+  @Getter
+  private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
 
   @Getter
   private final Logger logger = new Logger() {

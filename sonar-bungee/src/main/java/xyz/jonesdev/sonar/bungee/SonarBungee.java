@@ -24,6 +24,7 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
@@ -31,6 +32,7 @@ import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
+import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import java.io.File;
@@ -52,6 +54,9 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
   @Getter
   private File pluginDataFolder;
+
+  @Getter
+  private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
 
   @Getter
   private final Logger logger = new Logger() {

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command.subcommand
+package xyz.jonesdev.sonar.api.command.subcommand
 
-import xyz.jonesdev.sonar.common.command.subcommand.argument.Argument
+import xyz.jonesdev.sonar.api.command.argument.Argument
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)

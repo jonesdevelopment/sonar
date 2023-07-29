@@ -15,25 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command.subcommand.impl
+package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.Sonar
-import xyz.jonesdev.sonar.common.command.CommandInvocation
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
-import xyz.jonesdev.sonar.common.command.subcommand.argument.Argument
+import xyz.jonesdev.sonar.api.command.CommandInvocation
+import xyz.jonesdev.sonar.api.command.argument.Argument
+import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
 import java.net.InetAddress
 
 @SubCommandInfo(
-  name = "whitelist",
-  description = "Manage verified IP addresses",
+  name = "blacklist",
+  description = "Manage blacklisted IP addresses",
   arguments = [
     Argument("add"),
     Argument("remove"),
+    Argument("clear"),
     Argument("size"),
   ],
 )
-class WhitelistCommand : SubCommand() {
+class BlacklistCommand : SubCommand() {
   companion object {
     private val IP_REGEX =
       Regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])([.])){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\$")
@@ -45,7 +46,7 @@ class WhitelistCommand : SubCommand() {
         if (invocation.arguments.size <= 2) {
           invocation.invocationSender.sendMessage(
             sonar.config.INCORRECT_COMMAND_USAGE
-              .replace("%usage%", "whitelist add <IP address>")
+              .replace("%usage%", "blacklist add <IP address>")
           )
           return
         }
@@ -64,15 +65,15 @@ class WhitelistCommand : SubCommand() {
           return
         }
 
-        synchronized(sonar.fallback.verified) {
-          if (sonar.fallback.verified.contains(inetAddress.toString())) {
-            invocation.invocationSender.sendMessage(sonar.config.WHITELIST_DUPLICATE)
+        synchronized(sonar.fallback.blacklisted) {
+          if (sonar.fallback.blacklisted.has(inetAddress.toString())) {
+            invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_DUPLICATE)
             return
           }
 
-          sonar.fallback.verified.add(inetAddress.toString())
+          sonar.fallback.blacklisted.put(inetAddress.toString())
           invocation.invocationSender.sendMessage(
-            sonar.config.WHITELIST_ADD
+            sonar.config.BLACKLIST_ADD
               .replace("%ip%", rawInetAddress)
           )
         }
@@ -82,7 +83,7 @@ class WhitelistCommand : SubCommand() {
         if (invocation.arguments.size <= 2) {
           invocation.invocationSender.sendMessage(
             sonar.config.INCORRECT_COMMAND_USAGE
-              .replace("%usage%", "whitelist remove <IP address>")
+              .replace("%usage%", "blacklist remove <IP address>")
           )
           return
         }
@@ -101,24 +102,42 @@ class WhitelistCommand : SubCommand() {
           return
         }
 
-        synchronized(sonar.fallback.verified) {
-          if (!sonar.fallback.verified.contains(inetAddress.toString())) {
-            invocation.invocationSender.sendMessage(sonar.config.WHITELIST_NOT_FOUND)
+        synchronized(sonar.fallback.blacklisted) {
+          if (!sonar.fallback.blacklisted.has(inetAddress.toString())) {
+            invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_NOT_FOUND)
             return
           }
 
-          sonar.fallback.verified.remove(inetAddress.toString())
+          sonar.fallback.blacklisted.invalidate(inetAddress.toString())
           invocation.invocationSender.sendMessage(
-            sonar.config.WHITELIST_REMOVE
+            sonar.config.BLACKLIST_REMOVE
               .replace("%ip%", rawInetAddress)
+          )
+        }
+      }
+
+      "clear" -> {
+        synchronized(sonar.fallback.blacklisted) {
+          val blacklisted = sonar.fallback.blacklisted.estimatedSize()
+
+          if (blacklisted == 0L) {
+            invocation.invocationSender.sendMessage(sonar.config.BLACKLIST_EMPTY)
+            return
+          }
+
+          sonar.fallback.blacklisted.invalidateAll()
+
+          invocation.invocationSender.sendMessage(
+            sonar.config.BLACKLIST_CLEARED
+              .replace("%removed%", Sonar.DECIMAL_FORMAT.format(blacklisted))
           )
         }
       }
 
       "size" -> {
         invocation.invocationSender.sendMessage(
-          sonar.config.WHITELIST_SIZE
-            .replace("%amount%", Sonar.DECIMAL_FORMAT.format(sonar.fallback.verified.size))
+          sonar.config.BLACKLIST_SIZE
+            .replace("%amount%", Sonar.DECIMAL_FORMAT.format(sonar.fallback.blacklisted.estimatedSize()))
         )
       }
 

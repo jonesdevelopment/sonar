@@ -17,33 +17,21 @@
 
 package xyz.jonesdev.sonar.common.command;
 
-import lombok.RequiredArgsConstructor;
-import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommand;
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
+import xyz.jonesdev.sonar.common.command.impl.*;
 
-@RequiredArgsConstructor
-public final class CommandInvocation {
-  private final String executorName;
-
-  public String getExecutorName() {
-    return executorName;
-  }
-
-  private final InvocationSender invocationSender;
-
-  public InvocationSender getInvocationSender() {
-    return invocationSender;
-  }
-
-  private final SubCommand command;
-
-  public SubCommand getCommand() {
-    return command;
-  }
-
-  private final String[] arguments;
-
-  public String[] getArguments() {
-    return arguments;
+public final class SubcommandRegistryHolder implements SubcommandRegistry {
+  public SubcommandRegistryHolder() {
+    register(
+      new BlacklistCommand(),
+      new WhitelistCommand(),
+      new StatisticsCommand(),
+      new DatabaseCommand(),
+      new LockdownCommand(),
+      new VerboseCommand(),
+      new ReloadCommand(),
+      new VersionCommand(),
+      new DumpCommand()
+    );
   }
 }

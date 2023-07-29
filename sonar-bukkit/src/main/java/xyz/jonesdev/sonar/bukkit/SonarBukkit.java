@@ -23,12 +23,14 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
 import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
+import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import java.io.File;
@@ -51,6 +53,9 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
   @Getter
   private File pluginDataFolder;
+
+  @Getter
+  private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
 
   @Getter
   private final Logger logger = new Logger() {

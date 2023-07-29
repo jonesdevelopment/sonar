@@ -28,10 +28,9 @@ import net.md_5.bungee.api.plugin.Command
 import net.md_5.bungee.api.plugin.TabExecutor
 import net.md_5.bungee.command.ConsoleCommandSender
 import xyz.jonesdev.sonar.api.Sonar
+import xyz.jonesdev.sonar.api.command.CommandInvocation
 import xyz.jonesdev.sonar.api.command.InvocationSender
-import xyz.jonesdev.sonar.common.command.CommandInvocation
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommandRegistry
+import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
 import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -78,7 +77,7 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
 
     if (args.isNotEmpty()) {
       // Search subcommand if command arguments are present
-      subCommand = SubCommandRegistry.getSubCommands().stream()
+      subCommand = Sonar.get().subcommandRegistry.subcommands.stream()
         .filter { sub: SubCommand ->
           (sub.info.name.equals(args[0], true)
             || (sub.info.aliases.isNotEmpty()
@@ -127,7 +126,7 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
         CACHED_HELP.add(helpComponent)
         CACHED_HELP.add(EMPTY_TEXT_COMPONENT)
 
-        SubCommandRegistry.getSubCommands().forEach(Consumer { sub: SubCommand ->
+        Sonar.get().subcommandRegistry.subcommands.forEach(Consumer { sub: SubCommand ->
           val component = TextComponent(
             " §a▪ §7/sonar "
               + sub.info.name
@@ -195,7 +194,7 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
   override fun onTabComplete(sender: CommandSender, args: Array<String>): Iterable<String> {
     return if (args.size <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
-        for (subCommand in SubCommandRegistry.getSubCommands()) {
+        for (subCommand in Sonar.get().subcommandRegistry.subcommands) {
           TAB_SUGGESTIONS.add(subCommand.info.name)
           if (subCommand.info.aliases.isNotEmpty()) {
             TAB_SUGGESTIONS.addAll(listOf(*subCommand.info.aliases))
@@ -205,7 +204,7 @@ class SonarCommand : Command("sonar", "sonar.command"), TabExecutor {
       TAB_SUGGESTIONS
     } else if (args.size == 2) {
       if (ARG_TAB_SUGGESTIONS.isEmpty()) {
-        for (subCommand in SubCommandRegistry.getSubCommands()) {
+        for (subCommand in Sonar.get().subcommandRegistry.subcommands) {
           ARG_TAB_SUGGESTIONS[subCommand.info.name] = subCommand.info.arguments
             .map { argument -> argument.name }
             .toList()

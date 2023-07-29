@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command.subcommand.impl
+package xyz.jonesdev.sonar.common.command.impl
 
 import xyz.jonesdev.sonar.api.Sonar
+import xyz.jonesdev.sonar.api.command.CommandInvocation
+import xyz.jonesdev.sonar.api.command.argument.Argument
+import xyz.jonesdev.sonar.api.command.subcommand.SubCommand
+import xyz.jonesdev.sonar.api.command.subcommand.SubCommandInfo
 import xyz.jonesdev.sonar.api.database.DatabaseType
 import xyz.jonesdev.sonar.api.format.MemoryFormatter
-import xyz.jonesdev.sonar.common.command.CommandInvocation
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommand
-import xyz.jonesdev.sonar.common.command.subcommand.SubCommandInfo
-import xyz.jonesdev.sonar.common.command.subcommand.argument.Argument
 import java.io.File
 import java.nio.file.Files
 
