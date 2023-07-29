@@ -261,7 +261,7 @@ public class FallbackPreparer {
       }
 
       joinGame.setCurrentDimensionData(currentDimensionData);
-      joinGame.setLevelNames(new String[] {Sonar.get().getConfig().DIMENSION_KEY});
+      joinGame.setLevelNames(new String[]{Sonar.get().getConfig().DIMENSION_KEY});
       joinGame.setRegistry(registryContainer.build());
     } catch (Throwable throwable) {
       throw new ReflectionException(throwable);

@@ -27,7 +27,6 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 @RequiredArgsConstructor
 public enum BlockType {
   STONE {
-
     @Override
     public int getId(final ProtocolVersion protocolVersion) {
       return protocolVersion.compareTo(MINECRAFT_1_12_2) > 0 ? 1 : 16;

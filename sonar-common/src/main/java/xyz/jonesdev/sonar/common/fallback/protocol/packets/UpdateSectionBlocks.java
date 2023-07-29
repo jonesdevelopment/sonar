@@ -64,8 +64,8 @@ public final class UpdateSectionBlocks implements FallbackPacket {
       // Why is Mojang doing this? :(
       byteBuf.writeLong(
         ((long) (sectionX & 0x3FFFFF) << 42)
-        | (sectionY & 0xFFFFF)
-        | ((long) (sectionZ & 0x3FFFFF) << 20)
+          | (sectionY & 0xFFFFF)
+          | ((long) (sectionZ & 0x3FFFFF) << 20)
       );
 
       // 1.20+ don't have light update suppression

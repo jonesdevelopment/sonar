@@ -107,7 +107,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     player.sendPacket(EMPTY_CHUNK_DATA);
   }
 
-  private static boolean validateClientBrand(final @NotNull FallbackConnection<?, ?> player,final ByteBuf content) {
+  private static boolean validateClientBrand(final @NotNull FallbackConnection<?, ?> player, final ByteBuf content) {
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
     try {
