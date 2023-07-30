@@ -30,6 +30,7 @@ import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
+import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -50,7 +51,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Getter
   private State state;
 
-  private final long loginTimestamp = System.currentTimeMillis();
+  private final DelayTimer login = new DelayTimer();
   private static final Random random = new Random();
 
   @RequiredArgsConstructor
@@ -138,10 +139,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     checkFrame(++packets < maxPackets, "too many packets");
 
     // Check for timeout since the player could be sending packets but not important ones
-    final long elapsed = System.currentTimeMillis() - loginTimestamp;
     final long timeout = player.getFallback().getSonar().getConfig().VERIFICATION_TIMEOUT;
     // Check if the time limit has exceeded
-    if (elapsed > timeout) {
+    if (login.delay() > timeout) {
       player.getChannel().close();
       return;
     }
@@ -317,6 +317,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     player.disconnect(Sonar.get().getConfig().VERIFICATION_SUCCESS);
 
-    player.getFallback().getLogger().info(username + " has been verified successfully.");
+    player.getFallback().getLogger().info("{} has been verified successfully ({}s!).",
+      username, login.formattedDelay());
   }
 }
