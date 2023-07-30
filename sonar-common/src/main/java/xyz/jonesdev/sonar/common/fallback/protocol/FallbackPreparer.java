@@ -177,7 +177,7 @@ public class FallbackPreparer {
 
     joinGame.setLevelType("flat");
     joinGame.setGamemode(Sonar.get().getConfig().GAMEMODE_ID);
-    joinGame.setDimension(Sonar.get().getConfig().DIMENSION_LEGACY_ID);
+    joinGame.setDimension(0);
     joinGame.setReducedDebugInfo(true);
     return joinGame;
   }
@@ -187,10 +187,10 @@ public class FallbackPreparer {
 
     joinGame.setLevelType("flat");
     joinGame.setGamemode(Sonar.get().getConfig().GAMEMODE_ID);
-    joinGame.setDimension(Sonar.get().getConfig().DIMENSION_MODERN_ID);
+    joinGame.setDimension(0);
     joinGame.setReducedDebugInfo(true);
     joinGame.setDimensionInfo(new DimensionInfo(
-      Sonar.get().getConfig().DIMENSION_KEY,
+      "minecraft:overworld",
       "sonar", false, false
     ));
 
@@ -208,8 +208,8 @@ public class FallbackPreparer {
       registryContainer.put("minecraft:dimension_type", dimensionRegistryEntry.build());
 
       final CompoundBinaryTag.Builder effectsTagBuilder = CompoundBinaryTag.builder()
-        .putInt("sky_color", Sonar.get().getConfig().DIMENSION_SKY_COLOR)
-        .putInt("fog_color", Sonar.get().getConfig().DIMENSION_FOG_COLOR)
+        .putInt("sky_color", 7907327)
+        .putInt("fog_color", 12638463)
         .putInt("water_color", 0)
         .putInt("water_fog_color", 0);
 
@@ -261,7 +261,7 @@ public class FallbackPreparer {
       }
 
       joinGame.setCurrentDimensionData(currentDimensionData);
-      joinGame.setLevelNames(new String[]{Sonar.get().getConfig().DIMENSION_KEY});
+      joinGame.setLevelNames(new String[]{"minecraft:overworld"});
       joinGame.setRegistry(registryContainer.build());
     } catch (Throwable throwable) {
       throw new ReflectionException(throwable);
@@ -285,7 +285,7 @@ public class FallbackPreparer {
       .putString("infiniburn", version.compareTo(ProtocolVersion.MINECRAFT_1_18_2) >= 0 ? "#minecraft" +
         ":infiniburn_nether" : "minecraft:infiniburn_nether")
       .putDouble("coordinate_scale", 1.0)
-      .putString("effects", Sonar.get().getConfig().DIMENSION_KEY)
+      .putString("effects", "minecraft:overworld")
       .putInt("min_y", 0)
       .putInt("height", 256)
       .putInt("monster_spawn_block_light_limit", 0)
@@ -294,12 +294,12 @@ public class FallbackPreparer {
 
     if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
       return CompoundBinaryTag.builder()
-        .putString("name", Sonar.get().getConfig().DIMENSION_KEY)
-        .putInt("id", Sonar.get().getConfig().DIMENSION_MODERN_ID)
+        .putString("name", "minecraft:overworld")
+        .putInt("id", 0)
         .put("element", details)
         .build();
     }
 
-    return details.putString("name", Sonar.get().getConfig().DIMENSION_KEY);
+    return details.putString("name", "minecraft:overworld");
   }
 }
