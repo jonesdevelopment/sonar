@@ -44,12 +44,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private final String username;
   private final short transactionId;
   private final long verifyKeepAliveId;
-  private int movementTick;
+  private int movementTick, packets;
   private double lastY;
   @Setter
   @Getter
   private State state;
 
+  private final long loginTimestamp = System.currentTimeMillis();
   private static final Random random = new Random();
 
   @RequiredArgsConstructor
@@ -131,6 +132,20 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   @Override
   public void handle(final FallbackPacket packet) {
+    // Check if the player is not sending a ton of packets to the server
+    final int maxPackets = player.getFallback().getSonar().getConfig().MAXIMUM_LOGIN_PACKETS
+      + player.getFallback().getSonar().getConfig().MAXIMUM_MOVEMENT_TICKS;
+    checkFrame(++packets < maxPackets, "too many packets");
+
+    // Check for timeout since the player could be sending packets but not important ones
+    final long elapsed = System.currentTimeMillis() - loginTimestamp;
+    final long timeout = player.getFallback().getSonar().getConfig().VERIFICATION_TIMEOUT;
+    // Check if the time limit has exceeded
+    if (elapsed > timeout) {
+      player.getChannel().close();
+      return;
+    }
+
     if (packet instanceof KeepAlive) {
       final KeepAlive keepAlive = (KeepAlive) packet;
 
