@@ -83,14 +83,17 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     }
   }
 
-  private void doLengthSanityChecks(final ByteBuf byteBuf, final FallbackPacket packet) throws Exception {
+  private void doLengthSanityChecks(final ByteBuf byteBuf,
+                                    final @NotNull FallbackPacket packet) throws Exception {
     final int expectedMaxLen = packet.expectedMaxLength(byteBuf, connection.getProtocolVersion());
     if (expectedMaxLen != -1 && byteBuf.readableBytes() > expectedMaxLen) {
+      connection.fail("packet too large");
       throw new CorruptedFrameException("Packet too large");
     }
 
     final int expectedMinLen = packet.expectedMinLength(byteBuf, connection.getProtocolVersion());
     if (byteBuf.readableBytes() < expectedMinLen) {
+      connection.fail("packet too small");
       throw new CorruptedFrameException("Packet too small");
     }
   }
