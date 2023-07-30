@@ -25,7 +25,6 @@ import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
-import com.velocitypowered.proxy.protocol.packet.LoginPluginResponse;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
 import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import io.netty.buffer.ByteBuf;
@@ -91,6 +90,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     this.inboundConnection = inboundConnection;
     this.sessionHandler = sessionHandler;
     this.server = (VelocityServer) SonarVelocity.INSTANCE.getPlugin().getServer();
+
+    // Don't allow exceptions or disconnect messages
+    mcConnection.setAssociation(null);
 
     // Create an instance for the connected player
     final ConnectedPlayer connectedPlayer;
@@ -171,17 +173,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   }
 
   @Override
-  public boolean handle(final LoginPluginResponse packet) {
-    return sessionHandler.handle(packet);
-  }
-
-  @Override
   public void handleUnknown(final ByteBuf buf) {
     mcConnection.close(true);
-  }
-
-  @Override
-  public void disconnected() {
-    sessionHandler.disconnected();
   }
 }

@@ -34,7 +34,7 @@ public final class FallbackQueue {
 
   /**
    * @param inetAddress IP address of the player
-   * @param runnable queued action on the netty thread
+   * @param runnable Queued action on the netty thread
    * @see #remove
    */
   public void queue(final InetAddress inetAddress, final Runnable runnable) {
@@ -59,8 +59,10 @@ public final class FallbackQueue {
       if (++index > max) {
         break;
       }
+      // Run the cached runnable
       final Map.Entry<InetAddress, Runnable> entry = iterator.next();
       entry.getValue().run();
+      // Remove runnable from iterator
       iterator.remove();
     }
   }
