@@ -76,6 +76,6 @@ tasks {
 
   // This is a small wrapper tasks to simplify the building process
   register("build-sonar") {
-    dependsOn("clean", "shadowJar")
+    dependsOn(clean, shadowJar)
   }
 }
