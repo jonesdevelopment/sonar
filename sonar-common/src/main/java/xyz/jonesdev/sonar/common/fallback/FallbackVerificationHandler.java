@@ -215,10 +215,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         return;
       }
 
-      // Teleport the player to the spawn position
-      player.sendPacket(SPAWN_TELEPORT);
       // Make sure the player is unable to fly (the player is in spectator mode)
       player.sendPacket(DEFAULT_ABILITIES);
+      // Teleport the player to the spawn position
+      player.sendPacket(SPAWN_TELEPORT);
 
       // 1.7-1.8 clients do not have a TeleportConfirm packet
       if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
