@@ -112,6 +112,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     player.sendPacket(EMPTY_CHUNK_DATA);
   }
 
+  private static boolean validateClientLocale(final @NotNull FallbackConnection<?, ?> player, final String locale) {
+    // Check the client locale by performing a simple regex check on it
+    final Pattern pattern = player.getFallback().getSonar().getConfig().VALID_LOCALE_REGEX;
+    return pattern.matcher(locale).matches(); // Disallow non-ascii characters (by default)
+  }
+
   private static boolean validateClientBrand(final @NotNull FallbackConnection<?, ?> player, final ByteBuf content) {
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
@@ -164,6 +170,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof ClientSettings) {
+      final ClientSettings clientSettings = (ClientSettings) packet;
+
+      // Validate the locale using a regex to filter unwanted characters.
+      checkFrame(validateClientLocale(player, clientSettings.getLocale()), "invalid locale");
+
       state = State.PLUGIN_MESSAGE;
     }
 

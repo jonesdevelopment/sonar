@@ -52,6 +52,7 @@ public final class SonarConfiguration {
   public boolean LOG_CONNECTIONS;
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
+  public Pattern VALID_LOCALE_REGEX;
   public String DIMENSION_KEY;
   public short GAMEMODE_ID;
   public int DIMENSION_LEGACY_ID;
@@ -317,6 +318,13 @@ public final class SonarConfiguration {
     );
     VALID_BRAND_REGEX = Pattern.compile(generalConfig.getString(
       "general.verification.valid-brand-regex", "^[!-~ ]+$"
+    ));
+
+    generalConfig.getYaml().setComment("general.verification.valid-locale-regex",
+      "Regex for validating client locale during verification"
+    );
+    VALID_LOCALE_REGEX = Pattern.compile(generalConfig.getString(
+      "general.verification.valid-locale-regex", "^[a-zA-Z_]+$"
     ));
 
     generalConfig.getYaml().setComment("general.verification.max-brand-length",

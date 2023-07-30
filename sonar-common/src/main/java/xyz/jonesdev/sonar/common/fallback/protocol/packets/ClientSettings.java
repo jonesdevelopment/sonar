@@ -22,7 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
@@ -34,7 +33,7 @@ import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class ClientSettings implements FallbackPacket {
-  private @Nullable String locale;
+  private String locale;
   private byte viewDistance;
   private int chatVisibility;
   private boolean chatColors;
