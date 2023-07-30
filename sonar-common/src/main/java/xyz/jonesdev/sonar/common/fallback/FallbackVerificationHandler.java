@@ -290,21 +290,22 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         if (player.getFallback().getSonar().getConfig().CHECK_COLLISIONS) {
           if (state != State.COLLISIONS) {
             // Prevent the packet from flooding the traffic by limiting
-            // the times the packet is sent to the player
+            // the times the packet is sent to the player.
             state = State.COLLISIONS;
             // Send an UpdateSectionBlocks packet with a platform of blocks
-            // to check if the player collides with the solid platform
+            // to check if the player collides with the solid platform.
             player.sendPacket(UPDATE_SECTION_BLOCKS);
           } else {
             final double offsetY = DEFAULT_Y_COLLIDE_POSITION - lastY;
 
             // The offset cannot be 0 or greater than 0 since the blocks will
-            // not let the player fall through them
+            // not let the player fall through them.
             checkFrame(offsetY < 0, "no collisions: " + offsetY);
 
-            // Check if the player is colliding by performing a basic Y offset check
+            // Check if the player is colliding by performing a basic Y offset check.
             if (ground) {
               // The player is colliding, finish verification
+              // TODO: Check for: velocity, entities/mounting, interactions
               finish();
             }
           }
