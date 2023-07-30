@@ -746,13 +746,17 @@ public final class SonarConfiguration {
         "\n- %verifying% Number of verifying connections" +
         "\n- %blacklisted% Number of blacklisted IP addresses" +
         "\n- %whitelisted% Number of verified IP addresses" +
-        "\n- %total-traffic% Number of total joins (not unique!)" +
-        "\n- %real-traffic% Number of verification attempts" +
+        "\n- %total-joins% Number of total joins (not unique!)" +
+        "\n- %real-joins% Number of verification attempts" +
         "\n- %failed-verify% Number of failed verifications" +
-        "\n- %used-memory% Amount of used memory (process)" +
-        "\n- %total-memory% Amount of total memory (process)" +
-        "\n- %max-memory% Amount of max memory (process)" +
-        "\n- %free-memory% Amount of free memory (process)" +
+        "\n- %incoming-traffic% Incoming traffic per second (new players)" +
+        "\n- %outgoing-traffic% Outgoing traffic per second (new players)" +
+        "\n- %incoming-traffic-ttl% Total incoming traffic (new players)" +
+        "\n- %outgoing-traffic-ttl% Total outgoing traffic (new players)" +
+        "\n- %used-memory% Amount of used memory (JVM process)" +
+        "\n- %total-memory% Amount of total memory (JVM process)" +
+        "\n- %max-memory% Amount of max memory (JVM process)" +
+        "\n- %free-memory% Amount of free memory (JVM process)" +
         "\n- %animation% Animated spinning circle (by default)"
     );
     ACTION_BAR_LAYOUT = formatString(messagesConfig.getString(
@@ -760,7 +764,7 @@ public final class SonarConfiguration {
       "%prefix%&fQueued &7%queued%" +
         "  &fVerifying &7%verifying%" +
         "  &fBlacklisted &7%blacklisted%" +
-        "  &fTtl. Joins &7%total-traffic%" +
+        "  &fBot Traffic &a⬇ &7%incoming-traffic% &c⬆ &7%outgoing-traffic%" +
         "  &fMemory &7≅ %used-memory%" +
         "  &a&l%animation%"
     ));

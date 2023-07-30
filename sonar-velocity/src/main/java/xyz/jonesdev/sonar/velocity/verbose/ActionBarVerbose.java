@@ -24,6 +24,7 @@ import net.kyori.adventure.text.Component;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
+import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.common.verbose.VerboseAnimation;
 
 import java.util.ArrayList;
@@ -47,9 +48,13 @@ public final class ActionBarVerbose implements Verbose {
         .replace("%verifying%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
         .replace("%whitelisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getVerified().size()))
         .replace("%blacklisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
-        .replace("%total-traffic%", Sonar.DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get(0)))
-        .replace("%real-traffic%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get(0)))
+        .replace("%total-joins%", Sonar.DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get(0)))
+        .replace("%real-joins%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get(0)))
         .replace("%failed-verify%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get(0)))
+        .replace("%incoming-traffic%", TrafficCounter.INCOMING.getCachedSecond())
+        .replace("%outgoing-traffic%", TrafficCounter.OUTGOING.getCachedSecond())
+        .replace("%incoming-traffic-ttl%", TrafficCounter.INCOMING.getCachedTtl())
+        .replace("%outgoing-traffic-ttl%", TrafficCounter.OUTGOING.getCachedTtl())
         .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
         .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
         .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))

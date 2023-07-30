@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 
@@ -56,6 +57,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       final int originalReaderIndex = byteBuf.readerIndex();
       final int packetId = readVarInt(byteBuf);
       final FallbackPacket packet = registry.createPacket(packetId);
+      TrafficCounter.INCOMING.increment(byteBuf.readableBytes());
 
       if (packet == null) {
         byteBuf.readerIndex(originalReaderIndex);

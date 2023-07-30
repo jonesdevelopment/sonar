@@ -26,7 +26,7 @@ public class MemoryFormatter {
 
   public String formatMemory(long memory) {
     if (memory < MIN) {
-      return memory + " B";
+      return memory + "B";
     }
 
     memory /= MIN; // KB

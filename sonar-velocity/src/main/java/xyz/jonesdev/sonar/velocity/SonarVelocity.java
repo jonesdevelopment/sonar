@@ -31,6 +31,7 @@ import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
+import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 import xyz.jonesdev.sonar.velocity.command.SonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
@@ -145,6 +146,11 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
     // Register Fallback queue task
     plugin.getServer().getScheduler().buildTask(plugin, getFallback().getQueue()::poll)
       .repeat(500L, TimeUnit.MILLISECONDS)
+      .schedule();
+
+    // Register traffic counter reset task
+    plugin.getServer().getScheduler().buildTask(plugin, TrafficCounter::reset)
+      .repeat(1L, TimeUnit.SECONDS)
       .schedule();
 
     // Initialize action bar verbose
