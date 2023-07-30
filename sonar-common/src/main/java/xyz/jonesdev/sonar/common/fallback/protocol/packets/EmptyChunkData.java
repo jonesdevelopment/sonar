@@ -41,8 +41,12 @@ import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 @AllArgsConstructor
 public final class EmptyChunkData implements FallbackPacket {
   private int x, z;
+
   private static final byte[] SECTION_BYTES = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
   private static final byte[] LIGHT_BYTES = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
+
+  private static final byte[] LEGACY_FILLER_BYTES = new byte[256];
+  private static final byte[] MODERN_FILLER_BYTES = new byte[1024];
 
   // Prepare nbt for 1.18 and pre-1.18
   private static final CompoundBinaryTag MODERN_TAG;
@@ -118,9 +122,9 @@ public final class EmptyChunkData implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
-      writeArray(byteBuf, new byte[256]); // 1.8 - 1.12.2
+      writeArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
     } else if (protocolVersion.compareTo(MINECRAFT_1_15) < 0) {
-      writeArray(byteBuf, new byte[1024]); // 1.13 - 1.14.4
+      writeArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
     } else if (protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
       writeVarInt(byteBuf, 0); // 1.15 - 1.17.1
     } else {
