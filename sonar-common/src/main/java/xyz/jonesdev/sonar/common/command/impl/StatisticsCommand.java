@@ -22,6 +22,7 @@ import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 
@@ -49,9 +50,13 @@ public final class StatisticsCommand extends Subcommand {
     invocation.getSender().sendMessage(" §a▪ §7Verifying IP addresses: §f" + DECIMAL_FORMAT.format(verifying));
     invocation.getSender().sendMessage(" §a▪ §7Blacklisted IP addresses: §f" + DECIMAL_FORMAT.format(blacklisted));
     invocation.getSender().sendMessage(" §a▪ §7Queued connections: §f" + DECIMAL_FORMAT.format(queued));
-    invocation.getSender().sendMessage(" §a▪ §7Total traffic (joins): §f" + DECIMAL_FORMAT.format(total));
+    invocation.getSender().sendMessage(" §a▪ §7Total non-unique joins: §f" + DECIMAL_FORMAT.format(total));
     invocation.getSender().sendMessage(" §a▪ §7Total verification attempts: §f" + DECIMAL_FORMAT.format(real));
     invocation.getSender().sendMessage(" §a▪ §7Total failed verifications: §f" + DECIMAL_FORMAT.format(failed));
+    invocation.getSender().sendMessage(" §a▪ §7Current incoming bot traffic: §f" + TrafficCounter.INCOMING.getCachedSecond());
+    invocation.getSender().sendMessage(" §a▪ §7Current outgoing bot traffic: §f" + TrafficCounter.OUTGOING.getCachedSecond());
+    invocation.getSender().sendMessage(" §a▪ §7Total incoming bot traffic: §f" + TrafficCounter.INCOMING.getCachedTtl());
+    invocation.getSender().sendMessage(" §a▪ §7Total outgoing bot traffic: §f" + TrafficCounter.OUTGOING.getCachedTtl());
     invocation.getSender().sendMessage();
   }
 }
