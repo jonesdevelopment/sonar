@@ -247,7 +247,7 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.queue.max-polls",
       "Maximum number of queue polls per 500 milliseconds"
     );
-    MAXIMUM_QUEUE_POLLS = clamp(generalConfig.getInt("general.queue.max-polls", 10), 1, 1000);
+    MAXIMUM_QUEUE_POLLS = clamp(generalConfig.getInt("general.queue.max-polls", 30), 1, 1000);
 
     // Verification
     generalConfig.getYaml().setComment("general.verification.enabled",
