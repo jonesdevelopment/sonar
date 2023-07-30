@@ -58,7 +58,7 @@ public class FallbackPreparer {
   }
 
   // JoinGame
-  public final JoinGame LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
+  public JoinGame LEGACY_JOIN_GAME;
   private JoinGame JOIN_GAME_1_16;
   private JoinGame JOIN_GAME_1_16_2;
   private JoinGame JOIN_GAME_1_18_2;
@@ -87,6 +87,7 @@ public class FallbackPreparer {
   public int DYNAMIC_BLOCK_Y_POSITION;
 
   public void prepare() {
+    LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
     JOIN_GAME_1_16 = createJoinGamePacket(MINECRAFT_1_16);
     JOIN_GAME_1_16_2 = createJoinGamePacket(MINECRAFT_1_16_2);
     JOIN_GAME_1_18_2 = createJoinGamePacket(MINECRAFT_1_18_2);

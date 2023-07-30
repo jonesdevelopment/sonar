@@ -19,8 +19,10 @@ package xyz.jonesdev.sonar.common.fallback.protocol.block;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 @Getter
+@ToString
 @RequiredArgsConstructor
 public final class BlockPosition {
   private final int x, y, z;

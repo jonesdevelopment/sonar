@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_12_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
 
 @Getter
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public enum BlockType {
   STONE {
     @Override
     public int getId(final ProtocolVersion protocolVersion) {
-      return protocolVersion.compareTo(MINECRAFT_1_12_2) > 0 ? 1 : 16;
+      return protocolVersion.compareTo(MINECRAFT_1_13) >= 0 ? 1 : 16;
     }
   };
 
