@@ -111,7 +111,7 @@ public class ProtocolUtil {
     }
   }
 
-  public void writeCompoundTag(final ByteBuf byteBuf, final CompoundBinaryTag compoundTag) {
+  public static void writeCompoundTag(final ByteBuf byteBuf, final CompoundBinaryTag compoundTag) {
     try {
       BinaryTagIO.writer().write(compoundTag, (DataOutput) new ByteBufOutputStream(byteBuf));
     } catch (IOException e) {
