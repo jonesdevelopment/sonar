@@ -154,9 +154,7 @@ public final class FallbackListener {
     }
 
     // Check if the player is already queued since we don't want bots to flood the queue
-    // TODO: do some performance testing
-    if (fallback.getQueue().getQueuedPlayers().stream()
-      .anyMatch(pair -> Objects.equals(pair.getFirst(), inetAddress))) {
+    if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         ALREADY_QUEUED,
         inboundConnection.getProtocolVersion()

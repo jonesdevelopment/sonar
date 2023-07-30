@@ -207,9 +207,7 @@ public final class FallbackListener implements Listener {
     }
 
     // Check if the player is already queued since we don't want bots to flood the queue
-    // TODO: do some performance testing
-    if (fallback.getQueue().getQueuedPlayers().stream()
-      .anyMatch(pair -> Objects.equals(pair.getFirst(), inetAddress))) {
+    if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
       event.setCancelled(true);
       event.setCancelReason(ALREADY_QUEUED);
       return;

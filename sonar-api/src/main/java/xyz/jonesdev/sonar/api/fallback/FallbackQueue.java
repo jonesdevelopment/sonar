@@ -21,55 +21,47 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.list.Pair;
 
 import java.net.InetAddress;
-import java.util.List;
-import java.util.Vector;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
   @Getter
-  private final List<Pair<InetAddress, Runnable>> queuedPlayers = new Vector<>(8);
+  private final Map<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(16, 0.5f);
 
   /**
-   * Creates a pair of InetAddress and Runnable (action to be run after the queue entry
-   * has been polled) since we cannot store the Runnable for the InetAddress here because
-   * of concurrency and accessibility issues.
-   *
    * @param inetAddress IP address of the player
    * @param runnable queued action on the netty thread
    * @see #remove
    */
   public void queue(final InetAddress inetAddress, final Runnable runnable) {
-    queuedPlayers.add(new Pair<>(inetAddress, runnable));
+    queuedPlayers.put(inetAddress, runnable);
   }
 
   /**
-   * Since every entry is a Pair<>, we cannot just remove an InetAddress from the map.
-   * Therefore, we check for each pair and see if the InetAddress matches the one that
-   * has to be removed.
-   * Furthermore, we remove the entry (Pair<>)
-   *
    * @param inetAddress IP address of the player
    */
   public void remove(final InetAddress inetAddress) {
-    queuedPlayers.removeIf(pair -> pair.getFirst() == inetAddress);
+    queuedPlayers.remove(inetAddress);
   }
 
   public void poll() {
-    final Vector<Pair<InetAddress, Runnable>> toRemove = new Vector<>();
+    final int max = Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS;
+    int index = 0;
 
     // We need to be very careful here since we don't want any concurrency issues.
-    synchronized (queuedPlayers) {
-      queuedPlayers.parallelStream()
-        .limit(Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS)
-        .forEach(pair -> {
-          pair.getSecond().run();
-          toRemove.add(pair);
-        });
-
-      queuedPlayers.removeAll(toRemove);
+    final Iterator<Map.Entry<InetAddress, Runnable>> iterator = queuedPlayers.entrySet().iterator();
+    while (iterator.hasNext()) {
+      // Break if we reached our maximum entries
+      if (++index > max) {
+        break;
+      }
+      final Map.Entry<InetAddress, Runnable> entry = iterator.next();
+      entry.getValue().run();
+      iterator.remove();
     }
   }
 }
