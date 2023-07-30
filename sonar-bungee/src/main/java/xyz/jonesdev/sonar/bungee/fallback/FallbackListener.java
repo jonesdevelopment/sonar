@@ -73,7 +73,6 @@ public final class FallbackListener implements Listener {
     static TextComponent TOO_FAST_RECONNECT;
     static TextComponent LOCKDOWN_DISCONNECT;
     static TextComponent INVALID_USERNAME;
-    public static TextComponent UNEXPECTED_ERROR;
 
     public static void update() {
       ALREADY_VERIFYING = new TextComponent(Sonar.get().getConfig().ALREADY_VERIFYING);
@@ -84,7 +83,6 @@ public final class FallbackListener implements Listener {
       TOO_FAST_RECONNECT = new TextComponent(Sonar.get().getConfig().TOO_FAST_RECONNECT);
       LOCKDOWN_DISCONNECT = new TextComponent(Sonar.get().getConfig().LOCKDOWN_DISCONNECT);
       INVALID_USERNAME = new TextComponent(Sonar.get().getConfig().INVALID_USERNAME);
-      UNEXPECTED_ERROR = new TextComponent(Sonar.get().getConfig().UNEXPECTED_ERROR);
     }
   }
 

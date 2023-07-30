@@ -82,7 +82,6 @@ public final class SonarConfiguration {
   public String ALREADY_VERIFYING;
   public String ALREADY_QUEUED;
   public String BLACKLISTED;
-  public String UNEXPECTED_ERROR;
 
   public String INCORRECT_COMMAND_USAGE;
   public String INCORRECT_IP_ADDRESS;
@@ -696,18 +695,6 @@ public final class SonarConfiguration {
         "&cYou are currently denied from entering the server.",
         "&cPlease wait a few minutes to be able to join the server again.",
         "&6False positive? &7%support-url%",
-        "%footer%"
-      )));
-
-    messagesConfig.getYaml().setComment("messages.verification.unexpected-error",
-      "Disconnect message that is shown when someone tries verifying but something goes wrong (Usually lag)"
-    );
-    UNEXPECTED_ERROR = fromList(messagesConfig.getStringList("messages.verification.unexpected-error",
-      Arrays.asList(
-        "%header%",
-        "&6An unexpected error occurred when trying to process your connection.",
-        "&7Please wait a few seconds before trying to verify again.",
-        "&6Need help? &7%support-url%",
         "%footer%"
       )));
 

@@ -143,10 +143,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     if (packet instanceof ClientSettings) {
       // For some odd reason, the client rarely sends a ClientSettings packet twice?!
-      if (state != State.CLIENT_SETTINGS) {
-        player.disconnect(player.getFallback().getSonar().getConfig().UNEXPECTED_ERROR);
+      /*if (state != State.CLIENT_SETTINGS) {
+        player.disconnect("Unexpected error");
         return;
-      }
+      }*/
 
       state = State.PLUGIN_MESSAGE;
     }
