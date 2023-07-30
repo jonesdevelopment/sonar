@@ -317,6 +317,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         final double predictedY = PREPARED_MOVEMENT_PACKETS[movementTick];
         final double offsetY = Math.abs(deltaY - predictedY);
 
+        System.out.println(y + " | " + offsetY);
         // Check if the y motion is similar to the predicted value
         checkFrame(offsetY < 0.01, "too high y offset: " + offsetY);
       }
