@@ -34,11 +34,12 @@ public final class StatisticsCommand extends Subcommand {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    final long total = Statistics.TOTAL_TRAFFIC.get(0);
-    final long real = Statistics.REAL_TRAFFIC.get(0);
-    final long queued = SONAR.getFallback().getQueue().getQueuedPlayers().size();
-    final long verifying = SONAR.getFallback().getConnected().size();
-    final long verified = SONAR.getFallback().getVerified().size();
+    final int total = Statistics.TOTAL_TRAFFIC.get(0);
+    final int real = Statistics.REAL_TRAFFIC.get(0);
+    final int failed = Statistics.FAILED_VERIFICATIONS.get(0);
+    final int queued = SONAR.getFallback().getQueue().getQueuedPlayers().size();
+    final int verifying = SONAR.getFallback().getConnected().size();
+    final int verified = SONAR.getFallback().getVerified().size();
     final int blacklisted = SONAR.getFallback().getBlacklisted().estimatedSize();
 
     invocation.getSender().sendMessage();
@@ -50,6 +51,7 @@ public final class StatisticsCommand extends Subcommand {
     invocation.getSender().sendMessage(" §a▪ §7Queued connections: §f" + DECIMAL_FORMAT.format(queued));
     invocation.getSender().sendMessage(" §a▪ §7Total traffic (joins): §f" + DECIMAL_FORMAT.format(total));
     invocation.getSender().sendMessage(" §a▪ §7Total verification attempts: §f" + DECIMAL_FORMAT.format(real));
+    invocation.getSender().sendMessage(" §a▪ §7Total failed verifications: §f" + DECIMAL_FORMAT.format(failed));
     invocation.getSender().sendMessage();
   }
 }

@@ -748,6 +748,7 @@ public final class SonarConfiguration {
         "\n- %whitelisted% Number of verified IP addresses" +
         "\n- %total-traffic% Number of total joins (not unique!)" +
         "\n- %real-traffic% Number of verification attempts" +
+        "\n- %failed-verify% Number of failed verifications" +
         "\n- %used-memory% Amount of used memory (process)" +
         "\n- %total-memory% Amount of total memory (process)" +
         "\n- %max-memory% Amount of max memory (process)" +

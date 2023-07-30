@@ -19,7 +19,8 @@ package xyz.jonesdev.sonar.api.statistics;
 
 public enum Statistics {
   TOTAL_TRAFFIC,
-  REAL_TRAFFIC;
+  REAL_TRAFFIC,
+  FAILED_VERIFICATIONS;
 
   private int val = -1;
 

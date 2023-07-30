@@ -25,6 +25,7 @@ import xyz.jonesdev.cappuchino.Cappuchino;
 import xyz.jonesdev.cappuchino.ExpiringCache;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.statistics.Statistics;
 
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
@@ -53,12 +54,14 @@ public interface FallbackConnection<X, Y> {
   default void fail(final @Nullable String reason) {
     if (getChannel().isActive()) {
       disconnect(getFallback().getSonar().getConfig().VERIFICATION_FAILED);
+
+      if (reason != null) {
+        getFallback().getLogger().info("{} ({}) has failed the bot check for: {}",
+          getInetAddress(), getProtocolVersion().getProtocol(), reason);
+      }
     }
 
-    if (reason != null) {
-      getFallback().getLogger().info("{} ({}) has failed the bot check for: {}",
-        getInetAddress(), getProtocolVersion().getProtocol(), reason);
-    }
+    Statistics.FAILED_VERIFICATIONS.increment();
 
     // Make sure old entries are removed
     PREVIOUS_FAILS.cleanUp();

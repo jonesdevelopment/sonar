@@ -49,6 +49,7 @@ public final class ActionBarVerbose implements Verbose {
         .replace("%blacklisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
         .replace("%total-traffic%", Sonar.DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get(0)))
         .replace("%real-traffic%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get(0)))
+        .replace("%failed-verify%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get(0)))
         .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
         .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
         .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))
