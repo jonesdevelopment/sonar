@@ -18,18 +18,19 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.LongArrayBinaryTag;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
-import java.io.IOException;
 import java.util.BitSet;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.writeArray;
+import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.writeCompoundTag;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
 // Taken from
@@ -77,23 +78,17 @@ public final class EmptyChunkData implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      try (final ByteBufOutputStream output = new ByteBufOutputStream(byteBuf)) {
-        output.writeByte(10); // CompoundTag
-        output.writeUTF(""); // CompoundName
-        output.writeByte(10); // CompoundTag
-        output.writeUTF("root"); // root compound
-        output.writeByte(12); // long array
-        output.writeUTF("MOTION_BLOCKING");
-        final long[] tag = new long[protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? 36 : 37];
-        output.writeInt(tag.length);
-        for (long l : tag) {
-          output.writeLong(l);
-        }
-        byteBuf.writeByte(0); // end
-        byteBuf.writeByte(0); // end
-      } catch (IOException exception) {
-        throw new RuntimeException(exception);
-      }
+      final long[] arrayData = new long[protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? 36 : 37];
+      final LongArrayBinaryTag longArray = LongArrayBinaryTag.longArrayBinaryTag(arrayData);
+
+      final CompoundBinaryTag motion = CompoundBinaryTag.builder()
+        .put("MOTION_BLOCKING", longArray)
+        .build();
+      final CompoundBinaryTag root = CompoundBinaryTag.builder()
+        .put("root", motion)
+        .build();
+
+      writeCompoundTag(byteBuf, root);
 
       if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0 && protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
         if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
