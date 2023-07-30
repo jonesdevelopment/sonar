@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.LongArrayBinaryTag;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
@@ -42,6 +43,27 @@ public final class EmptyChunkData implements FallbackPacket {
   private int x, z;
   private static final byte[] SECTION_BYTES = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
   private static final byte[] LIGHT_BYTES = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
+
+  // Prepare nbt for 1.18 and pre-1.18
+  private static final CompoundBinaryTag MODERN_TAG;
+  private static final CompoundBinaryTag LEGACY_TAG;
+
+  static {
+    MODERN_TAG = prepareNBT(false);
+    LEGACY_TAG = prepareNBT(true);
+  }
+
+  private static @NotNull CompoundBinaryTag prepareNBT(final boolean legacy) {
+    final long[] arrayData = new long[legacy ? 36 : 37];
+    final LongArrayBinaryTag longArray = LongArrayBinaryTag.longArrayBinaryTag(arrayData);
+
+    final CompoundBinaryTag motion = CompoundBinaryTag.builder()
+      .put("MOTION_BLOCKING", longArray)
+      .build();
+    return CompoundBinaryTag.builder()
+      .put("root", motion)
+      .build();
+  }
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -78,17 +100,7 @@ public final class EmptyChunkData implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      final long[] arrayData = new long[protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? 36 : 37];
-      final LongArrayBinaryTag longArray = LongArrayBinaryTag.longArrayBinaryTag(arrayData);
-
-      final CompoundBinaryTag motion = CompoundBinaryTag.builder()
-        .put("MOTION_BLOCKING", longArray)
-        .build();
-      final CompoundBinaryTag root = CompoundBinaryTag.builder()
-        .put("root", motion)
-        .build();
-
-      writeCompoundTag(byteBuf, root);
+      writeCompoundTag(byteBuf, protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? LEGACY_TAG : MODERN_TAG);
 
       if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0 && protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
         if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
