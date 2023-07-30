@@ -35,6 +35,7 @@ import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketCompressor;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
@@ -150,7 +151,7 @@ public final class FallbackListener implements Listener {
 
   @EventHandler
   public void handle(final @NotNull PreLoginEvent event) throws Throwable {
-    fallback.getSonar().getStatistics().increment("total");
+    Statistics.TOTAL_TRAFFIC.increment();
 
     final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
 

@@ -17,43 +17,29 @@
 
 package xyz.jonesdev.sonar.api.statistics;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+public enum Statistics {
+  TOTAL_TRAFFIC,
+  REAL_TRAFFIC;
 
-@SuppressWarnings("unused")
-public interface Statistics {
-  Map<String, Integer> map = Collections.synchronizedMap(new HashMap<>());
+  private int val = -1;
 
-  Statistics INSTANCE = new Statistics() {
-  };
-
-  default void increment(final String key) {
-    increment(key, 0);
+  public void increment() {
+    increment(0);
   }
 
-  default void increment(final String key, final int fallback) {
-    set(key, get(key, fallback) + 1);
+  public void increment(final int def) {
+    set(get(def) + 1);
   }
 
-  default int get(final String key, final int fallback) {
-    return map.getOrDefault(key, fallback);
+  public int get(final int def) {
+    return val == -1 ? def : val;
   }
 
-  default void set(final String key, final int value) {
-    if (!has(key)) map.put(key, value);
-    else map.replace(key, value);
+  public void set(final int value) {
+    val = value;
   }
 
-  default void reset(final String key) {
-    set(key, 0);
-  }
-
-  default void remove(final String key) {
-    map.remove(key);
-  }
-
-  default boolean has(final String key) {
-    return map.containsKey(key);
+  public void reset() {
+    val = 0;
   }
 }

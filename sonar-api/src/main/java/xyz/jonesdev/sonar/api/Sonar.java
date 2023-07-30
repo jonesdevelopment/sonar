@@ -25,7 +25,6 @@ import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackHolder;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
-import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.api.version.SonarVersion;
 
@@ -68,11 +67,6 @@ public interface Sonar {
   @NotNull
   default Fallback getFallback() {
     return FallbackHolder.INSTANCE;
-  }
-
-  @NotNull
-  default Statistics getStatistics() {
-    return Statistics.INSTANCE;
   }
 
   @NotNull

@@ -35,6 +35,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
@@ -104,7 +105,7 @@ public final class FallbackListener {
 
   @Subscribe(order = PostOrder.FIRST)
   public void handle(final PreLoginEvent event) throws Throwable {
-    fallback.getSonar().getStatistics().increment("total");
+    Statistics.TOTAL_TRAFFIC.increment();
 
     final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
@@ -206,6 +207,9 @@ public final class FallbackListener {
           mcConnection.closeWith(Disconnect.create(INVALID_USERNAME, mcConnection.getProtocolVersion()));
           return;
         }
+
+        // The player joined the verification
+        Statistics.REAL_TRAFFIC.increment();
 
         // Add better timeout handler to avoid known exploits or issues
         // We also want to timeout bots quickly to avoid flooding

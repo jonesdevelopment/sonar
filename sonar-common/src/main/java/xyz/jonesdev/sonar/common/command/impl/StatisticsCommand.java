@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
+import xyz.jonesdev.sonar.api.statistics.Statistics;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 
@@ -33,7 +34,8 @@ public final class StatisticsCommand extends Subcommand {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    final long total = SONAR.getStatistics().get("total", 0);
+    final long total = Statistics.TOTAL_TRAFFIC.get(0);
+    final long real = Statistics.REAL_TRAFFIC.get(0);
     final long queued = SONAR.getFallback().getQueue().getQueuedPlayers().size();
     final long verifying = SONAR.getFallback().getConnected().size();
     final long verified = SONAR.getFallback().getVerified().size();
@@ -46,7 +48,8 @@ public final class StatisticsCommand extends Subcommand {
     invocation.getSender().sendMessage(" §a▪ §7Verifying IP addresses: §f" + DECIMAL_FORMAT.format(verifying));
     invocation.getSender().sendMessage(" §a▪ §7Blacklisted IP addresses: §f" + DECIMAL_FORMAT.format(blacklisted));
     invocation.getSender().sendMessage(" §a▪ §7Queued connections: §f" + DECIMAL_FORMAT.format(queued));
-    invocation.getSender().sendMessage(" §a▪ §7Total connections: §f" + DECIMAL_FORMAT.format(total));
+    invocation.getSender().sendMessage(" §a▪ §7Total traffic (joins): §f" + DECIMAL_FORMAT.format(total));
+    invocation.getSender().sendMessage(" §a▪ §7Total verification attempts: §f" + DECIMAL_FORMAT.format(real));
     invocation.getSender().sendMessage();
   }
 }

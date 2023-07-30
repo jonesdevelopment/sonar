@@ -753,14 +753,26 @@ public final class SonarConfiguration {
       )));
 
     messagesConfig.getYaml().setComment("messages.action-bar.layout",
-      "General layout for the verbose action-bar"
+      "General layout for the verbose action-bar" +
+        "\nPlaceholders and their descriptions:" +
+        "\n- %queued% Number of queued connections" +
+        "\n- %verifying% Number of verifying connections" +
+        "\n- %blacklisted% Number of blacklisted IP addresses" +
+        "\n- %whitelisted% Number of verified IP addresses" +
+        "\n- %total-traffic% Number of total joins (not unique!)" +
+        "\n- %real-traffic% Number of verification attempts" +
+        "\n- %used-memory% Amount of used memory (process)" +
+        "\n- %total-memory% Amount of total memory (process)" +
+        "\n- %max-memory% Amount of max memory (process)" +
+        "\n- %free-memory% Amount of free memory (process)" +
+        "\n- %animation% Animated spinning circle (by default)"
     );
     ACTION_BAR_LAYOUT = formatString(messagesConfig.getString(
       "messages.action-bar.layout",
       "%prefix%&fQueued &7%queued%" +
         "  &fVerifying &7%verifying%" +
         "  &fBlacklisted &7%blacklisted%" +
-        "  &fTraffic &7%total%" +
+        "  &fTtl. Joins &7%total-traffic%" +
         "  &fMemory &7≅ %used-memory%" +
         "  &a&l%animation%"
     ));
