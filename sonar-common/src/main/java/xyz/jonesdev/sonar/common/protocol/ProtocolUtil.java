@@ -55,13 +55,13 @@ public class ProtocolUtil {
   }
 
   public static @NotNull String readString(final ByteBuf buf,
-                                    final int cap) throws CorruptedFrameException {
+                                           final int cap) throws CorruptedFrameException {
     return readString(buf, cap, false);
   }
 
   public static @NotNull String readString(final ByteBuf buf,
-                                    final int cap,
-                                    final boolean legacy) throws CorruptedFrameException {
+                                           final int cap,
+                                           final boolean legacy) throws CorruptedFrameException {
     final int length = readVarInt(buf);
 
     checkFrame(length >= 0, "Got a negative-length string");

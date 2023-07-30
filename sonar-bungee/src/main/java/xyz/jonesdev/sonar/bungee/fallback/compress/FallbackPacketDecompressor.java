@@ -41,7 +41,7 @@ public final class FallbackPacketDecompressor extends PacketDecompressor {
   private static final int VANILLA_MAXIMUM_UNCOMPRESSED_SIZE = 8 * 1024 * 1024; // 8MiB
   private static final int HARD_MAXIMUM_UNCOMPRESSED_SIZE = 16 * 1024 * 1024; // 16MiB
   private static final int UNCOMPRESSED_CAP = Boolean.getBoolean("sonar.increased-compression-cap")
-      ? HARD_MAXIMUM_UNCOMPRESSED_SIZE : VANILLA_MAXIMUM_UNCOMPRESSED_SIZE;
+    ? HARD_MAXIMUM_UNCOMPRESSED_SIZE : VANILLA_MAXIMUM_UNCOMPRESSED_SIZE;
 
   public FallbackPacketDecompressor(final int compressionThreshold, final VelocityCompressor compressor) {
     super(compressionThreshold);

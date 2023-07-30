@@ -34,7 +34,7 @@ public final class FallbackQueue {
 
   /**
    * @param inetAddress IP address of the player
-   * @param runnable Queued action on the netty thread
+   * @param runnable    Queued action on the netty thread
    * @see #remove
    */
   public void queue(final InetAddress inetAddress, final Runnable runnable) {

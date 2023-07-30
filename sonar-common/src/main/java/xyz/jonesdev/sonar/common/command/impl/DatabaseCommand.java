@@ -58,7 +58,8 @@ public final class DatabaseCommand extends Subcommand {
             invocation.getSender().sendMessage(" §a▪ §7Database URL: §f${sonar.config.DATABASE_URL}");
             invocation.getSender().sendMessage(" §a▪ §7Database port: §f${sonar.config.DATABASE_PORT}");
             invocation.getSender().sendMessage(" §a▪ §7Database name: §f${sonar.config.DATABASE_NAME}");
-            invocation.getSender().sendMessage(" §a▪ §7Query limit: §f${Sonar.DECIMAL_FORMAT.format(sonar.config.DATABASE_QUERY_LIMIT)}");
+            invocation.getSender().sendMessage(" §a▪ §7Query limit: §f${Sonar.DECIMAL_FORMAT.format(sonar.config" +
+              ".DATABASE_QUERY_LIMIT)}");
             break;
           }
 

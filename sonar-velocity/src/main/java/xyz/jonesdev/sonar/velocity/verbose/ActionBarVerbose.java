@@ -44,10 +44,12 @@ public final class ActionBarVerbose implements Verbose {
 
     final Component component = Component.text(
       Sonar.get().getConfig().ACTION_BAR_LAYOUT
-        .replace("%queued%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+        .replace("%queued%",
+          Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
         .replace("%verifying%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
         .replace("%whitelisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getVerified().size()))
-        .replace("%blacklisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
+        .replace("%blacklisted%",
+          Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
         .replace("%total-joins%", Sonar.DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get(0)))
         .replace("%real-joins%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get(0)))
         .replace("%failed-verify%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get(0)))

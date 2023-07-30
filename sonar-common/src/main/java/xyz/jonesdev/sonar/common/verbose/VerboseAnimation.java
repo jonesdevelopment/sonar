@@ -27,6 +27,6 @@ public class VerboseAnimation {
   public String nextAnimation() {
     return Sonar.get().getConfig().ANIMATION.toArray(new String[0])[
       ++index % Sonar.get().getConfig().ANIMATION.size()
-    ];
+      ];
   }
 }

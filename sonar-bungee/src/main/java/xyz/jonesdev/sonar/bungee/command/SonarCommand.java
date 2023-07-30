@@ -183,7 +183,8 @@ public final class SonarCommand extends Command implements TabExecutor {
               + "\n§7Permission: §f" + sub.getPermission()
               + "\n§7Aliases: §f" + sub.getAliases()
           ).create()));
-          component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " "));
+          component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+            "/sonar " + sub.getInfo().name() + " "));
 
           CACHED_HELP.add(component);
         });
