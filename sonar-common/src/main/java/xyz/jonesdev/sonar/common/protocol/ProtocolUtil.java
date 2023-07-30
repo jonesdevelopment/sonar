@@ -30,12 +30,14 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
-// Mostly taken from Velocity
+// Mostly taken from
+// https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
 public class ProtocolUtil {
   private static final int FORGE_MAX_ARRAY_LENGTH = Integer.MAX_VALUE & 0x1FFF9A;
@@ -84,13 +86,25 @@ public class ProtocolUtil {
     buf.writeCharSequence(str, StandardCharsets.UTF_8);
   }
 
-  public static void writeArray(final ByteBuf byteBuf, final byte[] bytes) {
+  public static void writeUUID(final @NotNull ByteBuf byteBuf, final @NotNull UUID uuid) {
+    byteBuf.writeLong(uuid.getMostSignificantBits());
+    byteBuf.writeLong(uuid.getLeastSignificantBits());
+  }
+
+  public static void writeUUIDIntArray(final @NotNull ByteBuf byteBuf, final @NotNull UUID uuid) {
+    byteBuf.writeInt((int) (uuid.getMostSignificantBits() >> 32));
+    byteBuf.writeInt((int) uuid.getMostSignificantBits());
+    byteBuf.writeInt((int) (uuid.getLeastSignificantBits() >> 32));
+    byteBuf.writeInt((int) uuid.getLeastSignificantBits());
+  }
+
+  public static void writeArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
     checkFrame(bytes.length < Short.MAX_VALUE, "Too long array");
     writeVarInt(byteBuf, bytes.length);
     byteBuf.writeBytes(bytes);
   }
 
-  public static void writeStringArray(final ByteBuf byteBuf, final String[] stringArray) {
+  public static void writeStringArray(final ByteBuf byteBuf, final String @NotNull [] stringArray) {
     writeVarInt(byteBuf, stringArray.length);
     for (final String s : stringArray) {
       writeString(byteBuf, s);
@@ -105,20 +119,20 @@ public class ProtocolUtil {
     }
   }
 
-  private static int readExtendedForgeShort(ByteBuf buf) {
-    int low = buf.readUnsignedShort();
+  private static int readExtendedForgeShort(@NotNull final ByteBuf byteBuf) {
+    int low = byteBuf.readUnsignedShort();
     int high = 0;
     if ((low & 0x8000) != 0) {
       low = low & 0x7FFF;
-      high = buf.readUnsignedByte();
+      high = byteBuf.readUnsignedByte();
     }
     return ((high & 0xFF) << 15) | low;
   }
 
-  public static ByteBuf readRetainedByteBufSlice17(final ByteBuf buf) {
-    final int length = readExtendedForgeShort(buf);
+  public static ByteBuf readRetainedByteBufSlice17(final ByteBuf byteBuf) {
+    final int length = readExtendedForgeShort(byteBuf);
     checkFrame(length <= FORGE_MAX_ARRAY_LENGTH, "Too long");
-    return buf.readRetainedSlice(length);
+    return byteBuf.readRetainedSlice(length);
   }
 
   public static @NotNull String transformLegacyToModernChannel(@NotNull final String name) {

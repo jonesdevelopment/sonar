@@ -36,6 +36,12 @@ public enum FallbackPacketRegistry {
     {
       clientbound.fallback = false;
       serverbound.fallback = false;
+
+      // LOGIN
+      clientbound.register(ServerLoginSuccess.class, ServerLoginSuccess::new,
+        map(0x02, MINECRAFT_1_7_2, false));
+
+      // GAME
       clientbound.register(JoinGame.class, JoinGame::new,
         map(0x01, MINECRAFT_1_7_2, true),
         map(0x23, MINECRAFT_1_9, true),

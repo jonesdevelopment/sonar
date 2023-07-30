@@ -33,6 +33,7 @@ import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import java.util.Random;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
@@ -72,12 +73,17 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     private final boolean canMove;
   }
 
-  public FallbackVerificationHandler(final @NotNull FallbackConnection<?, ?> player, final String username) {
+  public FallbackVerificationHandler(final @NotNull FallbackConnection<?, ?> player,
+                                     final @NotNull String username,
+                                     final @NotNull UUID uuid) {
     this.player = player;
     this.username = username;
     this.transactionId = (short) random.nextInt();
     this.verifyKeepAliveId = random.nextInt();
     this.state = State.KEEP_ALIVE;
+
+    // Send LoginSuccess packet to make the client think they are joining the server
+    player.sendPacket(new ServerLoginSuccess(username, uuid));
 
     if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       // 1.7 players don't have KeepAlive packets in the login process

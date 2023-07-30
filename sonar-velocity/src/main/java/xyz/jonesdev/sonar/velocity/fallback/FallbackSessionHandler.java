@@ -25,8 +25,6 @@ import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
-import com.velocitypowered.proxy.protocol.packet.ServerLoginSuccess;
-import com.velocitypowered.proxy.protocol.packet.SetCompression;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
@@ -47,7 +45,6 @@ import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 @Getter
 public final class FallbackSessionHandler implements MinecraftSessionHandler {
@@ -138,22 +135,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // Mark the player as connected → verifying players
     fallback.getConnected().put(username, inetAddress);
 
-    // Set compression
-    final int threshold = mcConnection.server.getConfiguration().getCompressionThreshold();
-    if (threshold >= 0 && fallbackPlayer.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
-      mcConnection.write(new SetCompression(threshold));
-      mcConnection.setCompressionThreshold(threshold);
-    }
-
-    // Send LoginSuccess packet to make the client think they successfully logged in
-    final ServerLoginSuccess loginSuccess = new ServerLoginSuccess();
-
-    loginSuccess.setUsername(connectedPlayer.getUsername());
-    loginSuccess.setProperties(connectedPlayer.getGameProfileProperties());
-    loginSuccess.setUuid(connectedPlayer.getUniqueId());
-
-    mcConnection.write(loginSuccess);
-
     // Replace normal encoder to allow custom packets
     fallbackPlayer.getPipeline().replace(
       MINECRAFT_ENCODER,
@@ -167,7 +148,11 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       FALLBACK_PACKET_DECODER,
       new FallbackPacketDecoder(
         fallbackPlayer,
-        new FallbackVerificationHandler(fallbackPlayer, username)
+        new FallbackVerificationHandler(
+          fallbackPlayer,
+          username,
+          connectedPlayer.getUniqueId()
+        )
       )
     );
   }
