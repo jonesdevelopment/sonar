@@ -153,9 +153,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof KeepAlive) {
+      assertState(State.KEEP_ALIVE);
+
       final KeepAlive keepAlive = (KeepAlive) packet;
 
-      checkFrame(state == State.KEEP_ALIVE, "wrong state: " + state);
       checkFrame(keepAlive.getId() == verifyKeepAliveId, "invalid KeepAlive ID");
 
       // The correct KeepAlive packet has been received
@@ -163,12 +164,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof ClientSettings) {
-      // For some odd reason, the client rarely sends a ClientSettings packet twice?!
-      /*if (state != State.CLIENT_SETTINGS) {
-        player.disconnect("Unexpected error");
-        return;
-      }*/
-
       state = State.PLUGIN_MESSAGE;
     }
 
@@ -178,7 +173,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Only the brand channel is important
       if (pluginMessage.getChannel().equals("MC|Brand")
         || pluginMessage.getChannel().equals("minecraft:brand")) {
-        checkFrame(state == State.PLUGIN_MESSAGE, "wrong state: " + state);
 
         // Check if the channel is correct - 1.13 uses the new namespace
         // system ('minecraft:' + channel) and anything below 1.13 uses
@@ -195,7 +189,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof Transaction) {
-      checkFrame(state == State.TRANSACTION, "wrong state: " + state);
+      assertState(State.TRANSACTION);
 
       final Transaction transaction = (Transaction) packet;
 
@@ -226,7 +220,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     if (packet instanceof TeleportConfirm) {
       // Check if the player sent the TeleportConfirm packet twice
-      checkFrame(state == State.TELEPORT, "wrong state: " + state);
+      assertState(State.TELEPORT);
 
       final TeleportConfirm teleportConfirm = (TeleportConfirm) packet;
 
@@ -305,6 +299,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // Check if the y motion is similar to the predicted value
         checkFrame(offsetY < 0.01, "too high y offset");
       }
+    }
+  }
+
+  private void assertState(final State state) {
+    if (state != this.state) {
+      player.fail("expected " + state + ", got " + this.state);
     }
   }
 
