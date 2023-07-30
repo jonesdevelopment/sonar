@@ -66,11 +66,11 @@ public class DeferredByteBufHolder implements ByteBufHolder {
   }
 
   @Override
-  public ByteBufHolder replace(ByteBuf content) {
+  public ByteBufHolder replace(final ByteBuf content) {
     if (content == null) {
       throw new NullPointerException("content");
     }
-    this.backing = content;
+    backing = content;
     return this;
   }
 
@@ -92,7 +92,7 @@ public class DeferredByteBufHolder implements ByteBufHolder {
   }
 
   @Override
-  public ByteBufHolder retain(int increment) {
+  public ByteBufHolder retain(final int increment) {
     if (backing == null) {
       throw new IllegalStateException("Trying to obtain contents of holder with a null buffer");
     }
@@ -110,7 +110,7 @@ public class DeferredByteBufHolder implements ByteBufHolder {
   }
 
   @Override
-  public ByteBufHolder touch(Object hint) {
+  public ByteBufHolder touch(final Object hint) {
     if (backing == null) {
       throw new IllegalStateException("Trying to obtain contents of holder with a null buffer");
     }
@@ -127,7 +127,7 @@ public class DeferredByteBufHolder implements ByteBufHolder {
   }
 
   @Override
-  public boolean release(int decrement) {
+  public boolean release(final int decrement) {
     if (backing == null) {
       throw new IllegalStateException("Trying to obtain contents of holder with a null buffer");
     }

@@ -21,7 +21,6 @@ import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.netty.FastUUID;
@@ -47,7 +46,7 @@ public final class ServerLoginSuccess implements FallbackPacket {
     } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_6) >= 0) {
       writeString(byteBuf, uuid.toString());
     } else {
-      writeString(byteBuf, removeDashes(uuid));
+      writeString(byteBuf, FastUUID.toString(uuid));
     }
 
     writeString(byteBuf, username);
@@ -55,10 +54,6 @@ public final class ServerLoginSuccess implements FallbackPacket {
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0) {
       writeVarInt(byteBuf, 0); // properties
     }
-  }
-
-  private static @NotNull String removeDashes(final @NotNull UUID uuid) {
-    return FastUUID.toString(uuid);
   }
 
   @Override
