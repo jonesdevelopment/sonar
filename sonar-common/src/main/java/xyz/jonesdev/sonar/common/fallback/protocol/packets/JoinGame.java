@@ -27,6 +27,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionInfo;
 
 import java.util.Objects;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
@@ -58,7 +59,7 @@ public final class JoinGame implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
       encode116Up(byteBuf, protocolVersion);
     } else {
       encodeLegacy(byteBuf, protocolVersion);
@@ -68,24 +69,24 @@ public final class JoinGame implements FallbackPacket {
   private void encodeLegacy(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     byteBuf.writeInt(entityId);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
       byteBuf.writeBoolean(isHardcore);
       byteBuf.writeByte(gamemode);
     } else {
       byteBuf.writeByte(isHardcore ? gamemode | 0x8 : gamemode);
     }
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_9_1) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_9_1) >= 0) {
       byteBuf.writeInt(dimension);
     } else {
       byteBuf.writeByte(dimension);
     }
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_13_2) <= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_13_2) <= 0) {
       byteBuf.writeByte(difficulty);
     }
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_15) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0) {
       byteBuf.writeLong(partialHashedSeed);
     }
 
@@ -93,15 +94,15 @@ public final class JoinGame implements FallbackPacket {
 
     writeString(byteBuf, Objects.requireNonNull(levelType));
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_14) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
       writeVarInt(byteBuf, viewDistance);
     }
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
       byteBuf.writeBoolean(reducedDebugInfo);
     }
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_15) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0) {
       byteBuf.writeBoolean(showRespawnScreen);
     }
   }
@@ -109,7 +110,7 @@ public final class JoinGame implements FallbackPacket {
   private void encode116Up(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     byteBuf.writeInt(entityId);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
       byteBuf.writeBoolean(isHardcore);
       byteBuf.writeByte(gamemode);
     } else {
@@ -121,8 +122,8 @@ public final class JoinGame implements FallbackPacket {
     writeStringArray(byteBuf, levelNames);
     writeCompoundTag(byteBuf, registry);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0
-      && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) < 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0
+      && protocolVersion.compareTo(MINECRAFT_1_19) < 0) {
       writeCompoundTag(byteBuf, currentDimensionData);
       writeString(byteBuf, dimensionInfo.getRegistryIdentifier());
     } else {
@@ -132,14 +133,14 @@ public final class JoinGame implements FallbackPacket {
 
     byteBuf.writeLong(partialHashedSeed);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
       writeVarInt(byteBuf, 1); // max players
     } else {
       byteBuf.writeByte(1); // max players
     }
 
     writeVarInt(byteBuf, viewDistance);
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_18) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_18) >= 0) {
       writeVarInt(byteBuf, simulationDistance);
     }
 
@@ -149,12 +150,12 @@ public final class JoinGame implements FallbackPacket {
     byteBuf.writeBoolean(dimensionInfo.isDebugType());
     byteBuf.writeBoolean(dimensionInfo.isFlat());
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       // no last death location
       byteBuf.writeBoolean(false);
     }
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_20) >= 0) {
       writeVarInt(byteBuf, portalCooldown);
     }
   }

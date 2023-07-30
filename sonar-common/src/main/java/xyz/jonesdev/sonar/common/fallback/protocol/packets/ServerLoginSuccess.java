@@ -27,6 +27,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.netty.FastUUID;
 
 import java.util.UUID;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
@@ -39,11 +40,11 @@ public final class ServerLoginSuccess implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       writeUUID(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16) >= 0) {
+    } else if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
       writeUUIDIntArray(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_6) >= 0) {
+    } else if (protocolVersion.compareTo(MINECRAFT_1_7_6) >= 0) {
       writeString(byteBuf, uuid.toString());
     } else {
       writeString(byteBuf, FastUUID.toString(uuid));
@@ -51,7 +52,7 @@ public final class ServerLoginSuccess implements FallbackPacket {
 
     writeString(byteBuf, username);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       writeVarInt(byteBuf, 0); // properties
     }
   }

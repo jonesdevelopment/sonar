@@ -25,6 +25,7 @@ import lombok.ToString;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.readString;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 
@@ -60,19 +61,19 @@ public final class ClientSettings implements FallbackPacket {
     chatVisibility = readVarInt(byteBuf);
     chatColors = byteBuf.readBoolean();
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_6) <= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_7_6) <= 0) {
       difficulty = byteBuf.readByte();
     }
 
     skinParts = byteBuf.readUnsignedByte();
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
       mainHand = readVarInt(byteBuf);
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) >= 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
         chatFilteringEnabled = byteBuf.readBoolean();
 
-        if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_18) >= 0) {
+        if (protocolVersion.compareTo(MINECRAFT_1_18) >= 0) {
           clientListingAllowed = byteBuf.readBoolean();
         }
       }

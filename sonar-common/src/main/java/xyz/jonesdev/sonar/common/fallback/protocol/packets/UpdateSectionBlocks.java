@@ -27,6 +27,7 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_16_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarLong;
 
@@ -69,7 +70,7 @@ public final class UpdateSectionBlocks implements FallbackPacket {
       );
 
       // 1.20+ don't have light update suppression
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20) < 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_20) < 0) {
         byteBuf.writeBoolean(true); // suppress light updates
       }
 

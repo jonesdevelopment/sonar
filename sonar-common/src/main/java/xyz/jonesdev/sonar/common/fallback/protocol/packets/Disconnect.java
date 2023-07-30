@@ -25,7 +25,11 @@ import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
+
+import java.util.Objects;
+
+import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.readString;
+import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.writeString;
 
 @Getter
 @ToString
@@ -36,16 +40,12 @@ public final class Disconnect implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    reason = ProtocolUtil.readString(byteBuf);
+    reason = readString(byteBuf);
   }
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    if (reason == null) {
-      throw new IllegalStateException("No reason specified");
-    }
-
-    ProtocolUtil.writeString(byteBuf, reason);
+    writeString(byteBuf, Objects.requireNonNull(reason));
   }
 
   public static Disconnect create(final String serialized) {
