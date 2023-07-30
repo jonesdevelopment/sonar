@@ -45,6 +45,16 @@ public final class ClientSettings implements FallbackPacket {
   private boolean clientListingAllowed; // Added in 1.18, overwrites server-list "anonymous" mode
 
   @Override
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 2;
+  }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 0xff + 1; // 256 as a hard-limit
+  }
+
+  @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     locale = readString(byteBuf, 16);
     viewDistance = byteBuf.readByte();
