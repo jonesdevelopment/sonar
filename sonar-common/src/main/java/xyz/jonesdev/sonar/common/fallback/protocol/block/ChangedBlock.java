@@ -18,14 +18,11 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.block;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-public class ChangedBlock {
+@RequiredArgsConstructor
+public final class ChangedBlock {
   private final BlockPosition position;
   private final BlockType type;
-
-  public ChangedBlock(final BlockPosition position, final BlockType type) {
-    this.position = position;
-    this.type = type;
-  }
 }
