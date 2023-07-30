@@ -47,7 +47,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private final short transactionId;
   private final long verifyKeepAliveId;
   private int movementTick, packets;
-  private double lastY;
+  private double lastX, lastY, lastZ;
   @Setter
   @Getter
   private State state;
@@ -247,30 +247,40 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (packet instanceof Position) {
         final Position position = (Position) packet;
 
-        handlePositionUpdate(position.getY(), position.isOnGround());
+        // Immediately handle new position update
+        handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
       }
 
       if (packet instanceof PositionLook) {
         final PositionLook position = (PositionLook) packet;
 
-        handlePositionUpdate(position.getY(), position.isOnGround());
+        // Immediately handle new position update
+        handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
       }
 
       if (packet instanceof Player) {
         final Player player = (Player) packet;
 
         // This packet does not send new position data, reuse the last Y
-        handlePositionUpdate(lastY, player.isOnGround());
+        handlePositionUpdate(lastX, lastY, lastZ, player.isOnGround());
       }
     }
   }
 
-  private void handlePositionUpdate(final double y, final boolean isOnGround) {
+  private void handlePositionUpdate(final double x, final double y, final double z, final boolean ground) {
     final double deltaY = lastY - y;
+
+    lastX = x;
     lastY = y;
+    lastZ = z;
+
+    // The player is not allowed to move away from the collision platform.
+    // This should not happen unless the max movement tick is configured to a high number.
+    checkFrame(Math.abs(x - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (x)");
+    checkFrame(Math.abs(z - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (z)");
 
     // The onGround property can never be true when we aren't checking for collisions
-    checkFrame(!isOnGround || state == State.COLLISIONS, "invalid ground state");
+    checkFrame(!ground || state == State.COLLISIONS, "invalid ground state");
 
     // Skip teleports using this small check
     if (deltaY > 0.07) {
@@ -286,14 +296,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             // to check if the player collides with the solid platform
             player.sendPacket(UPDATE_SECTION_BLOCKS);
           } else {
-            final double offset = DEFAULT_Y_COLLIDE_POSITION - lastY;
+            final double offsetY = DEFAULT_Y_COLLIDE_POSITION - lastY;
 
             // The offset cannot be 0 or greater than 0 since the blocks will
             // not let the player fall through them
-            checkFrame(offset < 0, "invalid y collision");
+            checkFrame(offsetY < 0, "no collisions: " + offsetY);
 
             // Check if the player is colliding by performing a basic Y offset check
-            if (isOnGround) {
+            if (ground) {
               // The player is colliding, finish verification
               finish();
             }
@@ -308,7 +318,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         final double offsetY = Math.abs(deltaY - predictedY);
 
         // Check if the y motion is similar to the predicted value
-        checkFrame(offsetY < 0.01, "too high y offset");
+        checkFrame(offsetY < 0.01, "too high y offset: " + offsetY);
       }
     }
   }

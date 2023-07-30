@@ -74,7 +74,7 @@ public class FallbackPreparer {
   public PositionLook SPAWN_TELEPORT;
 
   // Collisions
-  private final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (max)
+  public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (max)
   private final int SPAWN_BUFFER = 10; // player spawns at 255 + 10 (10 blocks above the platform)
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is max
 
