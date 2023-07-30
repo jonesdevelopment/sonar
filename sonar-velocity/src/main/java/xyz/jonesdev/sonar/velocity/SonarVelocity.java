@@ -30,7 +30,6 @@ import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 import xyz.jonesdev.sonar.velocity.command.SonarCommand;
@@ -169,7 +168,6 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   public void reload() {
     getConfig().load();
     FallbackListener.CachedMessages.update();
-    FallbackPreparer.prepare();
 
     // Apply filter (connection limiter) to Fallback
     getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);

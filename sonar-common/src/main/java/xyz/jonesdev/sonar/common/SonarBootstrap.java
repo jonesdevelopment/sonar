@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common;
 
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.database.DatabaseType;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import static xyz.jonesdev.sonar.api.database.Database.IP_COLUMN;
@@ -28,6 +29,8 @@ public interface SonarBootstrap<T> extends Sonar {
   void enable(final T plugin);
 
   default void reload() {
+    FallbackPreparer.prepare();
+
     if (getConfig().DATABASE != DatabaseType.NONE) {
       final DelayTimer timer = new DelayTimer();
 
