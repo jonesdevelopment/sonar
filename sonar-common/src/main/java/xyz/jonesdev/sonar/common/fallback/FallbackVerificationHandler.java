@@ -302,6 +302,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     player.disconnect(Sonar.get().getConfig().VERIFICATION_SUCCESS);
 
-    player.getFallback().getLogger().info("Successfully verified " + username);
+    player.getFallback().getLogger().info(username + " has been verified successfully.");
   }
 }

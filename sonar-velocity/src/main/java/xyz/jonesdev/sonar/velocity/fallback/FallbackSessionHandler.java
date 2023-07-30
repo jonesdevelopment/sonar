@@ -129,7 +129,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       // Only log the processing message if the server isn't under attack.
       // We let the user override this through the configuration.
       if (!fallback.isUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
-        fallback.getLogger().info("Processing: {}{} ({})",
+        fallback.getLogger().info("{}{} ({}) has connected.",
           username, fallback.getSonar().getConfig().formatAddress(inetAddress),
           fallbackPlayer.getProtocolVersion().getProtocol());
       }
