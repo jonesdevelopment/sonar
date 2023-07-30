@@ -296,11 +296,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             // to check if the player collides with the solid platform.
             player.sendPacket(UPDATE_SECTION_BLOCKS);
           } else {
-            final double offsetY = DEFAULT_Y_COLLIDE_POSITION - lastY;
+            // 0.25 for the 2 snow layers the player is supposed to fall on
+            final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
 
-            // The offset cannot be 0 or greater than 0 since the blocks will
-            // not let the player fall through them.
-            checkFrame(offsetY < 0, "no collisions: " + offsetY);
+            // The offset cannot greater than 0 since the blocks will not let the player fall through them.
+            checkFrame(offsetY <= 0, "no collisions: " + offsetY);
 
             // Check if the player is colliding by performing a basic Y offset check.
             if (ground) {
