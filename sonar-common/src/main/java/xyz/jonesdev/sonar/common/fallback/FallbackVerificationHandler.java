@@ -175,7 +175,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Validate the locale using a regex to filter unwanted characters.
       checkFrame(validateClientLocale(player, clientSettings.getLocale()), "invalid locale");
 
-      state = State.PLUGIN_MESSAGE;
+      if (state == State.CLIENT_SETTINGS) {
+        state = State.PLUGIN_MESSAGE;
+      }
     }
 
     if (packet instanceof PluginMessage) {
@@ -195,7 +197,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         checkFrame(validateClientBrand(player, pluginMessage.content()), "invalid client brand");
 
         // Send the transaction packet
-        sendTransaction();
+        if (state == State.PLUGIN_MESSAGE) {
+          sendTransaction();
+        }
       }
     }
 
