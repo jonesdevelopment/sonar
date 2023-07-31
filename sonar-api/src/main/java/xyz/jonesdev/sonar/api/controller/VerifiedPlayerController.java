@@ -140,6 +140,10 @@ public final class VerifiedPlayerController {
       .sum();
   }
 
+  public Collection<UUID> getUUIDs(final @NotNull String inetAddress) {
+    return MAP.getOrDefault(inetAddress, Collections.emptyList());
+  }
+
   public void clearAll() {
     try {
       MAP.clear();
