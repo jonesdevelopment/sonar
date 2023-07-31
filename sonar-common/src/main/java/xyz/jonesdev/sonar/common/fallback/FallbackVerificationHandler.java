@@ -64,7 +64,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     PLUGIN_MESSAGE(false),
     TRANSACTION(false),
     // IN-GAME
-    TELEPORT(true),
+    TELEPORT(false),
     POSITION(true),
     COLLISIONS(true),
     // OTHER
