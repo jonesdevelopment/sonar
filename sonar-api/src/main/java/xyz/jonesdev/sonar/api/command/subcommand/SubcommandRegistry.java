@@ -23,17 +23,17 @@ import java.util.Collections;
 import java.util.List;
 
 public interface SubcommandRegistry {
-  List<Subcommand> subcommands = Collections.synchronizedList(new ArrayList<>());
+  List<Subcommand> SUBCOMMANDS = Collections.synchronizedList(new ArrayList<>());
 
   default List<Subcommand> getSubcommands() {
-    return Collections.unmodifiableList(subcommands);
+    return Collections.unmodifiableList(SUBCOMMANDS);
   }
 
   default void register(final Subcommand... subcommand) {
-    subcommands.addAll(Arrays.asList(subcommand));
+    SUBCOMMANDS.addAll(Arrays.asList(subcommand));
   }
 
   default void unregister(final Subcommand... subcommand) {
-    subcommands.removeAll(Arrays.asList(subcommand));
+    SUBCOMMANDS.removeAll(Arrays.asList(subcommand));
   }
 }
