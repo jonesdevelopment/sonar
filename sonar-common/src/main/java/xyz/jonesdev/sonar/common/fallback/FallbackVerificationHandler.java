@@ -27,11 +27,11 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
+import xyz.jonesdev.sonar.api.timer.DelayTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
-import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
 import java.util.Random;
 import java.util.UUID;

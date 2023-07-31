@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.timer;
+package xyz.jonesdev.sonar.api.timer;
 
 public final class DelayTimer {
   public final long start = System.currentTimeMillis();

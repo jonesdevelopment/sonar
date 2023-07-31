@@ -27,15 +27,17 @@ import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
+import xyz.jonesdev.sonar.api.dependencies.DependencyLoader;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
+import xyz.jonesdev.sonar.api.timer.DelayTimer;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
-import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +59,9 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
   @Getter
   private VerifiedPlayerController verifiedPlayerController;
+
+  @Getter
+  private File dataDirectory;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -123,8 +128,14 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
     logger.info("Initializing Sonar...");
 
+    // Set data directory
+    dataDirectory = plugin.getDataFolder();
+
+    // Download all dependencies
+    DependencyLoader.download();
+
     // Initialize configuration
-    config = new SonarConfiguration(plugin.getDataFolder());
+    config = new SonarConfiguration(dataDirectory);
     reload();
 
     // Initialize sub commands
