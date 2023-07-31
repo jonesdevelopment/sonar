@@ -15,10 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.version;
+package xyz.jonesdev.sonar.api;
 
 import lombok.Getter;
-import xyz.jonesdev.sonar.api.Sonar;
 
 @Getter
 public final class SonarVersion {

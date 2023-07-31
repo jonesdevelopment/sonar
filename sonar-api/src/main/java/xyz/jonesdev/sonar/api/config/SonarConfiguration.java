@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.yaml.SimpleYamlConfig;
 
 import java.io.File;
 import java.net.InetAddress;

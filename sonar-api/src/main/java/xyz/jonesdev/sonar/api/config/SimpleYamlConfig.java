@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.yaml;
+package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
 import org.simpleyaml.configuration.comments.format.YamlCommentFormat;
