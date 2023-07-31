@@ -25,6 +25,7 @@ import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
@@ -52,6 +53,9 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
   @Getter
   private SubcommandRegistry subcommandRegistry;
+
+  @Getter
+  private VerifiedPlayerController verifiedPlayerController;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -140,5 +144,12 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
     // Done
     logger.info("Done ({}s)!", timer.formattedDelay());
+  }
+
+  @Override
+  public void reload() {
+    SonarBootstrap.super.reload();
+
+    verifiedPlayerController = new VerifiedPlayerController();
   }
 }

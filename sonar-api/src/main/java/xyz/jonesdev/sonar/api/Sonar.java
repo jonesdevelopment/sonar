@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.api;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
@@ -52,6 +53,8 @@ public interface Sonar {
 
   @NotNull
   SubcommandRegistry getSubcommandRegistry();
+
+  VerifiedPlayerController getVerifiedPlayerController();
 
   @NotNull
   default SonarVersion getVersion() {

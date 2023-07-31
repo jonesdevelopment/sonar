@@ -44,6 +44,7 @@ subprojects {
     compileOnly("io.netty:netty-all:4.1.96.Final") // netty
 
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
+    implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
     implementation("xyz.jonesdev:cappuchino:0.1.4-SNAPSHOT") // expiring cache
   }
 }

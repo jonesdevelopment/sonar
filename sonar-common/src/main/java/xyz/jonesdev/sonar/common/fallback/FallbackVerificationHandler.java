@@ -26,6 +26,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
@@ -44,6 +45,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Getter
   private final @NotNull FallbackPlayer<?, ?> player;
   private final String username;
+  private final UUID uuid;
   private final short transactionId;
   private final long verifyKeepAliveId;
   private int movementTick, packets;
@@ -78,6 +80,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
                                      final @NotNull UUID uuid) {
     this.player = player;
     this.username = username;
+    this.uuid = uuid;
     this.transactionId = (short) random.nextInt();
     this.verifyKeepAliveId = random.nextInt();
     this.state = State.KEEP_ALIVE;
@@ -358,9 +361,15 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void finish() {
     state = State.SUCCESS;
 
-    player.getFallback().getVerified().add(player.getInetAddress().toString());
     player.getFallback().getConnected().remove(username);
 
+    // Add verified player to the database
+    final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(
+      player.getInetAddress().toString(), uuid, login.start
+    );
+    player.getFallback().getSonar().getVerifiedPlayerController().add(verifiedPlayer);
+
+    // Disconnect player with the verification success message
     player.disconnect(Sonar.get().getConfig().VERIFICATION_SUCCESS);
 
     player.getFallback().getLogger().info("{} has been verified successfully ({}s!).",

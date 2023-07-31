@@ -25,6 +25,7 @@ import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
@@ -53,6 +54,9 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
   @Getter
   private SubcommandRegistry subcommandRegistry;
+
+  @Getter
+  private VerifiedPlayerController verifiedPlayerController;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -160,6 +164,8 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   @Override
   public void reload() {
     SonarBootstrap.super.reload();
+
+    verifiedPlayerController = new VerifiedPlayerController();
 
     // Prepare cached messages
     FallbackListener.CachedMessages.update();
