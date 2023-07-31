@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.api.format;
 
 import lombok.experimental.UtilityClass;
-import xyz.jonesdev.sonar.api.Sonar;
 
 @UtilityClass
 public class MemoryFormatter {
@@ -27,7 +26,6 @@ public class MemoryFormatter {
   public String formatMemory(final long m) {
     if (m < 1024) return m + " B";
     final int z = (63 - Long.numberOfLeadingZeros(m)) / 10;
-    final String formatted = Sonar.DECIMAL_FORMAT.format((double) m / (1L << (z * 10)));
-    return String.format("%s %sB", formatted, " KMGTPE".charAt(z));
+    return String.format("%.1f %sB", (double) m / (1L << (z * 10)), " KMGTPE".charAt(z));
   }
 }
