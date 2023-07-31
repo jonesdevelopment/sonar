@@ -22,7 +22,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import net.md_5.bungee.compress.PacketCompressor;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,9 +34,13 @@ import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.*;
 @Getter
 @AllArgsConstructor
 public final class FallbackPacketCompressor extends PacketCompressor {
-  @Setter
   private int compressionThreshold;
   private final VelocityCompressor compressor;
+
+  @Override
+  public void setThreshold(final int compressionThreshold) {
+    this.compressionThreshold = compressionThreshold;
+  }
 
   @Override
   public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
