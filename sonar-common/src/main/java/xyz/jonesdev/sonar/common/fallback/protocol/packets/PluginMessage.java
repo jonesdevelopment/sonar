@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.common.fallback.protocol.packets;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.ToString;
-import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.netty.DeferredByteBufHolder;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;

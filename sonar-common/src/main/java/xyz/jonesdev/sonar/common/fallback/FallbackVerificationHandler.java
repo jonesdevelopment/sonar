@@ -25,8 +25,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
-import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
 import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
@@ -42,7 +42,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener {
   @Getter
-  private final @NotNull FallbackConnection<?, ?> player;
+  private final @NotNull FallbackPlayer<?, ?> player;
   private final String username;
   private final short transactionId;
   private final long verifyKeepAliveId;
@@ -73,7 +73,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     private final boolean canMove;
   }
 
-  public FallbackVerificationHandler(final @NotNull FallbackConnection<?, ?> player,
+  public FallbackVerificationHandler(final @NotNull FallbackPlayer<?, ?> player,
                                      final @NotNull String username,
                                      final @NotNull UUID uuid) {
     this.player = player;
@@ -83,14 +83,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.state = State.KEEP_ALIVE;
 
     // Send LoginSuccess packet to make the client think they are joining the server
-    player.sendPacket(new ServerLoginSuccess(username, uuid));
+    player.write(new ServerLoginSuccess(username, uuid));
 
     if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       // 1.7 players don't have KeepAlive packets in the login process
       sendJoinGamePacket();
     } else {
       // Send first KeepAlive to check if the connection is somewhat responsive
-      player.sendPacket(new KeepAlive(verifyKeepAliveId));
+      player.write(new KeepAlive(verifyKeepAliveId));
     }
   }
 
@@ -99,7 +99,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // and go on with the flow of the verification.
     state = State.TRANSACTION;
     // Send a transaction with a
-    player.sendPacket(new Transaction(
+    player.write(new Transaction(
       0, transactionId, false
     ));
   }
@@ -109,7 +109,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // and go on with the flow of the verification.
     state = State.CLIENT_SETTINGS;
     // Select the JoinGame packet for the respective protocol version
-    player.sendPacket(getJoinPacketForVersion(player.getProtocolVersion()));
+    player.write(getJoinPacketForVersion(player.getProtocolVersion()));
   }
 
   private void sendChunkData() {
@@ -117,16 +117,16 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // and go on with the flow of the verification.
     state = State.POSITION;
     // Teleport player into the fake lobby by sending an empty chunk
-    player.sendPacket(EMPTY_CHUNK_DATA);
+    player.write(EMPTY_CHUNK_DATA);
   }
 
-  private static boolean validateClientLocale(final @NotNull FallbackConnection<?, ?> player, final String locale) {
+  private static boolean validateClientLocale(final @NotNull FallbackPlayer<?, ?> player, final String locale) {
     // Check the client locale by performing a simple regex check on it
     final Pattern pattern = player.getFallback().getSonar().getConfig().VALID_LOCALE_REGEX;
     return pattern.matcher(locale).matches(); // Disallow non-ascii characters (by default)
   }
 
-  private static boolean validateClientBrand(final @NotNull FallbackConnection<?, ?> player, final ByteBuf content) {
+  private static boolean validateClientBrand(final @NotNull FallbackPlayer<?, ?> player, final ByteBuf content) {
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
     try {
@@ -230,9 +230,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
 
       // Make sure the player is unable to fly (the player is in spectator mode)
-      player.sendPacket(DEFAULT_ABILITIES);
+      player.write(DEFAULT_ABILITIES);
       // Teleport the player to the spawn position
-      player.sendPacket(SPAWN_TELEPORT);
+      player.write(SPAWN_TELEPORT);
 
       // 1.7-1.8 clients do not have a TeleportConfirm packet
       if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
@@ -312,7 +312,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             state = State.COLLISIONS;
             // Send an UpdateSectionBlocks packet with a platform of blocks
             // to check if the player collides with the solid platform.
-            player.sendPacket(UPDATE_SECTION_BLOCKS);
+            player.write(UPDATE_SECTION_BLOCKS);
           } else {
             // 0.25 for the 2 snow layers the player is supposed to fall on
             final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;

@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.velocity;
 
-import com.velocitypowered.proxy.util.ratelimit.Ratelimiters;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -164,8 +163,5 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
     // Prepare cached messages
     FallbackListener.CachedMessages.update();
-
-    // Apply filter (connection limiter) to Fallback
-    getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);
   }
 }

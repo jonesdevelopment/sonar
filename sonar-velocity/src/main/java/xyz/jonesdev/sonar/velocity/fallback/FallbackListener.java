@@ -145,7 +145,7 @@ public final class FallbackListener {
     }
 
     // Check if the IP address is reconnecting too quickly while being unverified
-    if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
+    if (fallback.getRatelimiter().shouldDeny(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         TOO_FAST_RECONNECT,
         inboundConnection.getProtocolVersion()

@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
-import xyz.jonesdev.sonar.api.fallback.FallbackHolder;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
@@ -62,7 +61,7 @@ public interface Sonar {
 
   @NotNull
   default Fallback getFallback() {
-    return FallbackHolder.INSTANCE;
+    return Fallback.INSTANCE;
   }
 
   @NotNull Verbose getActionBarVerbose();

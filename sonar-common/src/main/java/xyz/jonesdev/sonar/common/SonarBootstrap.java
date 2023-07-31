@@ -17,8 +17,14 @@
 
 package xyz.jonesdev.sonar.common;
 
+import xyz.jonesdev.cappuchino.Cappuchino;
+import xyz.jonesdev.cappuchino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.fallback.FallbackRatelimiter;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
+
+import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
 
 public interface SonarBootstrap<T> extends Sonar {
   void enable(final T plugin);
@@ -29,6 +35,12 @@ public interface SonarBootstrap<T> extends Sonar {
 
     // Prepare cached packets
     FallbackPreparer.prepare();
+
+    // Update ratelimiter
+    final ExpiringCache<InetAddress> expiringCache = Cappuchino.buildExpiring(
+      getConfig().VERIFICATION_DELAY, TimeUnit.MILLISECONDS, 250L
+    );
+    FallbackRatelimiter.INSTANCE.setExpiringCache(expiringCache);
   }
 
   default void disable() {

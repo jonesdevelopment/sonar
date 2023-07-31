@@ -23,14 +23,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.cappuchino.Cappuchino;
 import xyz.jonesdev.cappuchino.ExpiringCache;
-import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
-public interface FallbackConnection<X, Y> {
+public interface FallbackPlayer<X, Y> {
   @NotNull Fallback getFallback();
 
   @NotNull X getPlayer();
@@ -47,7 +46,7 @@ public interface FallbackConnection<X, Y> {
 
   void disconnect(final @NotNull String reason);
 
-  void sendPacket(final FallbackPacket packet);
+  void write(final @NotNull Object packet);
 
   ExpiringCache<String> PREVIOUS_FAILS = Cappuchino.buildExpiring(3L, TimeUnit.MINUTES);
 

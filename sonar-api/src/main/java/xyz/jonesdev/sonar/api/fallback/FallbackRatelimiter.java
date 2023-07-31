@@ -17,11 +17,25 @@
 
 package xyz.jonesdev.sonar.api.fallback;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import xyz.jonesdev.cappuchino.ExpiringCache;
 
 import java.net.InetAddress;
 
-@FunctionalInterface
-public interface FallbackFilter {
-  boolean attempt(final @NotNull InetAddress inetAddress);
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class FallbackRatelimiter {
+  public static final FallbackRatelimiter INSTANCE = new FallbackRatelimiter();
+  @Setter
+  private ExpiringCache<InetAddress> expiringCache;
+
+  public boolean shouldDeny(final InetAddress inetAddress) {
+    expiringCache.cleanUp();
+    if (expiringCache.has(inetAddress)) {
+      return true;
+    }
+    expiringCache.put(inetAddress);
+    return false;
+  }
 }

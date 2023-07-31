@@ -15,9 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback.protocol;
+package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import io.netty.buffer.ByteBuf;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 public interface FallbackPacket {
   void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);

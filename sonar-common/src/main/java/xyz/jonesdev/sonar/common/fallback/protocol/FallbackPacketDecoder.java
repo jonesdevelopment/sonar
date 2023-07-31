@@ -23,19 +23,18 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
-import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
-  private final FallbackConnection<?, ?> connection;
+  private final FallbackPlayer<?, ?> connection;
   private final FallbackPacketRegistry.ProtocolRegistry registry;
   private final FallbackPacketListener listener;
 
-  public FallbackPacketDecoder(final FallbackConnection<?, ?> connection, final FallbackPacketListener listener) {
+  public FallbackPacketDecoder(final FallbackPlayer<?, ?> connection, final FallbackPacketListener listener) {
     this.connection = connection;
     this.registry = FallbackPacketRegistry.SONAR.getProtocolRegistry(
       FallbackPacketRegistry.Direction.SERVERBOUND, connection.getProtocolVersion()

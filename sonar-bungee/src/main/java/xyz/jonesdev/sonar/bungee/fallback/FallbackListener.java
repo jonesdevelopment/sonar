@@ -200,7 +200,7 @@ public final class FallbackListener implements Listener {
     }
 
     // Check if the IP address is reconnecting too quickly while being unverified
-    if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
+    if (fallback.getRatelimiter().shouldDeny(inetAddress)) {
       event.setCancelled(true);
       event.setCancelReason(TOO_FAST_RECONNECT);
       return;

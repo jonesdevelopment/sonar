@@ -27,8 +27,7 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
-import xyz.jonesdev.sonar.api.fallback.FallbackConnection;
-import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
 
@@ -36,7 +35,7 @@ import java.net.InetAddress;
 
 @Getter
 @RequiredArgsConstructor
-public final class FallbackPlayerWrapper implements FallbackConnection<ConnectedPlayer, MinecraftConnection> {
+public final class FallbackPlayerWrapper implements FallbackPlayer<ConnectedPlayer, MinecraftConnection> {
   private final Fallback fallback;
   private final ConnectedPlayer player;
   private final MinecraftConnection connection;
@@ -53,7 +52,7 @@ public final class FallbackPlayerWrapper implements FallbackConnection<Connected
   }
 
   @Override
-  public void sendPacket(final FallbackPacket packet) {
+  public void write(final @NotNull Object packet) {
     connection.write(packet);
   }
 }
