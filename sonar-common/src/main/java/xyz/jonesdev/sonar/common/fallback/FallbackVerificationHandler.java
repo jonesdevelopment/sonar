@@ -95,18 +95,26 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void sendTransaction() {
+    // Set the state to TRANSACTION to avoid false positives
+    // and go on with the flow of the verification.
     state = State.TRANSACTION;
+    // Send a transaction with a
     player.sendPacket(new Transaction(
       0, transactionId, false
     ));
   }
 
   private void sendJoinGamePacket() {
+    // Set the state to CLIENT_SETTINGS to avoid false positives
+    // and go on with the flow of the verification.
     state = State.CLIENT_SETTINGS;
+    // Select the JoinGame packet for the respective protocol version
     player.sendPacket(getJoinPacketForVersion(player.getProtocolVersion()));
   }
 
   private void sendChunkData() {
+    // Set the state to POSITION to avoid false positives
+    // and go on with the flow of the verification.
     state = State.POSITION;
     // Teleport player into the fake lobby by sending an empty chunk
     player.sendPacket(EMPTY_CHUNK_DATA);
@@ -175,6 +183,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Validate the locale using a regex to filter unwanted characters.
       checkFrame(validateClientLocale(player, clientSettings.getLocale()), "invalid locale");
 
+      // Clients sometimes mess up the ClientSettings or PluginMessage packet.
       if (state == State.CLIENT_SETTINGS) {
         state = State.PLUGIN_MESSAGE;
       }
@@ -196,8 +205,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // Validate the client branding using a regex to filter unwanted characters.
         checkFrame(validateClientBrand(player, pluginMessage.content()), "invalid client brand");
 
-        // Send the transaction packet
+        // Clients sometimes mess up the ClientSettings or PluginMessage packet.
         if (state == State.PLUGIN_MESSAGE) {
+          // Send the transaction packet
           sendTransaction();
         }
       }
@@ -229,6 +239,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // Immediately send the chunk data as 1.7-1.8 can't confirm teleports
         sendChunkData();
       } else {
+        // Set the state to TELEPORT to avoid false positives
+        // and go on with the flow of the verification.
         state = State.TELEPORT;
       }
     }
@@ -295,6 +307,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           if (state != State.COLLISIONS) {
             // Prevent the packet from flooding the traffic by limiting
             // the times the packet is sent to the player.
+            // Set the state to COLLISIONS to avoid false positives
+            // and go on with the flow of the verification.
             state = State.COLLISIONS;
             // Send an UpdateSectionBlocks packet with a platform of blocks
             // to check if the player collides with the solid platform.
