@@ -42,9 +42,20 @@ public final class VerifiedPlayerController {
   private @Nullable ConnectionSource connectionSource;
   private Dao<VerifiedPlayer, Integer> dao;
   private QueryBuilder<VerifiedPlayer, Integer> queryBuilder;
+  private final @NotNull SonarConfiguration.DatabaseType cachedDatabaseType;
 
   public VerifiedPlayerController() {
     final SonarConfiguration config = Sonar.get().getConfig();
+
+    // Cache selected database type, so we don't need to call Sonar.get() every time
+    cachedDatabaseType = config.DATABASE_TYPE;
+
+    // Don't establish a database connection if the type is NONE
+    if (cachedDatabaseType == SonarConfiguration.DatabaseType.NONE) {
+      Sonar.get().getLogger().warn("Make sure to select a database type to store all verified players.");
+      return;
+    }
+
     final String databaseURL = "jdbc:mysql://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
 
     try (final ConnectionSource connectionSource = new JdbcConnectionSource(
@@ -72,6 +83,11 @@ public final class VerifiedPlayerController {
     Objects.requireNonNull(connectionSource);
     _remove(inetAddress);
 
+    // Don't try to update the column if the database type is NONE
+    if (cachedDatabaseType == SonarConfiguration.DatabaseType.NONE) {
+      return;
+    }
+
     try {
       final List<VerifiedPlayer> verifiedPlayer = queryBuilder.where()
         .eq("ip_address", inetAddress)
@@ -96,6 +112,11 @@ public final class VerifiedPlayerController {
 
     _add(player);
 
+    // Don't try to update the column if the database type is NONE
+    if (cachedDatabaseType == SonarConfiguration.DatabaseType.NONE) {
+      return;
+    }
+
     DB_UPDATE_SERVICE.execute(() -> {
       try {
         dao.create(player);
@@ -119,7 +140,11 @@ public final class VerifiedPlayerController {
   public void clearAll() {
     try {
       MAP.clear();
-      dao.deleteBuilder().delete();
+
+      // Only update the column if the database type is not NONE
+      if (cachedDatabaseType != SonarConfiguration.DatabaseType.NONE) {
+        dao.deleteBuilder().delete();
+      }
     } catch (SQLException exception) {
       exception.printStackTrace();
     }
