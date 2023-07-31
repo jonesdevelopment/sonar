@@ -80,7 +80,6 @@ public final class VerifiedPlayerController {
   }
 
   public void remove(final @NotNull String inetAddress) {
-    Objects.requireNonNull(connectionSource);
     _remove(inetAddress);
 
     // Don't try to update the column if the database type is NONE
@@ -89,6 +88,8 @@ public final class VerifiedPlayerController {
     }
 
     try {
+      Objects.requireNonNull(connectionSource);
+
       final List<VerifiedPlayer> verifiedPlayer = queryBuilder.where()
         .eq("ip_address", inetAddress)
         .query();
@@ -108,8 +109,6 @@ public final class VerifiedPlayerController {
   }
 
   public void add(final @NotNull VerifiedPlayer player) {
-    Objects.requireNonNull(connectionSource);
-
     _add(player);
 
     // Don't try to update the column if the database type is NONE
@@ -118,6 +117,8 @@ public final class VerifiedPlayerController {
     }
 
     DB_UPDATE_SERVICE.execute(() -> {
+      Objects.requireNonNull(connectionSource);
+
       try {
         dao.create(player);
       } catch (SQLException exception) {
