@@ -33,7 +33,6 @@ import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
-import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -50,9 +49,6 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
   @Getter
   private SonarConfiguration config;
-
-  @Getter
-  private File pluginDataFolder;
 
   @Getter
   private SubcommandRegistry subcommandRegistry;
@@ -121,8 +117,6 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     SonarSupplier.set(this);
 
     logger.info("Initializing Sonar...");
-
-    pluginDataFolder = plugin.getDataFolder();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());

@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.api.yaml.SimpleYamlConfig;
 
 import java.io.File;
@@ -118,16 +117,6 @@ public final class SonarConfiguration {
   public String LOCKDOWN_NOTIFICATION;
   public String LOCKDOWN_CONSOLE_LOG;
 
-  public DatabaseType DATABASE;
-  public boolean ALLOW_PURGING;
-  public String DATABASE_FILE_NAME;
-  public String DATABASE_URL;
-  public String DATABASE_NAME;
-  public String DATABASE_USERNAME;
-  public String DATABASE_PASSWORD;
-  public int DATABASE_PORT;
-  public int DATABASE_QUERY_LIMIT;
-
   public String DATABASE_PURGE_DISALLOWED;
   public String DATABASE_PURGE_CONFIRM;
   public String DATABASE_PURGE;
@@ -184,55 +173,6 @@ public final class SonarConfiguration {
       "Should Sonar notify admins when they join the server during lockdown?"
     );
     LOCKDOWN_ENABLE_NOTIFY = generalConfig.getBoolean("general.lockdown.notify-admins", true);
-
-    // Database
-    generalConfig.getYaml().setComment("general.database.type",
-      "The database can either be NONE, MYSQL or YAML"
-    );
-    DATABASE = DatabaseType.valueOf(generalConfig.getString("general.database.type", "NONE").toUpperCase());
-
-    generalConfig.getYaml().setComment("general.database.allow-purging",
-      "Should Sonar allow database purges?"
-    );
-    ALLOW_PURGING = generalConfig.getBoolean("general.database.allow-purging", true);
-
-    // YAML
-    generalConfig.getYaml().setComment("general.database.yaml.file-name",
-      "YAML database file name"
-    );
-    DATABASE_FILE_NAME = generalConfig.getString("general.database.yaml.file-name", "database");
-
-    // MySQL
-    generalConfig.getYaml().setComment("general.database.mysql.name",
-      "MySQL database name"
-    );
-    DATABASE_NAME = generalConfig.getString("general.database.mysql.name", "sonar");
-
-    generalConfig.getYaml().setComment("general.database.mysql.url",
-      "MySQL database URL"
-    );
-    DATABASE_URL = generalConfig.getString("general.database.mysql.url", "localhost");
-
-    generalConfig.getYaml().setComment("general.database.mysql.port",
-      "MySQL database port"
-    );
-    DATABASE_PORT = clamp(generalConfig.getInt("general.database.mysql.port", 3306), 0, 65535);
-
-    generalConfig.getYaml().setComment("general.database.mysql.username",
-      "MySQL database username"
-    );
-    DATABASE_USERNAME = generalConfig.getString("general.database.mysql.username", "root");
-
-    generalConfig.getYaml().setComment("general.database.mysql.password",
-      "MySQL database password"
-    );
-    DATABASE_PASSWORD = generalConfig.getString("general.database.mysql.password", "");
-
-    generalConfig.getYaml().setComment("general.database.mysql.query-limit",
-      "Maximum number of database entries"
-    );
-    DATABASE_QUERY_LIMIT = clamp(generalConfig.getInt("general.database.mysql.query-limit", 100000), 1000,
-      Integer.MAX_VALUE);
 
     // Queue
     generalConfig.getYaml().setComment("general.queue.max-players",

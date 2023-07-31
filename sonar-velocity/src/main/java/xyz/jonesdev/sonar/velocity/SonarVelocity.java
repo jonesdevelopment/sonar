@@ -36,7 +36,6 @@ import xyz.jonesdev.sonar.velocity.command.SonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.verbose.ActionBarVerbose;
 
-import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -52,9 +51,6 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
   @Getter
   private SonarConfiguration config;
-
-  @Getter
-  private File pluginDataFolder;
 
   @Getter
   private SubcommandRegistry subcommandRegistry;
@@ -123,8 +119,6 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
     SonarSupplier.set(this);
 
     logger.info("Initializing Sonar...");
-
-    pluginDataFolder = plugin.getDataDirectory().toFile();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());

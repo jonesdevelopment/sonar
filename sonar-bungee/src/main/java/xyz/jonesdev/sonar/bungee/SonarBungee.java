@@ -35,7 +35,6 @@ import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
-import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -51,9 +50,6 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
   @Getter
   private SonarConfiguration config;
-
-  @Getter
-  private File pluginDataFolder;
 
   @Getter
   private SubcommandRegistry subcommandRegistry;
@@ -122,8 +118,6 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
     SonarSupplier.set(this);
 
     logger.info("Initializing Sonar...");
-
-    pluginDataFolder = plugin.getDataFolder();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());

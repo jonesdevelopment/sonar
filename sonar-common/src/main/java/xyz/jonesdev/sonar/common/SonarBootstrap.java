@@ -18,58 +18,17 @@
 package xyz.jonesdev.sonar.common;
 
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.database.DatabaseType;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
-import xyz.jonesdev.sonar.common.timer.DelayTimer;
-
-import static xyz.jonesdev.sonar.api.database.Database.IP_COLUMN;
-import static xyz.jonesdev.sonar.api.database.Database.VERIFIED_TABLE;
 
 public interface SonarBootstrap<T> extends Sonar {
   void enable(final T plugin);
 
   default void reload() {
     FallbackPreparer.prepare();
-
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      final DelayTimer timer = new DelayTimer();
-
-      getLogger().info("[database] Initializing database...");
-      getDatabase().initialize(getConfig());
-
-      // Clear all verified IPs from memory to avoid issues with the database
-      if (!getFallback().getVerified().isEmpty()) {
-        getLogger().info("[database] Cleaning verified IPs from memory...");
-        getFallback().getVerified().clear();
-      }
-
-      // Load all blacklisted and verified IPs from the database
-      getLogger().info("[database] Loading verified IPs from the database...");
-      getFallback().getVerified().addAll(getDatabase().getListFromTable(VERIFIED_TABLE, IP_COLUMN));
-
-      getLogger().info("[database] Done ({}s)!", timer.formattedDelay());
-    }
   }
 
   default void disable() {
     getLogger().info("Starting shutdown process...");
-
-    if (getConfig().DATABASE != DatabaseType.NONE) {
-      final DelayTimer timer = new DelayTimer();
-
-      getLogger().info("[database] Saving entries to database...");
-
-      // We need to clear the table because we don't want any IPs that aren't present
-      // or have been manually removed to still be present in the database
-      getDatabase().clear(VERIFIED_TABLE);
-      getDatabase().addListToTable(VERIFIED_TABLE, IP_COLUMN, getFallback().getVerified());
-
-      // Dispose the database instance
-      getDatabase().dispose();
-
-      getLogger().info("[database] Done ({}s)!", timer.formattedDelay());
-    }
-
     getLogger().info("Successfully shut down. Goodbye!");
   }
 }
