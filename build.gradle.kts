@@ -12,6 +12,7 @@ plugins {
 
 apply(plugin = "io.toolebox.git-versioner")
 
+rootProject.group = "xyz.jonesdev.sonar"
 val semanticVersion = "2.0.0"
 
 versioner {
