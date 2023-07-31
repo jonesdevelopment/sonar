@@ -22,25 +22,12 @@ import xyz.jonesdev.sonar.api.Sonar;
 
 @UtilityClass
 public class MemoryFormatter {
-  private final int MIN = 1024;
 
-  public String formatMemory(long memory) {
-    if (memory < MIN) {
-      return memory + "B";
-    }
-
-    memory /= MIN; // KB
-    String suffix = "KB";
-
-    if (memory >= MIN) {
-      suffix = "MB";
-      memory /= MIN;
-    }
-
-    if (memory >= MIN) {
-      suffix = "GB";
-      memory /= MIN;
-    }
-    return Sonar.DECIMAL_FORMAT.format(memory) + suffix;
+  // https://stackoverflow.com/questions/2015463/how-to-view-the-current-heap-size-that-an-application-is-using
+  public String formatMemory(final long m) {
+    if (m < 1024) return m + " B";
+    final int z = (63 - Long.numberOfLeadingZeros(m)) / 10;
+    final String formatted = Sonar.DECIMAL_FORMAT.format((double) m / (1L << (z * 10)));
+    return String.format("%s %sB", formatted, " KMGTPE".charAt(z));
   }
 }

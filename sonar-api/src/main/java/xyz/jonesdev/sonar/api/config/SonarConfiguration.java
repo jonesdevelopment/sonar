@@ -743,7 +743,7 @@ public final class SonarConfiguration {
         "  &7Verifying &f%verifying%" +
         "  &7Blacklisted &f%blacklisted%" +
         "  &7Used memory ≅ &f%used-memory%" +
-        "  &7Bot Traffic &a⬆ &f+%outgoing-traffic%/s &c⬇ &f+%incoming-traffic%/s" +
+        "  &7Bot Traffic &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
         "  &a&l%animation%"
     ));
     ANIMATION = messagesConfig.getStringList("messages.action-bar.animation",
