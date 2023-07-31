@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.velocity;
 
-import com.velocitypowered.proxy.util.ratelimit.Ratelimiters;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -26,6 +25,7 @@ import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
@@ -36,7 +36,6 @@ import xyz.jonesdev.sonar.velocity.command.SonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.verbose.ActionBarVerbose;
 
-import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -54,10 +53,10 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   private SonarConfiguration config;
 
   @Getter
-  private File pluginDataFolder;
+  private SubcommandRegistry subcommandRegistry;
 
   @Getter
-  private SubcommandRegistry subcommandRegistry;
+  private VerifiedPlayerController verifiedPlayerController;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -124,8 +123,6 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
     logger.info("Initializing Sonar...");
 
-    pluginDataFolder = plugin.getDataDirectory().toFile();
-
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataDirectory().toFile());
     reload();
@@ -166,13 +163,12 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
   @Override
   public void reload() {
-    getConfig().load();
-    FallbackListener.CachedMessages.update();
-
-    // Apply filter (connection limiter) to Fallback
-    getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);
-
-    // Run the shared reload process
     SonarBootstrap.super.reload();
+
+    // Reinitialize database controller
+    verifiedPlayerController = new VerifiedPlayerController();
+
+    // Prepare cached messages
+    FallbackListener.CachedMessages.update();
   }
 }

@@ -25,6 +25,7 @@ import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
@@ -33,7 +34,6 @@ import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
-import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -52,10 +52,10 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   private SonarConfiguration config;
 
   @Getter
-  private File pluginDataFolder;
+  private SubcommandRegistry subcommandRegistry;
 
   @Getter
-  private SubcommandRegistry subcommandRegistry;
+  private VerifiedPlayerController verifiedPlayerController;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -122,8 +122,6 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
     logger.info("Initializing Sonar...");
 
-    pluginDataFolder = plugin.getDataFolder();
-
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
@@ -150,9 +148,9 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
   @Override
   public void reload() {
-    getConfig().load();
-
-    // Run the shared reload process
     SonarBootstrap.super.reload();
+
+    // Reinitialize database controller
+    verifiedPlayerController = new VerifiedPlayerController();
   }
 }

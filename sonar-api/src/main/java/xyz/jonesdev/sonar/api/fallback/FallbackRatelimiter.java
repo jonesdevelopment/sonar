@@ -15,17 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.database;
+package xyz.jonesdev.sonar.api.fallback;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import xyz.jonesdev.cappuchino.ExpiringCache;
 
-@RequiredArgsConstructor
-public enum DatabaseType {
-  NONE(null),
-  YAML(new YamlDatabase()),
-  MYSQL(new MySQLDatabase());
+import java.net.InetAddress;
 
-  @Getter
-  private final Database holder;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class FallbackRatelimiter {
+  public static final FallbackRatelimiter INSTANCE = new FallbackRatelimiter();
+  @Setter
+  private ExpiringCache<InetAddress> expiringCache;
+
+  public boolean shouldDeny(final InetAddress inetAddress) {
+    expiringCache.cleanUp();
+    if (expiringCache.has(inetAddress)) {
+      return true;
+    }
+    expiringCache.put(inetAddress);
+    return false;
+  }
 }

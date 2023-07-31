@@ -109,7 +109,7 @@ public class FallbackPreparer {
     }
 
     // Set the dynamic spawn buffer
-    DYNAMIC_SPAWN_BUFFER = SPAWN_BUFFER + ((int) maxFallDistance / 3);
+    DYNAMIC_SPAWN_BUFFER = SPAWN_BUFFER + (int) (maxFallDistance / 2.5);
     // Set the dynamic block and collide Y position based on the maximum fall distance
     DYNAMIC_BLOCK_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + DYNAMIC_SPAWN_BUFFER + (int) maxFallDistance;
 

@@ -79,7 +79,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
                                 final MinecraftConnection mcConnection,
                                 final LoginInboundConnection inboundConnection,
                                 final InitialLoginSessionHandler sessionHandler,
-                                final String username,
+                                final GameProfile gameProfile,
                                 final InetAddress inetAddress,
                                 final boolean onlineMode) {
     this.fallback = fallback;
@@ -96,7 +96,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     try {
       connectedPlayer = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
         mcConnection.server,
-        GameProfile.forOfflinePlayer(username),
+        gameProfile,
         mcConnection,
         inboundConnection.getVirtualHost().orElse(null),
         onlineMode,
@@ -104,7 +104,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       );
     } catch (Throwable throwable) {
       // This should not happen
-      fallback.getLogger().error("Error processing {}: {}", username, throwable);
+      fallback.getLogger().error("Error processing {}: {}", gameProfile.getName(), throwable);
       mcConnection.close(true);
       return;
     }
@@ -127,13 +127,13 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       // We let the user override this through the configuration.
       if (!fallback.isUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
         fallback.getLogger().info("{}{} ({}) has connected.",
-          username, fallback.getSonar().getConfig().formatAddress(inetAddress),
+          gameProfile.getName(), fallback.getSonar().getConfig().formatAddress(inetAddress),
           fallbackPlayer.getProtocolVersion().getProtocol());
       }
     }
 
     // Mark the player as connected → verifying players
-    fallback.getConnected().put(username, inetAddress);
+    fallback.getConnected().put(gameProfile.getName(), inetAddress);
 
     // Replace normal encoder to allow custom packets
     fallbackPlayer.getPipeline().replace(
@@ -150,7 +150,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
         fallbackPlayer,
         new FallbackVerificationHandler(
           fallbackPlayer,
-          username,
+          gameProfile.getName(),
           connectedPlayer.getUniqueId()
         )
       )

@@ -19,8 +19,6 @@ package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.database.DatabaseType;
-import xyz.jonesdev.sonar.api.yaml.SimpleYamlConfig;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -96,11 +94,12 @@ public final class SonarConfiguration {
   public String BLACKLIST_CLEARED;
   public String BLACKLIST_SIZE;
 
-  public String WHITELIST_ADD;
-  public String WHITELIST_DUPLICATE;
-  public String WHITELIST_NOT_FOUND;
-  public String WHITELIST_REMOVE;
-  public String WHITELIST_SIZE;
+  public String VERIFIED_REMOVE;
+  public String VERIFIED_NOT_FOUND;
+  public String VERIFIED_CLEARED;
+  public String VERIFIED_SIZE;
+  public String VERIFIED_EMPTY;
+  public String VERIFIED_BLOCKED;
 
   public String VERBOSE_SUBSCRIBED;
   public String VERBOSE_UNSUBSCRIBED;
@@ -108,6 +107,17 @@ public final class SonarConfiguration {
   public String VERBOSE_UNSUBSCRIBED_OTHER;
   public String RELOADING;
   public String RELOADED;
+
+  public enum DatabaseType {
+    MYSQL,
+    NONE
+  }
+  public DatabaseType DATABASE_TYPE;
+  public String MYSQL_URL;
+  public int MYSQL_PORT;
+  public String MYSQL_DATABASE;
+  public String MYSQL_USER;
+  public String MYSQL_PASSWORD;
 
   public boolean LOCKDOWN_ENABLED;
   public boolean LOCKDOWN_ENABLE_NOTIFY;
@@ -117,16 +127,6 @@ public final class SonarConfiguration {
   public String LOCKDOWN_DEACTIVATED;
   public String LOCKDOWN_NOTIFICATION;
   public String LOCKDOWN_CONSOLE_LOG;
-
-  public DatabaseType DATABASE;
-  public boolean ALLOW_PURGING;
-  public String DATABASE_FILE_NAME;
-  public String DATABASE_URL;
-  public String DATABASE_NAME;
-  public String DATABASE_USERNAME;
-  public String DATABASE_PASSWORD;
-  public int DATABASE_PORT;
-  public int DATABASE_QUERY_LIMIT;
 
   public String DATABASE_PURGE_DISALLOWED;
   public String DATABASE_PURGE_CONFIRM;
@@ -169,6 +169,38 @@ public final class SonarConfiguration {
     );
     LOG_PLAYER_ADDRESSES = generalConfig.getBoolean("general.log-player-addresses", true);
 
+    // Database
+    generalConfig.getYaml().setComment("general.database.type",
+      "Type of database Sonar uses to store verified players"
+    );
+    DATABASE_TYPE = DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
+
+    // MySQL
+    generalConfig.getYaml().setComment("general.database.mysql.url",
+      "URL for authenticating with the MySQL database"
+    );
+    MYSQL_URL = generalConfig.getString("general.database.mysql.url", "localhost");
+
+    generalConfig.getYaml().setComment("general.database.mysql.port",
+      "Port for authenticating with the MySQL database"
+    );
+    MYSQL_PORT = generalConfig.getInt("general.database.mysql.port", 3306);
+
+    generalConfig.getYaml().setComment("general.database.mysql.database",
+      "Name of the MySQL database"
+    );
+    MYSQL_DATABASE = generalConfig.getString("general.database.mysql.database", "sonar");
+
+    generalConfig.getYaml().setComment("general.database.mysql.username",
+      "Username for authenticating with the MySQL database"
+    );
+    MYSQL_USER = generalConfig.getString("general.database.mysql.username", "");
+
+    generalConfig.getYaml().setComment("general.database.mysql.password",
+      "Password for authenticating with the MySQL database"
+    );
+    MYSQL_PASSWORD = generalConfig.getString("general.database.mysql.password", "");
+
     // Lockdown
     generalConfig.getYaml().setComment("general.lockdown.enabled",
       "Should Sonar prevent players from joining the server?"
@@ -184,55 +216,6 @@ public final class SonarConfiguration {
       "Should Sonar notify admins when they join the server during lockdown?"
     );
     LOCKDOWN_ENABLE_NOTIFY = generalConfig.getBoolean("general.lockdown.notify-admins", true);
-
-    // Database
-    generalConfig.getYaml().setComment("general.database.type",
-      "The database can either be NONE, MYSQL or YAML"
-    );
-    DATABASE = DatabaseType.valueOf(generalConfig.getString("general.database.type", "NONE").toUpperCase());
-
-    generalConfig.getYaml().setComment("general.database.allow-purging",
-      "Should Sonar allow database purges?"
-    );
-    ALLOW_PURGING = generalConfig.getBoolean("general.database.allow-purging", true);
-
-    // YAML
-    generalConfig.getYaml().setComment("general.database.yaml.file-name",
-      "YAML database file name"
-    );
-    DATABASE_FILE_NAME = generalConfig.getString("general.database.yaml.file-name", "database");
-
-    // MySQL
-    generalConfig.getYaml().setComment("general.database.mysql.name",
-      "MySQL database name"
-    );
-    DATABASE_NAME = generalConfig.getString("general.database.mysql.name", "sonar");
-
-    generalConfig.getYaml().setComment("general.database.mysql.url",
-      "MySQL database URL"
-    );
-    DATABASE_URL = generalConfig.getString("general.database.mysql.url", "localhost");
-
-    generalConfig.getYaml().setComment("general.database.mysql.port",
-      "MySQL database port"
-    );
-    DATABASE_PORT = clamp(generalConfig.getInt("general.database.mysql.port", 3306), 0, 65535);
-
-    generalConfig.getYaml().setComment("general.database.mysql.username",
-      "MySQL database username"
-    );
-    DATABASE_USERNAME = generalConfig.getString("general.database.mysql.username", "root");
-
-    generalConfig.getYaml().setComment("general.database.mysql.password",
-      "MySQL database password"
-    );
-    DATABASE_PASSWORD = generalConfig.getString("general.database.mysql.password", "");
-
-    generalConfig.getYaml().setComment("general.database.mysql.query-limit",
-      "Maximum number of database entries"
-    );
-    DATABASE_QUERY_LIMIT = clamp(generalConfig.getInt("general.database.mysql.query-limit", 100000), 1000,
-      Integer.MAX_VALUE);
 
     // Queue
     generalConfig.getYaml().setComment("general.queue.max-players",
@@ -585,39 +568,46 @@ public final class SonarConfiguration {
       "%prefix%The IP address you provided is not blacklisted."
     ));
 
-    messagesConfig.getYaml().setComment("messages.whitelist.size",
-      "Message that is shown when someone checks the size of the whitelist"
+    messagesConfig.getYaml().setComment("messages.verified.empty",
+      "Message that is shown when someone tries clearing the list of verified players but is is empty"
     );
-    WHITELIST_SIZE = formatString(messagesConfig.getString("messages.whitelist.size",
-      "%prefix%The whitelist currently contains %amount% IP address(es)."
+    VERIFIED_EMPTY = formatString(messagesConfig.getString("messages.verified.empty",
+      "%prefix%The list of verified players is currently empty. Therefore, no players were unverified."
     ));
 
-    messagesConfig.getYaml().setComment("messages.whitelist.added",
-      "Message that is shown when someone adds an IP address to the whitelist"
+    messagesConfig.getYaml().setComment("messages.verified.cleared",
+      "Message that is shown when someone clears the list of verified players"
     );
-    WHITELIST_ADD = formatString(messagesConfig.getString("messages.whitelist.added",
-      "%prefix%Successfully added %ip% to the whitelist."
+    VERIFIED_CLEARED = formatString(messagesConfig.getString("messages.verified.cleared",
+      "%prefix%You successfully unverified a total of %removed% unique player(s)."
     ));
 
-    messagesConfig.getYaml().setComment("messages.whitelist.removed",
-      "Message that is shown when someone removes an IP address from the whitelist"
+    messagesConfig.getYaml().setComment("messages.verified.size",
+      "Message that is shown when someone checks the size of the list of verified players"
     );
-    WHITELIST_REMOVE = formatString(messagesConfig.getString("messages.whitelist.removed",
-      "%prefix%Successfully removed %ip% from the whitelist."
+    VERIFIED_SIZE = formatString(messagesConfig.getString("messages.verified.size",
+      "%prefix%There are currently %amount% unique player(s) verified."
     ));
 
-    messagesConfig.getYaml().setComment("messages.whitelist.duplicate-ip",
-      "Message that is shown when someone adds an IP address to the whitelist but it is already whitelisted"
+    messagesConfig.getYaml().setComment("messages.verified.removed",
+      "Message that is shown when someone un-verifies an IP address"
     );
-    WHITELIST_DUPLICATE = formatString(messagesConfig.getString("messages.whitelist.duplicate-ip",
-      "%prefix%The IP address you provided is already whitelisted."
+    VERIFIED_REMOVE = formatString(messagesConfig.getString("messages.verified.removed",
+      "%prefix%Successfully unverified %ip%."
     ));
 
-    messagesConfig.getYaml().setComment("messages.whitelist.ip-not-found",
-      "Message that is shown when someone removes an IP address from the whitelist but it is not whitelisted"
+    messagesConfig.getYaml().setComment("messages.verified.ip-not-found",
+      "Message that is shown when someone un-verifies an IP address but it is not verified"
     );
-    WHITELIST_NOT_FOUND = formatString(messagesConfig.getString("messages.whitelist.ip-not-found",
-      "%prefix%The IP address you provided is not whitelisted."
+    VERIFIED_NOT_FOUND = formatString(messagesConfig.getString("messages.verified.ip-not-found",
+      "%prefix%The IP address you provided is not verified."
+    ));
+
+    messagesConfig.getYaml().setComment("messages.verified.blocked",
+      "Message that is shown when someone tries un-verifying the same IP address twice (double operation)"
+    );
+    VERIFIED_BLOCKED = formatString(messagesConfig.getString("messages.verified.blocked",
+      "%prefix%Please wait for the current operation to finish."
     ));
 
     messagesConfig.getYaml().setComment("messages.verification.too-many-players",

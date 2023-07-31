@@ -20,15 +20,12 @@ package xyz.jonesdev.sonar.api;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.api.database.Database;
+import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
-import xyz.jonesdev.sonar.api.fallback.FallbackHolder;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
-import xyz.jonesdev.sonar.api.version.SonarVersion;
 
-import java.io.File;
 import java.text.DecimalFormat;
 
 public interface Sonar {
@@ -52,12 +49,12 @@ public interface Sonar {
     }
   }
 
-  @NotNull File getPluginDataFolder();
-
   @NotNull SonarConfiguration getConfig();
 
   @NotNull
   SubcommandRegistry getSubcommandRegistry();
+
+  VerifiedPlayerController getVerifiedPlayerController();
 
   @NotNull
   default SonarVersion getVersion() {
@@ -66,12 +63,7 @@ public interface Sonar {
 
   @NotNull
   default Fallback getFallback() {
-    return FallbackHolder.INSTANCE;
-  }
-
-  @NotNull
-  default Database getDatabase() {
-    return getConfig().DATABASE.getHolder();
+    return Fallback.INSTANCE;
   }
 
   @NotNull Verbose getActionBarVerbose();

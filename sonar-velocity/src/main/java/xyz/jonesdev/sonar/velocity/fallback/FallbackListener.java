@@ -21,6 +21,7 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
@@ -120,8 +121,10 @@ public final class FallbackListener {
       return;
     }
 
-    if (fallback.getVerified().contains(inetAddress.toString())) return;
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
+
+    final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
+    if (fallback.getSonar().getVerifiedPlayerController().has(inetAddress.toString(), gameProfile.getId())) return;
 
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
@@ -145,7 +148,7 @@ public final class FallbackListener {
     }
 
     // Check if the IP address is reconnecting too quickly while being unverified
-    if (!fallback.getAttemptLimiter().attempt(inetAddress)) {
+    if (fallback.getRatelimiter().shouldDeny(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         TOO_FAST_RECONNECT,
         inboundConnection.getProtocolVersion()
@@ -228,7 +231,7 @@ public final class FallbackListener {
 
         mcConnection.setSessionHandler(new FallbackSessionHandler(
           fallback, mcConnection, inboundConnection, sessionHandler,
-          event.getUsername(), inetAddress, onlineMode
+          gameProfile, inetAddress, onlineMode
         ));
       }));
     });

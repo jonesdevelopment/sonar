@@ -24,8 +24,8 @@ import lombok.NoArgsConstructor;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.LongArrayBinaryTag;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import java.util.BitSet;
 

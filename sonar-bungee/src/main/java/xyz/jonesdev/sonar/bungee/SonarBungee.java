@@ -26,6 +26,7 @@ import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
@@ -35,7 +36,6 @@ import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.timer.DelayTimer;
 
-import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -53,10 +53,10 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   private SonarConfiguration config;
 
   @Getter
-  private File pluginDataFolder;
+  private SubcommandRegistry subcommandRegistry;
 
   @Getter
-  private SubcommandRegistry subcommandRegistry;
+  private VerifiedPlayerController verifiedPlayerController;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -123,8 +123,6 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
     logger.info("Initializing Sonar...");
 
-    pluginDataFolder = plugin.getDataFolder();
-
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());
     reload();
@@ -158,10 +156,12 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
   @Override
   public void reload() {
-    getConfig().load();
-    FallbackListener.CachedMessages.update();
-
-    // Run the shared reload process
     SonarBootstrap.super.reload();
+
+    // Reinitialize database controller
+    verifiedPlayerController = new VerifiedPlayerController();
+
+    // Prepare cached messages
+    FallbackListener.CachedMessages.update();
   }
 }

@@ -17,7 +17,9 @@
 
 package xyz.jonesdev.sonar.api.fallback;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.cappuchino.Cappuchino;
 import xyz.jonesdev.cappuchino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.logger.Logger;
@@ -25,25 +27,43 @@ import xyz.jonesdev.sonar.api.logger.Logger;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
-public interface Fallback {
-  @NotNull Map<String, InetAddress> getConnected();
+@Getter
+public final class Fallback {
+  public static final Fallback INSTANCE = new Fallback();
+  private final Sonar sonar = Sonar.get();
 
-  @NotNull Collection<String> getVerified();
+  private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
+  private final Collection<String> verified = new Vector<>(1);
+  // Only block the player for a few minutes to avoid issues
+  private final ExpiringCache<String> blacklisted = Cappuchino.buildExpiring(
+    10L, TimeUnit.MINUTES, 2500L
+  );
+  private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;
+  private final @NotNull FallbackRatelimiter ratelimiter = FallbackRatelimiter.INSTANCE;
 
-  @NotNull ExpiringCache<String> getBlacklisted();
+  private final Logger logger = new Logger() {
 
-  @NotNull FallbackQueue getQueue();
+    @Override
+    public void info(final String message, final Object... args) {
+      sonar.getLogger().info("[Fallback] " + message, args);
+    }
 
-  @NotNull FallbackFilter getAttemptLimiter();
+    @Override
+    public void warn(final String message, final Object... args) {
+      sonar.getLogger().warn("[Fallback] " + message, args);
+    }
 
-  @NotNull Sonar getSonar();
+    @Override
+    public void error(final String message, final Object... args) {
+      sonar.getLogger().error("[Fallback] " + message, args);
+    }
+  };
 
-  @NotNull Logger getLogger();
-
-  void setAttemptLimiter(final @NotNull FallbackFilter limiter);
-
-  default boolean isUnderAttack() {
+  public boolean isUnderAttack() {
     return getConnected().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK
       || getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK;
   }

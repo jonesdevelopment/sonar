@@ -27,8 +27,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FallbackQueue {
+  public static final FallbackQueue INSTANCE = new FallbackQueue();
   @Getter
   private final Map<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(16, 0.5f);
 

@@ -22,7 +22,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.Getter;
-import lombok.Setter;
 import net.md_5.bungee.compress.PacketDecompressor;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,8 +33,7 @@ import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 
 @Getter
 public final class FallbackPacketDecompressor extends PacketDecompressor {
-  @Setter
-  private int compressionThreshold;
+  private final int compressionThreshold;
   private final VelocityCompressor compressor;
 
   private static final int VANILLA_MAXIMUM_UNCOMPRESSED_SIZE = 8 * 1024 * 1024; // 8MiB

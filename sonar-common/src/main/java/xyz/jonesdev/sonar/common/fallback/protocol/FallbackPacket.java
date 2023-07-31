@@ -15,13 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback;
+package xyz.jonesdev.sonar.common.fallback.protocol;
 
-import org.jetbrains.annotations.NotNull;
+import io.netty.buffer.ByteBuf;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
-import java.net.InetAddress;
+public interface FallbackPacket {
+  void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
 
-@FunctionalInterface
-public interface FallbackFilter {
-  boolean attempt(final @NotNull InetAddress inetAddress);
+  void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
+
+  default int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return -1;
+  }
+
+  default int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return -1;
+  }
 }

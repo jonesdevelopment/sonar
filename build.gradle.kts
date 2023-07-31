@@ -12,6 +12,7 @@ plugins {
 
 apply(plugin = "io.toolebox.git-versioner")
 
+rootProject.group = "xyz.jonesdev.sonar"
 val semanticVersion = "2.0.0"
 
 versioner {
@@ -43,6 +44,7 @@ subprojects {
     compileOnly("io.netty:netty-all:4.1.96.Final") // netty
 
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
+    implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
     implementation("xyz.jonesdev:cappuchino:0.1.4-SNAPSHOT") // expiring cache
   }
 }
