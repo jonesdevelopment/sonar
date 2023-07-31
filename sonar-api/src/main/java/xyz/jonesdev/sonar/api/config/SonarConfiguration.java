@@ -739,11 +739,11 @@ public final class SonarConfiguration {
     );
     ACTION_BAR_LAYOUT = formatString(messagesConfig.getString(
       "messages.action-bar.layout",
-      "%prefix%&fQueued &7%queued%" +
-        "  &fVerifying &7%verifying%" +
-        "  &fBlacklisted &7%blacklisted%" +
-        "  &fBot Traffic &a⬇ &7%incoming-traffic% &c⬆ &7%outgoing-traffic%" +
-        "  &fMemory &7≅ %used-memory%" +
+      "%prefix%&7Queued &f%queued%" +
+        "  &7Verifying &f%verifying%" +
+        "  &7Blacklisted &f%blacklisted%" +
+        "  &7Used memory ≅ &f%used-memory%" +
+        "  &7Bot Traffic &a⬆ &f+%outgoing-traffic%/s &c⬇ &f+%incoming-traffic%/s" +
         "  &a&l%animation%"
     ));
     ANIMATION = messagesConfig.getStringList("messages.action-bar.animation",
