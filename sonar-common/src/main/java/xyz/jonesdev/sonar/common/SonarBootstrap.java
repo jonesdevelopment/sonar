@@ -33,6 +33,13 @@ public interface SonarBootstrap<T> extends Sonar {
     // Load the configuration
     getConfig().load();
 
+    // Warn player if they reloaded and changed the database type
+    if (getVerifiedPlayerController() != null
+      && getVerifiedPlayerController().getCachedDatabaseType() != getConfig().DATABASE_TYPE) {
+      Sonar.get().getLogger().warn("Reloading the server after changing the database type"
+        + " is generally not recommended as it can sometimes cause data loss.");
+    }
+
     // Prepare cached packets
     FallbackPreparer.prepare();
 
