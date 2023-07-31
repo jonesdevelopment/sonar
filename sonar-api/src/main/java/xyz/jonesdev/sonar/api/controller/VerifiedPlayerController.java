@@ -151,7 +151,6 @@ public final class VerifiedPlayerController {
   }
 
   public boolean has(final @NotNull String inetAddress, final @NotNull UUID uuid) {
-    Objects.requireNonNull(connectionSource);
     final Collection<UUID> got = MAP.get(inetAddress);
     if (got != null) {
       return got.contains(uuid);
@@ -160,7 +159,6 @@ public final class VerifiedPlayerController {
   }
 
   public boolean has(final @NotNull String inetAddress) {
-    Objects.requireNonNull(connectionSource);
     return MAP.containsKey(inetAddress);
   }
 }
