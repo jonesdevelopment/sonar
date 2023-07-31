@@ -152,10 +152,9 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
   @Override
   public void reload() {
-    getConfig().load();
-    FallbackListener.CachedMessages.update();
-
-    // Run the shared reload process
     SonarBootstrap.super.reload();
+
+    // Prepare cached messages
+    FallbackListener.CachedMessages.update();
   }
 }

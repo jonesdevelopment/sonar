@@ -24,6 +24,10 @@ public interface SonarBootstrap<T> extends Sonar {
   void enable(final T plugin);
 
   default void reload() {
+    // Load the configuration
+    getConfig().load();
+
+    // Prepare cached packets
     FallbackPreparer.prepare();
   }
 

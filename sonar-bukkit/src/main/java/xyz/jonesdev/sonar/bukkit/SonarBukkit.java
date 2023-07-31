@@ -141,12 +141,4 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     // Done
     logger.info("Done ({}s)!", timer.formattedDelay());
   }
-
-  @Override
-  public void reload() {
-    getConfig().load();
-
-    // Run the shared reload process
-    SonarBootstrap.super.reload();
-  }
 }

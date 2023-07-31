@@ -160,13 +160,12 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
   @Override
   public void reload() {
-    getConfig().load();
+    SonarBootstrap.super.reload();
+
+    // Prepare cached messages
     FallbackListener.CachedMessages.update();
 
     // Apply filter (connection limiter) to Fallback
     getFallback().setAttemptLimiter(Ratelimiters.createWithMilliseconds(config.VERIFICATION_DELAY)::attempt);
-
-    // Run the shared reload process
-    SonarBootstrap.super.reload();
   }
 }
