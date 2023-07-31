@@ -108,6 +108,11 @@ public final class SonarConfiguration {
   public String RELOADING;
   public String RELOADED;
 
+  public enum DatabaseType {
+    MYSQL,
+    NONE
+  }
+  public DatabaseType DATABASE_TYPE;
   public String MYSQL_URL;
   public int MYSQL_PORT;
   public String MYSQL_DATABASE;
@@ -165,6 +170,12 @@ public final class SonarConfiguration {
     LOG_PLAYER_ADDRESSES = generalConfig.getBoolean("general.log-player-addresses", true);
 
     // Database
+    generalConfig.getYaml().setComment("general.database.type",
+      "Type of database Sonar uses to store verified players"
+    );
+    DATABASE_TYPE = DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
+
+    // MySQL
     generalConfig.getYaml().setComment("general.database.mysql.url",
       "URL for authenticating with the MySQL database"
     );

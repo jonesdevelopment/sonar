@@ -150,6 +150,8 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   public void reload() {
     SonarBootstrap.super.reload();
 
-    verifiedPlayerController = new VerifiedPlayerController();
+    // Reinitialize database controller
+    verifiedPlayerController = getConfig().DATABASE_TYPE != SonarConfiguration.DatabaseType.NONE
+      ? new VerifiedPlayerController() : null;
   }
 }

@@ -165,7 +165,9 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   public void reload() {
     SonarBootstrap.super.reload();
 
-    verifiedPlayerController = new VerifiedPlayerController();
+    // Reinitialize database controller
+    verifiedPlayerController = getConfig().DATABASE_TYPE != SonarConfiguration.DatabaseType.NONE
+      ? new VerifiedPlayerController() : null;
 
     // Prepare cached messages
     FallbackListener.CachedMessages.update();
