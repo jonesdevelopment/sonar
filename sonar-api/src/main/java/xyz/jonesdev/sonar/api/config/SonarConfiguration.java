@@ -18,7 +18,9 @@
 package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.dependencies.Dependency;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -108,9 +110,12 @@ public final class SonarConfiguration {
   public String RELOADING;
   public String RELOADED;
 
+  @Getter
+  @RequiredArgsConstructor
   public enum DatabaseType {
-    MYSQL,
-    NONE
+    MYSQL(Dependency.JDBC_DRIVER),
+    NONE(null);
+    private final Dependency dependency;
   }
   public DatabaseType DATABASE_TYPE;
   public String MYSQL_URL;

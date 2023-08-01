@@ -26,7 +26,6 @@ import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
-import xyz.jonesdev.sonar.api.dependencies.DependencyLoader;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.api.timer.DelayTimer;
@@ -129,9 +128,6 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
     // Set data directory
     dataDirectory = plugin.getDataFolder();
-
-    // Download all dependencies
-    DependencyLoader.download();
 
     // Initialize configuration
     config = new SonarConfiguration(plugin.getDataFolder());

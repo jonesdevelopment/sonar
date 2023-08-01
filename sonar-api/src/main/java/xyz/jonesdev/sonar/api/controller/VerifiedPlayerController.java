@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.api.controller;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -28,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.dependencies.DependencyLoader;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
 import java.sql.SQLException;
@@ -58,11 +58,7 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    final String databaseURL = "jdbc:mysql://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
-
-    try (final ConnectionSource connectionSource = new JdbcConnectionSource(
-      databaseURL, config.MYSQL_USER, config.MYSQL_PASSWORD)
-    ) {
+    try (final ConnectionSource connectionSource = DependencyLoader.setUpDriverAndConnect()) {
       this.connectionSource = connectionSource;
 
       // Create table

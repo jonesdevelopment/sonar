@@ -17,18 +17,65 @@
 
 package xyz.jonesdev.sonar.api.dependencies;
 
+import com.j256.ormlite.jdbc.JdbcSingleConnectionSource;
+import com.j256.ormlite.support.ConnectionSource;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.util.Properties;
 
 @UtilityClass
 public class DependencyLoader {
-  public void download() {
-    for (final Dependency value : Dependency.values()) {
-      try {
-        // TODO: load classes
-        value.getClassLoaderURL();
-      } catch (Exception exception) {
-        exception.printStackTrace();
-      }
+  public ConnectionSource setUpDriverAndConnect() {
+    try {
+      final SonarConfiguration config = Sonar.get().getConfig();
+      final URL url = config.DATABASE_TYPE.getDependency().getClassLoaderURL();
+      final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
+
+      final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
+      addPath.setAccessible(true);
+      addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
+
+      final String databaseURL = "jdbc:mysql://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
+
+      final IsolatedClassLoader classLoader = new IsolatedClassLoader(new URL[] {url});
+      final Connection connection = connect(classLoader, databaseURL, config.MYSQL_USER, config.MYSQL_PASSWORD);
+      return new JdbcSingleConnectionSource(databaseURL, connection);
+    } catch (Throwable throwable) {
+      throw new IllegalStateException("Could not connect to database", throwable);
     }
+  }
+
+  // Mostly taken from
+  // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/DatabaseLibrary.java#L134
+  private Connection connect(final @NotNull ClassLoader classLoader,
+                             final @NotNull String databaseURL,
+                             final @NotNull String username,
+                             final @NotNull String password) throws Throwable {
+    final Class<?> driverClass = classLoader.loadClass("com.mysql.cj.jdbc.NonRegisteringDriver");
+    final Object driver = driverClass.getDeclaredConstructor().newInstance();
+
+    DriverManager.registerDriver((Driver) driver);
+
+    final Properties properties = new Properties();
+    if (!username.isEmpty()) {
+      properties.put("user", username);
+    }
+    if (!password.isEmpty()) {
+      properties.put("password", password);
+    }
+
+    final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);
+    connect.setAccessible(true);
+    return (Connection) connect.invoke(driver, databaseURL, properties);
   }
 }
