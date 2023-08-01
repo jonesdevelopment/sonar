@@ -699,7 +699,8 @@ public final class SonarConfiguration {
         "%header%",
         "&cYou have failed the verification.",
         "&7Please wait a few seconds before trying to verify again.",
-        "&6Need help? &7%support-url%"
+        "&6Need help? &7%support-url%",
+        "%footer%"
       )));
 
     messagesConfig.getYaml().setComment("messages.verification.too-many-online-per-ip",
