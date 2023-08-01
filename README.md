@@ -29,7 +29,8 @@ notifications.
 ## Checks
 
 - New player logins are queued to prevent spam login attacks.
-- [Fallback](https://github.com/jonesdevelopment/sonar-antibot#fallback) is Sonar's main component designed to prevent all types of bots.
+- [Fallback](https://github.com/jonesdevelopment/sonar-antibot#fallback) is Sonar's main component designed to prevent
+  all types of bots.
 - Spigot & BungeeCord
   - The compression method is changed
     to [Velocity's libdeflate](https://github.com/PaperMC/Velocity/tree/dev/3.0.0/native).

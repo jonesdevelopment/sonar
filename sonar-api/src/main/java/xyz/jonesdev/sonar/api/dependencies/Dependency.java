@@ -39,8 +39,10 @@ public enum Dependency {
     "8.1.0"
   );
 
-  private @NotNull final Path tempFilePath;
-  private @NotNull final URL mvnRepoURL;
+  private @NotNull
+  final Path tempFilePath;
+  private @NotNull
+  final URL mvnRepoURL;
 
   Dependency(final @NotNull String groupId,
              final @NotNull String artifactId,

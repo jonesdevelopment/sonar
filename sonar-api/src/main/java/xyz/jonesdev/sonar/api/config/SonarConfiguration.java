@@ -117,6 +117,7 @@ public final class SonarConfiguration {
     NONE(null);
     private final Dependency dependency;
   }
+
   public DatabaseType DATABASE_TYPE;
   public String MYSQL_URL;
   public int MYSQL_PORT;
@@ -178,7 +179,8 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.database.type",
       "Type of database Sonar uses to store verified players"
     );
-    DATABASE_TYPE = DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
+    DATABASE_TYPE =
+      DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
 
     // MySQL
     generalConfig.getYaml().setComment("general.database.mysql.url",
