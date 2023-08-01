@@ -47,7 +47,7 @@ public class DependencyLoader {
 
       final String databaseURL = "jdbc:mysql://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
 
-      final IsolatedClassLoader classLoader = new IsolatedClassLoader(new URL[] {url});
+      final ExternalClassLoader classLoader = new ExternalClassLoader(new URL[] {url});
       final Connection connection = connect(classLoader, databaseURL, config.MYSQL_USER, config.MYSQL_PASSWORD);
       return new JdbcSingleConnectionSource(databaseURL, connection);
     } catch (Throwable throwable) {
