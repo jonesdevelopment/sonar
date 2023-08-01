@@ -25,12 +25,14 @@ import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @SubcommandInfo(
   name = "verified",
   description = "Manage verified IP addresses",
   arguments = {
+    @Argument("history"),
     @Argument("remove"),
     @Argument("clear"),
     @Argument("size")
@@ -42,6 +44,42 @@ public final class VerifiedCommand extends Subcommand {
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
     switch (invocation.getArguments()[1].toLowerCase()) {
+      case "history": {
+        if (invocation.getArguments().length <= 2) {
+          invocation.getSender().sendMessage(
+            SONAR.getConfig().INCORRECT_COMMAND_USAGE
+              .replace("%usage%", "verified history <IP address>")
+          );
+          return;
+        }
+
+        final String inetAddress = invocation.getArguments()[2];
+
+        if (!IP_PATTERN.matcher(inetAddress).matches()) {
+          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_IP_ADDRESS);
+          return;
+        }
+
+        // We don't need to parse this, so we can just use the string.
+        final String realInetAddress = "/" + inetAddress;
+
+        if (!SONAR.getVerifiedPlayerController().has(realInetAddress)) {
+          invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_NOT_FOUND);
+          return;
+        }
+
+        invocation.getSender().sendMessage();
+        invocation.getSender().sendMessage(" §ePrevious UUIDs (" + inetAddress + ")");
+        invocation.getSender().sendMessage();
+
+        for (final UUID uuid : SONAR.getVerifiedPlayerController().getUUIDs(realInetAddress)) {
+          invocation.getSender().sendMessage(" §a▪ §f" + uuid.toString());
+        }
+
+        invocation.getSender().sendMessage();
+        break;
+      }
+
       case "remove": {
         if (invocation.getArguments().length <= 2) {
           invocation.getSender().sendMessage(
@@ -62,7 +100,7 @@ public final class VerifiedCommand extends Subcommand {
         final String realInetAddress = "/" + inetAddress;
 
         if (LOCK.contains(realInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().COMMAND_COOL_DOWN);
+          invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_BLOCKED);
           return;
         }
 

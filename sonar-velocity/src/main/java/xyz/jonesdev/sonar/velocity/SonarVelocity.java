@@ -28,14 +28,15 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
+import xyz.jonesdev.sonar.api.timer.DelayTimer;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
-import xyz.jonesdev.sonar.common.timer.DelayTimer;
 import xyz.jonesdev.sonar.velocity.command.SonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.verbose.ActionBarVerbose;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +58,9 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
   @Getter
   private VerifiedPlayerController verifiedPlayerController;
+
+  @Getter
+  private File dataDirectory;
 
   @Getter
   private final Logger logger = new Logger() {
@@ -123,8 +127,11 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
 
     logger.info("Initializing Sonar...");
 
+    // Set data directory
+    dataDirectory = plugin.getDataDirectory().toFile();
+
     // Initialize configuration
-    config = new SonarConfiguration(plugin.getDataDirectory().toFile());
+    config = new SonarConfiguration(dataDirectory);
     reload();
 
     // Initialize sub commands

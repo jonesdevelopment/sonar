@@ -28,7 +28,7 @@ notifications.
 
 ## Checks
 
-- **Fallback** is designed to prevent all types of bots.
+- [Fallback](https://github.com/jonesdevelopment/sonar-antibot#fallback) is designed to prevent all types of bots.
 - Exceptions occurring in the [pipeline](https://netty.io/4.1/api/io/netty/channel/ChannelPipeline.html) are handled
   accordingly.
 - Spigot & BungeeCord

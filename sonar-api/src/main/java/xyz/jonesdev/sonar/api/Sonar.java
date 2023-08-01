@@ -26,12 +26,11 @@ import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
+import java.io.File;
 import java.text.DecimalFormat;
 
 public interface Sonar {
   DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
-
-  ServerWrapper getServer();
 
   // used for bStats metrics
   default int getServiceId() {
@@ -49,12 +48,21 @@ public interface Sonar {
     }
   }
 
+  @NotNull ServerWrapper getServer();
+
   @NotNull SonarConfiguration getConfig();
 
-  @NotNull
-  SubcommandRegistry getSubcommandRegistry();
+  @NotNull SubcommandRegistry getSubcommandRegistry();
 
-  VerifiedPlayerController getVerifiedPlayerController();
+  @NotNull File getDataDirectory();
+
+  @NotNull VerifiedPlayerController getVerifiedPlayerController();
+
+  @NotNull Verbose getActionBarVerbose();
+
+  @NotNull Logger getLogger();
+
+  void reload();
 
   @NotNull
   default SonarVersion getVersion() {
@@ -65,12 +73,6 @@ public interface Sonar {
   default Fallback getFallback() {
     return Fallback.INSTANCE;
   }
-
-  @NotNull Verbose getActionBarVerbose();
-
-  @NotNull Logger getLogger();
-
-  void reload();
 
   @NotNull
   static Sonar get() {
