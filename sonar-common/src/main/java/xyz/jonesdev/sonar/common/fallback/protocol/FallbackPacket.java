@@ -25,7 +25,7 @@ public interface FallbackPacket {
   /**
    * Encodes the packet sent by the server
    *
-   * @param byteBuf ByteBuf
+   * @param byteBuf         ByteBuf
    * @param protocolVersion Protocol version of the player
    */
   void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
@@ -33,13 +33,13 @@ public interface FallbackPacket {
   /**
    * Decodes the packet sent by the client
    *
-   * @param byteBuf ByteBuf
+   * @param byteBuf         ByteBuf
    * @param protocolVersion Protocol version of the player
    */
   void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
 
   /**
-   * @param byteBuf ByteBuf
+   * @param byteBuf         ByteBuf
    * @param protocolVersion Protocol version of the player
    * @return The minimum allowed length of the decoded packet
    */
@@ -48,7 +48,7 @@ public interface FallbackPacket {
   }
 
   /**
-   * @param byteBuf ByteBuf
+   * @param byteBuf         ByteBuf
    * @param protocolVersion Protocol version of the player
    * @return The maximum allowed length of the decoded packet
    */
