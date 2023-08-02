@@ -23,8 +23,7 @@ import lombok.Setter;
 import static xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory;
 
 /**
- * This counts all incoming and outgoing traffic new players
- * who need to be verified are sending to the server.
+ * This counts all incoming and outgoing traffic.
  */
 @Getter
 public enum TrafficCounter {
@@ -35,10 +34,20 @@ public enum TrafficCounter {
   private long ttl, curr;
   private String cachedSecond = "-", cachedTtl = "-";
 
+  /**
+   * Increments the current (per-second) value.
+   *
+   * @param b Bytes sent
+   */
   public void increment(final long b) {
     curr += b;
   }
 
+  /**
+   * Increments the total value by the current
+   * (per-second) value and resets the current value.
+   * This method is called every second.
+   */
   public static synchronized void reset() {
     for (final TrafficCounter value : values()) {
       value.ttl += value.curr; // increment total
