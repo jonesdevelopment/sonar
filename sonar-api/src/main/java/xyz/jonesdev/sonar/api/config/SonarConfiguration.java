@@ -228,7 +228,7 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.queue.max-players",
       "Maximum number of players on the queue"
     );
-    MAXIMUM_QUEUED_PLAYERS = clamp(generalConfig.getInt("general.queue.max-players", 8192), 128, Short.MAX_VALUE);
+    MAXIMUM_QUEUED_PLAYERS = clamp(generalConfig.getInt("general.queue.max-players", 100000), 1000, 500000);
 
     generalConfig.getYaml().setComment("general.queue.max-polls",
       "Maximum number of queue polls per 500 milliseconds"
