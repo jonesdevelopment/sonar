@@ -143,6 +143,10 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     // Register Sonar command
     Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());
 
+    // Register Fallback queue task
+    plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, getFallback().getQueue()::poll,
+      10L, 10L);
+
     // Register traffic counter reset task
     plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, TrafficCounter::reset,
       20L, 20L);
@@ -152,7 +156,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
     // Register action bar verbose task
     plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, actionBarVerbose::update,
-      100L, 100L);
+      2L, 2L);
 
     // Done
     logger.info("Done ({}s)!", timer.formattedDelay());
