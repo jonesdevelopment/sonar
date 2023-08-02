@@ -30,6 +30,12 @@ public final class FallbackRatelimiter {
   @Setter
   private ExpiringCache<InetAddress> expiringCache;
 
+  /**
+   * Checks if the player has tried verifying too fast
+   *
+   * @param inetAddress IP address of the player
+   * @return Whether the player is allowed to verify
+   */
   public boolean shouldDeny(final InetAddress inetAddress) {
     expiringCache.cleanUp();
     if (expiringCache.has(inetAddress)) {

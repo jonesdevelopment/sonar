@@ -44,12 +44,31 @@ public interface FallbackPlayer<X, Y> {
 
   @NotNull ProtocolVersion getProtocolVersion();
 
+  /**
+   * Kicks the player from the server with
+   * the given disconnect message.
+   *
+   * @param reason Disconnect message
+   */
   void disconnect(final @NotNull String reason);
 
-  void write(final @NotNull Object packet);
+  /**
+   * Sends a packet/message to the player
+   *
+   * @param msg Message to send to the player
+   */
+  void write(final @NotNull Object msg);
 
   ExpiringCache<String> PREVIOUS_FAILS = Cappuchino.buildExpiring(3L, TimeUnit.MINUTES);
 
+  /**
+   * Disconnects the player who failed the verification
+   * and caches them in FAILED_VERIFICATIONS.
+   * If the player fails the verification twice,
+   * the player will be temporarily denied from verifying.
+   *
+   * @param reason Reason for failing the verification
+   */
   default void fail(final @Nullable String reason) {
     if (getChannel().isActive()) {
       disconnect(getFallback().getSonar().getConfig().VERIFICATION_FAILED);

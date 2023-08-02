@@ -24,14 +24,24 @@ import java.util.Collection;
 public interface Verbose {
   @NotNull Collection<String> getSubscribers();
 
+  /**
+   * @param subscriber Name of the player who subscribed
+   * @return Whether the player is subscribed or not
+   */
   default boolean isSubscribed(final @NotNull String subscriber) {
     return getSubscribers().contains(subscriber);
   }
 
-  default void subscribe(final @NotNull String username) {
-    getSubscribers().add(username);
+  /**
+   * @param subscriber Name of the player to subscribe
+   */
+  default void subscribe(final @NotNull String subscriber) {
+    getSubscribers().add(subscriber);
   }
 
+  /**
+   * @param subscriber Name of the player to unsubscribe
+   */
   default void unsubscribe(final @NotNull String subscriber) {
     getSubscribers().remove(subscriber);
   }

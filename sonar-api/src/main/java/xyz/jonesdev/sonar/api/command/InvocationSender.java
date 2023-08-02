@@ -20,6 +20,11 @@ package xyz.jonesdev.sonar.api.command;
 public interface InvocationSender {
   String getName();
 
+  /**
+   * Sends a message to the command executor
+   *
+   * @param message Message to send
+   */
   void sendMessage(final String message);
 
   default void sendMessage() {

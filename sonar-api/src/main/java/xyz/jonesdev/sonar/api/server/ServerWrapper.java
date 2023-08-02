@@ -23,7 +23,16 @@ import xyz.jonesdev.sonar.api.command.InvocationSender;
 import java.util.Optional;
 
 public interface ServerWrapper {
+
+  /**
+   * @return Platform of the server (Velocity, BungeeCord, Spigot)
+   */
   SonarPlatform getPlatform();
 
+  /**
+   * @param username Username of the player
+   * @return Optional player wrapped as InvocationSender
+   * @see xyz.jonesdev.sonar.api.command.InvocationSender
+   */
   Optional<InvocationSender> getOnlinePlayer(final String username);
 }

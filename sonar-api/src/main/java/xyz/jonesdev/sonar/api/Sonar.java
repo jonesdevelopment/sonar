@@ -32,7 +32,9 @@ import java.text.DecimalFormat;
 public interface Sonar {
   DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
 
-  // used for bStats metrics
+  /**
+   * @return bStats service ID for the respective Sonar platform
+   */
   default int getServiceId() {
     switch (getServer().getPlatform()) {
       case BUKKIT: {
@@ -48,6 +50,9 @@ public interface Sonar {
     }
   }
 
+  /**
+   * @return A small wrapper for the server
+   */
   @NotNull ServerWrapper getServer();
 
   @NotNull SonarConfiguration getConfig();
@@ -62,6 +67,9 @@ public interface Sonar {
 
   @NotNull Logger getLogger();
 
+  /**
+   * Reloads the entire plugin
+   */
   void reload();
 
   @NotNull
