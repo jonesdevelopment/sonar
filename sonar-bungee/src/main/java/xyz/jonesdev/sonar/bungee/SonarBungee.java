@@ -35,6 +35,7 @@ import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
+import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
 import java.io.File;
 import java.util.Optional;
@@ -149,6 +150,10 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
     // Register Fallback queue task
     plugin.getServer().getScheduler().schedule(plugin, getFallback().getQueue()::poll,
       500L, 500L, TimeUnit.MILLISECONDS);
+
+    // Register traffic counter reset task
+    plugin.getServer().getScheduler().schedule(plugin, TrafficCounter::reset,
+      1L, 1L, TimeUnit.SECONDS);
 
     // Initialize action bar verbose
     actionBarVerbose = new ActionBarVerbose(plugin.getServer());

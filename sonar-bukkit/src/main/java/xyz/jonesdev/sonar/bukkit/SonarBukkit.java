@@ -33,6 +33,7 @@ import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
 import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
+import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
 import java.io.File;
 import java.util.Objects;
@@ -141,6 +142,10 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
     // Register Sonar command
     Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());
+
+    // Register traffic counter reset task
+    plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, TrafficCounter::reset,
+      20L, 20L);
 
     // Initialize action bar verbose
     actionBarVerbose = new ActionBarVerbose(plugin.getServer());
