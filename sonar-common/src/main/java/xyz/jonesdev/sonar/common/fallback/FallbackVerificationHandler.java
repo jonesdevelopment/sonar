@@ -295,8 +295,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // The player is not allowed to move away from the collision platform.
     // This should not happen unless the max movement tick is configured to a high number.
-    checkFrame(Math.abs(x - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (x)");
-    checkFrame(Math.abs(z - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (z)");
+    checkFrame(Math.abs(x - BLOCKS_PER_ROW) <= BLOCKS_PER_ROW, "moved too far (x)");
+    checkFrame(Math.abs(z - BLOCKS_PER_ROW) <= BLOCKS_PER_ROW, "moved too far (z)");
 
     // The onGround property can never be true when we aren't checking for collisions
     checkFrame(!ground || state == State.COLLISIONS, "invalid ground state");
