@@ -61,7 +61,7 @@ public interface Sonar {
 
   @NotNull File getDataDirectory();
 
-  @NotNull VerifiedPlayerController getVerifiedPlayerController();
+  VerifiedPlayerController getVerifiedPlayerController();
 
   @NotNull Verbose getActionBarVerbose();
 
