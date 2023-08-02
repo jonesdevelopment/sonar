@@ -126,7 +126,8 @@ public final class SonarCommand implements SimpleCommand {
 
       // The subcommands has arguments which are not present in the executed command
       if (sub.getInfo().arguments().length > 0
-        && commandInvocation.getArguments().length <= 1) {
+        && commandInvocation.getArguments().length <= 1
+        && sub.getInfo().argumentsRequired()) {
         invocationSender.sendMessage(
           Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
             .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
