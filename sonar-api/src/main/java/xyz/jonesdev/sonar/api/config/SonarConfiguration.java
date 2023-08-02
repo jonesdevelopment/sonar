@@ -721,7 +721,7 @@ public final class SonarConfiguration {
         "\n- %queued% Number of queued connections" +
         "\n- %verifying% Number of verifying connections" +
         "\n- %blacklisted% Number of blacklisted IP addresses" +
-        "\n- %whitelisted% Number of verified IP addresses" +
+        "\n- %verified% Number of verified IP addresses" +
         "\n- %total-joins% Number of total joins (not unique!)" +
         "\n- %real-joins% Number of verification attempts" +
         "\n- %failed-verify% Number of failed verifications" +
@@ -740,7 +740,6 @@ public final class SonarConfiguration {
       "%prefix%&7Queued &f%queued%" +
         "  &7Verifying &f%verifying%" +
         "  &7Blacklisted &f%blacklisted%" +
-        "  &7Used memory ≅ &f%used-memory%" +
         "  &7Bandwidth &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
         "  &a&l%animation%"
     ));
