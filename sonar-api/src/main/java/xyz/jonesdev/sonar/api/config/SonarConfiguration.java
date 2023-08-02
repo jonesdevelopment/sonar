@@ -26,18 +26,20 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public final class SonarConfiguration {
   @Getter
   private final SimpleYamlConfig generalConfig;
-  private final SimpleYamlConfig messagesConfig;
+  private final File pluginFolder;
+  private SimpleYamlConfig messagesConfig;
 
-  public SonarConfiguration(final @NotNull File folder) {
-    generalConfig = new SimpleYamlConfig(folder, "config");
-    messagesConfig = new SimpleYamlConfig(folder, "messages");
+  public SonarConfiguration(final @NotNull File pluginFolder) {
+    this.pluginFolder = pluginFolder;
+    this.generalConfig = new SimpleYamlConfig(pluginFolder, "config");
   }
+
+  public String LANGUAGE;
 
   public String PREFIX;
   public String SUPPORT_URL;
@@ -142,23 +144,14 @@ public final class SonarConfiguration {
   public String DATABASE_RELOADED;
 
   public void load() {
-    Objects.requireNonNull(generalConfig);
-
     generalConfig.load();
-    messagesConfig.load();
-
-    // Message settings
-    messagesConfig.getYaml().setComment("messages.prefix",
-      "Placeholder for every '%prefix%' in this configuration file"
-    );
-    PREFIX = formatString(messagesConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
-
-    messagesConfig.getYaml().setComment("messages.support-url",
-      "Placeholder for every '%support-url%' in this configuration file"
-    );
-    SUPPORT_URL = messagesConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
 
     // General options
+    generalConfig.getYaml().setComment("general.language",
+      "Suffix of the language file Sonar should use for messages"
+    );
+    LANGUAGE = generalConfig.getString("general.language", "en");
+
     generalConfig.getYaml().setComment("general.max-online-per-ip",
       "Maximum number of players online with the same IP address"
     );
@@ -180,6 +173,20 @@ public final class SonarConfiguration {
     );
     DATABASE_TYPE =
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
+
+    // Message settings
+    messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
+    messagesConfig.load();
+
+    messagesConfig.getYaml().setComment("messages.prefix",
+      "Placeholder for every '%prefix%' in this configuration file"
+    );
+    PREFIX = formatString(messagesConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
+
+    messagesConfig.getYaml().setComment("messages.support-url",
+      "Placeholder for every '%support-url%' in this configuration file"
+    );
+    SUPPORT_URL = messagesConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
 
     // MySQL
     generalConfig.getYaml().setComment("general.database.mysql.url",
