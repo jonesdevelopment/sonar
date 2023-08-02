@@ -17,17 +17,15 @@
 
 package xyz.jonesdev.sonar.common.command.impl;
 
-import com.sun.management.OperatingSystemMXBean;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.argument.Argument;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.format.MemoryFormatter;
+import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
-
-import java.lang.management.ManagementFactory;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 
@@ -42,10 +40,7 @@ import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
   },
   argumentsRequired = false
 )
-public final class StatisticsCommand extends Subcommand {
-  private static final Runtime RUNTIME = Runtime.getRuntime();
-  private static final OperatingSystemMXBean OPERATING_SYSTEM_MX_BEAN =
-    (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+public final class StatisticsCommand extends Subcommand implements JVMProfiler {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
@@ -65,31 +60,21 @@ public final class StatisticsCommand extends Subcommand {
         }
 
         case "memory": {
-          final long freeMemory = RUNTIME.freeMemory();
-          final long totalMemory = RUNTIME.totalMemory();
-          final long maxMemory = RUNTIME.maxMemory();
-          final long usedMemory = totalMemory - freeMemory;
-          invocation.getSender().sendMessage(" §a▪ §7Total free memory (JVM): §f" + MemoryFormatter.formatMemory(freeMemory));
-          invocation.getSender().sendMessage(" §a▪ §7Total used memory (JVM): §f" + MemoryFormatter.formatMemory(usedMemory));
-          invocation.getSender().sendMessage(" §a▪ §7Total maximum memory (JVM): §f" + MemoryFormatter.formatMemory(maxMemory));
-          invocation.getSender().sendMessage(" §a▪ §7Total allocated memory (JVM): §f" + MemoryFormatter.formatMemory(totalMemory));
+          invocation.getSender().sendMessage(" §a▪ §7Total free memory (JVM): §f" + MemoryFormatter.formatMemory(getFreeMemory()));
+          invocation.getSender().sendMessage(" §a▪ §7Total used memory (JVM): §f" + MemoryFormatter.formatMemory(getUsedMemory()));
+          invocation.getSender().sendMessage(" §a▪ §7Total maximum memory (JVM): §f" + MemoryFormatter.formatMemory(getMaxMemory()));
+          invocation.getSender().sendMessage(" §a▪ §7Total allocated memory (JVM): §f" + MemoryFormatter.formatMemory(getTotalMemory()));
           invocation.getSender().sendMessage();
           return;
         }
 
         case "cpu": {
-          final int virtualCores = RUNTIME.availableProcessors();
-          final double process = OPERATING_SYSTEM_MX_BEAN.getProcessCpuLoad() * 100;
-          final double system = OPERATING_SYSTEM_MX_BEAN.getSystemCpuLoad() * 100;
-          final double averageP = process / virtualCores;
-          final double averageS = system / virtualCores;
-          final double loadAverage = OPERATING_SYSTEM_MX_BEAN.getSystemLoadAverage() * 100;
-          invocation.getSender().sendMessage(" §a▪ §7Process CPU usage right now: §f" + DECIMAL_FORMAT.format(process) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7System CPU usage right now: §f" + DECIMAL_FORMAT.format(system) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7Per-core process CPU usage: §f" + DECIMAL_FORMAT.format(averageP) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7Per-core system CPU usage: §f" + DECIMAL_FORMAT.format(averageS) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7General system load average: §f" + DECIMAL_FORMAT.format(loadAverage) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7Total virtual cpu cores (JVM): §f" + virtualCores);
+          invocation.getSender().sendMessage(" §a▪ §7Process CPU usage right now: §f" + DECIMAL_FORMAT.format(getProcessCPUUsage()) + "%");
+          invocation.getSender().sendMessage(" §a▪ §7System CPU usage right now: §f" + DECIMAL_FORMAT.format(getSystemCPUUsage()) + "%");
+          invocation.getSender().sendMessage(" §a▪ §7Per-core process CPU usage: §f" + DECIMAL_FORMAT.format(getAverageProcessCPUUsage()) + "%");
+          invocation.getSender().sendMessage(" §a▪ §7Per-core system CPU usage: §f" + DECIMAL_FORMAT.format(getAverageSystemCPUUsage()) + "%");
+          invocation.getSender().sendMessage(" §a▪ §7General system load average: §f" + DECIMAL_FORMAT.format(getSystemLoadAverage()) + "%");
+          invocation.getSender().sendMessage(" §a▪ §7Total virtual cpu cores (JVM): §f" + DECIMAL_FORMAT.format(getVirtualCores()));
           invocation.getSender().sendMessage();
           return;
         }
