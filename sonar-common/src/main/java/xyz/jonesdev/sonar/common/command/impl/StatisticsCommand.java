@@ -53,10 +53,10 @@ public final class StatisticsCommand extends Subcommand {
     invocation.getSender().sendMessage(" §a▪ §7Total non-unique joins: §f" + DECIMAL_FORMAT.format(total));
     invocation.getSender().sendMessage(" §a▪ §7Total verification attempts: §f" + DECIMAL_FORMAT.format(real));
     invocation.getSender().sendMessage(" §a▪ §7Total failed verifications: §f" + DECIMAL_FORMAT.format(failed));
-    invocation.getSender().sendMessage(" §a▪ §7Current incoming bot traffic: §f" + TrafficCounter.INCOMING.getCachedSecond());
-    invocation.getSender().sendMessage(" §a▪ §7Current outgoing bot traffic: §f" + TrafficCounter.OUTGOING.getCachedSecond());
-    invocation.getSender().sendMessage(" §a▪ §7Total incoming bot traffic: §f" + TrafficCounter.INCOMING.getCachedTtl());
-    invocation.getSender().sendMessage(" §a▪ §7Total outgoing bot traffic: §f" + TrafficCounter.OUTGOING.getCachedTtl());
+    invocation.getSender().sendMessage(" §a▪ §7Current incoming used bandwidth: §f" + TrafficCounter.INCOMING.getCachedSecond());
+    invocation.getSender().sendMessage(" §a▪ §7Current outgoing used bandwidth: §f" + TrafficCounter.OUTGOING.getCachedSecond());
+    invocation.getSender().sendMessage(" §a▪ §7Total incoming used bandwidth: §f" + TrafficCounter.INCOMING.getCachedTtl());
+    invocation.getSender().sendMessage(" §a▪ §7Total outgoing used bandwidth: §f" + TrafficCounter.OUTGOING.getCachedTtl());
     invocation.getSender().sendMessage();
   }
 }

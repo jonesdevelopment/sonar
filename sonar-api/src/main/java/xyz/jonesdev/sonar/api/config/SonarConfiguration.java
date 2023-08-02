@@ -725,10 +725,10 @@ public final class SonarConfiguration {
         "\n- %total-joins% Number of total joins (not unique!)" +
         "\n- %real-joins% Number of verification attempts" +
         "\n- %failed-verify% Number of failed verifications" +
-        "\n- %incoming-traffic% Incoming traffic per second (new players)" +
-        "\n- %outgoing-traffic% Outgoing traffic per second (new players)" +
-        "\n- %incoming-traffic-ttl% Total incoming traffic (new players)" +
-        "\n- %outgoing-traffic-ttl% Total outgoing traffic (new players)" +
+        "\n- %incoming-traffic% Incoming bandwidth usage per second" +
+        "\n- %outgoing-traffic% Outgoing bandwidth usage per second" +
+        "\n- %incoming-traffic-ttl% Total incoming bandwidth usage" +
+        "\n- %outgoing-traffic-ttl% Total outgoing bandwidth usage" +
         "\n- %used-memory% Amount of used memory (JVM process)" +
         "\n- %total-memory% Amount of total memory (JVM process)" +
         "\n- %max-memory% Amount of max memory (JVM process)" +
@@ -741,7 +741,7 @@ public final class SonarConfiguration {
         "  &7Verifying &f%verifying%" +
         "  &7Blacklisted &f%blacklisted%" +
         "  &7Used memory ≅ &f%used-memory%" +
-        "  &7Bot Traffic &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
+        "  &7Bandwidth &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
         "  &a&l%animation%"
     ));
     ANIMATION = messagesConfig.getStringList("messages.action-bar.animation",

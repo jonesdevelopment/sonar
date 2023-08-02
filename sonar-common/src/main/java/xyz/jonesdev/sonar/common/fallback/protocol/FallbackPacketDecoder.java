@@ -24,7 +24,6 @@ import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
-import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
 
@@ -34,7 +33,8 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final FallbackPacketRegistry.ProtocolRegistry registry;
   private final FallbackPacketListener listener;
 
-  public FallbackPacketDecoder(final FallbackPlayer<?, ?> connection, final FallbackPacketListener listener) {
+  public FallbackPacketDecoder(final @NotNull FallbackPlayer<?, ?> connection,
+                               final @NotNull FallbackPacketListener listener) {
     this.connection = connection;
     this.registry = FallbackPacketRegistry.SONAR.getProtocolRegistry(
       FallbackPacketRegistry.Direction.SERVERBOUND, connection.getProtocolVersion()
@@ -56,7 +56,6 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       final int originalReaderIndex = byteBuf.readerIndex();
       final int packetId = readVarInt(byteBuf);
       final FallbackPacket packet = registry.createPacket(packetId);
-      TrafficCounter.INCOMING.increment(byteBuf.readableBytes());
 
       if (packet == null) {
         byteBuf.readerIndex(originalReaderIndex);

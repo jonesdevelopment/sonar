@@ -40,6 +40,7 @@ import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
+import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import xyz.jonesdev.sonar.velocity.fallback.dummy.DummyConnection;
@@ -51,7 +52,7 @@ import java.net.InetAddress;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.velocitypowered.proxy.network.Connections.READ_TIMEOUT;
+import static com.velocitypowered.proxy.network.Connections.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
@@ -121,6 +122,12 @@ public final class FallbackListener {
       return;
     }
 
+    final MinecraftConnection mcConnection = initialConnection.getConnection();
+    final Channel channel = mcConnection.getChannel();
+    final ChannelPipeline pipeline = channel.pipeline();
+
+    TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
+
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
     final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
@@ -165,9 +172,6 @@ public final class FallbackListener {
       return;
     }
 
-    final MinecraftConnection mcConnection = initialConnection.getConnection();
-    final Channel channel = mcConnection.getChannel();
-
     // Completely skip Geyser connections
     // TODO: different handling?
     if (GeyserValidator.isGeyser(channel)) {
@@ -188,8 +192,6 @@ public final class FallbackListener {
 
       // Do not continue if the connection is closed or marked as disconnected
       if (mcConnection.isClosed() || mcConnection.isKnownDisconnect()) return;
-
-      final ChannelPipeline pipeline = channel.pipeline();
 
       // We have to add this pipeline to monitor whenever the client disconnects
       // to remove them from the list of connected and queued players

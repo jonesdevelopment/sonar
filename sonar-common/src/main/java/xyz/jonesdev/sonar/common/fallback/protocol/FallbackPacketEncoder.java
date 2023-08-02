@@ -21,7 +21,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
 import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
@@ -43,6 +42,5 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
     final int packetId = registry.getPacketId(msg);
     writeVarInt(out, packetId);
     msg.encode(out, protocolVersion);
-    TrafficCounter.OUTGOING.increment(out.readableBytes());
   }
 }
