@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
@@ -33,7 +34,7 @@ import java.util.Collection;
 import static xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory;
 
 @RequiredArgsConstructor
-public final class ActionBarVerbose implements Verbose {
+public final class ActionBarVerbose implements Verbose, JVMProfiler {
   private final ProxyServer server;
   @Getter
   private final Collection<String> subscribers = new ArrayList<>();
@@ -57,10 +58,10 @@ public final class ActionBarVerbose implements Verbose {
         .replace("%outgoing-traffic%", TrafficCounter.OUTGOING.getCachedSecond())
         .replace("%incoming-traffic-ttl%", TrafficCounter.INCOMING.getCachedTtl())
         .replace("%outgoing-traffic-ttl%", TrafficCounter.OUTGOING.getCachedTtl())
-        .replace("%used-memory%", formatMemory(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()))
-        .replace("%free-memory%", formatMemory(Runtime.getRuntime().freeMemory()))
-        .replace("%total-memory%", formatMemory(Runtime.getRuntime().totalMemory()))
-        .replace("%max-memory%", formatMemory(Runtime.getRuntime().maxMemory()))
+        .replace("%used-memory%", formatMemory(getUsedMemory()))
+        .replace("%free-memory%", formatMemory(getFreeMemory()))
+        .replace("%total-memory%", formatMemory(getTotalMemory()))
+        .replace("%max-memory%", formatMemory(getMaxMemory()))
         .replace("%animation%", VerboseAnimation.nextAnimation())
     );
 
