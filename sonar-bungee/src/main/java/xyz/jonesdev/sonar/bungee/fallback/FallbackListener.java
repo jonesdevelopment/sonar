@@ -192,8 +192,7 @@ public final class FallbackListener implements Listener {
     }
 
     // We cannot allow too many players on our Fallback server
-    if (fallback.getQueue().getQueuedPlayers().size() > fallback.getSonar().getConfig().MAXIMUM_QUEUED_PLAYERS
-      || fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
+    if (fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
       event.setCancelled(true);
       event.setCancelReason(TOO_MANY_PLAYERS);
       return;

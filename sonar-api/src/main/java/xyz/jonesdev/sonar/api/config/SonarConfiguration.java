@@ -59,7 +59,6 @@ public final class SonarConfiguration {
   public int MINIMUM_PLAYERS_FOR_ATTACK;
   public int MAXIMUM_VERIFYING_PLAYERS;
   public int MAXIMUM_ONLINE_PER_IP;
-  public int MAXIMUM_QUEUED_PLAYERS;
   public int MAXIMUM_QUEUE_POLLS;
   public int MAXIMUM_LOGIN_PACKETS;
   public int VERIFICATION_TIMEOUT;
@@ -225,11 +224,6 @@ public final class SonarConfiguration {
     LOCKDOWN_ENABLE_NOTIFY = generalConfig.getBoolean("general.lockdown.notify-admins", true);
 
     // Queue
-    generalConfig.getYaml().setComment("general.queue.max-players",
-      "Maximum number of players on the queue"
-    );
-    MAXIMUM_QUEUED_PLAYERS = clamp(generalConfig.getInt("general.queue.max-players", 100000), 1000, 500000);
-
     generalConfig.getYaml().setComment("general.queue.max-polls",
       "Maximum number of queue polls per 500 milliseconds"
     );

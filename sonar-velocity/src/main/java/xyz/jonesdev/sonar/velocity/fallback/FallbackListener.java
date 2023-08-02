@@ -145,8 +145,7 @@ public final class FallbackListener {
     }
 
     // We cannot allow too many players on our Fallback server
-    if (fallback.getQueue().getQueuedPlayers().size() > fallback.getSonar().getConfig().MAXIMUM_QUEUED_PLAYERS
-      || fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
+    if (fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         TOO_MANY_PLAYERS,
         inboundConnection.getProtocolVersion()
