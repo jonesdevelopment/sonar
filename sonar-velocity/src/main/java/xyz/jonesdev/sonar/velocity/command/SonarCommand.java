@@ -212,9 +212,13 @@ public final class SonarCommand implements SimpleCommand {
     } else if (invocation.arguments().length == 2) {
       if (ARG_TAB_SUGGESTIONS.isEmpty()) {
         for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-          ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), Arrays.stream(subcommand.getInfo().arguments())
+          final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
             .map(Argument::value)
-            .collect(Collectors.toUnmodifiableList()));
+            .collect(Collectors.toUnmodifiableList());
+          ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
+          for (final String alias : subcommand.getInfo().aliases()) {
+            ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
+          }
         }
       }
 
