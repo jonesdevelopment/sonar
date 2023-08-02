@@ -21,14 +21,37 @@ import io.netty.buffer.ByteBuf;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 public interface FallbackPacket {
+
+  /**
+   * Encodes the packet sent by the server
+   *
+   * @param byteBuf ByteBuf
+   * @param protocolVersion Protocol version of the player
+   */
   void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
 
+  /**
+   * Decodes the packet sent by the client
+   *
+   * @param byteBuf ByteBuf
+   * @param protocolVersion Protocol version of the player
+   */
   void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
 
+  /**
+   * @param byteBuf ByteBuf
+   * @param protocolVersion Protocol version of the player
+   * @return The minimum allowed length of the decoded packet
+   */
   default int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     return -1;
   }
 
+  /**
+   * @param byteBuf ByteBuf
+   * @param protocolVersion Protocol version of the player
+   * @return The maximum allowed length of the decoded packet
+   */
   default int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     return -1;
   }

@@ -19,5 +19,11 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 
 @FunctionalInterface
 public interface FallbackPacketListener {
+
+  /**
+   * Handles the incoming packet
+   *
+   * @param packet Packet to handle
+   */
   void handle(final FallbackPacket packet);
 }
