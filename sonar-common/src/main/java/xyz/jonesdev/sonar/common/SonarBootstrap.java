@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common;
 
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuchino.Cappuchino;
 import xyz.jonesdev.cappuchino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -27,7 +28,7 @@ import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 public interface SonarBootstrap<T> extends Sonar {
-  void enable(final T plugin);
+  void enable(final @NotNull T plugin);
 
   default void reload() {
     // Load the configuration

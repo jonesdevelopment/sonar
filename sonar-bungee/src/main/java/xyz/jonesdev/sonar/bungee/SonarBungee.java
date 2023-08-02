@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.bungee;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bstats.bungeecord.Metrics;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
@@ -118,7 +119,7 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   };
 
   @Override
-  public void enable(final SonarBungeePlugin plugin) {
+  public void enable(final @NotNull SonarBungeePlugin plugin) {
     this.plugin = plugin;
 
     final DelayTimer timer = new DelayTimer();

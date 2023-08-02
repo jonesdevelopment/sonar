@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.velocity;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
@@ -117,7 +118,7 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   };
 
   @Override
-  public void enable(final SonarVelocityPlugin plugin) {
+  public void enable(final @NotNull SonarVelocityPlugin plugin) {
     this.plugin = plugin;
 
     final DelayTimer timer = new DelayTimer();

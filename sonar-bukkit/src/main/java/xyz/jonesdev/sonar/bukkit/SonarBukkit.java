@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.bukkit;
 
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
@@ -117,7 +118,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   };
 
   @Override
-  public void enable(final SonarBukkitPlugin plugin) {
+  public void enable(final @NotNull SonarBukkitPlugin plugin) {
     this.plugin = plugin;
 
     final DelayTimer timer = new DelayTimer();
