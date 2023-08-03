@@ -22,10 +22,8 @@ import com.velocitypowered.natives.util.Natives;
 import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.compress.PacketCompressor;
 import net.md_5.bungee.compress.PacketDecompressor;
@@ -35,21 +33,17 @@ import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
-import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketCompressor;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
-import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
 
 import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.util.Objects;
 
 import static net.md_5.bungee.netty.PipelineUtils.FRAME_PREPENDER;
-import static xyz.jonesdev.sonar.bungee.fallback.FallbackListener.CachedMessages.*;
+import static xyz.jonesdev.sonar.bungee.fallback.FallbackListener.CachedMessages.LOCKDOWN_DISCONNECT;
 
-@RequiredArgsConstructor
 @SuppressWarnings("deprecation")
+@RequiredArgsConstructor
 public final class FallbackListener implements Listener {
   private final Fallback fallback;
 
@@ -65,24 +59,10 @@ public final class FallbackListener implements Listener {
   }
 
   public static class CachedMessages {
-    static TextComponent TOO_MANY_PLAYERS;
-    static TextComponent BLACKLISTED;
-    static TextComponent ALREADY_VERIFYING;
-    static TextComponent ALREADY_QUEUED;
-    static TextComponent TOO_MANY_ONLINE_PER_IP;
-    static TextComponent TOO_FAST_RECONNECT;
     static TextComponent LOCKDOWN_DISCONNECT;
-    static TextComponent INVALID_USERNAME;
 
     public static void update() {
-      ALREADY_VERIFYING = new TextComponent(Sonar.get().getConfig().ALREADY_VERIFYING);
-      ALREADY_QUEUED = new TextComponent(Sonar.get().getConfig().ALREADY_QUEUED);
-      TOO_MANY_PLAYERS = new TextComponent(Sonar.get().getConfig().TOO_MANY_PLAYERS);
-      BLACKLISTED = new TextComponent(Sonar.get().getConfig().BLACKLISTED);
-      TOO_MANY_ONLINE_PER_IP = new TextComponent(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP);
-      TOO_FAST_RECONNECT = new TextComponent(Sonar.get().getConfig().TOO_FAST_RECONNECT);
       LOCKDOWN_DISCONNECT = new TextComponent(Sonar.get().getConfig().LOCKDOWN_DISCONNECT);
-      INVALID_USERNAME = new TextComponent(Sonar.get().getConfig().INVALID_USERNAME);
     }
   }
 
@@ -145,101 +125,5 @@ public final class FallbackListener implements Listener {
         )
       );
     }
-  }
-
-  @EventHandler
-  public void handle(final @NotNull PreLoginEvent event) throws Throwable {
-    Statistics.TOTAL_TRAFFIC.increment();
-
-    final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
-
-    if (fallback.getBlacklisted().has(inetAddress.toString())) {
-      event.setCancelled(true);
-      event.setCancelReason(BLACKLISTED);
-      return;
-    }
-
-    final InitialHandler initialHandler = (InitialHandler) event.getConnection();
-    final ChannelWrapper channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER.get(initialHandler);
-
-    // Check if the number of online players using the same IP address as
-    // the connecting player is greater than the configured amount
-    final int maxOnlinePerIp = fallback.getSonar().getConfig().MAXIMUM_ONLINE_PER_IP;
-
-    if (maxOnlinePerIp > 0) {
-      final long onlinePerIp = ProxyServer.getInstance().getPlayers().stream()
-        .filter(player -> Objects.equals(player.getAddress().getAddress(), inetAddress))
-        .count();
-
-      // We use '>=' because the player connecting to the server hasn't joined yet
-      if (onlinePerIp >= maxOnlinePerIp) {
-        event.setCancelled(true);
-        event.setCancelReason(TOO_MANY_ONLINE_PER_IP);
-        return;
-      }
-    }
-
-    if (fallback.getVerified().contains(inetAddress.toString())) return;
-    if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
-
-    // Check if Fallback is already verifying a player
-    // → is another player with the same IP address connected to Fallback?
-    if (fallback.getConnected().containsKey(event.getConnection().getName())
-      || fallback.getConnected().containsValue(inetAddress)) {
-      event.setCancelled(true);
-      event.setCancelReason(ALREADY_VERIFYING);
-      return;
-    }
-
-    // We cannot allow too many players on our Fallback server
-    if (fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
-      event.setCancelled(true);
-      event.setCancelReason(TOO_MANY_PLAYERS);
-      return;
-    }
-
-    // Check if the IP address is reconnecting too quickly while being unverified
-    if (fallback.getRatelimiter().shouldDeny(inetAddress)) {
-      event.setCancelled(true);
-      event.setCancelReason(TOO_FAST_RECONNECT);
-      return;
-    }
-
-    // Check if the player is already queued since we don't want bots to flood the queue
-    if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-      event.setCancelled(true);
-      event.setCancelReason(ALREADY_QUEUED);
-      return;
-    }
-
-    // Completely skip Geyser connections
-    // TODO: different handling?
-    if (GeyserValidator.isGeyser(channelWrapper.getHandle())) {
-      // TODO: Do we need to log this?
-      fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
-      return;
-    }
-
-    handleLogin(initialHandler, channelWrapper);
-  }
-
-  private void handleLogin(final InitialHandler initialHandler, final ChannelWrapper channelWrapper) {
-    if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
-
-    final InetAddress inetAddress = initialHandler.getAddress().getAddress();
-
-    // We don't want to check players that have already been verified
-    if (fallback.getVerified().contains(inetAddress.toString())) return;
-
-    // Run in the channel's event loop
-    channelWrapper.getHandle().eventLoop().execute(() -> {
-
-      // Do not continue if the connection is closed
-      if (channelWrapper.isClosed()) return;
-
-      final ChannelPipeline pipeline = channelWrapper.getHandle().pipeline();
-
-      // TODO: create Fallback for BungeeCord
-    });
   }
 }
