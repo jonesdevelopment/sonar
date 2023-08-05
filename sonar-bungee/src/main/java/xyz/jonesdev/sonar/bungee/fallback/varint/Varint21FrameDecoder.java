@@ -24,6 +24,8 @@ import io.netty.handler.codec.CorruptedFrameException;
 
 import java.util.List;
 
+// Mostly taken from
+// https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java
 public final class Varint21FrameDecoder extends ByteToMessageDecoder {
 
   @Override

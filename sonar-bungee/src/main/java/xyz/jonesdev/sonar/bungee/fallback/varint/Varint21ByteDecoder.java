@@ -21,6 +21,8 @@ import io.netty.util.ByteProcessor;
 import lombok.Getter;
 import lombok.ToString;
 
+// Taken from
+// https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/VarintByteDecoder.java
 @Getter
 @ToString
 public final class Varint21ByteDecoder implements ByteProcessor {
