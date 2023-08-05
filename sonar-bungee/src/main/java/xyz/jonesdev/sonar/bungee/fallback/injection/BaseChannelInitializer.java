@@ -54,6 +54,7 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
     }
   }
 
+  // Mostly taken from Waterfall
   @Override
   protected void initChannel(final @NotNull Channel channel) throws Exception {
     try {

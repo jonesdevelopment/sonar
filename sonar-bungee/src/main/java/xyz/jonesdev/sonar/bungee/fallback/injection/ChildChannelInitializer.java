@@ -54,6 +54,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
     }
   }
 
+  // Mostly taken from Waterfall
   @Override
   protected void initChannel(final @NotNull Channel channel) throws Exception {
     final SocketAddress remoteAddress = channel.remoteAddress() == null ? channel.parent().localAddress() : channel.remoteAddress();
