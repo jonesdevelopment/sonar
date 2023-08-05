@@ -98,8 +98,6 @@ public final class FallbackListener implements Listener {
 
     if (compressionThreshold <= 0) return;
 
-    final VelocityCompressor velocityCompressor = Natives.compress.get().create(-1);
-
     // You don't need the frame decoder anymore
     if (pipeline.get(FRAME_PREPENDER) != null) {
       pipeline.remove(FRAME_PREPENDER);
@@ -108,12 +106,14 @@ public final class FallbackListener implements Listener {
     // Replace compression handlers
     if (pipeline.get(PacketCompressor.class) != null
       && pipeline.get(PacketDecompressor.class) != null) {
+      final VelocityCompressor compressor = Natives.compress.get().create(-1);
+
       pipeline.replace(
         PacketCompressor.class,
         "compress",
         new FallbackPacketCompressor(
           compressionThreshold,
-          velocityCompressor
+          compressor
         )
       );
       pipeline.replace(
@@ -121,7 +121,7 @@ public final class FallbackListener implements Listener {
         "decompress",
         new FallbackPacketDecompressor(
           compressionThreshold,
-          velocityCompressor
+          compressor
         )
       );
     }
