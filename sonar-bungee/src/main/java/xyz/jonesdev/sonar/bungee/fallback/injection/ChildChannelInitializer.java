@@ -57,7 +57,8 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
   // Mostly taken from Waterfall
   @Override
   protected void initChannel(final @NotNull Channel channel) throws Exception {
-    final SocketAddress remoteAddress = channel.remoteAddress() == null ? channel.parent().localAddress() : channel.remoteAddress();
+    final SocketAddress remoteAddress = channel.remoteAddress() == null ? channel.parent().localAddress() :
+      channel.remoteAddress();
 
     if (BungeeCord.getInstance().getConnectionThrottle() != null && BungeeCord.getInstance().getConnectionThrottle().throttle(remoteAddress)) {
       channel.close();
@@ -76,8 +77,10 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
         }
 
         channel.pipeline().addBefore("frame-decoder", "legacy-decoder", new LegacyDecoder());
-        channel.pipeline().addAfter("frame-decoder", "packet-decoder", new MinecraftDecoder(Protocol.HANDSHAKE, true, ProxyServer.getInstance().getProtocolVersion()));
-        channel.pipeline().addAfter("frame-prepender", "packet-encoder", new MinecraftEncoder(Protocol.HANDSHAKE, true, ProxyServer.getInstance().getProtocolVersion()));
+        channel.pipeline().addAfter("frame-decoder", "packet-decoder", new MinecraftDecoder(Protocol.HANDSHAKE, true,
+          ProxyServer.getInstance().getProtocolVersion()));
+        channel.pipeline().addAfter("frame-prepender", "packet-encoder", new MinecraftEncoder(Protocol.HANDSHAKE,
+          true, ProxyServer.getInstance().getProtocolVersion()));
         channel.pipeline().addBefore("frame-prepender", "legacy-kick", LEGACY_KICKER);
         channel.pipeline().get(HandlerBoss.class).setHandler(new InitialHandler(BungeeCord.getInstance(), listener));
 

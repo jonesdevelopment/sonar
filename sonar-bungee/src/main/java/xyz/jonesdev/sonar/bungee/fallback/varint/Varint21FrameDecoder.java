@@ -61,9 +61,7 @@ public final class Varint21FrameDecoder extends ByteToMessageDecoder {
         if (readVarInt < 0) {
           byteBuf.clear();
           throw new CorruptedFrameException("Result: " + reader);
-        }
-
-        else if (readVarInt == 0) {
+        } else if (readVarInt == 0) {
           // Actually, we don't want to throw an Exception if the packet is empty.
           // The check would also false flag a lot of legit players since packets
           // in 1.7 could sometimes be empty.
