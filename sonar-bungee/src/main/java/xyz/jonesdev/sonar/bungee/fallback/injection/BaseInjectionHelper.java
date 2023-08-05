@@ -15,19 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.fallback.netty;
+package xyz.jonesdev.sonar.bungee.fallback.injection;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import lombok.experimental.UtilityClass;
 import net.md_5.bungee.netty.PipelineUtils;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 
-public final class NettyInjector {
+@UtilityClass
+public class BaseInjectionHelper {
   public void inject(final ChannelInitializer<Channel> childHandler) {
     try {
-      final Field childField = PipelineUtils.class.getDeclaredField("SERVER_CHILD");
+      final Field childField = PipelineUtils.class.getField("SERVER_CHILD");
       childField.setAccessible(true);
 
       final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");

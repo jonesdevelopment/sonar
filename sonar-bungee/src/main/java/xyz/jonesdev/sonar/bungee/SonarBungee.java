@@ -33,6 +33,8 @@ import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.api.timer.DelayTimer;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
+import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
+import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
 import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
@@ -162,6 +164,9 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
     // Register action bar verbose task
     plugin.getServer().getScheduler().schedule(plugin, actionBarVerbose::update,
       100L, 100L, TimeUnit.MILLISECONDS);
+
+    // Inject base into ProtocolUtils
+    BaseInjectionHelper.inject(ChildChannelInitializer.INSTANCE);
 
     // Done
     logger.info("Done ({}s)!", timer.formattedDelay());
