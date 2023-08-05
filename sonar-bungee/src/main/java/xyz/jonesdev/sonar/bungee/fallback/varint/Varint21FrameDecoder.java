@@ -35,7 +35,6 @@ public final class Varint21FrameDecoder extends ByteToMessageDecoder {
       // https://github.com/jonesdevelopment/sonar/pull/5
       return;
     }
-    System.out.println(byteBuf.readableBytes());
 
     final Varint21ByteDecoder reader = new Varint21ByteDecoder();
     final int end = byteBuf.forEachByte(reader);
