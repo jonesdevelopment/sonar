@@ -187,7 +187,7 @@ public final class VerifiedPlayerController {
 
   /**
    * @param inetAddress IP address
-   * @param uuid UUID associated to the IP
+   * @param uuid        UUID associated to the IP
    * @return Whether the local cache contains the IP and UUID
    */
   public boolean has(final @NotNull String inetAddress, final @NotNull UUID uuid) {
