@@ -18,5 +18,9 @@
 package xyz.jonesdev.sonar.api.command.argument;
 
 public @interface Argument {
+
+  /**
+   * @return Returns the name of the argument
+   */
   String value();
 }

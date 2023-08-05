@@ -77,6 +77,12 @@ public final class VerifiedPlayerController {
     }
   }
 
+  /**
+   * First, remove the player from the local cache and then,
+   * secondly, asynchronously add the player to the database.
+   *
+   * @param inetAddress InetAddress of the VerifiedPlayer model
+   */
   public void remove(final @NotNull String inetAddress) {
     _remove(inetAddress);
 
@@ -102,10 +108,21 @@ public final class VerifiedPlayerController {
     }
   }
 
+  /**
+   * Locally remove the object from the cache
+   *
+   * @param inetAddress IP address of the player
+   */
   private void _remove(final @NotNull String inetAddress) {
     MAP.remove(inetAddress);
   }
 
+  /**
+   * First, cache the player locally and then,
+   * secondly, asynchronously add the player to the database.
+   *
+   * @param player VerifiedPlayer model
+   */
   public void add(final @NotNull VerifiedPlayer player) {
     _add(player);
 
@@ -125,21 +142,36 @@ public final class VerifiedPlayerController {
     });
   }
 
+  /**
+   * Locally cache the object
+   *
+   * @param player VerifiedPlayer model
+   */
   private void _add(final @NotNull VerifiedPlayer player) {
     MAP.computeIfAbsent(player.getInetAddress(), v -> new Vector<>())
       .add(player.getPlayerUUID());
   }
 
+  /**
+   * @return Estimated size of the local cache
+   */
   public synchronized int estimatedSize() {
     return MAP.values().stream()
       .mapToInt(Collection::size)
       .sum();
   }
 
+  /**
+   * @return List of UUIDs associated with one IP address
+   */
   public Collection<UUID> getUUIDs(final @NotNull String inetAddress) {
     return MAP.getOrDefault(inetAddress, Collections.emptyList());
   }
 
+  /**
+   * Clear the local cache, and then if the database type is set,
+   * remove the table from the database.
+   */
   public void clearAll() {
     try {
       MAP.clear();
@@ -153,6 +185,11 @@ public final class VerifiedPlayerController {
     }
   }
 
+  /**
+   * @param inetAddress IP address
+   * @param uuid UUID associated to the IP
+   * @return Whether the local cache contains the IP and UUID
+   */
   public boolean has(final @NotNull String inetAddress, final @NotNull UUID uuid) {
     final Collection<UUID> got = MAP.get(inetAddress);
     if (got != null) {
@@ -161,6 +198,10 @@ public final class VerifiedPlayerController {
     return false;
   }
 
+  /**
+   * @param inetAddress IP address
+   * @return Whether the local cache contains the IP
+   */
   public boolean has(final @NotNull String inetAddress) {
     return MAP.containsKey(inetAddress);
   }
