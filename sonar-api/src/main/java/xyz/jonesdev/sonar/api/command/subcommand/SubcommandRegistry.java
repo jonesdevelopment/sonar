@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 public interface SubcommandRegistry {
-  List<Subcommand> SUBCOMMANDS = Collections.synchronizedList(new ArrayList<>());
+  List<Subcommand> SUBCOMMANDS = new ArrayList<>();
 
   default List<Subcommand> getSubcommands() {
     return Collections.unmodifiableList(SUBCOMMANDS);
