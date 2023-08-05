@@ -54,7 +54,8 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
     }
   }
 
-  // Mostly taken from Waterfall
+  // Mostly taken from BungeeCord
+  // https://github.com/SpigotMC/BungeeCord/blob/master/proxy/src/main/java/net/md_5/bungee/netty/PipelineUtils.java#L162
   @Override
   protected void initChannel(final @NotNull Channel channel) throws Exception {
     try {

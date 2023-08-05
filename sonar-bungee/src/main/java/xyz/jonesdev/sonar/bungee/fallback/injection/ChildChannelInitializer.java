@@ -54,7 +54,8 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
     }
   }
 
-  // Mostly taken from Waterfall
+  // Mostly taken from BungeeCord
+  // https://github.com/SpigotMC/BungeeCord/blob/master/proxy/src/main/java/net/md_5/bungee/netty/PipelineUtils.java
   @Override
   protected void initChannel(final @NotNull Channel channel) throws Exception {
     final SocketAddress remoteAddress = channel.remoteAddress() == null ? channel.parent().localAddress() :
