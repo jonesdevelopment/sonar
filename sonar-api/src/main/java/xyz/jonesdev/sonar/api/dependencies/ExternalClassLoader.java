@@ -21,10 +21,17 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 public final class ExternalClassLoader extends URLClassLoader {
-  public ExternalClassLoader(final URL[] urls) {
-    super(urls, ClassLoader.getSystemClassLoader().getParent());
+
+  /**
+   * Create a URLClassLoader with the system ClassLoader as parent
+   *
+   * @param url URL for of the local file
+   */
+  public ExternalClassLoader(final URL url) {
+    super(new URL[]{url}, ClassLoader.getSystemClassLoader().getParent());
   }
 
+  // Register this URLClassLoader as parallel capable
   static {
     ClassLoader.registerAsParallelCapable();
   }

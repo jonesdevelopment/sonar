@@ -60,6 +60,9 @@ public enum Dependency {
     }
   }
 
+  /**
+   * @return URL for the local file used for the external URLClassLoader
+   */
   public @NotNull URL getClassLoaderURL() throws MalformedURLException {
     if (!Files.exists(tempFilePath)) {
       final DelayTimer timer = new DelayTimer();
