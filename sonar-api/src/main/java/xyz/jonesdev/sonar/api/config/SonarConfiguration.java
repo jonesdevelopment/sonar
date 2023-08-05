@@ -32,7 +32,6 @@ public final class SonarConfiguration {
   @Getter
   private final SimpleYamlConfig generalConfig;
   private final File pluginFolder;
-  private SimpleYamlConfig messagesConfig;
 
   public SonarConfiguration(final @NotNull File pluginFolder) {
     this.pluginFolder = pluginFolder;
@@ -175,7 +174,7 @@ public final class SonarConfiguration {
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
 
     // Message settings
-    messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
+    final SimpleYamlConfig messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
     messagesConfig.load();
 
     messagesConfig.getYaml().setComment("messages.prefix",
