@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.api.dependencies;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-public final class ExternalClassLoader extends URLClassLoader {
+final class ExternalClassLoader extends URLClassLoader {
 
   /**
    * Create a URLClassLoader with the system ClassLoader as parent
