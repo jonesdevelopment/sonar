@@ -1,4 +1,7 @@
-![](https://img.shields.io/github/v/release/jonesdevelopment/sonar) ![](https://img.shields.io/github/issues/jonesdevelopment/sonar) ![](https://img.shields.io/github/downloads/jonesdevelopment/sonar/total)
+[![Release](https://img.shields.io/github/v/release/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/releases)
+[![Issues](https://img.shields.io/github/issues/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/issues)
+[![Downloads](https://img.shields.io/github/downloads/jonesdevelopment/sonar/total)](https://github.com/jonesdevelopment/sonar/releases)
+[![Discord](https://img.shields.io/discord/923308209769426994.svg?logo=discord)](https://jonesdev.xyz/discord)
 
 ## Introduction
 
