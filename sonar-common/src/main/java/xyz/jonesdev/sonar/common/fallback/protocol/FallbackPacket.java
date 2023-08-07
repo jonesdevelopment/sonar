@@ -28,7 +28,7 @@ public interface FallbackPacket {
    * @param byteBuf         ByteBuf
    * @param protocolVersion Protocol version of the player
    */
-  void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
+  void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception;
 
   /**
    * Decodes the packet sent by the client
@@ -36,7 +36,7 @@ public interface FallbackPacket {
    * @param byteBuf         ByteBuf
    * @param protocolVersion Protocol version of the player
    */
-  void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion);
+  void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception;
 
   /**
    * @param byteBuf         ByteBuf

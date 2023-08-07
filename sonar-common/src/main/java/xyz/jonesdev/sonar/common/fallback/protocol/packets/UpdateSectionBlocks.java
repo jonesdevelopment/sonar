@@ -41,7 +41,7 @@ public final class UpdateSectionBlocks implements FallbackPacket {
   private ChangedBlock[] changedBlocks;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
       byteBuf.writeInt(sectionX);
       byteBuf.writeInt(sectionZ);
