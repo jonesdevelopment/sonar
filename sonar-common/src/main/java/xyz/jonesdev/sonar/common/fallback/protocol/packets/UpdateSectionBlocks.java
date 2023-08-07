@@ -54,11 +54,8 @@ public final class UpdateSectionBlocks implements FallbackPacket {
         writeVarInt(byteBuf, block.getType().getId(protocolVersion));
       }
     } else {
-      int sectionY = 0;
-
-      for (final ChangedBlock block : changedBlocks) {
-        sectionY = block.getPosition().getY() >> 4;
-      }
+      final ChangedBlock lastChangedBlock = changedBlocks[changedBlocks.length - 1];
+      final int sectionY = lastChangedBlock.getPosition().getY() >> 4;
 
       // Why is Mojang doing this? :(
       byteBuf.writeLong(
