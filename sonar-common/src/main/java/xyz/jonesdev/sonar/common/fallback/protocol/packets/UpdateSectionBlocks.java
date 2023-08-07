@@ -54,12 +54,10 @@ public final class UpdateSectionBlocks implements FallbackPacket {
         writeVarInt(byteBuf, block.getType().getId(protocolVersion));
       }
     } else {
-      int blockY;
       int sectionY = 0;
 
       for (final ChangedBlock block : changedBlocks) {
-        blockY = block.getPosition().getY();
-        sectionY = blockY >> 4;
+        sectionY = block.getPosition().getY() >> 4;
       }
 
       // Why is Mojang doing this? :(
@@ -81,7 +79,8 @@ public final class UpdateSectionBlocks implements FallbackPacket {
           - (block.getPosition().getChunkX() << 4) << 8 | block.getPosition().getZ()
           - (block.getPosition().getChunkZ() << 4) << 4 | block.getPosition().getY()
           - (sectionY << 4);
-        writeVarLong(byteBuf, (long) block.getType().getId(protocolVersion) << 12 | (long) chunkPosCrammed);
+        final int shiftedBlockId = block.getType().getId(protocolVersion) << 12;
+        writeVarLong(byteBuf, shiftedBlockId | chunkPosCrammed);
       }
     }
   }
