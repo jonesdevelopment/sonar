@@ -25,6 +25,7 @@ public final class ChangedBlock {
   private final @NotNull BlockPosition position;
   private final BlockType type;
   private final int legacyChunkPosCrammed;
+  private final int modernChunkPosCrammed;
 
   public ChangedBlock(final @NotNull BlockPosition position, final BlockType type) {
     this.position = position;
@@ -32,5 +33,9 @@ public final class ChangedBlock {
     this.legacyChunkPosCrammed = position.getX()
       - (position.getChunkX() << 4) << 12 | position.getZ()
       - (position.getChunkZ() << 4) << 8 | position.getY();
+    this.modernChunkPosCrammed = position.getX()
+      - (position.getChunkX() << 4) << 8 | position.getZ()
+      - (position.getChunkZ() << 4) << 4 | position.getY()
+      - ((position.getY() >> 4) << 4);
   }
 }
