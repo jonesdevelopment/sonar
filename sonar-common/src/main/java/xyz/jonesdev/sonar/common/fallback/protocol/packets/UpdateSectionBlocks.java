@@ -48,9 +48,7 @@ public final class UpdateSectionBlocks implements FallbackPacket {
       writeVarInt(byteBuf, changedBlocks.length);
 
       for (final ChangedBlock block : changedBlocks) {
-        byteBuf.writeShort(block.getPosition().getX()
-          - (block.getPosition().getChunkX() << 4) << 12 | block.getPosition().getZ()
-          - (block.getPosition().getChunkZ() << 4) << 8 | block.getPosition().getY());
+        byteBuf.writeShort(block.getLegacyChunkPosCrammed());
         writeVarInt(byteBuf, block.getType().getId(protocolVersion));
       }
     } else {

@@ -18,11 +18,19 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.block;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
-@RequiredArgsConstructor
 public final class ChangedBlock {
-  private final BlockPosition position;
+  private final @NotNull BlockPosition position;
   private final BlockType type;
+  private final int legacyChunkPosCrammed;
+
+  public ChangedBlock(final @NotNull BlockPosition position, final BlockType type) {
+    this.position = position;
+    this.type = type;
+    this.legacyChunkPosCrammed = position.getX()
+      - (position.getChunkX() << 4) << 12 | position.getZ()
+      - (position.getChunkZ() << 4) << 8 | position.getY();
+  }
 }
