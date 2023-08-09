@@ -29,8 +29,8 @@ import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.common.verbose.VerboseAnimation;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Vector;
 
 import static xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory;
 
@@ -38,7 +38,7 @@ import static xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory;
 public final class ActionBarVerbose implements Verbose, JVMProfiler {
   private final Server server;
   @Getter
-  private final Collection<String> subscribers = new ArrayList<>();
+  private final Collection<String> subscribers = new Vector<>(1);
 
   public void update() {
     // Clean up blacklisted IPs
