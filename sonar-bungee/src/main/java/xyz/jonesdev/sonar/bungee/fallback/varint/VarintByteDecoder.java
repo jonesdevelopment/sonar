@@ -25,7 +25,7 @@ import lombok.ToString;
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/VarintByteDecoder.java
 @Getter
 @ToString
-public final class Varint21ByteDecoder implements ByteProcessor {
+public final class VarintByteDecoder implements ByteProcessor {
   private DecoderResult result = DecoderResult.TOO_SMALL;
   private int readVarInt, bytesRead;
 

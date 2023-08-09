@@ -38,13 +38,13 @@ public final class Varint21FrameDecoder extends ByteToMessageDecoder {
       return;
     }
 
-    final Varint21ByteDecoder reader = new Varint21ByteDecoder();
+    final VarintByteDecoder reader = new VarintByteDecoder();
     final int end = byteBuf.forEachByte(reader);
 
     if (end == -1) {
       // This is probably a good sign that the buffer was too short or empty
       // since the ByteBuf cannot hold a proper VarInt.
-      if (reader.getResult() == Varint21ByteDecoder.DecoderResult.RUN_OF_ZEROES) {
+      if (reader.getResult() == VarintByteDecoder.DecoderResult.RUN_OF_ZEROES) {
         byteBuf.clear();
       }
       return;
