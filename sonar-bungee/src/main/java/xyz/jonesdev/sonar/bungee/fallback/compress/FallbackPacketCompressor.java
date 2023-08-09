@@ -37,6 +37,8 @@ public final class FallbackPacketCompressor extends PacketCompressor {
   private int compressionThreshold;
   private final VelocityCompressor compressor;
 
+  private static final int MAX_COMPRESSED_LENGTH = 1 << 21;
+
   @Override
   public void setThreshold(final int compressionThreshold) {
     this.compressionThreshold = compressionThreshold;
@@ -72,7 +74,7 @@ public final class FallbackPacketCompressor extends PacketCompressor {
                                 final ByteBuf out) throws DataFormatException {
     final int uncompressed = msg.readableBytes();
 
-    write21BitVarInt(out, 0);
+    write21BitVarInt(out, 0); // Fake packet length
     writeVarInt(out, uncompressed);
 
     final ByteBuf compatibleIn = ensureCompatible(ctx.alloc(), compressor, msg);
@@ -85,7 +87,7 @@ public final class FallbackPacketCompressor extends PacketCompressor {
     }
 
     final int compressedLength = out.writerIndex() - startCompressed;
-    if (compressedLength >= 1 << 21) {
+    if (compressedLength >= MAX_COMPRESSED_LENGTH) {
       throw new DataFormatException("The server sent a very large (over 2MiB compressed) packet.");
     }
 
