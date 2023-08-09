@@ -35,7 +35,7 @@ import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.*;
 @AllArgsConstructor
 public final class FallbackPacketCompressor extends PacketCompressor {
   private int compressionThreshold;
-  private final VelocityCompressor compressor;
+  private final @NotNull VelocityCompressor compressor;
 
   private static final int MAX_COMPRESSED_LENGTH = 1 << 21;
 
