@@ -80,7 +80,7 @@ You can also take a look at the [gradle documentation](https://docs.gradle.org/c
 ## Contributing
 
 If you are interested in contributing, you can check out
-the [Contributing Guidelines](https://github.com/jonesdevelopment/sonar/blob/main/CONTRIBUTING.md) for detailed
+the [Contributing Guidelines](https://github.com/jonesdevelopment/sonar/blob/main/.github/CONTRIBUTING.md) for detailed
 instructions.
 
 ## License
