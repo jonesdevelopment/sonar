@@ -1,33 +1,40 @@
-[![Release](https://img.shields.io/github/v/release/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/releases)
-[![Issues](https://img.shields.io/github/issues/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/issues)
-[![Downloads](https://img.shields.io/github/downloads/jonesdevelopment/sonar/total)](https://github.com/jonesdevelopment/sonar/releases)
-[![Discord](https://img.shields.io/discord/923308209769426994.svg?logo=discord)](https://jonesdev.xyz/discord)
+<div align="center">
+  <!-- Introduction -->
+  <p>
+    <h1>Sonar</h1>
+    Lightweight and easy-to-use anti-bot plugin for your Minecraft server. Supporting every client and server version.
+    <br>
+    An effective and extensible solution for protecting your Minecraft server against all kinds of bot attacks
+  </p>
+  
+  <!-- Badges & icons -->
+  [![](https://img.shields.io/github/v/release/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/releases)
+  [![](https://img.shields.io/github/issues/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/issues)
+  [![](https://img.shields.io/github/downloads/jonesdevelopment/sonar/total)](https://github.com/jonesdevelopment/sonar/releases)
+  [![](https://img.shields.io/discord/923308209769426994.svg?logo=discord)](https://jonesdev.xyz/discord)
+  [![](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+  <br>
+  <br>
+  <!-- Quick navigation -->
+  [Releases](https://github.com/jonesdevelopment/sonar/releases)
+  |
+  [Issues](https://github.com/jonesdevelopment/sonar/issues)
+  |
+  [Pull Requests](https://github.com/jonesdevelopment/sonar/pulls)
+  |
+  [Discord](https://jonesdev.xyz/discord)
+  |
+  [License](https://github.com/jonesdevelopment/sonar/blob/main/README.md#license)
+</div>
 
-## Introduction
+## Design and Goal
 
-The old version of Sonar had a ton of features, but it never really protected against advanced types of bots.
-This version features more advanced checks and fewer bloated features, and is designed to work on more than one type of
-server.
-
-Please note that this version is still in development and may have bugs and other issues.
-If you want to report a bug or issue, please open
-a [GitHub issue](https://github.com/jonesdevelopment/sonar/issues) or ticket
-on [Discord](https://jonesdev.xyz/discord/).
-If you encounter a false positive, please
-read [this](https://github.com/jonesdevelopment/sonar/tree/main#false-positives).
-Make sure to join the Jones Development [Discord](https://jonesdev.xyz/discord/) in order to receive update
-notifications.
-
-## Design
-
-* Effective and lightweight
-* No complicated installation
-* No unnecessary features
-* Protection against exploits
-* Protection against bots
-  * No annoying captchas
-  * No VPN or proxy check
-* Multi-platform support
+* Effective, lightweight, and easy-to-use
+* No unnecessary features and clean code
+* Protection against all kinds of bot attacks
+* No player should be annoyed by any sort of captcha
+* No sort of checking for VPNs or proxies
+* Multi-platform support (Velocity, BungeeCord, and Bukkit)
 
 ## Checks
 
@@ -40,7 +47,7 @@ notifications.
   - The Varint decoder is updated to Velocity's
     improved [MinecraftVarintFrameDecoder](https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java).
 
-## Fallback
+### Fallback
 
 Fallback analyzes a player's behavior before joining the actual server, therefore stopping malicious traffic from ever
 reaching the backend.
@@ -56,7 +63,7 @@ advanced types of bots.
 Fallback also protects from huge spambot attacks since it queues the incoming connections, therefore making it
 technically impossible to have a ton of bots join the server at the same time.
 
-## False positives
+### False positives
 
 Fallback is unlikely to ever falsely prevent a player from joining the server since Minecraft uses the TCP protocol
 which means that packets are always sent in the correct order. Lag should not affect the bot check.
@@ -70,12 +77,9 @@ on [Discord](https://jonesdev.xyz/discord/).
 
 ## Building
 
-- You can build the jar file using `gradle build-sonar` in the main project.
-  - If this does not work, try `gradle shadowJar` as a fallback option.
-- To clean temporary files and build files, use `gradle clean`.
-- If there are any issues, you can also try `gradle shadowJar --stacktrace` to see exceptions.
-
-You can also take a look at the [gradle documentation](https://docs.gradle.org/current/userguide/userguide.html).
+If you want to build your own version of Sonar, please take a look at the [Sonar building documentation](https://docs.jonesdev.xyz/sonar/building).
+<br>
+You can also take a look at the [gradle documentation](https://docs.gradle.org/current/userguide/userguide.html) for a better understanding of Gradle.
 
 ## Contributing
 
@@ -85,9 +89,7 @@ instructions.
 
 ## License
 
-Sonar is licensed under the GNU General Public License 3.0.
-
-[![](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+Sonar is licensed under the [GNU General Public License 3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 ## Credits
 
