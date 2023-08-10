@@ -42,7 +42,11 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 
 @UtilityClass
 public class FallbackPreparer {
-  private final Random random = new Random();
+  private final Random RANDOM = new Random();
+  private final DimensionInfo DIMENSION = new DimensionInfo(
+      "minecraft:overworld",
+        "sonar", false, false
+  );
 
   // Mappings
   private final CompoundBinaryTag CHAT_TYPE_119;
@@ -117,7 +121,7 @@ public class FallbackPreparer {
     SPAWN_TELEPORT = new PositionLook(
       8, DYNAMIC_BLOCK_Y_POSITION, 8,
       0f, 0f,
-      random.nextInt(Short.MAX_VALUE),
+      RANDOM.nextInt(Short.MAX_VALUE),
       true
     );
 
@@ -186,6 +190,8 @@ public class FallbackPreparer {
     return joinGame;
   }
 
+  // Partially taken from
+  // https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L607
   private @NotNull JoinGame createJoinGamePacket(final ProtocolVersion protocolVersion) {
     final JoinGame joinGame = new JoinGame();
 
@@ -193,10 +199,7 @@ public class FallbackPreparer {
     joinGame.setGamemode(Sonar.get().getConfig().GAMEMODE_ID);
     joinGame.setDimension(0);
     joinGame.setReducedDebugInfo(true);
-    joinGame.setDimensionInfo(new DimensionInfo(
-      "minecraft:overworld",
-      "sonar", false, false
-    ));
+    joinGame.setDimensionInfo(DIMENSION);
 
     final CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
     final ListBinaryTag encodedDimensionRegistry = ListBinaryTag.builder(BinaryTagTypes.COMPOUND)

@@ -24,7 +24,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-public class DimensionInfo {
+public final class DimensionInfo {
   private final String registryIdentifier;
   private final String levelName;
   private final boolean isFlat;
