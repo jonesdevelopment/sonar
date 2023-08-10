@@ -41,6 +41,8 @@ public final class Transaction implements FallbackPacket {
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
       byteBuf.writeByte(windowId);
       byteBuf.writeShort((short) id);
+      // The "accepted" field is actually really unnecessary since
+      // the client must accept the transaction either way.
       byteBuf.writeBoolean(accepted);
     } else {
       byteBuf.writeInt(id);
@@ -55,6 +57,8 @@ public final class Transaction implements FallbackPacket {
       accepted = byteBuf.readBoolean();
     } else {
       id = byteBuf.readInt();
+      // Always set accepted to true since 1.17 or higher don't use
+      // transactions for inventory confirmation anymore.
       accepted = true;
     }
   }
