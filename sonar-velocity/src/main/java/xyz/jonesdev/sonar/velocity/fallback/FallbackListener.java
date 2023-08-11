@@ -114,14 +114,6 @@ public final class FallbackListener {
     val inboundConnection = (LoginInboundConnection) event.getConnection();
     val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
 
-    if (fallback.getBlacklisted().has(inetAddress.toString())) {
-      initialConnection.getConnection().closeWith(Disconnect.create(
-        BLACKLISTED,
-        inboundConnection.getProtocolVersion()
-      ));
-      return;
-    }
-
     final MinecraftConnection mcConnection = initialConnection.getConnection();
     final Channel channel = mcConnection.getChannel();
     final ChannelPipeline pipeline = channel.pipeline();
@@ -147,6 +139,15 @@ public final class FallbackListener {
     // which is why we override the field value for the MinecraftConnection with
     // a fake connection
     CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
+
+    // Check the blacklist here since we cannot let the player ghost join
+    if (fallback.getBlacklisted().has(inetAddress.toString())) {
+      initialConnection.getConnection().closeWith(Disconnect.create(
+        BLACKLISTED,
+        inboundConnection.getProtocolVersion()
+      ));
+      return;
+    }
 
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
