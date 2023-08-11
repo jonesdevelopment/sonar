@@ -36,19 +36,21 @@ import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import java.lang.reflect.Field;
 import java.net.SocketAddress;
 
+import static net.md_5.bungee.netty.PipelineUtils.*;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
   public static final ChildChannelInitializer INSTANCE = new ChildChannelInitializer();
 
   private static final BaseChannelInitializer BASE = BaseChannelInitializer.INSTANCE;
 
-  private static final KickStringWriter LEGACY_KICKER;
+  private static final KickStringWriter LEGACY_KICK;
 
   static {
     try {
       final Field kickField = PipelineUtils.class.getDeclaredField("legacyKicker");
       kickField.setAccessible(true);
-      LEGACY_KICKER = (KickStringWriter) kickField.get(null);
+      LEGACY_KICK = (KickStringWriter) kickField.get(null);
     } catch (Throwable throwable) {
       throw new ReflectionException(throwable);
     }
@@ -77,12 +79,12 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
           return;
         }
 
-        channel.pipeline().addBefore("frame-decoder", "legacy-decoder", new LegacyDecoder());
-        channel.pipeline().addAfter("frame-decoder", "packet-decoder", new MinecraftDecoder(Protocol.HANDSHAKE, true,
+        channel.pipeline().addBefore(FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder());
+        channel.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER, new MinecraftDecoder(Protocol.HANDSHAKE, true,
           ProxyServer.getInstance().getProtocolVersion()));
-        channel.pipeline().addAfter("frame-prepender", "packet-encoder", new MinecraftEncoder(Protocol.HANDSHAKE,
+        channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(Protocol.HANDSHAKE,
           true, ProxyServer.getInstance().getProtocolVersion()));
-        channel.pipeline().addBefore("frame-prepender", "legacy-kick", LEGACY_KICKER);
+        channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
         channel.pipeline().get(HandlerBoss.class).setHandler(new InitialHandler(BungeeCord.getInstance(), listener));
 
         if (listener.isProxyProtocol()) {

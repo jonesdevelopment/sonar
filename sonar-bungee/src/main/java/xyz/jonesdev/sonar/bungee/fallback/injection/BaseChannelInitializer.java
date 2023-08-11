@@ -33,6 +33,8 @@ import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
 
+import static net.md_5.bungee.netty.PipelineUtils.*;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
   public static final BaseChannelInitializer INSTANCE = new BaseChannelInitializer();
@@ -60,18 +62,18 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
   protected void initChannel(final @NotNull Channel channel) throws Exception {
     try {
       channel.config().setOption(ChannelOption.IP_TOS, 0x18);
-    } catch (ChannelException exception) {
+    } catch (ChannelException ignored) {
     }
 
     channel.config().setOption(ChannelOption.TCP_NODELAY, true);
     channel.config().setAllocator(PooledByteBufAllocator.DEFAULT);
     channel.config().setWriteBufferWaterMark(MARK);
 
-    channel.pipeline().addLast("frame-decoder", new Varint21FrameDecoder());
-    channel.pipeline().addLast("timeout", new FallbackTimeoutHandler(
+    channel.pipeline().addLast(FRAME_DECODER, new Varint21FrameDecoder());
+    channel.pipeline().addLast(TIMEOUT_HANDLER, new FallbackTimeoutHandler(
       BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS
     ));
-    channel.pipeline().addLast("frame-prepender", FRAME_ENCODER);
-    channel.pipeline().addLast("inbound-boss", new HandlerBoss());
+    channel.pipeline().addLast(FRAME_PREPENDER, FRAME_ENCODER);
+    channel.pipeline().addLast(BOSS_HANDLER, new HandlerBoss());
   }
 }
