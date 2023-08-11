@@ -116,17 +116,17 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
     );
 
-    // Check if the player is already connected to the proxy
-    if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {
-      fallbackPlayer.disconnect("Could not find any available servers.");
-      return;
-    }
-
     // This sometimes happens when the channel hangs, but the player is still connecting
     // This also fixes a weird issue with TCPShield and other reverse proxies
     if (fallbackPlayer.getPipeline().get(MINECRAFT_ENCODER) == null
       || fallbackPlayer.getPipeline().get(MINECRAFT_DECODER) == null) {
       mcConnection.close(true);
+      return;
+    }
+
+    // Check if the player is already connected to the proxy
+    if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {
+      fallbackPlayer.disconnect("Could not find any available servers.");
       return;
     }
 
