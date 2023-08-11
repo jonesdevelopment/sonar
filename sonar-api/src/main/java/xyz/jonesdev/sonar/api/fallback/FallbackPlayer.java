@@ -21,8 +21,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.cappuchino.Cappuchino;
-import xyz.jonesdev.cappuchino.ExpiringCache;
+import xyz.jonesdev.cappuccino.Cappuccino;
+import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 
@@ -59,7 +59,7 @@ public interface FallbackPlayer<X, Y> {
    */
   void write(final @NotNull Object msg);
 
-  ExpiringCache<String> PREVIOUS_FAILS = Cappuchino.buildExpiring(3L, TimeUnit.MINUTES);
+  ExpiringCache<String> PREVIOUS_FAILS = Cappuccino.buildExpiring(3L, TimeUnit.MINUTES);
 
   /**
    * Disconnects the player who failed the verification

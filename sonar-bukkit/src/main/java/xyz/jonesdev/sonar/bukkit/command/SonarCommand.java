@@ -24,8 +24,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuchino.Cappuchino;
-import xyz.jonesdev.cappuchino.ExpiringCache;
+import xyz.jonesdev.cappuccino.Cappuccino;
+import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
@@ -40,7 +40,7 @@ import static java.util.Collections.emptyList;
 public final class SonarCommand implements CommandExecutor, TabExecutor {
   private static final List<String> TAB_SUGGESTIONS = new ArrayList<>();
   private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
-  private static final ExpiringCache<CommandSender> DELAY = Cappuchino.buildExpiring(500L);
+  private static final ExpiringCache<CommandSender> DELAY = Cappuccino.buildExpiring(500L);
   private static final List<TextComponent> CACHED_HELP = new Vector<>();
 
   @Override

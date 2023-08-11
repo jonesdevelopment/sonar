@@ -19,8 +19,8 @@ package xyz.jonesdev.sonar.api.fallback;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuchino.Cappuchino;
-import xyz.jonesdev.cappuchino.ExpiringCache;
+import xyz.jonesdev.cappuccino.Cappuccino;
+import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.logger.Logger;
 
@@ -39,7 +39,7 @@ public final class Fallback {
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
   private final Collection<String> verified = new Vector<>(1);
   // Only block the player for a few minutes to avoid issues
-  private final ExpiringCache<String> blacklisted = Cappuchino.buildExpiring(
+  private final ExpiringCache<String> blacklisted = Cappuccino.buildExpiring(
     10L, TimeUnit.MINUTES, 2500L
   );
   private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;

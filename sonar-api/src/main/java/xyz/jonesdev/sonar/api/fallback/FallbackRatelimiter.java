@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.api.fallback;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import xyz.jonesdev.cappuchino.ExpiringCache;
+import xyz.jonesdev.cappuccino.ExpiringCache;
 
 import java.net.InetAddress;
 
