@@ -105,7 +105,7 @@ public final class FallbackListener {
     }
   }
 
-  @Subscribe(order = PostOrder.FIRST)
+  @Subscribe(order = PostOrder.LAST)
   public void handle(final PreLoginEvent event) throws Throwable {
     Statistics.TOTAL_TRAFFIC.increment();
 
