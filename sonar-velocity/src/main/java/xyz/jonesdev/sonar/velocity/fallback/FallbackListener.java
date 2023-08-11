@@ -133,6 +133,21 @@ public final class FallbackListener {
     final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
     if (fallback.getSonar().getVerifiedPlayerController().has(inetAddress.toString(), gameProfile.getId())) return;
 
+    // Completely skip Geyser connections
+    // TODO: different handling?
+    if (GeyserValidator.isGeyser(channel)) {
+      // TODO: Do we need to log this?
+      fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
+      return;
+    }
+
+    final InitialLoginSessionHandler sessionHandler = (InitialLoginSessionHandler) mcConnection.getSessionHandler();
+
+    // The AuthSessionHandler isn't supposed to continue the connection process,
+    // which is why we override the field value for the MinecraftConnection with
+    // a fake connection
+    CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
+
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
     if (fallback.getConnected().containsKey(event.getUsername())
@@ -170,21 +185,6 @@ public final class FallbackListener {
       ));
       return;
     }
-
-    // Completely skip Geyser connections
-    // TODO: different handling?
-    if (GeyserValidator.isGeyser(channel)) {
-      // TODO: Do we need to log this?
-      fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
-      return;
-    }
-
-    final InitialLoginSessionHandler sessionHandler = (InitialLoginSessionHandler) mcConnection.getSessionHandler();
-
-    // The AuthSessionHandler isn't supposed to continue the connection process,
-    // which is why we override the field value for the MinecraftConnection with
-    // a fake connection
-    CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
 
     // Run in the channel's event loop
     channel.eventLoop().execute(() -> {
