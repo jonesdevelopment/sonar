@@ -122,6 +122,14 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       return;
     }
 
+    // This sometimes happens when the channel hangs, but the player is still connecting
+    // This also fixes a weird issue with TCPShield and other reverse proxies
+    if (fallbackPlayer.getPipeline().get(MINECRAFT_ENCODER) == null
+      || fallbackPlayer.getPipeline().get(MINECRAFT_DECODER) == null) {
+      mcConnection.close(true);
+      return;
+    }
+
     if (fallback.getSonar().getConfig().LOG_CONNECTIONS) {
       // Only log the processing message if the server isn't under attack.
       // We let the user override this through the configuration.
