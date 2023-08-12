@@ -22,14 +22,12 @@ import org.bstats.bukkit.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
-import xyz.jonesdev.sonar.api.timer.DelayTimer;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
 import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
@@ -106,15 +104,8 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   };
 
   @Override
-  public void enable(final @NotNull SonarBukkitPlugin plugin) {
+  public void load(final @NotNull SonarBukkitPlugin plugin) {
     this.plugin = plugin;
-
-    final DelayTimer timer = new DelayTimer();
-
-    // Set the API to this class
-    SonarSupplier.set(this);
-
-    logger.info("Initializing Sonar {}...", getVersion());
 
     // Set data directory
     dataDirectory = plugin.getDataFolder();
@@ -146,9 +137,6 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     // Register action bar verbose task
     plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, actionBarVerbose::update,
       2L, 2L);
-
-    // Done
-    logger.info("Done ({}s)!", timer.formattedDelay());
   }
 
   @Override

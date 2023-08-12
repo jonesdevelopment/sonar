@@ -22,14 +22,12 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
-import xyz.jonesdev.sonar.api.timer.DelayTimer;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
@@ -106,15 +104,8 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   };
 
   @Override
-  public void enable(final @NotNull SonarVelocityPlugin plugin) {
+  public void load(final @NotNull SonarVelocityPlugin plugin) {
     this.plugin = plugin;
-
-    final DelayTimer timer = new DelayTimer();
-
-    // Set the API to this class
-    SonarSupplier.set(this);
-
-    logger.info("Initializing Sonar {}...", getVersion());
 
     // Set data directory
     dataDirectory = plugin.getDataDirectory().toFile();
@@ -152,9 +143,6 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
     plugin.getServer().getScheduler().buildTask(plugin, actionBarVerbose::update)
       .repeat(100L, TimeUnit.MILLISECONDS)
       .schedule();
-
-    // Done
-    logger.info("Done ({}s)!", timer.formattedDelay());
   }
 
   @Override

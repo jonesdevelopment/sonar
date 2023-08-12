@@ -23,14 +23,12 @@ import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
-import xyz.jonesdev.sonar.api.timer.DelayTimer;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
@@ -109,15 +107,8 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   };
 
   @Override
-  public void enable(final @NotNull SonarBungeePlugin plugin) {
+  public void load(final @NotNull SonarBungeePlugin plugin) {
     this.plugin = plugin;
-
-    final DelayTimer timer = new DelayTimer();
-
-    // Set the API to this class
-    SonarSupplier.set(this);
-
-    logger.info("Initializing Sonar {}...", getVersion());
 
     // Set data directory
     dataDirectory = plugin.getDataFolder();
@@ -155,9 +146,6 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
 
     // Inject base into ProtocolUtils
     BaseInjectionHelper.inject(ChildChannelInitializer.INSTANCE);
-
-    // Done
-    logger.info("Done ({}s)!", timer.formattedDelay());
   }
 
   @Override

@@ -21,14 +21,31 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.fallback.FallbackRatelimiter;
+import xyz.jonesdev.sonar.api.timer.DelayTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 public interface SonarBootstrap<T> extends Sonar {
-  void enable(final @NotNull T plugin);
+  void load(final @NotNull T plugin);
+
+  default void enable(final @NotNull T plugin) {
+    final DelayTimer timer = new DelayTimer();
+
+    getLogger().info("Initializing Sonar {}...", getVersion());
+
+    // Set the API to this class
+    SonarSupplier.set(this);
+
+    // Run the per-platform initialization method
+    load(plugin);
+
+    // Done
+    getLogger().info("Done ({}s)!", timer.formattedDelay());
+  }
 
   default void reload() {
     // Load the configuration
