@@ -19,53 +19,44 @@ package xyz.jonesdev.sonar.velocity;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
-import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
-import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.velocity.command.SonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.verbose.ActionBarVerbose;
 
-import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> {
+public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> implements Sonar {
+  public static SonarVelocity INSTANCE;
 
-  INSTANCE;
-
-  private SonarVelocityPlugin plugin;
-  private ActionBarVerbose actionBarVerbose;
-  private SonarConfiguration config;
-  private SubcommandRegistry subcommandRegistry;
-  private VerifiedPlayerController verifiedPlayerController;
-  private File dataDirectory;
+  public SonarVelocity(final SonarVelocityPlugin plugin) {
+    super(plugin, plugin.getDataDirectory().toFile(), new ActionBarVerbose(plugin.getServer()));
+    INSTANCE = this;
+  }
 
   private final Logger logger = new Logger() {
 
     @Override
     public void info(final String message, final Object... args) {
-      plugin.getLogger().info(message, args);
+      getPlugin().getLogger().info(message, args);
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      plugin.getLogger().warn(message, args);
+      getPlugin().getLogger().warn(message, args);
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      plugin.getLogger().error(message, args);
+      getPlugin().getLogger().error(message, args);
     }
   };
 
@@ -104,53 +95,35 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   };
 
   @Override
-  public void load(final @NotNull SonarVelocityPlugin plugin) {
-    this.plugin = plugin;
-    this.dataDirectory = plugin.getDataDirectory().toFile();
-    this.config = new SonarConfiguration(dataDirectory);
-    this.subcommandRegistry = new SubcommandRegistryHolder();
-  }
-
-  @Override
   public void enable() {
 
-    // Reload configuration
-    reload();
-
     // Initialize bStats.org metrics
-    plugin.getMetricsFactory().make(plugin, getServiceId());
+    getPlugin().getMetricsFactory().make(getPlugin(), getServiceId());
 
     // Register Sonar command
-    plugin.getServer().getCommandManager().register("sonar", new SonarCommand());
+    getPlugin().getServer().getCommandManager().register("sonar", new SonarCommand());
 
     // Register Fallback listener
-    plugin.getServer().getEventManager().register(plugin, new FallbackListener(getFallback()));
+    getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackListener(getFallback()));
 
     // Register Fallback queue task
-    plugin.getServer().getScheduler().buildTask(plugin, getFallback().getQueue()::poll)
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), getFallback().getQueue()::poll)
       .repeat(500L, TimeUnit.MILLISECONDS)
       .schedule();
 
     // Register traffic counter reset task
-    plugin.getServer().getScheduler().buildTask(plugin, TrafficCounter::reset)
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), TrafficCounter::reset)
       .repeat(1L, TimeUnit.SECONDS)
       .schedule();
 
-    // Initialize action bar verbose
-    actionBarVerbose = new ActionBarVerbose(plugin.getServer());
-
     // Register action bar verbose task
-    plugin.getServer().getScheduler().buildTask(plugin, actionBarVerbose::update)
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), getActionBarVerbose()::update)
       .repeat(100L, TimeUnit.MILLISECONDS)
       .schedule();
   }
 
   @Override
-  public void reload() {
-    SonarBootstrap.super.reload();
-
-    // Reinitialize database controller
-    verifiedPlayerController = new VerifiedPlayerController();
+  public void postReload() {
 
     // Prepare cached messages
     FallbackListener.CachedMessages.update();

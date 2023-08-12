@@ -17,30 +17,56 @@
 
 package xyz.jonesdev.sonar.common;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarSupplier;
+import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
+import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.fallback.FallbackRatelimiter;
 import xyz.jonesdev.sonar.api.timer.DelayTimer;
+import xyz.jonesdev.sonar.api.verbose.Verbose;
+import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
-public interface SonarBootstrap<T> extends Sonar {
-  default void initialize(final @NotNull T plugin) {
-    final DelayTimer timer = new DelayTimer();
+@Getter
+@RequiredArgsConstructor
+public abstract class SonarBootstrap<T> implements Sonar {
+  private T plugin;
+  private Verbose actionBarVerbose;
+  private SonarConfiguration config;
+  private VerifiedPlayerController verifiedPlayerController;
+  private File dataDirectory;
+  private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
 
-    // Set the API to this instance
+  public SonarBootstrap(final @NotNull T plugin,
+                        final File dataDirectory,
+                        final Verbose actionBarVerbose) {
+    // Set the API to this instance so the config doesn't have issues
     SonarSupplier.set(this);
 
-    // Initialize plugin
-    load(plugin);
+    this.plugin = plugin;
+    this.dataDirectory = dataDirectory;
+    this.actionBarVerbose = actionBarVerbose;
+    this.config = new SonarConfiguration(dataDirectory);
+  }
+
+  public final void initialize() {
+    final DelayTimer timer = new DelayTimer();
 
     // Start main plugin enable task
     getLogger().info("Enabling Sonar {}...", getVersion());
+
+    // Reload configuration
+    reload();
 
     // Run the per-platform initialization method
     enable();
@@ -49,11 +75,9 @@ public interface SonarBootstrap<T> extends Sonar {
     getLogger().info("Done ({}s)!", timer.formattedDelay());
   }
 
-  void load(final @NotNull T plugin);
+  public abstract void enable();
 
-  void enable();
-
-  default void reload() {
+  public final void reload() {
     // Load the configuration
     getConfig().load();
 
@@ -72,9 +96,19 @@ public interface SonarBootstrap<T> extends Sonar {
       getConfig().VERIFICATION_DELAY, TimeUnit.MILLISECONDS, 250L
     );
     FallbackRatelimiter.INSTANCE.setExpiringCache(expiringCache);
+
+    // Reinitialize database controller
+    verifiedPlayerController = new VerifiedPlayerController();
+
+    // Call post reload task
+    postReload();
   }
 
-  default void disable() {
+  public void postReload() {
+    // Do nothing by default
+  }
+
+  public void shutdown() {
     getLogger().info("Starting shutdown process...");
     // ...
     getLogger().info("Successfully shut down. Goodbye!");

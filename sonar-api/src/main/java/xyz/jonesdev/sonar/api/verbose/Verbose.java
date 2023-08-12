@@ -24,6 +24,9 @@ import java.util.Collection;
 public interface Verbose {
   @NotNull Collection<String> getSubscribers();
 
+  // Run action bar verbose
+  void update();
+
   /**
    * @param subscriber Name of the player who subscribed
    * @return Whether the player is subscribed or not

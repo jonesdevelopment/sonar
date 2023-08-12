@@ -20,13 +20,9 @@ package xyz.jonesdev.sonar.bungee;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bstats.bungeecord.Metrics;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
-import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
@@ -35,40 +31,35 @@ import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
 import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
-import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
-import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
+public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> implements Sonar {
+  public static SonarBungee INSTANCE;
 
-  INSTANCE;
-
-  private SonarBungeePlugin plugin;
-  private ActionBarVerbose actionBarVerbose;
-  private SonarConfiguration config;
-  private SubcommandRegistry subcommandRegistry;
-  private VerifiedPlayerController verifiedPlayerController;
-  private File dataDirectory;
+  public SonarBungee(final SonarBungeePlugin plugin) {
+    super(plugin, plugin.getDataFolder(), new ActionBarVerbose(plugin.getServer()));
+    INSTANCE = this;
+  }
 
   private final Logger logger = new Logger() {
 
     @Override
     public void info(final String message, final Object... args) {
-      plugin.getLog4JLogger().info(message, args);
+      getPlugin().getLog4JLogger().info(message, args);
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      plugin.getLog4JLogger().warn(message, args);
+      getPlugin().getLog4JLogger().warn(message, args);
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      plugin.getLog4JLogger().error(message, args);
+      getPlugin().getLog4JLogger().error(message, args);
     }
   };
 
@@ -107,41 +98,30 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   };
 
   @Override
-  public void load(final @NotNull SonarBungeePlugin plugin) {
-    this.plugin = plugin;
-    this.dataDirectory = plugin.getDataFolder();
-    this.config = new SonarConfiguration(dataDirectory);
-    this.subcommandRegistry = new SubcommandRegistryHolder();
-  }
-
-  @Override
   public void enable() {
 
     // Reload configuration
     reload();
 
     // Initialize bStats.org metrics
-    new Metrics(plugin, getServiceId());
+    new Metrics(getPlugin(), getServiceId());
 
     // Register Sonar command
-    plugin.getServer().getPluginManager().registerCommand(plugin, new SonarCommand());
+    getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new SonarCommand());
 
     // Register Fallback listener
-    plugin.getServer().getPluginManager().registerListener(plugin, new FallbackListener(getFallback()));
+    getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new FallbackListener(getFallback()));
 
     // Register Fallback queue task
-    plugin.getServer().getScheduler().schedule(plugin, getFallback().getQueue()::poll,
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), getFallback().getQueue()::poll,
       500L, 500L, TimeUnit.MILLISECONDS);
 
     // Register traffic counter reset task
-    plugin.getServer().getScheduler().schedule(plugin, TrafficCounter::reset,
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), TrafficCounter::reset,
       1L, 1L, TimeUnit.SECONDS);
 
-    // Initialize action bar verbose
-    actionBarVerbose = new ActionBarVerbose(plugin.getServer());
-
     // Register action bar verbose task
-    plugin.getServer().getScheduler().schedule(plugin, actionBarVerbose::update,
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), getActionBarVerbose()::update,
       100L, 100L, TimeUnit.MILLISECONDS);
 
     // Inject base into ProtocolUtils
@@ -149,11 +129,7 @@ public enum SonarBungee implements Sonar, SonarBootstrap<SonarBungeePlugin> {
   }
 
   @Override
-  public void reload() {
-    SonarBootstrap.super.reload();
-
-    // Reinitialize database controller
-    verifiedPlayerController = new VerifiedPlayerController();
+  public void postReload() {
 
     // Prepare cached messages
     FallbackListener.CachedMessages.update();

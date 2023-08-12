@@ -29,13 +29,12 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 public final class SonarConfiguration {
+  private final @NotNull File pluginFolder;
   @Getter
-  private final SimpleYamlConfig generalConfig;
-  private final File pluginFolder;
+  private SimpleYamlConfig generalConfig, messagesConfig;
 
   public SonarConfiguration(final @NotNull File pluginFolder) {
     this.pluginFolder = pluginFolder;
-    this.generalConfig = new SimpleYamlConfig(pluginFolder, "config");
   }
 
   public String LANGUAGE;
@@ -146,6 +145,7 @@ public final class SonarConfiguration {
   public String DATABASE_RELOADED;
 
   public void load() {
+    generalConfig = new SimpleYamlConfig(pluginFolder, "config");
     generalConfig.load();
 
     // General options
@@ -177,7 +177,7 @@ public final class SonarConfiguration {
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
 
     // Message settings
-    final SimpleYamlConfig messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
+    messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
     messagesConfig.load();
 
     messagesConfig.getYaml().setComment("messages.prefix",

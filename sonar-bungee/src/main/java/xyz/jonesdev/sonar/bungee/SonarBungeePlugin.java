@@ -27,17 +27,19 @@ import org.apache.logging.log4j.Logger;
 public final class SonarBungeePlugin extends Plugin {
   private ProxyServer server;
   private Logger log4JLogger;
+  private SonarBungee bootstrap;
 
   @Override
   public void onEnable() {
     server = ProxyServer.getInstance();
     log4JLogger = LogManager.getLogger("Sonar");
 
-    SonarBungee.INSTANCE.initialize(this);
+    bootstrap = new SonarBungee(this);
+    bootstrap.initialize();
   }
 
   @Override
   public void onDisable() {
-    SonarBungee.INSTANCE.disable();
+    bootstrap.shutdown();
   }
 }

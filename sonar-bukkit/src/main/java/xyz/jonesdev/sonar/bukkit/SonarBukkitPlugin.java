@@ -20,14 +20,16 @@ package xyz.jonesdev.sonar.bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class SonarBukkitPlugin extends JavaPlugin {
+  private SonarBukkit bootstrap;
 
   @Override
   public void onEnable() {
-    SonarBukkit.INSTANCE.initialize(this);
+    bootstrap = new SonarBukkit(this);
+    bootstrap.initialize();
   }
 
   @Override
   public void onDisable() {
-    SonarBukkit.INSTANCE.disable();
+    bootstrap.shutdown();
   }
 }

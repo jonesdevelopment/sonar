@@ -44,6 +44,7 @@ public final class SonarVelocityPlugin {
   private final Logger logger;
   private final Path dataDirectory;
   private final Metrics.Factory metricsFactory;
+  private SonarVelocity bootstrap;
 
   @Inject
   public SonarVelocityPlugin(final ProxyServer server,
@@ -58,11 +59,12 @@ public final class SonarVelocityPlugin {
 
   @Subscribe
   public void handle(final ProxyInitializeEvent event) {
-    SonarVelocity.INSTANCE.initialize(this);
+    bootstrap = new SonarVelocity(this);
+    bootstrap.initialize();
   }
 
   @Subscribe
   public void handle(final ProxyShutdownEvent event) {
-    SonarVelocity.INSTANCE.disable();
+    bootstrap.shutdown();
   }
 }

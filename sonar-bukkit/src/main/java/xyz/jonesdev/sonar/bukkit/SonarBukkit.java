@@ -19,53 +19,44 @@ package xyz.jonesdev.sonar.bukkit;
 
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
-import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
 import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
-import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
-import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 
 @Getter
-public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
+public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> implements Sonar {
+  public static SonarBukkit INSTANCE;
 
-  INSTANCE;
-
-  private SonarBukkitPlugin plugin;
-  private ActionBarVerbose actionBarVerbose;
-  private SonarConfiguration config;
-  private SubcommandRegistry subcommandRegistry;
-  private VerifiedPlayerController verifiedPlayerController;
-  private File dataDirectory;
+  public SonarBukkit(final SonarBukkitPlugin plugin) {
+    super(plugin, plugin.getDataFolder(), new ActionBarVerbose(plugin.getServer()));
+    INSTANCE = this;
+  }
 
   private final Logger logger = new Logger() {
 
     @Override
     public void info(final String message, final Object... args) {
-      plugin.getLogger().log(Level.INFO, message, args);
+      getPlugin().getLogger().log(Level.INFO, message, args);
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      plugin.getLogger().log(Level.WARNING, message, args);
+      getPlugin().getLogger().log(Level.WARNING, message, args);
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      plugin.getLogger().log(Level.SEVERE, message, args);
+      getPlugin().getLogger().log(Level.SEVERE, message, args);
     }
   };
 
@@ -104,46 +95,27 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   };
 
   @Override
-  public void load(final @NotNull SonarBukkitPlugin plugin) {
-    this.plugin = plugin;
-    this.dataDirectory = plugin.getDataFolder();
-    this.config = new SonarConfiguration(dataDirectory);
-    this.subcommandRegistry = new SubcommandRegistryHolder();
-  }
-
-  @Override
   public void enable() {
 
     // Reload configuration
     reload();
 
     // Initialize bStats.org metrics
-    new Metrics(plugin, getServiceId());
+    new Metrics(getPlugin(), getServiceId());
 
     // Register Sonar command
-    Objects.requireNonNull(plugin.getCommand("sonar")).setExecutor(new SonarCommand());
+    Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new SonarCommand());
 
     // Register Fallback queue task
-    plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, getFallback().getQueue()::poll,
+    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), getFallback().getQueue()::poll,
       10L, 10L);
 
     // Register traffic counter reset task
-    plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, TrafficCounter::reset,
+    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), TrafficCounter::reset,
       20L, 20L);
 
-    // Initialize action bar verbose
-    actionBarVerbose = new ActionBarVerbose(plugin.getServer());
-
     // Register action bar verbose task
-    plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, actionBarVerbose::update,
+    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), getActionBarVerbose()::update,
       2L, 2L);
-  }
-
-  @Override
-  public void reload() {
-    SonarBootstrap.super.reload();
-
-    // Reinitialize database controller
-    verifiedPlayerController = new VerifiedPlayerController();
   }
 }
