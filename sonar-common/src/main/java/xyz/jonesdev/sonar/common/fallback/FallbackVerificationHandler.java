@@ -176,6 +176,15 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       checkFrame(keepAlive.getId() == verifyKeepAliveId, "invalid KeepAlive ID");
 
+      // Check if the transaction ping is unstable/too high
+      final long ping = login.delay();
+      if (ping > player.getFallback().getSonar().getConfig().MAXIMUM_K_PING) {
+        // Do not blacklist for a too high ping, only kick for unstable connection
+        player.disconnect(player.getFallback().getSonar().getConfig().TIMED_OUT
+          .replaceAll("%ping%", Sonar.DECIMAL_FORMAT.format(ping)));
+        return;
+      }
+
       // The correct KeepAlive packet has been received
       sendJoinGamePacket();
     }
@@ -226,10 +235,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Check if the transaction ID is valid
       checkFrame(transaction.getId() == transactionId, "invalid transaction id");
 
-      // Check if the ping is unstable/too high
+      // Check if the transaction ping is unstable/too high
       final long ping = login.delay();
-      final long maxPing = player.getFallback().getSonar().getConfig().MAXIMUM_VERIFICATION_PING;
-      if (ping > maxPing) {
+      if (ping > player.getFallback().getSonar().getConfig().MAXIMUM_T_PING) {
         // Do not blacklist for a too high ping, only kick for unstable connection
         player.disconnect(player.getFallback().getSonar().getConfig().TIMED_OUT
           .replaceAll("%ping%", Sonar.DECIMAL_FORMAT.format(ping)));

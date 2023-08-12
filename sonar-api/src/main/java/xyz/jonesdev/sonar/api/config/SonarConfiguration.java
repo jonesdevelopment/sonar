@@ -62,7 +62,8 @@ public final class SonarConfiguration {
   public int MAXIMUM_ONLINE_PER_IP;
   public int MAXIMUM_QUEUE_POLLS;
   public int MAXIMUM_LOGIN_PACKETS;
-  public int MAXIMUM_VERIFICATION_PING;
+  public int MAXIMUM_T_PING;
+  public int MAXIMUM_K_PING;
   public int VERIFICATION_TIMEOUT;
   public int VERIFICATION_READ_TIMEOUT;
   public int VERIFICATION_DELAY;
@@ -305,9 +306,14 @@ public final class SonarConfiguration {
     VERIFICATION_READ_TIMEOUT = clamp(generalConfig.getInt("general.verification.read-timeout", 4000), 500, 30000);
 
     generalConfig.getYaml().setComment("general.verification.max-t-ping",
-      "Maximum transaction delay (in milliseconds) a player needs to have before timing out"
+      "Maximum transaction ping (in milliseconds) a player needs to have before timing out"
     );
-    MAXIMUM_VERIFICATION_PING = clamp(generalConfig.getInt("general.verification.max-t-ping", 2500), 500, 30000);
+    MAXIMUM_T_PING = clamp(generalConfig.getInt("general.verification.max-t-ping", 2500), 500, 30000);
+
+    generalConfig.getYaml().setComment("general.verification.max-k-ping",
+      "Maximum keep alive ping (in milliseconds) a player needs to have before timing out (1.8+)"
+    );
+    MAXIMUM_K_PING = clamp(generalConfig.getInt("general.verification.max-k-ping", 2000), 500, 30000);
 
     generalConfig.getYaml().setComment("general.verification.max-login-packets",
       "Maximum number of login packets the player has to send in order to be kicked"
