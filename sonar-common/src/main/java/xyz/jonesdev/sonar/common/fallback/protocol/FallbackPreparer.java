@@ -44,8 +44,8 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 public class FallbackPreparer {
   private final Random RANDOM = new Random();
   private final DimensionInfo DIMENSION = new DimensionInfo(
-      "minecraft:overworld",
-        "sonar", false, false
+    "minecraft:overworld",
+    "sonar", false, false
   );
 
   // Mappings
