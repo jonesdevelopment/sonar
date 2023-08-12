@@ -18,6 +18,7 @@ gradlew
 *.jpeg
 *.log
 *.yml
+*.svg
 .editorconfig
 HEADER
 LICENSE
