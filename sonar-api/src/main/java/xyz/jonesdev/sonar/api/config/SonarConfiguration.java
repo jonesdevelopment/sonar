@@ -145,7 +145,9 @@ public final class SonarConfiguration {
   public String DATABASE_RELOADED;
 
   public void load() {
-    generalConfig = new SimpleYamlConfig(pluginFolder, "config");
+    if (generalConfig == null) {
+      generalConfig = new SimpleYamlConfig(pluginFolder, "config");
+    }
     generalConfig.load();
 
     // General options
@@ -171,7 +173,7 @@ public final class SonarConfiguration {
 
     // Database
     generalConfig.getYaml().setComment("general.database.type",
-      "Type of database Sonar uses to store verified players"
+      "Type of database Sonar uses to store verified players\nPossible types: NONE, MYSQL, ..."
     );
     DATABASE_TYPE =
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
