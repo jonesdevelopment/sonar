@@ -30,22 +30,28 @@ import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 public interface SonarBootstrap<T> extends Sonar {
-  void load(final @NotNull T plugin);
-
-  default void enable(final @NotNull T plugin) {
+  default void initialize(final @NotNull T plugin) {
     final DelayTimer timer = new DelayTimer();
 
-    getLogger().info("Initializing Sonar {}...", getVersion());
-
-    // Set the API to this class
+    // Set the API to this instance
     SonarSupplier.set(this);
 
-    // Run the per-platform initialization method
+    // Initialize plugin
     load(plugin);
+
+    // Start main plugin enable task
+    getLogger().info("Enabling Sonar {}...", getVersion());
+
+    // Run the per-platform initialization method
+    enable();
 
     // Done
     getLogger().info("Done ({}s)!", timer.formattedDelay());
   }
+
+  void load(final @NotNull T plugin);
+
+  void enable();
 
   default void reload() {
     // Load the configuration
@@ -70,6 +76,7 @@ public interface SonarBootstrap<T> extends Sonar {
 
   default void disable() {
     getLogger().info("Starting shutdown process...");
+    // ...
     getLogger().info("Successfully shut down. Goodbye!");
   }
 }

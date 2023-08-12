@@ -33,7 +33,7 @@ public final class SonarBungeePlugin extends Plugin {
     server = ProxyServer.getInstance();
     log4JLogger = LogManager.getLogger("Sonar");
 
-    SonarBungee.INSTANCE.enable(this);
+    SonarBungee.INSTANCE.initialize(this);
   }
 
   @Override

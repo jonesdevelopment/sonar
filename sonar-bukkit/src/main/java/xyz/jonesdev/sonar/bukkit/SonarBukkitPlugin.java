@@ -23,7 +23,7 @@ public final class SonarBukkitPlugin extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    SonarBukkit.INSTANCE.enable(this);
+    SonarBukkit.INSTANCE.initialize(this);
   }
 
   @Override

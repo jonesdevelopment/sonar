@@ -58,7 +58,7 @@ public final class SonarVelocityPlugin {
 
   @Subscribe
   public void handle(final ProxyInitializeEvent event) {
-    SonarVelocity.INSTANCE.enable(this);
+    SonarVelocity.INSTANCE.initialize(this);
   }
 
   @Subscribe

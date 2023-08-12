@@ -106,16 +106,16 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
   @Override
   public void load(final @NotNull SonarBukkitPlugin plugin) {
     this.plugin = plugin;
+    this.dataDirectory = plugin.getDataFolder();
+    this.config = new SonarConfiguration(dataDirectory);
+    this.subcommandRegistry = new SubcommandRegistryHolder();
+  }
 
-    // Set data directory
-    dataDirectory = plugin.getDataFolder();
+  @Override
+  public void enable() {
 
-    // Initialize configuration
-    config = new SonarConfiguration(plugin.getDataFolder());
+    // Reload configuration
     reload();
-
-    // Initialize sub commands
-    subcommandRegistry = new SubcommandRegistryHolder();
 
     // Initialize bStats.org metrics
     new Metrics(plugin, getServiceId());

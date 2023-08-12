@@ -106,16 +106,16 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
   @Override
   public void load(final @NotNull SonarVelocityPlugin plugin) {
     this.plugin = plugin;
+    this.dataDirectory = plugin.getDataDirectory().toFile();
+    this.config = new SonarConfiguration(dataDirectory);
+    this.subcommandRegistry = new SubcommandRegistryHolder();
+  }
 
-    // Set data directory
-    dataDirectory = plugin.getDataDirectory().toFile();
+  @Override
+  public void enable() {
 
-    // Initialize configuration
-    config = new SonarConfiguration(dataDirectory);
+    // Reload configuration
     reload();
-
-    // Initialize sub commands
-    subcommandRegistry = new SubcommandRegistryHolder();
 
     // Initialize bStats.org metrics
     plugin.getMetricsFactory().make(plugin, getServiceId());
