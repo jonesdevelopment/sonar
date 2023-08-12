@@ -118,6 +118,14 @@ public final class FallbackListener {
     final Channel channel = mcConnection.getChannel();
     final ChannelPipeline pipeline = channel.pipeline();
 
+    // This sometimes happens when the channel hangs, but the player is still connecting
+    // This also fixes a weird issue with TCPShield and other reverse proxies
+    if (pipeline.get(MINECRAFT_ENCODER) == null
+      || pipeline.get(MINECRAFT_DECODER) == null) {
+      mcConnection.close(true);
+      return;
+    }
+
     TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
 
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
