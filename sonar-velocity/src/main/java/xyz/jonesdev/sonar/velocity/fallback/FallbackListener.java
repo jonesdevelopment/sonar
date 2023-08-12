@@ -69,7 +69,7 @@ public final class FallbackListener {
     static Component ALREADY_QUEUED;
     static Component TOO_FAST_RECONNECT;
     public static Component INVALID_USERNAME;
-    static PreLoginEvent.PreLoginComponentResult TIMED_OUT;
+    static PreLoginEvent.PreLoginComponentResult DISCONNECTED;
 
     public static void update() {
       ALREADY_VERIFYING = Component.text(Sonar.get().getConfig().ALREADY_VERIFYING);
@@ -80,9 +80,7 @@ public final class FallbackListener {
       INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
       TOO_MANY_ONLINE_PER_IP = Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP);
       LOCKDOWN_DISCONNECT = Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT);
-      TIMED_OUT = PreLoginEvent.PreLoginComponentResult.denied(
-        Component.text(Sonar.get().getConfig().TIMED_OUT.replace("%ping%", "-"))
-      );
+      DISCONNECTED = PreLoginEvent.PreLoginComponentResult.denied(Component.text("Disconnected"));
     }
   }
 
@@ -127,7 +125,7 @@ public final class FallbackListener {
     if (pipeline.get(MINECRAFT_ENCODER) == null
       || pipeline.get(MINECRAFT_DECODER) == null) {
       mcConnection.close(true);
-      event.setResult(TIMED_OUT);
+      event.setResult(DISCONNECTED);
       return;
     }
 
