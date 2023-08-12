@@ -126,7 +126,7 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
     // Set the API to this class
     SonarSupplier.set(this);
 
-    logger.info("Initializing Sonar...");
+    logger.info("Initializing Sonar {}...", getVersion());
 
     // Set data directory
     dataDirectory = plugin.getDataFolder();

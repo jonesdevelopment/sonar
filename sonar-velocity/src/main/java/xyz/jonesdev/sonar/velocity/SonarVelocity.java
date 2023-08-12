@@ -126,7 +126,7 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
     // Set the API to this class
     SonarSupplier.set(this);
 
-    logger.info("Initializing Sonar...");
+    logger.info("Initializing Sonar {}...", getVersion());
 
     // Set data directory
     dataDirectory = plugin.getDataDirectory().toFile();
