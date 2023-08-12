@@ -62,6 +62,7 @@ public final class SonarConfiguration {
   public int MAXIMUM_ONLINE_PER_IP;
   public int MAXIMUM_QUEUE_POLLS;
   public int MAXIMUM_LOGIN_PACKETS;
+  public int MAXIMUM_VERIFICATION_PING;
   public int VERIFICATION_TIMEOUT;
   public int VERIFICATION_READ_TIMEOUT;
   public int VERIFICATION_DELAY;
@@ -78,6 +79,7 @@ public final class SonarConfiguration {
   public String ALREADY_VERIFYING;
   public String ALREADY_QUEUED;
   public String BLACKLISTED;
+  public String TIMED_OUT;
 
   public String INCORRECT_COMMAND_USAGE;
   public String INCORRECT_IP_ADDRESS;
@@ -301,6 +303,11 @@ public final class SonarConfiguration {
       "Amount of time that has to pass before a player times out"
     );
     VERIFICATION_READ_TIMEOUT = clamp(generalConfig.getInt("general.verification.read-timeout", 4000), 500, 30000);
+
+    generalConfig.getYaml().setComment("general.verification.max-t-ping",
+      "Maximum transaction delay (in milliseconds) a player needs to have before timing out"
+    );
+    MAXIMUM_VERIFICATION_PING = clamp(generalConfig.getInt("general.verification.max-t-ping", 2500), 500, 30000);
 
     generalConfig.getYaml().setComment("general.verification.max-login-packets",
       "Maximum number of login packets the player has to send in order to be kicked"
@@ -700,6 +707,18 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "&cYou have failed the verification.",
+        "&7Please wait a few seconds before trying to verify again.",
+        "&6Need help? &7%support-url%",
+        "%footer%"
+      )));
+
+    messagesConfig.getYaml().setComment("messages.verification.timed-out",
+      "Disconnect message that is shown when someone has a ping that exceeds the maximum ping"
+    );
+    TIMED_OUT = fromList(messagesConfig.getStringList("messages.verification.timed-out",
+      Arrays.asList(
+        "%header%",
+        "&cYour connection is currently too unstable. &7(%ping%ms)",
         "&7Please wait a few seconds before trying to verify again.",
         "&6Need help? &7%support-url%",
         "%footer%"

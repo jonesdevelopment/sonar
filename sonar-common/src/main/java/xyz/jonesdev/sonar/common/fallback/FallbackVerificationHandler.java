@@ -226,6 +226,16 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Check if the transaction ID is valid
       checkFrame(transaction.getId() == transactionId, "invalid transaction id");
 
+      // Check if the ping is unstable/too high
+      final long ping = login.delay();
+      final long maxPing = player.getFallback().getSonar().getConfig().MAXIMUM_VERIFICATION_PING;
+      if (ping > maxPing) {
+        // Do not blacklist for a too high ping, only kick for unstable connection
+        player.disconnect(player.getFallback().getSonar().getConfig().TIMED_OUT
+          .replaceAll("%ping%", Sonar.DECIMAL_FORMAT.format(ping)));
+        return;
+      }
+
       // Checking gravity is disabled, just finish verification
       if (!player.getFallback().getSonar().getConfig().CHECK_GRAVITY) {
         finish();
