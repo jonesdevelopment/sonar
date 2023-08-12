@@ -54,7 +54,7 @@ public final class VerifiedPlayerController {
 
     // Don't establish a database connection if the type is NONE
     if (cachedDatabaseType == SonarConfiguration.DatabaseType.NONE) {
-      Sonar.get().getLogger().warn("Make sure to select a database type to store all verified players.");
+      Sonar.get().getLogger().warn("Make sure to configure a database to save verified players.");
       return;
     }
 
