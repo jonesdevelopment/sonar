@@ -45,7 +45,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
   private File dataDirectory;
-  private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
+  private final SubcommandRegistry subcommandRegistry;
   private final DelayTimer launchTimer = new DelayTimer();
 
   public SonarBootstrap(final @NotNull T plugin,
@@ -59,6 +59,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     this.dataDirectory = dataDirectory;
     this.actionBarVerbose = actionBarVerbose;
     this.config = new SonarConfiguration(dataDirectory);
+    this.subcommandRegistry = new SubcommandRegistryHolder();
   }
 
   public final void initialize() {
