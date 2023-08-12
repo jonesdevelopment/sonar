@@ -25,9 +25,7 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.logger.Logger;
 
 import java.net.InetAddress;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +35,6 @@ public final class Fallback {
   private final Sonar sonar = Sonar.get();
 
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
-  private final Collection<String> verified = new Vector<>(1);
   // Only block the player for a few minutes to avoid issues
   private final ExpiringCache<String> blacklisted = Cappuccino.buildExpiring(
     10L, TimeUnit.MINUTES, 2500L

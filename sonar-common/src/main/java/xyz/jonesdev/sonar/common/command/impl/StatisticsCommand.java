@@ -90,7 +90,7 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
     final int failed = Statistics.FAILED_VERIFICATIONS.get(0);
     final int queued = SONAR.getFallback().getQueue().getQueuedPlayers().size();
     final int verifying = SONAR.getFallback().getConnected().size();
-    final int verified = SONAR.getFallback().getVerified().size();
+    final int verified = SONAR.getVerifiedPlayerController().estimatedSize();
     final int blacklisted = SONAR.getFallback().getBlacklisted().estimatedSize();
 
     invocation.getSender().sendMessage(" §a▪ §7Verified IP addresses: §f" + DECIMAL_FORMAT.format(verified));
