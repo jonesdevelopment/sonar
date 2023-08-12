@@ -46,6 +46,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private VerifiedPlayerController verifiedPlayerController;
   private File dataDirectory;
   private final SubcommandRegistry subcommandRegistry = new SubcommandRegistryHolder();
+  private final DelayTimer launchTimer = new DelayTimer();
 
   public SonarBootstrap(final @NotNull T plugin,
                         final File dataDirectory,
@@ -53,6 +54,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Set the API to this instance so the config doesn't have issues
     SonarSupplier.set(this);
 
+    // Set the plugin instance before anything else
     this.plugin = plugin;
     this.dataDirectory = dataDirectory;
     this.actionBarVerbose = actionBarVerbose;
@@ -60,19 +62,20 @@ public abstract class SonarBootstrap<T> implements Sonar {
   }
 
   public final void initialize() {
-    final DelayTimer timer = new DelayTimer();
-
-    // Start main plugin enable task
-    getLogger().info("Enabling Sonar {}...", getVersion());
+    getLogger().info("Successfully booted in {}s!", launchTimer.formattedDelay());
+    getLogger().info("Initializing shared components...");
 
     // Reload configuration
     reload();
+
+    getLogger().info("Successfully initialized components in {}s!", launchTimer.formattedDelay());
+    getLogger().info("Enabling all tasks and features...");
 
     // Run the per-platform initialization method
     enable();
 
     // Done
-    getLogger().info("Done ({}s)!", timer.formattedDelay());
+    getLogger().info("Done ({}s)!", launchTimer.formattedDelay());
   }
 
   public abstract void enable();
