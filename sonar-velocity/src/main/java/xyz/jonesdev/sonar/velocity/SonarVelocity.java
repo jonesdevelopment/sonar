@@ -41,29 +41,18 @@ import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+@Getter
 public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> {
 
   INSTANCE;
 
-  @Getter
   private SonarVelocityPlugin plugin;
-
-  @Getter
   private ActionBarVerbose actionBarVerbose;
-
-  @Getter
   private SonarConfiguration config;
-
-  @Getter
   private SubcommandRegistry subcommandRegistry;
-
-  @Getter
   private VerifiedPlayerController verifiedPlayerController;
-
-  @Getter
   private File dataDirectory;
 
-  @Getter
   private final Logger logger = new Logger() {
 
     @Override
@@ -89,7 +78,6 @@ public enum SonarVelocity implements Sonar, SonarBootstrap<SonarVelocityPlugin> 
    *
    * @since 2.0.0 (7faa4b6)
    */
-  @Getter
   public final ServerWrapper server = new ServerWrapper() {
 
     @Override

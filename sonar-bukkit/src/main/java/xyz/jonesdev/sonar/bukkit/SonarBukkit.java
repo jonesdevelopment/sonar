@@ -41,29 +41,18 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 
+@Getter
 public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
 
   INSTANCE;
 
-  @Getter
   private SonarBukkitPlugin plugin;
-
-  @Getter
   private ActionBarVerbose actionBarVerbose;
-
-  @Getter
   private SonarConfiguration config;
-
-  @Getter
   private SubcommandRegistry subcommandRegistry;
-
-  @Getter
   private VerifiedPlayerController verifiedPlayerController;
-
-  @Getter
   private File dataDirectory;
 
-  @Getter
   private final Logger logger = new Logger() {
 
     @Override
@@ -89,7 +78,6 @@ public enum SonarBukkit implements Sonar, SonarBootstrap<SonarBukkitPlugin> {
    *
    * @since 2.0.0 (7faa4b6)
    */
-  @Getter
   public final ServerWrapper server = new ServerWrapper() {
 
     @Override
