@@ -72,10 +72,15 @@ public abstract class SonarBootstrap<T> implements Sonar {
     getLogger().info("Enabling all tasks and features...");
 
     // Run the per-platform initialization method
-    enable();
+    try {
+      enable();
 
-    // Done
-    getLogger().info("Done ({}s)!", launchTimer.formattedDelay());
+      // Done
+      getLogger().info("Done ({}s)!", launchTimer.formattedDelay());
+    } catch (Exception exception) {
+      // Error
+      getLogger().error("An error has occurred while launching Sonar: {}", exception);
+    }
   }
 
   public abstract void enable();
