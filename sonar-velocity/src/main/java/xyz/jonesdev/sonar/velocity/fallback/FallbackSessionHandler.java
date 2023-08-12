@@ -35,7 +35,6 @@ import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
-import xyz.jonesdev.sonar.velocity.SonarVelocity;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -88,7 +87,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     this.mcConnection = mcConnection;
     this.inboundConnection = inboundConnection;
     this.sessionHandler = sessionHandler;
-    this.server = (VelocityServer) SonarVelocity.INSTANCE.getPlugin().getServer();
+    this.server = mcConnection.server;
 
     // Don't allow exceptions or disconnect messages
     mcConnection.setAssociation(null);
