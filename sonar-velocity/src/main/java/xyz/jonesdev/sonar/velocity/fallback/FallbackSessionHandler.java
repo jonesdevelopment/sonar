@@ -27,6 +27,7 @@ import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
@@ -76,13 +77,13 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     }
   }
 
-  public FallbackSessionHandler(final Fallback fallback,
-                                final MinecraftConnection mcConnection,
-                                final LoginInboundConnection inboundConnection,
-                                final InitialLoginSessionHandler sessionHandler,
-                                final GameProfile gameProfile,
-                                final InetAddress inetAddress,
-                                final boolean onlineMode) {
+  FallbackSessionHandler(final Fallback fallback,
+                         final @NotNull MinecraftConnection mcConnection,
+                         final LoginInboundConnection inboundConnection,
+                         final InitialLoginSessionHandler sessionHandler,
+                         final GameProfile gameProfile,
+                         final InetAddress inetAddress,
+                         final boolean onlineMode) {
     this.fallback = fallback;
     this.mcConnection = mcConnection;
     this.inboundConnection = inboundConnection;
