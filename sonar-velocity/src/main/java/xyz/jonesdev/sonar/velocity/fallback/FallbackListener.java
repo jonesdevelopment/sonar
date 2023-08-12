@@ -222,9 +222,6 @@ public final class FallbackListener {
           return;
         }
 
-        // The player joined the verification
-        Statistics.REAL_TRAFFIC.increment();
-
         // Add better timeout handler to avoid known exploits or issues
         // We also want to timeout bots quickly to avoid flooding
         pipeline.replace(

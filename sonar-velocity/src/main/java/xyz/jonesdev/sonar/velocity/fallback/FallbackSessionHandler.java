@@ -29,6 +29,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
@@ -121,6 +122,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
       fallbackPlayer.disconnect("Could not find any available servers.");
       return;
     }
+
+    // The player joined the verification
+    Statistics.REAL_TRAFFIC.increment();
 
     if (fallback.getSonar().getConfig().LOG_CONNECTIONS) {
       // Only log the processing message if the server isn't under attack.
