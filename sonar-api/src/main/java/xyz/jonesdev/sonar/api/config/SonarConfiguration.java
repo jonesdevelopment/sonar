@@ -748,10 +748,10 @@ public final class SonarConfiguration {
         "\n- %queued% Number of queued connections" +
         "\n- %verifying% Number of verifying connections" +
         "\n- %blacklisted% Number of blacklisted IP addresses" +
-        "\n- %verified% Number of verified IP addresses" +
         "\n- %total-joins% Number of total joins (not unique!)" +
-        "\n- %real-joins% Number of verification attempts" +
-        "\n- %failed-verify% Number of failed verifications" +
+        "\n- %verify-total% Number of total verification attempts" +
+        "\n- %verify-success% Number of verified IP addresses" +
+        "\n- %verify-failed% Number of failed verifications" +
         "\n- %incoming-traffic% Incoming bandwidth usage per second" +
         "\n- %outgoing-traffic% Outgoing bandwidth usage per second" +
         "\n- %incoming-traffic-ttl% Total incoming bandwidth usage" +
