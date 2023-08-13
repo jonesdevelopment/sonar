@@ -765,10 +765,10 @@ public final class SonarConfiguration {
     ACTION_BAR_LAYOUT = formatString(messagesConfig.getString(
       "messages.action-bar.layout",
       "%prefix%&7Queued &f%queued%" +
-        "  &7Verifying &f%verifying%" +
-        "  &7Blacklisted &f%blacklisted%" +
-        "  &7Bandwidth &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
-        "  &a&l%animation%"
+        " &3╺ &7Verifying &f%verifying%" +
+        " &3╺ &7Blacklisted &f%blacklisted%" +
+        " &3╺ &7Bandwidth &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
+        " &3╺ &a&l%animation%"
     ));
     ANIMATION = messagesConfig.getStringList("messages.action-bar.animation",
       Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
