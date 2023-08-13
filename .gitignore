@@ -5,7 +5,9 @@ gradle/
 build/
 vscode/
 .fleet/
+gradle*
 gradlew
+*.kts
 *.bat
 *.cmd
 *.sh
@@ -19,7 +21,7 @@ gradlew
 *.log
 *.yml
 *.svg
-.editorconfig
+.*config
 HEADER
 LICENSE
-.gitignore
+.*ignore
