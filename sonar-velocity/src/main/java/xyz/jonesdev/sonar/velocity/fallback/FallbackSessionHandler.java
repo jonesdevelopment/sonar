@@ -139,6 +139,14 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // Mark the player as connected → verifying players
     fallback.getConnected().put(gameProfile.getName(), inetAddress);
 
+    // This sometimes happens when the channel hangs, but the player is still connecting
+    // This also fixes a weird issue with TCPShield and other reverse proxies
+    if (fallbackPlayer.getPipeline().get(MINECRAFT_ENCODER) == null
+      || fallbackPlayer.getPipeline().get(MINECRAFT_DECODER) == null) {
+      mcConnection.close(true);
+      return;
+    }
+
     // Replace normal encoder to allow custom packets
     fallbackPlayer.getPipeline().replace(
       MINECRAFT_ENCODER,

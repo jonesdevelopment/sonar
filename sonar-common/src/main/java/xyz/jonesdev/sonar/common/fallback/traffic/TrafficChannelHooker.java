@@ -27,10 +27,10 @@ public class TrafficChannelHooker implements FallbackPipelines {
   public void hook(final @NotNull ChannelPipeline pipeline,
                    final @NotNull String decoder,
                    final @NotNull String encoder) {
-    if (pipeline.get(FALLBACK_IN_TRAFFIC) == null) {
+    if (pipeline.get(FALLBACK_IN_TRAFFIC) == null && pipeline.get(decoder) != null) {
       pipeline.addBefore(decoder, FALLBACK_IN_TRAFFIC, IncomingBandwidthDecoder.INSTANCE);
     }
-    if (pipeline.get(FALLBACK_OUT_TRAFFIC) == null) {
+    if (pipeline.get(FALLBACK_OUT_TRAFFIC) == null && pipeline.get(encoder) != null) {
       pipeline.addBefore(encoder, FALLBACK_OUT_TRAFFIC, OutgoingBandwidthEncoder.INSTANCE);
     }
   }
