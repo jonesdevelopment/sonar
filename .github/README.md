@@ -65,12 +65,8 @@ technically impossible to have a ton of bots join the server at the same time.
 
 ### False positives
 
-Fallback is unlikely to ever falsely prevent a player from joining the server since Minecraft uses the TCP protocol
-which means that packets are always sent in the correct order. Lag should not affect the bot check.
-However, there are some edge cases where Fallback might not receive packets within the necessary time period. In that
-case, Sonar tries to account for these edge cases in order to prevent false positives. For example, some higher
-Minecraft versions have a bug where the client sometimes sends a packet out of order. Sonar accounts for that and does
-not falsely blacklist clients.
+Fallback is unlikely to ever falsely prevent a player from joining the server since Minecraft uses the TCP protocol which means that packets are always sent in the correct order. Therefore, lag or ping should not affect the bot check.
+However, there are some edge cases where Fallback might not receive packets within the necessary time period. In this case, Sonar tries to account for these edge cases in order to prevent false positives. For example, some higher Minecraft versions have a bug where the client sometimes sends a packet out of order. Sonar accounts for that and does not falsely blacklist clients.
 If you or one of your players experiences a false positive, make sure to report it by opening
 a [GitHub issue](https://github.com/jonesdevelopment/sonar/issues) or a ticket
 on [Discord](https://jonesdev.xyz/discord/).
