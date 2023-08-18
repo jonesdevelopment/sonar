@@ -54,7 +54,8 @@ public final class ActionBarVerbose implements Verbose, JVMProfiler {
           Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
         .replace("%total-joins%", Sonar.DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get(0)))
         .replace("%verify-total%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get(0)))
-        .replace("%verify-success%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
+        .replace("%verify-success%",
+          Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
         .replace("%verify-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get(0)))
         .replace("%incoming-traffic%", TrafficCounter.INCOMING.getCachedSecond())
         .replace("%outgoing-traffic%", TrafficCounter.OUTGOING.getCachedSecond())

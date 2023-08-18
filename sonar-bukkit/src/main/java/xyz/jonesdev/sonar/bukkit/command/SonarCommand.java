@@ -48,7 +48,6 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
                            final Command command,
                            final String label,
                            final String[] args) {
-
     if (!(sender instanceof ConsoleCommandSender)) {
       // Checking if it contains will only break more since it can throw
       // a NullPointerException if the cache is being accessed from parallel threads
