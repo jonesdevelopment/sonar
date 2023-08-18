@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.velocity;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.logger.Logger;
@@ -34,7 +33,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> implements Sonar {
+public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
   public static SonarVelocity INSTANCE;
 
   public SonarVelocity(final SonarVelocityPlugin plugin) {

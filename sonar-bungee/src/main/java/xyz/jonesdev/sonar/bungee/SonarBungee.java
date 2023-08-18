@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.bungee;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bstats.bungeecord.Metrics;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.logger.Logger;
@@ -37,7 +36,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> implements Sonar {
+public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   public static SonarBungee INSTANCE;
 
   public SonarBungee(final SonarBungeePlugin plugin) {
