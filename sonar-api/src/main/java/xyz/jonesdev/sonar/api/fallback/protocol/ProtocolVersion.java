@@ -65,7 +65,8 @@ public enum ProtocolVersion {
   MINECRAFT_1_19_1(760),
   MINECRAFT_1_19_3(761),
   MINECRAFT_1_19_4(762),
-  MINECRAFT_1_20(763);
+  MINECRAFT_1_20(763),
+  MINECRAFT_1_20_2(-1);
 
   private final int protocol;
   private final int snapshotProtocol = -1;
