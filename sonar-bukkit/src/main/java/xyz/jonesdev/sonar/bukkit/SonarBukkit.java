@@ -62,6 +62,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
   /**
    * Create a wrapper object for our server, so we can use it outside
    * the velocity module.
+   * <br>
    * We have to do this, so we can access all necessary API functions.
    */
   public final ServerWrapper server = new ServerWrapper() {
