@@ -38,17 +38,24 @@ public class DependencyLoader {
   public ConnectionSource setUpDriverAndConnect() {
     try {
       final SonarConfiguration config = Sonar.get().getConfig();
-      final URL url = config.DATABASE_TYPE.getDependency().getClassLoaderURL();
-      final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
 
-      final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
-      addPath.setAccessible(true);
-      addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
+      final URL[] urls = new URL[config.DATABASE_TYPE.getDependencies().length];
+      for (final Dependency dependency : config.DATABASE_TYPE.getDependencies()) {
+        final URL url = dependency.getClassLoaderURL();
+        final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
 
+        final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
+        addPath.setAccessible(true);
+        addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
+
+        urls[dependency.ordinal()] = url;
+      }
+
+      final String type = config.DATABASE_TYPE.name().toLowerCase();
       final String databaseURL =
-        "jdbc:mysql://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
+        "jdbc:" + type + "://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
 
-      final ExternalClassLoader classLoader = new ExternalClassLoader(url);
+      final ExternalClassLoader classLoader = new ExternalClassLoader(urls);
       final Connection connection = connect(classLoader, databaseURL, config.MYSQL_USER, config.MYSQL_PASSWORD);
       return new JdbcSingleConnectionSource(databaseURL, connection);
     } catch (Throwable throwable) {

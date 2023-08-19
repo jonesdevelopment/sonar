@@ -27,8 +27,8 @@ final class ExternalClassLoader extends URLClassLoader {
    *
    * @param url URL for of the local file
    */
-  public ExternalClassLoader(final URL url) {
-    super(new URL[]{url}, ClassLoader.getSystemClassLoader().getParent());
+  public ExternalClassLoader(final URL[] url) {
+    super(url, ClassLoader.getSystemClassLoader().getParent());
   }
 
   // Register this URLClassLoader as parallel capable

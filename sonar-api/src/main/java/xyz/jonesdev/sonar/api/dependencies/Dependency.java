@@ -33,10 +33,17 @@ import java.nio.file.StandardCopyOption;
 // Mostly taken from
 // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/BaseLibrary.java
 public enum Dependency {
-  JDBC_DRIVER(
+  // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+  MYSQL(
     "com/mysql",
     "mysql-connector-j",
     "8.1.0"
+  ),
+  // https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
+  MARIADB(
+    "org/mariadb/jdbc",
+    "mariadb-java-client",
+    "3.1.4"
   );
 
   private @NotNull
