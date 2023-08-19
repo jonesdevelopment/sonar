@@ -19,14 +19,13 @@ package xyz.jonesdev.sonar.common.fallback.traffic;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import static xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory;
+import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 
 /**
  * This counts all incoming and outgoing traffic.
  */
 @Getter
-public enum TrafficCounter {
+public enum TrafficCounter implements JVMProfiler {
   INCOMING,
   OUTGOING;
 
@@ -50,10 +49,14 @@ public enum TrafficCounter {
    */
   public static synchronized void reset() {
     for (final TrafficCounter value : values()) {
-      value.ttl += value.curr; // increment total
-      value.cachedSecond = formatMemory(value.curr);
-      value.cachedTtl = formatMemory(value.ttl);
-      value.curr = 0L; // reset current
+      value.cacheAndReset();
     }
+  }
+
+  private void cacheAndReset() {
+    ttl += curr; // increment total
+    cachedSecond = formatMemory(curr);
+    cachedTtl = formatMemory(ttl);
+    curr = 0L; // reset current
   }
 }

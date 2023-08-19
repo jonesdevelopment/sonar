@@ -27,6 +27,12 @@ public interface JVMProfiler {
   OperatingSystemMXBean OPERATING_SYSTEM_MX_BEAN = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
   RuntimeMXBean RUNTIME_MX_BEAN = ManagementFactory.getRuntimeMXBean();
 
+  default String formatMemory(final long m) {
+    if (m < 1024L) return m + " B";
+    final int z = (63 - Long.numberOfLeadingZeros(m)) / 10;
+    return String.format("%.1f %sB", (double) m / (1L << (z * 10)), " KMGTPE".charAt(z));
+  }
+
   default int getVirtualCores() {
     return RUNTIME.availableProcessors();
   }

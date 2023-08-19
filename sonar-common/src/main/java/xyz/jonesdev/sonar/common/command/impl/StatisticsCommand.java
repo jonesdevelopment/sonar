@@ -22,7 +22,6 @@ import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.argument.Argument;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.api.format.MemoryFormatter;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
@@ -60,10 +59,10 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
         }
 
         case "memory": {
-          invocation.getSender().sendMessage(" §a▪ §7Total free memory (JVM): §f" + MemoryFormatter.formatMemory(getFreeMemory()));
-          invocation.getSender().sendMessage(" §a▪ §7Total used memory (JVM): §f" + MemoryFormatter.formatMemory(getUsedMemory()));
-          invocation.getSender().sendMessage(" §a▪ §7Total maximum memory (JVM): §f" + MemoryFormatter.formatMemory(getMaxMemory()));
-          invocation.getSender().sendMessage(" §a▪ §7Total allocated memory (JVM): §f" + MemoryFormatter.formatMemory(getTotalMemory()));
+          invocation.getSender().sendMessage(" §a▪ §7Total free memory (JVM): §f" + formatMemory(getFreeMemory()));
+          invocation.getSender().sendMessage(" §a▪ §7Total used memory (JVM): §f" + formatMemory(getUsedMemory()));
+          invocation.getSender().sendMessage(" §a▪ §7Total maximum memory (JVM): §f" + formatMemory(getMaxMemory()));
+          invocation.getSender().sendMessage(" §a▪ §7Total allocated memory (JVM): §f" + formatMemory(getTotalMemory()));
           invocation.getSender().sendMessage();
           return;
         }

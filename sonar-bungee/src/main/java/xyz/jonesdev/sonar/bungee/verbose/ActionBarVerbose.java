@@ -33,8 +33,6 @@ import xyz.jonesdev.sonar.common.verbose.VerboseAnimation;
 import java.util.Collection;
 import java.util.Vector;
 
-import static xyz.jonesdev.sonar.api.format.MemoryFormatter.formatMemory;
-
 @RequiredArgsConstructor
 public final class ActionBarVerbose implements Verbose, JVMProfiler {
   private final ProxyServer server;

@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.api.format.MemoryFormatter;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 
 // This command is only used to display helpful information in order to help
@@ -45,10 +44,10 @@ public final class DumpCommand extends Subcommand implements JVMProfiler {
     invocation.getSender().sendMessage("Java version: " + RUNTIME_MX_BEAN.getVmVersion());
     invocation.getSender().sendMessage("Java vendor: " + RUNTIME_MX_BEAN.getVmVendor());
     invocation.getSender().sendMessage("Operating system: " + osName + ", " + osArch);
-    invocation.getSender().sendMessage("Total memory: " + MemoryFormatter.formatMemory(getTotalMemory()));
-    invocation.getSender().sendMessage("Max memory: " + MemoryFormatter.formatMemory(getMaxMemory()));
-    invocation.getSender().sendMessage("Free memory: " + MemoryFormatter.formatMemory(getFreeMemory()));
-    invocation.getSender().sendMessage("Used Memory: " + MemoryFormatter.formatMemory(getUsedMemory()));
+    invocation.getSender().sendMessage("Total memory: " + formatMemory(getTotalMemory()));
+    invocation.getSender().sendMessage("Max memory: " + formatMemory(getMaxMemory()));
+    invocation.getSender().sendMessage("Free memory: " + formatMemory(getFreeMemory()));
+    invocation.getSender().sendMessage("Used Memory: " + formatMemory(getUsedMemory()));
     invocation.getSender().sendMessage("Platform: " + SONAR.getServer().getPlatform().getDisplayName());
     invocation.getSender().sendMessage("Version: " + SONAR.getVersion().getFull());
   }
