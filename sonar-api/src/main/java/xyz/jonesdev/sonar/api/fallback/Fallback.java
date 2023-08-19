@@ -17,7 +17,9 @@
 
 package xyz.jonesdev.sonar.api.fallback;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
@@ -30,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Fallback {
   public static final Fallback INSTANCE = new Fallback();
   private final Sonar sonar = Sonar.get();

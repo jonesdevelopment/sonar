@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+@Getter
 public final class SimpleYamlConfig {
-  @Getter
   private final YamlFile yaml;
 
   private static final List<String> HEADER = Arrays.asList(
