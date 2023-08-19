@@ -35,32 +35,28 @@ import java.util.Properties;
 
 @UtilityClass
 public class DependencyLoader {
-  public ConnectionSource setUpDriverAndConnect() {
-    try {
-      final SonarConfiguration config = Sonar.get().getConfig();
+  public ConnectionSource setUpDriverAndConnect() throws Throwable {
+    final SonarConfiguration config = Sonar.get().getConfig();
 
-      final URL[] urls = new URL[config.DATABASE_TYPE.getDependencies().length];
-      for (final Dependency dependency : config.DATABASE_TYPE.getDependencies()) {
-        final URL url = dependency.getClassLoaderURL();
-        final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
+    final URL[] urls = new URL[config.DATABASE_TYPE.getDependencies().length];
+    for (final Dependency dependency : config.DATABASE_TYPE.getDependencies()) {
+      final URL url = dependency.getClassLoaderURL();
+      final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
 
-        final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
-        addPath.setAccessible(true);
-        addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
+      final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
+      addPath.setAccessible(true);
+      addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
 
-        urls[dependency.ordinal()] = url;
-      }
-
-      final String type = config.DATABASE_TYPE.name().toLowerCase();
-      final String databaseURL =
-        "jdbc:" + type + "://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
-
-      final ExternalClassLoader classLoader = new ExternalClassLoader(urls);
-      final Connection connection = connect(classLoader, databaseURL, config.MYSQL_USER, config.MYSQL_PASSWORD);
-      return new JdbcSingleConnectionSource(databaseURL, connection);
-    } catch (Throwable throwable) {
-      throw new IllegalStateException("Could not connect to database: {}", throwable);
+      urls[dependency.ordinal()] = url;
     }
+
+    final String type = config.DATABASE_TYPE.name().toLowerCase();
+    final String databaseURL =
+      "jdbc:" + type + "://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
+
+    final ExternalClassLoader classLoader = new ExternalClassLoader(urls);
+    final Connection connection = connect(classLoader, databaseURL, config.MYSQL_USER, config.MYSQL_PASSWORD);
+    return new JdbcSingleConnectionSource(databaseURL, connection);
   }
 
   // Mostly taken from

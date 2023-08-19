@@ -74,6 +74,7 @@ public final class VerifiedPlayerController {
       dao.queryForAll().forEach(this::_add);
     } catch (Throwable throwable) {
       Sonar.get().getLogger().error("Error setting up database connection: {}", throwable);
+      throwable.printStackTrace();
     }
   }
 
