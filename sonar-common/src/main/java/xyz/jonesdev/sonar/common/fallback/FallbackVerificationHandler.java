@@ -181,7 +181,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (ping > player.getFallback().getSonar().getConfig().MAXIMUM_K_PING) {
         // Do not blacklist for a too high ping, only kick for unstable connection
         player.disconnect(player.getFallback().getSonar().getConfig().TIMED_OUT
-          .replaceAll("%ping%", Sonar.DECIMAL_FORMAT.format(ping)));
+          .replace("%ping%", Sonar.DECIMAL_FORMAT.format(ping)));
         return;
       }
 
@@ -240,7 +240,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (ping > player.getFallback().getSonar().getConfig().MAXIMUM_T_PING) {
         // Do not blacklist for a too high ping, only kick for unstable connection
         player.disconnect(player.getFallback().getSonar().getConfig().TIMED_OUT
-          .replaceAll("%ping%", Sonar.DECIMAL_FORMAT.format(ping)));
+          .replace("%ping%", Sonar.DECIMAL_FORMAT.format(ping)));
         return;
       }
 
