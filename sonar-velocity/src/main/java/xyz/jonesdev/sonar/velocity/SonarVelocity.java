@@ -41,6 +41,12 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     INSTANCE = this;
   }
 
+  /**
+   * Create a wrapper for the plugin logger, so we can use it outside
+   * the velocity module.
+   * <br>
+   * We have to do this, so we can access all necessary API functions.
+   */
   private final Logger logger = new Logger() {
 
     @Override
