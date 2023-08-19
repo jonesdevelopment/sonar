@@ -73,7 +73,7 @@ public final class VerifiedPlayerController {
 
       dao.queryForAll().forEach(this::_add);
     } catch (Throwable throwable) {
-      throwable.printStackTrace();
+      Sonar.get().getLogger().error("Error setting up database connection: {}", throwable);
     }
   }
 
@@ -104,7 +104,7 @@ public final class VerifiedPlayerController {
         }
       }
     } catch (SQLException exception) {
-      exception.printStackTrace();
+      Sonar.get().getLogger().error("Error trying to remove entry: {}", exception);
     }
   }
 
@@ -137,7 +137,7 @@ public final class VerifiedPlayerController {
       try {
         dao.create(player);
       } catch (SQLException exception) {
-        exception.printStackTrace();
+        Sonar.get().getLogger().error("Error trying to add entry: {}", exception);
       }
     });
   }
@@ -181,7 +181,7 @@ public final class VerifiedPlayerController {
         dao.deleteBuilder().delete();
       }
     } catch (SQLException exception) {
-      exception.printStackTrace();
+      Sonar.get().getLogger().error("Error trying to clear entries: {}", exception);
     }
   }
 
