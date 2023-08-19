@@ -115,18 +115,19 @@ public final class SonarConfiguration {
   @Getter
   @RequiredArgsConstructor
   public enum DatabaseType {
-    MYSQL(new Dependency[]{Dependency.MYSQL}),
-    MARIADB(new Dependency[]{Dependency.MYSQL, Dependency.MARIADB}),
-    NONE(null);
+    MYSQL(new Dependency[]{Dependency.MYSQL}, "com.mysql.cj.jdbc.NonRegisteringDriver"),
+    MARIADB(new Dependency[]{Dependency.MYSQL, Dependency.MARIADB}, "org.mariadb.jdbc.Driver"),
+    NONE(null, null);
     private final Dependency[] dependencies;
+    private final String driverClassName;
   }
 
   public DatabaseType DATABASE_TYPE;
-  public String MYSQL_URL;
-  public int MYSQL_PORT;
-  public String MYSQL_DATABASE;
-  public String MYSQL_USER;
-  public String MYSQL_PASSWORD;
+  public String SQL_URL;
+  public int SQL_PORT;
+  public String SQL_DATABASE;
+  public String SQL_USER;
+  public String SQL_PASSWORD;
 
   public boolean LOCKDOWN_ENABLED;
   public boolean LOCKDOWN_ENABLE_NOTIFY;
@@ -197,27 +198,27 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.database.sql.url",
       "URL for authenticating with the SQL database"
     );
-    MYSQL_URL = generalConfig.getString("general.database.sql.url", "localhost");
+    SQL_URL = generalConfig.getString("general.database.sql.url", "localhost");
 
     generalConfig.getYaml().setComment("general.database.sql.port",
       "Port for authenticating with the SQL database"
     );
-    MYSQL_PORT = generalConfig.getInt("general.database.sql.port", 3306);
+    SQL_PORT = generalConfig.getInt("general.database.sql.port", 3306);
 
     generalConfig.getYaml().setComment("general.database.sql.database",
       "Name of the SQL database"
     );
-    MYSQL_DATABASE = generalConfig.getString("general.database.sql.database", "sonar");
+    SQL_DATABASE = generalConfig.getString("general.database.sql.database", "sonar");
 
     generalConfig.getYaml().setComment("general.database.sql.username",
       "Username for authenticating with the SQL database"
     );
-    MYSQL_USER = generalConfig.getString("general.database.sql.username", "");
+    SQL_USER = generalConfig.getString("general.database.sql.username", "");
 
     generalConfig.getYaml().setComment("general.database.sql.password",
       "Password for authenticating with the SQL database"
     );
-    MYSQL_PASSWORD = generalConfig.getString("general.database.sql.password", "");
+    SQL_PASSWORD = generalConfig.getString("general.database.sql.password", "");
 
     // Lockdown
     generalConfig.getYaml().setComment("general.lockdown.enabled",

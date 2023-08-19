@@ -52,10 +52,10 @@ public class DependencyLoader {
 
     final String type = config.DATABASE_TYPE.name().toLowerCase();
     final String databaseURL =
-      "jdbc:" + type + "://" + config.MYSQL_URL + ":" + config.MYSQL_PORT + "/" + config.MYSQL_DATABASE;
+      "jdbc:" + type + "://" + config.SQL_URL + ":" + config.SQL_PORT + "/" + config.SQL_DATABASE;
 
     final ExternalClassLoader classLoader = new ExternalClassLoader(urls);
-    final Connection connection = connect(classLoader, databaseURL, config.MYSQL_USER, config.MYSQL_PASSWORD);
+    final Connection connection = connect(classLoader, databaseURL, config);
     return new JdbcSingleConnectionSource(databaseURL, connection);
   }
 
@@ -63,19 +63,18 @@ public class DependencyLoader {
   // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/DatabaseLibrary.java#L134
   private Connection connect(final @NotNull ClassLoader classLoader,
                              final @NotNull String databaseURL,
-                             final @NotNull String username,
-                             final @NotNull String password) throws Throwable {
-    final Class<?> driverClass = classLoader.loadClass("com.mysql.cj.jdbc.NonRegisteringDriver");
+                             final @NotNull SonarConfiguration configuration) throws Throwable {
+    final Class<?> driverClass = classLoader.loadClass(configuration.DATABASE_TYPE.getDriverClassName());
     final Object driver = driverClass.getDeclaredConstructor().newInstance();
 
     DriverManager.registerDriver((Driver) driver);
 
     final Properties properties = new Properties();
-    if (!username.isEmpty()) {
-      properties.put("user", username);
+    if (!configuration.SQL_USER.isEmpty()) {
+      properties.put("user", configuration.SQL_USER);
     }
-    if (!password.isEmpty()) {
-      properties.put("password", password);
+    if (!configuration.SQL_PASSWORD.isEmpty()) {
+      properties.put("password", configuration.SQL_PASSWORD);
     }
 
     final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);
