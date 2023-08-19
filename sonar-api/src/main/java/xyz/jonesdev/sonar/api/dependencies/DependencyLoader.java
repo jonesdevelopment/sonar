@@ -59,7 +59,7 @@ public class DependencyLoader {
       final Connection connection = connect(classLoader, databaseURL, config.MYSQL_USER, config.MYSQL_PASSWORD);
       return new JdbcSingleConnectionSource(databaseURL, connection);
     } catch (Throwable throwable) {
-      throw new IllegalStateException("Could not connect to database", throwable);
+      throw new IllegalStateException("Could not connect to database: {}", throwable);
     }
   }
 
