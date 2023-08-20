@@ -44,25 +44,50 @@ public final class SonarCommand implements SimpleCommand {
   private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
   private static final ExpiringCache<CommandSource> DELAY = Cappuccino.buildExpiring(500L);
 
-  private static final Component[] HELP = {
-    Component.text("Running Sonar " + Sonar.get().getVersion()
-      + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
-      + ".", NamedTextColor.YELLOW),
-    Component.text("(C) 2023 Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
-    Component.text("https://github.com/jonesdevelopment/sonar", NamedTextColor.GREEN)
-      .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar")),
-    Component.empty(),
-    Component.text("Need help or have any questions?", NamedTextColor.YELLOW),
-    Component.textOfChildren(
-      Component.text("Open a ticket on the Discord ", NamedTextColor.YELLOW)
-        .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open Discord)")))
-        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")),
-      Component.text("or open a new issue on GitHub.", NamedTextColor.YELLOW)
-        .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open GitHub)")))
-        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar/issues"))
-    ),
-    Component.empty(),
-  };
+  private static final List<Component> HELP = new Vector<>();
+
+  static {
+    HELP.addAll(Arrays.asList(
+      Component.text("Running Sonar " + Sonar.get().getVersion()
+        + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
+        + ".", NamedTextColor.YELLOW),
+      Component.text("(C) 2023 Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
+      Component.text("https://github.com/jonesdevelopment/sonar", NamedTextColor.GREEN)
+        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar")),
+      Component.empty(),
+      Component.text("Need help or have any questions?", NamedTextColor.YELLOW),
+      Component.textOfChildren(
+        Component.text("Open a ticket on the Discord ", NamedTextColor.YELLOW)
+          .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open Discord)")))
+          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")),
+        Component.text("or open a new issue on GitHub.", NamedTextColor.YELLOW)
+          .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open GitHub)")))
+          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar/issues"))
+      ),
+      Component.empty()
+    ));
+
+    Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
+      var component = Component.textOfChildren(
+        Component.text(" ▪ ", NamedTextColor.GRAY),
+        Component.text("/sonar " + sub.getInfo().name(), NamedTextColor.GREEN),
+        Component.text(" - ", NamedTextColor.GRAY),
+        Component.text(sub.getInfo().description(), NamedTextColor.WHITE)
+      );
+
+      component = component.clickEvent(
+        ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
+      ).hoverEvent(
+        HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
+          "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
+            + "\n§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
+            + "\n§7Permission: §f" + sub.getPermission()
+            + "\n§7Aliases: §f" + sub.getAliases()
+        ))
+      );
+      HELP.add(component);
+    });
+  }
 
   @Override
   public void execute(final @NotNull Invocation invocation) {
@@ -167,27 +192,6 @@ public final class SonarCommand implements SimpleCommand {
       for (final Component component : HELP) {
         invocation.source().sendMessage(component);
       }
-
-      Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
-        var component = Component.textOfChildren(
-          Component.text(" ▪ ", NamedTextColor.GRAY),
-          Component.text("/sonar " + sub.getInfo().name(), NamedTextColor.GREEN),
-          Component.text(" - ", NamedTextColor.GRAY),
-          Component.text(sub.getInfo().description(), NamedTextColor.WHITE)
-        );
-
-        component = component.clickEvent(
-          ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
-        ).hoverEvent(
-          HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
-            "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-              + "\n§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-              + "\n§7Permission: §f" + sub.getPermission()
-              + "\n§7Aliases: §f" + sub.getAliases()
-          ))
-        );
-        invocation.source().sendMessage(component);
-      });
     }
   }
 

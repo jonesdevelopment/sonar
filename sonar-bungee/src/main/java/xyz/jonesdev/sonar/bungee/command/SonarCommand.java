@@ -62,20 +62,45 @@ public final class SonarCommand extends Command implements TabExecutor {
     GITHUB_ISSUES.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open GitHub)").create()));
   }
 
-  private static final TextComponent[] HELP = {
-    new TextComponent(ChatColor.YELLOW + "Running Sonar " + Sonar.get().getVersion()
-      + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
-      + "."),
-    new TextComponent(ChatColor.YELLOW + "(C) 2023 Jones Development and Sonar Contributors"),
-    GITHUB_LINK_COMPONENT,
-    new TextComponent(""),
-    new TextComponent(ChatColor.YELLOW + "Need help or have any questions?"),
-    new TextComponent(
-      DISCORD_SUPPORT,
-      GITHUB_ISSUES
-    ),
-    new TextComponent(""),
-  };
+  private static final List<TextComponent> HELP = new Vector<>();
+
+  static {
+    HELP.addAll(Arrays.asList(
+      new TextComponent(ChatColor.YELLOW + "Running Sonar " + Sonar.get().getVersion()
+        + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
+        + "."),
+      new TextComponent(ChatColor.YELLOW + "(C) 2023 Jones Development and Sonar Contributors"),
+      GITHUB_LINK_COMPONENT,
+      new TextComponent(""),
+      new TextComponent(ChatColor.YELLOW + "Need help or have any questions?"),
+      new TextComponent(
+        DISCORD_SUPPORT,
+        GITHUB_ISSUES
+      ),
+      new TextComponent("")
+    ));
+
+    Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
+      final TextComponent component = new TextComponent(
+        new TextComponent(ChatColor.GRAY + " ▪ "),
+        new TextComponent(ChatColor.GREEN + "/sonar " + sub.getInfo().name()),
+        new TextComponent(ChatColor.GRAY + " - "),
+        new TextComponent(ChatColor.WHITE + sub.getInfo().description())
+      );
+
+      component.setClickEvent(
+        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
+      );
+      component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
+          "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
+            + "\n§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
+            + "\n§7Permission: §f" + sub.getPermission()
+            + "\n§7Aliases: §f" + sub.getAliases()
+        ).create())
+      );
+      HELP.add(component);
+    });
+  }
 
   @Override
   @SuppressWarnings({"deprecation", "redundantSuppression"})
@@ -178,27 +203,6 @@ public final class SonarCommand extends Command implements TabExecutor {
       for (final TextComponent component : HELP) {
         sender.sendMessage(component);
       }
-
-      Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
-        final TextComponent component = new TextComponent(
-          new TextComponent(ChatColor.GRAY + " ▪ "),
-          new TextComponent(ChatColor.GREEN + "/sonar " + sub.getInfo().name()),
-          new TextComponent(ChatColor.GRAY + " - "),
-          new TextComponent(ChatColor.WHITE + sub.getInfo().description())
-        );
-
-        component.setClickEvent(
-          new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
-        );
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
-            "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-              + "\n§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-              + "\n§7Permission: §f" + sub.getPermission()
-              + "\n§7Aliases: §f" + sub.getAliases()
-          ).create())
-        );
-        sender.sendMessage(component);
-      });
     }
   }
 
