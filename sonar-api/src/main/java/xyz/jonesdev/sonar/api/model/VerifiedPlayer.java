@@ -31,6 +31,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DatabaseTable(tableName = "verified_players")
 public final class VerifiedPlayer {
+  @SuppressWarnings("unused")
   @DatabaseField(generatedId = true)
   private int id;
 

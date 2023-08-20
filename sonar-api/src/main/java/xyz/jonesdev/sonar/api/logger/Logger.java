@@ -17,12 +17,10 @@
 
 package xyz.jonesdev.sonar.api.logger;
 
-import xyz.jonesdev.sonar.api.Sonar;
-
 /**
  * The whole purpose of doing this is, so we can have one logger for every module.
  * We wouldn't need to get the plugin logger every time we try to use it.
- * Additionally, we are also able to access this logger from {@link Sonar}.
+ * Additionally, we are also able to access this logger from {@link xyz.jonesdev.sonar.api.Sonar}.
  */
 public interface Logger {
   void info(final String message, final Object... args);

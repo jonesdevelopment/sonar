@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.api.fallback;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 
 import java.net.InetAddress;
@@ -36,7 +37,7 @@ public final class FallbackRatelimiter {
    * @param inetAddress IP address of the player
    * @return Whether the player is allowed to verify
    */
-  public boolean shouldDeny(final InetAddress inetAddress) {
+  public boolean shouldDeny(final @NotNull InetAddress inetAddress) {
     expiringCache.cleanUp();
     if (expiringCache.has(inetAddress)) {
       return true;
