@@ -69,7 +69,6 @@ public final class VerifiedCommand extends Subcommand {
         }
 
         invocation.getSender().sendMessage("§ePrevious UUIDs for " + inetAddress + ":");
-        invocation.getSender().sendMessage();
 
         for (final UUID uuid : SONAR.getVerifiedPlayerController().getUUIDs(realInetAddress)) {
           invocation.getSender().sendMessage(" §7▪ §f" + uuid.toString());
