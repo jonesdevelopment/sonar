@@ -28,7 +28,7 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.fallback.FallbackRatelimiter;
-import xyz.jonesdev.sonar.api.timer.DelayTimer;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
@@ -46,7 +46,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private VerifiedPlayerController verifiedPlayerController;
   private File dataDirectory;
   private final SubcommandRegistry subcommandRegistry;
-  private final DelayTimer launchTimer = new DelayTimer();
+  private final SystemTimer launchTimer = new SystemTimer();
 
   public SonarBootstrap(final @NotNull T plugin,
                         final File dataDirectory,

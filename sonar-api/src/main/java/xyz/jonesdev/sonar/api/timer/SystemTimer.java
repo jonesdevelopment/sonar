@@ -17,7 +17,7 @@
 
 package xyz.jonesdev.sonar.api.timer;
 
-public final class DelayTimer {
+public final class SystemTimer {
   public final long start = System.currentTimeMillis();
 
   public long delay() {

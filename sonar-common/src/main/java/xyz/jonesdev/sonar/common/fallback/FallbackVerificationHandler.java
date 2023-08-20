@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
-import xyz.jonesdev.sonar.api.timer.DelayTimer;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
@@ -54,7 +54,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Getter
   private State state;
 
-  private final DelayTimer login = new DelayTimer();
+  private final SystemTimer login = new SystemTimer();
   private static final Random random = new Random();
 
   @RequiredArgsConstructor

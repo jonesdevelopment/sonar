@@ -19,7 +19,7 @@ package xyz.jonesdev.sonar.api.dependencies;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.timer.DelayTimer;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public enum Dependency {
    */
   public @NotNull URL getClassLoaderURL() throws MalformedURLException {
     if (!Files.exists(tempFilePath)) {
-      final DelayTimer timer = new DelayTimer();
+      final SystemTimer timer = new SystemTimer();
       Sonar.get().getLogger().info("Downloading dependency {}...", tempFilePath.getFileName());
 
       try (final InputStream inputStream = mvnRepoURL.openStream()) {
