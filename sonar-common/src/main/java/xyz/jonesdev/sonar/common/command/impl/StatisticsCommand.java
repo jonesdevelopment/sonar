@@ -43,43 +43,39 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    invocation.getSender().sendMessage();
-    invocation.getSender().sendMessage(" §eStatistics (this session)");
+    final String showing = invocation.getArguments().length >= 2
+      ? invocation.getArguments()[1].toLowerCase() : "bot";
+
+    invocation.getSender().sendMessage("§eShowing " + showing + " statistics for this session:");
+    invocation.getSender().sendMessage("§ePlease note that session statistics are not saved when the server restarts.");
     invocation.getSender().sendMessage();
 
-    if (invocation.getArguments().length >= 2) {
-      switch (invocation.getArguments()[1].toLowerCase()) {
+    if (!showing.equals("bot")) {
+      switch (showing) {
         case "network": {
-          invocation.getSender().sendMessage(" §a▪ §7Current incoming used bandwidth: §f" + TrafficCounter.INCOMING.getCachedSecond());
-          invocation.getSender().sendMessage(" §a▪ §7Current outgoing used bandwidth: §f" + TrafficCounter.OUTGOING.getCachedSecond());
-          invocation.getSender().sendMessage(" §a▪ §7Total incoming used bandwidth: §f" + TrafficCounter.INCOMING.getCachedTtl());
-          invocation.getSender().sendMessage(" §a▪ §7Total outgoing used bandwidth: §f" + TrafficCounter.OUTGOING.getCachedTtl());
-          invocation.getSender().sendMessage();
+          invocation.getSender().sendMessage(" §7▪ §aCurrent incoming used bandwidth: §f" + TrafficCounter.INCOMING.getCachedSecond());
+          invocation.getSender().sendMessage(" §7▪ §aCurrent outgoing used bandwidth: §f" + TrafficCounter.OUTGOING.getCachedSecond());
+          invocation.getSender().sendMessage(" §7▪ §aTotal incoming used bandwidth: §f" + TrafficCounter.INCOMING.getCachedTtl());
+          invocation.getSender().sendMessage(" §7▪ §aTotal outgoing used bandwidth: §f" + TrafficCounter.OUTGOING.getCachedTtl());
           return;
         }
 
         case "memory": {
-          invocation.getSender().sendMessage(" §a▪ §7Total free memory (JVM): §f" + formatMemory(getFreeMemory()));
-          invocation.getSender().sendMessage(" §a▪ §7Total used memory (JVM): §f" + formatMemory(getUsedMemory()));
-          invocation.getSender().sendMessage(" §a▪ §7Total maximum memory (JVM): §f" + formatMemory(getMaxMemory()));
-          invocation.getSender().sendMessage(" §a▪ §7Total allocated memory (JVM): §f" + formatMemory(getTotalMemory()));
-          invocation.getSender().sendMessage();
+          invocation.getSender().sendMessage(" §7▪ §aTotal free memory (JVM): §f" + formatMemory(getFreeMemory()));
+          invocation.getSender().sendMessage(" §7▪ §aTotal used memory (JVM): §f" + formatMemory(getUsedMemory()));
+          invocation.getSender().sendMessage(" §7▪ §aTotal maximum memory (JVM): §f" + formatMemory(getMaxMemory()));
+          invocation.getSender().sendMessage(" §7▪ §aTotal allocated memory (JVM): §f" + formatMemory(getTotalMemory()));
           return;
         }
 
         case "cpu": {
-          invocation.getSender().sendMessage(" §a▪ §7Process CPU usage right now: §f" + DECIMAL_FORMAT.format(getProcessCPUUsage()) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7System CPU usage right now: §f" + DECIMAL_FORMAT.format(getSystemCPUUsage()) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7Per-core process CPU usage: §f" + DECIMAL_FORMAT.format(getAverageProcessCPUUsage()) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7Per-core system CPU usage: §f" + DECIMAL_FORMAT.format(getAverageSystemCPUUsage()) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7General system load average: §f" + DECIMAL_FORMAT.format(getSystemLoadAverage()) + "%");
-          invocation.getSender().sendMessage(" §a▪ §7Total virtual cpu cores (JVM): §f" + DECIMAL_FORMAT.format(getVirtualCores()));
-          invocation.getSender().sendMessage();
+          invocation.getSender().sendMessage(" §7▪ §aProcess CPU usage right now: §f" + DECIMAL_FORMAT.format(getProcessCPUUsage()) + "%");
+          invocation.getSender().sendMessage(" §7▪ §aSystem CPU usage right now: §f" + DECIMAL_FORMAT.format(getSystemCPUUsage()) + "%");
+          invocation.getSender().sendMessage(" §7▪ §aPer-core process CPU usage: §f" + DECIMAL_FORMAT.format(getAverageProcessCPUUsage()) + "%");
+          invocation.getSender().sendMessage(" §7▪ §aPer-core system CPU usage: §f" + DECIMAL_FORMAT.format(getAverageSystemCPUUsage()) + "%");
+          invocation.getSender().sendMessage(" §7▪ §aGeneral system load average: §f" + DECIMAL_FORMAT.format(getSystemLoadAverage()) + "%");
+          invocation.getSender().sendMessage(" §7▪ §aTotal virtual cpu cores (JVM): §f" + DECIMAL_FORMAT.format(getVirtualCores()));
           return;
-        }
-
-        default: {
-          break;
         }
       }
     }
@@ -92,13 +88,12 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
     final int verified = SONAR.getVerifiedPlayerController().estimatedSize();
     final int blacklisted = SONAR.getFallback().getBlacklisted().estimatedSize();
 
-    invocation.getSender().sendMessage(" §a▪ §7Verified IP addresses: §f" + DECIMAL_FORMAT.format(verified));
-    invocation.getSender().sendMessage(" §a▪ §7Verifying IP addresses: §f" + DECIMAL_FORMAT.format(verifying));
-    invocation.getSender().sendMessage(" §a▪ §7Blacklisted IP addresses: §f" + DECIMAL_FORMAT.format(blacklisted));
-    invocation.getSender().sendMessage(" §a▪ §7Currently queued logins: §f" + DECIMAL_FORMAT.format(queued));
-    invocation.getSender().sendMessage(" §a▪ §7Total non-unique joins: §f" + DECIMAL_FORMAT.format(total));
-    invocation.getSender().sendMessage(" §a▪ §7Total verification attempts: §f" + DECIMAL_FORMAT.format(real));
-    invocation.getSender().sendMessage(" §a▪ §7Total failed verifications: §f" + DECIMAL_FORMAT.format(failed));
-    invocation.getSender().sendMessage();
+    invocation.getSender().sendMessage(" §7▪ §aVerified IP addresses: §f" + DECIMAL_FORMAT.format(verified));
+    invocation.getSender().sendMessage(" §7▪ §aVerifying IP addresses: §f" + DECIMAL_FORMAT.format(verifying));
+    invocation.getSender().sendMessage(" §7▪ §aBlacklisted IP addresses: §f" + DECIMAL_FORMAT.format(blacklisted));
+    invocation.getSender().sendMessage(" §7▪ §aCurrently queued logins: §f" + DECIMAL_FORMAT.format(queued));
+    invocation.getSender().sendMessage(" §7▪ §aTotal non-unique joins: §f" + DECIMAL_FORMAT.format(total));
+    invocation.getSender().sendMessage(" §7▪ §aTotal verification attempts: §f" + DECIMAL_FORMAT.format(real));
+    invocation.getSender().sendMessage(" §7▪ §aTotal failed verifications: §f" + DECIMAL_FORMAT.format(failed));
   }
 }
