@@ -32,6 +32,7 @@ public final class LockdownCommand extends Subcommand {
   public void execute(final @NotNull CommandInvocation invocation) {
     SONAR.getConfig().LOCKDOWN_ENABLED = !SONAR.getConfig().LOCKDOWN_ENABLED;
     SONAR.getConfig().getGeneralConfig().set("general.lockdown.enabled", SONAR.getConfig().LOCKDOWN_ENABLED);
+    SONAR.getConfig().getGeneralConfig().save();
 
     invocation.getSender().sendMessage(
       SONAR.getConfig().LOCKDOWN_ENABLED
