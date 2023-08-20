@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.api.logger.Logger;
 
 import java.net.InetAddress;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Fallback {
   public static final Fallback INSTANCE = new Fallback();
-  private final Sonar sonar = Sonar.get();
+  private final @NotNull Sonar sonar = Objects.requireNonNull(Sonar.get());
 
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
   // Only block the player for a few minutes to avoid issues
@@ -64,7 +65,7 @@ public final class Fallback {
   };
 
   public boolean isUnderAttack() {
-    return getConnected().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK
-      || getQueue().getQueuedPlayers().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK;
+    return connected.size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK
+      || queue.getQueuedPlayers().size() > Sonar.get().getConfig().MINIMUM_PLAYERS_FOR_ATTACK;
   }
 }

@@ -79,6 +79,8 @@ public interface Sonar {
 
   @NotNull
   default Fallback getFallback() {
+    // We only have one single instance of Fallback,
+    // and we don't want anyone else to create a new instance.
     return Fallback.INSTANCE;
   }
 
