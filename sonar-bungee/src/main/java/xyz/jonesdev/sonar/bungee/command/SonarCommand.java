@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.bungee.command;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -48,7 +49,33 @@ public final class SonarCommand extends Command implements TabExecutor {
   private static final List<String> TAB_SUGGESTIONS = new ArrayList<>();
   private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
   private static final ExpiringCache<CommandSender> DELAY = Cappuccino.buildExpiring(500L);
-  private static final List<TextComponent> CACHED_HELP = new Vector<>();
+
+  private static final TextComponent GITHUB_LINK_COMPONENT = new TextComponent(ChatColor.GREEN + "https://github.com/jonesdevelopment/sonar");
+  private static final TextComponent DISCORD_SUPPORT = new TextComponent(ChatColor.YELLOW + "Open a ticket on the Discord ");
+  private static final TextComponent GITHUB_ISSUES = new TextComponent(ChatColor.YELLOW + "or open a new issue on GitHub.");
+
+  static {
+    GITHUB_LINK_COMPONENT.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar"));
+    DISCORD_SUPPORT.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/"));
+    DISCORD_SUPPORT.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open Discord)").create()));
+    GITHUB_ISSUES.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar/issues"));
+    GITHUB_ISSUES.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open GitHub)").create()));
+  }
+
+  private static final TextComponent[] HELP = {
+    new TextComponent(ChatColor.YELLOW + "Running Sonar " + Sonar.get().getVersion()
+      + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
+      + "."),
+    new TextComponent(ChatColor.YELLOW + "(C) 2023 Jones Development and Sonar Contributors"),
+    GITHUB_LINK_COMPONENT,
+    new TextComponent(""),
+    new TextComponent(ChatColor.YELLOW + "Need help or have any questions?"),
+    new TextComponent(
+      DISCORD_SUPPORT,
+      GITHUB_ISSUES
+    ),
+    new TextComponent(""),
+  };
 
   @Override
   @SuppressWarnings({"deprecation", "redundantSuppression"})
@@ -148,53 +175,30 @@ public final class SonarCommand extends Command implements TabExecutor {
       // Re-use the old, cached help message since we don't want to scan
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
-      if (CACHED_HELP.isEmpty()) {
-        CACHED_HELP.add(new TextComponent());
-        CACHED_HELP.add(
-          new TextComponent(
-            " §eRunning §lSonar §e"
-              + Sonar.get().getVersion()
-              + " on "
-              + Sonar.get().getServer().getPlatform().getDisplayName()
-          )
+      for (final TextComponent component : HELP) {
+        sender.sendMessage(component);
+      }
+
+      Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
+        final TextComponent component = new TextComponent(
+          new TextComponent(ChatColor.GRAY + " ▪ "),
+          new TextComponent(ChatColor.GREEN + "/sonar " + sub.getInfo().name()),
+          new TextComponent(ChatColor.GRAY + " - "),
+          new TextComponent(ChatColor.WHITE + sub.getInfo().description())
         );
-        CACHED_HELP.add(new TextComponent());
-        {
-          final TextComponent helpComponent = new TextComponent(" §7Need help?§b https://jonesdev.xyz/discord/");
-          helpComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
-            "§7Click to open Discord"
-          ).create()));
-          helpComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/"));
-          CACHED_HELP.add(helpComponent);
-        }
-        CACHED_HELP.add(new TextComponent());
 
-        Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
-          final TextComponent component = new TextComponent(
-            " §a▪ §7/sonar "
-              + sub.getInfo().name()
-              + " §f"
-              + sub.getInfo().description()
-          );
-
-          component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
+        component.setClickEvent(
+          new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
+        );
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
             "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
               + "\n§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
               + "\n§7Permission: §f" + sub.getPermission()
               + "\n§7Aliases: §f" + sub.getAliases()
-          ).create()));
-          component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-            "/sonar " + sub.getInfo().name() + " "));
-
-          CACHED_HELP.add(component);
-        });
-
-        CACHED_HELP.add(new TextComponent());
-      }
-
-      for (final TextComponent component : CACHED_HELP) {
+          ).create())
+        );
         sender.sendMessage(component);
-      }
+      });
     }
   }
 

@@ -24,6 +24,7 @@ import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
@@ -42,7 +43,26 @@ public final class SonarCommand implements SimpleCommand {
   private static final List<String> TAB_SUGGESTIONS = new ArrayList<>();
   private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
   private static final ExpiringCache<CommandSource> DELAY = Cappuccino.buildExpiring(500L);
-  private static final List<Component> CACHED_HELP = new Vector<>();
+
+  private static final Component[] HELP = {
+    Component.text("Running Sonar " + Sonar.get().getVersion()
+      + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
+      + ".", NamedTextColor.YELLOW),
+    Component.text("(C) 2023 Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
+    Component.text("https://github.com/jonesdevelopment/sonar", NamedTextColor.GREEN)
+      .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar")),
+    Component.empty(),
+    Component.text("Need help or have any questions?", NamedTextColor.YELLOW),
+    Component.textOfChildren(
+      Component.text("Open a ticket on the Discord ", NamedTextColor.YELLOW)
+        .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open Discord)")))
+        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")),
+      Component.text("or open a new issue on GitHub.", NamedTextColor.YELLOW)
+        .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open GitHub)")))
+        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar/issues"))
+    ),
+    Component.empty(),
+  };
 
   @Override
   public void execute(final @NotNull Invocation invocation) {
@@ -144,55 +164,30 @@ public final class SonarCommand implements SimpleCommand {
       // Re-use the old, cached help message since we don't want to scan
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
-      if (CACHED_HELP.isEmpty()) {
-        CACHED_HELP.add(Component.empty());
-        CACHED_HELP.add(
-          Component.text(
-            " §eRunning §lSonar §e"
-              + Sonar.get().getVersion()
-              + " on "
-              + Sonar.get().getServer().getPlatform().getDisplayName()
-          )
-        );
-        CACHED_HELP.add(Component.empty());
-        CACHED_HELP.add(
-          Component.text(
-            " §7Need help?§b https://jonesdev.xyz/discord/"
-          ).hoverEvent(
-            HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("§7Click to open Discord"))
-          ).clickEvent(
-            ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")
-          )
-        );
-        CACHED_HELP.add(Component.empty());
-
-        Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
-          var component = Component.text(
-            " §a▪ §7/sonar "
-              + sub.getInfo().name()
-              + " §f"
-              + sub.getInfo().description()
-          );
-
-          component = component.clickEvent(
-            ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
-          ).hoverEvent(
-            HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
-              "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-                + "\n§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-                + "\n§7Permission: §f" + sub.getPermission()
-                + "\n§7Aliases: §f" + sub.getAliases()
-            ))
-          );
-          CACHED_HELP.add(component);
-        });
-
-        CACHED_HELP.add(Component.empty());
-      }
-
-      for (final Component component : CACHED_HELP) {
+      for (final Component component : HELP) {
         invocation.source().sendMessage(component);
       }
+
+      Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
+        var component = Component.textOfChildren(
+          Component.text(" ▪ ", NamedTextColor.GRAY),
+          Component.text("/sonar " + sub.getInfo().name(), NamedTextColor.GREEN),
+          Component.text(" - ", NamedTextColor.GRAY),
+          Component.text(sub.getInfo().description(), NamedTextColor.WHITE)
+        );
+
+        component = component.clickEvent(
+          ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
+        ).hoverEvent(
+          HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
+            "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
+              + "\n§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
+              + "\n§7Permission: §f" + sub.getPermission()
+              + "\n§7Aliases: §f" + sub.getAliases()
+          ))
+        );
+        invocation.source().sendMessage(component);
+      });
     }
   }
 
