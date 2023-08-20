@@ -53,6 +53,10 @@ public final class SonarConfiguration {
   public Pattern VALID_NAME_REGEX;
   public Pattern VALID_BRAND_REGEX;
   public Pattern VALID_LOCALE_REGEX;
+  public String VERIFICATION_CONNECT_LOG;
+  public String VERIFICATION_FAILED_LOG;
+  public String VERIFICATION_SUCCESSFUL_LOG;
+  public String VERIFICATION_BLACKLIST_LOG;
   public short GAMEMODE_ID;
   public int MAXIMUM_BRAND_LENGTH;
   public int MAXIMUM_MOVEMENT_TICKS;
@@ -644,6 +648,34 @@ public final class SonarConfiguration {
         "&7Please wait a few seconds before trying to join again.",
         "%footer%"
       )));
+
+    messagesConfig.getYaml().setComment("messages.verification.logs.connection",
+      "Message that is logged to console whenever a new player joins the server"
+    );
+    VERIFICATION_CONNECT_LOG = formatString(messagesConfig.getString("messages.verification.logs.connection",
+      "%name%%ip% (%protocol%) has connected."
+    ));
+
+    messagesConfig.getYaml().setComment("messages.verification.logs.failed",
+      "Message that is logged to console whenever a player fails verification"
+    );
+    VERIFICATION_FAILED_LOG = formatString(messagesConfig.getString("messages.verification.logs.failed",
+      "%ip% (%protocol%) has failed the bot check for: %reason%"
+    ));
+
+    messagesConfig.getYaml().setComment("messages.verification.logs.blacklisted",
+      "Message that is logged to console whenever a player is blacklisted"
+    );
+    VERIFICATION_BLACKLIST_LOG = formatString(messagesConfig.getString("messages.verification.logs.blacklisted",
+      "%ip% (%protocol%) was blacklisted for too many failed attempts"
+    ));
+
+    messagesConfig.getYaml().setComment("messages.verification.logs.successful",
+      "Message that is logged to console whenever a player is verified"
+    );
+    VERIFICATION_SUCCESSFUL_LOG = formatString(messagesConfig.getString("messages.verification.logs.successful",
+      "%name% has been verified successfully (%time%s!)."
+    ));
 
     messagesConfig.getYaml().setComment("messages.verification.too-fast-reconnect",
       "Disconnect message that is shown when someone rejoins too fast during verification"

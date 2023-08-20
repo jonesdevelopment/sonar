@@ -74,8 +74,10 @@ public interface FallbackPlayer<X, Y> {
       disconnect(getFallback().getSonar().getConfig().VERIFICATION_FAILED);
 
       if (reason != null) {
-        getFallback().getLogger().info("{} ({}) has failed the bot check for: {}",
-          getInetAddress(), getProtocolVersion().getProtocol(), reason);
+        getFallback().getLogger().info(getFallback().getSonar().getConfig().VERIFICATION_FAILED_LOG
+          .replace("%ip%", getInetAddress().toString())
+          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
+          .replace("%reason%", reason));
       }
     }
 
@@ -87,8 +89,9 @@ public interface FallbackPlayer<X, Y> {
     // Check if the player has too many failed attempts
     if (PREVIOUS_FAILS.has(getInetAddress().toString())) {
       getFallback().getBlacklisted().put(getInetAddress().toString());
-      getFallback().getLogger().info("{} ({}) was blacklisted for too many failed attempts",
-        getInetAddress(), getProtocolVersion().getProtocol());
+      getFallback().getLogger().info(getFallback().getSonar().getConfig().VERIFICATION_BLACKLIST_LOG
+        .replace("%ip%", getInetAddress().toString())
+        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
     } else {
       // Cache the InetAddress for 3 minutes
       PREVIOUS_FAILS.put(getInetAddress().toString());
