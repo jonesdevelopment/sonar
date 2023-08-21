@@ -88,7 +88,7 @@ public class FallbackPreparer {
   public int MAX_MOVEMENT_TICK;
   public double[] PREPARED_MOVEMENT_PACKETS;
   public int DYNAMIC_SPAWN_BUFFER = SPAWN_BUFFER;
-  public int DYNAMIC_BLOCK_Y_POSITION;
+  public int DYNAMIC_SPAWN_Y_POSITION;
 
   public void prepare() {
     LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
@@ -113,13 +113,13 @@ public class FallbackPreparer {
     }
 
     // Set the dynamic spawn buffer
-    DYNAMIC_SPAWN_BUFFER = SPAWN_BUFFER + (int) (maxFallDistance / 2.5);
+    DYNAMIC_SPAWN_BUFFER = (int) (SPAWN_BUFFER + maxFallDistance);
     // Set the dynamic block and collide Y position based on the maximum fall distance
-    DYNAMIC_BLOCK_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + DYNAMIC_SPAWN_BUFFER + (int) maxFallDistance;
+    DYNAMIC_SPAWN_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + DYNAMIC_SPAWN_BUFFER + (int) maxFallDistance;
 
     // Prepare spawn PositionLook with the dynamic Y position
     SPAWN_TELEPORT = new PositionLook(
-      8, DYNAMIC_BLOCK_Y_POSITION, 8,
+      8, DYNAMIC_SPAWN_Y_POSITION, 8,
       0f, 0f,
       RANDOM.nextInt(Short.MAX_VALUE),
       true
