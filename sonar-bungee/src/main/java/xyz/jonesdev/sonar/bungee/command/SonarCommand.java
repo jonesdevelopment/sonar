@@ -50,16 +50,23 @@ public final class SonarCommand extends Command implements TabExecutor {
   private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
   private static final ExpiringCache<CommandSender> DELAY = Cappuccino.buildExpiring(500L);
 
-  private static final TextComponent GITHUB_LINK_COMPONENT = new TextComponent(ChatColor.GREEN + "https://github.com/jonesdevelopment/sonar");
-  private static final TextComponent DISCORD_SUPPORT = new TextComponent(ChatColor.YELLOW + "Open a ticket on the Discord ");
-  private static final TextComponent GITHUB_ISSUES = new TextComponent(ChatColor.YELLOW + "or open a new issue on GitHub.");
+  private static final TextComponent GITHUB_LINK_COMPONENT = new TextComponent(ChatColor.GREEN + "https://github" +
+    ".com/jonesdevelopment/sonar");
+  private static final TextComponent DISCORD_SUPPORT = new TextComponent(ChatColor.YELLOW + "Open a ticket on the " +
+    "Discord ");
+  private static final TextComponent GITHUB_ISSUES = new TextComponent(ChatColor.YELLOW + "or open a new issue on " +
+    "GitHub.");
 
   static {
-    GITHUB_LINK_COMPONENT.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar"));
+    GITHUB_LINK_COMPONENT.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github" +
+      ".com/jonesdevelopment/sonar"));
     DISCORD_SUPPORT.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/"));
-    DISCORD_SUPPORT.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open Discord)").create()));
-    GITHUB_ISSUES.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar/issues"));
-    GITHUB_ISSUES.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open GitHub)").create()));
+    DISCORD_SUPPORT.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open " +
+      "Discord)").create()));
+    GITHUB_ISSUES.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar" +
+      "/issues"));
+    GITHUB_ISSUES.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open " +
+      "GitHub)").create()));
   }
 
   private static final List<TextComponent> HELP = new Vector<>();

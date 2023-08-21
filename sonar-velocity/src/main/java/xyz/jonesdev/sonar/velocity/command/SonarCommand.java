@@ -62,7 +62,8 @@ public final class SonarCommand implements SimpleCommand {
           .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")),
         Component.text("or open a new issue on GitHub.", NamedTextColor.YELLOW)
           .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open GitHub)")))
-          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar/issues"))
+          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar" +
+            "/issues"))
       ),
       Component.empty()
     ));
