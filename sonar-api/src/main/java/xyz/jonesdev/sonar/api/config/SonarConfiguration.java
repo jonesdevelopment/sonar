@@ -350,7 +350,8 @@ public final class SonarConfiguration {
     );
     HEADER = fromList(messagesConfig.getStringList("messages.header",
       Arrays.asList(
-        "&e&lSonar"
+        "&e&lSonar",
+        ""
       )));
 
     messagesConfig.getYaml().setComment("messages.footer",
