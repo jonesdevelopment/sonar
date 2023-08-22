@@ -67,6 +67,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     TRANSACTION(false),
     // IN-GAME
     TELEPORT(false),
+    CHUNK_DATA(true),
     POSITION(true),
     COLLISIONS(true),
     // OTHER
@@ -118,7 +119,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void sendChunkData() {
     // Set the state to POSITION to avoid false positives
     // and go on with the flow of the verification.
-    state = State.POSITION;
+    state = State.CHUNK_DATA;
     // Teleport player into the fake lobby by sending an empty chunk
     player.write(EMPTY_CHUNK_DATA);
   }
@@ -326,14 +327,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (movementTick++ >= MAX_MOVEMENT_TICK) {
         if (player.getFallback().getSonar().getConfig().CHECK_COLLISIONS) {
           if (state != State.COLLISIONS) {
-            // Prevent the packet from flooding the traffic by limiting
-            // the times the packet is sent to the player.
             // Set the state to COLLISIONS to avoid false positives
             // and go on with the flow of the verification.
+            // Now we don't care about gravity anymore,
+            // we just want the player to collide with the blocks.
             state = State.COLLISIONS;
-            // Send an UpdateSectionBlocks packet with a platform of blocks
-            // to check if the player collides with the solid platform.
-            player.write(UPDATE_SECTION_BLOCKS);
           } else {
             // 0.25 for the 2 snow layers the player is supposed to fall on
             final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
@@ -359,6 +357,15 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
         // Check if the y motion is roughly equal to the predicted value
         checkFrame(offsetY < 0.01, "invalid offset: " + y + ", " + offsetY);
+
+        if (state == State.CHUNK_DATA) {
+          // Prevent the packet from flooding the traffic by limiting
+          // the times the packet is sent to the player.
+          state = State.POSITION;
+          // Send an UpdateSectionBlocks packet with a platform of blocks
+          // to check if the player collides with the solid platform.
+          player.write(UPDATE_SECTION_BLOCKS);
+        }
       }
     }
   }
