@@ -33,8 +33,8 @@ public final class Varint21FrameDecoder extends ByteToMessageDecoder {
                         final ByteBuf byteBuf,
                         final List<Object> out) throws Exception {
     if (!ctx.channel().isActive() || !byteBuf.isReadable()) {
-      // MessageToMessageDecoder always do release after decode
-      // https://github.com/jonesdevelopment/sonar/pull/5
+      // MessageToMessageDecoder always do release after decoding
+      // https://github.com/jonesdevelopment/sonar-legacy/pull/5
       return;
     }
 

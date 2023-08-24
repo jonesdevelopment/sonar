@@ -62,13 +62,13 @@ public final class FallbackInitialHandler extends InitialHandler {
         channel, channel.pipeline(), inetAddress,
         ProtocolVersion.fromId(getHandshake().getProtocolVersion())
       );
+      // TODO: implement Fallback
     }
 
-    // TODO: implement Fallback
     super.handle(loginRequest);
   }
 
-  // Taken from Velocity
+  // Mostly taken from Velocity
   public void closeWith(final Object msg) {
     if (player != null && player.getChannel().isActive()) {
       boolean is17 = player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
