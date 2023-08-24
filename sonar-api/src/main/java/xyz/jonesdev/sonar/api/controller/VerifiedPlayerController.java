@@ -30,6 +30,7 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.dependencies.DependencyLoader;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
+import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -205,5 +206,14 @@ public final class VerifiedPlayerController {
    */
   public boolean has(final @NotNull String inetAddress) {
     return MAP.containsKey(inetAddress);
+  }
+
+  /**
+   * @param inetAddress IP address
+   * @return Whether the local cache contains the IP
+   * @see #has(String)
+   */
+  public boolean has(final @NotNull InetAddress inetAddress) {
+    return has(inetAddress.toString());
   }
 }
