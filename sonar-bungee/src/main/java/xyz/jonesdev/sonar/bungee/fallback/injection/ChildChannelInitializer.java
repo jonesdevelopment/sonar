@@ -26,11 +26,11 @@ import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.event.ClientConnectEvent;
-import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.*;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
 import xyz.jonesdev.sonar.common.exception.ReflectionException;
 
 import java.lang.reflect.Field;
@@ -85,7 +85,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
         channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(Protocol.HANDSHAKE,
           true, ProxyServer.getInstance().getProtocolVersion()));
         channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
-        channel.pipeline().get(HandlerBoss.class).setHandler(new InitialHandler(BungeeCord.getInstance(), listener));
+        channel.pipeline().get(HandlerBoss.class).setHandler(new FallbackInitialHandler(BungeeCord.getInstance(), listener));
 
         if (listener.isProxyProtocol()) {
           channel.pipeline().addFirst(new HAProxyMessageDecoder());
