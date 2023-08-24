@@ -123,7 +123,7 @@ public final class FallbackListener {
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
     final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
-    if (fallback.getSonar().getVerifiedPlayerController().has(inetAddress.toString(), gameProfile.getId())) return;
+    if (fallback.getSonar().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
 
     // Completely skip Geyser connections
     // TODO: different handling?

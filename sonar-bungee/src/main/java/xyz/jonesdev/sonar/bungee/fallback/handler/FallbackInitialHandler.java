@@ -25,6 +25,7 @@ import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
@@ -38,10 +39,10 @@ public final class FallbackInitialHandler extends InitialHandler {
   public FallbackInitialHandler(final BungeeCord bungee, final ListenerInfo listener) {
     super(bungee, listener);
   }
+  private static final @NotNull Fallback fallback = Objects.requireNonNull(Sonar.get().getFallback());
   private ChannelWrapper channelWrapper;
   @SuppressWarnings("unused") // TODO: remove later
-  private FallbackPlayerWrapper player;
-  private static final @NotNull Fallback fallback = Objects.requireNonNull(Sonar.get().getFallback());
+  private @Nullable FallbackPlayerWrapper player;
 
   @Override
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
@@ -54,11 +55,13 @@ public final class FallbackInitialHandler extends InitialHandler {
     final InetAddress inetAddress = getAddress().getAddress();
     final Channel channel = channelWrapper.getHandle();
 
-    player = new FallbackPlayerWrapper(
-      fallback, channelWrapper, this,
-      channel, channel.pipeline(), inetAddress,
-      ProtocolVersion.fromId(getHandshake().getProtocolVersion())
-    );
+    if (!fallback.getSonar().getVerifiedPlayerController().has(inetAddress)) {
+      player = new FallbackPlayerWrapper(
+        fallback, channelWrapper, this,
+        channel, channel.pipeline(), inetAddress,
+        ProtocolVersion.fromId(getHandshake().getProtocolVersion())
+      );
+    }
 
     // TODO: implement Fallback
     super.handle(loginRequest);
