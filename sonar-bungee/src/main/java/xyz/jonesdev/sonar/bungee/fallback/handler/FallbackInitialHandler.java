@@ -17,19 +17,70 @@
 
 package xyz.jonesdev.sonar.bungee.fallback.handler;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.connection.InitialHandler;
+import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.packet.LoginRequest;
+import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackPlayerWrapper;
+
+import java.net.InetAddress;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public final class FallbackInitialHandler extends InitialHandler {
   public FallbackInitialHandler(final BungeeCord bungee, final ListenerInfo listener) {
     super(bungee, listener);
   }
+  private ChannelWrapper channelWrapper;
+  @SuppressWarnings("unused") // TODO: remove later
+  private FallbackPlayerWrapper player;
+  private static final @NotNull Fallback fallback = Objects.requireNonNull(Sonar.get().getFallback());
+
+  @Override
+  public void connected(final ChannelWrapper channelWrapper) throws Exception {
+    this.channelWrapper = channelWrapper;
+    super.connected(channelWrapper);
+  }
 
   @Override
   public void handle(final LoginRequest loginRequest) throws Exception {
+    final InetAddress inetAddress = getAddress().getAddress();
+    final Channel channel = channelWrapper.getHandle();
+
+    player = new FallbackPlayerWrapper(
+      fallback, channelWrapper, this,
+      channel, channel.pipeline(), inetAddress,
+      ProtocolVersion.fromId(getHandshake().getProtocolVersion())
+    );
+
     // TODO: implement Fallback
     super.handle(loginRequest);
+  }
+
+  // Taken from Velocity
+  public void closeWith(final FallbackPlayerWrapper player, final Object msg) {
+    if (player.getChannel().isActive()) {
+      boolean is17 = player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
+        && player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0;
+      if (is17) {
+        player.getChannel().eventLoop().execute(() -> {
+          channelWrapper.getHandle().config().setAutoRead(false);
+          player.getChannel().eventLoop().schedule(() -> {
+            channelWrapper.markClosed();
+            player.getChannel().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+          }, 250L, TimeUnit.MILLISECONDS);
+        });
+      } else {
+        channelWrapper.markClosed();
+        player.getChannel().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+      }
+    }
   }
 }

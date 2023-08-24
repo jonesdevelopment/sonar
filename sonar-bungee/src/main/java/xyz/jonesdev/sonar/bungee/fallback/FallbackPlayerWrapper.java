@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Sonar Contributors
+ * Copyright (C) 2023 jones
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,30 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback;
+package xyz.jonesdev.sonar.bungee.fallback;
 
-import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
 
 import java.net.InetAddress;
 
 @Getter
 @RequiredArgsConstructor
-public final class FallbackPlayerWrapper implements FallbackPlayer<ConnectedPlayer, MinecraftConnection> {
+public final class FallbackPlayerWrapper implements FallbackPlayer<ChannelWrapper, FallbackInitialHandler> {
   private final Fallback fallback;
-  private final ConnectedPlayer player;
-  private final MinecraftConnection connection;
+  private final ChannelWrapper player;
+  private final FallbackInitialHandler connection;
   private final Channel channel;
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
@@ -46,13 +46,15 @@ public final class FallbackPlayerWrapper implements FallbackPlayer<ConnectedPlay
 
   @Override
   public void disconnect(final @NotNull String reason) {
-    final String serialized = ProtocolUtils.getJsonChatSerializer(connection.getProtocolVersion())
-      .serialize(Component.text(reason));
-    connection.closeWith(Disconnect.create(serialized));
+    connection.closeWith(this, Disconnect.create(TextComponent.toLegacyText(new TextComponent(reason))));
   }
 
   @Override
   public void write(final @NotNull Object packet) {
-    connection.write(packet);
+    if (channel.isActive()) {
+      channel.writeAndFlush(packet, channel.voidPromise());
+    } else {
+      ReferenceCountUtil.release(packet);
+    }
   }
 }
