@@ -46,7 +46,7 @@ public final class FallbackPlayerWrapper implements FallbackPlayer<ChannelWrappe
 
   @Override
   public void disconnect(final @NotNull String reason) {
-    connection.closeWith(this, Disconnect.create(TextComponent.toLegacyText(new TextComponent(reason))));
+    connection.closeWith(Disconnect.create(TextComponent.toLegacyText(new TextComponent(reason))));
   }
 
   @Override

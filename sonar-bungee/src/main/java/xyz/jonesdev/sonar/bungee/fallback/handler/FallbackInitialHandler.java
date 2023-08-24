@@ -69,8 +69,8 @@ public final class FallbackInitialHandler extends InitialHandler {
   }
 
   // Taken from Velocity
-  public void closeWith(final FallbackPlayerWrapper player, final Object msg) {
-    if (player.getChannel().isActive()) {
+  public void closeWith(final Object msg) {
+    if (player != null && player.getChannel().isActive()) {
       boolean is17 = player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
         && player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0;
       if (is17) {
