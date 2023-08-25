@@ -81,9 +81,9 @@ public final class SonarCommand implements SimpleCommand {
       ).hoverEvent(
         HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
           "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-            + System.lineSeparator() + "§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-            + System.lineSeparator() + "§7Permission: §f" + sub.getPermission()
-            + System.lineSeparator() + "§7Aliases: §f" + sub.getAliases()
+            + Sonar.LINE_SEPARATOR + "§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
+            + Sonar.LINE_SEPARATOR + "§7Permission: §f" + sub.getPermission()
+            + Sonar.LINE_SEPARATOR + "§7Aliases: §f" + sub.getAliases()
         ))
       );
       HELP.add(component);

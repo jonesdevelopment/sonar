@@ -100,9 +100,9 @@ public final class SonarCommand extends Command implements TabExecutor {
       );
       component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
           "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-            + System.lineSeparator() + "§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-            + System.lineSeparator() + "§7Permission: §f" + sub.getPermission()
-            + System.lineSeparator() + "§7Aliases: §f" + sub.getAliases()
+            + Sonar.LINE_SEPARATOR + "§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
+            + Sonar.LINE_SEPARATOR + "§7Permission: §f" + sub.getPermission()
+            + Sonar.LINE_SEPARATOR + "§7Aliases: §f" + sub.getAliases()
         ).create())
       );
       HELP.add(component);

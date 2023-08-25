@@ -185,14 +185,14 @@ public final class SonarConfiguration {
 
     if (Sonar.get().getServer().getPlatform() == SonarPlatform.BUNGEE) {
       generalConfig.getYaml().setComment("general.replace-varint-decoder",
-        "Should Sonar replace BungeeCord's VarInt decoder?" + System.lineSeparator() + "This option is only available on BungeeCord."
+        "Should Sonar replace BungeeCord's VarInt decoder?" + Sonar.LINE_SEPARATOR + "This option is only available on BungeeCord."
       );
       REPLACE_VAR_INT_DECODER = generalConfig.getBoolean("general.replace-varint-decoder", true);
     }
 
     // Database
     generalConfig.getYaml().setComment("general.database.type",
-      "Type of database Sonar uses to store verified players" + System.lineSeparator() + "Possible types: NONE, MYSQL, MARIADB"
+      "Type of database Sonar uses to store verified players" + Sonar.LINE_SEPARATOR + "Possible types: NONE, MYSQL, MARIADB"
     );
     DATABASE_TYPE =
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
@@ -792,23 +792,23 @@ public final class SonarConfiguration {
 
     messagesConfig.getYaml().setComment("messages.action-bar.layout",
       "General layout for the verbose action-bar" +
-        System.lineSeparator() + "Placeholders and their descriptions:" +
-        System.lineSeparator() + "- %queued% Number of queued connections" +
-        System.lineSeparator() + "- %verifying% Number of verifying connections" +
-        System.lineSeparator() + "- %blacklisted% Number of blacklisted IP addresses" +
-        System.lineSeparator() + "- %total-joins% Number of total joins (not unique!)" +
-        System.lineSeparator() + "- %verify-total% Number of total verification attempts" +
-        System.lineSeparator() + "- %verify-success% Number of verified IP addresses" +
-        System.lineSeparator() + "- %verify-failed% Number of failed verifications" +
-        System.lineSeparator() + "- %incoming-traffic% Incoming bandwidth usage per second" +
-        System.lineSeparator() + "- %outgoing-traffic% Outgoing bandwidth usage per second" +
-        System.lineSeparator() + "- %incoming-traffic-ttl% Total incoming bandwidth usage" +
-        System.lineSeparator() + "- %outgoing-traffic-ttl% Total outgoing bandwidth usage" +
-        System.lineSeparator() + "- %used-memory% Amount of used memory (JVM process)" +
-        System.lineSeparator() + "- %total-memory% Amount of total memory (JVM process)" +
-        System.lineSeparator() + "- %max-memory% Amount of max memory (JVM process)" +
-        System.lineSeparator() + "- %free-memory% Amount of free memory (JVM process)" +
-        System.lineSeparator() + "- %animation% Animated spinning circle (by default)"
+        Sonar.LINE_SEPARATOR + "Placeholders and their descriptions:" +
+        Sonar.LINE_SEPARATOR + "- %queued% Number of queued connections" +
+        Sonar.LINE_SEPARATOR + "- %verifying% Number of verifying connections" +
+        Sonar.LINE_SEPARATOR + "- %blacklisted% Number of blacklisted IP addresses" +
+        Sonar.LINE_SEPARATOR + "- %total-joins% Number of total joins (not unique!)" +
+        Sonar.LINE_SEPARATOR + "- %verify-total% Number of total verification attempts" +
+        Sonar.LINE_SEPARATOR + "- %verify-success% Number of verified IP addresses" +
+        Sonar.LINE_SEPARATOR + "- %verify-failed% Number of failed verifications" +
+        Sonar.LINE_SEPARATOR + "- %incoming-traffic% Incoming bandwidth usage per second" +
+        Sonar.LINE_SEPARATOR + "- %outgoing-traffic% Outgoing bandwidth usage per second" +
+        Sonar.LINE_SEPARATOR + "- %incoming-traffic-ttl% Total incoming bandwidth usage" +
+        Sonar.LINE_SEPARATOR + "- %outgoing-traffic-ttl% Total outgoing bandwidth usage" +
+        Sonar.LINE_SEPARATOR + "- %used-memory% Amount of used memory (JVM process)" +
+        Sonar.LINE_SEPARATOR + "- %total-memory% Amount of total memory (JVM process)" +
+        Sonar.LINE_SEPARATOR + "- %max-memory% Amount of max memory (JVM process)" +
+        Sonar.LINE_SEPARATOR + "- %free-memory% Amount of free memory (JVM process)" +
+        Sonar.LINE_SEPARATOR + "- %animation% Animated spinning circle (by default)"
     );
     ACTION_BAR_LAYOUT = formatString(messagesConfig.getString(
       "messages.action-bar.layout",
@@ -839,7 +839,7 @@ public final class SonarConfiguration {
   }
 
   private @NotNull String fromList(final @NotNull Collection<String> list) {
-    return formatString(String.join(System.lineSeparator(), list));
+    return formatString(String.join(Sonar.LINE_SEPARATOR, list));
   }
 
   private @NotNull String formatString(final @NotNull String str) {
