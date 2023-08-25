@@ -75,7 +75,7 @@ public interface FallbackPlayer<X, Y> {
 
       if (reason != null) {
         getFallback().getLogger().info(getFallback().getSonar().getConfig().VERIFICATION_FAILED_LOG
-          .replace("%ip%", getInetAddress().toString())
+          .replace("%ip%", getFallback().getSonar().getConfig().formatAddress(getInetAddress()))
           .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
           .replace("%reason%", reason));
       }
@@ -90,7 +90,7 @@ public interface FallbackPlayer<X, Y> {
     if (PREVIOUS_FAILS.has(getInetAddress().toString())) {
       getFallback().getBlacklisted().put(getInetAddress().toString());
       getFallback().getLogger().info(getFallback().getSonar().getConfig().VERIFICATION_BLACKLIST_LOG
-        .replace("%ip%", getInetAddress().toString())
+        .replace("%ip%", getFallback().getSonar().getConfig().formatAddress(getInetAddress()))
         .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
     } else {
       // Cache the InetAddress for 3 minutes

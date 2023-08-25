@@ -76,7 +76,8 @@ public final class FallbackListener implements Listener {
           fallback.getSonar().getLogger().info(
             fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
               .replace("%player%", event.getPlayer().getName())
-              .replace("%ip%", event.getPlayer().getAddress().getAddress().toString())
+              .replace("%ip%", fallback.getSonar().getConfig()
+                .formatAddress(event.getPlayer().getAddress().getAddress()))
               .replace("%protocol%",
                 String.valueOf(event.getPlayer().getPendingConnection().getVersion()))
           );

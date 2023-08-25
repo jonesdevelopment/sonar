@@ -250,7 +250,8 @@ public final class FallbackListener {
           fallback.getSonar().getLogger().info(
             fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
               .replace("%player%", event.getPlayer().getUsername())
-              .replace("%ip%", event.getPlayer().getRemoteAddress().getAddress().toString())
+              .replace("%ip%", fallback.getSonar().getConfig()
+                .formatAddress(event.getPlayer().getRemoteAddress().getAddress()))
               .replace("%protocol%",
                 String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
           );
