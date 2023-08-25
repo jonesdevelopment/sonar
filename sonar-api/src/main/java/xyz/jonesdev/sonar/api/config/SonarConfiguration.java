@@ -185,14 +185,14 @@ public final class SonarConfiguration {
 
     if (Sonar.get().getServer().getPlatform() == SonarPlatform.BUNGEE) {
       generalConfig.getYaml().setComment("general.replace-varint-decoder",
-        "Should Sonar replace BungeeCord's VarInt decoder?\nThis option is only available on BungeeCord."
+        "Should Sonar replace BungeeCord's VarInt decoder?" + System.lineSeparator() + "This option is only available on BungeeCord."
       );
       REPLACE_VAR_INT_DECODER = generalConfig.getBoolean("general.replace-varint-decoder", true);
     }
 
     // Database
     generalConfig.getYaml().setComment("general.database.type",
-      "Type of database Sonar uses to store verified players\nPossible types: NONE, MYSQL, MARIADB"
+      "Type of database Sonar uses to store verified players" + System.lineSeparator() + "Possible types: NONE, MYSQL, MARIADB"
     );
     DATABASE_TYPE =
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
@@ -792,23 +792,23 @@ public final class SonarConfiguration {
 
     messagesConfig.getYaml().setComment("messages.action-bar.layout",
       "General layout for the verbose action-bar" +
-        "\nPlaceholders and their descriptions:" +
-        "\n- %queued% Number of queued connections" +
-        "\n- %verifying% Number of verifying connections" +
-        "\n- %blacklisted% Number of blacklisted IP addresses" +
-        "\n- %total-joins% Number of total joins (not unique!)" +
-        "\n- %verify-total% Number of total verification attempts" +
-        "\n- %verify-success% Number of verified IP addresses" +
-        "\n- %verify-failed% Number of failed verifications" +
-        "\n- %incoming-traffic% Incoming bandwidth usage per second" +
-        "\n- %outgoing-traffic% Outgoing bandwidth usage per second" +
-        "\n- %incoming-traffic-ttl% Total incoming bandwidth usage" +
-        "\n- %outgoing-traffic-ttl% Total outgoing bandwidth usage" +
-        "\n- %used-memory% Amount of used memory (JVM process)" +
-        "\n- %total-memory% Amount of total memory (JVM process)" +
-        "\n- %max-memory% Amount of max memory (JVM process)" +
-        "\n- %free-memory% Amount of free memory (JVM process)" +
-        "\n- %animation% Animated spinning circle (by default)"
+        System.lineSeparator() + "Placeholders and their descriptions:" +
+        System.lineSeparator() + "- %queued% Number of queued connections" +
+        System.lineSeparator() + "- %verifying% Number of verifying connections" +
+        System.lineSeparator() + "- %blacklisted% Number of blacklisted IP addresses" +
+        System.lineSeparator() + "- %total-joins% Number of total joins (not unique!)" +
+        System.lineSeparator() + "- %verify-total% Number of total verification attempts" +
+        System.lineSeparator() + "- %verify-success% Number of verified IP addresses" +
+        System.lineSeparator() + "- %verify-failed% Number of failed verifications" +
+        System.lineSeparator() + "- %incoming-traffic% Incoming bandwidth usage per second" +
+        System.lineSeparator() + "- %outgoing-traffic% Outgoing bandwidth usage per second" +
+        System.lineSeparator() + "- %incoming-traffic-ttl% Total incoming bandwidth usage" +
+        System.lineSeparator() + "- %outgoing-traffic-ttl% Total outgoing bandwidth usage" +
+        System.lineSeparator() + "- %used-memory% Amount of used memory (JVM process)" +
+        System.lineSeparator() + "- %total-memory% Amount of total memory (JVM process)" +
+        System.lineSeparator() + "- %max-memory% Amount of max memory (JVM process)" +
+        System.lineSeparator() + "- %free-memory% Amount of free memory (JVM process)" +
+        System.lineSeparator() + "- %animation% Animated spinning circle (by default)"
     );
     ACTION_BAR_LAYOUT = formatString(messagesConfig.getString(
       "messages.action-bar.layout",

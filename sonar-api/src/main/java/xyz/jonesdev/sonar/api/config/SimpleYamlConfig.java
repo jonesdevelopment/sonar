@@ -65,7 +65,7 @@ public final class SimpleYamlConfig {
       yaml.createOrLoadWithComments();
 
       yaml.options().headerFormatter().commentPrefix("# ");
-      yaml.setHeader(String.join("\n", HEADER));
+      yaml.setHeader(String.join(System.lineSeparator(), HEADER));
     } catch (IOException exception) {
       exception.printStackTrace();
     }
