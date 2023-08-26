@@ -106,7 +106,7 @@ public final class FallbackListener {
   }
 
   @Subscribe(order = PostOrder.LAST)
-  public void handle(final PreLoginEvent event) throws Throwable {
+  public void handle(final @NotNull PreLoginEvent event) throws Throwable {
     Statistics.TOTAL_TRAFFIC.increment();
 
     final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
@@ -237,7 +237,7 @@ public final class FallbackListener {
   }
 
   @Subscribe(order = PostOrder.LAST)
-  public void handle(final LoginEvent event) {
+  public void handle(final @NotNull LoginEvent event) {
     val connectedPlayer = (ConnectedPlayer) event.getPlayer();
 
     if (fallback.getSonar().getConfig().LOCKDOWN_ENABLED) {
