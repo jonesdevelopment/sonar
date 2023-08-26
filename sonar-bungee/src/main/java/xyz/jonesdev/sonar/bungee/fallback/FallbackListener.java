@@ -42,7 +42,6 @@ import java.lang.reflect.Field;
 import static net.md_5.bungee.netty.PipelineUtils.FRAME_PREPENDER;
 import static xyz.jonesdev.sonar.bungee.fallback.FallbackListener.CachedMessages.LOCKDOWN_DISCONNECT;
 
-@SuppressWarnings("deprecation")
 @RequiredArgsConstructor
 public final class FallbackListener implements Listener {
   private final Fallback fallback;
@@ -67,6 +66,7 @@ public final class FallbackListener implements Listener {
   }
 
   @EventHandler
+  @SuppressWarnings("deprecation")
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
     if (fallback.getSonar().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
