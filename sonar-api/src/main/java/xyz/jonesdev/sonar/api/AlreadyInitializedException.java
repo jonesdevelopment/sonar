@@ -17,23 +17,5 @@
 
 package xyz.jonesdev.sonar.api;
 
-import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
-
-@UtilityClass
-public class SonarSupplier {
-  private Sonar sonar;
-
-  public void set(final @NotNull Sonar s) {
-    if (sonar != null) {
-      throw new AlreadyInitializedException();
-    }
-    sonar = Objects.requireNonNull(s);
-  }
-
-  public @NotNull Sonar get() {
-    return sonar;
-  }
+final class AlreadyInitializedException extends RuntimeException {
 }

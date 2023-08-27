@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
 
@@ -292,7 +293,7 @@ public enum FallbackPacketRegistry {
 
     <P extends FallbackPacket> void register(final Class<P> clazz,
                                              final Supplier<P> packetSupplier,
-                                             final PacketMapping... mappings) {
+                                             final PacketMapping @NotNull ... mappings) {
       if (mappings.length == 0) {
         throw new IllegalArgumentException("At least one mapping must be provided.");
       }
@@ -302,29 +303,7 @@ public enum FallbackPacketRegistry {
         final PacketMapping next = (i + 1 < mappings.length) ? mappings[i + 1] : current;
 
         final ProtocolVersion from = current.protocolVersion;
-        final ProtocolVersion lastValid = current.lastValidProtocolVersion;
-
-        if (lastValid != null) {
-          if (next != current) {
-            throw new IllegalArgumentException("Cannot add a mapping after last valid mapping");
-          }
-
-          if (from.compareTo(lastValid) > 0) {
-            throw new IllegalArgumentException(
-              "Last mapping version cannot be higher than highest mapping version");
-          }
-        }
-
-        final ProtocolVersion last = (ProtocolVersion) SUPPORTED_VERSIONS.toArray()[SUPPORTED_VERSIONS.size() - 1];
-        final ProtocolVersion to = current == next ? lastValid != null
-          ? lastValid : last : next.protocolVersion;
-
-        final ProtocolVersion lastInList = lastValid != null ? lastValid : last;
-
-        if (from.compareTo(to) >= 0 && from != lastInList) {
-          throw new IllegalArgumentException(String.format(
-            "Next mapping version (%s) should be lower then current (%s)", to, from));
-        }
+        final ProtocolVersion to = getProtocolVersion(current, next, from);
 
         for (final ProtocolVersion protocol : EnumSet.range(from, to)) {
           if (protocol == to && next != current) {
@@ -354,6 +333,36 @@ public enum FallbackPacketRegistry {
           registry.packetClassToId.put(clazz, current.id);
         }
       }
+    }
+
+    @NotNull
+    private static ProtocolVersion getProtocolVersion(final @NotNull PacketMapping current,
+                                                      final @NotNull PacketMapping next,
+                                                      final @NotNull ProtocolVersion from) {
+      final ProtocolVersion lastValid = current.lastValidProtocolVersion;
+
+      if (lastValid != null) {
+        if (next != current) {
+          throw new IllegalArgumentException("Cannot add a mapping after last valid mapping");
+        }
+
+        if (from.compareTo(lastValid) > 0) {
+          throw new IllegalArgumentException(
+            "Last mapping version cannot be higher than highest mapping version");
+        }
+      }
+
+      final ProtocolVersion last = (ProtocolVersion) SUPPORTED_VERSIONS.toArray()[SUPPORTED_VERSIONS.size() - 1];
+      final ProtocolVersion to = current == next ? lastValid != null
+        ? lastValid : last : next.protocolVersion;
+
+      final ProtocolVersion lastInList = lastValid != null ? lastValid : last;
+
+      if (from.compareTo(to) >= 0 && from != lastInList) {
+        throw new IllegalArgumentException(String.format(
+          "Next mapping version (%s) should be lower then current (%s)", to, from));
+      }
+      return to;
     }
   }
 
