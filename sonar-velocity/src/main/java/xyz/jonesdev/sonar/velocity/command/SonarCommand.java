@@ -229,7 +229,7 @@ public final class SonarCommand implements SimpleCommand {
   }
 
   @Override
-  public boolean hasPermission(final Invocation invocation) {
+  public boolean hasPermission(final @NotNull Invocation invocation) {
     return invocation.source().hasPermission("sonar.command");
   }
 }

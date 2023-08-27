@@ -17,6 +17,9 @@
 
 package xyz.jonesdev.sonar.api.command.subcommand;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,6 +28,8 @@ import java.util.List;
 public interface SubcommandRegistry {
   List<Subcommand> SUBCOMMANDS = new ArrayList<>();
 
+  @NotNull
+  @Unmodifiable
   default List<Subcommand> getSubcommands() {
     return Collections.unmodifiableList(SUBCOMMANDS);
   }
@@ -34,7 +39,7 @@ public interface SubcommandRegistry {
    *
    * @param subcommand Array of Subcommands to register
    */
-  default void register(final Subcommand... subcommand) {
+  default void register(final Subcommand @NotNull ... subcommand) {
     SUBCOMMANDS.addAll(Arrays.asList(subcommand));
   }
 
@@ -44,7 +49,7 @@ public interface SubcommandRegistry {
    * @param subcommand Array of Subcommands to unregister
    */
   @SuppressWarnings("unused")
-  default void unregister(final Subcommand... subcommand) {
+  default void unregister(final Subcommand @NotNull ... subcommand) {
     SUBCOMMANDS.removeAll(Arrays.asList(subcommand));
   }
 }
