@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.exception;
+package xyz.jonesdev.sonar.api;
 
-public final class ReflectionException extends RuntimeException {
-  public ReflectionException(final Throwable throwable) {
+public final class ReflectiveOperationException extends RuntimeException {
+  public ReflectiveOperationException(final Throwable throwable) {
     super(throwable);
     throwable.printStackTrace();
   }

@@ -24,9 +24,9 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
@@ -271,7 +271,7 @@ public class FallbackPreparer {
       joinGame.setLevelNames(new String[]{"minecraft:overworld"});
       joinGame.setRegistry(registryContainer.build());
     } catch (Throwable throwable) {
-      throw new ReflectionException(throwable);
+      throw new ReflectiveOperationException(throwable);
     }
     return joinGame;
   }

@@ -28,10 +28,10 @@ import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
-import xyz.jonesdev.sonar.common.exception.ReflectionException;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
@@ -72,7 +72,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
           )
         );
     } catch (Throwable throwable) {
-      throw new ReflectionException(throwable);
+      throw new ReflectiveOperationException(throwable);
     }
   }
 

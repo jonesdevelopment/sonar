@@ -30,8 +30,8 @@ import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.*;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
-import xyz.jonesdev.sonar.common.exception.ReflectionException;
 
 import java.lang.reflect.Field;
 import java.net.SocketAddress;
@@ -52,7 +52,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
       kickField.setAccessible(true);
       LEGACY_KICK = (KickStringWriter) kickField.get(null);
     } catch (Throwable throwable) {
-      throw new ReflectionException(throwable);
+      throw new ReflectiveOperationException(throwable);
     }
   }
 

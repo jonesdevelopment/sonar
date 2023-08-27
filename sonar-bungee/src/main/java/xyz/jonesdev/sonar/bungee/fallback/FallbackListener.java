@@ -31,11 +31,11 @@ import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketCompressor;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
-import xyz.jonesdev.sonar.common.exception.ReflectionException;
 
 import java.lang.reflect.Field;
 
@@ -53,7 +53,7 @@ public final class FallbackListener implements Listener {
       CHANNEL_WRAPPER = InitialHandler.class.getDeclaredField("ch");
       CHANNEL_WRAPPER.setAccessible(true);
     } catch (Throwable throwable) {
-      throw new ReflectionException(throwable);
+      throw new ReflectiveOperationException(throwable);
     }
   }
 
