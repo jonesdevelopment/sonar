@@ -29,10 +29,21 @@ public interface SubcommandRegistry {
     return Collections.unmodifiableList(SUBCOMMANDS);
   }
 
+  /**
+   * Registers a single or multiple subcommand(s)
+   *
+   * @param subcommand Array of Subcommands to register
+   */
   default void register(final Subcommand... subcommand) {
     SUBCOMMANDS.addAll(Arrays.asList(subcommand));
   }
 
+  /**
+   * Unregisters a single or multiple subcommand(s)
+   *
+   * @param subcommand Array of Subcommands to unregister
+   */
+  @SuppressWarnings("unused")
   default void unregister(final Subcommand... subcommand) {
     SUBCOMMANDS.removeAll(Arrays.asList(subcommand));
   }
