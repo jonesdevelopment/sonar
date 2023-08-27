@@ -8,9 +8,9 @@
   </p>
   
   <!-- Badges & icons -->
+  [![](https://github.com/jonesdevelopment/sonar/actions/workflows/gradle.yml/badge.svg)](https://github.com/jonesdevelopment/sonar/actions/workflows/gradle.yml)
   [![](https://img.shields.io/github/v/release/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/releases)
   [![](https://img.shields.io/github/issues/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/issues)
-  [![](https://img.shields.io/github/downloads/jonesdevelopment/sonar/total)](https://github.com/jonesdevelopment/sonar/releases)
   [![](https://img.shields.io/discord/923308209769426994.svg?logo=discord)](https://jonesdev.xyz/discord)
   [![](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   <br>
