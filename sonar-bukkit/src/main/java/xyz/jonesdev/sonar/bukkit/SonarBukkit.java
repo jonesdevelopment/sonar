@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.bukkit;
 
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.logger.Logger;
@@ -36,7 +37,7 @@ import java.util.logging.Level;
 public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
   public static SonarBukkit INSTANCE;
 
-  public SonarBukkit(final SonarBukkitPlugin plugin) {
+  public SonarBukkit(final @NotNull SonarBukkitPlugin plugin) {
     super(plugin, plugin.getDataFolder(), new ActionBarVerbose(plugin.getServer()));
     INSTANCE = this;
   }
