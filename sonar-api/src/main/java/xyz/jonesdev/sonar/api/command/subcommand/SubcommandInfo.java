@@ -27,17 +27,39 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface SubcommandInfo {
+
+  /**
+   * @return Name of the subcommand
+   */
   String name();
 
+  /**
+   * @return Description of the subcommand
+   */
   String description();
 
+  /**
+   * @return Aliases of the subcommand
+   */
   String[] aliases() default {};
 
+  /**
+   * @return Arguments of the subcommand
+   */
   Argument[] arguments() default {};
 
+  /**
+   * @return Whether the subcommands requires arguments
+   */
   boolean argumentsRequired() default true;
 
+  /**
+   * @return Whether the subcommands can only be executed by a player
+   */
   boolean onlyPlayers() default false;
 
+  /**
+   * @return Whether the subcommands can only be executed by console
+   */
   boolean onlyConsole() default false;
 }

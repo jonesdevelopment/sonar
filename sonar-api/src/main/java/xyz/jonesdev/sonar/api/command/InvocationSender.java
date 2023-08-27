@@ -18,15 +18,22 @@
 package xyz.jonesdev.sonar.api.command;
 
 public interface InvocationSender {
+
+  /**
+   * @return The name of the command executor
+   */
   String getName();
 
   /**
    * Sends a message to the command executor
    *
-   * @param message Message to send
+   * @param message Deserialized message
    */
   void sendMessage(final String message);
 
+  /**
+   * Sends an empty chat message to the command executor
+   */
   default void sendMessage() {
     sendMessage("");
   }
