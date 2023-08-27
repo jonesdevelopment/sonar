@@ -113,9 +113,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     postReload();
   }
 
-  public void postReload() {
-    // Do nothing by default
-  }
+  public abstract void postReload();
 
   public void shutdown() {
     getLogger().info("Starting shutdown process...");

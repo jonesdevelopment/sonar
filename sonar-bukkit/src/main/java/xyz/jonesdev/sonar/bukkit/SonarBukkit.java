@@ -123,4 +123,9 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), getActionBarVerbose()::update,
       2L, 2L);
   }
+
+  @Override
+  public void postReload() {
+    // Do nothing
+  }
 }
