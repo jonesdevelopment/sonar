@@ -41,7 +41,7 @@ subprojects {
     testCompileOnly("org.projectlombok:lombok:1.18.28")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.28")
 
-    compileOnly("io.netty:netty-all:4.1.96.Final") // netty
+    compileOnly("io.netty:netty-all:4.1.97.Final") // netty
 
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
     implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
