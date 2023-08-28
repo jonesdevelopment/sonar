@@ -324,7 +324,7 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.verification.read-timeout",
       "Amount of time that has to pass before a player times out"
     );
-    VERIFICATION_READ_TIMEOUT = clamp(generalConfig.getInt("general.verification.read-timeout", 4000), 500, 30000);
+    VERIFICATION_READ_TIMEOUT = clamp(generalConfig.getInt("general.verification.read-timeout", 5000), 500, 30000);
 
     generalConfig.getYaml().setComment("general.verification.max-t-ping",
       "Maximum transaction ping (in milliseconds) a player needs to have before timing out"
