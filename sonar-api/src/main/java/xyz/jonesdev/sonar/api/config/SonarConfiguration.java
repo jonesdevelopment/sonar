@@ -329,12 +329,12 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.verification.max-t-ping",
       "Maximum transaction ping (in milliseconds) a player needs to have before timing out"
     );
-    MAXIMUM_T_PING = clamp(generalConfig.getInt("general.verification.max-t-ping", 2500), 500, 30000);
+    MAXIMUM_T_PING = clamp(generalConfig.getInt("general.verification.max-t-ping", 3500), 500, 30000);
 
     generalConfig.getYaml().setComment("general.verification.max-k-ping",
       "Maximum keep alive ping (in milliseconds) a player needs to have before timing out (1.8+)"
     );
-    MAXIMUM_K_PING = clamp(generalConfig.getInt("general.verification.max-k-ping", 2000), 500, 30000);
+    MAXIMUM_K_PING = clamp(generalConfig.getInt("general.verification.max-k-ping", 3500), 500, 30000);
 
     generalConfig.getYaml().setComment("general.verification.max-login-packets",
       "Maximum number of login packets the player has to send in order to be kicked"
