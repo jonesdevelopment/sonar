@@ -17,8 +17,15 @@
 
 package xyz.jonesdev.sonar.api.timer;
 
+import lombok.Getter;
+
+@Getter
 public final class SystemTimer {
-  public final long start = System.currentTimeMillis();
+  private long start = System.currentTimeMillis();
+
+  public void reset() {
+    start = System.currentTimeMillis();
+  }
 
   public long delay() {
     return System.currentTimeMillis() - start;
