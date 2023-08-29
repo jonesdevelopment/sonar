@@ -345,9 +345,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
-  private void assertState(final State state) {
-    if (state != this.state) {
-      player.fail("expected " + state + ", got " + this.state);
+  private void assertState(final @NotNull State expectedState) {
+    if (expectedState != state) {
+      player.fail("expected " + expectedState + ", got " + state);
     }
   }
 
