@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.common.fallback;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +41,6 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener {
-  @Getter
   private final @NotNull FallbackPlayer<?, ?> player;
   private final String username;
   private final UUID uuid;
@@ -51,11 +49,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private int movementTick, packets;
   private double lastX, lastY, lastZ;
   @Setter
-  @Getter
   private State state;
 
   private final SystemTimer login = new SystemTimer();
-  private static final Random random = new Random();
+  private static final Random RANDOM = new Random();
 
   @RequiredArgsConstructor
   public enum State {
@@ -81,8 +78,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.player = player;
     this.username = username;
     this.uuid = uuid;
-    this.transactionId = (short) random.nextInt();
-    this.verifyKeepAliveId = random.nextInt();
+    this.transactionId = (short) RANDOM.nextInt();
+    this.verifyKeepAliveId = RANDOM.nextInt();
     this.state = State.KEEP_ALIVE;
 
     // Send LoginSuccess packet to make the client think they are joining the server
