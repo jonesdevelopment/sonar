@@ -25,8 +25,6 @@ import lombok.ToString;
 @ToString
 @RequiredArgsConstructor
 public final class DimensionInfo {
-  private final String registryIdentifier;
-  private final String levelName;
-  private final boolean isFlat;
-  private final boolean isDebugType;
+  private final String identifier, levelName;
+  private final boolean flat, debug;
 }

@@ -125,9 +125,9 @@ public final class JoinGame implements FallbackPacket {
     if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0
       && protocolVersion.compareTo(MINECRAFT_1_19) < 0) {
       writeCompoundTag(byteBuf, currentDimensionData);
-      writeString(byteBuf, dimensionInfo.getRegistryIdentifier());
+      writeString(byteBuf, dimensionInfo.getIdentifier());
     } else {
-      writeString(byteBuf, dimensionInfo.getRegistryIdentifier());
+      writeString(byteBuf, dimensionInfo.getIdentifier());
       writeString(byteBuf, dimensionInfo.getLevelName());
     }
 
@@ -147,7 +147,7 @@ public final class JoinGame implements FallbackPacket {
     byteBuf.writeBoolean(reducedDebugInfo);
     byteBuf.writeBoolean(showRespawnScreen);
 
-    byteBuf.writeBoolean(dimensionInfo.isDebugType());
+    byteBuf.writeBoolean(dimensionInfo.isDebug());
     byteBuf.writeBoolean(dimensionInfo.isFlat());
 
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
