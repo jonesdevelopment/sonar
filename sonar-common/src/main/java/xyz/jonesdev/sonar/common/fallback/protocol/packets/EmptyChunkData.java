@@ -49,8 +49,7 @@ public final class EmptyChunkData implements FallbackPacket {
   private static final byte[] MODERN_FILLER_BYTES = new byte[1024];
 
   // Prepare nbt for 1.18 and pre-1.18
-  private static final CompoundBinaryTag MODERN_TAG;
-  private static final CompoundBinaryTag LEGACY_TAG;
+  private static final CompoundBinaryTag MODERN_TAG, LEGACY_TAG;
 
   static {
     MODERN_TAG = prepareNBT(false);

@@ -32,8 +32,7 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 @NoArgsConstructor
 @AllArgsConstructor
 public final class Transaction implements FallbackPacket {
-  private int windowId;
-  private int id;
+  private int windowId, id;
   private boolean accepted;
 
   @Override
