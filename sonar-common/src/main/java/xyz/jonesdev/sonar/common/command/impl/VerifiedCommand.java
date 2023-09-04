@@ -46,10 +46,8 @@ public final class VerifiedCommand extends Subcommand {
     switch (invocation.getArguments()[1].toLowerCase()) {
       case "history": {
         if (invocation.getArguments().length <= 2) {
-          invocation.getSender().sendMessage(
-            SONAR.getConfig().INCORRECT_COMMAND_USAGE
-              .replace("%usage%", "verified history <IP address>")
-          );
+          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_COMMAND_USAGE
+            .replace("%usage%", "verified history <IP address>"));
           return;
         }
 
@@ -78,10 +76,8 @@ public final class VerifiedCommand extends Subcommand {
 
       case "remove": {
         if (invocation.getArguments().length <= 2) {
-          invocation.getSender().sendMessage(
-            SONAR.getConfig().INCORRECT_COMMAND_USAGE
-              .replace("%usage%", "verified remove <IP address>")
-          );
+          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_COMMAND_USAGE
+            .replace("%usage%", "verified remove <IP address>"));
           return;
         }
 
@@ -110,10 +106,8 @@ public final class VerifiedCommand extends Subcommand {
         SONAR.getVerifiedPlayerController().remove(realInetAddress);
         LOCK.remove(realInetAddress);
 
-        invocation.getSender().sendMessage(
-          SONAR.getConfig().VERIFIED_REMOVE
-            .replace("%ip%", inetAddress)
-        );
+        invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_REMOVE
+          .replace("%ip%", inetAddress));
         break;
       }
 
@@ -127,18 +121,14 @@ public final class VerifiedCommand extends Subcommand {
 
         SONAR.getVerifiedPlayerController().clearAll();
 
-        invocation.getSender().sendMessage(
-          SONAR.getConfig().VERIFIED_CLEARED
-            .replace("%removed%", Sonar.DECIMAL_FORMAT.format(verified))
-        );
+        invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_CLEARED
+          .replace("%removed%", Sonar.DECIMAL_FORMAT.format(verified)));
         break;
       }
 
       case "size": {
-        invocation.getSender().sendMessage(
-          SONAR.getConfig().VERIFIED_SIZE
-            .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize()))
-        );
+        invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_SIZE
+          .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize())));
         break;
       }
 

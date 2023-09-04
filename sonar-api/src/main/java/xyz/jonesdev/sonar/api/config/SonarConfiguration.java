@@ -183,14 +183,16 @@ public final class SonarConfiguration {
 
     if (Sonar.get().getServer().getPlatform() == SonarPlatform.BUNGEE) {
       generalConfig.getYaml().setComment("general.replace-varint-decoder",
-        "Should Sonar replace BungeeCord's VarInt decoder?" + Sonar.LINE_SEPARATOR + "This option is only available on BungeeCord."
+        "Should Sonar replace BungeeCord's VarInt decoder?" + Sonar.LINE_SEPARATOR + "This option is only available " +
+          "on BungeeCord."
       );
       REPLACE_VAR_INT_DECODER = generalConfig.getBoolean("general.replace-varint-decoder", true);
     }
 
     // Database
     generalConfig.getYaml().setComment("general.database.type",
-      "Type of database Sonar uses to store verified players" + Sonar.LINE_SEPARATOR + "Possible types: NONE, MYSQL, MARIADB"
+      "Type of database Sonar uses to store verified players" + Sonar.LINE_SEPARATOR + "Possible types: NONE, MYSQL, " +
+        "MARIADB"
     );
     DATABASE_TYPE =
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());

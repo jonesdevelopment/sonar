@@ -39,6 +39,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   public FallbackInitialHandler(final BungeeCord bungee, final ListenerInfo listener) {
     super(bungee, listener);
   }
+
   private static final @NotNull Fallback fallback = Objects.requireNonNull(Sonar.get().getFallback());
   private ChannelWrapper channelWrapper;
   @SuppressWarnings("unused") // TODO: remove later

@@ -26,6 +26,7 @@ public enum Statistics {
 
   /**
    * Increments the current value by 1 with the default value of 0
+   *
    * @see #get(int)
    * @see #set(int)
    */
@@ -35,6 +36,7 @@ public enum Statistics {
 
   /**
    * Increments the current value by 1 with a custom default value
+   *
    * @see #get(int)
    * @see #set(int)
    */
