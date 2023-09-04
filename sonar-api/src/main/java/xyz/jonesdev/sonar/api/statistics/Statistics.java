@@ -24,22 +24,49 @@ public enum Statistics {
 
   private int val = -1;
 
+  /**
+   * Increments the current value by 1 with the default value of 0
+   * @see #get(int)
+   * @see #set(int)
+   */
   public void increment() {
     increment(0);
   }
 
+  /**
+   * Increments the current value by 1 with a custom default value
+   * @see #get(int)
+   * @see #set(int)
+   */
   public void increment(final int def) {
     set(get(def) + 1);
   }
 
+  /**
+   * @return The current value with the default value of 0
+   * @see #get(int)
+   */
+  public int get() {
+    return get(0);
+  }
+
+  /**
+   * @return The current value with a custom default value
+   */
   public int get(final int def) {
     return val == -1 ? def : val;
   }
 
+  /**
+   * Set current value to a new value
+   */
   public void set(final int value) {
     val = value;
   }
 
+  /**
+   * Set current value to 0
+   */
   public void reset() {
     val = 0;
   }

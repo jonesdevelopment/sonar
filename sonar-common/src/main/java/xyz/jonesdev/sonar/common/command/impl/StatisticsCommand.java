@@ -80,9 +80,9 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
       }
     }
 
-    final int total = Statistics.TOTAL_TRAFFIC.get(0);
-    final int real = Statistics.REAL_TRAFFIC.get(0);
-    final int failed = Statistics.FAILED_VERIFICATIONS.get(0);
+    final int total = Statistics.TOTAL_TRAFFIC.get();
+    final int real = Statistics.REAL_TRAFFIC.get();
+    final int failed = Statistics.FAILED_VERIFICATIONS.get();
     final int queued = SONAR.getFallback().getQueue().getQueuedPlayers().size();
     final int verifying = SONAR.getFallback().getConnected().size();
     final int verified = SONAR.getVerifiedPlayerController().estimatedSize();

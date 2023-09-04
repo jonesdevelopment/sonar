@@ -44,7 +44,7 @@ public final class ActionBarVerbose implements Verbose, JVMProfiler {
     // Clean up blacklisted IPs
     Sonar.get().getFallback().getBlacklisted().cleanUp(false);
 
-    final int totalJoins = Statistics.TOTAL_TRAFFIC.get(0);
+    final int totalJoins = Statistics.TOTAL_TRAFFIC.get();
 
     // Statistically determine the joins per second without any caches
     if (totalJoins > 0 && timer.delay() >= 1000L) {
@@ -62,10 +62,10 @@ public final class ActionBarVerbose implements Verbose, JVMProfiler {
           Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
         .replace("%total-joins%", Sonar.DECIMAL_FORMAT.format(totalJoins))
         .replace("%per-second-joins%", Sonar.DECIMAL_FORMAT.format(joinsPerSecond))
-        .replace("%verify-total%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get(0)))
+        .replace("%verify-total%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
         .replace("%verify-success%",
           Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
-        .replace("%verify-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get(0)))
+        .replace("%verify-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
         .replace("%incoming-traffic%", TrafficCounter.INCOMING.getCachedSecond())
         .replace("%outgoing-traffic%", TrafficCounter.OUTGOING.getCachedSecond())
         .replace("%incoming-traffic-ttl%", TrafficCounter.INCOMING.getCachedTtl())
