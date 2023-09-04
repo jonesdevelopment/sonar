@@ -63,11 +63,4 @@ public enum Statistics {
   public void set(final int value) {
     val = value;
   }
-
-  /**
-   * Set current value to 0
-   */
-  public void reset() {
-    val = 0;
-  }
 }
