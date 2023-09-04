@@ -772,6 +772,7 @@ public final class SonarConfiguration {
         Sonar.LINE_SEPARATOR + "- %verifying% Number of verifying connections" +
         Sonar.LINE_SEPARATOR + "- %blacklisted% Number of blacklisted IP addresses" +
         Sonar.LINE_SEPARATOR + "- %total-joins% Number of total joins (not unique!)" +
+        Sonar.LINE_SEPARATOR + "- %per-second-joins% Number of joins per second" +
         Sonar.LINE_SEPARATOR + "- %verify-total% Number of total verification attempts" +
         Sonar.LINE_SEPARATOR + "- %verify-success% Number of verified IP addresses" +
         Sonar.LINE_SEPARATOR + "- %verify-failed% Number of failed verifications" +

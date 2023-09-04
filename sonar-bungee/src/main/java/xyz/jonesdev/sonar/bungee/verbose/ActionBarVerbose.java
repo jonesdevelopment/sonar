@@ -26,6 +26,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.common.verbose.VerboseAnimation;
@@ -38,10 +39,21 @@ public final class ActionBarVerbose implements Verbose, JVMProfiler {
   private final ProxyServer server;
   @Getter
   private final Collection<String> subscribers = new Vector<>(1);
+  private final SystemTimer timer = new SystemTimer();
+  private int joinsPerSecond, lastTotalJoins;
 
   public void update() {
     // Clean up blacklisted IPs
     Sonar.get().getFallback().getBlacklisted().cleanUp(false);
+
+    final int totalJoins = Statistics.TOTAL_TRAFFIC.get(0);
+
+    // Statistically determine the joins per second without any caches
+    if (totalJoins > 0 && timer.delay() >= 1000L) {
+      timer.reset();
+      joinsPerSecond = totalJoins - lastTotalJoins;
+      lastTotalJoins = totalJoins;
+    }
 
     final TextComponent component = new TextComponent(
       Sonar.get().getConfig().ACTION_BAR_LAYOUT
@@ -50,7 +62,8 @@ public final class ActionBarVerbose implements Verbose, JVMProfiler {
         .replace("%verifying%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
         .replace("%blacklisted%",
           Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
-        .replace("%total-joins%", Sonar.DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get(0)))
+        .replace("%total-joins%", Sonar.DECIMAL_FORMAT.format(totalJoins))
+        .replace("%per-second-joins%", Sonar.DECIMAL_FORMAT.format(joinsPerSecond))
         .replace("%verify-total%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get(0)))
         .replace("%verify-success%",
           Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
