@@ -137,13 +137,15 @@ public final class FallbackListener {
       return;
     }
 
+    // Don't continue the verification process if the verification is disabled
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
+    // Check if the player is already verified.
+    // No one wants to be verified over and over again.
     final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
     if (fallback.getSonar().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
 
-    // Completely skip Geyser connections
-    // TODO: different handling?
+    // Completely skip Geyser connections (for now)
     if (GeyserValidator.isGeyser(channel)) {
       // TODO: Do we need to log this?
       fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
@@ -162,6 +164,7 @@ public final class FallbackListener {
     }
 
     // We cannot allow too many players on our Fallback server
+    // There's technically no reason for limiting this, but we'll better stay safe.
     if (fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         TOO_MANY_PLAYERS,

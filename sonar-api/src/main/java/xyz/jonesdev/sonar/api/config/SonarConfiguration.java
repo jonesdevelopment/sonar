@@ -99,6 +99,7 @@ public final class SonarConfiguration {
 
   public String BLACKLIST_EMPTY;
   public String BLACKLIST_ADD;
+  public String BLACKLIST_ADD_WARNING;
   public String BLACKLIST_DUPLICATE;
   public String BLACKLIST_NOT_FOUND;
   public String BLACKLIST_REMOVE;
@@ -574,6 +575,14 @@ public final class SonarConfiguration {
     );
     BLACKLIST_ADD = formatString(messagesConfig.getString("messages.blacklist.added",
       "%prefix%Successfully added %ip% to the blacklist."
+    ));
+
+    messagesConfig.getYaml().setComment("messages.blacklist.added-warning",
+      "Message that is shown when someone adds an IP address to the blacklist that is verified"
+    );
+    BLACKLIST_ADD_WARNING = formatString(messagesConfig.getString("messages.blacklist.added-warning",
+      "%prefix%&cWarning: &f%ip% is currently whitelisted. " +
+        "Consider removing the IP address from the list of verified players to avoid potential issues."
     ));
 
     messagesConfig.getYaml().setComment("messages.blacklist.removed",

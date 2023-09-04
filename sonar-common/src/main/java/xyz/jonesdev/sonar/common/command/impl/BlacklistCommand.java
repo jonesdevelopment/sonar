@@ -44,10 +44,8 @@ public final class BlacklistCommand extends Subcommand {
     switch (invocation.getArguments()[1].toLowerCase()) {
       case "add": {
         if (invocation.getArguments().length <= 2) {
-          invocation.getSender().sendMessage(
-            SONAR.getConfig().INCORRECT_COMMAND_USAGE
-              .replace("%usage%", "blacklist add <IP address>")
-          );
+          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_COMMAND_USAGE
+            .replace("%usage%", "blacklist add <IP address>"));
           return;
         }
 
@@ -76,20 +74,21 @@ public final class BlacklistCommand extends Subcommand {
           return;
         }
 
+        if (SONAR.getVerifiedPlayerController().has(inetAddress)) {
+          invocation.getSender().sendMessage(SONAR.getConfig().BLACKLIST_ADD_WARNING
+            .replace("%ip%", rawInetAddress));
+        }
+
         SONAR.getFallback().getBlacklisted().put(inetAddress.toString());
-        invocation.getSender().sendMessage(
-          SONAR.getConfig().BLACKLIST_ADD
-            .replace("%ip%", rawInetAddress)
-        );
+        invocation.getSender().sendMessage(SONAR.getConfig().BLACKLIST_ADD
+          .replace("%ip%", rawInetAddress));
         break;
       }
 
       case "remove": {
         if (invocation.getArguments().length <= 2) {
-          invocation.getSender().sendMessage(
-            SONAR.getConfig().INCORRECT_COMMAND_USAGE
-              .replace("%usage%", "blacklist remove <IP address>")
-          );
+          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_COMMAND_USAGE
+            .replace("%usage%", "blacklist remove <IP address>"));
           return;
         }
 
@@ -119,10 +118,8 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         SONAR.getFallback().getBlacklisted().invalidate(inetAddress.toString());
-        invocation.getSender().sendMessage(
-          SONAR.getConfig().BLACKLIST_REMOVE
-            .replace("%ip%", rawInetAddress)
-        );
+        invocation.getSender().sendMessage(SONAR.getConfig().BLACKLIST_REMOVE
+          .replace("%ip%", rawInetAddress));
         break;
       }
 
@@ -144,10 +141,8 @@ public final class BlacklistCommand extends Subcommand {
       }
 
       case "size": {
-        invocation.getSender().sendMessage(
-          SONAR.getConfig().BLACKLIST_SIZE
-            .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize()))
-        );
+        invocation.getSender().sendMessage(SONAR.getConfig().BLACKLIST_SIZE
+          .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize())));
         break;
       }
 
