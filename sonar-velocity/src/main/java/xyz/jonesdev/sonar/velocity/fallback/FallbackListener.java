@@ -118,7 +118,24 @@ public final class FallbackListener {
     final Channel channel = mcConnection.getChannel();
     final ChannelPipeline pipeline = channel.pipeline();
 
+    // Hook the custom traffic pipeline, so we can count the incoming and outgoing traffic
     TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
+
+    final InitialLoginSessionHandler sessionHandler = (InitialLoginSessionHandler) mcConnection.getSessionHandler();
+
+    // The AuthSessionHandler isn't supposed to continue the connection process,
+    // which is why we override the field value for the MinecraftConnection with
+    // a fake connection.
+    CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
+
+    // Check the blacklist here since we cannot let the player "ghost join"
+    if (fallback.getBlacklisted().has(inetAddress.toString())) {
+      initialConnection.getConnection().closeWith(Disconnect.create(
+        BLACKLISTED,
+        inboundConnection.getProtocolVersion()
+      ));
+      return;
+    }
 
     if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
 
@@ -130,22 +147,6 @@ public final class FallbackListener {
     if (GeyserValidator.isGeyser(channel)) {
       // TODO: Do we need to log this?
       fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
-      return;
-    }
-
-    final InitialLoginSessionHandler sessionHandler = (InitialLoginSessionHandler) mcConnection.getSessionHandler();
-
-    // The AuthSessionHandler isn't supposed to continue the connection process,
-    // which is why we override the field value for the MinecraftConnection with
-    // a fake connection
-    CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
-
-    // Check the blacklist here since we cannot let the player ghost join
-    if (fallback.getBlacklisted().has(inetAddress.toString())) {
-      initialConnection.getConnection().closeWith(Disconnect.create(
-        BLACKLISTED,
-        inboundConnection.getProtocolVersion()
-      ));
       return;
     }
 
