@@ -23,7 +23,6 @@ import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
@@ -52,7 +51,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final Fallback fallback;
   private final MinecraftConnection mcConnection;
   private final LoginInboundConnection inboundConnection;
-  private final InitialLoginSessionHandler sessionHandler;
   private final VelocityServer server;
 
   private static final MethodHandle CONNECTED_PLAYER;
@@ -79,14 +77,12 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   FallbackSessionHandler(final Fallback fallback,
                          final @NotNull MinecraftConnection mcConnection,
                          final LoginInboundConnection inboundConnection,
-                         final InitialLoginSessionHandler sessionHandler,
                          final GameProfile gameProfile,
                          final InetAddress inetAddress,
                          final boolean onlineMode) {
     this.fallback = fallback;
     this.mcConnection = mcConnection;
     this.inboundConnection = inboundConnection;
-    this.sessionHandler = sessionHandler;
     this.server = mcConnection.server;
 
     // Don't allow exceptions or disconnect messages

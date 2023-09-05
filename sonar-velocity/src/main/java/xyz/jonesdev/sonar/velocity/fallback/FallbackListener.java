@@ -121,12 +121,10 @@ public final class FallbackListener {
     // Hook the custom traffic pipeline, so we can count the incoming and outgoing traffic
     TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
 
-    final InitialLoginSessionHandler sessionHandler = (InitialLoginSessionHandler) mcConnection.getSessionHandler();
-
     // The AuthSessionHandler isn't supposed to continue the connection process,
     // which is why we override the field value for the MinecraftConnection with
     // a fake connection.
-    CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
+    CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
 
     // Check the blacklist here since we cannot let the player "ghost join"
     if (fallback.getBlacklisted().has(inetAddress.toString())) {
@@ -232,8 +230,9 @@ public final class FallbackListener {
           && (SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
           || event.getResult().isOnlineModeAllowed());
 
+        // Replace the session handler to intercept all packets and handle them
         mcConnection.setSessionHandler(new FallbackSessionHandler(
-          fallback, mcConnection, inboundConnection, sessionHandler,
+          fallback, mcConnection, inboundConnection,
           gameProfile, inetAddress, onlineMode
         ));
       }));
