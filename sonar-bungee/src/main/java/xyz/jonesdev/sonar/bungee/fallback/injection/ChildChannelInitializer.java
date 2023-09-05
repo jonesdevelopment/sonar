@@ -60,8 +60,8 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
   // https://github.com/SpigotMC/BungeeCord/blob/master/proxy/src/main/java/net/md_5/bungee/netty/PipelineUtils.java
   @Override
   protected void initChannel(final @NotNull Channel channel) throws Exception {
-    final SocketAddress remoteAddress = channel.remoteAddress() == null ? channel.parent().localAddress() :
-      channel.remoteAddress();
+    final SocketAddress remoteAddress = channel.remoteAddress() == null ? channel.parent().localAddress()
+      : channel.remoteAddress();
 
     if (BungeeCord.getInstance().getConnectionThrottle() != null && BungeeCord.getInstance().getConnectionThrottle().throttle(remoteAddress)) {
       channel.close();

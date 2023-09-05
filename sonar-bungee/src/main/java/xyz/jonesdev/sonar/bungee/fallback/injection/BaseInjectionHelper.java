@@ -22,6 +22,7 @@ import io.netty.channel.ChannelInitializer;
 import lombok.experimental.UtilityClass;
 import net.md_5.bungee.netty.PipelineUtils;
 import sun.misc.Unsafe;
+import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 
 import java.lang.reflect.Field;
 
@@ -41,7 +42,7 @@ public class BaseInjectionHelper {
 
       unsafe.putObject(base, offset, childHandler);
     } catch (Exception exception) {
-      exception.printStackTrace();
+      throw new ReflectiveOperationException(exception);
     }
   }
 }

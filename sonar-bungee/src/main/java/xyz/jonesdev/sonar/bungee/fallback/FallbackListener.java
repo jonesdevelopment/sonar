@@ -109,21 +109,18 @@ public final class FallbackListener implements Listener {
       && pipeline.get(PacketDecompressor.class) != null) {
       final VelocityCompressor compressor = Natives.compress.get().create(-1);
 
+      // Replace (de)compressor with Velocity's to ensure better performance
       pipeline.replace(
         PacketCompressor.class,
         "compress",
-        new FallbackPacketCompressor(
-          compressionThreshold,
-          compressor
-        )
+        // Create a new compressor instance with the Velocity compressor
+        new FallbackPacketCompressor(compressionThreshold, compressor)
       );
       pipeline.replace(
         PacketDecompressor.class,
         "decompress",
-        new FallbackPacketDecompressor(
-          compressionThreshold,
-          compressor
-        )
+        // Create a new decompressor instance with the Velocity decompressor
+        new FallbackPacketDecompressor(compressionThreshold, compressor)
       );
     }
   }
