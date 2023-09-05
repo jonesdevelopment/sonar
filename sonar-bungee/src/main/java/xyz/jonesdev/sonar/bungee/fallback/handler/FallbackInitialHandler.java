@@ -40,7 +40,7 @@ public final class FallbackInitialHandler extends InitialHandler {
     super(bungee, listener);
   }
 
-  private static final @NotNull Fallback fallback = Objects.requireNonNull(Sonar.get().getFallback());
+  private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
   private ChannelWrapper channelWrapper;
   @SuppressWarnings("unused") // TODO: remove later
   private @Nullable FallbackPlayerWrapper player;
@@ -55,11 +55,11 @@ public final class FallbackInitialHandler extends InitialHandler {
   public void handle(final LoginRequest loginRequest) throws Exception {
     final InetAddress inetAddress = getAddress().getAddress();
 
-    if (player == null && !fallback.getSonar().getVerifiedPlayerController().has(inetAddress)) {
+    if (player == null && !FALLBACK.getSonar().getVerifiedPlayerController().has(inetAddress)) {
       final Channel channel = channelWrapper.getHandle();
 
       player = new FallbackPlayerWrapper(
-        fallback, channelWrapper, this,
+        FALLBACK, channelWrapper, this,
         channel, channel.pipeline(), inetAddress,
         ProtocolVersion.fromId(getHandshake().getProtocolVersion())
       );
