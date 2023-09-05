@@ -37,8 +37,8 @@ public final class VerboseCommand extends Subcommand {
     InvocationSender verboseSubscriber = invocation.getSender();
 
     // Support for '/sonar verbose [username]'
-    if (invocation.getArguments().length >= 2) {
-      final Optional<InvocationSender> optional = SONAR.getServer().getOnlinePlayer(invocation.getArguments()[1]);
+    if (invocation.getRawArguments().length >= 2) {
+      final Optional<InvocationSender> optional = SONAR.getServer().getOnlinePlayer(invocation.getRawArguments()[1]);
       if (optional.isPresent()) verboseSubscriber = optional.get();
     }
 

@@ -20,9 +20,9 @@ package xyz.jonesdev.sonar.common.command.impl;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
-import xyz.jonesdev.sonar.api.command.argument.Argument;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
+import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.Queue;
 import java.util.UUID;
@@ -43,15 +43,15 @@ public final class VerifiedCommand extends Subcommand {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    switch (invocation.getArguments()[1].toLowerCase()) {
+    switch (invocation.getRawArguments()[1].toLowerCase()) {
       case "history": {
-        if (invocation.getArguments().length <= 2) {
+        if (invocation.getRawArguments().length <= 2) {
           invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_COMMAND_USAGE
             .replace("%usage%", "verified history <IP address>"));
           return;
         }
 
-        final String inetAddress = invocation.getArguments()[2];
+        final String inetAddress = invocation.getRawArguments()[2];
 
         if (!IP_PATTERN.matcher(inetAddress).matches()) {
           invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_IP_ADDRESS);
@@ -75,13 +75,13 @@ public final class VerifiedCommand extends Subcommand {
       }
 
       case "remove": {
-        if (invocation.getArguments().length <= 2) {
+        if (invocation.getRawArguments().length <= 2) {
           invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_COMMAND_USAGE
             .replace("%usage%", "verified remove <IP address>"));
           return;
         }
 
-        final String inetAddress = invocation.getArguments()[2];
+        final String inetAddress = invocation.getRawArguments()[2];
 
         if (!IP_PATTERN.matcher(inetAddress).matches()) {
           invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_IP_ADDRESS);

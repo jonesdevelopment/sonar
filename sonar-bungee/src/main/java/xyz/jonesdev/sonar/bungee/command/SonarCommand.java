@@ -33,8 +33,8 @@ import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.api.command.argument.Argument;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
+import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -190,7 +190,7 @@ public final class SonarCommand extends Command implements TabExecutor {
 
       // The subcommands has arguments which are not present in the executed command
       if (sub.getInfo().arguments().length > 0
-        && commandInvocation.getArguments().length <= 1) {
+        && commandInvocation.getRawArguments().length <= 1) {
         invocationSender.sendMessage(
           Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
             .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")

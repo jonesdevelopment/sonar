@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.command.argument;
+package xyz.jonesdev.sonar.api.command.subcommand.argument;
 
 public @interface Argument {
 

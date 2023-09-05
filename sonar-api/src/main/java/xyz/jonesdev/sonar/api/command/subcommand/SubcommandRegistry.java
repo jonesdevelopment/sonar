@@ -20,13 +20,13 @@ package xyz.jonesdev.sonar.api.command.subcommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 public interface SubcommandRegistry {
-  List<Subcommand> SUBCOMMANDS = new ArrayList<>();
+  List<Subcommand> SUBCOMMANDS = new Vector<>();
 
   @NotNull
   @Unmodifiable

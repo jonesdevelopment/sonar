@@ -17,7 +17,7 @@
 
 package xyz.jonesdev.sonar.api.command.subcommand;
 
-import xyz.jonesdev.sonar.api.command.argument.Argument;
+import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

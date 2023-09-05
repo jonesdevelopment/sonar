@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.api.command.argument.Argument;
+import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;

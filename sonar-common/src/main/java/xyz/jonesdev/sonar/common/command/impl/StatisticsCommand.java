@@ -19,9 +19,9 @@ package xyz.jonesdev.sonar.common.command.impl;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
-import xyz.jonesdev.sonar.api.command.argument.Argument;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
+import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
@@ -43,8 +43,8 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    final String showing = invocation.getArguments().length >= 2
-      ? invocation.getArguments()[1].toLowerCase() : "bot";
+    final String showing = invocation.getRawArguments().length >= 2
+      ? invocation.getRawArguments()[1].toLowerCase() : "bot";
 
     invocation.getSender().sendMessage("§eShowing " + showing + " statistics for this session:");
     invocation.getSender().sendMessage("§ePlease note that session statistics are not saved when the server restarts.");

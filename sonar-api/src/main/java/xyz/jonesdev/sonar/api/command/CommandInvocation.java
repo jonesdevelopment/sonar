@@ -26,5 +26,5 @@ import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 public final class CommandInvocation {
   private final InvocationSender sender;
   private final Subcommand command;
-  private final String[] arguments;
+  private final String[] rawArguments;
 }
