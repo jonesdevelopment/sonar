@@ -44,10 +44,10 @@ public final class SonarCommand implements SimpleCommand {
   private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
   private static final ExpiringCache<CommandSource> DELAY = Cappuccino.buildExpiring(500L);
 
-  private static final List<Component> HELP = new Vector<>();
+  private static final List<Component> HELP;
 
   static {
-    HELP.addAll(Arrays.asList(
+    HELP = Arrays.asList(
       Component.text("Running Sonar " + Sonar.get().getVersion()
         + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
         + ".", NamedTextColor.YELLOW),
@@ -66,7 +66,7 @@ public final class SonarCommand implements SimpleCommand {
             "/issues"))
       ),
       Component.empty()
-    ));
+    );
 
     Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
       var component = Component.textOfChildren(
