@@ -15,18 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.verbose;
+package xyz.jonesdev.sonar.velocity.verbose;
 
-import lombok.experimental.UtilityClass;
-import xyz.jonesdev.sonar.api.Sonar;
+import com.velocitypowered.api.proxy.ProxyServer;
+import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
+import xyz.jonesdev.sonar.api.verbose.Verbose;
 
-@UtilityClass
-public class VerboseAnimation {
-  private int index;
+@RequiredArgsConstructor
+public final class VerboseWrapper extends Verbose {
+  private final ProxyServer server;
 
-  public String nextAnimation() {
-    return Sonar.get().getConfig().ANIMATION.toArray(new String[0])[
-      ++index % Sonar.get().getConfig().ANIMATION.size()
-      ];
+  @Override
+  public void broadcast(final String message) {
+    final Component component = Component.text(message);
+
+    synchronized (subscribers) {
+      for (final String subscriber : subscribers) {
+        server.getPlayer(subscriber).ifPresent(player -> {
+          player.sendActionBar(component);
+        });
+      }
+    }
   }
 }

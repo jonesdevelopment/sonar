@@ -15,27 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.timer;
+package xyz.jonesdev.sonar.api.verbose;
 
-import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import xyz.jonesdev.sonar.api.Sonar;
 
-@Getter
-public final class SystemTimer {
-  private long start = System.currentTimeMillis();
+@UtilityClass
+public class VerboseAnimation {
+  private int index;
 
-  public void reset() {
-    start = System.currentTimeMillis();
-  }
-
-  public long delay() {
-    return System.currentTimeMillis() - start;
-  }
-
-  public boolean elapsed(final long amount) {
-    return delay() >= amount;
-  }
-
-  public String formattedDelay() {
-    return String.format("%.3f", delay() / 1000D);
+  public String nextAnimation() {
+    return Sonar.get().getConfig().ANIMATION.toArray(new String[0])[
+      ++index % Sonar.get().getConfig().ANIMATION.size()
+      ];
   }
 }

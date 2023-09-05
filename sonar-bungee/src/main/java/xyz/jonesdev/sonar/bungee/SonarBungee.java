@@ -23,15 +23,15 @@ import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.Logger;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
-import xyz.jonesdev.sonar.bungee.verbose.ActionBarVerbose;
+import xyz.jonesdev.sonar.bungee.verbose.VerboseWrapper;
 import xyz.jonesdev.sonar.common.SonarBootstrap;
-import xyz.jonesdev.sonar.common.fallback.traffic.TrafficCounter;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +41,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   public static SonarBungee INSTANCE;
 
   public SonarBungee(final @NotNull SonarBungeePlugin plugin) {
-    super(plugin, plugin.getDataFolder(), new ActionBarVerbose(plugin.getServer()));
+    super(plugin, plugin.getDataFolder(), new VerboseWrapper(plugin.getServer()));
     INSTANCE = this;
   }
 

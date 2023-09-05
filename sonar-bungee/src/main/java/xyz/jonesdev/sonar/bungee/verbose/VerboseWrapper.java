@@ -15,26 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bukkit.verbose;
+package xyz.jonesdev.sonar.bungee.verbose;
 
 import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Server;
-import org.bukkit.entity.Player;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
 @RequiredArgsConstructor
-public final class ActionBarVerbose extends Verbose {
-  private final Server server;
+public final class VerboseWrapper extends Verbose {
+  private final ProxyServer server;
 
   public void broadcast(final String message) {
     final TextComponent component = new TextComponent(message);
 
     synchronized (subscribers) {
       for (final String subscriber : subscribers) {
-        final Player player = server.getPlayer(subscriber);
+        final ProxiedPlayer player = server.getPlayer(subscriber);
         if (player != null) {
-          //player.sendMessage(ChatMessageType.ACTION_BAR, component);
+          player.sendMessage(ChatMessageType.ACTION_BAR, component);
         }
       }
     }

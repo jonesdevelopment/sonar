@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.traffic;
+package xyz.jonesdev.sonar.api.fallback.traffic;
 
 import lombok.Getter;
 import lombok.Setter;
