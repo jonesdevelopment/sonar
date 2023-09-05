@@ -51,7 +51,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
   private final Fallback fallback;
   private final MinecraftConnection mcConnection;
   private final LoginInboundConnection inboundConnection;
-  private final VelocityServer server;
 
   private static final MethodHandle CONNECTED_PLAYER;
 
@@ -83,7 +82,6 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     this.fallback = fallback;
     this.mcConnection = mcConnection;
     this.inboundConnection = inboundConnection;
-    this.server = mcConnection.server;
 
     // Don't allow exceptions or disconnect messages
     mcConnection.setAssociation(null);
