@@ -62,10 +62,10 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
       "GitHub)").create()));
   }
 
-  private static final List<TextComponent> HELP;
+  private static final List<TextComponent> HELP = new Vector<>();
 
   static {
-    HELP = Arrays.asList(
+    HELP.addAll(Arrays.asList(
       new TextComponent(ChatColor.YELLOW + "Running Sonar " + Sonar.get().getVersion()
         + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
         + "."),
@@ -78,7 +78,7 @@ public final class SonarCommand implements CommandExecutor, TabExecutor {
         GITHUB_ISSUES
       ),
       new TextComponent("")
-    );
+    ));
 
     Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
       final TextComponent component = new TextComponent(
