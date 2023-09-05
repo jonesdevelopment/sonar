@@ -41,7 +41,6 @@ import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
-import xyz.jonesdev.sonar.common.geyser.GeyserValidator;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import xyz.jonesdev.sonar.velocity.fallback.dummy.DummyConnection;
 
@@ -54,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.proxy.network.Connections.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
+import static xyz.jonesdev.sonar.common.geyser.GeyserValidator.isGeyserConnection;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
@@ -146,7 +146,7 @@ public final class FallbackListener {
     if (fallback.getSonar().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
 
     // Completely skip Geyser connections (for now)
-    if (GeyserValidator.isGeyser(channel)) {
+    if (isGeyserConnection(channel)) {
       // TODO: Do we need to log this?
       fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
       return;
