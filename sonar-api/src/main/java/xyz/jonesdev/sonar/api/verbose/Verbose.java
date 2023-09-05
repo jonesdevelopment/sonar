@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.api.verbose;
 
 import lombok.Getter;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
@@ -35,7 +36,7 @@ public abstract class Verbose implements JVMProfiler {
   protected final @NotNull Collection<String> subscribers = new Vector<>(0);
   private final SystemTimer secondTimer = new SystemTimer();
   protected int joinsPerSecond, totalJoins;
-  private int lastTotalJoins;
+  private int lastTotalJoins, animationIndex;
 
   // Run action bar verbose
   public final void update() {
@@ -76,7 +77,13 @@ public abstract class Verbose implements JVMProfiler {
       .replace("%free-memory%", formatMemory(getFreeMemory()))
       .replace("%total-memory%", formatMemory(getTotalMemory()))
       .replace("%max-memory%", formatMemory(getMaxMemory()))
-      .replace("%animation%", VerboseAnimation.nextAnimation());
+      .replace("%animation%", nextAnimation());
+  }
+
+  protected final String nextAnimation() {
+    val animations = Sonar.get().getConfig().ANIMATION;
+    final int nextIndex = ++animationIndex % animations.size();
+    return animations.toArray(new String[0])[nextIndex];
   }
 
   // Run action bar verbose
