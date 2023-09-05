@@ -23,6 +23,7 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
+import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
 import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
@@ -105,6 +106,13 @@ public final class FallbackListener {
     }
   }
 
+  private static void markConnectionAsDead(final MinecraftSessionHandler sessionHandler) throws Throwable {
+    // The AuthSessionHandler isn't supposed to continue the connection process,
+    // which is why we override the field value for the MinecraftConnection with
+    // a fake connection.
+    CONNECTION_FIELD.set(sessionHandler, CLOSED_MINECRAFT_CONNECTION);
+  }
+
   @Subscribe(order = PostOrder.LAST)
   public void handle(final @NotNull PreLoginEvent event) throws Throwable {
     Statistics.TOTAL_TRAFFIC.increment();
@@ -121,13 +129,9 @@ public final class FallbackListener {
     // Hook the custom traffic pipeline, so we can count the incoming and outgoing traffic
     TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
 
-    // The AuthSessionHandler isn't supposed to continue the connection process,
-    // which is why we override the field value for the MinecraftConnection with
-    // a fake connection.
-    CONNECTION_FIELD.set(mcConnection.getSessionHandler(), CLOSED_MINECRAFT_CONNECTION);
-
     // Check the blacklist here since we cannot let the player "ghost join"
     if (fallback.getBlacklisted().has(inetAddress.toString())) {
+      markConnectionAsDead(mcConnection.getSessionHandler());
       initialConnection.getConnection().closeWith(Disconnect.create(
         BLACKLISTED,
         inboundConnection.getProtocolVersion()
@@ -149,6 +153,9 @@ public final class FallbackListener {
       fallback.getLogger().info("Allowing Geyser connection: " + inetAddress);
       return;
     }
+
+    // We now mark the connection as dead by using our dummy connection
+    markConnectionAsDead(mcConnection.getSessionHandler());
 
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
