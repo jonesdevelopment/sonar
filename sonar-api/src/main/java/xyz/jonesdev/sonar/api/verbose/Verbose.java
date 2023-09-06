@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import java.util.Collection;
 import java.util.Vector;
 
+import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.INCOMING;
 import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.OUTGOING;
 
@@ -56,19 +57,19 @@ public abstract class Verbose implements JVMProfiler {
     broadcast(prepareActionBarFormat());
   }
 
-  protected String prepareActionBarFormat() {
+  protected final @NotNull String prepareActionBarFormat() {
     return Sonar.get().getConfig().ACTION_BAR_LAYOUT
       .replace("%queued%",
-        Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-      .replace("%verifying%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
+        DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+      .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%",
-        Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
-      .replace("%total-joins%", Sonar.DECIMAL_FORMAT.format(totalJoins))
-      .replace("%per-second-joins%", Sonar.DECIMAL_FORMAT.format(joinsPerSecond))
-      .replace("%verify-total%", Sonar.DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
+        DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
+      .replace("%total-joins%", DECIMAL_FORMAT.format(totalJoins))
+      .replace("%per-second-joins%", DECIMAL_FORMAT.format(joinsPerSecond))
+      .replace("%verify-total%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
       .replace("%verify-success%",
-        Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
-      .replace("%verify-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
+        DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
+      .replace("%verify-failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
       .replace("%incoming-traffic%", INCOMING.getCachedSecond())
       .replace("%outgoing-traffic%", OUTGOING.getCachedSecond())
       .replace("%incoming-traffic-ttl%", INCOMING.getCachedTtl())
