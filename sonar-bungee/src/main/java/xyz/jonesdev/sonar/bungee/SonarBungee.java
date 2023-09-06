@@ -126,7 +126,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
       1L, 1L, TimeUnit.SECONDS);
 
     // Register action bar verbose task
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), getActionBarVerbose()::update,
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), getVerboseHandler()::update,
       100L, 100L, TimeUnit.MILLISECONDS);
 
     // Inject base into ProtocolUtils

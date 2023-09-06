@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public abstract class SonarBootstrap<T> implements Sonar {
   private T plugin;
-  private Verbose actionBarVerbose;
+  private Verbose verboseHandler;
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
   private File dataDirectory;
@@ -50,14 +50,14 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
   public SonarBootstrap(final @NotNull T plugin,
                         final File dataDirectory,
-                        final Verbose actionBarVerbose) {
+                        final Verbose verboseHandler) {
     // Set the API to this instance so the config doesn't have issues
     SonarSupplier.set(this);
 
     // Set the plugin instance before anything else
     this.plugin = plugin;
     this.dataDirectory = dataDirectory;
-    this.actionBarVerbose = actionBarVerbose;
+    this.verboseHandler = verboseHandler;
     this.config = new SonarConfiguration(dataDirectory);
     this.subcommandRegistry = new SubcommandRegistryHolder();
   }

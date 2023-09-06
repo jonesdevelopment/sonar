@@ -122,7 +122,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
       .schedule();
 
     // Register action bar verbose task
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), getActionBarVerbose()::update)
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), getVerboseHandler()::update)
       .repeat(100L, TimeUnit.MILLISECONDS)
       .schedule();
   }

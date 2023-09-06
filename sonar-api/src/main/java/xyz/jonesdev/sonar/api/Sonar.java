@@ -64,7 +64,7 @@ public interface Sonar {
 
   VerifiedPlayerController getVerifiedPlayerController();
 
-  @NotNull Verbose getActionBarVerbose();
+  @NotNull Verbose getVerboseHandler();
 
   @NotNull LoggerWrapper getLogger();
 

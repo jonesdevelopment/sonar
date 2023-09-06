@@ -120,7 +120,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
       20L, 20L);
 
     // Register action bar verbose task
-    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), getActionBarVerbose()::update,
+    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), getVerboseHandler()::update,
       2L, 2L);
   }
 
