@@ -22,7 +22,7 @@ package xyz.jonesdev.sonar.api.logger;
  * We wouldn't need to get the plugin logger every time we try to use it.
  * Additionally, we are also able to access this logger from {@link xyz.jonesdev.sonar.api.Sonar}.
  */
-public interface Logger {
+public interface LoggerWrapper {
   void info(final String message, final Object... args);
 
   void warn(final String message, final Object... args);

@@ -22,7 +22,7 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
-import xyz.jonesdev.sonar.api.logger.Logger;
+import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
@@ -66,7 +66,7 @@ public interface Sonar {
 
   @NotNull Verbose getActionBarVerbose();
 
-  @NotNull Logger getLogger();
+  @NotNull LoggerWrapper getLogger();
 
   /**
    * Reloads the entire plugin

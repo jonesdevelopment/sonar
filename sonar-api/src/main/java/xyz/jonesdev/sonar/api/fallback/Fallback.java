@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.logger.Logger;
+import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.net.InetAddress;
 import java.util.Map;
@@ -46,7 +46,7 @@ public final class Fallback {
   private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;
   private final @NotNull FallbackRatelimiter ratelimiter = FallbackRatelimiter.INSTANCE;
 
-  private final Logger logger = new Logger() {
+  private final LoggerWrapper logger = new LoggerWrapper() {
 
     @Override
     public void info(final String message, final Object... args) {

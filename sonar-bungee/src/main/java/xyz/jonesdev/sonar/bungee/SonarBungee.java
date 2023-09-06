@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
 import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
-import xyz.jonesdev.sonar.api.logger.Logger;
+import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
@@ -51,7 +51,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
    * <br>
    * We have to do this, so we can access all necessary API functions.
    */
-  private final Logger logger = new Logger() {
+  private final LoggerWrapper logger = new LoggerWrapper() {
 
     @Override
     public void info(final String message, final Object... args) {
