@@ -162,7 +162,7 @@ public final class SonarConfiguration {
 
     // General options
     generalConfig.getYaml().setComment("general.language",
-      "Suffix of the language file Sonar should use for messages"
+      "Name of the language file Sonar should use for messages"
     );
     LANGUAGE = generalConfig.getString("general.language", "en");
 
@@ -177,7 +177,7 @@ public final class SonarConfiguration {
     MINIMUM_PLAYERS_FOR_ATTACK = clamp(generalConfig.getInt("general.min-players-for-attack", 5), 2, 1024);
 
     generalConfig.getYaml().setComment("general.log-player-addresses",
-      "Should Sonar log player IP addresses in console?"
+      "Should Sonar log players' IP addresses in the console?"
     );
     LOG_PLAYER_ADDRESSES = generalConfig.getBoolean("general.log-player-addresses", true);
 
@@ -192,7 +192,7 @@ public final class SonarConfiguration {
     // Database
     generalConfig.getYaml().setComment("general.database.type",
       "Type of database Sonar uses to store verified players" + Sonar.LINE_SEPARATOR + "Possible types: NONE, MYSQL, " +
-        "MARIADB"
+        "MARIADB (experimental)"
     );
     DATABASE_TYPE =
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
@@ -239,12 +239,12 @@ public final class SonarConfiguration {
 
     // Lockdown
     generalConfig.getYaml().setComment("general.lockdown.enabled",
-      "Should Sonar prevent players from joining the server?"
+      "Should Sonar prevent all players from joining the server?"
     );
     LOCKDOWN_ENABLED = generalConfig.getBoolean("general.lockdown.enabled", false);
 
     generalConfig.getYaml().setComment("general.lockdown.log-attempts",
-      "Should Sonar should log login attempts during lockdown?"
+      "Should Sonar log new login attempts during lockdown?"
     );
     LOCKDOWN_LOG_ATTEMPTS = generalConfig.getBoolean("general.lockdown.log-attempts", true);
 
@@ -261,7 +261,7 @@ public final class SonarConfiguration {
 
     // Verification
     generalConfig.getYaml().setComment("general.verification.enabled",
-      "Should Sonar verify new players? (Recommended)"
+      "Should Sonar verify new/unknown players? (Recommended)"
     );
     ENABLE_VERIFICATION = generalConfig.getBoolean("general.verification.enabled", true);
 
@@ -276,17 +276,17 @@ public final class SonarConfiguration {
     CHECK_COLLISIONS = generalConfig.getBoolean("general.verification.check-collisions", true);
 
     generalConfig.getYaml().setComment("general.verification.gamemode",
-      "The gamemode of the player when verifying (0, 1, 2, or 3)"
+      "The gamemode of the player during verification (0, 1, 2, or 3)"
     );
     GAMEMODE_ID = (short) clamp(generalConfig.getInt("general.verification.gamemode", 3), 0, 3);
 
     generalConfig.getYaml().setComment("general.verification.log-connections",
-      "Should Sonar log new connections?"
+      "Should Sonar log new verification attempts?"
     );
     LOG_CONNECTIONS = generalConfig.getBoolean("general.verification.log-connections", true);
 
     generalConfig.getYaml().setComment("general.verification.log-during-attack",
-      "Should Sonar log new connections during an attack?"
+      "Should Sonar log new verification attempts during attacks?"
     );
     LOG_DURING_ATTACK = generalConfig.getBoolean("general.verification.log-during-attack", false);
 
