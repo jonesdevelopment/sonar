@@ -23,9 +23,13 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum SonarPlatform {
-  BUKKIT("Bukkit"),
-  BUNGEE("BungeeCord"),
-  VELOCITY("Velocity");
+  BUKKIT("Bukkit", 19110),
+  BUNGEE("BungeeCord", 19109),
+  VELOCITY("Velocity", 19107);
 
   private final String displayName;
+  /**
+   * bStats service ID for the respective Sonar platform
+   */
+  private final int metricsId;
 }

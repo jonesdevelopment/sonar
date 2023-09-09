@@ -106,7 +106,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     reload();
 
     // Initialize bStats.org metrics
-    new Metrics(getPlugin(), getServiceId());
+    new Metrics(getPlugin(), getServer().getPlatform().getMetricsId());
 
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new SonarCommand());

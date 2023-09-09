@@ -103,7 +103,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
   public void enable() {
 
     // Initialize bStats.org metrics
-    getPlugin().getMetricsFactory().make(getPlugin(), getServiceId());
+    getPlugin().getMetricsFactory().make(getPlugin(), getServer().getPlatform().getMetricsId());
 
     // Register Sonar command
     getPlugin().getServer().getCommandManager().register("sonar", new SonarCommand());

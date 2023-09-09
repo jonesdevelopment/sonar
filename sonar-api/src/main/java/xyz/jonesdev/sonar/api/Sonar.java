@@ -34,24 +34,6 @@ public interface Sonar {
   String LINE_SEPARATOR = "\n"; // Using Sonar.lineSeparator is broken, for some reason...
 
   /**
-   * @return bStats service ID for the respective Sonar platform
-   */
-  default int getServiceId() {
-    switch (getServer().getPlatform()) {
-      case BUKKIT: {
-        return 19110;
-      }
-      case BUNGEE: {
-        return 19109;
-      }
-      default:
-      case VELOCITY: {
-        return 19107;
-      }
-    }
-  }
-
-  /**
    * @return A small wrapper for the server
    */
   @NotNull ServerWrapper getServer();

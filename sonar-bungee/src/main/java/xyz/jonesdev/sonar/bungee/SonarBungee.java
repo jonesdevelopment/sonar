@@ -109,7 +109,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     reload();
 
     // Initialize bStats.org metrics
-    new Metrics(getPlugin(), getServiceId());
+    new Metrics(getPlugin(), getServer().getPlatform().getMetricsId());
 
     // Register Sonar command
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new SonarCommand());
