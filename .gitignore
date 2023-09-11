@@ -1,18 +1,27 @@
+# GitHub
 .github/
+HEADER
+LICENSE
+.*ignore
+.*config
+.*attributes
+
+# Editor configurations
 .idea/
 .gradle/
+vscode/
+.fleet/
+
+# Build directories
 target/
 out/
 gradle/
 build/
-vscode/
-.fleet/
-gradle*
-gradlew
-*.kts
+gradlew*
+
+# Uncommon files
 *.bat
 *.cmd
-*.sh
 *.jar
 *.class
 *.iml
@@ -23,7 +32,4 @@ gradlew
 *.log
 *.yml
 *.svg
-HEADER
-LICENSE
-.*ignore
-.*config
+*.txt
