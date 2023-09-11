@@ -1,6 +1,8 @@
 .github/
 .idea/
 .gradle/
+target/
+out/
 gradle/
 build/
 vscode/
@@ -21,7 +23,7 @@ gradlew
 *.log
 *.yml
 *.svg
-.*config
 HEADER
 LICENSE
 .*ignore
+.*config
