@@ -38,17 +38,20 @@ public interface Sonar {
    */
   @NotNull ServerWrapper getServer();
 
+  /**
+   * @return A small wrapper for the plugin logger so we can use the logger everywhere
+   */
+  @NotNull LoggerWrapper getLogger();
+
+  @NotNull File getDataDirectory();
+
   @NotNull SonarConfiguration getConfig();
 
   @NotNull SubcommandRegistry getSubcommandRegistry();
 
-  @NotNull File getDataDirectory();
-
   VerifiedPlayerController getVerifiedPlayerController();
 
   @NotNull Verbose getVerboseHandler();
-
-  @NotNull LoggerWrapper getLogger();
 
   /**
    * Reloads the entire plugin
