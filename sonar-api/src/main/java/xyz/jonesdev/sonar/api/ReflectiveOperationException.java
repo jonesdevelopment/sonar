@@ -20,6 +20,8 @@ package xyz.jonesdev.sonar.api;
 public final class ReflectiveOperationException extends RuntimeException {
   public ReflectiveOperationException(final Throwable throwable) {
     super(throwable);
-    throwable.printStackTrace();
+
+    Sonar.get().getLogger().error("A reflective operation resulted in error:");
+    throwable.printStackTrace(System.err);
   }
 }
