@@ -1,7 +1,7 @@
 <div align="center">
   <!-- Introduction -->
   <p>
-    <h1>Sonar</h1>
+    <h1>💫 Sonar</h1>
     Lightweight and easy-to-use anti-bot plugin for your Minecraft server. Supporting every client and server version.
     <br>
     An effective and extensible solution for protecting your Minecraft server against all kinds of bot attacks
