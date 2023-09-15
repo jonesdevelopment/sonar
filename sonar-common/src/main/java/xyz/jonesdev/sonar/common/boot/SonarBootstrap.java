@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common;
+package xyz.jonesdev.sonar.common.boot;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

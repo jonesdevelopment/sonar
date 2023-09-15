@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.protocol;
+package xyz.jonesdev.sonar.common.util.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -32,9 +32,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
-import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.readVarInt;
-import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
 
 // Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
@@ -62,7 +59,7 @@ public class ProtocolUtil {
   public static @NotNull String readString(final ByteBuf buf,
                                            final int cap,
                                            final boolean legacy) throws CorruptedFrameException {
-    final int length = readVarInt(buf);
+    final int length = VarIntUtil.readVarInt(buf);
 
     checkFrame(length >= 0, "Got a negative-length string");
     checkFrame(length <= cap * 3, "Bad string size");
@@ -82,7 +79,7 @@ public class ProtocolUtil {
 
   public static void writeString(final ByteBuf buf, final CharSequence str) {
     final int size = ByteBufUtil.utf8Bytes(str);
-    writeVarInt(buf, size);
+    VarIntUtil.writeVarInt(buf, size);
     buf.writeCharSequence(str, StandardCharsets.UTF_8);
   }
 
@@ -100,12 +97,12 @@ public class ProtocolUtil {
 
   public static void writeArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
     checkFrame(bytes.length < Short.MAX_VALUE, "Too long array");
-    writeVarInt(byteBuf, bytes.length);
+    VarIntUtil.writeVarInt(byteBuf, bytes.length);
     byteBuf.writeBytes(bytes);
   }
 
   public static void writeStringArray(final ByteBuf byteBuf, final String @NotNull [] stringArray) {
-    writeVarInt(byteBuf, stringArray.length);
+    VarIntUtil.writeVarInt(byteBuf, stringArray.length);
     for (final String s : stringArray) {
       writeString(byteBuf, s);
     }

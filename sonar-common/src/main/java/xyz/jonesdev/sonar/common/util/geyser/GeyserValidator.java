@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.geyser;
+package xyz.jonesdev.sonar.common.util.geyser;
 
 import io.netty.channel.Channel;
 import lombok.experimental.UtilityClass;

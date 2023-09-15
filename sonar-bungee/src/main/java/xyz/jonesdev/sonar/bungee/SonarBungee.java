@@ -31,7 +31,7 @@ import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
 import xyz.jonesdev.sonar.bungee.verbose.VerboseWrapper;
-import xyz.jonesdev.sonar.common.SonarBootstrap;
+import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;

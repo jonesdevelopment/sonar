@@ -22,7 +22,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
-import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.writeVarInt;
 
 public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPacket> {
   private final ProtocolVersion protocolVersion;

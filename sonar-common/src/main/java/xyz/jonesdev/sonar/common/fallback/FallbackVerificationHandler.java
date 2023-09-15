@@ -30,7 +30,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
-import xyz.jonesdev.sonar.common.protocol.ProtocolUtil;
+import xyz.jonesdev.sonar.common.util.protocol.ProtocolUtil;
 
 import java.util.Random;
 import java.util.UUID;

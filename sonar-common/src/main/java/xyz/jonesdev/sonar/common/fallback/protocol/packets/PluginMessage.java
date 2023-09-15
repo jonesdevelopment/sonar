@@ -26,7 +26,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.netty.DeferredByteBufHolder;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.common.protocol.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.util.protocol.ProtocolUtil.*;
 
 // Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/PluginMessage.java

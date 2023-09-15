@@ -29,7 +29,7 @@ import java.util.zip.DataFormatException;
 
 import static com.velocitypowered.natives.util.MoreByteBufUtils.ensureCompatible;
 import static com.velocitypowered.natives.util.MoreByteBufUtils.preferredBuffer;
-import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.*;
+import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.*;
 
 @Getter
 @AllArgsConstructor

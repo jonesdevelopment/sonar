@@ -28,8 +28,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_16_2;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20;
-import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarInt;
-import static xyz.jonesdev.sonar.common.protocol.VarIntUtil.writeVarLong;
+import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.writeVarLong;
 
 @Getter
 @ToString
