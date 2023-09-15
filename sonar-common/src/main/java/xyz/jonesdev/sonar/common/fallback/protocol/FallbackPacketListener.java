@@ -17,6 +17,8 @@
 
 package xyz.jonesdev.sonar.common.fallback.protocol;
 
+import org.jetbrains.annotations.NotNull;
+
 @FunctionalInterface
 public interface FallbackPacketListener {
 
@@ -25,5 +27,5 @@ public interface FallbackPacketListener {
    *
    * @param packet Packet to handle
    */
-  void handle(final FallbackPacket packet);
+  void handle(final @NotNull FallbackPacket packet);
 }

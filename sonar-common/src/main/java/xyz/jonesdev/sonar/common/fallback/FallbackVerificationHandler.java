@@ -46,7 +46,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private final UUID uuid;
   private final short transactionId;
   private final long verifyKeepAliveId;
-  private int movementTick, packets;
+  private int movementTick, receivedPackets;
   private double lastX, lastY, lastZ;
   @Setter
   private State state;
@@ -155,11 +155,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   @Override
-  public void handle(final FallbackPacket packet) {
+  public void handle(final @NotNull FallbackPacket packet) {
     // Check if the player is not sending a ton of packets to the server
     final int maxPackets = player.getFallback().getSonar().getConfig().MAXIMUM_LOGIN_PACKETS
       + player.getFallback().getSonar().getConfig().MAXIMUM_MOVEMENT_TICKS;
-    checkFrame(++packets < maxPackets, "too many packets");
+    checkFrame(++receivedPackets < maxPackets, "too many packets");
 
     // Check for timeout since the player could be sending packets but not important ones
     final long timeout = player.getFallback().getSonar().getConfig().VERIFICATION_TIMEOUT;
@@ -170,6 +170,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof KeepAlive) {
+      // Check if we are currently expecting a KeepAlive packet
       assertState(State.KEEP_ALIVE);
 
       final KeepAlive keepAlive = (KeepAlive) packet;
@@ -217,6 +218,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof Transaction) {
+      // Check if we are currently expecting a Transaction packet
       assertState(State.TRANSACTION);
 
       final Transaction transaction = (Transaction) packet;
@@ -249,7 +251,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof TeleportConfirm) {
-      // Check if the player sent the TeleportConfirm packet twice
+      // Check if we are currently expecting a TeleportConfirm packet
       assertState(State.TELEPORT);
 
       final TeleportConfirm teleportConfirm = (TeleportConfirm) packet;
@@ -262,6 +264,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       sendChunkData();
     }
 
+    // Only handle positions if the player can send position packets.
     if (state.canMove) {
       if (packet instanceof Position) {
         final Position position = (Position) packet;
