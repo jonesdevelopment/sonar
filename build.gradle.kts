@@ -45,7 +45,7 @@ subprojects {
 
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
     implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
-    implementation("xyz.jonesdev:cappuccino:0.1.5-SNAPSHOT") // expiring cache
+    implementation("xyz.jonesdev:cappuccino:0.1.6-SNAPSHOT") // expiring cache
   }
 }
 
