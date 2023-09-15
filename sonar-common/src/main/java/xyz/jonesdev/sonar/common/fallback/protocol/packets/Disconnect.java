@@ -28,8 +28,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import java.util.Objects;
 
-import static xyz.jonesdev.sonar.common.util.protocol.ProtocolUtil.readString;
-import static xyz.jonesdev.sonar.common.util.protocol.ProtocolUtil.writeString;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.readString;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
 
 @Getter
 @ToString

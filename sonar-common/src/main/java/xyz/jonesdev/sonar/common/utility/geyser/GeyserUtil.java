@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.util.geyser;
+package xyz.jonesdev.sonar.common.utility.geyser;
 
 import io.netty.channel.Channel;
 import lombok.experimental.UtilityClass;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  * Simple utility to determine if someone joins using GeyserMC
  */
 @UtilityClass
-public class GeyserValidator {
+public class GeyserUtil {
 
   /**
    * Checks if Geyser holds the parent channel of the player

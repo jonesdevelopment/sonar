@@ -28,8 +28,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.netty.FastUUID;
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.protocol.ProtocolUtil.*;
-import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @NoArgsConstructor

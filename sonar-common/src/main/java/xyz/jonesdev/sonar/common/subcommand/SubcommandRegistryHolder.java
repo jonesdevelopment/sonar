@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command;
+package xyz.jonesdev.sonar.common.subcommand;
 
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
-import xyz.jonesdev.sonar.common.command.impl.*;
+import xyz.jonesdev.sonar.common.subcommand.impl.*;
 
 public final class SubcommandRegistryHolder implements SubcommandRegistry {
   public SubcommandRegistryHolder() {

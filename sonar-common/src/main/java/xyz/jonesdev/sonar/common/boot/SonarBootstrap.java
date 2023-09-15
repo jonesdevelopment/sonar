@@ -30,8 +30,8 @@ import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.fallback.FallbackRatelimiter;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
-import xyz.jonesdev.sonar.common.command.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
+import xyz.jonesdev.sonar.common.subcommand.SubcommandRegistryHolder;
 
 import java.io.File;
 import java.net.InetAddress;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.command.impl;
+package xyz.jonesdev.sonar.common.subcommand.impl;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
@@ -23,21 +23,22 @@ import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
 @SubcommandInfo(
-  name = "lockdown",
-  description = "Lock the server down"
+  name = "reload",
+  description = "Reload the configuration"
 )
-public final class LockdownCommand extends Subcommand {
+public final class ReloadCommand extends Subcommand {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    SONAR.getConfig().LOCKDOWN_ENABLED = !SONAR.getConfig().LOCKDOWN_ENABLED;
-    SONAR.getConfig().getGeneralConfig().set("general.lockdown.enabled", SONAR.getConfig().LOCKDOWN_ENABLED);
-    SONAR.getConfig().getGeneralConfig().save();
+    final long startTime = System.currentTimeMillis();
 
+    invocation.getSender().sendMessage(SONAR.getConfig().RELOADING);
+    SONAR.reload();
+
+    final long timeTaken = System.currentTimeMillis() - startTime;
     invocation.getSender().sendMessage(
-      SONAR.getConfig().LOCKDOWN_ENABLED
-        ? SONAR.getConfig().LOCKDOWN_ACTIVATED
-        : SONAR.getConfig().LOCKDOWN_DEACTIVATED
+      SONAR.getConfig().RELOADED
+        .replace("%taken%", String.valueOf(timeTaken))
     );
   }
 }

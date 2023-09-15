@@ -29,7 +29,7 @@ import java.util.List;
 
 import static com.velocitypowered.natives.util.MoreByteBufUtils.ensureCompatible;
 import static com.velocitypowered.natives.util.MoreByteBufUtils.preferredBuffer;
-import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.readVarInt;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 
 @Getter
 public final class FallbackPacketDecompressor extends PacketDecompressor {

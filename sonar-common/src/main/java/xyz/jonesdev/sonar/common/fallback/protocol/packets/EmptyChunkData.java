@@ -30,9 +30,9 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import java.util.BitSet;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.protocol.ProtocolUtil.writeArray;
-import static xyz.jonesdev.sonar.common.util.protocol.ProtocolUtil.writeCompoundTag;
-import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeArray;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeCompoundTag;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 // Partially taken from
 // https://github.com/Leymooo/BungeeCord/blob/master/protocol/src/main/java/ru/leymooo/botfilter/packets/EmptyChunkPacket.java

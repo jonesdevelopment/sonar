@@ -15,11 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.util.protocol;
+package xyz.jonesdev.sonar.common.utility.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
 @UtilityClass
 public class VarIntUtil {
@@ -36,7 +37,7 @@ public class VarIntUtil {
     return EXACT_BYTE_LENGTHS[Integer.numberOfLeadingZeros(value)];
   }
 
-  public static void write21BitVarInt(final ByteBuf byteBuf, final int value) {
+  public static void write21BitVarInt(final @NotNull ByteBuf byteBuf, final int value) {
     // See https://steinborn.me/posts/performance/how-fast-can-you-write-a-varint/
     int w = (value & 0x7F | 0x80) << 16 | ((value >>> 7) & 0x7F | 0x80) << 8 | (value >>> 14);
     byteBuf.writeMedium(w);
@@ -50,7 +51,7 @@ public class VarIntUtil {
     return read;
   }
 
-  public static int readVarIntSafely(final ByteBuf byteBuf) {
+  public static int readVarIntSafely(final @NotNull ByteBuf byteBuf) {
     int i = 0;
     int maxRead = Math.min(5, byteBuf.readableBytes());
     for (int j = 0; j < maxRead; j++) {

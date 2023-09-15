@@ -28,8 +28,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionInfo;
 import java.util.Objects;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.protocol.ProtocolUtil.*;
-import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 // Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/JoinGame.java

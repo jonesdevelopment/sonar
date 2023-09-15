@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.proxy.network.Connections.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
-import static xyz.jonesdev.sonar.common.util.geyser.GeyserValidator.isGeyserConnection;
+import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
 import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor

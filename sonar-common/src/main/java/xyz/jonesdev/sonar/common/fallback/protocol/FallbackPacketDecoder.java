@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 
-import static xyz.jonesdev.sonar.common.util.protocol.VarIntUtil.readVarInt;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
