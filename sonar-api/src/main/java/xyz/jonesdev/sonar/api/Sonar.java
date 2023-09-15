@@ -31,7 +31,7 @@ import java.text.DecimalFormat;
 
 public interface Sonar {
   DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
-  String LINE_SEPARATOR = "\n"; // Using Sonar.lineSeparator is broken, for some reason...
+  String LINE_SEPARATOR = "\n"; // Using System.lineSeparator is broken, for some reason...
 
   /**
    * @return A small wrapper for the server
