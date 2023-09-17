@@ -150,7 +150,7 @@ public class FallbackPreparer {
       );
     } catch (Throwable throwable) {
       Sonar.get().getLogger().error("Could not load mapping {}", fileName);
-      throwable.printStackTrace();
+      throwable.printStackTrace(System.err);
       return null;
     }
   }
