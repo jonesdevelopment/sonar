@@ -55,7 +55,7 @@ public final class SimpleYamlConfig {
     try {
       yaml.save();
     } catch (IOException exception) {
-      exception.printStackTrace();
+      exception.printStackTrace(System.err);
     }
   }
 
@@ -67,7 +67,7 @@ public final class SimpleYamlConfig {
       yaml.options().headerFormatter().commentPrefix("# ");
       yaml.setHeader(String.join(Sonar.LINE_SEPARATOR, HEADER));
     } catch (IOException exception) {
-      exception.printStackTrace();
+      exception.printStackTrace(System.err);
     }
   }
 

@@ -74,7 +74,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
         try {
           BASE.initChannel(channel);
         } catch (Exception exception) {
-          exception.printStackTrace();
+          exception.printStackTrace(System.err);
           channel.close();
           return;
         }
