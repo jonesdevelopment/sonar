@@ -93,21 +93,23 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    try {
+    DB_UPDATE_SERVICE.execute(() -> {
       Objects.requireNonNull(connectionSource);
 
-      final List<VerifiedPlayer> verifiedPlayer = queryBuilder.where()
-        .eq("ip_address", inetAddress)
-        .query();
+      try {
+        final List<VerifiedPlayer> verifiedPlayer = queryBuilder.where()
+          .eq("ip_address", inetAddress)
+          .query();
 
-      if (verifiedPlayer != null) {
-        for (final VerifiedPlayer player : verifiedPlayer) {
-          dao.delete(player);
+        if (verifiedPlayer != null) {
+          for (final VerifiedPlayer player : verifiedPlayer) {
+            dao.delete(player);
+          }
         }
+      } catch (SQLException exception) {
+        Sonar.get().getLogger().error("Error trying to remove entry: {}", exception);
       }
-    } catch (SQLException exception) {
-      Sonar.get().getLogger().error("Error trying to remove entry: {}", exception);
-    }
+    });
   }
 
   /**
