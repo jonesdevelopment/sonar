@@ -35,6 +35,7 @@ import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 @Getter
 public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
@@ -55,17 +56,17 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     @Override
     public void info(final String message, final Object... args) {
-      getPlugin().getLog4JLogger().info(message, args);
+      getPlugin().getLogger().log(Level.INFO, message, args);
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      getPlugin().getLog4JLogger().warn(message, args);
+      getPlugin().getLogger().log(Level.WARNING, message, args);
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      getPlugin().getLog4JLogger().error(message, args);
+      getPlugin().getLogger().log(Level.SEVERE, message, args);
     }
   };
 

@@ -43,7 +43,7 @@ public final class FallbackPacketDecompressor extends PacketDecompressor {
 
   public FallbackPacketDecompressor(final int compressionThreshold,
                                     final @NotNull VelocityCompressor compressor) {
-    super(compressionThreshold);
+    super(); // super(compressionThreshold);
     this.compressionThreshold = compressionThreshold;
     this.compressor = compressor;
   }

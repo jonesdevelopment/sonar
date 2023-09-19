@@ -8,7 +8,7 @@ dependencies {
     exclude(group = "org.checkerframework")
   }
 
-  compileOnly("io.papermc:waterfall-proxy:1.20-R0.1-SNAPSHOT")
+  compileOnly("net.md_5:bungeecord:1.20.2-rc2-SNAPSHOT")
 
   // Implement bStats.org for metrics
   implementation("org.bstats:bstats-bungeecord:3.0.2")
