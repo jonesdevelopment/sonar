@@ -38,11 +38,15 @@ public final class FallbackRatelimiter {
    * @return Whether the player is allowed to verify
    */
   public boolean attempt(final @NotNull InetAddress inetAddress) {
+    // Clean up the cache
     expiringCache.cleanUp(false);
-    if (expiringCache.has(inetAddress)) {
-      return false;
+
+    // Cache the IP address if it's not already cached
+    if (!expiringCache.has(inetAddress)) {
+      expiringCache.put(inetAddress);
+      return true;
     }
-    expiringCache.put(inetAddress);
-    return true;
+    // Deny the connection attempt
+    return false;
   }
 }
