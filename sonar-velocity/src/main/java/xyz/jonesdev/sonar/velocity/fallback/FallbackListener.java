@@ -178,8 +178,8 @@ public final class FallbackListener {
       return;
     }
 
-    // Check if the IP address is reconnecting too quickly while being unverified
-    if (fallback.getRatelimiter().shouldDeny(inetAddress)) {
+    // Check if the IP address is currently being rate-limited
+    if (!fallback.getRatelimiter().attempt(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         TOO_FAST_RECONNECT,
         inboundConnection.getProtocolVersion()
