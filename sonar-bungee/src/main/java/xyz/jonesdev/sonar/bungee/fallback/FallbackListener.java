@@ -68,24 +68,24 @@ public final class FallbackListener implements Listener {
   @EventHandler
   @SuppressWarnings("deprecation")
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
-    if (fallback.getSonar().getConfig().LOCKDOWN_ENABLED) {
+    if (Sonar.get().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
         event.getPlayer().disconnect(LOCKDOWN_DISCONNECT);
 
-        if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
-          fallback.getSonar().getLogger().info(
-            fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
+        if (Sonar.get().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
+          Sonar.get().getLogger().info(
+            Sonar.get().getConfig().LOCKDOWN_CONSOLE_LOG
               .replace("%player%", event.getPlayer().getName())
-              .replace("%ip%", fallback.getSonar().getConfig()
+              .replace("%ip%", Sonar.get().getConfig()
                 .formatAddress(event.getPlayer().getAddress().getAddress()))
               .replace("%protocol%",
                 String.valueOf(event.getPlayer().getPendingConnection().getVersion()))
           );
         }
         return;
-      } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
+      } else if (Sonar.get().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
         event.getPlayer().sendMessage(
-          new TextComponent(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
+          new TextComponent(Sonar.get().getConfig().LOCKDOWN_NOTIFICATION)
         );
       }
     }

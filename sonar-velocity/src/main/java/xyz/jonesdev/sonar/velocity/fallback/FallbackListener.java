@@ -140,12 +140,12 @@ public final class FallbackListener {
     }
 
     // Don't continue the verification process if the verification is disabled
-    if (!fallback.getSonar().getConfig().ENABLE_VERIFICATION) return;
+    if (!Sonar.get().getConfig().ENABLE_VERIFICATION) return;
 
     // Check if the player is already verified.
     // No one wants to be verified over and over again.
     final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
-    if (fallback.getSonar().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
+    if (Sonar.get().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
 
     // Completely skip Geyser connections (for now)
     if (isGeyserConnection(channel)) {
@@ -170,7 +170,7 @@ public final class FallbackListener {
 
     // We cannot allow too many players on our Fallback server
     // There's technically no reason for limiting this, but we'll better stay safe.
-    if (fallback.getConnected().size() > fallback.getSonar().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
+    if (fallback.getConnected().size() > Sonar.get().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
       initialConnection.getConnection().closeWith(Disconnect.create(
         TOO_MANY_PLAYERS,
         inboundConnection.getProtocolVersion()
@@ -214,7 +214,7 @@ public final class FallbackListener {
 
         // Check if the username matches the valid name regex in order to prevent
         // UTF-16 names or other types of flood attacks
-        if (!fallback.getSonar().getConfig().VALID_NAME_REGEX
+        if (!Sonar.get().getConfig().VALID_NAME_REGEX
           .matcher(event.getUsername()).matches()) {
           mcConnection.closeWith(Disconnect.create(INVALID_USERNAME, mcConnection.getProtocolVersion()));
           return;
@@ -226,7 +226,7 @@ public final class FallbackListener {
           READ_TIMEOUT,
           READ_TIMEOUT,
           new FallbackTimeoutHandler(
-            fallback.getSonar().getConfig().VERIFICATION_READ_TIMEOUT,
+            Sonar.get().getConfig().VERIFICATION_READ_TIMEOUT,
             TimeUnit.MILLISECONDS
           )
         );
@@ -250,26 +250,26 @@ public final class FallbackListener {
   public void handle(final @NotNull LoginEvent event) {
     val connectedPlayer = (ConnectedPlayer) event.getPlayer();
 
-    if (fallback.getSonar().getConfig().LOCKDOWN_ENABLED) {
+    if (Sonar.get().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
           LOCKDOWN_DISCONNECT, connectedPlayer.getProtocolVersion()
         ));
 
-        if (fallback.getSonar().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
-          fallback.getSonar().getLogger().info(
-            fallback.getSonar().getConfig().LOCKDOWN_CONSOLE_LOG
+        if (Sonar.get().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
+          Sonar.get().getLogger().info(
+            Sonar.get().getConfig().LOCKDOWN_CONSOLE_LOG
               .replace("%player%", event.getPlayer().getUsername())
-              .replace("%ip%", fallback.getSonar().getConfig()
+              .replace("%ip%", Sonar.get().getConfig()
                 .formatAddress(event.getPlayer().getRemoteAddress().getAddress()))
               .replace("%protocol%",
                 String.valueOf(event.getPlayer().getProtocolVersion().getProtocol()))
           );
         }
         return;
-      } else if (fallback.getSonar().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
+      } else if (Sonar.get().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
         event.getPlayer().sendMessage(
-          Component.text(fallback.getSonar().getConfig().LOCKDOWN_NOTIFICATION)
+          Component.text(Sonar.get().getConfig().LOCKDOWN_NOTIFICATION)
         );
       }
     }
@@ -278,7 +278,7 @@ public final class FallbackListener {
 
     // Check if the number of online players using the same IP address as
     // the connecting player is greater than the configured amount
-    final int maxOnlinePerIp = fallback.getSonar().getConfig().MAXIMUM_ONLINE_PER_IP;
+    final int maxOnlinePerIp = Sonar.get().getConfig().MAXIMUM_ONLINE_PER_IP;
 
     if (maxOnlinePerIp > 0) {
       final long onlinePerIp = SonarVelocity.INSTANCE.getPlugin().getServer().getAllPlayers().stream()

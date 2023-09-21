@@ -55,7 +55,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   public void handle(final LoginRequest loginRequest) throws Exception {
     final InetAddress inetAddress = getAddress().getAddress();
 
-    if (player == null && !FALLBACK.getSonar().getVerifiedPlayerController().has(inetAddress)) {
+    if (player == null && !Sonar.get().getVerifiedPlayerController().has(inetAddress)) {
       final Channel channel = channelWrapper.getHandle();
 
       player = new FallbackPlayerWrapper(

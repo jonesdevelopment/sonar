@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Fallback {
   public static final Fallback INSTANCE = new Fallback();
-  private final @NotNull Sonar sonar = Objects.requireNonNull(Sonar.get());
+  private static final @NotNull Sonar SONAR = Objects.requireNonNull(Sonar.get());
 
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
   // Only block the player for a few minutes to avoid issues
@@ -50,22 +50,22 @@ public final class Fallback {
 
     @Override
     public void info(final String message, final Object... args) {
-      sonar.getLogger().info("[Fallback] " + message, args);
+      SONAR.getLogger().info("[Fallback] " + message, args);
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      sonar.getLogger().warn("[Fallback] " + message, args);
+      SONAR.getLogger().warn("[Fallback] " + message, args);
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      sonar.getLogger().error("[Fallback] " + message, args);
+      SONAR.getLogger().error("[Fallback] " + message, args);
     }
   };
 
   public boolean isPotentiallyUnderAttack() {
-    return connected.size() > sonar.getConfig().MINIMUM_PLAYERS_FOR_ATTACK
-      || queue.getQueuedPlayers().size() > sonar.getConfig().MINIMUM_PLAYERS_FOR_ATTACK;
+    return connected.size() > SONAR.getConfig().MINIMUM_PLAYERS_FOR_ATTACK
+      || queue.getQueuedPlayers().size() > SONAR.getConfig().MINIMUM_PLAYERS_FOR_ATTACK;
   }
 }

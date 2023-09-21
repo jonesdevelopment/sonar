@@ -28,6 +28,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
@@ -120,13 +121,13 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // The player joined the verification
     Statistics.REAL_TRAFFIC.increment();
 
-    if (fallback.getSonar().getConfig().LOG_CONNECTIONS) {
+    if (Sonar.get().getConfig().LOG_CONNECTIONS) {
       // Only log the processing message if the server isn't under attack.
       // We let the user override this through the configuration.
-      if (!fallback.isPotentiallyUnderAttack() || fallback.getSonar().getConfig().LOG_DURING_ATTACK) {
-        fallback.getLogger().info(fallback.getSonar().getConfig().VERIFICATION_CONNECT_LOG
+      if (!fallback.isPotentiallyUnderAttack() || Sonar.get().getConfig().LOG_DURING_ATTACK) {
+        fallback.getLogger().info(Sonar.get().getConfig().VERIFICATION_CONNECT_LOG
           .replace("%name%", connectedPlayer.getUsername())
-          .replace("%ip%", getFallback().getSonar().getConfig().formatAddress(fallbackPlayer.getInetAddress()))
+          .replace("%ip%", Sonar.get().getConfig().formatAddress(fallbackPlayer.getInetAddress()))
           .replace("%protocol%", String.valueOf(fallbackPlayer.getProtocolVersion().getProtocol())));
       }
     }

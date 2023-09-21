@@ -125,7 +125,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private static boolean validateClientLocale(final @NotNull FallbackPlayer<?, ?> player, final String locale) {
     // Check the client locale by performing a simple regex check on it
-    final Pattern pattern = player.getFallback().getSonar().getConfig().VALID_LOCALE_REGEX;
+    final Pattern pattern = Sonar.get().getConfig().VALID_LOCALE_REGEX;
     return pattern.matcher(locale).matches(); // Disallow non-ascii characters (by default)
   }
 
@@ -134,10 +134,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // the player instead of only disconnecting them due to an exception.
     try {
       // Regex pattern for validating client brands
-      final Pattern pattern = player.getFallback().getSonar().getConfig().VALID_BRAND_REGEX;
+      final Pattern pattern = Sonar.get().getConfig().VALID_BRAND_REGEX;
       // 1.7 has some very weird issues when trying to decode the client brand
       final boolean legacy = player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0;
-      final int cap = player.getFallback().getSonar().getConfig().MAXIMUM_BRAND_LENGTH;
+      final int cap = Sonar.get().getConfig().MAXIMUM_BRAND_LENGTH;
       // Read the client brand using our custom readString method that supports 1.7.
       // The legacy version of readString does not compare the string length
       // with the VarInt sent by the client.
@@ -157,12 +157,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     // Check if the player is not sending a ton of packets to the server
-    final int maxPackets = player.getFallback().getSonar().getConfig().MAXIMUM_LOGIN_PACKETS
-      + player.getFallback().getSonar().getConfig().MAXIMUM_MOVEMENT_TICKS;
+    final int maxPackets = Sonar.get().getConfig().MAXIMUM_LOGIN_PACKETS
+      + Sonar.get().getConfig().MAXIMUM_MOVEMENT_TICKS;
     checkFrame(++receivedPackets < maxPackets, "too many packets");
 
     // Check for timeout since the player could be sending packets but not important ones
-    final long timeout = player.getFallback().getSonar().getConfig().VERIFICATION_TIMEOUT;
+    final long timeout = Sonar.get().getConfig().VERIFICATION_TIMEOUT;
     // Check if the time limit has exceeded
     if (login.delay() > timeout) {
       player.getChannel().close();
@@ -229,7 +229,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(transaction.getId() == transactionId, "invalid transaction id");
 
       // Checking gravity is disabled, just finish verification
-      if (!player.getFallback().getSonar().getConfig().CHECK_GRAVITY) {
+      if (!Sonar.get().getConfig().CHECK_GRAVITY) {
         finish();
         return;
       }
@@ -309,7 +309,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Verify the player if they sent correct movement packets
       if (movementTick++ >= MAX_MOVEMENT_TICK) {
-        if (player.getFallback().getSonar().getConfig().CHECK_COLLISIONS) {
+        if (Sonar.get().getConfig().CHECK_COLLISIONS) {
           if (state != State.COLLISIONS) {
             // Set the state to COLLISIONS to avoid false positives
             // and go on with the flow of the verification.
@@ -367,13 +367,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(
       player.getInetAddress().toString(), uuid, login.getStart()
     );
-    player.getFallback().getSonar().getVerifiedPlayerController().add(verifiedPlayer);
+    Sonar.get().getVerifiedPlayerController().add(verifiedPlayer);
 
     // Disconnect player with the verification success message
     player.disconnect(Sonar.get().getConfig().VERIFICATION_SUCCESS);
 
     player.getFallback().getLogger().info(
-      player.getFallback().getSonar().getConfig().VERIFICATION_SUCCESSFUL_LOG
+      Sonar.get().getConfig().VERIFICATION_SUCCESSFUL_LOG
         .replace("%name%", username)
         .replace("%time%", login.formattedDelay())
     );
