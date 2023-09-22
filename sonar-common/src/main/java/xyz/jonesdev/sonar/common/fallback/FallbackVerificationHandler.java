@@ -169,10 +169,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof KeepAlive) {
+      final KeepAlive keepAlive = (KeepAlive) packet;
+
+      // 1.7-1.8.9 are sending a KeepAlive packet with the ID 0 every 20 ticks
+      if (keepAlive.getId() == 0 && player.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) return;
+
       // Check if we are currently expecting a KeepAlive packet
       assertState(State.KEEP_ALIVE);
-
-      final KeepAlive keepAlive = (KeepAlive) packet;
 
       checkFrame(keepAlive.getId() == verifyKeepAliveId, "invalid KeepAlive ID");
 
