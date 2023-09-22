@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.velocity.command;
 
-import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
@@ -26,32 +25,27 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuccino.Cappuccino;
-import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.SonarBaseCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
-public final class SonarCommand implements SimpleCommand {
-  private static final List<String> TAB_SUGGESTIONS = new ArrayList<>();
-  private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
-  private static final ExpiringCache<CommandSource> DELAY = Cappuccino.buildExpiring(500L);
-
-  private static final List<Component> HELP = new Vector<>();
-
+public final class SonarCommand implements SimpleCommand, SonarBaseCommand {
   static {
-    HELP.addAll(Arrays.asList(
+    CACHED_HELP_MESSAGE.addAll(Arrays.asList(
       Component.text("Running Sonar " + Sonar.get().getVersion()
         + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
         + ".", NamedTextColor.YELLOW),
-      Component.text("(C) 2023 Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
+      Component.text("(C) " + COPYRIGHT_YEAR + " Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
       Component.text("https://github.com/jonesdevelopment/sonar", NamedTextColor.GREEN)
         .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar")),
       Component.empty(),
@@ -86,7 +80,7 @@ public final class SonarCommand implements SimpleCommand {
             + Sonar.LINE_SEPARATOR + "§7Aliases: §f" + sub.getAliases()
         ))
       );
-      HELP.add(component);
+      CACHED_HELP_MESSAGE.add(component);
     });
   }
 
@@ -190,8 +184,8 @@ public final class SonarCommand implements SimpleCommand {
       // Re-use the old, cached help message since we don't want to scan
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
-      for (final Component component : HELP) {
-        invocation.source().sendMessage(component);
+      for (final Object component : CACHED_HELP_MESSAGE) {
+        invocation.source().sendMessage((Component) component);
       }
     }
   }

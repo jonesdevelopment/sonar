@@ -28,27 +28,24 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuccino.Cappuccino;
-import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.SonarBaseCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
-public final class SonarCommand extends Command implements TabExecutor {
+public final class SonarCommand extends Command implements TabExecutor, SonarBaseCommand {
   public SonarCommand() {
     super("sonar", "sonar.command");
   }
-
-  private static final List<String> TAB_SUGGESTIONS = new ArrayList<>();
-  private static final Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
-  private static final ExpiringCache<CommandSender> DELAY = Cappuccino.buildExpiring(500L);
 
   private static final TextComponent GITHUB_LINK_COMPONENT = new TextComponent(ChatColor.GREEN + "https://github" +
     ".com/jonesdevelopment/sonar");
@@ -69,14 +66,12 @@ public final class SonarCommand extends Command implements TabExecutor {
       "GitHub)").create()));
   }
 
-  private static final List<TextComponent> HELP = new Vector<>();
-
   static {
-    HELP.addAll(Arrays.asList(
+    CACHED_HELP_MESSAGE.addAll(Arrays.asList(
       new TextComponent(ChatColor.YELLOW + "Running Sonar " + Sonar.get().getVersion()
         + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
         + "."),
-      new TextComponent(ChatColor.YELLOW + "(C) 2023 Jones Development and Sonar Contributors"),
+      new TextComponent(ChatColor.YELLOW + "(C) " + COPYRIGHT_YEAR + " Jones Development and Sonar Contributors"),
       GITHUB_LINK_COMPONENT,
       new TextComponent(""),
       new TextComponent(ChatColor.YELLOW + "Need help or have any questions?"),
@@ -105,12 +100,12 @@ public final class SonarCommand extends Command implements TabExecutor {
             + Sonar.LINE_SEPARATOR + "§7Aliases: §f" + sub.getAliases()
         ).create())
       );
-      HELP.add(component);
+      CACHED_HELP_MESSAGE.add(component);
     });
   }
 
   @Override
-  @SuppressWarnings({"deprecation", "redundantSuppression"})
+  @SuppressWarnings({"redundantSuppression"})
   public void execute(final @NotNull CommandSender sender, final String[] args) {
     if (!(sender instanceof ConsoleCommandSender)) {
       // Checking if it contains will only break more since it can throw
@@ -207,8 +202,8 @@ public final class SonarCommand extends Command implements TabExecutor {
       // Re-use the old, cached help message since we don't want to scan
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
-      for (final TextComponent component : HELP) {
-        sender.sendMessage(component);
+      for (final Object component : CACHED_HELP_MESSAGE) {
+        sender.sendMessage((TextComponent) component);
       }
     }
   }
