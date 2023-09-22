@@ -41,7 +41,7 @@ public final class Transaction implements FallbackPacket {
       byteBuf.writeByte(windowId);
       byteBuf.writeShort((short) id);
       // The "accepted" field is actually really unnecessary since
-      // the client must accept the transaction either way.
+      // it's never even used in the client.
       byteBuf.writeBoolean(accepted);
     } else {
       byteBuf.writeInt(id);

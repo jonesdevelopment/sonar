@@ -38,14 +38,20 @@ public final class DefaultSpawnPosition implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    final long encoded = protocolVersion.compareTo(MINECRAFT_1_14) < 0
-      ? ((x & 0x3FFFFFFL) << 38) | ((y & 0xFFFL) << 26) | (z & 0x3FFFFFFL)
-      : ((x & 0x3FFFFFFL) << 38) | ((y & 0x3FFFFFFL) << 12) | (z & 0xFFFL);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.writeInt(x);
+      byteBuf.writeInt(y);
+      byteBuf.writeInt(z);
+    } else {
+      final long encoded = protocolVersion.compareTo(MINECRAFT_1_14) < 0
+        ? ((x & 0x3FFFFFFL) << 38) | ((y & 0xFFFL) << 26) | (z & 0x3FFFFFFL)
+        : ((x & 0x3FFFFFFL) << 38) | ((y & 0x3FFFFFFL) << 12) | (z & 0xFFFL);
 
-    byteBuf.writeLong(encoded);
+      byteBuf.writeLong(encoded);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
-      byteBuf.writeFloat(angle);
+      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
+        byteBuf.writeFloat(angle);
+      }
     }
   }
 
