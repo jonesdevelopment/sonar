@@ -59,14 +59,20 @@ public final class PositionLook implements FallbackPacket {
     byteBuf.writeDouble(z);
     byteBuf.writeFloat(yaw);
     byteBuf.writeFloat(pitch);
-    byteBuf.writeByte(0x00);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
-      writeVarInt(byteBuf, teleportId);
-    }
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+      byteBuf.writeBoolean(onGround);
+    } else {
+      byteBuf.writeByte(0x00);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0 && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
-      byteBuf.writeBoolean(true); // Dismount vehicle
+      if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
+        writeVarInt(byteBuf, teleportId);
+      }
+
+      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0
+        && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+        byteBuf.writeBoolean(true); // Always dismount vehicle
+      }
     }
   }
 
