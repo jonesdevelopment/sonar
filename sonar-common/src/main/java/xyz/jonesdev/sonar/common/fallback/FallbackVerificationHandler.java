@@ -305,40 +305,47 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // The onGround property can never be true when we aren't checking for collisions
     checkFrame(!ground || state == State.COLLISIONS, "invalid ground state");
 
-    // Verify the player if they sent correct movement packets
-    if (movementTick++ >= MAX_MOVEMENT_TICK) {
-      if (Sonar.get().getConfig().CHECK_COLLISIONS) {
-        if (state != State.COLLISIONS) {
-          // Set the state to COLLISIONS to avoid false positives
-          // and go on with the flow of the verification.
-          // Now we don't care about gravity anymore,
-          // we just want the player to collide with the blocks.
-          state = State.COLLISIONS;
-        } else {
-          // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-          final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
+    // Check if the chunk might be unloaded
+    if (deltaY > 0.07) {
+      // Verify the player if they sent correct movement packets
+      if (movementTick++ >= MAX_MOVEMENT_TICK) {
+        if (Sonar.get().getConfig().CHECK_COLLISIONS) {
+          if (state != State.COLLISIONS) {
+            // Set the state to COLLISIONS to avoid false positives
+            // and go on with the flow of the verification.
+            // Now we don't care about gravity anymore,
+            // we just want the player to collide with the blocks.
+            state = State.COLLISIONS;
+          } else {
+            // Calculate the difference between the player's Y coordinate and the expected Y coordinate
+            final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
 
-          // The offset cannot greater than 0 since the blocks will not let the player fall through them.
-          checkFrame(offsetY <= 0, "no collisions: " + offsetY);
+            // The offset cannot greater than 0 since the blocks will not let the player fall through them.
+            checkFrame(offsetY <= 0, "no collisions: " + offsetY);
 
-          // Check if the player is colliding by performing a basic Y offset check.
-          if (ground) {
-            // The player is colliding, finish verification
-            // TODO: Check for: velocity, entities/mounting, interactions
-            finish();
+            // Check if the player is colliding by performing a basic Y offset check.
+            if (ground) {
+              // The player is colliding, finish verification
+              // TODO: Check for: velocity, entities/mounting, interactions
+              finish();
+            }
           }
+        } else {
+          // Checking collisions is disabled, just finish verification
+          finish();
         }
-      } else {
-        // Checking collisions is disabled, just finish verification
-        finish();
-      }
-    } else if (y >= DEFAULT_Y_COLLIDE_POSITION && y <= DYNAMIC_SPAWN_Y_POSITION && deltaY > 0.09801) {
-      // This is a basic gravity check that predicts the next y position
-      final double predictedY = PREPARED_MOVEMENT_PACKETS[movementTick];
-      final double offsetY = Math.abs(deltaY - predictedY);
+      } else if (y <= DYNAMIC_SPAWN_Y_POSITION) {
+        // The player has to be above the platform when falling
+        checkFrame(y >= DEFAULT_Y_COLLIDE_POSITION, "fell too fast");
 
-      // Check if the y motion is roughly equal to the predicted value
-      checkFrame(offsetY < 0.01, "invalid offset: " + y + ", " + offsetY + ", " + deltaY);
+        // This is a basic gravity check that predicts the next y position
+        final double predictedY = PREPARED_MOVEMENT_PACKETS[movementTick];
+        final double offsetY = Math.abs(deltaY - predictedY);
+
+        // Check if the y motion is roughly equal to the predicted value
+        final String verbose = String.format("%d: %.7f %.10f %.10f!%.10f", movementTick, y, offsetY, deltaY, predictedY);
+        checkFrame(offsetY < 0.01, verbose);
+      }
     }
   }
 

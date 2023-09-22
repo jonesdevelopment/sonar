@@ -121,7 +121,12 @@ public final class EmptyChunkData implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
-      writeArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
+      if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+        writeArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
+      } else {
+        byteBuf.writeInt(0); // Compressed size.
+        byteBuf.writeBytes(new byte[2]); // 1.7
+      }
     } else if (protocolVersion.compareTo(MINECRAFT_1_15) < 0) {
       writeArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
     } else if (protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
