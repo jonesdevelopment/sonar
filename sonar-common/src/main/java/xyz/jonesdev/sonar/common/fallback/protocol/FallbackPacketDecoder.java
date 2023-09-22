@@ -71,7 +71,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
           }
 
           if (byteBuf.isReadable()) {
-            connection.fail("could not read packet to end");
+            connection.fail("could not read packet to end (" + byteBuf.readableBytes() + " bytes left)");
             throw new CorruptedFrameException("Could not read packet to end");
           }
 

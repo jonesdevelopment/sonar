@@ -98,10 +98,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to TRANSACTION to avoid false positives
     // and go on with the flow of the verification.
     state = State.TRANSACTION;
+    System.out.println("rofl?");
     // Send a transaction with a
-    player.write(new Transaction(
+    /*player.write(new Transaction(
       0, transactionId, false
-    ));
+    ));*/
   }
 
   private void sendJoinGamePacket() {
@@ -123,7 +124,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     player.write(UPDATE_SECTION_BLOCKS);
   }
 
-  private static boolean validateClientLocale(final @NotNull FallbackPlayer<?, ?> player, final String locale) {
+  private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackPlayer<?, ?> player,
+                                              final String locale) {
     // Check the client locale by performing a simple regex check on it
     final Pattern pattern = Sonar.get().getConfig().VALID_LOCALE_REGEX;
     return pattern.matcher(locale).matches(); // Disallow non-ascii characters (by default)
@@ -133,17 +135,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
     try {
-      // Regex pattern for validating client brands
-      final Pattern pattern = Sonar.get().getConfig().VALID_BRAND_REGEX;
       // 1.7 has some very weird issues when trying to decode the client brand
-      final boolean legacy = player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0;
-      final int cap = Sonar.get().getConfig().MAXIMUM_BRAND_LENGTH;
-      // Read the client brand using our custom readString method that supports 1.7.
-      // The legacy version of readString does not compare the string length
-      // with the VarInt sent by the client.
-      final String read = ProtocolUtil.readString(content, cap, legacy);
+      // TODO: fix this?
+      if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) return true;
       // No need to check for empty or too long client brands since
       // ProtocolUtil#readString already does exactly that.
+      final String read = ProtocolUtil.readString(content, Sonar.get().getConfig().MAXIMUM_BRAND_LENGTH);
+      // Regex pattern for validating client brands
+      final Pattern pattern = Sonar.get().getConfig().VALID_BRAND_REGEX;
       return !read.equals("Vanilla") // The normal brand is always lowercase
         && pattern.matcher(read).matches(); // Disallow non-ascii characters (by default)
     } catch (DecoderException exception) {

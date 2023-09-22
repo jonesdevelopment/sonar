@@ -41,6 +41,10 @@ public final class PositionLook implements FallbackPacket {
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     x = byteBuf.readDouble();
+    // https://github.com/jonesdevelopment/sonar/issues/20
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.skipBytes(8);
+    }
     y = byteBuf.readDouble();
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();
