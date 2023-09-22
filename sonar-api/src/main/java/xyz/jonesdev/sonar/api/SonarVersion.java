@@ -30,7 +30,13 @@ public final class SonarVersion {
     final String versionString = manifest.getImplementationVersion();
 
     if (versionString == null) {
-      throw new ModifiedManifestException("Could not read version string (Manifest missing?)");
+      this.full = "<could not retrieve version>";
+      this.semanticVersion = "<unknown>";
+      this.commitSHA = "<unknown>";
+      this.build = 0;
+      this.formatted = full;
+      Sonar.get().getLogger().error("Could not find version information (Is the manifest missing?)");
+      return;
     }
 
     this.full = versionString;
