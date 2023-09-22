@@ -1,3 +1,17 @@
+plugins {
+  id("net.minecrell.plugin-yml.bungee") version "0.5.3"
+}
+
+apply(plugin = "net.minecrell.plugin-yml.bungee")
+
+bungee {
+  name = rootProject.name
+  version = rootProject.version.toString()
+  main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
+  author = "Jones Development, Sonar Contributors"
+  description = "Effective Anti-bot plugin for Velocity, BungeeCord, and Bukkit (1.7-latest)"
+}
+
 dependencies {
   compileOnly(project(":api"))
   compileOnly(project(":common"))

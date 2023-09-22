@@ -1,5 +1,0 @@
-name: Sonar
-main: xyz.jonesdev.sonar.bungee.SonarBungeePlugin
-version: '2.0'
-author: 'Jones Development & Sonar Contributors'
-description: 'Effective Anti-bot plugin for Velocity, BungeeCord, and Bukkit (1.7-latest)'
