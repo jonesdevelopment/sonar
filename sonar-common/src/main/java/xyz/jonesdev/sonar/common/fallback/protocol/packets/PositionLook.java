@@ -69,4 +69,14 @@ public final class PositionLook implements FallbackPacket {
       byteBuf.writeBoolean(true); // Dismount vehicle
     }
   }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 41 : 33;
+  }
+
+  @Override
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 33;
+  }
 }

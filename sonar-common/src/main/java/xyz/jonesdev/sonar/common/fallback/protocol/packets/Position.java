@@ -49,4 +49,14 @@ public final class Position implements FallbackPacket {
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
   }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 33 : 25;
+  }
+
+  @Override
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 25;
+  }
 }
