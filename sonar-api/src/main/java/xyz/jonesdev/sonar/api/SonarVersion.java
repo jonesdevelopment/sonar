@@ -21,13 +21,17 @@ import lombok.Getter;
 
 @Getter
 public final class SonarVersion {
-  public static final SonarVersion GET = new SonarVersion();
+  static final SonarVersion GET = new SonarVersion();
   private final String semanticVersion, full, formatted, commitSHA;
   private final int build;
 
   SonarVersion() {
     final Package manifest = Sonar.class.getPackage();
     final String versionString = manifest.getImplementationVersion();
+
+    if (versionString == null) {
+      throw new ModifiedManifestException("Could not read version string (Manifest missing?)");
+    }
 
     this.full = versionString;
     this.semanticVersion = versionString.split("-")[0];
