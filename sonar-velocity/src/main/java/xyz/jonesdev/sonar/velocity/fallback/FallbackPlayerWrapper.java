@@ -22,6 +22,7 @@ import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -34,6 +35,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
 import java.net.InetAddress;
 
 @Getter
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public final class FallbackPlayerWrapper implements FallbackPlayer<ConnectedPlayer, MinecraftConnection> {
   private final Fallback fallback;
