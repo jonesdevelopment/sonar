@@ -1,7 +1,7 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
-  id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
+  id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
 }
 
 apply(plugin = "net.minecrell.plugin-yml.bukkit")
