@@ -98,11 +98,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to TRANSACTION to avoid false positives
     // and go on with the flow of the verification.
     state = State.TRANSACTION;
-    System.out.println("rofl?");
     // Send a transaction with a
-    /*player.write(new Transaction(
+    player.write(new Transaction(
       0, transactionId, false
-    ));*/
+    ));
   }
 
   private void sendJoinGamePacket() {
