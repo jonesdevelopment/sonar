@@ -26,8 +26,7 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_16_2;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarLong;
 
@@ -44,11 +43,22 @@ public final class UpdateSectionBlocks implements FallbackPacket {
     if (protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
       byteBuf.writeInt(sectionX);
       byteBuf.writeInt(sectionZ);
-      writeVarInt(byteBuf, changedBlocks.length);
 
-      for (final ChangedBlock block : changedBlocks) {
-        byteBuf.writeShort(block.getLegacyChunkPosCrammed());
-        writeVarInt(byteBuf, block.getType().getId(protocolVersion));
+      if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+        byteBuf.writeShort((short) changedBlocks.length);
+        byteBuf.writeInt(4 * changedBlocks.length);
+
+        for (final ChangedBlock block : changedBlocks) {
+          byteBuf.writeShort(block.getLegacyChunkPosCrammed());
+          byteBuf.writeShort(block.getType().getId(protocolVersion));
+        }
+      } else {
+        writeVarInt(byteBuf, changedBlocks.length);
+
+        for (final ChangedBlock block : changedBlocks) {
+          byteBuf.writeShort(block.getLegacyChunkPosCrammed());
+          writeVarInt(byteBuf, block.getType().getId(protocolVersion));
+        }
       }
     } else {
       final ChangedBlock lastChangedBlock = changedBlocks[changedBlocks.length - 1];
