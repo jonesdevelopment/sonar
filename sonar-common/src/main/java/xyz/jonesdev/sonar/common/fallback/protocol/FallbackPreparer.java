@@ -122,7 +122,7 @@ public class FallbackPreparer {
       8, DYNAMIC_SPAWN_Y_POSITION, 8,
       0f, 0f,
       RANDOM.nextInt(Short.MAX_VALUE),
-      true
+      false // 1.7 support
     );
 
     // Prepare collision platform positions
