@@ -334,10 +334,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           // Checking collisions is disabled, just finish verification
           finish();
         }
-      } else if (y <= DYNAMIC_SPAWN_Y_POSITION) {
-        // The player has to be above the platform when falling
-        checkFrame(y >= DEFAULT_Y_COLLIDE_POSITION, "fell too fast");
-
+      } else if (y <= DYNAMIC_SPAWN_Y_POSITION && y >= DEFAULT_Y_COLLIDE_POSITION) {
         // This is a basic gravity check that predicts the next y position
         final double predictedY = PREPARED_MOVEMENT_PACKETS[movementTick];
         final double offsetY = Math.abs(deltaY - predictedY);
