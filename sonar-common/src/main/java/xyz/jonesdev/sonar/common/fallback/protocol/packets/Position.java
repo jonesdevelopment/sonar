@@ -36,6 +36,10 @@ public final class Position implements FallbackPacket {
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     x = byteBuf.readDouble();
+    // https://github.com/jonesdevelopment/sonar/issues/20
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.skipBytes(8);
+    }
     y = byteBuf.readDouble();
     z = byteBuf.readDouble();
     onGround = byteBuf.readBoolean();
@@ -44,5 +48,15 @@ public final class Position implements FallbackPacket {
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 33 : 25;
+  }
+
+  @Override
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 25;
   }
 }

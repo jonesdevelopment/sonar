@@ -53,34 +53,21 @@ public class ProtocolUtil {
 
   public static @NotNull String readString(final ByteBuf buf,
                                            final int cap) throws CorruptedFrameException {
-    return readString(buf, cap, false);
-  }
-
-  public static @NotNull String readString(final ByteBuf buf,
-                                           final int cap,
-                                           final boolean legacy) throws CorruptedFrameException {
     final int length = VarIntUtil.readVarInt(buf);
 
     checkFrame(length >= 0, "Got a negative-length string");
     checkFrame(length <= cap * 3, "Bad string size");
-    String str;
-    if (legacy) {
-      // TODO: length checking?
-      str = buf.toString(StandardCharsets.UTF_8);
-      buf.skipBytes(buf.readableBytes());
-    } else {
-      checkFrame(buf.isReadable(length), "Got an invalid string length");
-      str = buf.toString(buf.readerIndex(), length, StandardCharsets.UTF_8);
-      buf.skipBytes(length);
-    }
+    checkFrame(buf.isReadable(length), "Got an invalid string length");
+    final String str = buf.toString(buf.readerIndex(), length, StandardCharsets.UTF_8);
+    buf.skipBytes(length);
     checkFrame(str.length() <= cap, "Got a too-long string");
     return str;
   }
 
-  public static void writeString(final ByteBuf buf, final CharSequence str) {
+  public static void writeString(final ByteBuf byteBuf, final CharSequence str) {
     final int size = ByteBufUtil.utf8Bytes(str);
-    VarIntUtil.writeVarInt(buf, size);
-    buf.writeCharSequence(str, StandardCharsets.UTF_8);
+    VarIntUtil.writeVarInt(byteBuf, size);
+    byteBuf.writeCharSequence(str, StandardCharsets.UTF_8);
   }
 
   public static void writeUUID(final @NotNull ByteBuf byteBuf, final @NotNull UUID uuid) {

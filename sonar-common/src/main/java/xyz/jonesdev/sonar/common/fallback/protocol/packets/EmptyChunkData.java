@@ -48,10 +48,20 @@ public final class EmptyChunkData implements FallbackPacket {
   private static final byte[] LEGACY_FILLER_BYTES = new byte[256];
   private static final byte[] MODERN_FILLER_BYTES = new byte[1024];
 
+  private static final long[] MASK;
+
   // Prepare nbt for 1.18 and pre-1.18
   private static final CompoundBinaryTag MODERN_TAG, LEGACY_TAG;
 
   static {
+    final BitSet bitSet = new BitSet();
+
+    for (int i = 0; i < 16; i++) {
+      bitSet.set(i, false);
+    }
+
+    MASK = bitSet.toLongArray();
+
     MODERN_TAG = prepareNBT(false);
     LEGACY_TAG = prepareNBT(true);
   }
@@ -73,32 +83,26 @@ public final class EmptyChunkData implements FallbackPacket {
     byteBuf.writeInt(x);
     byteBuf.writeInt(z);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      byteBuf.writeBoolean(true);
-    }
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) >= 0) {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17_1) <= 0) {
+        writeVarInt(byteBuf, MASK.length);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0 && protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
-      byteBuf.writeBoolean(true);
-    }
+        for (final long l : MASK) {
+          byteBuf.writeLong(l);
+        }
+      }
+    } else {
+      byteBuf.writeBoolean(true); // Full chunk
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_8) == 0) {
-        byteBuf.writeShort(1);
-      } else {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16) >= 0
+        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) < 0) {
+        byteBuf.writeBoolean(true); // Ignore old data
+      }
+
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) > 0) {
         writeVarInt(byteBuf, 0);
-      }
-    } else if (protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
-      final BitSet bitSet = new BitSet();
-
-      for (int i = 0; i < 16; i++) {
-        bitSet.set(i, false);
-      }
-
-      long[] mask = bitSet.toLongArray();
-      writeVarInt(byteBuf, mask.length);
-
-      for (long l : mask) {
-        byteBuf.writeLong(l);
+      } else {
+        byteBuf.writeShort(1); // Fix void chunk
       }
     }
 
@@ -121,7 +125,12 @@ public final class EmptyChunkData implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
-      writeArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
+      if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+        writeArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
+      } else {
+        byteBuf.writeInt(0); // Compressed size.
+        byteBuf.writeBytes(new byte[2]); // 1.7
+      }
     } else if (protocolVersion.compareTo(MINECRAFT_1_15) < 0) {
       writeArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
     } else if (protocolVersion.compareTo(MINECRAFT_1_18) < 0) {

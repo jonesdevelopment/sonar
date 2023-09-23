@@ -123,7 +123,7 @@ public enum FallbackPacketRegistry {
         map(0x20, MINECRAFT_1_19_3, true),
         map(0x24, MINECRAFT_1_19_4, true));
       clientbound.register(UpdateSectionBlocks.class, UpdateSectionBlocks::new,
-        map(34, MINECRAFT_1_7_2, true),
+        map(0x22, MINECRAFT_1_7_2, true),
         map(16, MINECRAFT_1_9, true),
         map(15, MINECRAFT_1_13, true),
         map(16, MINECRAFT_1_15, true),

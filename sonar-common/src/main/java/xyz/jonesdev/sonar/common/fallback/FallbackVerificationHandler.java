@@ -123,7 +123,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     player.write(UPDATE_SECTION_BLOCKS);
   }
 
-  private static boolean validateClientLocale(final @NotNull FallbackPlayer<?, ?> player, final String locale) {
+  private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackPlayer<?, ?> player,
+                                              final String locale) {
     // Check the client locale by performing a simple regex check on it
     final Pattern pattern = Sonar.get().getConfig().VALID_LOCALE_REGEX;
     return pattern.matcher(locale).matches(); // Disallow non-ascii characters (by default)
@@ -133,17 +134,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
     try {
-      // Regex pattern for validating client brands
-      final Pattern pattern = Sonar.get().getConfig().VALID_BRAND_REGEX;
       // 1.7 has some very weird issues when trying to decode the client brand
-      final boolean legacy = player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0;
-      final int cap = Sonar.get().getConfig().MAXIMUM_BRAND_LENGTH;
-      // Read the client brand using our custom readString method that supports 1.7.
-      // The legacy version of readString does not compare the string length
-      // with the VarInt sent by the client.
-      final String read = ProtocolUtil.readString(content, cap, legacy);
+      // TODO: fix this?
+      if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) return true;
       // No need to check for empty or too long client brands since
       // ProtocolUtil#readString already does exactly that.
+      final String read = ProtocolUtil.readString(content, Sonar.get().getConfig().MAXIMUM_BRAND_LENGTH);
+      // Regex pattern for validating client brands
+      final Pattern pattern = Sonar.get().getConfig().VALID_BRAND_REGEX;
       return !read.equals("Vanilla") // The normal brand is always lowercase
         && pattern.matcher(read).matches(); // Disallow non-ascii characters (by default)
     } catch (DecoderException exception) {
@@ -170,10 +168,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof KeepAlive) {
+      final KeepAlive keepAlive = (KeepAlive) packet;
+
+      // 1.7-1.8.9 are sending a KeepAlive packet with the ID 0 every 20 ticks
+      if (keepAlive.getId() == 0 && player.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) return;
+
       // Check if we are currently expecting a KeepAlive packet
       assertState(State.KEEP_ALIVE);
-
-      final KeepAlive keepAlive = (KeepAlive) packet;
 
       checkFrame(keepAlive.getId() == verifyKeepAliveId, "invalid KeepAlive ID");
 
@@ -304,9 +305,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // The onGround property can never be true when we aren't checking for collisions
     checkFrame(!ground || state == State.COLLISIONS, "invalid ground state");
 
-    // Skip teleports using this small check
+    // Check if the chunk might be unloaded
     if (deltaY > 0.07) {
-
       // Verify the player if they sent correct movement packets
       if (movementTick++ >= MAX_MOVEMENT_TICK) {
         if (Sonar.get().getConfig().CHECK_COLLISIONS) {
@@ -334,13 +334,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           // Checking collisions is disabled, just finish verification
           finish();
         }
-      } else if (y >= DEFAULT_Y_COLLIDE_POSITION && y <= DYNAMIC_SPAWN_Y_POSITION) {
+      } else if (y <= DYNAMIC_SPAWN_Y_POSITION && y >= DEFAULT_Y_COLLIDE_POSITION) {
         // This is a basic gravity check that predicts the next y position
         final double predictedY = PREPARED_MOVEMENT_PACKETS[movementTick];
         final double offsetY = Math.abs(deltaY - predictedY);
 
         // Check if the y motion is roughly equal to the predicted value
-        checkFrame(offsetY < 0.01, "invalid offset: " + y + ", " + offsetY);
+        final String verbose = String.format("%d: %.7f %.10f %.10f!%.10f", movementTick, y, offsetY, deltaY, predictedY);
+        checkFrame(offsetY < 0.01, verbose);
       }
     }
   }

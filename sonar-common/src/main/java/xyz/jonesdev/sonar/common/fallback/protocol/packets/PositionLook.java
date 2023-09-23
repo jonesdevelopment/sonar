@@ -41,6 +41,10 @@ public final class PositionLook implements FallbackPacket {
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     x = byteBuf.readDouble();
+    // https://github.com/jonesdevelopment/sonar/issues/20
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.skipBytes(8);
+    }
     y = byteBuf.readDouble();
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();
@@ -55,14 +59,30 @@ public final class PositionLook implements FallbackPacket {
     byteBuf.writeDouble(z);
     byteBuf.writeFloat(yaw);
     byteBuf.writeFloat(pitch);
-    byteBuf.writeByte(0x00);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
-      writeVarInt(byteBuf, teleportId);
-    }
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+      byteBuf.writeBoolean(onGround);
+    } else {
+      byteBuf.writeByte(0x00);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0 && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
-      byteBuf.writeBoolean(true); // Dismount vehicle
+      if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
+        writeVarInt(byteBuf, teleportId);
+      }
+
+      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0
+        && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+        byteBuf.writeBoolean(true); // Always dismount vehicle
+      }
     }
+  }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 41 : 33;
+  }
+
+  @Override
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 33;
   }
 }
