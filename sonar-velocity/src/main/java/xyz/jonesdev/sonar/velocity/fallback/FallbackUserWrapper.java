@@ -25,19 +25,21 @@ import io.netty.channel.ChannelPipeline;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
-import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
 
 import java.net.InetAddress;
 
 @Getter
+@ToString(of = {"protocolVersion"})
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public final class FallbackPlayerWrapper implements FallbackPlayer<ConnectedPlayer, MinecraftConnection> {
+public final class FallbackUserWrapper implements FallbackUser<ConnectedPlayer, MinecraftConnection> {
   private final Fallback fallback;
   private final ConnectedPlayer player;
   private final MinecraftConnection connection;

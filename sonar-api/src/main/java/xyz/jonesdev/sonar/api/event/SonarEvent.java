@@ -15,28 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.timer;
+package xyz.jonesdev.sonar.api.event;
 
-import lombok.Getter;
-
-@Getter
-public final class SystemTimer {
-  private long start = System.currentTimeMillis();
-
-  public void reset() {
-    start = System.currentTimeMillis();
-  }
-
-  public long delay() {
-    return System.currentTimeMillis() - start;
-  }
-
-  public boolean elapsed(final long amount) {
-    return delay() >= amount;
-  }
-
-  @Override
-  public String toString() {
-    return String.format("%.3f", delay() / 1000D);
-  }
+public interface SonarEvent {
 }

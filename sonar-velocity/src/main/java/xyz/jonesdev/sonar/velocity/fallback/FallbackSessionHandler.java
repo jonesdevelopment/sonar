@@ -29,6 +29,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
@@ -106,7 +107,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     }
 
     // Create an instance for the Fallback connection
-    final FallbackPlayerWrapper fallbackPlayer = new FallbackPlayerWrapper(
+    final FallbackUserWrapper fallbackPlayer = new FallbackUserWrapper(
       fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
       mcConnection.getChannel().pipeline(), inetAddress,
       ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
@@ -131,6 +132,9 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
           .replace("%protocol%", String.valueOf(fallbackPlayer.getProtocolVersion().getProtocol())));
       }
     }
+
+    // Call the VerifyJoinEvent for external API usage
+    Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(gameProfile.getName(), fallbackPlayer));
 
     // Mark the player as connected → verifying players
     fallback.getConnected().put(gameProfile.getName(), inetAddress);

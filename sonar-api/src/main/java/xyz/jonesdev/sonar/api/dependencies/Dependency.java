@@ -28,7 +28,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 // Mostly taken from
 // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/BaseLibrary.java
@@ -77,13 +78,12 @@ public enum Dependency {
 
       try (final InputStream inputStream = mvnRepoURL.openStream()) {
         Files.createDirectories(tempFilePath.getParent());
-        Files.copy(inputStream, Files.createFile(tempFilePath), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(inputStream, Files.createFile(tempFilePath), REPLACE_EXISTING);
       } catch (IOException exception) {
         throw new IllegalStateException(exception);
       }
 
-      Sonar.get().getLogger().info("Finished downloading {} ({}s)!",
-        tempFilePath.getFileName(), timer.formattedDelay());
+      Sonar.get().getLogger().info("Finished downloading {} ({}s)!", tempFilePath.getFileName(), timer);
     }
 
     return tempFilePath.toUri().toURL();

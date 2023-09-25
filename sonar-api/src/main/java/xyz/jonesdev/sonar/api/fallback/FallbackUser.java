@@ -24,13 +24,15 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.event.impl.UserBlacklistedEvent;
+import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
-public interface FallbackPlayer<X, Y> {
+public interface FallbackUser<X, Y> {
   @NotNull Fallback getFallback();
 
   @NotNull X getPlayer();
@@ -72,6 +74,9 @@ public interface FallbackPlayer<X, Y> {
    */
   default void fail(final @Nullable String reason) {
     if (getChannel().isActive()) {
+      // Call the VerifyFailedEvent for external API usage
+      Sonar.get().getEventManager().publish(new UserVerifyFailedEvent(this, reason));
+
       disconnect(Sonar.get().getConfig().VERIFICATION_FAILED);
 
       if (reason != null) {
@@ -89,6 +94,9 @@ public interface FallbackPlayer<X, Y> {
 
     // Check if the player has too many failed attempts
     if (PREVIOUS_FAILS.has(getInetAddress().toString())) {
+      // Call the BotBlacklistedEvent for external API usage
+      Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
+
       getFallback().getBlacklisted().put(getInetAddress().toString());
       getFallback().getLogger().info(Sonar.get().getConfig().VERIFICATION_BLACKLIST_LOG
         .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))

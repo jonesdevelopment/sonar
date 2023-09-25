@@ -26,7 +26,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
-import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
@@ -35,7 +35,7 @@ import java.net.InetAddress;
 
 @Getter
 @RequiredArgsConstructor
-public final class FallbackPlayerWrapper implements FallbackPlayer<ChannelWrapper, FallbackInitialHandler> {
+public final class FallbackUserWrapper implements FallbackUser<ChannelWrapper, FallbackInitialHandler> {
   private final Fallback fallback;
   private final ChannelWrapper player;
   private final FallbackInitialHandler connection;

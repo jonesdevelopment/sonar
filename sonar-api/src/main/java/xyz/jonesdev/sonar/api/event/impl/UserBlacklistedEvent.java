@@ -15,28 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.timer;
+package xyz.jonesdev.sonar.api.event.impl;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import org.jetbrains.annotations.ApiStatus;
+import xyz.jonesdev.sonar.api.event.SonarEvent;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 @Getter
-public final class SystemTimer {
-  private long start = System.currentTimeMillis();
-
-  public void reset() {
-    start = System.currentTimeMillis();
-  }
-
-  public long delay() {
-    return System.currentTimeMillis() - start;
-  }
-
-  public boolean elapsed(final long amount) {
-    return delay() >= amount;
-  }
-
-  @Override
-  public String toString() {
-    return String.format("%.3f", delay() / 1000D);
-  }
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public final class UserBlacklistedEvent implements SonarEvent {
+  @ApiStatus.Experimental
+  private final FallbackUser<?, ?> user;
 }

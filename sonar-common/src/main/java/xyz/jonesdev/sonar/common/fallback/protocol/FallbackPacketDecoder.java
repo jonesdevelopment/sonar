@@ -23,21 +23,21 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
-  private final FallbackPlayer<?, ?> connection;
+  private final FallbackUser<?, ?> user;
   private final FallbackPacketRegistry.ProtocolRegistry registry;
   private final FallbackPacketListener listener;
 
-  public FallbackPacketDecoder(final @NotNull FallbackPlayer<?, ?> connection,
+  public FallbackPacketDecoder(final @NotNull FallbackUser<?, ?> user,
                                final @NotNull FallbackPacketListener listener) {
-    this.connection = connection;
+    this.user = user;
     this.registry = FallbackPacketRegistry.SONAR.getProtocolRegistry(
-      FallbackPacketRegistry.Direction.SERVERBOUND, connection.getProtocolVersion()
+      FallbackPacketRegistry.Direction.SERVERBOUND, user.getProtocolVersion()
     );
     this.listener = listener;
   }
@@ -64,14 +64,14 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
           doLengthSanityChecks(byteBuf, packet);
 
           try {
-            packet.decode(byteBuf, connection.getProtocolVersion());
+            packet.decode(byteBuf, user.getProtocolVersion());
           } catch (Throwable throwable) {
-            connection.fail("could not decode packet");
+            user.fail("could not decode packet");
             throw new CorruptedFrameException("Failed to decode packet");
           }
 
           if (byteBuf.isReadable()) {
-            connection.fail("could not read packet to end (" + byteBuf.readableBytes() + " bytes left)");
+            user.fail("could not read packet to end (" + byteBuf.readableBytes() + " bytes left)");
             throw new CorruptedFrameException("Could not read packet to end");
           }
 
@@ -85,15 +85,15 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
   private void doLengthSanityChecks(final ByteBuf byteBuf,
                                     final @NotNull FallbackPacket packet) throws Exception {
-    final int expectedMaxLen = packet.expectedMaxLength(byteBuf, connection.getProtocolVersion());
+    final int expectedMaxLen = packet.expectedMaxLength(byteBuf, user.getProtocolVersion());
     if (expectedMaxLen != -1 && byteBuf.readableBytes() > expectedMaxLen) {
-      connection.fail("packet too large");
+      user.fail("packet too large");
       throw new CorruptedFrameException("Packet too large");
     }
 
-    final int expectedMinLen = packet.expectedMinLength(byteBuf, connection.getProtocolVersion());
+    final int expectedMinLen = packet.expectedMinLength(byteBuf, user.getProtocolVersion());
     if (byteBuf.readableBytes() < expectedMinLen) {
-      connection.fail("packet too small");
+      user.fail("packet too small");
       throw new CorruptedFrameException("Packet too small");
     }
   }
