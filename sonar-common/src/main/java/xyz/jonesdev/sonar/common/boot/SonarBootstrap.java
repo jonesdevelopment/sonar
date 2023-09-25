@@ -63,13 +63,13 @@ public abstract class SonarBootstrap<T> implements Sonar {
   }
 
   public final void initialize() {
-    getLogger().info("Successfully booted in {}s!", launchTimer.formattedDelay());
+    getLogger().info("Successfully booted in {}s!", launchTimer);
     getLogger().info("Initializing shared components...");
 
     // Reload configuration
     reload();
 
-    getLogger().info("Successfully initialized components in {}s!", launchTimer.formattedDelay());
+    getLogger().info("Successfully initialized components in {}s!", launchTimer);
     getLogger().info("Enabling all tasks and features...");
 
     try {
@@ -77,7 +77,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
       enable();
 
       // Done
-      getLogger().info("Done ({}s)!", launchTimer.formattedDelay());
+      getLogger().info("Done ({}s)!", launchTimer);
     } catch (Throwable throwable) {
       // An error has occurred
       getLogger().error("An error has occurred while launching Sonar: {}", throwable);

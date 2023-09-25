@@ -376,7 +376,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     player.getFallback().getLogger().info(
       Sonar.get().getConfig().VERIFICATION_SUCCESSFUL_LOG
         .replace("%name%", username)
-        .replace("%time%", login.formattedDelay())
+        .replace("%time%", login.toString())
     );
   }
 }

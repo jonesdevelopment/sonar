@@ -35,7 +35,8 @@ public final class SystemTimer {
     return delay() >= amount;
   }
 
-  public String formattedDelay() {
+  @Override
+  public String toString() {
     return String.format("%.3f", delay() / 1000D);
   }
 }
