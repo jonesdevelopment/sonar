@@ -162,7 +162,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Check for timeout since the player could be sending packets but not important ones
     final long timeout = Sonar.get().getConfig().VERIFICATION_TIMEOUT;
     // Check if the time limit has exceeded
-    if (login.delay() > timeout) {
+    if (login.elapsed(timeout)) {
       player.getChannel().close();
       return;
     }

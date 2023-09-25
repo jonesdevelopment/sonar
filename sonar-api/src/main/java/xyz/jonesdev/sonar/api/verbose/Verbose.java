@@ -47,7 +47,7 @@ public abstract class Verbose implements JVMProfiler {
     totalJoins = Statistics.TOTAL_TRAFFIC.get();
 
     // Statistically determine the joins per second without any caches
-    if (totalJoins > 0 && secondTimer.delay() >= 1000L) {
+    if (totalJoins > 0 && secondTimer.elapsed(1000L)) {
       secondTimer.reset();
       joinsPerSecond = totalJoins - lastTotalJoins;
       lastTotalJoins = totalJoins;
