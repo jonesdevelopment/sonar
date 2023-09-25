@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
@@ -369,6 +370,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       player.getInetAddress().toString(), uuid, login.getStart()
     );
     Sonar.get().getVerifiedPlayerController().add(verifiedPlayer);
+
+    // Call the VerifySuccessEvent for external API usage
+    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, uuid, player, login.delay()));
 
     // Disconnect player with the verification success message
     player.disconnect(Sonar.get().getConfig().VERIFICATION_SUCCESS);
