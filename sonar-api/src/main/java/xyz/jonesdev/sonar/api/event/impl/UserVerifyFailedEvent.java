@@ -22,13 +22,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 @Getter
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public final class UserVerifyFailedEvent implements SonarEvent {
-  private final FallbackPlayer<?, ?> fallbackPlayer;
+  private final FallbackUser<?, ?> user;
   private final String reason;
 }

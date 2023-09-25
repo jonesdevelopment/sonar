@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 @Getter
 @ToString
@@ -31,5 +31,5 @@ import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 @RequiredArgsConstructor
 public final class UserBlacklistedEvent implements SonarEvent {
   @ApiStatus.Experimental
-  private final FallbackPlayer<?, ?> fallbackPlayer;
+  private final FallbackUser<?, ?> user;
 }

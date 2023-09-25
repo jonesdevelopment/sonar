@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 @Getter
 @ToString
@@ -30,5 +30,5 @@ import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
 @RequiredArgsConstructor
 public final class UserVerifyJoinEvent implements SonarEvent {
   private final String username;
-  private final FallbackPlayer<?, ?> fallbackPlayer;
+  private final FallbackUser<?, ?> user;
 }

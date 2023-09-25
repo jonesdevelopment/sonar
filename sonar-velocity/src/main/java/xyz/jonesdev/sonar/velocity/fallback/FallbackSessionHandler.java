@@ -107,7 +107,7 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     }
 
     // Create an instance for the Fallback connection
-    final FallbackPlayerWrapper fallbackPlayer = new FallbackPlayerWrapper(
+    final FallbackUserWrapper fallbackPlayer = new FallbackUserWrapper(
       fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
       mcConnection.getChannel().pipeline(), inetAddress,
       ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())

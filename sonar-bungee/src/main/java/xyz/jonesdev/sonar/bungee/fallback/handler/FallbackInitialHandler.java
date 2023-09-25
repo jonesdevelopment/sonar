@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.bungee.fallback.FallbackPlayerWrapper;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackUserWrapper;
 
 import java.net.InetAddress;
 import java.util.Objects;
@@ -43,7 +43,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
   private ChannelWrapper channelWrapper;
   @SuppressWarnings("unused") // TODO: remove later
-  private @Nullable FallbackPlayerWrapper player;
+  private @Nullable FallbackUserWrapper player;
 
   @Override
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
@@ -58,7 +58,7 @@ public final class FallbackInitialHandler extends InitialHandler {
     if (player == null && !Sonar.get().getVerifiedPlayerController().has(inetAddress)) {
       final Channel channel = channelWrapper.getHandle();
 
-      player = new FallbackPlayerWrapper(
+      player = new FallbackUserWrapper(
         FALLBACK, channelWrapper, this,
         channel, channel.pipeline(), inetAddress,
         ProtocolVersion.fromId(getHandshake().getProtocolVersion())

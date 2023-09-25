@@ -25,7 +25,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackPlayer;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -42,7 +42,7 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener {
-  private final @NotNull FallbackPlayer<?, ?> player;
+  private final @NotNull FallbackUser<?, ?> user;
   private final String username;
   private final UUID uuid;
   private final short transactionId;
@@ -73,10 +73,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     private final boolean canMove;
   }
 
-  public FallbackVerificationHandler(final @NotNull FallbackPlayer<?, ?> player,
+  public FallbackVerificationHandler(final @NotNull FallbackUser<?, ?> user,
                                      final @NotNull String username,
                                      final @NotNull UUID uuid) {
-    this.player = player;
+    this.user = user;
     this.username = username;
     this.uuid = uuid;
     this.transactionId = (short) RANDOM.nextInt();
@@ -84,14 +84,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.state = State.KEEP_ALIVE;
 
     // Send LoginSuccess packet to make the client think they are joining the server
-    player.write(new ServerLoginSuccess(username, uuid));
+    user.write(new ServerLoginSuccess(username, uuid));
 
-    if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       // 1.7 players don't have KeepAlive packets in the login process
       sendJoinGamePacket();
     } else {
       // Send first KeepAlive to check if the connection is somewhat responsive
-      player.write(new KeepAlive(verifyKeepAliveId));
+      user.write(new KeepAlive(verifyKeepAliveId));
     }
   }
 
@@ -100,7 +100,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // and go on with the flow of the verification.
     state = State.TRANSACTION;
     // Send a transaction with a
-    player.write(new Transaction(
+    user.write(new Transaction(
       0, transactionId, false
     ));
   }
@@ -110,7 +110,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // and go on with the flow of the verification.
     state = State.CLIENT_SETTINGS;
     // Select the JoinGame packet for the respective protocol version
-    player.write(getJoinPacketForVersion(player.getProtocolVersion()));
+    user.write(getJoinPacketForVersion(user.getProtocolVersion()));
   }
 
   private void sendChunkData() {
@@ -118,26 +118,26 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // and go on with the flow of the verification.
     state = State.POSITION;
     // Teleport player into the fake lobby by sending an empty chunk
-    player.write(EMPTY_CHUNK_DATA);
+    user.write(EMPTY_CHUNK_DATA);
     // Send an UpdateSectionBlocks packet with a platform of blocks
     // to check if the player collides with the solid platform.
-    player.write(UPDATE_SECTION_BLOCKS);
+    user.write(UPDATE_SECTION_BLOCKS);
   }
 
-  private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackPlayer<?, ?> player,
+  private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
                                               final String locale) {
     // Check the client locale by performing a simple regex check on it
     final Pattern pattern = Sonar.get().getConfig().VALID_LOCALE_REGEX;
     return pattern.matcher(locale).matches(); // Disallow non-ascii characters (by default)
   }
 
-  private static boolean validateClientBrand(final @NotNull FallbackPlayer<?, ?> player, final ByteBuf content) {
+  private static boolean validateClientBrand(final @NotNull FallbackUser<?, ?> user, final ByteBuf content) {
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
     try {
       // 1.7 has some very weird issues when trying to decode the client brand
       // TODO: fix this?
-      if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) return true;
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) return true;
       // No need to check for empty or too long client brands since
       // ProtocolUtil#readString already does exactly that.
       final String read = ProtocolUtil.readString(content, Sonar.get().getConfig().MAXIMUM_BRAND_LENGTH);
@@ -147,7 +147,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         && pattern.matcher(read).matches(); // Disallow non-ascii characters (by default)
     } catch (DecoderException exception) {
       // Fail if the string (client brand) could not be decoded properly
-      player.fail("could not decode string");
+      user.fail("could not decode string");
       // Throw the exception so we don't continue checking
       throw exception;
     }
@@ -164,7 +164,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     final long timeout = Sonar.get().getConfig().VERIFICATION_TIMEOUT;
     // Check if the time limit has exceeded
     if (login.elapsed(timeout)) {
-      player.getChannel().close();
+      user.getChannel().close();
       return;
     }
 
@@ -172,7 +172,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       final KeepAlive keepAlive = (KeepAlive) packet;
 
       // 1.7-1.8.9 are sending a KeepAlive packet with the ID 0 every 20 ticks
-      if (keepAlive.getId() == 0 && player.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) return;
+      if (keepAlive.getId() == 0 && user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) return;
 
       // Check if we are currently expecting a KeepAlive packet
       assertState(State.KEEP_ALIVE);
@@ -187,7 +187,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       final ClientSettings clientSettings = (ClientSettings) packet;
 
       // Validate the locale using a regex to filter unwanted characters.
-      checkFrame(validateClientLocale(player, clientSettings.getLocale()), "invalid locale");
+      checkFrame(validateClientLocale(user, clientSettings.getLocale()), "invalid locale");
 
       // Clients sometimes mess up the ClientSettings or PluginMessage packet.
       if (state == State.CLIENT_SETTINGS) {
@@ -205,11 +205,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // Check if the channel is correct - 1.13 uses the new namespace
         // system ('minecraft:' + channel) and anything below 1.13 uses
         // the legacy namespace system ('MC|' + channel).
-        final boolean v1_13 = player.getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
+        final boolean v1_13 = user.getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
         checkFrame(pluginMessage.getChannel().equals("MC|Brand") || v1_13, "invalid channel");
 
         // Validate the client branding using a regex to filter unwanted characters.
-        checkFrame(validateClientBrand(player, pluginMessage.content()), "invalid client brand");
+        checkFrame(validateClientBrand(user, pluginMessage.content()), "invalid client brand");
 
         // Clients sometimes mess up the ClientSettings or PluginMessage packet.
         if (state == State.PLUGIN_MESSAGE) {
@@ -237,12 +237,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
 
       // Make sure the player is unable to fly (the player is in spectator mode)
-      player.write(DEFAULT_ABILITIES);
+      user.write(DEFAULT_ABILITIES);
       // Teleport the player to the spawn position
-      player.write(SPAWN_TELEPORT);
+      user.write(SPAWN_TELEPORT);
 
       // 1.7-1.8 clients do not have a TeleportConfirm packet
-      if (player.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
         // Immediately send the chunk data as 1.7-1.8 can't confirm teleports
         sendChunkData();
       } else {
@@ -349,13 +349,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private void assertState(final @NotNull State expectedState) {
     if (expectedState != state) {
-      player.fail("expected " + expectedState + ", got " + state);
+      user.fail("expected " + expectedState + ", got " + state);
     }
   }
 
   private void checkFrame(final boolean condition, final String message) {
     if (!condition) {
-      player.fail(message);
+      user.fail(message);
       throw new CorruptedFrameException(message);
     }
   }
@@ -363,21 +363,21 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void finish() {
     state = State.SUCCESS;
 
-    player.getFallback().getConnected().remove(username);
+    user.getFallback().getConnected().remove(username);
 
     // Add verified player to the database
     final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(
-      player.getInetAddress().toString(), uuid, login.getStart()
+      user.getInetAddress().toString(), uuid, login.getStart()
     );
     Sonar.get().getVerifiedPlayerController().add(verifiedPlayer);
 
     // Call the VerifySuccessEvent for external API usage
-    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, uuid, player, login.delay()));
+    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, uuid, user, login.delay()));
 
     // Disconnect player with the verification success message
-    player.disconnect(Sonar.get().getConfig().VERIFICATION_SUCCESS);
+    user.disconnect(Sonar.get().getConfig().VERIFICATION_SUCCESS);
 
-    player.getFallback().getLogger().info(
+    user.getFallback().getLogger().info(
       Sonar.get().getConfig().VERIFICATION_SUCCESSFUL_LOG
         .replace("%name%", username)
         .replace("%time%", login.toString())
