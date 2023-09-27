@@ -29,6 +29,7 @@ import java.util.List;
 
 @Getter
 public final class SimpleYamlConfig {
+  private final File file;
   private final YamlFile yaml;
 
   private static final List<String> HEADER = Arrays.asList(
@@ -48,6 +49,7 @@ public final class SimpleYamlConfig {
       throw new IllegalStateException("Could not create folder?!");
     }
 
+    this.file = file;
     this.yaml = new YamlFile(file.getPath());
   }
 
