@@ -20,12 +20,17 @@ package xyz.jonesdev.sonar.api.config;
 import lombok.Getter;
 import org.simpleyaml.configuration.comments.format.YamlCommentFormat;
 import org.simpleyaml.configuration.file.YamlFile;
+import org.simpleyaml.exceptions.InvalidConfigurationException;
 import xyz.jonesdev.sonar.api.Sonar;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+
+import static xyz.jonesdev.sonar.api.Sonar.LINE_SEPARATOR;
 
 @Getter
 public final class SimpleYamlConfig {
@@ -62,18 +67,38 @@ public final class SimpleYamlConfig {
   }
 
   public void load() {
+    String backupContent = null;
     try {
       // https://github.com/jonesdevelopment/sonar/issues/26
       // Only load the configuration if the file already exists
       if (yaml.exists()) {
+        try {
+          // Load all lines from the existing files before trying to load/overwrite it
+          backupContent = String.join(LINE_SEPARATOR, Files.readAllLines(file.toPath()));
+        } catch (IOException exception) {
+          Sonar.get().getLogger().error("Error while creating backup configuration: {}", exception);
+        }
         yaml.loadWithComments();
       } else {
         yaml.setCommentFormat(YamlCommentFormat.PRETTY);
 
-        yaml.createOrLoadWithComments();
-
         yaml.options().headerFormatter().commentPrefix("# ");
-        yaml.setHeader(String.join(Sonar.LINE_SEPARATOR, HEADER));
+        yaml.setHeader(String.join(LINE_SEPARATOR, HEADER));
+
+        yaml.createOrLoadWithComments();
+      }
+    } catch (InvalidConfigurationException exception) {
+      Sonar.get().getLogger().error("Invalid configuration: {}", exception);
+
+      // Try to save a backup configuration to prevent data loss
+      if (backupContent != null) {
+        final File backupFile = new File(file.getParentFile(), file.getName() + ".broken");
+        try (final FileWriter fileWriter = new FileWriter(backupFile, false)) {
+          fileWriter.write(backupContent);
+          Sonar.get().getLogger().info("Saved backup configuration to {}", backupFile.getName());
+        } catch (Throwable throwable) {
+          Sonar.get().getLogger().warn("Could not load from backup configuration: {}", throwable);
+        }
       }
     } catch (IOException exception) {
       Sonar.get().getLogger().error("Error while loading configuration: {}", exception);
