@@ -69,7 +69,7 @@ public final class SimpleYamlConfig {
       yaml.options().headerFormatter().commentPrefix("# ");
       yaml.setHeader(String.join(Sonar.LINE_SEPARATOR, HEADER));
     } catch (IOException exception) {
-      exception.printStackTrace(System.err);
+      Sonar.get().getLogger().error("Error while loading configuration: {}", exception);
     }
   }
 
