@@ -198,7 +198,11 @@ public final class SonarConfiguration {
       DatabaseType.valueOf(generalConfig.getString("general.database.type", DatabaseType.NONE.name()).toUpperCase());
 
     // Message settings
-    messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
+    // Only create a new messages configuration object if the preferred language changed
+    // https://github.com/jonesdevelopment/sonar/issues/26
+    if (messagesConfig == null || !messagesConfig.getFile().getName().equals(LANGUAGE + ".yml")) {
+      messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
+    }
     messagesConfig.load();
 
     messagesConfig.getYaml().setComment("messages.prefix",
