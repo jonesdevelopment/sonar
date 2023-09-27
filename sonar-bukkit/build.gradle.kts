@@ -8,7 +8,7 @@ apply(plugin = "net.minecrell.plugin-yml.bukkit")
 
 bukkit {
   name = rootProject.name
-  version = rootProject.version.toString()
+  version = rootProject.version.toString().split("-")[0]
   main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
   authors = listOf("Jones Development", "Sonar Contributors")
   website = "https://jonesdev.xyz/discord/"
