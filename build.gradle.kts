@@ -12,12 +12,9 @@ plugins {
 
 apply(plugin = "io.toolebox.git-versioner")
 
-rootProject.group = "xyz.jonesdev.sonar"
-val semanticVersion = "2.0.0"
-
 versioner {
   pattern {
-    pattern = "$semanticVersion-%h(-%c)"
+    pattern = "$version-%h-%c-%b"
   }
 }
 
@@ -62,6 +59,7 @@ tasks {
       // Set the implementation version, so we can create exact version
       // information in-game and make it accessible to the user.
       attributes["Implementation-Version"] = version
+      attributes["Implementation-Vendor"] = "Jones Development, Sonar Contributors"
     }
   }
 
