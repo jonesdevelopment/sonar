@@ -62,6 +62,7 @@ tasks {
       // Set the implementation version, so we can create exact version
       // information in-game and make it accessible to the user.
       attributes["Implementation-Version"] = version
+      attributes["Implementation-Vendor"] = "Jones Development, Sonar Contributors"
     }
   }
 
