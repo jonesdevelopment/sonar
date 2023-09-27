@@ -80,13 +80,14 @@ public final class SimpleYamlConfig {
         }
         yaml.loadWithComments();
       } else {
-        yaml.setCommentFormat(YamlCommentFormat.PRETTY);
-
-        yaml.options().headerFormatter().commentPrefix("# ");
-        yaml.setHeader(String.join(LINE_SEPARATOR, HEADER));
-
         yaml.createOrLoadWithComments();
       }
+
+      // Always load the comment format and options
+      yaml.setCommentFormat(YamlCommentFormat.PRETTY);
+
+      yaml.options().headerFormatter().commentPrefix("# ");
+      yaml.setHeader(String.join(LINE_SEPARATOR, HEADER));
     } catch (InvalidConfigurationException exception) {
       Sonar.get().getLogger().error("Invalid configuration: {}", exception);
 
