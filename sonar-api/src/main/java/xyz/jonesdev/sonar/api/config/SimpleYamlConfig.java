@@ -63,11 +63,18 @@ public final class SimpleYamlConfig {
 
   public void load() {
     try {
-      yaml.setCommentFormat(YamlCommentFormat.PRETTY);
-      yaml.createOrLoadWithComments();
+      // https://github.com/jonesdevelopment/sonar/issues/26
+      // Only load the configuration if the file already exists
+      if (yaml.exists()) {
+        yaml.loadWithComments();
+      } else {
+        yaml.setCommentFormat(YamlCommentFormat.PRETTY);
 
-      yaml.options().headerFormatter().commentPrefix("# ");
-      yaml.setHeader(String.join(Sonar.LINE_SEPARATOR, HEADER));
+        yaml.createOrLoadWithComments();
+
+        yaml.options().headerFormatter().commentPrefix("# ");
+        yaml.setHeader(String.join(Sonar.LINE_SEPARATOR, HEADER));
+      }
     } catch (IOException exception) {
       Sonar.get().getLogger().error("Error while loading configuration: {}", exception);
     }
