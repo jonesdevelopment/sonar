@@ -27,7 +27,7 @@ import xyz.jonesdev.sonar.api.Sonar;
 
 import java.util.*;
 
-public interface SonarBaseCommand {
+public interface SonarCommand {
   List<String> TAB_SUGGESTIONS = new ArrayList<>();
 
   Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();

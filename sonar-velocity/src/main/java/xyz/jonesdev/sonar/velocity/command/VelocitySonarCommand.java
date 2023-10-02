@@ -15,16 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bukkit.command;
+package xyz.jonesdev.sonar.velocity.command;
 
+import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.proxy.ConsoleCommandSource;
+import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.*;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
-import xyz.jonesdev.sonar.api.command.SonarBaseCommand;
+import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
@@ -35,84 +36,82 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
-public final class SonarCommand implements CommandExecutor, TabExecutor, SonarBaseCommand {
+public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
   {
     cacheHelpMessage();
   }
 
   @Override
-  public boolean onCommand(final CommandSender sender,
-                           final Command command,
-                           final String label,
-                           final String[] args) {
-    if (!(sender instanceof ConsoleCommandSender)) {
+  public void execute(final @NotNull Invocation invocation) {
+    if (!(invocation.source() instanceof ConsoleCommandSource)) {
       // Checking if it contains will only break more since it can throw
       // a NullPointerException if the cache is being accessed from parallel threads
       DELAY.cleanUp(); // Clean up the cache
-      final long mapTimestamp = DELAY.asMap().getOrDefault(sender, -1L);
+      final long mapTimestamp = DELAY.asMap().getOrDefault(invocation.source(), -1L);
 
       // There were some exploits with spamming commands in the past.
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN);
+        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().COMMAND_COOL_DOWN));
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
-        sender.sendMessage(
+        invocation.source().sendMessage(Component.text(
           Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
             .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))
-        );
-        return false;
+        ));
+        return;
       }
 
-      DELAY.put(sender);
+      DELAY.put(invocation.source());
     }
 
     Optional<Subcommand> subcommand = Optional.empty();
 
-    final InvocationSource invocationSource = new BukkitInvocationSource(sender);
+    final InvocationSource invocationSource = new VelocityInvocationSource(invocation.source());
 
-    if (args.length > 0) {
+    if (invocation.arguments().length > 0) {
       // Search subcommand if command arguments are present
       subcommand = Sonar.get().getSubcommandRegistry().getSubcommands().parallelStream()
-        .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
+        .filter(sub -> sub.getInfo().name().equalsIgnoreCase(invocation.arguments()[0])
           || Arrays.stream(sub.getInfo().aliases())
-          .anyMatch(alias -> alias.equalsIgnoreCase(args[0])))
+          .anyMatch(alias -> alias.equalsIgnoreCase(invocation.arguments()[0])))
         .findFirst();
 
       // Check permissions for subcommands
       if (subcommand.isPresent()) {
         if (!subcommand.get().getInfo().onlyConsole()
-          && !sender.hasPermission(subcommand.get().getPermission())
+          && !invocation.source().hasPermission(subcommand.get().getPermission())
         ) {
           invocationSource.sendMessage(
             Sonar.get().getConfig().SUB_COMMAND_NO_PERM
               .replace("%permission%", subcommand.get().getPermission())
           );
-          return false;
+          return;
         }
       }
     }
 
     subcommand.ifPresent(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
+      if (sub.getInfo().onlyPlayers() && !(invocation.source() instanceof Player)) {
         invocationSource.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
         return;
       }
 
-      if (sub.getInfo().onlyConsole() && !(sender instanceof ConsoleCommandSender)) {
+      if (sub.getInfo().onlyConsole() && !(invocation.source() instanceof ConsoleCommandSource)) {
         invocationSource.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
         return;
       }
 
-      final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, sub, args);
+      final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, sub, invocation.arguments());
 
       // The subcommands has arguments which are not present in the executed command
       if (sub.getInfo().arguments().length > 0
-        && commandInvocation.getRawArguments().length <= 1) {
+        && commandInvocation.getRawArguments().length <= 1
+        && sub.getInfo().argumentsRequired()) {
         invocationSource.sendMessage(
           Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
             .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
@@ -124,24 +123,20 @@ public final class SonarCommand implements CommandExecutor, TabExecutor, SonarBa
       sub.execute(commandInvocation);
     });
 
-    if (!subcommand.isPresent()) {
+    if (subcommand.isEmpty()) {
 
       // Re-use the old, cached help message since we don't want to scan
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
       for (final Component component : CACHED_HELP_MESSAGE) {
-        invocationSource.sendMessage(component);
+        invocation.source().sendMessage(component);
       }
     }
-    return false;
   }
 
   @Override
-  public List<String> onTabComplete(final CommandSender sender,
-                                    final Command command,
-                                    final String commandAlias,
-                                    final String @NotNull [] args) {
-    if (args.length <= 1) {
+  public List<String> suggest(final @NotNull Invocation invocation) {
+    if (invocation.arguments().length <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
         for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
           TAB_SUGGESTIONS.add(subcommand.getInfo().name());
@@ -152,12 +147,12 @@ public final class SonarCommand implements CommandExecutor, TabExecutor, SonarBa
         }
       }
       return TAB_SUGGESTIONS;
-    } else if (args.length == 2) {
+    } else if (invocation.arguments().length == 2) {
       if (ARG_TAB_SUGGESTIONS.isEmpty()) {
         for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
           final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
             .map(Argument::value)
-            .collect(Collectors.toList());
+            .collect(Collectors.toUnmodifiableList());
           ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
           for (final String alias : subcommand.getInfo().aliases()) {
             ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
@@ -165,9 +160,14 @@ public final class SonarCommand implements CommandExecutor, TabExecutor, SonarBa
         }
       }
 
-      final String subCommandName = args[0].toLowerCase();
+      final String subCommandName = invocation.arguments()[0].toLowerCase();
       return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
     }
     return emptyList();
+  }
+
+  @Override
+  public boolean hasPermission(final @NotNull Invocation invocation) {
+    return invocation.source().hasPermission("sonar.command");
   }
 }

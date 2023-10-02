@@ -26,7 +26,7 @@ import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.BukkitInvocationSource;
-import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
+import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
 import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
@@ -91,7 +91,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     new Metrics(getPlugin(), getServer().getPlatform().getMetricsId());
 
     // Register Sonar command
-    Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new SonarCommand());
+    Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
 
     // Register Fallback queue task
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), getFallback().getQueue()::poll,

@@ -25,7 +25,7 @@ import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
-import xyz.jonesdev.sonar.velocity.command.SonarCommand;
+import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.command.VelocityInvocationSource;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.verbose.VerboseWrapper;
@@ -90,7 +90,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     getPlugin().getMetricsFactory().make(getPlugin(), getServer().getPlatform().getMetricsId());
 
     // Register Sonar command
-    getPlugin().getServer().getCommandManager().register("sonar", new SonarCommand());
+    getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
 
     // Register Fallback listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackListener(getFallback()));

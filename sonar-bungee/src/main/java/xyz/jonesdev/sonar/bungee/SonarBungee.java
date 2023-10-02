@@ -26,7 +26,7 @@ import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bungee.command.BungeeInvocationSource;
-import xyz.jonesdev.sonar.bungee.command.SonarCommand;
+import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
@@ -94,7 +94,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     new Metrics(getPlugin(), getServer().getPlatform().getMetricsId());
 
     // Register Sonar command
-    getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new SonarCommand());
+    getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());
 
     // Register Fallback listener
     getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new FallbackListener(getFallback()));

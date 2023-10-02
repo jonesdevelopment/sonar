@@ -15,20 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.command;
+package xyz.jonesdev.sonar.bukkit.command;
 
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.api.plugin.TabExecutor;
-import net.md_5.bungee.command.ConsoleCommandSender;
+import org.bukkit.command.*;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
-import xyz.jonesdev.sonar.api.command.SonarBaseCommand;
+import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
@@ -39,15 +35,16 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
-public final class SonarCommand extends Command implements TabExecutor, SonarBaseCommand {
-  public SonarCommand() {
-    super("sonar", "sonar.command");
+public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, SonarCommand {
+  {
     cacheHelpMessage();
   }
 
   @Override
-  @SuppressWarnings({"redundantSuppression"})
-  public void execute(final @NotNull CommandSender sender, final String[] args) {
+  public boolean onCommand(final CommandSender sender,
+                           final Command command,
+                           final String label,
+                           final String[] args) {
     if (!(sender instanceof ConsoleCommandSender)) {
       // Checking if it contains will only break more since it can throw
       // a NullPointerException if the cache is being accessed from parallel threads
@@ -58,17 +55,17 @@ public final class SonarCommand extends Command implements TabExecutor, SonarBas
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        sender.sendMessage(new TextComponent(Sonar.get().getConfig().COMMAND_COOL_DOWN));
+        sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN);
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
-        sender.sendMessage(new TextComponent(
+        sender.sendMessage(
           Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
             .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))
-        ));
-        return;
+        );
+        return false;
       }
 
       DELAY.put(sender);
@@ -76,7 +73,7 @@ public final class SonarCommand extends Command implements TabExecutor, SonarBas
 
     Optional<Subcommand> subcommand = Optional.empty();
 
-    final InvocationSource invocationSource = new BungeeInvocationSource(sender);
+    final InvocationSource invocationSource = new BukkitInvocationSource(sender);
 
     if (args.length > 0) {
       // Search subcommand if command arguments are present
@@ -95,13 +92,13 @@ public final class SonarCommand extends Command implements TabExecutor, SonarBas
             Sonar.get().getConfig().SUB_COMMAND_NO_PERM
               .replace("%permission%", subcommand.get().getPermission())
           );
-          return;
+          return false;
         }
       }
     }
 
     subcommand.ifPresent(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(sender instanceof ProxiedPlayer)) {
+      if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
         invocationSource.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
         return;
       }
@@ -136,10 +133,14 @@ public final class SonarCommand extends Command implements TabExecutor, SonarBas
         invocationSource.sendMessage(component);
       }
     }
+    return false;
   }
 
   @Override
-  public Iterable<String> onTabComplete(final CommandSender sender, final String @NotNull [] args) {
+  public List<String> onTabComplete(final CommandSender sender,
+                                    final Command command,
+                                    final String commandAlias,
+                                    final String @NotNull [] args) {
     if (args.length <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
         for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
