@@ -72,12 +72,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
    * <br>
    * We have to do this, so we can access all necessary API functions.
    */
-  public final ServerWrapper server = new ServerWrapper() {
-
-    @Override
-    public SonarPlatform getPlatform() {
-      return SonarPlatform.VELOCITY;
-    }
+  public final ServerWrapper server = new ServerWrapper(SonarPlatform.VELOCITY) {
 
     @Override
     public Optional<InvocationSource> getOnlinePlayer(final String username) {

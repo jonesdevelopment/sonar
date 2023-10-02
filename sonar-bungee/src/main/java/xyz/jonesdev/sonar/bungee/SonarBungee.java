@@ -76,12 +76,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
    * <br>
    * We have to do this, so we can access all necessary API functions.
    */
-  public final ServerWrapper server = new ServerWrapper() {
-
-    @Override
-    public SonarPlatform getPlatform() {
-      return SonarPlatform.BUNGEE;
-    }
+  public final ServerWrapper server = new ServerWrapper(SonarPlatform.BUNGEE) {
 
     @Override
     public Optional<InvocationSource> getOnlinePlayer(final String username) {

@@ -17,22 +17,26 @@
 
 package xyz.jonesdev.sonar.api.server;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 
 import java.util.Optional;
 
-public interface ServerWrapper {
+@Getter
+@RequiredArgsConstructor
+public abstract class ServerWrapper {
 
   /**
-   * @return Platform of the server (Velocity, BungeeCord, Spigot)
+   * Platform of the server (Velocity, BungeeCord, Spigot)
    */
-  SonarPlatform getPlatform();
+  private final SonarPlatform platform;
 
   /**
    * @param username Username of the player
    * @return Optional player wrapped as InvocationSender
    * @see InvocationSource
    */
-  Optional<InvocationSource> getOnlinePlayer(final String username);
+  public abstract Optional<InvocationSource> getOnlinePlayer(final String username);
 }
