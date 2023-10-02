@@ -43,10 +43,6 @@ subprojects {
     implementation("net.kyori:adventure-text-serializer-json:4.14.0")
     implementation("net.kyori:adventure-text-serializer-gson:4.14.0")
 
-    // MiniMessage platform support
-    implementation("net.kyori:adventure-platform-bungeecord:4.3.1")
-    implementation("net.kyori:adventure-platform-bukkit:4.3.1")
-
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
     implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
     implementation("xyz.jonesdev:cappuccino:0.1.6-SNAPSHOT") // expiring cache
