@@ -22,7 +22,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
@@ -45,8 +45,8 @@ public final class FallbackUserWrapper implements FallbackUser<ChannelWrapper, F
   private final ProtocolVersion protocolVersion;
 
   @Override
-  public void disconnect(final @NotNull String reason) {
-    connection.closeWith(Disconnect.create(TextComponent.toLegacyText(new TextComponent(reason))));
+  public void disconnect(final @NotNull Component reason) {
+    connection.closeWith(Disconnect.create(reason));
   }
 
   @Override
