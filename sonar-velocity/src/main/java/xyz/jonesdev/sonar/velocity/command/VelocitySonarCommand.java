@@ -129,7 +129,7 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
       for (final Component component : CACHED_HELP_MESSAGE) {
-        invocation.source().sendMessage(component);
+        invocationSource.sendMessage(component);
       }
     }
   }
