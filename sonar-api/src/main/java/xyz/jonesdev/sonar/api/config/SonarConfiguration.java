@@ -158,7 +158,14 @@ public final class SonarConfiguration {
     if (generalConfig == null) {
       generalConfig = new SimpleYamlConfig(pluginFolder, "config");
     }
-    generalConfig.load();
+    try {
+      generalConfig.load();
+    } catch (Exception exception) {
+      // https://github.com/jonesdevelopment/sonar/issues/33
+      // Only save the configuration when necessary
+      Sonar.get().getLogger().error("Error while loading configuration: {}", exception);
+      return;
+    }
 
     // General options
     generalConfig.getYaml().setComment("general.language",
@@ -203,7 +210,14 @@ public final class SonarConfiguration {
     if (messagesConfig == null || !messagesConfig.getFile().getName().equals(LANGUAGE + ".yml")) {
       messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
     }
-    messagesConfig.load();
+    try {
+      messagesConfig.load();
+    } catch (Exception exception) {
+      // https://github.com/jonesdevelopment/sonar/issues/33
+      // Only save the configuration when necessary
+      Sonar.get().getLogger().error("Error while loading configuration: {}", exception);
+      return;
+    }
 
     messagesConfig.getYaml().setComment("messages.prefix",
       "Placeholder for every '%prefix%' in this configuration file"
