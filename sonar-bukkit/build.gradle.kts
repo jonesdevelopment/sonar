@@ -31,6 +31,9 @@ dependencies {
   compileOnly(project(":api"))
   compileOnly(project(":common"))
 
+  // MiniMessage platform support
+  implementation("net.kyori:adventure-platform-bukkit:4.3.1")
+
   // We have to use 1.8 for backwards compatibility
   compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
 

@@ -15,26 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.command;
+package xyz.jonesdev.sonar.bukkit.command;
 
-public interface InvocationSender {
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
+import xyz.jonesdev.sonar.bukkit.SonarBukkit;
 
-  /**
-   * @return The name of the command executor
-   */
-  String getName();
+public final class BukkitInvocationSource extends InvocationSource {
+  private static final BukkitAudiences AUDIENCES = BukkitAudiences.create(SonarBukkit.INSTANCE.getPlugin());
 
-  /**
-   * Sends a message to the command executor
-   *
-   * @param message Deserialized message
-   */
-  void sendMessage(final String message);
-
-  /**
-   * Sends an empty chat message to the command executor
-   */
-  default void sendMessage() {
-    sendMessage("");
+  public BukkitInvocationSource(final @NotNull CommandSender sender) {
+    super(sender.getName(), AUDIENCES.sender(sender));
   }
 }

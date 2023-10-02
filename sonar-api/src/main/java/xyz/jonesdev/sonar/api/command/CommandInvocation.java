@@ -24,7 +24,7 @@ import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 @Getter
 @RequiredArgsConstructor
 public final class CommandInvocation {
-  private final InvocationSender sender;
+  private final InvocationSource sender;
   private final Subcommand command;
   private final String[] rawArguments;
 }

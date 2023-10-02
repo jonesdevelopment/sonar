@@ -40,7 +40,6 @@ import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
 import java.lang.reflect.Field;
 
 import static net.md_5.bungee.netty.PipelineUtils.FRAME_PREPENDER;
-import static xyz.jonesdev.sonar.bungee.fallback.FallbackListener.CachedMessages.LOCKDOWN_DISCONNECT;
 
 @RequiredArgsConstructor
 public final class FallbackListener implements Listener {
@@ -57,20 +56,12 @@ public final class FallbackListener implements Listener {
     }
   }
 
-  public static class CachedMessages {
-    static TextComponent LOCKDOWN_DISCONNECT;
-
-    public static void update() {
-      LOCKDOWN_DISCONNECT = new TextComponent(Sonar.get().getConfig().LOCKDOWN_DISCONNECT);
-    }
-  }
-
   @EventHandler
   @SuppressWarnings("deprecation")
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
     if (Sonar.get().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
-        event.getPlayer().disconnect(LOCKDOWN_DISCONNECT);
+        event.getPlayer().disconnect(new TextComponent(Sonar.get().getConfig().LOCKDOWN_DISCONNECT));
 
         if (Sonar.get().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
           Sonar.get().getLogger().info(

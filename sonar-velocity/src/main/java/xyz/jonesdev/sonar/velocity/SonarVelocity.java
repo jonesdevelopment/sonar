@@ -18,15 +18,15 @@
 package xyz.jonesdev.sonar.velocity;
 
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
-import xyz.jonesdev.sonar.velocity.command.SonarCommand;
+import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
+import xyz.jonesdev.sonar.velocity.command.VelocityInvocationSource;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 import xyz.jonesdev.sonar.velocity.verbose.VerboseWrapper;
 
@@ -72,30 +72,14 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
    * <br>
    * We have to do this, so we can access all necessary API functions.
    */
-  public final ServerWrapper server = new ServerWrapper() {
+  public final ServerWrapper server = new ServerWrapper(SonarPlatform.VELOCITY) {
 
     @Override
-    public SonarPlatform getPlatform() {
-      return SonarPlatform.VELOCITY;
-    }
-
-    @Override
-    public Optional<InvocationSender> getOnlinePlayer(final String username) {
+    public Optional<InvocationSource> getOnlinePlayer(final String username) {
       return getPlugin().getServer().getAllPlayers().stream()
         .filter(player -> player.getUsername().equalsIgnoreCase(username))
         .findFirst()
-        .map(player -> new InvocationSender() {
-
-          @Override
-          public String getName() {
-            return player.getUsername();
-          }
-
-          @Override
-          public void sendMessage(final String message) {
-            player.sendMessage(Component.text(message));
-          }
-        });
+        .map(VelocityInvocationSource::new);
     }
   };
 
@@ -106,7 +90,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     getPlugin().getMetricsFactory().make(getPlugin(), getServer().getPlatform().getMetricsId());
 
     // Register Sonar command
-    getPlugin().getServer().getCommandManager().register("sonar", new SonarCommand());
+    getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
 
     // Register Fallback listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackListener(getFallback()));
@@ -129,8 +113,5 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
   @Override
   public void postReload() {
-
-    // Prepare cached messages
-    FallbackListener.CachedMessages.update();
   }
 }

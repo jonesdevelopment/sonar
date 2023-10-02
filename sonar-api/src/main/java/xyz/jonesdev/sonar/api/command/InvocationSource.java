@@ -15,28 +15,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.server;
+package xyz.jonesdev.sonar.api.command;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.command.InvocationSource;
-
-import java.util.Optional;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class ServerWrapper {
+public abstract class InvocationSource {
+  private final String name;
+  private final Audience audience;
 
   /**
-   * Platform of the server (Velocity, BungeeCord, Spigot)
+   * Sends an empty chat message to the command executor
    */
-  private final SonarPlatform platform;
+  public final void sendMessage() {
+    sendMessage(Component.empty());
+  }
 
   /**
-   * @param username Username of the player
-   * @return Optional player wrapped as InvocationSender
-   * @see InvocationSource
+   * Sends a message to the command executor
    */
-  public abstract Optional<InvocationSource> getOnlinePlayer(final String username);
+  public final void sendMessage(final String legacy) {
+    sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
+  }
+
+  /**
+   * Sends a message to the command executor
+   */
+  public final void sendMessage(final Component component) {
+    audience.sendMessage(component);
+  }
 }

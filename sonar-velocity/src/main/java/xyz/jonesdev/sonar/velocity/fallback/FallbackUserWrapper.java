@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.velocity.fallback;
 
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import lombok.EqualsAndHashCode;
@@ -49,10 +48,8 @@ public final class FallbackUserWrapper implements FallbackUser<ConnectedPlayer, 
   private final ProtocolVersion protocolVersion;
 
   @Override
-  public void disconnect(final @NotNull String reason) {
-    final String serialized = ProtocolUtils.getJsonChatSerializer(connection.getProtocolVersion())
-      .serialize(Component.text(reason));
-    connection.closeWith(Disconnect.create(serialized));
+  public void disconnect(final @NotNull Component reason) {
+    connection.closeWith(Disconnect.create(reason));
   }
 
   @Override

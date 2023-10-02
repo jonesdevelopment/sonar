@@ -15,23 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.command;
+package xyz.jonesdev.sonar.bukkit.command;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.api.plugin.TabExecutor;
-import net.md_5.bungee.command.ConsoleCommandSender;
+import net.kyori.adventure.text.Component;
+import org.bukkit.command.*;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
-import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.api.command.SonarBaseCommand;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
+import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
@@ -42,71 +35,16 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
-public final class SonarCommand extends Command implements TabExecutor, SonarBaseCommand {
-  public SonarCommand() {
-    super("sonar", "sonar.command");
-  }
-
-  private static final TextComponent GITHUB_LINK_COMPONENT = new TextComponent(ChatColor.GREEN + "https://github" +
-    ".com/jonesdevelopment/sonar");
-  private static final TextComponent DISCORD_SUPPORT = new TextComponent(ChatColor.YELLOW + "Open a ticket on the " +
-    "Discord ");
-  private static final TextComponent GITHUB_ISSUES = new TextComponent(ChatColor.YELLOW + "or open a new issue on " +
-    "GitHub.");
-
-  static {
-    GITHUB_LINK_COMPONENT.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github" +
-      ".com/jonesdevelopment/sonar"));
-    DISCORD_SUPPORT.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/"));
-    DISCORD_SUPPORT.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open " +
-      "Discord)").create()));
-    GITHUB_ISSUES.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar" +
-      "/issues"));
-    GITHUB_ISSUES.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("(Click to open " +
-      "GitHub)").create()));
-  }
-
-  static {
-    CACHED_HELP_MESSAGE.addAll(Arrays.asList(
-      new TextComponent(ChatColor.YELLOW + "Running Sonar " + Sonar.get().getVersion()
-        + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
-        + "."),
-      new TextComponent(ChatColor.YELLOW + "(C) " + COPYRIGHT_YEAR + " Jones Development and Sonar Contributors"),
-      GITHUB_LINK_COMPONENT,
-      new TextComponent(""),
-      new TextComponent(ChatColor.YELLOW + "Need help or have any questions?"),
-      new TextComponent(
-        DISCORD_SUPPORT,
-        GITHUB_ISSUES
-      ),
-      new TextComponent("")
-    ));
-
-    Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
-      final TextComponent component = new TextComponent(
-        new TextComponent(ChatColor.GRAY + " ▪ "),
-        new TextComponent(ChatColor.GREEN + "/sonar " + sub.getInfo().name()),
-        new TextComponent(ChatColor.GRAY + " - "),
-        new TextComponent(ChatColor.WHITE + sub.getInfo().description())
-      );
-
-      component.setClickEvent(
-        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
-      );
-      component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
-          "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-            + Sonar.LINE_SEPARATOR + "§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-            + Sonar.LINE_SEPARATOR + "§7Permission: §f" + sub.getPermission()
-            + Sonar.LINE_SEPARATOR + "§7Aliases: §f" + sub.getAliases()
-        ).create())
-      );
-      CACHED_HELP_MESSAGE.add(component);
-    });
+public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, SonarCommand {
+  {
+    cacheHelpMessage();
   }
 
   @Override
-  @SuppressWarnings({"redundantSuppression"})
-  public void execute(final @NotNull CommandSender sender, final String[] args) {
+  public boolean onCommand(final CommandSender sender,
+                           final Command command,
+                           final String label,
+                           final String[] args) {
     if (!(sender instanceof ConsoleCommandSender)) {
       // Checking if it contains will only break more since it can throw
       // a NullPointerException if the cache is being accessed from parallel threads
@@ -117,17 +55,17 @@ public final class SonarCommand extends Command implements TabExecutor, SonarBas
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        sender.sendMessage(new TextComponent(Sonar.get().getConfig().COMMAND_COOL_DOWN));
+        sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN);
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
-        sender.sendMessage(new TextComponent(
+        sender.sendMessage(
           Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
             .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))
-        ));
-        return;
+        );
+        return false;
       }
 
       DELAY.put(sender);
@@ -135,18 +73,7 @@ public final class SonarCommand extends Command implements TabExecutor, SonarBas
 
     Optional<Subcommand> subcommand = Optional.empty();
 
-    final InvocationSender invocationSender = new InvocationSender() {
-
-      @Override
-      public String getName() {
-        return sender.getName();
-      }
-
-      @Override
-      public void sendMessage(final String message) {
-        sender.sendMessage(new TextComponent(message));
-      }
-    };
+    final InvocationSource invocationSource = new BukkitInvocationSource(sender);
 
     if (args.length > 0) {
       // Search subcommand if command arguments are present
@@ -161,32 +88,32 @@ public final class SonarCommand extends Command implements TabExecutor, SonarBas
         if (!subcommand.get().getInfo().onlyConsole()
           && !sender.hasPermission(subcommand.get().getPermission())
         ) {
-          invocationSender.sendMessage(
+          invocationSource.sendMessage(
             Sonar.get().getConfig().SUB_COMMAND_NO_PERM
               .replace("%permission%", subcommand.get().getPermission())
           );
-          return;
+          return false;
         }
       }
     }
 
     subcommand.ifPresent(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(sender instanceof ProxiedPlayer)) {
-        invocationSender.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
+      if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
+        invocationSource.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
         return;
       }
 
       if (sub.getInfo().onlyConsole() && !(sender instanceof ConsoleCommandSender)) {
-        invocationSender.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
         return;
       }
 
-      final CommandInvocation commandInvocation = new CommandInvocation(invocationSender, sub, args);
+      final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, sub, args);
 
       // The subcommands has arguments which are not present in the executed command
       if (sub.getInfo().arguments().length > 0
         && commandInvocation.getRawArguments().length <= 1) {
-        invocationSender.sendMessage(
+        invocationSource.sendMessage(
           Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
             .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
         );
@@ -202,14 +129,18 @@ public final class SonarCommand extends Command implements TabExecutor, SonarBas
       // Re-use the old, cached help message since we don't want to scan
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
-      for (final Object component : CACHED_HELP_MESSAGE) {
-        sender.sendMessage((TextComponent) component);
+      for (final Component component : CACHED_HELP_MESSAGE) {
+        invocationSource.sendMessage(component);
       }
     }
+    return false;
   }
 
   @Override
-  public Iterable<String> onTabComplete(final CommandSender sender, final String @NotNull [] args) {
+  public List<String> onTabComplete(final CommandSender sender,
+                                    final Command command,
+                                    final String commandAlias,
+                                    final String @NotNull [] args) {
     if (args.length <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
         for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {

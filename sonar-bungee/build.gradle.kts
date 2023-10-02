@@ -7,7 +7,7 @@ apply(plugin = "net.minecrell.plugin-yml.bungee")
 bungee {
   name = rootProject.name
   version = rootProject.version.toString().split("-")[0]
-  main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
+  main = "xyz.jonesdev.sonar.bungee.SonarBungeePlugin"
   author = "Jones Development, Sonar Contributors"
   description = "Effective Anti-bot plugin for Velocity, BungeeCord, and Bukkit (1.7-latest)"
 }
@@ -23,6 +23,9 @@ dependencies {
   }
 
   compileOnly("net.md_5:bungeecord:1.20.2-rc2-SNAPSHOT")
+
+  // MiniMessage platform support
+  implementation("net.kyori:adventure-platform-bungeecord:4.3.1")
 
   // Implement bStats.org for metrics
   implementation("org.bstats:bstats-bungeecord:3.0.2")

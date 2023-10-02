@@ -21,7 +21,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
-import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public abstract class Subcommand {
       .collect(Collectors.joining(", "));
   }
 
-  protected final void incorrectUsage(final @NotNull InvocationSender sender) {
+  protected final void incorrectUsage(final @NotNull InvocationSource sender) {
     sender.sendMessage(
       SONAR.getConfig().INCORRECT_COMMAND_USAGE
         .replace("%usage%", info.name() + " (" + arguments + ")")

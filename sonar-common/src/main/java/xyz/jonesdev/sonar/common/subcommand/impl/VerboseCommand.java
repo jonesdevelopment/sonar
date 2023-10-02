@@ -19,7 +19,7 @@ package xyz.jonesdev.sonar.common.subcommand.impl;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
-import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
@@ -34,11 +34,11 @@ public final class VerboseCommand extends Subcommand {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    InvocationSender verboseSubscriber = invocation.getSender();
+    InvocationSource verboseSubscriber = invocation.getSender();
 
     // Support for '/sonar verbose [username]'
     if (invocation.getRawArguments().length >= 2) {
-      final Optional<InvocationSender> optional = SONAR.getServer().getOnlinePlayer(invocation.getRawArguments()[1]);
+      final Optional<InvocationSource> optional = SONAR.getServer().getOnlinePlayer(invocation.getRawArguments()[1]);
       if (optional.isPresent()) verboseSubscriber = optional.get();
     }
 

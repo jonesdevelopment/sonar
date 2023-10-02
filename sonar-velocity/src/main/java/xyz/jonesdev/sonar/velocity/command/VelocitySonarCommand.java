@@ -21,14 +21,11 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
-import xyz.jonesdev.sonar.api.command.InvocationSender;
-import xyz.jonesdev.sonar.api.command.SonarBaseCommand;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
+import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
@@ -39,49 +36,9 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
-public final class SonarCommand implements SimpleCommand, SonarBaseCommand {
-  static {
-    CACHED_HELP_MESSAGE.addAll(Arrays.asList(
-      Component.text("Running Sonar " + Sonar.get().getVersion()
-        + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
-        + ".", NamedTextColor.YELLOW),
-      Component.text("(C) " + COPYRIGHT_YEAR + " Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
-      Component.text("https://github.com/jonesdevelopment/sonar", NamedTextColor.GREEN)
-        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar")),
-      Component.empty(),
-      Component.text("Need help or have any questions?", NamedTextColor.YELLOW),
-      Component.textOfChildren(
-        Component.text("Open a ticket on the Discord ", NamedTextColor.YELLOW)
-          .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open Discord)")))
-          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")),
-        Component.text("or open a new issue on GitHub.", NamedTextColor.YELLOW)
-          .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open GitHub)")))
-          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar" +
-            "/issues"))
-      ),
-      Component.empty()
-    ));
-
-    Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
-      var component = Component.textOfChildren(
-        Component.text(" ▪ ", NamedTextColor.GRAY),
-        Component.text("/sonar " + sub.getInfo().name(), NamedTextColor.GREEN),
-        Component.text(" - ", NamedTextColor.GRAY),
-        Component.text(sub.getInfo().description(), NamedTextColor.WHITE)
-      );
-
-      component = component.clickEvent(
-        ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sonar " + sub.getInfo().name() + " ")
-      ).hoverEvent(
-        HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
-          "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-            + Sonar.LINE_SEPARATOR + "§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-            + Sonar.LINE_SEPARATOR + "§7Permission: §f" + sub.getPermission()
-            + Sonar.LINE_SEPARATOR + "§7Aliases: §f" + sub.getAliases()
-        ))
-      );
-      CACHED_HELP_MESSAGE.add(component);
-    });
+public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
+  {
+    cacheHelpMessage();
   }
 
   @Override
@@ -114,20 +71,7 @@ public final class SonarCommand implements SimpleCommand, SonarBaseCommand {
 
     Optional<Subcommand> subcommand = Optional.empty();
 
-    final InvocationSender invocationSender = new InvocationSender() {
-
-      @Override
-      public String getName() {
-        return invocation.source() instanceof Player
-          ? ((Player) invocation.source()).getUsername()
-          : "Console";
-      }
-
-      @Override
-      public void sendMessage(final String message) {
-        invocation.source().sendMessage(Component.text(message));
-      }
-    };
+    final InvocationSource invocationSource = new VelocityInvocationSource(invocation.source());
 
     if (invocation.arguments().length > 0) {
       // Search subcommand if command arguments are present
@@ -142,7 +86,7 @@ public final class SonarCommand implements SimpleCommand, SonarBaseCommand {
         if (!subcommand.get().getInfo().onlyConsole()
           && !invocation.source().hasPermission(subcommand.get().getPermission())
         ) {
-          invocationSender.sendMessage(
+          invocationSource.sendMessage(
             Sonar.get().getConfig().SUB_COMMAND_NO_PERM
               .replace("%permission%", subcommand.get().getPermission())
           );
@@ -153,22 +97,22 @@ public final class SonarCommand implements SimpleCommand, SonarBaseCommand {
 
     subcommand.ifPresent(sub -> {
       if (sub.getInfo().onlyPlayers() && !(invocation.source() instanceof Player)) {
-        invocationSender.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
         return;
       }
 
       if (sub.getInfo().onlyConsole() && !(invocation.source() instanceof ConsoleCommandSource)) {
-        invocationSender.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
         return;
       }
 
-      final CommandInvocation commandInvocation = new CommandInvocation(invocationSender, sub, invocation.arguments());
+      final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, sub, invocation.arguments());
 
       // The subcommands has arguments which are not present in the executed command
       if (sub.getInfo().arguments().length > 0
         && commandInvocation.getRawArguments().length <= 1
         && sub.getInfo().argumentsRequired()) {
-        invocationSender.sendMessage(
+        invocationSource.sendMessage(
           Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
             .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
         );
@@ -184,8 +128,8 @@ public final class SonarCommand implements SimpleCommand, SonarBaseCommand {
       // Re-use the old, cached help message since we don't want to scan
       // for each subcommand and it's arguments/attributes every time
       // someone runs /sonar since the subcommand don't change
-      for (final Object component : CACHED_HELP_MESSAGE) {
-        invocation.source().sendMessage((Component) component);
+      for (final Component component : CACHED_HELP_MESSAGE) {
+        invocationSource.sendMessage(component);
       }
     }
   }

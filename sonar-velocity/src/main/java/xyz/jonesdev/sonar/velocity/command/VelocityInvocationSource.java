@@ -15,28 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.server;
+package xyz.jonesdev.sonar.velocity.command;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import xyz.jonesdev.sonar.api.SonarPlatform;
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 
-import java.util.Optional;
-
-@Getter
-@RequiredArgsConstructor
-public abstract class ServerWrapper {
-
-  /**
-   * Platform of the server (Velocity, BungeeCord, Spigot)
-   */
-  private final SonarPlatform platform;
-
-  /**
-   * @param username Username of the player
-   * @return Optional player wrapped as InvocationSender
-   * @see InvocationSource
-   */
-  public abstract Optional<InvocationSource> getOnlinePlayer(final String username);
+public final class VelocityInvocationSource extends InvocationSource {
+  public VelocityInvocationSource(final @NotNull CommandSource sender) {
+    super(sender instanceof Player
+      ? ((Player) sender).getUsername()
+      : "Console", sender);
+  }
 }

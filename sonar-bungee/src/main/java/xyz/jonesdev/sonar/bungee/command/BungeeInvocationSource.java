@@ -15,17 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.command;
+package xyz.jonesdev.sonar.bungee.command;
 
-import xyz.jonesdev.cappuccino.Cappuccino;
-import xyz.jonesdev.cappuccino.ExpiringCache;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.md_5.bungee.api.CommandSender;
+import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
+import xyz.jonesdev.sonar.bungee.SonarBungee;
 
-import java.util.*;
+public final class BungeeInvocationSource extends InvocationSource {
+  private static final BungeeAudiences AUDIENCES = BungeeAudiences.create(SonarBungee.INSTANCE.getPlugin());
 
-public interface SonarBaseCommand {
-  List<String> TAB_SUGGESTIONS = new ArrayList<>();
-  Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
-  ExpiringCache<Object> DELAY = Cappuccino.buildExpiring(500L);
-  List<Object> CACHED_HELP_MESSAGE = new Vector<>();
-  int COPYRIGHT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
+  public BungeeInvocationSource(final @NotNull CommandSender sender) {
+    super(sender.getName(), AUDIENCES.sender(sender));
+  }
 }

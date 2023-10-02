@@ -19,6 +19,8 @@ package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
@@ -78,15 +80,15 @@ public final class SonarConfiguration {
   public boolean LOG_DURING_ATTACK;
 
   public String HEADER, FOOTER;
-  public String TOO_MANY_PLAYERS;
-  public String TOO_FAST_RECONNECT;
-  public String TOO_MANY_ONLINE_PER_IP;
-  public String INVALID_USERNAME;
-  public String VERIFICATION_SUCCESS;
-  public String VERIFICATION_FAILED;
-  public String ALREADY_VERIFYING;
-  public String ALREADY_QUEUED;
-  public String BLACKLISTED;
+  public Component TOO_MANY_PLAYERS;
+  public Component TOO_FAST_RECONNECT;
+  public Component TOO_MANY_ONLINE_PER_IP;
+  public Component INVALID_USERNAME;
+  public Component VERIFICATION_SUCCESS;
+  public Component VERIFICATION_FAILED;
+  public Component ALREADY_VERIFYING;
+  public Component ALREADY_QUEUED;
+  public Component BLACKLISTED;
 
   public String INCORRECT_COMMAND_USAGE;
   public String INCORRECT_IP_ADDRESS;
@@ -158,7 +160,14 @@ public final class SonarConfiguration {
     if (generalConfig == null) {
       generalConfig = new SimpleYamlConfig(pluginFolder, "config");
     }
-    generalConfig.load();
+    try {
+      generalConfig.load();
+    } catch (Exception exception) {
+      // https://github.com/jonesdevelopment/sonar/issues/33
+      // Only save the configuration when necessary
+      Sonar.get().getLogger().error("Error while loading configuration: {}", exception);
+      return;
+    }
 
     // General options
     generalConfig.getYaml().setComment("general.language",
@@ -203,7 +212,14 @@ public final class SonarConfiguration {
     if (messagesConfig == null || !messagesConfig.getFile().getName().equals(LANGUAGE + ".yml")) {
       messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + LANGUAGE);
     }
-    messagesConfig.load();
+    try {
+      messagesConfig.load();
+    } catch (Exception exception) {
+      // https://github.com/jonesdevelopment/sonar/issues/33
+      // Only save the configuration when necessary
+      Sonar.get().getLogger().error("Error while loading configuration: {}", exception);
+      return;
+    }
 
     messagesConfig.getYaml().setComment("messages.prefix",
       "Placeholder for every '%prefix%' in this configuration file"
@@ -657,13 +673,13 @@ public final class SonarConfiguration {
     messagesConfig.getYaml().setComment("messages.verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time"
     );
-    TOO_MANY_PLAYERS = fromList(messagesConfig.getStringList("messages.verification.too-many-players",
+    TOO_MANY_PLAYERS = deserialize(fromList(messagesConfig.getStringList("messages.verification.too-many-players",
       Arrays.asList(
         "%header%",
         "&6Too many players are currently trying to log in, try again later.",
         "&7Please wait a few seconds before trying to join again.",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.verification.logs.connection",
       "Message that is logged to console whenever a new player joins the server"
@@ -696,89 +712,89 @@ public final class SonarConfiguration {
     messagesConfig.getYaml().setComment("messages.verification.too-fast-reconnect",
       "Disconnect message that is shown when someone rejoins too fast during verification"
     );
-    TOO_FAST_RECONNECT = fromList(messagesConfig.getStringList("messages.verification.too-fast-reconnect",
+    TOO_FAST_RECONNECT = deserialize(fromList(messagesConfig.getStringList("messages.verification.too-fast-reconnect",
       Arrays.asList(
         "%header%",
         "&6You reconnected too fast, try again later.",
         "&7Please wait a few seconds before trying to verify again.",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.verification.already-verifying",
       "Disconnect message that is shown when someone joins but is already verifying"
     );
-    ALREADY_VERIFYING = fromList(messagesConfig.getStringList("messages.verification.already-verifying",
+    ALREADY_VERIFYING = deserialize(fromList(messagesConfig.getStringList("messages.verification.already-verifying",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently being verified.",
         "&cPlease wait a few seconds before trying to verify again.",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.verification.already-queued",
       "Disconnect message that is shown when someone joins but is already queued for verification"
     );
-    ALREADY_QUEUED = fromList(messagesConfig.getStringList("messages.verification.already-queued",
+    ALREADY_QUEUED = deserialize(fromList(messagesConfig.getStringList("messages.verification.already-queued",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently queued for verification.",
         "&cPlease wait a few minutes before trying to verify again.",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.verification.blacklisted",
       "Disconnect message that is shown when someone joins but is temporarily blacklisted"
     );
-    BLACKLISTED = fromList(messagesConfig.getStringList("messages.verification.blacklisted",
+    BLACKLISTED = deserialize(fromList(messagesConfig.getStringList("messages.verification.blacklisted",
       Arrays.asList(
         "%header%",
         "&cYou are currently denied from entering the server.",
         "&cPlease wait a few minutes to be able to join the server again.",
         "&6False positive? &7%support-url%",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.verification.invalid-username",
       "Disconnect message that is shown when someone joins with an invalid username"
     );
-    INVALID_USERNAME = fromList(messagesConfig.getStringList("messages.verification.invalid-username",
+    INVALID_USERNAME = deserialize(fromList(messagesConfig.getStringList("messages.verification.invalid-username",
       Arrays.asList(
         "%header%",
         "&cYour username contains invalid characters.",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.verification.success",
       "Disconnect message that is shown when someone verifies successfully"
     );
-    VERIFICATION_SUCCESS = fromList(messagesConfig.getStringList("messages.verification.success",
+    VERIFICATION_SUCCESS = deserialize(fromList(messagesConfig.getStringList("messages.verification.success",
       Arrays.asList(
         "%header%",
         "&aYou have successfully passed the verification.",
         "&fYou are now able to play on the server when you reconnect."
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.verification.failed",
       "Disconnect message that is shown when someone fails verification"
     );
-    VERIFICATION_FAILED = fromList(messagesConfig.getStringList("messages.verification.failed",
+    VERIFICATION_FAILED = deserialize(fromList(messagesConfig.getStringList("messages.verification.failed",
       Arrays.asList(
         "%header%",
         "&cYou have failed the verification.",
         "&7Please wait a few seconds before trying to verify again.",
         "&6Need help? &7%support-url%",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.verification.too-many-online-per-ip",
       "Disconnect message that is shown when someone joins but there are too many online players with their IP address"
     );
-    TOO_MANY_ONLINE_PER_IP = fromList(messagesConfig.getStringList("messages.too-many-online-per-ip",
+    TOO_MANY_ONLINE_PER_IP = deserialize(fromList(messagesConfig.getStringList("messages.too-many-online-per-ip",
       Arrays.asList(
         "%header%",
         "&cThere are too many players online with your IP address.",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.action-bar.layout",
       "General layout for the verbose action-bar" +
@@ -831,6 +847,10 @@ public final class SonarConfiguration {
 
   private @NotNull String fromList(final @NotNull Collection<String> list) {
     return formatString(String.join(Sonar.LINE_SEPARATOR, list));
+  }
+
+  private static Component deserialize(final String legacy) {
+    return LegacyComponentSerializer.legacyAmpersand().deserialize(legacy);
   }
 
   private @NotNull String formatString(final @NotNull String str) {

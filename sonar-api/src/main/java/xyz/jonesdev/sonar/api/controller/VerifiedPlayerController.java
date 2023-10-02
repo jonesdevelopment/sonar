@@ -48,10 +48,8 @@ public final class VerifiedPlayerController {
   private final @NotNull SonarConfiguration.DatabaseType cachedDatabaseType;
 
   public VerifiedPlayerController() {
-    final SonarConfiguration config = Sonar.get().getConfig();
-
     // Cache selected database type, so we don't need to call Sonar.get() every time
-    cachedDatabaseType = config.DATABASE_TYPE;
+    cachedDatabaseType = Sonar.get().getConfig().DATABASE_TYPE;
 
     // Don't establish a database connection if the type is NONE
     if (cachedDatabaseType == SonarConfiguration.DatabaseType.NONE) {
