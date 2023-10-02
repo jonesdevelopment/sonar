@@ -88,6 +88,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     } catch (Throwable throwable) {
       // An error has occurred
       getLogger().error("An error has occurred while launching Sonar: {}", throwable);
+      throwable.printStackTrace();
     }
   }
 

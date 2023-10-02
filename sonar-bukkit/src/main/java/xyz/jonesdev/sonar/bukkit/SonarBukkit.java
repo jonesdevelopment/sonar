@@ -21,10 +21,11 @@ import lombok.Getter;
 import org.bstats.bukkit.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
+import xyz.jonesdev.sonar.bukkit.command.BukkitInvocationSource;
 import xyz.jonesdev.sonar.bukkit.command.SonarCommand;
 import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
@@ -80,22 +81,11 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     }
 
     @Override
-    public Optional<InvocationSender> getOnlinePlayer(final String username) {
+    public Optional<InvocationSource> getOnlinePlayer(final String username) {
       return getPlugin().getServer().getOnlinePlayers().stream()
         .filter(player -> player.getName().equalsIgnoreCase(username))
         .findFirst()
-        .map(player -> new InvocationSender() {
-
-          @Override
-          public String getName() {
-            return player.getName();
-          }
-
-          @Override
-          public void sendMessage(final String message) {
-            player.sendMessage(message);
-          }
-        });
+        .map(BukkitInvocationSource::new);
     }
   };
 

@@ -38,11 +38,20 @@ subprojects {
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    compileOnly("io.netty:netty-all:4.1.98.Final") // netty
+    // MiniMessage
+    implementation("net.kyori:adventure-text-minimessage:4.14.0")
+    implementation("net.kyori:adventure-text-serializer-json:4.14.0")
+    implementation("net.kyori:adventure-text-serializer-gson:4.14.0")
+
+    // MiniMessage platform support
+    implementation("net.kyori:adventure-platform-bungeecord:4.3.1")
+    implementation("net.kyori:adventure-platform-bukkit:4.3.1")
 
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
     implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
     implementation("xyz.jonesdev:cappuccino:0.1.6-SNAPSHOT") // expiring cache
+
+    compileOnly("io.netty:netty-all:4.1.98.Final") // netty
   }
 }
 

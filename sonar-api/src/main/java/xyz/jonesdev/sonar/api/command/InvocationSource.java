@@ -17,24 +17,35 @@
 
 package xyz.jonesdev.sonar.api.command;
 
-public interface InvocationSender {
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 
-  /**
-   * @return The name of the command executor
-   */
-  String getName();
-
-  /**
-   * Sends a message to the command executor
-   *
-   * @param message Deserialized message
-   */
-  void sendMessage(final String message);
+@Getter
+@RequiredArgsConstructor
+public abstract class InvocationSource {
+  private final String name;
+  private final Audience audience;
 
   /**
    * Sends an empty chat message to the command executor
    */
-  default void sendMessage() {
-    sendMessage("");
+  public final void sendMessage() {
+    sendMessage(Component.empty());
+  }
+
+  /**
+   * Sends a message to the command executor
+   */
+  public final void sendMessage(final String legacy) {
+    sendMessage(Component.text(legacy));
+  }
+
+  /**
+   * Sends a message to the command executor
+   */
+  public final void sendMessage(final Component component) {
+    audience.sendMessage(component);
   }
 }

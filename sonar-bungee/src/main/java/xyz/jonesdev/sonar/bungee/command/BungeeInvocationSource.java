@@ -15,24 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.server;
+package xyz.jonesdev.sonar.bungee.command;
 
-import xyz.jonesdev.sonar.api.SonarPlatform;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.md_5.bungee.api.CommandSender;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
+import xyz.jonesdev.sonar.bungee.SonarBungee;
 
-import java.util.Optional;
+public final class BungeeInvocationSource extends InvocationSource {
+  private static final BungeeAudiences AUDIENCES = BungeeAudiences.create(SonarBungee.INSTANCE.getPlugin());
 
-public interface ServerWrapper {
-
-  /**
-   * @return Platform of the server (Velocity, BungeeCord, Spigot)
-   */
-  SonarPlatform getPlatform();
-
-  /**
-   * @param username Username of the player
-   * @return Optional player wrapped as InvocationSender
-   * @see InvocationSource
-   */
-  Optional<InvocationSource> getOnlinePlayer(final String username);
+  public BungeeInvocationSource(final @NotNull CommandSender sender) {
+    super(sender.getName(), AUDIENCES.sender(sender));
+  }
 }

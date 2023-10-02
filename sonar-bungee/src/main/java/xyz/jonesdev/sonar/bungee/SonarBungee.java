@@ -18,14 +18,14 @@
 package xyz.jonesdev.sonar.bungee;
 
 import lombok.Getter;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.command.InvocationSender;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
+import xyz.jonesdev.sonar.bungee.command.BungeeInvocationSource;
 import xyz.jonesdev.sonar.bungee.command.SonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
@@ -84,22 +84,11 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     }
 
     @Override
-    public Optional<InvocationSender> getOnlinePlayer(final String username) {
+    public Optional<InvocationSource> getOnlinePlayer(final String username) {
       return getPlugin().getServer().getPlayers().stream()
         .filter(player -> player.getName().equalsIgnoreCase(username))
         .findFirst()
-        .map(player -> new InvocationSender() {
-
-          @Override
-          public String getName() {
-            return player.getName();
-          }
-
-          @Override
-          public void sendMessage(final String message) {
-            player.sendMessage(new TextComponent(message));
-          }
-        });
+        .map(BungeeInvocationSource::new);
     }
   };
 
