@@ -1,0 +1,13 @@
+{
+  "id": "sonar",
+  "name": "$name",
+  "version": "$version",
+  "description": "$description",
+  "url": "$url",
+  "authors": [
+    "Jones Development",
+    "Sonar Contributors"
+  ],
+  "dependencies": [],
+  "main": "$main"
+}

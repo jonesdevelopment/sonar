@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.cappuccino.Cappuccino;
@@ -51,9 +52,20 @@ public interface FallbackUser<X, Y> {
    * Kicks the player from the server with
    * the given disconnect message.
    *
-   * @param reason Disconnect message
+   * @param reason Legacy disconnect message string
+   * @see #disconnect(Component)
    */
-  void disconnect(final @NotNull String reason);
+  default void disconnect(final @NotNull String reason) {
+    disconnect(Component.text(reason));
+  }
+
+  /**
+   * Kicks the player from the server with
+   * the given disconnect message.
+   *
+   * @param reason Disconnect message component
+   */
+  void disconnect(final @NotNull Component reason);
 
   /**
    * Sends a packet/message to the player

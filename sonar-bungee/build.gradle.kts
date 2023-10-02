@@ -24,6 +24,9 @@ dependencies {
 
   compileOnly("net.md_5:bungeecord:1.20.2-rc2-SNAPSHOT")
 
+  // MiniMessage platform support
+  implementation("net.kyori:adventure-platform-bungeecord:4.3.1")
+
   // Implement bStats.org for metrics
   implementation("org.bstats:bstats-bungeecord:3.0.2")
 }
