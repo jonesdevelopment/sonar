@@ -55,33 +55,10 @@ import java.util.concurrent.TimeUnit;
 import static com.velocitypowered.proxy.network.Connections.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
 import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
-import static xyz.jonesdev.sonar.velocity.fallback.FallbackListener.CachedMessages.*;
 
 @RequiredArgsConstructor
 public final class FallbackListener {
   private final @NotNull Fallback fallback;
-
-  public static class CachedMessages {
-    static Component LOCKDOWN_DISCONNECT;
-    static Component TOO_MANY_ONLINE_PER_IP;
-    static Component TOO_MANY_PLAYERS;
-    static Component BLACKLISTED;
-    static Component ALREADY_VERIFYING;
-    static Component ALREADY_QUEUED;
-    static Component TOO_FAST_RECONNECT;
-    public static Component INVALID_USERNAME;
-
-    public static void update() {
-      ALREADY_VERIFYING = Component.text(Sonar.get().getConfig().ALREADY_VERIFYING);
-      ALREADY_QUEUED = Component.text(Sonar.get().getConfig().ALREADY_QUEUED);
-      TOO_MANY_PLAYERS = Component.text(Sonar.get().getConfig().TOO_MANY_PLAYERS);
-      BLACKLISTED = Component.text(Sonar.get().getConfig().BLACKLISTED);
-      TOO_FAST_RECONNECT = Component.text(Sonar.get().getConfig().TOO_FAST_RECONNECT);
-      INVALID_USERNAME = Component.text(Sonar.get().getConfig().INVALID_USERNAME);
-      TOO_MANY_ONLINE_PER_IP = Component.text(Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP);
-      LOCKDOWN_DISCONNECT = Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT);
-    }
-  }
 
   private static final DummyConnection CLOSED_MINECRAFT_CONNECTION;
 
@@ -133,7 +110,7 @@ public final class FallbackListener {
     if (fallback.getBlacklisted().has(inetAddress.toString())) {
       markConnectionAsDead(mcConnection.getSessionHandler());
       initialConnection.getConnection().closeWith(Disconnect.create(
-        BLACKLISTED,
+        Sonar.get().getConfig().BLACKLISTED,
         inboundConnection.getProtocolVersion()
       ));
       return;
@@ -162,7 +139,7 @@ public final class FallbackListener {
     if (fallback.getConnected().containsKey(event.getUsername())
       || fallback.getConnected().containsValue(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
-        ALREADY_VERIFYING,
+        Sonar.get().getConfig().ALREADY_VERIFYING,
         inboundConnection.getProtocolVersion()
       ));
       return;
@@ -172,7 +149,7 @@ public final class FallbackListener {
     // There's technically no reason for limiting this, but we'll better stay safe.
     if (fallback.getConnected().size() > Sonar.get().getConfig().MAXIMUM_VERIFYING_PLAYERS) {
       initialConnection.getConnection().closeWith(Disconnect.create(
-        TOO_MANY_PLAYERS,
+        Sonar.get().getConfig().TOO_MANY_PLAYERS,
         inboundConnection.getProtocolVersion()
       ));
       return;
@@ -181,7 +158,7 @@ public final class FallbackListener {
     // Check if the IP address is currently being rate-limited
     if (!fallback.getRatelimiter().attempt(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
-        TOO_FAST_RECONNECT,
+        Sonar.get().getConfig().TOO_FAST_RECONNECT,
         inboundConnection.getProtocolVersion()
       ));
       return;
@@ -190,7 +167,7 @@ public final class FallbackListener {
     // Check if the player is already queued since we don't want bots to flood the queue
     if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
-        ALREADY_QUEUED,
+        Sonar.get().getConfig().ALREADY_QUEUED,
         inboundConnection.getProtocolVersion()
       ));
       return;
@@ -216,7 +193,7 @@ public final class FallbackListener {
         // UTF-16 names or other types of flood attacks
         if (!Sonar.get().getConfig().VALID_NAME_REGEX
           .matcher(event.getUsername()).matches()) {
-          mcConnection.closeWith(Disconnect.create(INVALID_USERNAME, mcConnection.getProtocolVersion()));
+          mcConnection.closeWith(Disconnect.create(Sonar.get().getConfig().INVALID_USERNAME, mcConnection.getProtocolVersion()));
           return;
         }
 
@@ -253,7 +230,7 @@ public final class FallbackListener {
     if (Sonar.get().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
-          LOCKDOWN_DISCONNECT, connectedPlayer.getProtocolVersion()
+          Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT), connectedPlayer.getProtocolVersion()
         ));
 
         if (Sonar.get().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
@@ -288,7 +265,7 @@ public final class FallbackListener {
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
-          TOO_MANY_ONLINE_PER_IP, connectedPlayer.getProtocolVersion()
+          Sonar.get().getConfig().TOO_MANY_ONLINE_PER_IP, connectedPlayer.getProtocolVersion()
         ));
       }
     }

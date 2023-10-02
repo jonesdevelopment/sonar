@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 @Getter
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public abstract class InvocationSource {
    * Sends a message to the command executor
    */
   public final void sendMessage(final String legacy) {
-    sendMessage(Component.text(legacy));
+    sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
   }
 
   /**

@@ -40,8 +40,8 @@ subprojects {
 
     // MiniMessage
     implementation("net.kyori:adventure-text-minimessage:4.14.0")
-    implementation("net.kyori:adventure-text-serializer-json:4.14.0")
     implementation("net.kyori:adventure-text-serializer-gson:4.14.0")
+    implementation("net.kyori:adventure-text-serializer-legacy:4.14.0")
 
     implementation("net.kyori:adventure-nbt:4.14.0") // nbt
     implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM

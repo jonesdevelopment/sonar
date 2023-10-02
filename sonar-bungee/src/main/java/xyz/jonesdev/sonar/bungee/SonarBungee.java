@@ -117,8 +117,5 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
   @Override
   public void postReload() {
-
-    // Prepare cached messages
-    FallbackListener.CachedMessages.update();
   }
 }

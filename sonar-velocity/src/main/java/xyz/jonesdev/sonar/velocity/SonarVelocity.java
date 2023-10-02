@@ -113,8 +113,5 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
   @Override
   public void postReload() {
-
-    // Prepare cached messages
-    FallbackListener.CachedMessages.update();
   }
 }
