@@ -106,9 +106,6 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   @Override
   public void enable() {
 
-    // Reload configuration
-    reload();
-
     // Initialize bStats.org metrics
     new Metrics(getPlugin(), getServer().getPlatform().getMetricsId());
 

@@ -102,9 +102,6 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
   @Override
   public void enable() {
 
-    // Reload configuration
-    reload();
-
     // Initialize bStats.org metrics
     new Metrics(getPlugin(), getServer().getPlatform().getMetricsId());
 
