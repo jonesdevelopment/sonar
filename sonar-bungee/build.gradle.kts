@@ -7,7 +7,7 @@ apply(plugin = "net.minecrell.plugin-yml.bungee")
 bungee {
   name = rootProject.name
   version = rootProject.version.toString().split("-")[0]
-  main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
+  main = "xyz.jonesdev.sonar.bungee.SonarBungeePlugin"
   author = "Jones Development, Sonar Contributors"
   description = "Effective Anti-bot plugin for Velocity, BungeeCord, and Bukkit (1.7-latest)"
 }
