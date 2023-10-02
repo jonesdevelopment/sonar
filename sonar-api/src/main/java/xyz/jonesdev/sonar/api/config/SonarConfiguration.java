@@ -142,7 +142,7 @@ public final class SonarConfiguration {
   public boolean LOCKDOWN_ENABLED;
   public boolean LOCKDOWN_ENABLE_NOTIFY;
   public boolean LOCKDOWN_LOG_ATTEMPTS;
-  public String LOCKDOWN_DISCONNECT;
+  public Component LOCKDOWN_DISCONNECT;
   public String LOCKDOWN_ACTIVATED;
   public String LOCKDOWN_DEACTIVATED;
   public String LOCKDOWN_NOTIFICATION;
@@ -419,12 +419,12 @@ public final class SonarConfiguration {
     messagesConfig.getYaml().setComment("messages.lockdown.disconnect-message",
       "Message that is shown to a normal player when they try joining the server during lockdown"
     );
-    LOCKDOWN_DISCONNECT = fromList(messagesConfig.getStringList("messages.lockdown.disconnect-message",
+    LOCKDOWN_DISCONNECT = deserialize(fromList(messagesConfig.getStringList("messages.lockdown.disconnect-message",
       Arrays.asList(
         "%header%",
         "&cThe server is currently locked down, please try again later.",
         "%footer%"
-      )));
+      ))));
 
     messagesConfig.getYaml().setComment("messages.reload.start",
       "Message that is shown when someone starts reloading Sonar"

@@ -230,7 +230,7 @@ public final class FallbackListener {
     if (Sonar.get().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
-          Component.text(Sonar.get().getConfig().LOCKDOWN_DISCONNECT), connectedPlayer.getProtocolVersion()
+          Sonar.get().getConfig().LOCKDOWN_DISCONNECT, connectedPlayer.getProtocolVersion()
         ));
 
         if (Sonar.get().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
