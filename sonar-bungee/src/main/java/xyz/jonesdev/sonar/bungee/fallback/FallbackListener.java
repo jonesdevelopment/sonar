@@ -21,8 +21,11 @@ import com.velocitypowered.natives.compression.VelocityCompressor;
 import com.velocitypowered.natives.util.Natives;
 import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.compress.PacketCompressor;
@@ -30,12 +33,15 @@ import net.md_5.bungee.compress.PacketDecompressor;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
+import net.md_5.bungee.protocol.packet.Kick;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketCompressor;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
+import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
 
 import java.lang.reflect.Field;
 
@@ -61,7 +67,18 @@ public final class FallbackListener implements Listener {
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
     if (Sonar.get().getConfig().LOCKDOWN_ENABLED) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
-        event.getPlayer().disconnect(new TextComponent(Sonar.get().getConfig().LOCKDOWN_DISCONNECT));
+        final PendingConnection pendingConnection = event.getPlayer().getPendingConnection();
+        // Try to close the channel with a custom serialized disconnect component
+        if (pendingConnection instanceof FallbackInitialHandler) {
+          final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) pendingConnection;
+          final Component component = Sonar.get().getConfig().LOCKDOWN_DISCONNECT;
+          final String serialized = JSONComponentSerializer.json().serialize(component);
+          fallbackInitialHandler.closeWith(new Kick(serialized));
+        } else {
+          // Fallback by disconnecting without a message
+          pendingConnection.disconnect();
+          Sonar.get().getLogger().warn("Fallback handler of {} is missing", event.getPlayer().getName());
+        }
 
         if (Sonar.get().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
           Sonar.get().getLogger().info(
