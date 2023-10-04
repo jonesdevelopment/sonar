@@ -74,6 +74,12 @@ public interface FallbackUser<X, Y> {
    */
   void write(final @NotNull Object msg);
 
+  /**
+   * Queues a buffered message that will be
+   * sent once all messages are flushed.
+   */
+  void delayedWrite(final @NotNull Object msg);
+
   ExpiringCache<String> PREVIOUS_FAILS = Cappuccino.buildExpiring(3L, TimeUnit.MINUTES);
 
   /**
