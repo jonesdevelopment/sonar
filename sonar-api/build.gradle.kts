@@ -1,5 +1,7 @@
 dependencies {
-  implementation("com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4") // yaml config
+  implementation("com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
+    exclude(group = "org.yaml")
+  }
 
   compileOnly("org.jetbrains:annotations:24.0.1")
 }
