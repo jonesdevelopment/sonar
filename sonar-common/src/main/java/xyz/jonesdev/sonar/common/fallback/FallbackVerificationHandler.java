@@ -99,7 +99,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to TRANSACTION to avoid false positives
     // and go on with the flow of the verification.
     state = State.TRANSACTION;
-    // Send a transaction with a
+    // Send a transaction with the given ID
     user.write(new Transaction(
       0, transactionId, false
     ));
@@ -118,10 +118,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // and go on with the flow of the verification.
     state = State.POSITION;
     // Teleport player into the fake lobby by sending an empty chunk
-    user.write(EMPTY_CHUNK_DATA);
+    user.delayedWrite(EMPTY_CHUNK_DATA);
     // Send an UpdateSectionBlocks packet with a platform of blocks
     // to check if the player collides with the solid platform.
-    user.write(UPDATE_SECTION_BLOCKS);
+    user.delayedWrite(UPDATE_SECTION_BLOCKS);
+    // Send all packets in one flush
+    user.getChannel().flush();
   }
 
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
