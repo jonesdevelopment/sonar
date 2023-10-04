@@ -55,6 +55,11 @@ public interface Sonar {
   @NotNull Verbose getVerboseHandler();
 
   /**
+   * Set a custom verbose handler
+   */
+  void setVerboseHandler(final @NotNull Verbose verboseHandler);
+
+  /**
    * Reloads the entire plugin
    */
   void reload();
