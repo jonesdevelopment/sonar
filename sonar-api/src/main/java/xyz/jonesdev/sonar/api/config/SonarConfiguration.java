@@ -30,6 +30,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -649,9 +650,9 @@ public final class SonarConfiguration {
           " &3| &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
           "  &a&l%animation%"
       ))));
-    animation = messagesConfig.getStringList("messages.action-bar.animation",
+    animation = Collections.unmodifiableList(messagesConfig.getStringList("messages.action-bar.animation",
       Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
-    );
+    ));
 
     generalConfig.save();
     messagesConfig.save();
