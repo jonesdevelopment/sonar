@@ -74,10 +74,6 @@ public final class SonarConfiguration {
   public int VERIFICATION_READ_TIMEOUT;
   public int VERIFICATION_DELAY;
 
-  // https://github.com/jonesdevelopment/sonar-legacy/issues/7
-  // Only available on BungeeCord
-  public boolean REPLACE_VAR_INT_DECODER;
-
   public boolean LOG_DURING_ATTACK;
 
   public String HEADER, FOOTER;
@@ -190,14 +186,6 @@ public final class SonarConfiguration {
       "Should Sonar log players' IP addresses in the console?"
     );
     LOG_PLAYER_ADDRESSES = generalConfig.getBoolean("general.log-player-addresses", true);
-
-    if (Sonar.get().getServer().getPlatform() == SonarPlatform.BUNGEE) {
-      generalConfig.getYaml().setComment("general.replace-varint-decoder",
-        "Should Sonar replace BungeeCord's VarInt decoder?" + Sonar.LINE_SEPARATOR + "This option is only available " +
-          "on BungeeCord."
-      );
-      REPLACE_VAR_INT_DECODER = generalConfig.getBoolean("general.replace-varint-decoder", true);
-    }
 
     // Database
     generalConfig.getYaml().setComment("general.database.type",
