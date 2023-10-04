@@ -30,6 +30,8 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Getter
@@ -47,7 +49,7 @@ public final class SonarConfiguration {
   private String noPermission;
 
   private String actionBarLayout;
-  private Collection<String> animation;
+  private List<String> animation;
 
   private boolean enableVerification;
   private boolean logPlayerAddresses;
@@ -648,9 +650,9 @@ public final class SonarConfiguration {
           " &3| &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
           "  &a&l%animation%"
       ))));
-    animation = messagesConfig.getStringList("messages.action-bar.animation",
+    animation = Collections.unmodifiableList(messagesConfig.getStringList("messages.action-bar.animation",
       Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
-    );
+    ));
 
     generalConfig.save();
     messagesConfig.save();
