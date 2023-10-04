@@ -57,4 +57,13 @@ public final class FallbackUserWrapper implements FallbackUser<ChannelWrapper, F
       ReferenceCountUtil.release(packet);
     }
   }
+
+  @Override
+  public void delayedWrite(final @NotNull Object packet) {
+    if (channel.isActive()) {
+      channel.write(packet, channel.voidPromise());
+    } else {
+      ReferenceCountUtil.release(packet);
+    }
+  }
 }

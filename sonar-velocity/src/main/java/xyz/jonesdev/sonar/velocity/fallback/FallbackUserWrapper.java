@@ -56,4 +56,9 @@ public final class FallbackUserWrapper implements FallbackUser<ConnectedPlayer, 
   public void write(final @NotNull Object packet) {
     connection.write(packet);
   }
+
+  @Override
+  public void delayedWrite(final @NotNull Object packet) {
+    connection.delayedWrite(packet);
+  }
 }
