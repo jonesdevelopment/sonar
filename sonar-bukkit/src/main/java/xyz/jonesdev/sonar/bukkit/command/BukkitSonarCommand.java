@@ -46,6 +46,11 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
                            final String label,
                            final String[] args) {
     if (!(sender instanceof ConsoleCommandSender)) {
+      // Check if the player actually has the permission to run the command
+      if (!sender.hasPermission("sonar.command")) {
+        sender.sendMessage(Sonar.get().getConfig().NO_PERMISSION);
+        return false;
+      }
       // Checking if it contains will only break more since it can throw
       // a NullPointerException if the cache is being accessed from parallel threads
       DELAY.cleanUp(); // Clean up the cache
@@ -141,6 +146,10 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
                                     final Command command,
                                     final String commandAlias,
                                     final String @NotNull [] args) {
+    // Do not allow tab completion if the player does not have the required permission
+    if (!sender.hasPermission("sonar.command")) {
+      return emptyList();
+    }
     if (args.length <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
         for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
