@@ -38,12 +38,15 @@ subprojects {
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    // MiniMessage
-    implementation("net.kyori:adventure-text-minimessage:4.14.0")
-    implementation("net.kyori:adventure-text-serializer-gson:4.14.0")
-    implementation("net.kyori:adventure-text-serializer-legacy:4.14.0")
+    val adventureVersion = "4.14.0"
 
-    implementation("net.kyori:adventure-nbt:4.14.0") // nbt
+    // adventure
+    implementation("net.kyori:adventure-text-minimessage:$adventureVersion")
+    implementation("net.kyori:adventure-text-serializer-gson:$adventureVersion")
+    implementation("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
+    // adventure nbt
+    implementation("net.kyori:adventure-nbt:$adventureVersion")
+
     implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
     implementation("xyz.jonesdev:cappuccino:0.1.6-SNAPSHOT") // expiring cache
 
@@ -69,10 +72,19 @@ tasks {
   }
 
   shadowJar {
-    // bStats has to be relocated to the Sonar package otherwise it throws an exception.
-    relocate("org.bstats", "xyz.jonesdev.sonar.bstats")
     // Set the file name of the shadowed jar
     archiveFileName.set("${rootProject.name}.jar")
+
+    // bStats has to be relocated to the Sonar package otherwise it throws an exception
+    // https://github.com/Bastian/bstats-metrics/blob/master/base/src/main/java/org/bstats/MetricsBase.java#L251
+    relocate("org.bstats", "xyz.jonesdev.sonar.libs.bstats")
+
+    // https://github.com/jonesdevelopment/sonar/issues/46
+    // Relocate some packages, so we don't run into issues where we accidentally use Velocity's classes
+    relocate("net.kyori.adventure.nbt", "xyz.jonesdev.sonar.libs.nbt")
+    relocate("com.google.gson", "xyz.jonesdev.sonar.libs.gson")
+    relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
+    relocate("com.velocitypowered.natives", "xyz.jonesdev.sonar.libs.natives")
   }
 
   compileJava {
