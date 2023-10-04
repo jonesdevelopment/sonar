@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common.boot;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
@@ -41,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public abstract class SonarBootstrap<T> implements Sonar {
   private T plugin;
+  @Setter
   private Verbose verboseHandler;
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
