@@ -41,7 +41,6 @@ import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketCompressor;
 import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
 import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.Disconnect;
 
 import java.lang.reflect.Field;
 
@@ -65,13 +64,13 @@ public final class FallbackListener implements Listener {
   @EventHandler
   @SuppressWarnings("deprecation")
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
-    if (Sonar.get().getConfig().LOCKDOWN_ENABLED) {
+    if (Sonar.get().getConfig().lockdownEnabled) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
         final PendingConnection pendingConnection = event.getPlayer().getPendingConnection();
         // Try to close the channel with a custom serialized disconnect component
         if (pendingConnection instanceof FallbackInitialHandler) {
           final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) pendingConnection;
-          final Component component = Sonar.get().getConfig().LOCKDOWN_DISCONNECT;
+          final Component component = Sonar.get().getConfig().lockdownDisconnect;
           final String serialized = JSONComponentSerializer.json().serialize(component);
           fallbackInitialHandler.closeWith(new Kick(serialized));
         } else {
@@ -80,9 +79,9 @@ public final class FallbackListener implements Listener {
           Sonar.get().getLogger().warn("Fallback handler of {} is missing", event.getPlayer().getName());
         }
 
-        if (Sonar.get().getConfig().LOCKDOWN_LOG_ATTEMPTS) {
+        if (Sonar.get().getConfig().lockdownLogAttempts) {
           Sonar.get().getLogger().info(
-            Sonar.get().getConfig().LOCKDOWN_CONSOLE_LOG
+            Sonar.get().getConfig().lockdownConsoleLog
               .replace("%player%", event.getPlayer().getName())
               .replace("%ip%", Sonar.get().getConfig()
                 .formatAddress(event.getPlayer().getAddress().getAddress()))
@@ -91,9 +90,9 @@ public final class FallbackListener implements Listener {
           );
         }
         return;
-      } else if (Sonar.get().getConfig().LOCKDOWN_ENABLE_NOTIFY) {
+      } else if (Sonar.get().getConfig().lockdownEnableNotify) {
         event.getPlayer().sendMessage(
-          new TextComponent(Sonar.get().getConfig().LOCKDOWN_NOTIFICATION)
+          new TextComponent(Sonar.get().getConfig().lockdownNotification)
         );
       }
     }

@@ -48,7 +48,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
     if (!(sender instanceof ConsoleCommandSender)) {
       // Check if the player actually has the permission to run the command
       if (!sender.hasPermission("sonar.command")) {
-        sender.sendMessage(Sonar.get().getConfig().NO_PERMISSION);
+        sender.sendMessage(Sonar.get().getConfig().getNoPermission());
         return false;
       }
       // Checking if it contains will only break more since it can throw
@@ -60,14 +60,14 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        sender.sendMessage(Sonar.get().getConfig().COMMAND_COOL_DOWN);
+        sender.sendMessage(Sonar.get().getConfig().commandCoolDown);
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
         sender.sendMessage(
-          Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
+          Sonar.get().getConfig().commandCoolDownLeft
             .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))
         );
         return false;
@@ -94,7 +94,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
           && !sender.hasPermission(subcommand.get().getPermission())
         ) {
           invocationSource.sendMessage(
-            Sonar.get().getConfig().SUB_COMMAND_NO_PERM
+            Sonar.get().getConfig().subCommandNoPerm
               .replace("%permission%", subcommand.get().getPermission())
           );
           return false;
@@ -104,12 +104,12 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
 
     subcommand.ifPresent(sub -> {
       if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().playersOnly);
         return;
       }
 
       if (sub.getInfo().onlyConsole() && !(sender instanceof ConsoleCommandSender)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().consoleOnly);
         return;
       }
 
@@ -119,7 +119,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
       if (sub.getInfo().arguments().length > 0
         && commandInvocation.getRawArguments().length <= 1) {
         invocationSource.sendMessage(
-          Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
+          Sonar.get().getConfig().incorrectCommandUsage
             .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
         );
         return;

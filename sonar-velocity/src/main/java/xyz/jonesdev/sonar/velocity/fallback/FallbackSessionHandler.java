@@ -122,11 +122,11 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     // The player joined the verification
     Statistics.REAL_TRAFFIC.increment();
 
-    if (Sonar.get().getConfig().LOG_CONNECTIONS) {
+    if (Sonar.get().getConfig().logConnections) {
       // Only log the processing message if the server isn't under attack.
       // We let the user override this through the configuration.
-      if (!fallback.isPotentiallyUnderAttack() || Sonar.get().getConfig().LOG_DURING_ATTACK) {
-        fallback.getLogger().info(Sonar.get().getConfig().VERIFICATION_CONNECT_LOG
+      if (!fallback.isPotentiallyUnderAttack() || Sonar.get().getConfig().logDuringAttack) {
+        fallback.getLogger().info(Sonar.get().getConfig().verificationConnectLog
           .replace("%name%", connectedPlayer.getUsername())
           .replace("%ip%", Sonar.get().getConfig().formatAddress(fallbackPlayer.getInetAddress()))
           .replace("%protocol%", String.valueOf(fallbackPlayer.getProtocolVersion().getProtocol())));

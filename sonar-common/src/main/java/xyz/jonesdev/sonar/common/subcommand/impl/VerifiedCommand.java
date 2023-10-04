@@ -46,7 +46,7 @@ public final class VerifiedCommand extends Subcommand {
     switch (invocation.getRawArguments()[1].toLowerCase()) {
       case "history": {
         if (invocation.getRawArguments().length <= 2) {
-          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_COMMAND_USAGE
+          invocation.getSender().sendMessage(SONAR.getConfig().incorrectCommandUsage
             .replace("%usage%", "verified history <IP address>"));
           return;
         }
@@ -54,7 +54,7 @@ public final class VerifiedCommand extends Subcommand {
         final String inetAddress = invocation.getRawArguments()[2];
 
         if (!IP_PATTERN.matcher(inetAddress).matches()) {
-          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_IP_ADDRESS);
+          invocation.getSender().sendMessage(SONAR.getConfig().incorrectIpAddress);
           return;
         }
 
@@ -62,7 +62,7 @@ public final class VerifiedCommand extends Subcommand {
         final String realInetAddress = "/" + inetAddress;
 
         if (!SONAR.getVerifiedPlayerController().has(realInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_NOT_FOUND);
+          invocation.getSender().sendMessage(SONAR.getConfig().verifiedNotFound);
           return;
         }
 
@@ -76,7 +76,7 @@ public final class VerifiedCommand extends Subcommand {
 
       case "remove": {
         if (invocation.getRawArguments().length <= 2) {
-          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_COMMAND_USAGE
+          invocation.getSender().sendMessage(SONAR.getConfig().incorrectCommandUsage
             .replace("%usage%", "verified remove <IP address>"));
           return;
         }
@@ -84,7 +84,7 @@ public final class VerifiedCommand extends Subcommand {
         final String inetAddress = invocation.getRawArguments()[2];
 
         if (!IP_PATTERN.matcher(inetAddress).matches()) {
-          invocation.getSender().sendMessage(SONAR.getConfig().INCORRECT_IP_ADDRESS);
+          invocation.getSender().sendMessage(SONAR.getConfig().incorrectIpAddress);
           return;
         }
 
@@ -92,12 +92,12 @@ public final class VerifiedCommand extends Subcommand {
         final String realInetAddress = "/" + inetAddress;
 
         if (LOCK.contains(realInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_BLOCKED);
+          invocation.getSender().sendMessage(SONAR.getConfig().verifiedBlocked);
           return;
         }
 
         if (!SONAR.getVerifiedPlayerController().has(realInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_NOT_FOUND);
+          invocation.getSender().sendMessage(SONAR.getConfig().verifiedNotFound);
           return;
         }
 
@@ -106,7 +106,7 @@ public final class VerifiedCommand extends Subcommand {
         SONAR.getVerifiedPlayerController().remove(realInetAddress);
         LOCK.remove(realInetAddress);
 
-        invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_REMOVE
+        invocation.getSender().sendMessage(SONAR.getConfig().verifiedRemove
           .replace("%ip%", inetAddress));
         break;
       }
@@ -115,19 +115,19 @@ public final class VerifiedCommand extends Subcommand {
         final int verified = SONAR.getVerifiedPlayerController().estimatedSize();
 
         if (verified == 0) {
-          invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_EMPTY);
+          invocation.getSender().sendMessage(SONAR.getConfig().verifiedEmpty);
           return;
         }
 
         SONAR.getVerifiedPlayerController().clearAll();
 
-        invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_CLEARED
+        invocation.getSender().sendMessage(SONAR.getConfig().verifiedCleared
           .replace("%removed%", Sonar.DECIMAL_FORMAT.format(verified)));
         break;
       }
 
       case "size": {
-        invocation.getSender().sendMessage(SONAR.getConfig().VERIFIED_SIZE
+        invocation.getSender().sendMessage(SONAR.getConfig().verifiedSize
           .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize())));
         break;
       }

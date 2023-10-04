@@ -32,12 +32,12 @@ public final class ReloadCommand extends Subcommand {
   public void execute(final @NotNull CommandInvocation invocation) {
     final long startTime = System.currentTimeMillis();
 
-    invocation.getSender().sendMessage(SONAR.getConfig().RELOADING);
+    invocation.getSender().sendMessage(SONAR.getConfig().reloading);
     SONAR.reload();
 
     final long timeTaken = System.currentTimeMillis() - startTime;
     invocation.getSender().sendMessage(
-      SONAR.getConfig().RELOADED
+      SONAR.getConfig().reloaded
         .replace("%taken%", String.valueOf(timeTaken))
     );
   }

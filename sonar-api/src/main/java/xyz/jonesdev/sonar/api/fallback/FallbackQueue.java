@@ -50,7 +50,7 @@ public final class FallbackQueue {
   }
 
   public void poll() {
-    final int max = Sonar.get().getConfig().MAXIMUM_QUEUE_POLLS;
+    final int max = Sonar.get().getConfig().maximumQueuePolls;
     int index = 0;
 
     // We need to be very careful here since we don't want any concurrency issues.
