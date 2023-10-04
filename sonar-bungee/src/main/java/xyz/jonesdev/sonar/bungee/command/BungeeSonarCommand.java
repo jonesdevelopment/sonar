@@ -41,7 +41,7 @@ import static java.util.Collections.emptyList;
 
 public final class BungeeSonarCommand extends Command implements TabExecutor, SonarCommand {
   public BungeeSonarCommand() {
-    super("sonar", "sonar.command");
+    super("sonar");
     cacheHelpMessage();
   }
 
@@ -49,6 +49,11 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
   @SuppressWarnings({"redundantSuppression"})
   public void execute(final @NotNull CommandSender sender, final String[] args) {
     if (!(sender instanceof ConsoleCommandSender)) {
+      // Check if the player actually has the permission to run the command
+      if (!sender.hasPermission("sonar.command")) {
+        sender.sendMessage(new TextComponent(Sonar.get().getConfig().NO_PERMISSION));
+        return;
+      }
       // Checking if it contains will only break more since it can throw
       // a NullPointerException if the cache is being accessed from parallel threads
       DELAY.cleanUp(); // Clean up the cache

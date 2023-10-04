@@ -45,6 +45,7 @@ public final class SonarConfiguration {
 
   public String PREFIX;
   public String SUPPORT_URL;
+  public String NO_PERMISSION;
 
   public String ACTION_BAR_LAYOUT;
   public Collection<String> ANIMATION;
@@ -374,7 +375,7 @@ public final class SonarConfiguration {
     HEADER = fromList(messagesConfig.getStringList("messages.header",
       Arrays.asList(
         "&e&lSonar",
-        ""
+        "&r"
       )));
 
     messagesConfig.getYaml().setComment("messages.footer",
@@ -384,6 +385,11 @@ public final class SonarConfiguration {
       Arrays.asList(
         "&7If you believe that this is an error, contact an administrator."
       )));
+
+    messagesConfig.getYaml().setComment("messages.no-permission",
+      "Message that is shown when a player tries running /sonar without permission");
+    NO_PERMISSION = formatString(messagesConfig.getString("messages.no-permission",
+      "%prefix%&cYou do not have permission to execute this command."));
 
     messagesConfig.getYaml().setComment("messages.lockdown.enabled",
       "Message that is shown when a player enables server lockdown"

@@ -44,6 +44,11 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
   @Override
   public void execute(final @NotNull Invocation invocation) {
     if (!(invocation.source() instanceof ConsoleCommandSource)) {
+      // Check if the player actually has the permission to run the command
+      if (!invocation.source().hasPermission("sonar.command")) {
+        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().NO_PERMISSION));
+        return;
+      }
       // Checking if it contains will only break more since it can throw
       // a NullPointerException if the cache is being accessed from parallel threads
       DELAY.cleanUp(); // Clean up the cache
@@ -164,10 +169,5 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
     }
     return emptyList();
-  }
-
-  @Override
-  public boolean hasPermission(final @NotNull Invocation invocation) {
-    return invocation.source().hasPermission("sonar.command");
   }
 }
