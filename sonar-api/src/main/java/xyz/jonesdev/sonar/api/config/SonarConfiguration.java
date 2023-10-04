@@ -30,6 +30,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Getter
@@ -47,7 +48,7 @@ public final class SonarConfiguration {
   private String noPermission;
 
   private String actionBarLayout;
-  private Collection<String> animation;
+  private List<String> animation;
 
   private boolean enableVerification;
   private boolean logPlayerAddresses;
