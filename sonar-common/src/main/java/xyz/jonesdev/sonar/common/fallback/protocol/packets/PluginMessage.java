@@ -45,6 +45,11 @@ public final class PluginMessage extends DeferredByteBufHolder implements Fallba
   }
 
   @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 0xfff + 1; // limit packet size to 4096
+  }
+
+  @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     channel = readString(byteBuf);
 
