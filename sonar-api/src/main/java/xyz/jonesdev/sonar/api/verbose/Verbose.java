@@ -96,21 +96,21 @@ public abstract class Verbose implements JVMProfiler {
    * @param subscriber Name of the player who subscribed
    * @return Whether the player is subscribed or not
    */
-  public boolean isSubscribed(final @NotNull String subscriber) {
+  public final boolean isSubscribed(final @NotNull String subscriber) {
     return subscribers.contains(subscriber);
   }
 
   /**
    * @param subscriber Name of the player to subscribe
    */
-  public void subscribe(final @NotNull String subscriber) {
+  public final void subscribe(final @NotNull String subscriber) {
     subscribers.add(subscriber);
   }
 
   /**
    * @param subscriber Name of the player to unsubscribe
    */
-  public void unsubscribe(final @NotNull String subscriber) {
+  public final void unsubscribe(final @NotNull String subscriber) {
     subscribers.remove(subscriber);
   }
 }
