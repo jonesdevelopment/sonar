@@ -57,7 +57,7 @@ public abstract class Verbose implements JVMProfiler {
     broadcast(prepareActionBarFormat());
   }
 
-  protected final @NotNull String prepareActionBarFormat() {
+  protected @NotNull String prepareActionBarFormat() {
     return Sonar.get().getConfig().ACTION_BAR_LAYOUT
       .replace("%queued%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
@@ -88,7 +88,9 @@ public abstract class Verbose implements JVMProfiler {
   }
 
   // Run action bar verbose
-  protected abstract void broadcast(final String message);
+  protected void broadcast(final String message) {
+    // This should be replaced by the wrapper
+  }
 
   /**
    * @param subscriber Name of the player who subscribed
