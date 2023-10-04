@@ -144,14 +144,6 @@ public final class SonarConfiguration {
   public String lockdownNotification;
   public String lockdownConsoleLog;
 
-  public String databasePurgeDisallowed;
-  public String databasePurgeConfirm;
-  public String databasePurge;
-  public String databasePurgeAlready;
-  public String databaseNotSelected;
-  public String databaseReloading;
-  public String databaseReloaded;
-
   public void load() {
     if (generalConfig == null) {
       generalConfig = new SimpleYamlConfig(pluginFolder, "config");
@@ -406,44 +398,6 @@ public final class SonarConfiguration {
       "Message that is shown when a player makes another player unsubscribe from Sonar verbose");
     verboseUnsubscribedOther = formatString(messagesConfig.getString("messages.verbose.unsubscribed-other",
       "%prefix%%player% is no longer viewing Sonar verbose."));
-
-    messagesConfig.getYaml().setComment("messages.database.disallowed",
-      "Message that is shown when someone tries purging the database when it is disallowed");
-    databasePurgeDisallowed = formatString(messagesConfig.getString("messages.database.disallowed",
-      "%prefix%&cPurging the database is currently disallowed. Therefore, your action has been cancelled."));
-
-    messagesConfig.getYaml().setComment("messages.database.purge-confirm",
-      "Message that is shown when someone tries purging the database and has to confirm their action");
-    databasePurgeConfirm = formatString(messagesConfig.getString("messages.database.purge-confirm",
-      "%prefix%&cPlease confirm that you want to delete all database entries by typing &7/sonar database " +
-        "purge " +
-        "confirm&c."
-    ));
-
-    messagesConfig.getYaml().setComment("messages.database.purged",
-      "Message that is shown when the database was successfully purged");
-    databasePurge = formatString(messagesConfig.getString("messages.database.purged",
-      "%prefix%&aSuccessfully purged all database entries."));
-
-    messagesConfig.getYaml().setComment("messages.database.already-purging",
-      "Message that is shown when the database is already being purged");
-    databasePurgeAlready = formatString(messagesConfig.getString("messages.database.already-purging",
-      "%prefix%&cThere is already a purge currently running."));
-
-    messagesConfig.getYaml().setComment("messages.database.not-selected",
-      "Message that is shown when no database is configured");
-    databaseNotSelected = formatString(messagesConfig.getString("messages.database.not-selected",
-      "%prefix%&cYou have not selected any data storage type."));
-
-    messagesConfig.getYaml().setComment("messages.database.reload.start",
-      "Message that is shown when someone starts reloading the database");
-    databaseReloading = formatString(messagesConfig.getString("messages.database.reload.start",
-      "%prefix%Reloading all databases..."));
-
-    messagesConfig.getYaml().setComment("messages.database.reload.finish",
-      "Message that is shown when the database has finished reloading");
-    databaseReloaded = formatString(messagesConfig.getString("messages.database.reload.finish",
-      "%prefix%&aSuccessfully reloaded &7(%taken%ms)"));
 
     messagesConfig.getYaml().setComment("messages.incorrect-command-usage",
       "Message that is shown when someone uses a command incorrectly");
