@@ -135,12 +135,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
     try {
-      // 1.7 has some very weird issues when trying to decode the client brand
-      // TODO: fix this?
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) return true;
-      // No need to check for empty or too long client brands since
-      // ProtocolUtil#readString already does exactly that.
-      final String read = ProtocolUtil.readString(content, Sonar.get().getConfig().getMaximumBrandLength());
+      // No need to check for empty brands since ProtocolUtil#readBrandMessage
+      // already performs these checks by default.
+      final String read = ProtocolUtil.readBrandMessage(content);
+      // Check if the decoded client brand string is too long
+      if (read.length() > Sonar.get().getConfig().getMaximumBrandLength()) {
+        return false;
+      }
       // Regex pattern for validating client brands
       final Pattern pattern = Sonar.get().getConfig().getValidBrandRegex();
       return !read.equals("Vanilla") // The normal brand is always lowercase

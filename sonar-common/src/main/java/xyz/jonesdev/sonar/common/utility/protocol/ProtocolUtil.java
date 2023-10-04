@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTagIO;
@@ -47,19 +48,33 @@ public class ProtocolUtil {
   private static final String UNREGISTER_CHANNEL = "minecraft:unregister";
   private static final Pattern INVALID_IDENTIFIER_REGEX = Pattern.compile("[^a-z0-9\\-_]*");
 
-  public static @NotNull String readString(final ByteBuf buf) throws CorruptedFrameException {
-    return readString(buf, Short.MAX_VALUE);
+  public static @NotNull String readBrandMessage(final @NotNull ByteBuf content) throws DecoderException {
+    final ByteBuf slice = content.slice();
+    try {
+      return readString(slice);
+    } catch (DecoderException exception) {
+      return readString(slice, 65536, slice.readableBytes());
+    }
   }
 
-  public static @NotNull String readString(final ByteBuf buf,
-                                           final int cap) throws CorruptedFrameException {
-    final int length = VarIntUtil.readVarInt(buf);
+  public static @NotNull String readString(final ByteBuf byteBuf) throws CorruptedFrameException {
+    return readString(byteBuf, Short.MAX_VALUE);
+  }
 
+  public static @NotNull String readString(final ByteBuf byteBuf,
+                                           final int cap) throws CorruptedFrameException {
+    final int length = VarIntUtil.readVarInt(byteBuf);
+    return readString(byteBuf, cap, length);
+  }
+
+  public static @NotNull String readString(final @NotNull ByteBuf byteBuf,
+                                           final int cap,
+                                           final int length) throws CorruptedFrameException {
     checkFrame(length >= 0, "Got a negative-length string");
     checkFrame(length <= cap * 3, "Bad string size");
-    checkFrame(buf.isReadable(length), "Got an invalid string length");
-    final String str = buf.toString(buf.readerIndex(), length, StandardCharsets.UTF_8);
-    buf.skipBytes(length);
+    checkFrame(byteBuf.isReadable(length), "Tried to read a too-long string");
+    final String str = byteBuf.toString(byteBuf.readerIndex(), length, StandardCharsets.UTF_8);
+    byteBuf.skipBytes(length);
     checkFrame(str.length() <= cap, "Got a too-long string");
     return str;
   }
