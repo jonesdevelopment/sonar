@@ -145,6 +145,10 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
 
   @Override
   public Iterable<String> onTabComplete(final CommandSender sender, final String @NotNull [] args) {
+    // Do not allow tab completion if the player does not have the required permission
+    if (!sender.hasPermission("sonar.command")) {
+      return emptyList();
+    }
     if (args.length <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
         for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {

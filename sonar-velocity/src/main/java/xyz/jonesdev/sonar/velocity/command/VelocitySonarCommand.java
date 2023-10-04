@@ -141,6 +141,10 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
 
   @Override
   public List<String> suggest(final @NotNull Invocation invocation) {
+    // Do not allow tab completion if the player does not have the required permission
+    if (!invocation.source().hasPermission("sonar.command")) {
+      return emptyList();
+    }
     if (invocation.arguments().length <= 1) {
       if (TAB_SUGGESTIONS.isEmpty()) {
         for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
