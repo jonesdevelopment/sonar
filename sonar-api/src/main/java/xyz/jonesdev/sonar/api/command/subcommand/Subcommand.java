@@ -50,7 +50,7 @@ public abstract class Subcommand {
   }
 
   protected final void incorrectUsage(final @NotNull InvocationSource sender) {
-    sender.sendMessage(SONAR.getConfig().incorrectCommandUsage
+    sender.sendMessage(SONAR.getConfig().getIncorrectCommandUsage()
       .replace("%usage%", info.name() + " (" + arguments + ")"));
   }
 

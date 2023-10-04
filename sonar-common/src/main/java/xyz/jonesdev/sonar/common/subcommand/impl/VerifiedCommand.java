@@ -46,27 +46,26 @@ public final class VerifiedCommand extends Subcommand {
     switch (invocation.getRawArguments()[1].toLowerCase()) {
       case "history": {
         if (invocation.getRawArguments().length <= 2) {
-          invocation.getSender().sendMessage(SONAR.getConfig().incorrectCommandUsage
+          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectCommandUsage()
             .replace("%usage%", "verified history <IP address>"));
           return;
         }
 
-        final String inetAddress = invocation.getRawArguments()[2];
-
-        if (!IP_PATTERN.matcher(inetAddress).matches()) {
-          invocation.getSender().sendMessage(SONAR.getConfig().incorrectIpAddress);
+        final String rawInetAddress = invocation.getRawArguments()[2];
+        if (!IP_PATTERN.matcher(rawInetAddress).matches()) {
+          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectIpAddress());
           return;
         }
 
         // We don't need to parse this, so we can just use the string.
-        final String realInetAddress = "/" + inetAddress;
+        final String realInetAddress = "/" + rawInetAddress;
 
         if (!SONAR.getVerifiedPlayerController().has(realInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().verifiedNotFound);
+          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedNotFound());
           return;
         }
 
-        invocation.getSender().sendMessage("§ePrevious UUIDs for " + inetAddress + ":");
+        invocation.getSender().sendMessage("§ePrevious UUIDs for " + rawInetAddress + ":");
 
         for (final UUID uuid : SONAR.getVerifiedPlayerController().getUUIDs(realInetAddress)) {
           invocation.getSender().sendMessage(" §7▪ §f" + uuid.toString());
@@ -76,28 +75,27 @@ public final class VerifiedCommand extends Subcommand {
 
       case "remove": {
         if (invocation.getRawArguments().length <= 2) {
-          invocation.getSender().sendMessage(SONAR.getConfig().incorrectCommandUsage
+          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectCommandUsage()
             .replace("%usage%", "verified remove <IP address>"));
           return;
         }
 
-        final String inetAddress = invocation.getRawArguments()[2];
-
-        if (!IP_PATTERN.matcher(inetAddress).matches()) {
-          invocation.getSender().sendMessage(SONAR.getConfig().incorrectIpAddress);
+        final String rawInetAddress = invocation.getRawArguments()[2];
+        if (!IP_PATTERN.matcher(rawInetAddress).matches()) {
+          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectIpAddress());
           return;
         }
 
         // We don't need to parse this, so we can just use the string.
-        final String realInetAddress = "/" + inetAddress;
+        final String realInetAddress = "/" + rawInetAddress;
 
         if (LOCK.contains(realInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().verifiedBlocked);
+          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedBlocked());
           return;
         }
 
         if (!SONAR.getVerifiedPlayerController().has(realInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().verifiedNotFound);
+          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedNotFound());
           return;
         }
 
@@ -106,8 +104,8 @@ public final class VerifiedCommand extends Subcommand {
         SONAR.getVerifiedPlayerController().remove(realInetAddress);
         LOCK.remove(realInetAddress);
 
-        invocation.getSender().sendMessage(SONAR.getConfig().verifiedRemove
-          .replace("%ip%", inetAddress));
+        invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedRemove()
+          .replace("%ip%", rawInetAddress));
         break;
       }
 
@@ -115,19 +113,18 @@ public final class VerifiedCommand extends Subcommand {
         final int verified = SONAR.getVerifiedPlayerController().estimatedSize();
 
         if (verified == 0) {
-          invocation.getSender().sendMessage(SONAR.getConfig().verifiedEmpty);
+          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedEmpty());
           return;
         }
 
         SONAR.getVerifiedPlayerController().clearAll();
-
-        invocation.getSender().sendMessage(SONAR.getConfig().verifiedCleared
+        invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedCleared()
           .replace("%removed%", Sonar.DECIMAL_FORMAT.format(verified)));
         break;
       }
 
       case "size": {
-        invocation.getSender().sendMessage(SONAR.getConfig().verifiedSize
+        invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedSize()
           .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize())));
         break;
       }

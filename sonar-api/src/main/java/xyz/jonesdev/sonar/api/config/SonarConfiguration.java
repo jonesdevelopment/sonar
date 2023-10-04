@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -45,77 +46,77 @@ public final class SonarConfiguration {
   private String supportUrl;
   private String noPermission;
 
-  public String actionBarLayout;
-  public Collection<String> animation;
+  private String actionBarLayout;
+  private Collection<String> animation;
 
-  public boolean enableVerification;
-  public boolean logPlayerAddresses;
-  public boolean checkGravity;
-  public boolean checkCollisions;
-  public boolean logConnections;
-  public boolean logDuringAttack;
-  public Pattern validNameRegex;
-  public Pattern validBrandRegex;
-  public Pattern validLocaleRegex;
-  public String verificationConnectLog;
-  public String verificationFailedLog;
-  public String verificationSuccessfulLog;
-  public String verificationBlacklistLog;
-  public short gamemodeId;
-  public int maximumBrandLength;
-  public int maximumMovementTicks;
-  public int minimumPlayersForAttack;
-  public int maximumVerifyingPlayers;
-  public int maximumOnlinePerIp;
-  public int maximumQueuePolls;
-  public int maximumLoginPackets;
-  public int verificationTimeout;
-  public int verificationReadTimeout;
-  public int verificationDelay;
+  private boolean enableVerification;
+  private boolean logPlayerAddresses;
+  private boolean checkGravity;
+  private boolean checkCollisions;
+  private boolean logConnections;
+  private boolean logDuringAttack;
+  private Pattern validNameRegex;
+  private Pattern validBrandRegex;
+  private Pattern validLocaleRegex;
+  private String verificationConnectLog;
+  private String verificationFailedLog;
+  private String verificationSuccessfulLog;
+  private String verificationBlacklistLog;
+  private short gamemodeId;
+  private int maximumBrandLength;
+  private int maximumMovementTicks;
+  private int minimumPlayersForAttack;
+  private int maximumVerifyingPlayers;
+  private int maximumOnlinePerIp;
+  private int maximumQueuePolls;
+  private int maximumLoginPackets;
+  private int verificationTimeout;
+  private int verificationReadTimeout;
+  private int verificationDelay;
 
-  public String header, footer;
-  public Component tooManyPlayers;
-  public Component tooFastReconnect;
-  public Component tooManyOnlinePerIp;
-  public Component invalidUsername;
-  public Component verificationSuccess;
-  public Component verificationFailed;
-  public Component alreadyVerifying;
-  public Component alreadyQueued;
-  public Component blacklisted;
+  private String header, footer;
+  private Component tooManyPlayers;
+  private Component tooFastReconnect;
+  private Component tooManyOnlinePerIp;
+  private Component invalidUsername;
+  private Component verificationSuccess;
+  private Component verificationFailed;
+  private Component alreadyVerifying;
+  private Component alreadyQueued;
+  private Component blacklisted;
 
-  public String incorrectCommandUsage;
-  public String incorrectIpAddress;
-  public String subCommandNoPerm;
-  public String illegalIpAddress;
-  public String playersOnly;
-  public String consoleOnly;
-  public String commandCoolDown;
-  public String commandCoolDownLeft;
+  private String incorrectCommandUsage;
+  private String incorrectIpAddress;
+  private String subCommandNoPerm;
+  private String illegalIpAddress;
+  private String playersOnly;
+  private String consoleOnly;
+  private String commandCoolDown;
+  private String commandCoolDownLeft;
 
-  public String blacklistEmpty;
-  public String blacklistAdd;
-  public String blacklistAddWarning;
-  public String blacklistDuplicate;
-  public String blacklistNotFound;
-  public String blacklistRemove;
-  public String blacklistCleared;
-  public String blacklistSize;
+  private String blacklistEmpty;
+  private String blacklistAdd;
+  private String blacklistAddWarning;
+  private String blacklistDuplicate;
+  private String blacklistNotFound;
+  private String blacklistRemove;
+  private String blacklistCleared;
+  private String blacklistSize;
 
-  public String verifiedRemove;
-  public String verifiedNotFound;
-  public String verifiedCleared;
-  public String verifiedSize;
-  public String verifiedEmpty;
-  public String verifiedBlocked;
+  private String verifiedRemove;
+  private String verifiedNotFound;
+  private String verifiedCleared;
+  private String verifiedSize;
+  private String verifiedEmpty;
+  private String verifiedBlocked;
 
-  public String verboseSubscribed;
-  public String verboseUnsubscribed;
-  public String verboseSubscribedOther;
-  public String verboseUnsubscribedOther;
+  private String verboseSubscribed;
+  private String verboseUnsubscribed;
+  private String verboseSubscribedOther;
+  private String verboseUnsubscribedOther;
 
-  public String reloading;
-  public String reloaded;
+  private String reloading;
+  private String reloaded;
 
   @Getter
   @RequiredArgsConstructor
@@ -128,21 +129,22 @@ public final class SonarConfiguration {
     private final String driverClassName;
   }
 
-  public DatabaseType databaseType;
-  public String sqlUrl;
-  public int sqlPort;
-  public String sqlDatabase;
-  public String sqlUser;
-  public String sqlPassword;
+  private DatabaseType databaseType;
+  private String sqlUrl;
+  private int sqlPort;
+  private String sqlDatabase;
+  private String sqlUser;
+  private String sqlPassword;
 
-  public boolean lockdownEnabled;
-  public boolean lockdownEnableNotify;
-  public boolean lockdownLogAttempts;
-  public Component lockdownDisconnect;
-  public String lockdownActivated;
-  public String lockdownDeactivated;
-  public String lockdownNotification;
-  public String lockdownConsoleLog;
+  @Setter
+  private boolean lockdownEnabled;
+  private boolean lockdownEnableNotify;
+  private boolean lockdownLogAttempts;
+  private Component lockdownDisconnect;
+  private String lockdownActivated;
+  private String lockdownDeactivated;
+  private String lockdownNotification;
+  private String lockdownConsoleLog;
 
   public void load() {
     if (generalConfig == null) {

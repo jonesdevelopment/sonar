@@ -64,13 +64,13 @@ public final class FallbackListener implements Listener {
   @EventHandler
   @SuppressWarnings("deprecation")
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
-    if (Sonar.get().getConfig().lockdownEnabled) {
+    if (Sonar.get().getConfig().isLockdownEnabled()) {
       if (!event.getPlayer().hasPermission("sonar.lockdown")) {
         final PendingConnection pendingConnection = event.getPlayer().getPendingConnection();
         // Try to close the channel with a custom serialized disconnect component
         if (pendingConnection instanceof FallbackInitialHandler) {
           final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) pendingConnection;
-          final Component component = Sonar.get().getConfig().lockdownDisconnect;
+          final Component component = Sonar.get().getConfig().getLockdownDisconnect();
           final String serialized = JSONComponentSerializer.json().serialize(component);
           fallbackInitialHandler.closeWith(new Kick(serialized));
         } else {
@@ -79,21 +79,17 @@ public final class FallbackListener implements Listener {
           Sonar.get().getLogger().warn("Fallback handler of {} is missing", event.getPlayer().getName());
         }
 
-        if (Sonar.get().getConfig().lockdownLogAttempts) {
-          Sonar.get().getLogger().info(
-            Sonar.get().getConfig().lockdownConsoleLog
-              .replace("%player%", event.getPlayer().getName())
-              .replace("%ip%", Sonar.get().getConfig()
-                .formatAddress(event.getPlayer().getAddress().getAddress()))
-              .replace("%protocol%",
-                String.valueOf(event.getPlayer().getPendingConnection().getVersion()))
-          );
+        if (Sonar.get().getConfig().isLockdownLogAttempts()) {
+          Sonar.get().getLogger().info(Sonar.get().getConfig().getLockdownConsoleLog()
+            .replace("%player%", event.getPlayer().getName())
+            .replace("%ip%", Sonar.get().getConfig()
+              .formatAddress(event.getPlayer().getAddress().getAddress()))
+            .replace("%protocol%",
+              String.valueOf(event.getPlayer().getPendingConnection().getVersion())));
         }
         return;
-      } else if (Sonar.get().getConfig().lockdownEnableNotify) {
-        event.getPlayer().sendMessage(
-          new TextComponent(Sonar.get().getConfig().lockdownNotification)
-        );
+      } else if (Sonar.get().getConfig().isLockdownEnableNotify()) {
+        event.getPlayer().sendMessage(new TextComponent(Sonar.get().getConfig().getLockdownNotification()));
       }
     }
 

@@ -99,7 +99,7 @@ public class FallbackPreparer {
     JOIN_GAME_1_19_4 = createJoinGamePacket(MINECRAFT_1_19_4);
     JOIN_GAME_1_20 = createJoinGamePacket(MINECRAFT_1_20);
 
-    MAX_MOVEMENT_TICK = Sonar.get().getConfig().maximumMovementTicks;
+    MAX_MOVEMENT_TICK = Sonar.get().getConfig().getMaximumMovementTicks();
     PREPARED_MOVEMENT_PACKETS = new double[MAX_MOVEMENT_TICK + 1];
 
     for (int i = 0; i < MAX_MOVEMENT_TICK + 1; i++) {
@@ -184,7 +184,7 @@ public class FallbackPreparer {
     final JoinGame joinGame = new JoinGame();
 
     joinGame.setLevelType("flat");
-    joinGame.setGamemode(Sonar.get().getConfig().gamemodeId);
+    joinGame.setGamemode(Sonar.get().getConfig().getGamemodeId());
     joinGame.setDimension(0);
     joinGame.setReducedDebugInfo(true);
     return joinGame;
@@ -196,7 +196,7 @@ public class FallbackPreparer {
     final JoinGame joinGame = new JoinGame();
 
     joinGame.setLevelType("flat");
-    joinGame.setGamemode(Sonar.get().getConfig().gamemodeId);
+    joinGame.setGamemode(Sonar.get().getConfig().getGamemodeId());
     joinGame.setDimension(0);
     joinGame.setReducedDebugInfo(true);
     joinGame.setDimensionInfo(DIMENSION);
