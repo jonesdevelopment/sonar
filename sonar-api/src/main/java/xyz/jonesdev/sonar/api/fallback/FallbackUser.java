@@ -89,10 +89,10 @@ public interface FallbackUser<X, Y> {
       // Call the VerifyFailedEvent for external API usage
       Sonar.get().getEventManager().publish(new UserVerifyFailedEvent(this, reason));
 
-      disconnect(Sonar.get().getConfig().VERIFICATION_FAILED);
+      disconnect(Sonar.get().getConfig().getVerificationFailed());
 
       if (reason != null) {
-        getFallback().getLogger().info(Sonar.get().getConfig().VERIFICATION_FAILED_LOG
+        getFallback().getLogger().info(Sonar.get().getConfig().getVerificationFailedLog()
           .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
           .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
           .replace("%reason%", reason));
@@ -110,7 +110,7 @@ public interface FallbackUser<X, Y> {
       Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
 
       getFallback().getBlacklisted().put(getInetAddress().toString());
-      getFallback().getLogger().info(Sonar.get().getConfig().VERIFICATION_BLACKLIST_LOG
+      getFallback().getLogger().info(Sonar.get().getConfig().getVerificationBlacklistLog()
         .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
         .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
     } else {

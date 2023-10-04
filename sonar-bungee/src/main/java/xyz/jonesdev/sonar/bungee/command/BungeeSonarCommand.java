@@ -51,7 +51,7 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
     if (!(sender instanceof ConsoleCommandSender)) {
       // Check if the player actually has the permission to run the command
       if (!sender.hasPermission("sonar.command")) {
-        sender.sendMessage(new TextComponent(Sonar.get().getConfig().NO_PERMISSION));
+        sender.sendMessage(new TextComponent(Sonar.get().getConfig().getNoPermission()));
         return;
       }
       // Checking if it contains will only break more since it can throw
@@ -63,16 +63,14 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        sender.sendMessage(new TextComponent(Sonar.get().getConfig().COMMAND_COOL_DOWN));
+        sender.sendMessage(new TextComponent(Sonar.get().getConfig().getCommandCoolDown()));
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
-        sender.sendMessage(new TextComponent(
-          Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
-            .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))
-        ));
+        sender.sendMessage(new TextComponent(Sonar.get().getConfig().getCommandCoolDownLeft()
+          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))));
         return;
       }
 
@@ -97,7 +95,7 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
           && !sender.hasPermission(subcommand.get().getPermission())
         ) {
           invocationSource.sendMessage(
-            Sonar.get().getConfig().SUB_COMMAND_NO_PERM
+            Sonar.get().getConfig().getSubCommandNoPerm()
               .replace("%permission%", subcommand.get().getPermission())
           );
           return;
@@ -107,12 +105,12 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
 
     subcommand.ifPresent(sub -> {
       if (sub.getInfo().onlyPlayers() && !(sender instanceof ProxiedPlayer)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().getPlayersOnly());
         return;
       }
 
       if (sub.getInfo().onlyConsole() && !(sender instanceof ConsoleCommandSender)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().getConsoleOnly());
         return;
       }
 
@@ -121,10 +119,8 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
       // The subcommands has arguments which are not present in the executed command
       if (sub.getInfo().arguments().length > 0
         && commandInvocation.getRawArguments().length <= 1) {
-        invocationSource.sendMessage(
-          Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
-            .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
-        );
+        invocationSource.sendMessage(Sonar.get().getConfig().getIncorrectCommandUsage()
+          .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")"));
         return;
       }
 

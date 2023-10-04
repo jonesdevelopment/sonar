@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 @SubcommandInfo(
   name = "reload",
@@ -30,15 +31,12 @@ public final class ReloadCommand extends Subcommand {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    final long startTime = System.currentTimeMillis();
+    final SystemTimer timer = new SystemTimer();
 
-    invocation.getSender().sendMessage(SONAR.getConfig().RELOADING);
+    invocation.getSender().sendMessage(SONAR.getConfig().getReloading());
     SONAR.reload();
 
-    final long timeTaken = System.currentTimeMillis() - startTime;
-    invocation.getSender().sendMessage(
-      SONAR.getConfig().RELOADED
-        .replace("%taken%", String.valueOf(timeTaken))
-    );
+    invocation.getSender().sendMessage(SONAR.getConfig().getReloaded()
+      .replace("%taken%", String.valueOf(timer.delay())));
   }
 }

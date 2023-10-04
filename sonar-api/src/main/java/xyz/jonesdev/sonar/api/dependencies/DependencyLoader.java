@@ -38,8 +38,8 @@ public class DependencyLoader {
   public ConnectionSource setUpDriverAndConnect() throws Throwable {
     final SonarConfiguration config = Sonar.get().getConfig();
 
-    final URL[] urls = new URL[config.DATABASE_TYPE.getDependencies().length];
-    for (final Dependency dependency : config.DATABASE_TYPE.getDependencies()) {
+    final URL[] urls = new URL[config.getDatabaseType().getDependencies().length];
+    for (final Dependency dependency : config.getDatabaseType().getDependencies()) {
       final URL url = dependency.getClassLoaderURL();
       final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
 
@@ -50,9 +50,9 @@ public class DependencyLoader {
       urls[dependency.ordinal()] = url;
     }
 
-    final String type = config.DATABASE_TYPE.name().toLowerCase();
+    final String type = config.getDatabaseType().name().toLowerCase();
     final String databaseURL =
-      "jdbc:" + type + "://" + config.SQL_URL + ":" + config.SQL_PORT + "/" + config.SQL_DATABASE;
+      "jdbc:" + type + "://" + config.getSqlUrl() + ":" + config.getSqlPort() + "/" + config.getSqlDatabase();
 
     final ExternalClassLoader classLoader = new ExternalClassLoader(urls);
     final Connection connection = connect(classLoader, databaseURL, config);
@@ -64,17 +64,17 @@ public class DependencyLoader {
   private Connection connect(final @NotNull ClassLoader classLoader,
                              final @NotNull String databaseURL,
                              final @NotNull SonarConfiguration configuration) throws Throwable {
-    final Class<?> driverClass = classLoader.loadClass(configuration.DATABASE_TYPE.getDriverClassName());
+    final Class<?> driverClass = classLoader.loadClass(configuration.getDatabaseType().getDriverClassName());
     final Object driver = driverClass.getDeclaredConstructor().newInstance();
 
     DriverManager.registerDriver((Driver) driver);
 
     final Properties properties = new Properties();
-    if (!configuration.SQL_USER.isEmpty()) {
-      properties.put("user", configuration.SQL_USER);
+    if (!configuration.getSqlUser().isEmpty()) {
+      properties.put("user", configuration.getSqlUser());
     }
-    if (!configuration.SQL_PASSWORD.isEmpty()) {
-      properties.put("password", configuration.SQL_PASSWORD);
+    if (!configuration.getSqlPassword().isEmpty()) {
+      properties.put("password", configuration.getSqlPassword());
     }
 
     final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);

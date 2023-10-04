@@ -46,7 +46,7 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
     if (!(invocation.source() instanceof ConsoleCommandSource)) {
       // Check if the player actually has the permission to run the command
       if (!invocation.source().hasPermission("sonar.command")) {
-        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().NO_PERMISSION));
+        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().getNoPermission()));
         return;
       }
       // Checking if it contains will only break more since it can throw
@@ -58,16 +58,14 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().COMMAND_COOL_DOWN));
+        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().getCommandCoolDown()));
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
-        invocation.source().sendMessage(Component.text(
-          Sonar.get().getConfig().COMMAND_COOL_DOWN_LEFT
-            .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))
-        ));
+        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().getCommandCoolDownLeft()
+          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))));
         return;
       }
 
@@ -92,7 +90,7 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
           && !invocation.source().hasPermission(subcommand.get().getPermission())
         ) {
           invocationSource.sendMessage(
-            Sonar.get().getConfig().SUB_COMMAND_NO_PERM
+            Sonar.get().getConfig().getSubCommandNoPerm()
               .replace("%permission%", subcommand.get().getPermission())
           );
           return;
@@ -102,12 +100,12 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
 
     subcommand.ifPresent(sub -> {
       if (sub.getInfo().onlyPlayers() && !(invocation.source() instanceof Player)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().PLAYERS_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().getPlayersOnly());
         return;
       }
 
       if (sub.getInfo().onlyConsole() && !(invocation.source() instanceof ConsoleCommandSource)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().CONSOLE_ONLY);
+        invocationSource.sendMessage(Sonar.get().getConfig().getConsoleOnly());
         return;
       }
 
@@ -117,10 +115,8 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       if (sub.getInfo().arguments().length > 0
         && commandInvocation.getRawArguments().length <= 1
         && sub.getInfo().argumentsRequired()) {
-        invocationSource.sendMessage(
-          Sonar.get().getConfig().INCORRECT_COMMAND_USAGE
-            .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")")
-        );
+        invocationSource.sendMessage(Sonar.get().getConfig().getIncorrectCommandUsage()
+          .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")"));
         return;
       }
 

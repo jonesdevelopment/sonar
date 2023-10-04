@@ -45,22 +45,18 @@ public final class VerboseCommand extends Subcommand {
     if (SONAR.getVerboseHandler().isSubscribed(verboseSubscriber.getName())) {
       SONAR.getVerboseHandler().unsubscribe(verboseSubscriber.getName());
       if (verboseSubscriber != invocation.getSender()) {
-        verboseSubscriber.sendMessage(
-          SONAR.getConfig().VERBOSE_UNSUBSCRIBED_OTHER
-            .replace("%player%", verboseSubscriber.getName())
-        );
+        verboseSubscriber.sendMessage(SONAR.getConfig().getVerboseUnsubscribedOther()
+          .replace("%player%", verboseSubscriber.getName()));
       }
-      verboseSubscriber.sendMessage(SONAR.getConfig().VERBOSE_UNSUBSCRIBED);
+      verboseSubscriber.sendMessage(SONAR.getConfig().getVerboseUnsubscribed());
       return;
     }
 
     if (verboseSubscriber != invocation.getSender()) {
-      verboseSubscriber.sendMessage(
-        SONAR.getConfig().VERBOSE_SUBSCRIBED_OTHER
-          .replace("%player%", verboseSubscriber.getName())
-      );
+      verboseSubscriber.sendMessage(SONAR.getConfig().getVerboseSubscribedOther()
+        .replace("%player%", verboseSubscriber.getName()));
     }
-    verboseSubscriber.sendMessage(SONAR.getConfig().VERBOSE_SUBSCRIBED);
+    verboseSubscriber.sendMessage(SONAR.getConfig().getVerboseSubscribed());
     SONAR.getVerboseHandler().subscribe(verboseSubscriber.getName());
   }
 }
