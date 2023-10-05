@@ -366,9 +366,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
       final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
 
+      // Log/debug position if enabled in the configuration
+      if (Sonar.get().getConfig().isDebugXYZPositions()) {
+        user.getFallback().getLogger().info("{}: {}/{}/{} - offset: {}", username, x, y, z, offsetY);
+      }
+
       // Check if the player is colliding by performing a basic Y offset check.
       // The offset cannot greater than 0 since the blocks will not let the player fall through them.
-      // TODO: Check for valid ground status & valid Y in combination
       checkFrame(offsetY <= 0, "no collisions: " + offsetY);
 
       if (ground) {
@@ -381,6 +385,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (!ground && tick < MAX_PREDICTION_TICK) {
       final double predictedY = PREPARED_MOVEMENTS[tick];
       final double offsetY = Math.abs(deltaY - predictedY);
+
+      // Log/debug position if enabled in the configuration
+      if (Sonar.get().getConfig().isDebugXYZPositions()) {
+        user.getFallback().getLogger().info("{}: {}/{}/{} - deltaY: {} - prediction: {} - offset: {}",
+          username, x, y, z, deltaY, predictedY, offsetY);
+      }
 
       // Check if the y motion is roughly equal to the predicted value
       final String verbose = String.format("%d: %.7f %.10f %.10f!%.10f", tick, y, offsetY, deltaY, predictedY);

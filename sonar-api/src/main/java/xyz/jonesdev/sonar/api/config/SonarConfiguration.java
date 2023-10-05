@@ -57,6 +57,7 @@ public final class SonarConfiguration {
   private boolean checkCollisions;
   private boolean logConnections;
   private boolean logDuringAttack;
+  private boolean debugXYZPositions;
   private Pattern validNameRegex;
   private Pattern validBrandRegex;
   private Pattern validLocaleRegex;
@@ -278,6 +279,11 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.verification.log-during-attack",
       "Should Sonar log new verification attempts during attacks?");
     logDuringAttack = generalConfig.getBoolean("general.verification.log-during-attack", false);
+
+    generalConfig.getYaml().setComment("general.verification.debug-xyz-positions",
+      "Should Sonar log every single movement/position change during verification?" +
+        "\nThis is not recommended for production servers but can be helpful for spotting errors.");
+    debugXYZPositions = generalConfig.getBoolean("general.verification.debug-xyz-positions", false);
 
     generalConfig.getYaml().setComment("general.verification.valid-name-regex",
       "Regex for validating usernames during verification");
