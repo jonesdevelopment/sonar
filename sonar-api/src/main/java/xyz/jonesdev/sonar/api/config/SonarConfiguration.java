@@ -67,6 +67,7 @@ public final class SonarConfiguration {
   private short gamemodeId;
   private int maximumBrandLength;
   private int maximumMovementTicks;
+  private int maximumInvalidTicks;
   private int minimumPlayersForAttack;
   private int maximumVerifyingPlayers;
   private int maximumOnlinePerIp;
@@ -311,6 +312,10 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("general.verification.max-movement-ticks",
       "Maximum number of movement packets the player has to send in order to be verified");
     maximumMovementTicks = clamp(generalConfig.getInt("general.verification.max-movement-ticks", 8), 2, 100);
+
+    generalConfig.getYaml().setComment("general.verification.max-invalid-ticks",
+      "Maximum number of invalid movement packets before a player fails verification");
+    maximumInvalidTicks = clamp(generalConfig.getInt("general.verification.max-invalid-ticks", 10), 1, 128);
 
     generalConfig.getYaml().setComment("general.verification.max-players",
       "Maximum number of players verifying at the same time");

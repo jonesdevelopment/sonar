@@ -48,6 +48,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private long expectedKeepAliveId;
   private int expectedTeleportId = -1;
   private int tick, totalReceivedPackets;
+  private int ignoredTicks, invalidTicks;
   private double posX, posY, posZ, lastY;
   @Setter
   private State state;
@@ -330,7 +331,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // Now, once we verified the X and Z position, we can safely check for gravity
         listenForMovements = true;
       }
-      // TODO: implement a check for invalid X/Y/Z ticks
+
+      // Check for too many invalid X/Z ticks
+      final int maxInvalidTicks = Sonar.get().getConfig().getMaximumInvalidTicks();
+      checkFrame(++invalidTicks < maxInvalidTicks, "too many invalid ticks");
 
       lastY = DYNAMIC_SPAWN_Y_POSITION;
       return;
