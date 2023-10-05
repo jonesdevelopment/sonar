@@ -344,7 +344,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // The deltaY is 0 whenever the player sends their first position packet.
     // We have to account for this or the player will fail the verification.
     if (deltaY == 0) {
-      // TODO: implement a check for ignored ticks
+      // Check for too many ignored Y ticks
+      final int maxIgnoredTicks = Sonar.get().getConfig().getMaximumIgnoredTicks();
+      checkFrame(++ignoredTicks < maxIgnoredTicks, "too many ignored ticks");
       return;
     }
 
