@@ -48,7 +48,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private long expectedKeepAliveId;
   private int expectedTeleportId = -1;
   private int tick, totalReceivedPackets;
-  private int ignoredTicks, invalidTicks;
+  private int ignoredMovementTicks;
   private double posX, posY, posZ, lastY;
   @Setter
   private State state;
@@ -332,10 +332,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         listenForMovements = true;
       }
 
-      // Check for too many invalid X/Z ticks
-      final int maxInvalidTicks = Sonar.get().getConfig().getMaximumInvalidTicks();
-      checkFrame(++invalidTicks < maxInvalidTicks, "too many invalid ticks");
-
       lastY = DYNAMIC_SPAWN_Y_POSITION;
       return;
     }
@@ -346,7 +342,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (deltaY == 0) {
       // Check for too many ignored Y ticks
       final int maxIgnoredTicks = Sonar.get().getConfig().getMaximumIgnoredTicks();
-      checkFrame(++ignoredTicks < maxIgnoredTicks, "too many ignored ticks");
+      checkFrame(++ignoredMovementTicks < maxIgnoredTicks, "too many ignored ticks");
       return;
     }
 
