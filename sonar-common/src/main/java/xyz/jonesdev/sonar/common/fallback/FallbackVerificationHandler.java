@@ -389,8 +389,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
 
       // Check if the y motion is roughly equal to the predicted value
-      final String verbose = String.format("%d: %.7f %.10f %.10f!%.10f", tick, y, offsetY, deltaY, predictedY);
-      checkFrame(offsetY < 0.005, verbose);
+      checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
+        tick, y, offsetY, deltaY, predictedY));
     }
     tick++;
   }
