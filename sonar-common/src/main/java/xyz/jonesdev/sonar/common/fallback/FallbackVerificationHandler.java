@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.common.fallback;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -44,54 +43,52 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 public final class FallbackVerificationHandler implements FallbackPacketListener {
   private final @NotNull FallbackUser<?, ?> user;
   private final String username;
-  private final UUID uuid;
-  private final short transactionId;
-  private final long verifyKeepAliveId;
-  private int movementTick, receivedPackets;
-  private double lastX, lastY, lastZ;
+  private final UUID playerUuid;
+  private short expectedTransactionId;
+  private long expectedKeepAliveId;
+  private int expectedTeleportId = -1;
+  private int tick, totalReceivedPackets;
+  private int ignoredMovementTicks;
+  private double posX, posY, posZ, lastY;
   @Setter
   private State state;
+  private boolean listenForMovements;
 
   private final SystemTimer login = new SystemTimer();
   private static final Random RANDOM = new Random();
 
-  @RequiredArgsConstructor
   public enum State {
-    // LOGIN
-    KEEP_ALIVE(false),
+    // PRE-JOIN
+    KEEP_ALIVE,
+    // JOIN
+    CLIENT_SETTINGS, PLUGIN_MESSAGE,
+    // POST-JOIN
+    TRANSACTION,
     // PLAY
-    CLIENT_SETTINGS(false),
-    PLUGIN_MESSAGE(false),
-    TRANSACTION(false),
-    // IN-GAME
-    TELEPORT(false),
-    POSITION(true),
-    COLLISIONS(true),
+    TELEPORT, POSITION, COLLISIONS,
     // OTHER
-    SUCCESS(false);
-
-    private final boolean canMove;
+    SUCCESS
   }
 
   public FallbackVerificationHandler(final @NotNull FallbackUser<?, ?> user,
                                      final @NotNull String username,
-                                     final @NotNull UUID uuid) {
+                                     final @NotNull UUID playerUuid) {
     this.user = user;
     this.username = username;
-    this.uuid = uuid;
-    this.transactionId = (short) RANDOM.nextInt();
-    this.verifyKeepAliveId = RANDOM.nextInt();
+    this.playerUuid = playerUuid;
     this.state = State.KEEP_ALIVE;
 
     // Send LoginSuccess packet to make the client think they are joining the server
-    user.write(new ServerLoginSuccess(username, uuid));
+    user.write(new ServerLoginSuccess(username, playerUuid));
 
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       // 1.7 players don't have KeepAlive packets in the login process
       sendJoinGamePacket();
     } else {
+      // Generate a random KeepAlive ID for the pre-join check
+      expectedKeepAliveId = RANDOM.nextInt();
       // Send first KeepAlive to check if the connection is somewhat responsive
-      user.write(new KeepAlive(verifyKeepAliveId));
+      user.write(new KeepAlive(expectedKeepAliveId));
     }
   }
 
@@ -99,10 +96,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to TRANSACTION to avoid false positives
     // and go on with the flow of the verification.
     state = State.TRANSACTION;
+    // Generate a random transaction ID
+    expectedTransactionId = (short) RANDOM.nextInt();
     // Send a transaction with the given ID
-    user.write(new Transaction(
-      0, transactionId, false
-    ));
+    user.write(new Transaction(0, expectedTransactionId, false));
   }
 
   private void sendJoinGamePacket() {
@@ -124,6 +121,18 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.delayedWrite(UPDATE_SECTION_BLOCKS);
     // Send all packets in one flush
     user.getChannel().flush();
+  }
+
+  private void setAbilitiesAndTeleport() {
+    // Make sure the player is unable to fly (the player is in spectator mode)
+    user.write(DEFAULT_ABILITIES);
+    // Generate the current teleport ID
+    expectedTeleportId = RANDOM.nextInt(Short.MAX_VALUE);
+    // Teleport the player to the spawn position
+    user.write(new PositionLook(
+      SPAWN_X_POSITION, DYNAMIC_SPAWN_Y_POSITION, SPAWN_Z_POSITION,
+      0f, 0f, expectedTeleportId, false
+    ));
   }
 
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
@@ -158,10 +167,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
+    // The player has already been verified, drop all other packets
+    if (state == State.SUCCESS) return;
+
     // Check if the player is not sending a ton of packets to the server
     final int maxPackets = Sonar.get().getConfig().getMaximumLoginPackets()
       + Sonar.get().getConfig().getMaximumMovementTicks();
-    checkFrame(++receivedPackets < maxPackets, "too many packets");
+    checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
 
     // Check for timeout since the player could be sending packets but not important ones
     final long timeout = Sonar.get().getConfig().getVerificationTimeout();
@@ -180,7 +192,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Check if we are currently expecting a KeepAlive packet
       assertState(State.KEEP_ALIVE);
 
-      checkFrame(keepAlive.getId() == verifyKeepAliveId, "invalid KeepAlive ID");
+      checkFrame(keepAlive.getId() == expectedKeepAliveId, "invalid KeepAlive ID");
 
       // The correct KeepAlive packet has been received
       sendJoinGamePacket();
@@ -231,7 +243,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // The transaction should always be accepted
       checkFrame(transaction.isAccepted(), "transaction not accepted?!");
       // Check if the transaction ID is valid
-      checkFrame(transaction.getId() == transactionId, "invalid transaction id");
+      checkFrame(transaction.getId() == expectedTransactionId, "invalid transaction id");
 
       // Checking gravity is disabled, just finish verification
       if (!Sonar.get().getConfig().isCheckGravity()) {
@@ -239,10 +251,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         return;
       }
 
-      // Make sure the player is unable to fly (the player is in spectator mode)
-      user.write(DEFAULT_ABILITIES);
-      // Teleport the player to the spawn position
-      user.write(SPAWN_TELEPORT);
+      // First, send an abilities packet to the client to make
+      // sure the player falls even in spectator mode.
+      // Then, teleport the player to the spawn position.
+      setAbilitiesAndTeleport();
 
       // 1.7-1.8 clients do not have a TeleportConfirm packet
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
@@ -259,47 +271,51 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Check if we are currently expecting a TeleportConfirm packet
       assertState(State.TELEPORT);
 
+      // Check if the teleport ID is correct
       final TeleportConfirm teleportConfirm = (TeleportConfirm) packet;
+      checkFrame(teleportConfirm.getTeleportId() == expectedTeleportId, "invalid teleport ID");
 
-      // Check if the teleport id is correct
-      final boolean teleportIdCorrect = teleportConfirm.getTeleportId() == SPAWN_TELEPORT.getTeleportId();
-      checkFrame(teleportIdCorrect, "invalid teleport ID");
+      // Reset all values to ensure safety on teleport
+      tick = 1;
+      posY = lastY = -1;
+      expectedTeleportId = -1;
 
       // Now we can send the chunk data
       sendChunkData();
     }
 
-    // Only handle positions if the player can send position packets.
-    if (state.canMove) {
-      if (packet instanceof Position) {
-        final Position position = (Position) packet;
+    if (packet instanceof Position) {
+      final Position position = (Position) packet;
+      handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
+    }
 
-        // Immediately handle new position update
-        handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
-      }
+    if (packet instanceof PositionLook) {
+      final PositionLook position = (PositionLook) packet;
+      handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
+    }
 
-      if (packet instanceof PositionLook) {
-        final PositionLook position = (PositionLook) packet;
-
-        // Immediately handle new position update
-        handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
-      }
-
-      if (packet instanceof Player) {
-        final Player player = (Player) packet;
-
-        // This packet does not send new position data, reuse the last Y
-        handlePositionUpdate(lastX, lastY, lastZ, player.isOnGround());
-      }
+    if (packet instanceof Player) {
+      final Player player = (Player) packet;
+      handlePositionUpdate(posX, posY, posZ, player.isOnGround());
     }
   }
 
   private void handlePositionUpdate(final double x, final double y, final double z, final boolean ground) {
-    final double deltaY = lastY - y;
+    // 1.8 does not have a TeleportConfirm packet, so we need to handle the spawning differently
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0
+      && expectedTeleportId != -1 // Check if the teleport ID is currently unset
+      // Then, check if the position is equal to the spawn position
+      && x == SPAWN_X_POSITION && y == DYNAMIC_SPAWN_Y_POSITION && z == SPAWN_Z_POSITION) {
+      // Reset all values to ensure safety on teleport
+      tick = 1;
+      posY = -1;
+      expectedTeleportId = -1;
+    }
 
-    lastX = x;
-    lastY = y;
-    lastZ = z;
+    posX = x;
+    lastY = posY;
+    posY = y;
+    posZ = z;
 
     // The player is not allowed to move away from the collision platform.
     // This should not happen unless the max movement tick is configured to a high number.
@@ -309,45 +325,74 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // The onGround property can never be true when we aren't checking for collisions
     checkFrame(!ground || state == State.COLLISIONS, "invalid ground state");
 
-    // Check if the chunk might be unloaded
-    if (deltaY > 0.07) {
-      // Verify the player if they sent correct movement packets
-      if (movementTick++ >= MAX_MOVEMENT_TICK) {
-        if (Sonar.get().getConfig().isCheckCollisions()) {
-          if (state != State.COLLISIONS) {
-            // Set the state to COLLISIONS to avoid false positives
-            // and go on with the flow of the verification.
-            // Now we don't care about gravity anymore,
-            // we just want the player to collide with the blocks.
-            state = State.COLLISIONS;
-          } else {
-            // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-            final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
+    // Check if the client hasn't moved before sending the first movement packet
+    if (!listenForMovements) {
+      if (posX == SPAWN_X_POSITION && posZ == SPAWN_Z_POSITION) {
+        // Now, once we verified the X and Z position, we can safely check for gravity
+        listenForMovements = true;
+      }
 
-            // The offset cannot greater than 0 since the blocks will not let the player fall through them.
-            checkFrame(offsetY <= 0, "no collisions: " + offsetY);
+      lastY = DYNAMIC_SPAWN_Y_POSITION;
+      return;
+    }
 
-            // Check if the player is colliding by performing a basic Y offset check.
-            if (ground) {
-              // The player is colliding, finish verification
-              // TODO: Check for: velocity, entities/mounting, interactions
-              finish();
-            }
-          }
-        } else {
-          // Checking collisions is disabled, just finish verification
-          finish();
-        }
-      } else if (y <= DYNAMIC_SPAWN_Y_POSITION && y >= DEFAULT_Y_COLLIDE_POSITION) {
-        // This is a basic gravity check that predicts the next y position
-        final double predictedY = PREPARED_MOVEMENT_PACKETS[movementTick];
-        final double offsetY = Math.abs(deltaY - predictedY);
+    final double deltaY = lastY - y;
+    // The deltaY is 0 whenever the player sends their first position packet.
+    // We have to account for this or the player will fail the verification.
+    if (deltaY == 0) {
+      // Check for too many ignored Y ticks
+      final int maxIgnoredTicks = Sonar.get().getConfig().getMaximumIgnoredTicks();
+      checkFrame(++ignoredMovementTicks < maxIgnoredTicks, "too many ignored ticks");
+      return;
+    }
 
-        // Check if the y motion is roughly equal to the predicted value
-        final String verbose = String.format("%d: %.7f %.10f %.10f!%.10f", movementTick, y, offsetY, deltaY, predictedY);
-        checkFrame(offsetY < 0.01, verbose);
+    if (tick > MAX_MOVEMENT_TICK) {
+      if (!Sonar.get().getConfig().isCheckCollisions()) {
+        // Checking collisions is disabled, just finish verification
+        finish();
+        return;
+      }
+
+      if (state != State.COLLISIONS) {
+        // Now we don't care about gravity anymore,
+        // we just want the player to collide with the blocks.
+        state = State.COLLISIONS;
+      }
+
+      // Calculate the difference between the player's Y coordinate and the expected Y coordinate
+      final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
+
+      // Log/debug position if enabled in the configuration
+      if (Sonar.get().getConfig().isDebugXYZPositions()) {
+        user.getFallback().getLogger().info("{}: {}/{}/{} - offset: {}", username, x, y, z, offsetY);
+      }
+
+      // Check if the player is colliding by performing a basic Y offset check.
+      // The offset cannot greater than 0 since the blocks will not let the player fall through them.
+      checkFrame(offsetY <= 0, "no collisions: " + offsetY);
+
+      if (ground) {
+        // The player is colliding to blocks, finish verification
+        finish();
+        return;
       }
     }
+
+    if (!ground && tick < MAX_PREDICTION_TICK) {
+      final double predictedY = PREPARED_MOVEMENTS[tick];
+      final double offsetY = Math.abs(deltaY - predictedY);
+
+      // Log/debug position if enabled in the configuration
+      if (Sonar.get().getConfig().isDebugXYZPositions()) {
+        user.getFallback().getLogger().info("{}: {}/{}/{} - deltaY: {} - prediction: {} - offset: {}",
+          username, x, y, z, deltaY, predictedY, offsetY);
+      }
+
+      // Check if the y motion is roughly equal to the predicted value
+      checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
+        tick, y, offsetY, deltaY, predictedY));
+    }
+    tick++;
   }
 
   private void assertState(final @NotNull State expectedState) {
@@ -369,11 +414,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.getFallback().getConnected().remove(username);
 
     // Add verified player to the database
-    final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(user.getInetAddress().toString(), uuid, login.getStart());
+    final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(user.getInetAddress().toString(), playerUuid, login.getStart());
     Sonar.get().getVerifiedPlayerController().add(verifiedPlayer);
 
     // Call the VerifySuccessEvent for external API usage
-    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, uuid, user, login.delay()));
+    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, playerUuid, user, login.delay()));
 
     // Disconnect player with the verification success message
     user.disconnect(Sonar.get().getConfig().getVerificationSuccess());

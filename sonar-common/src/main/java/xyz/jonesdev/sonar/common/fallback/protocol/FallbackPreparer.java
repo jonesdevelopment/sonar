@@ -31,7 +31,10 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionInfo;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.Abilities;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.EmptyChunkData;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.JoinGame;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.UpdateSectionBlocks;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -75,7 +78,6 @@ public class FallbackPreparer {
 
   // Chunks
   public final EmptyChunkData EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
-  public PositionLook SPAWN_TELEPORT;
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (max)
@@ -85,10 +87,12 @@ public class FallbackPreparer {
   public UpdateSectionBlocks UPDATE_SECTION_BLOCKS;
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 
-  public int MAX_MOVEMENT_TICK;
-  public double[] PREPARED_MOVEMENT_PACKETS;
+  public int MAX_MOVEMENT_TICK, MAX_PREDICTION_TICK;
+  public double[] PREPARED_MOVEMENTS;
   public int DYNAMIC_SPAWN_BUFFER = SPAWN_BUFFER;
   public int DYNAMIC_SPAWN_Y_POSITION;
+  public final int SPAWN_X_POSITION = 8; // in the middle of the chunk (16x16)
+  public final int SPAWN_Z_POSITION = 8;
 
   public void prepare() {
     LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
@@ -100,30 +104,23 @@ public class FallbackPreparer {
     JOIN_GAME_1_20 = createJoinGamePacket(MINECRAFT_1_20);
 
     MAX_MOVEMENT_TICK = Sonar.get().getConfig().getMaximumMovementTicks();
-    PREPARED_MOVEMENT_PACKETS = new double[MAX_MOVEMENT_TICK + 1];
+    MAX_PREDICTION_TICK = MAX_MOVEMENT_TICK + 10;
+    PREPARED_MOVEMENTS = new double[MAX_PREDICTION_TICK + 1];
 
-    for (int i = 0; i < MAX_MOVEMENT_TICK + 1; i++) {
-      PREPARED_MOVEMENT_PACKETS[i] = -((Math.pow(0.98, i) - 1) * 3.92);
+    for (int i = 0; i < MAX_PREDICTION_TICK + 1; i++) {
+      PREPARED_MOVEMENTS[i] = -((Math.pow(0.98, i) - 1) * 3.92);
     }
 
     // Adjust block and collide Y position based on max movement ticks
     double maxFallDistance = 0;
-    for (final double motion : PREPARED_MOVEMENT_PACKETS) {
-      maxFallDistance += motion;
+    for (int i = 0; i < MAX_MOVEMENT_TICK; i++) {
+      maxFallDistance += PREPARED_MOVEMENTS[i];
     }
 
     // Set the dynamic spawn buffer
     DYNAMIC_SPAWN_BUFFER = (int) (SPAWN_BUFFER + maxFallDistance);
     // Set the dynamic block and collide Y position based on the maximum fall distance
     DYNAMIC_SPAWN_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + DYNAMIC_SPAWN_BUFFER;
-
-    // Prepare spawn PositionLook with the dynamic Y position
-    SPAWN_TELEPORT = new PositionLook(
-      8, DYNAMIC_SPAWN_Y_POSITION, 8,
-      0f, 0f,
-      RANDOM.nextInt(Short.MAX_VALUE),
-      false // 1.7 support
-    );
 
     // Prepare collision platform positions
     int index = 0;

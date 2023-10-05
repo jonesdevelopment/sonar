@@ -57,6 +57,7 @@ public final class SonarConfiguration {
   private boolean checkCollisions;
   private boolean logConnections;
   private boolean logDuringAttack;
+  private boolean debugXYZPositions;
   private Pattern validNameRegex;
   private Pattern validBrandRegex;
   private Pattern validLocaleRegex;
@@ -67,6 +68,7 @@ public final class SonarConfiguration {
   private short gamemodeId;
   private int maximumBrandLength;
   private int maximumMovementTicks;
+  private int maximumIgnoredTicks;
   private int minimumPlayersForAttack;
   private int maximumVerifyingPlayers;
   private int maximumOnlinePerIp;
@@ -277,6 +279,11 @@ public final class SonarConfiguration {
       "Should Sonar log new verification attempts during attacks?");
     logDuringAttack = generalConfig.getBoolean("general.verification.log-during-attack", false);
 
+    generalConfig.getYaml().setComment("general.verification.debug-xyz-positions",
+      "Should Sonar log every single movement/position change during verification?" +
+        "\nThis is not recommended for production servers but can be helpful for spotting errors.");
+    debugXYZPositions = generalConfig.getBoolean("general.verification.debug-xyz-positions", false);
+
     generalConfig.getYaml().setComment("general.verification.valid-name-regex",
       "Regex for validating usernames during verification");
     validNameRegex = Pattern.compile(generalConfig.getString(
@@ -309,8 +316,12 @@ public final class SonarConfiguration {
     maximumLoginPackets = clamp(generalConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
 
     generalConfig.getYaml().setComment("general.verification.max-movement-ticks",
-      "Maximum number of movement packets the player has to send in order to be verified");
+      "Maximum number of ticks the player has to fall in order to hit the platform");
     maximumMovementTicks = clamp(generalConfig.getInt("general.verification.max-movement-ticks", 8), 2, 100);
+
+    generalConfig.getYaml().setComment("general.verification.max-ignored-ticks",
+      "Maximum number of ignored Y movement changes before a player fails verification");
+    maximumIgnoredTicks = clamp(generalConfig.getInt("general.verification.max-ignored-ticks", 5), 1, 128);
 
     generalConfig.getYaml().setComment("general.verification.max-players",
       "Maximum number of players verifying at the same time");
