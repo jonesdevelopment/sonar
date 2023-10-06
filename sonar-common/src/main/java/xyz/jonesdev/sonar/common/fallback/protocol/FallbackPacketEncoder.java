@@ -26,13 +26,17 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPacket> {
   private final ProtocolVersion protocolVersion;
-  private final FallbackPacketRegistry.ProtocolRegistry registry;
+  private FallbackPacketRegistry.ProtocolRegistry registry;
 
   public FallbackPacketEncoder(final ProtocolVersion protocolVersion) {
     this.protocolVersion = protocolVersion;
-    this.registry = FallbackPacketRegistry.SONAR.getProtocolRegistry(
-      FallbackPacketRegistry.Direction.CLIENTBOUND, protocolVersion
-    );
+    this.registry = FallbackPacketRegistry.LOGIN
+      .getProtocolRegistry(FallbackPacketRegistry.Direction.CLIENTBOUND, protocolVersion);
+  }
+
+  public void loginSuccess() {
+    this.registry = FallbackPacketRegistry.GAME
+      .getProtocolRegistry(FallbackPacketRegistry.Direction.CLIENTBOUND, protocolVersion);
   }
 
   @Override

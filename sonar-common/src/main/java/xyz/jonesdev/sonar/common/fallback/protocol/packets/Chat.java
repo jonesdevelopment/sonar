@@ -24,32 +24,48 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import java.util.Objects;
+import java.util.UUID;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeUUID;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class Disconnect implements FallbackPacket {
-  private @Nullable String reason;
+public final class Chat implements FallbackPacket {
+  private static final UUID PLACEHOLDER_UUID = new UUID(0L, 0L);
+  private Component component;
+  private byte position;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    writeString(byteBuf, Objects.requireNonNull(reason));
+    final String serialized = JSONComponentSerializer.json().serialize(component);
+    writeString(byteBuf, serialized);
+
+    // Message type
+    if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
+      byteBuf.writeBoolean(position == 2);
+    } else if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
+      writeVarInt(byteBuf, position);
+    } else {
+      byteBuf.writeByte(this.position);
+    }
+
+    // UUID
+    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
+      && protocolVersion.compareTo(MINECRAFT_1_19) < 0) {
+      writeUUID(byteBuf, PLACEHOLDER_UUID);
+    }
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
-  }
-
-  public static Disconnect create(final Component component) {
-    return new Disconnect(JSONComponentSerializer.json().serialize(component));
   }
 }

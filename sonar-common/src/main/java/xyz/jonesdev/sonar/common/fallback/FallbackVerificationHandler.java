@@ -78,9 +78,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.playerUuid = playerUuid;
     this.state = State.KEEP_ALIVE;
 
-    // Send LoginSuccess packet to make the client think they are joining the server
-    user.write(new ServerLoginSuccess(username, playerUuid));
-
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       // 1.7 players don't have KeepAlive packets in the login process
       sendJoinGamePacket();
@@ -110,6 +107,21 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.write(getJoinPacketForVersion(user.getProtocolVersion()));
   }
 
+  private void sendAbilitiesAndTeleport() {
+    // Set the state to TELEPORT to avoid false positives
+    // and go on with the flow of the verification.
+    state = State.TELEPORT;
+    // Make sure the player is unable to fly (the player is in spectator mode)
+    user.delayedWrite(DEFAULT_ABILITIES);
+    // Generate the current teleport ID
+    expectedTeleportId = RANDOM.nextInt(Short.MAX_VALUE);
+    // Teleport the player to the spawn position
+    user.delayedWrite(new PositionLook(
+      SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
+      0f, 0f, expectedTeleportId, false
+    ));
+  }
+
   private void sendChunkData() {
     // Set the state to POSITION to avoid false positives
     // and go on with the flow of the verification.
@@ -121,18 +133,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.delayedWrite(UPDATE_SECTION_BLOCKS);
     // Send all packets in one flush
     user.getChannel().flush();
-  }
-
-  private void setAbilitiesAndTeleport() {
-    // Make sure the player is unable to fly (the player is in spectator mode)
-    user.write(DEFAULT_ABILITIES);
-    // Generate the current teleport ID
-    expectedTeleportId = RANDOM.nextInt(Short.MAX_VALUE);
-    // Teleport the player to the spawn position
-    user.write(new PositionLook(
-      SPAWN_X_POSITION, DYNAMIC_SPAWN_Y_POSITION, SPAWN_Z_POSITION,
-      0f, 0f, expectedTeleportId, false
-    ));
   }
 
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
@@ -254,16 +254,16 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // First, send an abilities packet to the client to make
       // sure the player falls even in spectator mode.
       // Then, teleport the player to the spawn position.
-      setAbilitiesAndTeleport();
+      sendAbilitiesAndTeleport();
 
       // 1.7-1.8 clients do not have a TeleportConfirm packet
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
         // Immediately send the chunk data as 1.7-1.8 can't confirm teleports
         sendChunkData();
       } else {
-        // Set the state to TELEPORT to avoid false positives
-        // and go on with the flow of the verification.
-        state = State.TELEPORT;
+        // Send all previously sent packets in one flush since we didn't flush
+        // the channel earlier when we teleported the player.
+        user.getChannel().flush();
       }
     }
 
@@ -305,7 +305,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0
       && expectedTeleportId != -1 // Check if the teleport ID is currently unset
       // Then, check if the position is equal to the spawn position
-      && x == SPAWN_X_POSITION && y == DYNAMIC_SPAWN_Y_POSITION && z == SPAWN_Z_POSITION) {
+      && x == SPAWN_X_POSITION && y == dynamicSpawnYPosition && z == SPAWN_Z_POSITION) {
       // Reset all values to ensure safety on teleport
       tick = 1;
       posY = -1;
@@ -332,7 +332,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         listenForMovements = true;
       }
 
-      lastY = DYNAMIC_SPAWN_Y_POSITION;
+      lastY = dynamicSpawnYPosition;
       return;
     }
 
@@ -346,7 +346,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
-    if (tick > MAX_MOVEMENT_TICK) {
+    if (tick > maxMovementTick) {
       if (!Sonar.get().getConfig().isCheckCollisions()) {
         // Checking collisions is disabled, just finish verification
         finish();
@@ -378,8 +378,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
     }
 
-    if (!ground && tick < MAX_PREDICTION_TICK) {
-      final double predictedY = PREPARED_MOVEMENTS[tick];
+    if (!ground && tick < maxPredictionTick) {
+      final double predictedY = preparedCachedYMotions[tick];
       final double offsetY = Math.abs(deltaY - predictedY);
 
       // Log/debug position if enabled in the configuration

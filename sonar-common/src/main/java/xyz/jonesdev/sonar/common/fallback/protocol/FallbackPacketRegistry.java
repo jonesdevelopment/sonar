@@ -32,16 +32,17 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 // Most of this is taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/StateRegistry.java
 public enum FallbackPacketRegistry {
-  SONAR {
+  LOGIN {
     {
       clientbound.fallback = false;
       serverbound.fallback = false;
 
-      // LOGIN
       clientbound.register(ServerLoginSuccess.class, ServerLoginSuccess::new,
         map(0x02, MINECRAFT_1_7_2, false));
-
-      // GAME
+    }
+  },
+  GAME {
+    {
       clientbound.register(JoinGame.class, JoinGame::new,
         map(0x01, MINECRAFT_1_7_2, true),
         map(0x23, MINECRAFT_1_9, true),
@@ -160,6 +161,17 @@ public enum FallbackPacketRegistry {
         map(0x2F, MINECRAFT_1_19_1, true),
         map(0x2E, MINECRAFT_1_19_3, true),
         map(0x32, MINECRAFT_1_19_4, true));
+      clientbound.register(Chat.class, Chat::new,
+        map(0x02, MINECRAFT_1_7_2, true),
+        map(0x0F, MINECRAFT_1_9, true),
+        map(0x0E, MINECRAFT_1_13, true),
+        map(0x0F, MINECRAFT_1_15, true),
+        map(0x0E, MINECRAFT_1_16, true),
+        map(0x0F, MINECRAFT_1_18_2, true),
+        map(0x5F, MINECRAFT_1_19, true),
+        map(0x62, MINECRAFT_1_19_1, true),
+        map(0x60, MINECRAFT_1_19_3, true),
+        map(0x64, MINECRAFT_1_19_4, true));
 
       serverbound.register(KeepAlive.class, KeepAlive::new,
         map(0x00, MINECRAFT_1_7_2, false),
