@@ -122,14 +122,16 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private void setAbilitiesAndTeleport() {
     // Make sure the player is unable to fly (the player is in spectator mode)
-    user.write(DEFAULT_ABILITIES);
+    user.delayedWrite(DEFAULT_ABILITIES);
     // Generate the current teleport ID
     expectedTeleportId = RANDOM.nextInt(Short.MAX_VALUE);
     // Teleport the player to the spawn position
-    user.write(new PositionLook(
+    user.delayedWrite(new PositionLook(
       SPAWN_X_POSITION, DYNAMIC_SPAWN_Y_POSITION, SPAWN_Z_POSITION,
       0f, 0f, expectedTeleportId, false
     ));
+    // Send all packets in one flush
+    user.getChannel().flush();
   }
 
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
