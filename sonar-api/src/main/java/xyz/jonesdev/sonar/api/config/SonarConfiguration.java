@@ -623,7 +623,8 @@ public final class SonarConfiguration {
       ))));
 
     messagesConfig.getYaml().setComment("messages.verification.too-many-online-per-ip",
-      "Disconnect message that is shown when someone joins but there are too many online players with their IP address");
+      "Disconnect message that is shown when someone joins but there are too many online players with their IP " +
+        "address");
     tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("messages.too-many-online-per-ip",
       Arrays.asList(
         "%header%",

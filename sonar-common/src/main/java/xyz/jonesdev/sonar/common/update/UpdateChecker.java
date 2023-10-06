@@ -54,7 +54,8 @@ public class UpdateChecker {
           LOGGER.info("You are currently using the latest stable release of Sonar!");
         } else {
           LOGGER.warn("You are currently using the latest development version of Sonar!");
-          LOGGER.warn("The contributors of Sonar are not responsible for any damage done by using an unstable version.");
+          LOGGER.warn("The contributors of Sonar are not responsible for any damage done by using an unstable version" +
+            ".");
         }
       } catch (Exception exception) {
         LOGGER.warn("Could not retrieve latest version information: {}", exception);
