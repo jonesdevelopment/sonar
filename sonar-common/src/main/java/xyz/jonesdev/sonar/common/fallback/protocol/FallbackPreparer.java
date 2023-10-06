@@ -24,7 +24,6 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
@@ -65,7 +64,7 @@ public class FallbackPreparer {
   }
 
   // JoinGame
-  public JoinGame LEGACY_JOIN_GAME;
+  private JoinGame LEGACY_JOIN_GAME;
   private JoinGame JOIN_GAME_1_16;
   private JoinGame JOIN_GAME_1_16_2;
   private JoinGame JOIN_GAME_1_18_2;
@@ -89,13 +88,12 @@ public class FallbackPreparer {
 
   public int MAX_MOVEMENT_TICK, MAX_PREDICTION_TICK;
   public double[] PREPARED_MOVEMENTS;
-  public int DYNAMIC_SPAWN_BUFFER = SPAWN_BUFFER;
   public int DYNAMIC_SPAWN_Y_POSITION;
   public final int SPAWN_X_POSITION = BLOCKS_PER_ROW; // middle of the chunk
   public final int SPAWN_Z_POSITION = BLOCKS_PER_ROW;
 
   public void prepare() {
-    LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
+    LEGACY_JOIN_GAME = createJoinGamePacket(MINECRAFT_1_8);
     JOIN_GAME_1_16 = createJoinGamePacket(MINECRAFT_1_16);
     JOIN_GAME_1_16_2 = createJoinGamePacket(MINECRAFT_1_16_2);
     JOIN_GAME_1_18_2 = createJoinGamePacket(MINECRAFT_1_18_2);
@@ -118,7 +116,7 @@ public class FallbackPreparer {
     }
 
     // Set the dynamic spawn buffer
-    DYNAMIC_SPAWN_BUFFER = (int) (SPAWN_BUFFER + maxFallDistance);
+    final int DYNAMIC_SPAWN_BUFFER = (int) (SPAWN_BUFFER + maxFallDistance);
     // Set the dynamic block and collide Y position based on the maximum fall distance
     DYNAMIC_SPAWN_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + DYNAMIC_SPAWN_BUFFER;
 
@@ -177,25 +175,21 @@ public class FallbackPreparer {
     throw new IllegalStateException("Unsupported protocol version");
   }
 
-  private @NotNull JoinGame createLegacyJoinGamePacket() {
-    final JoinGame joinGame = new JoinGame();
-
-    joinGame.setLevelType("flat");
-    joinGame.setGamemode(Sonar.get().getConfig().getGamemodeId());
-    joinGame.setDimension(0);
-    joinGame.setReducedDebugInfo(true);
-    return joinGame;
-  }
-
   // Partially taken from
   // https://github.com/Elytrium/LimboAPI/blob/master/plugin/src/main/java/net/elytrium/limboapi/server/LimboImpl.java#L607
-  private @NotNull JoinGame createJoinGamePacket(final ProtocolVersion protocolVersion) {
+  private @NotNull JoinGame createJoinGamePacket(final @NotNull ProtocolVersion protocolVersion) {
     final JoinGame joinGame = new JoinGame();
 
     joinGame.setLevelType("flat");
     joinGame.setGamemode(Sonar.get().getConfig().getGamemodeId());
     joinGame.setDimension(0);
     joinGame.setReducedDebugInfo(true);
+
+    // 1.7/1.8 don't need dimension information
+    if (protocolVersion.compareTo(MINECRAFT_1_8) <= 0) {
+      return joinGame;
+    }
+
     joinGame.setDimensionInfo(DIMENSION);
 
     final CompoundBinaryTag.Builder registryContainer = CompoundBinaryTag.builder();
@@ -203,7 +197,7 @@ public class FallbackPreparer {
       .add(createDimensionData(protocolVersion))
       .build();
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
       final CompoundBinaryTag.Builder dimensionRegistryEntry = CompoundBinaryTag.builder();
 
       dimensionRegistryEntry.putString("type", "minecraft:dimension_type");
@@ -242,34 +236,30 @@ public class FallbackPreparer {
         ))).build()
       );
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) == 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_19) == 0) {
         registryContainer.put("minecraft:chat_type", CHAT_TYPE_119);
-      } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
+      } else if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
         registryContainer.put("minecraft:chat_type", CHAT_TYPE_1191);
       }
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_4) == 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_19_4) == 0) {
         registryContainer.put("minecraft:damage_type", DAMAGE_TYPE_1194);
-      } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20) >= 0) {
+      } else if (protocolVersion.compareTo(MINECRAFT_1_20) >= 0) {
         registryContainer.put("minecraft:damage_type", DAMAGE_TYPE_120);
       }
     } else {
       registryContainer.put("dimension", encodedDimensionRegistry);
     }
 
-    try {
-      CompoundBinaryTag currentDimensionData = encodedDimensionRegistry.getCompound(0);
+    CompoundBinaryTag currentDimensionData = encodedDimensionRegistry.getCompound(0);
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
-        currentDimensionData = currentDimensionData.getCompound("element");
-      }
-
-      joinGame.setCurrentDimensionData(currentDimensionData);
-      joinGame.setLevelNames(new String[]{"minecraft:overworld"});
-      joinGame.setRegistry(registryContainer.build());
-    } catch (Throwable throwable) {
-      throw new ReflectiveOperationException(throwable);
+    if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
+      currentDimensionData = currentDimensionData.getCompound("element");
     }
+
+    joinGame.setCurrentDimensionData(currentDimensionData);
+    joinGame.setLevelNames(new String[]{"minecraft:overworld"});
+    joinGame.setRegistry(registryContainer.build());
     return joinGame;
   }
 
@@ -286,7 +276,7 @@ public class FallbackPreparer {
       .putBoolean("respawn_anchor_works", false)
       .putBoolean("has_raids", false)
       .putInt("logical_height", 256)
-      .putString("infiniburn", version.compareTo(ProtocolVersion.MINECRAFT_1_18_2) >= 0 ? "#minecraft" +
+      .putString("infiniburn", version.compareTo(MINECRAFT_1_18_2) >= 0 ? "#minecraft" +
         ":infiniburn_nether" : "minecraft:infiniburn_nether")
       .putDouble("coordinate_scale", 1.0)
       .putString("effects", "minecraft:overworld")
@@ -296,7 +286,7 @@ public class FallbackPreparer {
       .putInt("monster_spawn_light_level", 0)
       .build();
 
-    if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+    if (version.compareTo(MINECRAFT_1_16_2) >= 0) {
       return CompoundBinaryTag.builder()
         .putString("name", "minecraft:overworld")
         .putInt("id", 0)
