@@ -91,8 +91,8 @@ public class FallbackPreparer {
   public double[] PREPARED_MOVEMENTS;
   public int DYNAMIC_SPAWN_BUFFER = SPAWN_BUFFER;
   public int DYNAMIC_SPAWN_Y_POSITION;
-  public final int SPAWN_X_POSITION = 8; // in the middle of the chunk (16x16)
-  public final int SPAWN_Z_POSITION = 8;
+  public final int SPAWN_X_POSITION = BLOCKS_PER_ROW; // middle of the chunk
+  public final int SPAWN_Z_POSITION = BLOCKS_PER_ROW;
 
   public void prepare() {
     LEGACY_JOIN_GAME = createLegacyJoinGamePacket();
