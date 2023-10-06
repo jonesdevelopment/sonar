@@ -45,6 +45,7 @@ public final class EmptyChunkData implements FallbackPacket {
   private static final byte[] SECTION_BYTES = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
   private static final byte[] LIGHT_BYTES = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
 
+  private static final byte[] LEGACY_FILLER_BYTES_17 = new byte[2];
   private static final byte[] LEGACY_FILLER_BYTES = new byte[256];
   private static final byte[] MODERN_FILLER_BYTES = new byte[1024];
 
@@ -128,8 +129,8 @@ public final class EmptyChunkData implements FallbackPacket {
       if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
         writeArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
       } else {
-        byteBuf.writeInt(0); // Compressed size.
-        byteBuf.writeBytes(new byte[2]); // 1.7
+        byteBuf.writeInt(0); // Compressed size
+        byteBuf.writeBytes(LEGACY_FILLER_BYTES_17); // 1.7
       }
     } else if (protocolVersion.compareTo(MINECRAFT_1_15) < 0) {
       writeArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
