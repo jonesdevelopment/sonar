@@ -128,7 +128,7 @@ public class FallbackPreparer {
           z + (BLOCKS_PER_ROW / 2),
           0, 0
         );
-        CHANGED_BLOCKS[index++] = new ChangedBlock(position, BlockType.STONE);
+        CHANGED_BLOCKS[index++] = new ChangedBlock(position, BlockType.BARRIER);
       }
     }
 
