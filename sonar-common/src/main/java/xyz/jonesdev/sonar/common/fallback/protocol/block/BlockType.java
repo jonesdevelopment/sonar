@@ -23,12 +23,10 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.util.function.Function;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
-
 @Getter
 @RequiredArgsConstructor
 public enum BlockType {
-  STONE(protocolVersion -> protocolVersion.compareTo(MINECRAFT_1_13) >= 0 ? 1 : 16);
+  STONE(protocolVersion -> 1);
 
   private final Function<ProtocolVersion, Integer> function;
 

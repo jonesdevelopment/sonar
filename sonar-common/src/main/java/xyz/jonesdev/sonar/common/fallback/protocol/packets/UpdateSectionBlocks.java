@@ -50,14 +50,21 @@ public final class UpdateSectionBlocks implements FallbackPacket {
 
         for (final ChangedBlock block : changedBlocks) {
           byteBuf.writeShort(block.getLegacyChunkPosCrammed());
-          byteBuf.writeShort(block.getType().getId(protocolVersion));
+          final int shiftedBlockId = block.getType().getId(protocolVersion) << 4;
+          byteBuf.writeShort(shiftedBlockId);
         }
       } else {
         writeVarInt(byteBuf, changedBlocks.length);
 
         for (final ChangedBlock block : changedBlocks) {
           byteBuf.writeShort(block.getLegacyChunkPosCrammed());
-          writeVarInt(byteBuf, block.getType().getId(protocolVersion));
+          final int id = block.getType().getId(protocolVersion);
+          if (protocolVersion.compareTo(MINECRAFT_1_13) >= 0) {
+            writeVarInt(byteBuf, id);
+          } else {
+            final int shiftedBlockId = id << 4;
+            writeVarInt(byteBuf, shiftedBlockId);
+          }
         }
       }
     } else {
