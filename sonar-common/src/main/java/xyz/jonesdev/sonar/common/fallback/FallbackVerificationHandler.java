@@ -78,9 +78,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.playerUuid = playerUuid;
     this.state = State.KEEP_ALIVE;
 
-    // Send LoginSuccess packet to make the client think they are joining the server
-    user.write(new ServerLoginSuccess(username, playerUuid));
-
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       // 1.7 players don't have KeepAlive packets in the login process
       sendJoinGamePacket();

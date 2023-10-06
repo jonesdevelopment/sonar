@@ -36,6 +36,7 @@ import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.ServerLoginSuccess;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -148,25 +149,20 @@ public final class FallbackSessionHandler implements MinecraftSessionHandler {
     }
 
     // Replace normal encoder to allow custom packets
-    fallbackPlayer.getPipeline().replace(
-      MINECRAFT_ENCODER,
-      FALLBACK_PACKET_ENCODER,
-      new FallbackPacketEncoder(fallbackPlayer.getProtocolVersion())
-    );
+    final FallbackPacketEncoder encoder = new FallbackPacketEncoder(fallbackPlayer.getProtocolVersion());
+    fallbackPlayer.getPipeline().replace(MINECRAFT_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
+
+    // Send LoginSuccess packet to make the client think they are joining the server
+    fallbackPlayer.write(new ServerLoginSuccess(gameProfile.getName(), gameProfile.getId()));
+
+    // The LoginSuccess packet has been sent, now we can change the registry state
+    encoder.loginSuccess();
 
     // Replace normal decoder to allow custom packets
     fallbackPlayer.getPipeline().replace(
-      MINECRAFT_DECODER,
-      FALLBACK_PACKET_DECODER,
-      new FallbackPacketDecoder(
-        fallbackPlayer,
-        new FallbackVerificationHandler(
-          fallbackPlayer,
-          gameProfile.getName(),
-          connectedPlayer.getUniqueId()
-        )
-      )
-    );
+      MINECRAFT_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(fallbackPlayer,
+        new FallbackVerificationHandler(fallbackPlayer, gameProfile.getName(), connectedPlayer.getUniqueId())
+      ));
   }
 
   @Override

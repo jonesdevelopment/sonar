@@ -36,7 +36,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   public FallbackPacketDecoder(final @NotNull FallbackUser<?, ?> user,
                                final @NotNull FallbackPacketListener listener) {
     this.user = user;
-    this.registry = FallbackPacketRegistry.SONAR.getProtocolRegistry(
+    this.registry = FallbackPacketRegistry.GAME.getProtocolRegistry(
       FallbackPacketRegistry.Direction.SERVERBOUND, user.getProtocolVersion()
     );
     this.listener = listener;
