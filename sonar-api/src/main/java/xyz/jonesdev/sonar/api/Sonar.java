@@ -57,6 +57,7 @@ public interface Sonar {
   /**
    * Set a custom verbose handler
    */
+  @SuppressWarnings("unused")
   void setVerboseHandler(final @NotNull Verbose verboseHandler);
 
   /**
@@ -65,19 +66,19 @@ public interface Sonar {
   void reload();
 
   @NotNull
-  default SonarEventManager getEventManager() {
-    return SonarEventManager.INSTANCE;
-  }
-
-  @NotNull
   default SonarVersion getVersion() {
     return SonarVersion.GET;
   }
 
   @NotNull
+  default SonarEventManager getEventManager() {
+    // We don't want anyone else to create a new instance.
+    return SonarEventManager.INSTANCE;
+  }
+
+  @NotNull
   default Fallback getFallback() {
-    // We only have one single instance of Fallback,
-    // and we don't want anyone else to create a new instance.
+    // We don't want anyone else to create a new instance.
     return Fallback.INSTANCE;
   }
 

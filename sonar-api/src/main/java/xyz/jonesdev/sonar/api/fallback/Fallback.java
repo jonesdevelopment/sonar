@@ -50,17 +50,17 @@ public final class Fallback {
 
     @Override
     public void info(final String message, final Object... args) {
-      SONAR.getLogger().info("[Fallback] " + message, args);
+      SONAR.getLogger().info("[fallback] " + message, args);
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      SONAR.getLogger().warn("[Fallback] " + message, args);
+      SONAR.getLogger().warn("[fallback] " + message, args);
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      SONAR.getLogger().error("[Fallback] " + message, args);
+      SONAR.getLogger().error("[fallback] " + message, args);
     }
   };
 
