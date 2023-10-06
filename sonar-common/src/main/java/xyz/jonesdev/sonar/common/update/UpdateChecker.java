@@ -50,8 +50,11 @@ public class UpdateChecker {
           LOGGER.warn("A new version of Sonar is available: {}", latestStableVersion);
           LOGGER.warn("Please make sure to update to the latest version to ensure stability and security:");
           LOGGER.warn("https://github.com/jonesdevelopment/sonar/releases");
-        } else {
+        } else if (Sonar.get().getVersion().isOnMainBranch()) {
           LOGGER.info("You are currently using the latest stable release of Sonar!");
+        } else {
+          LOGGER.warn("You are currently using the latest development version of Sonar!");
+          LOGGER.warn("The contributors of Sonar are not responsible for any damage done by using an unstable version.");
         }
       } catch (Exception exception) {
         LOGGER.warn("Could not retrieve latest version information: {}", exception);
