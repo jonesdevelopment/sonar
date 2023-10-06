@@ -33,6 +33,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.subcommand.SubcommandRegistryHolder;
+import xyz.jonesdev.sonar.common.update.UpdateChecker;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -90,8 +91,12 @@ public abstract class SonarBootstrap<T> implements Sonar {
     } catch (Throwable throwable) {
       // An error has occurred
       getLogger().error("An error has occurred while launching Sonar: {}", throwable);
-      throwable.printStackTrace();
+      throwable.printStackTrace(System.err);
+      return; // Do not check for updates if the launch failed
     }
+
+    // Check if a new version has been released
+    UpdateChecker.checkForUpdates();
   }
 
   public abstract void enable();
