@@ -117,7 +117,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     expectedTeleportId = RANDOM.nextInt(Short.MAX_VALUE);
     // Teleport the player to the spawn position
     user.delayedWrite(new PositionLook(
-      SPAWN_X_POSITION, DYNAMIC_SPAWN_Y_POSITION, SPAWN_Z_POSITION,
+      SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
       0f, 0f, expectedTeleportId, false
     ));
   }
@@ -305,7 +305,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0
       && expectedTeleportId != -1 // Check if the teleport ID is currently unset
       // Then, check if the position is equal to the spawn position
-      && x == SPAWN_X_POSITION && y == DYNAMIC_SPAWN_Y_POSITION && z == SPAWN_Z_POSITION) {
+      && x == SPAWN_X_POSITION && y == dynamicSpawnYPosition && z == SPAWN_Z_POSITION) {
       // Reset all values to ensure safety on teleport
       tick = 1;
       posY = -1;
@@ -332,7 +332,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         listenForMovements = true;
       }
 
-      lastY = DYNAMIC_SPAWN_Y_POSITION;
+      lastY = dynamicSpawnYPosition;
       return;
     }
 
@@ -346,7 +346,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
-    if (tick > MAX_MOVEMENT_TICK) {
+    if (tick > maxMovementTick) {
       if (!Sonar.get().getConfig().isCheckCollisions()) {
         // Checking collisions is disabled, just finish verification
         finish();
@@ -378,8 +378,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
     }
 
-    if (!ground && tick < MAX_PREDICTION_TICK) {
-      final double predictedY = PREPARED_MOVEMENTS[tick];
+    if (!ground && tick < maxPredictionTick) {
+      final double predictedY = preparedCachedYMotions[tick];
       final double offsetY = Math.abs(deltaY - predictedY);
 
       // Log/debug position if enabled in the configuration

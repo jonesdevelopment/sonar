@@ -38,13 +38,11 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.UpdateSectionBlocks;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.Random;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 
 @UtilityClass
 public class FallbackPreparer {
-  private final Random RANDOM = new Random();
   private final DimensionInfo DIMENSION = new DimensionInfo(
     "minecraft:overworld",
     "sonar", false, false
@@ -64,13 +62,13 @@ public class FallbackPreparer {
   }
 
   // JoinGame
-  private JoinGame LEGACY_JOIN_GAME;
-  private JoinGame JOIN_GAME_1_16;
-  private JoinGame JOIN_GAME_1_16_2;
-  private JoinGame JOIN_GAME_1_18_2;
-  private JoinGame JOIN_GAME_1_19_1;
-  private JoinGame JOIN_GAME_1_19_4;
-  private JoinGame JOIN_GAME_1_20;
+  private JoinGame legacyJoinGame;
+  private JoinGame joinGame116;
+  private JoinGame joinGame1162;
+  private JoinGame joinGame1182;
+  private JoinGame joinGame1191;
+  private JoinGame joinGame1194;
+  private JoinGame joinGame120;
 
   // Abilities
   public final Abilities DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
@@ -86,39 +84,39 @@ public class FallbackPreparer {
   public UpdateSectionBlocks UPDATE_SECTION_BLOCKS;
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 
-  public int MAX_MOVEMENT_TICK, MAX_PREDICTION_TICK;
-  public double[] PREPARED_MOVEMENTS;
-  public int DYNAMIC_SPAWN_Y_POSITION;
+  public int maxMovementTick, maxPredictionTick, dynamicSpawnYPosition;
+  public double[] preparedCachedYMotions;
+  public double maxFallDistance;
   public final int SPAWN_X_POSITION = BLOCKS_PER_ROW; // middle of the chunk
   public final int SPAWN_Z_POSITION = BLOCKS_PER_ROW;
 
   public void prepare() {
-    LEGACY_JOIN_GAME = createJoinGamePacket(MINECRAFT_1_8);
-    JOIN_GAME_1_16 = createJoinGamePacket(MINECRAFT_1_16);
-    JOIN_GAME_1_16_2 = createJoinGamePacket(MINECRAFT_1_16_2);
-    JOIN_GAME_1_18_2 = createJoinGamePacket(MINECRAFT_1_18_2);
-    JOIN_GAME_1_19_1 = createJoinGamePacket(MINECRAFT_1_19_1);
-    JOIN_GAME_1_19_4 = createJoinGamePacket(MINECRAFT_1_19_4);
-    JOIN_GAME_1_20 = createJoinGamePacket(MINECRAFT_1_20);
+    legacyJoinGame = createJoinGamePacket(MINECRAFT_1_8);
+    joinGame116 = createJoinGamePacket(MINECRAFT_1_16);
+    joinGame1162 = createJoinGamePacket(MINECRAFT_1_16_2);
+    joinGame1182 = createJoinGamePacket(MINECRAFT_1_18_2);
+    joinGame1191 = createJoinGamePacket(MINECRAFT_1_19_1);
+    joinGame1194 = createJoinGamePacket(MINECRAFT_1_19_4);
+    joinGame120 = createJoinGamePacket(MINECRAFT_1_20);
 
-    MAX_MOVEMENT_TICK = Sonar.get().getConfig().getMaximumMovementTicks();
-    MAX_PREDICTION_TICK = MAX_MOVEMENT_TICK + 10;
-    PREPARED_MOVEMENTS = new double[MAX_PREDICTION_TICK + 1];
+    maxMovementTick = Sonar.get().getConfig().getMaximumMovementTicks();
+    maxPredictionTick = maxMovementTick + 10;
+    preparedCachedYMotions = new double[maxPredictionTick + 1];
 
-    for (int i = 0; i < MAX_PREDICTION_TICK + 1; i++) {
-      PREPARED_MOVEMENTS[i] = -((Math.pow(0.98, i) - 1) * 3.92);
+    for (int i = 0; i < maxPredictionTick + 1; i++) {
+      preparedCachedYMotions[i] = -((Math.pow(0.98, i) - 1) * 3.92);
     }
 
-    // Adjust block and collide Y position based on max movement ticks
-    double maxFallDistance = 0;
-    for (int i = 0; i < MAX_MOVEMENT_TICK; i++) {
-      maxFallDistance += PREPARED_MOVEMENTS[i];
+    // Adjust block and collide Y position based on max fall distance
+    maxFallDistance = 0;
+    for (int i = 0; i < maxMovementTick; i++) {
+      maxFallDistance += preparedCachedYMotions[i];
     }
 
     // Set the dynamic spawn buffer
     final int DYNAMIC_SPAWN_BUFFER = (int) (SPAWN_BUFFER + maxFallDistance);
     // Set the dynamic block and collide Y position based on the maximum fall distance
-    DYNAMIC_SPAWN_Y_POSITION = DEFAULT_Y_COLLIDE_POSITION + DYNAMIC_SPAWN_BUFFER;
+    dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + DYNAMIC_SPAWN_BUFFER;
 
     // Prepare collision platform positions
     int index = 0;
@@ -149,25 +147,25 @@ public class FallbackPreparer {
 
   public static JoinGame getJoinPacketForVersion(final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
-      return LEGACY_JOIN_GAME; // 1.7-1.15.2
+      return legacyJoinGame; // 1.7-1.15.2
     }
     if (protocolVersion.compareTo(MINECRAFT_1_16_1) <= 0) {
-      return JOIN_GAME_1_16; // 1.16-1.16.1
+      return joinGame116; // 1.16-1.16.1
     }
     if (protocolVersion.compareTo(MINECRAFT_1_18) <= 0) {
-      return JOIN_GAME_1_16_2; // 1.16.2-1.18
+      return joinGame1162; // 1.16.2-1.18
     }
     if (protocolVersion.compareTo(MINECRAFT_1_19) <= 0) {
-      return JOIN_GAME_1_18_2; // 1.18.1-1.19
+      return joinGame1182; // 1.18.1-1.19
     }
     if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
-      return JOIN_GAME_1_19_1; // 1.19.1-1.19.3
+      return joinGame1191; // 1.19.1-1.19.3
     }
     if (protocolVersion.compareTo(MINECRAFT_1_19_4) <= 0) {
-      return JOIN_GAME_1_19_4; // 1.19.4
+      return joinGame1194; // 1.19.4
     }
     if (protocolVersion.compareTo(MINECRAFT_1_20) <= 0) {
-      return JOIN_GAME_1_20; // 1.20-1.20.1
+      return joinGame120; // 1.20-1.20.1
     }
     throw new IllegalStateException("Unsupported protocol version");
   }
