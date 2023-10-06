@@ -121,6 +121,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void setAbilitiesAndTeleport() {
+    // Set the state to TELEPORT to avoid false positives
+    // and go on with the flow of the verification.
+    state = State.TELEPORT;
     // Make sure the player is unable to fly (the player is in spectator mode)
     user.delayedWrite(DEFAULT_ABILITIES);
     // Generate the current teleport ID
@@ -130,8 +133,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       SPAWN_X_POSITION, DYNAMIC_SPAWN_Y_POSITION, SPAWN_Z_POSITION,
       0f, 0f, expectedTeleportId, false
     ));
-    // Send all packets in one flush
-    user.getChannel().flush();
   }
 
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
@@ -260,9 +261,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // Immediately send the chunk data as 1.7-1.8 can't confirm teleports
         sendChunkData();
       } else {
-        // Set the state to TELEPORT to avoid false positives
-        // and go on with the flow of the verification.
-        state = State.TELEPORT;
+        // Send all previously sent packets in one flush since we didn't flush
+        // the channel earlier when we teleported the player.
+        user.getChannel().flush();
       }
     }
 
