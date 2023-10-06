@@ -140,17 +140,14 @@ public class FallbackPreparer {
 
   private @Nullable CompoundBinaryTag getMapping(final @NotNull String fileName) {
     try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/" + fileName)) {
-      return BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream),
-        BinaryTagIO.Compression.GZIP
-      );
+      return BinaryTagIO.reader().read(Objects.requireNonNull(inputStream), BinaryTagIO.Compression.GZIP);
     } catch (Throwable throwable) {
-      Sonar.get().getLogger().error("Could not load mapping {}", fileName);
-      throwable.printStackTrace(System.err);
+      Sonar.get().getLogger().error("Could not load mappings for {}: {}", fileName, throwable);
       return null;
     }
   }
 
-  public static JoinGame getJoinPacketForVersion(final ProtocolVersion protocolVersion) {
+  public static JoinGame getJoinPacketForVersion(final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
       return LEGACY_JOIN_GAME; // 1.7-1.15.2
     }
