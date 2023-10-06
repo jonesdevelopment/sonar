@@ -107,20 +107,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.write(getJoinPacketForVersion(user.getProtocolVersion()));
   }
 
-  private void sendChunkData() {
-    // Set the state to POSITION to avoid false positives
-    // and go on with the flow of the verification.
-    state = State.POSITION;
-    // Teleport player into the fake lobby by sending an empty chunk
-    user.delayedWrite(EMPTY_CHUNK_DATA);
-    // Send an UpdateSectionBlocks packet with a platform of blocks
-    // to check if the player collides with the solid platform.
-    user.delayedWrite(UPDATE_SECTION_BLOCKS);
-    // Send all packets in one flush
-    user.getChannel().flush();
-  }
-
-  private void setAbilitiesAndTeleport() {
+  private void sendAbilitiesAndTeleport() {
     // Set the state to TELEPORT to avoid false positives
     // and go on with the flow of the verification.
     state = State.TELEPORT;
@@ -133,6 +120,19 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       SPAWN_X_POSITION, DYNAMIC_SPAWN_Y_POSITION, SPAWN_Z_POSITION,
       0f, 0f, expectedTeleportId, false
     ));
+  }
+
+  private void sendChunkData() {
+    // Set the state to POSITION to avoid false positives
+    // and go on with the flow of the verification.
+    state = State.POSITION;
+    // Teleport player into the fake lobby by sending an empty chunk
+    user.delayedWrite(EMPTY_CHUNK_DATA);
+    // Send an UpdateSectionBlocks packet with a platform of blocks
+    // to check if the player collides with the solid platform.
+    user.delayedWrite(UPDATE_SECTION_BLOCKS);
+    // Send all packets in one flush
+    user.getChannel().flush();
   }
 
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
@@ -254,7 +254,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // First, send an abilities packet to the client to make
       // sure the player falls even in spectator mode.
       // Then, teleport the player to the spawn position.
-      setAbilitiesAndTeleport();
+      sendAbilitiesAndTeleport();
 
       // 1.7-1.8 clients do not have a TeleportConfirm packet
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
