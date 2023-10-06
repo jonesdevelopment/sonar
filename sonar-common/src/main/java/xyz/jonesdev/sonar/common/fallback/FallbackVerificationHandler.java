@@ -414,7 +414,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.getFallback().getConnected().remove(username);
 
     // Add verified player to the database
-    final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(user.getInetAddress().toString(), playerUuid, login.getStart());
+    final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(user.getInetAddress().toString(), playerUuid,
+      login.getStart());
     Sonar.get().getVerifiedPlayerController().add(verifiedPlayer);
 
     // Call the VerifySuccessEvent for external API usage

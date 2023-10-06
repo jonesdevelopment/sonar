@@ -192,7 +192,8 @@ public final class FallbackListener {
         // Check if the username matches the valid name regex in order to prevent
         // UTF-16 names or other types of flood attacks
         if (!Sonar.get().getConfig().getValidNameRegex().matcher(event.getUsername()).matches()) {
-          mcConnection.closeWith(Disconnect.create(Sonar.get().getConfig().getInvalidUsername(), mcConnection.getProtocolVersion()));
+          mcConnection.closeWith(Disconnect.create(Sonar.get().getConfig().getInvalidUsername(),
+            mcConnection.getProtocolVersion()));
           return;
         }
 
