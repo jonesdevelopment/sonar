@@ -53,13 +53,6 @@ public final class VerifiedCommand extends Subcommand {
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-
-        // Make sure we aren't currently locking the IP address to avoid a double I/O operation
-        if (LOCK.contains(rawInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedBlocked());
-          return;
-        }
-
         final InetAddress inetAddress = checkIP(invocation.getSender(), rawInetAddress);
         // Make sure the given IP address is valid
         if (inetAddress == null) return;
@@ -70,16 +63,10 @@ public final class VerifiedCommand extends Subcommand {
           return;
         }
 
-        // Lock the IP address
-        // Make sure we don't accidentally run 2 operations at the same time
-        LOCK.add(rawInetAddress);
-
         invocation.getSender().sendMessage("§ePrevious UUIDs for " + rawInetAddress + ":");
         for (final UUID uuid : SONAR.getVerifiedPlayerController().getUUIDs(inetAddress.toString())) {
           invocation.getSender().sendMessage(" §7▪ §f" + uuid.toString());
         }
-        // Unlock the IP address
-        LOCK.remove(rawInetAddress);
         break;
       }
 
