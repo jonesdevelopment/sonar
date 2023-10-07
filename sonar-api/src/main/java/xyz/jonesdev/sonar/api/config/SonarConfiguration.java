@@ -175,7 +175,7 @@ public final class SonarConfiguration {
     private Type type;
     private String url;
     private int port;
-    private String database;
+    private String name;
     private String username;
     private String password;
   }
@@ -208,33 +208,33 @@ public final class SonarConfiguration {
     }
 
     // General options
-    generalConfig.getYaml().setComment("general.language",
+    generalConfig.getYaml().setComment("language",
       "Name of the language file Sonar should use for messages"
     );
-    String language = generalConfig.getString("general.language", "en");
+    String language = generalConfig.getString("language", "en");
 
-    generalConfig.getYaml().setComment("general.max-online-per-ip",
+    generalConfig.getYaml().setComment("max-online-per-ip",
       "Maximum number of players online with the same IP address"
     );
-    maxOnlinePerIp = clamp(generalConfig.getInt("general.max-online-per-ip", 3), 1, Byte.MAX_VALUE);
+    maxOnlinePerIp = clamp(generalConfig.getInt("max-online-per-ip", 3), 1, Byte.MAX_VALUE);
 
-    generalConfig.getYaml().setComment("general.min-players-for-attack",
+    generalConfig.getYaml().setComment("min-players-for-attack",
       "Minimum number of new players in order for an attack to be detected"
     );
-    minPlayersForAttack = clamp(generalConfig.getInt("general.min-players-for-attack", 5), 2, 1024);
+    minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 5), 2, 1024);
 
-    generalConfig.getYaml().setComment("general.log-player-addresses",
-      "Should Sonar log players' IP addresses in the console?"
+    generalConfig.getYaml().setComment("log-player-addresses",
+      "Should Sonar log players' IP addresses in console?"
     );
-    logPlayerAddresses = generalConfig.getBoolean("general.log-player-addresses", true);
+    logPlayerAddresses = generalConfig.getBoolean("log-player-addresses", true);
 
     // Database
-    generalConfig.getYaml().setComment("general.database.type",
+    generalConfig.getYaml().setComment("database.type",
       "Type of database Sonar uses to store verified players"
         + LINE_SEPARATOR + "Possible types: NONE, MYSQL, " +
         "MARIADB (experimental)"
     );
-    final String newDatabaseType = generalConfig.getString("general.database.type", Database.Type.NONE.name());
+    final String newDatabaseType = generalConfig.getString("database.type", Database.Type.NONE.name());
     database.type = Database.Type.valueOf(newDatabaseType.toUpperCase());
 
     // Message settings
@@ -252,329 +252,333 @@ public final class SonarConfiguration {
       return;
     }
 
-    messagesConfig.getYaml().setComment("messages.prefix",
+    messagesConfig.getYaml().setComment("prefix",
       "Placeholder for every '%prefix%' in this configuration file");
-    prefix = formatString(messagesConfig.getString("messages.prefix", "&e&lSonar &7» &f"));
+    prefix = formatString(messagesConfig.getString("prefix", "&e&lSonar &7» &f"));
 
-    messagesConfig.getYaml().setComment("messages.support-url",
+    messagesConfig.getYaml().setComment("support-url",
       "Placeholder for every '%support-url%' in this configuration file");
-    supportUrl = messagesConfig.getString("messages.support-url", "https://jonesdev.xyz/discord/");
+    supportUrl = messagesConfig.getString("support-url", "https://jonesdev.xyz/discord/");
 
     // SQL
-    generalConfig.getYaml().setComment("general.database.sql.url",
+    generalConfig.getYaml().setComment("database.url",
       "URL for authenticating with the SQL database");
-    database.url = generalConfig.getString("general.database.sql.url", "localhost");
+    database.url = generalConfig.getString("database.url", "localhost");
 
-    generalConfig.getYaml().setComment("general.database.sql.port",
+    generalConfig.getYaml().setComment("database.port",
       "Port for authenticating with the SQL database");
-    database.port = generalConfig.getInt("general.database.sql.port", 3306);
+    database.port = generalConfig.getInt("database.port", 3306);
 
-    generalConfig.getYaml().setComment("general.database.sql.database",
+    generalConfig.getYaml().setComment("database.name",
       "Name of the SQL database");
-    database.database = generalConfig.getString("general.database.sql.database", "sonar");
+    database.name = generalConfig.getString("database.name", "sonar");
 
-    generalConfig.getYaml().setComment("general.database.sql.username",
+    generalConfig.getYaml().setComment("database.username",
       "Username for authenticating with the SQL database");
-    database.username = generalConfig.getString("general.database.sql.username", "");
+    database.username = generalConfig.getString("database.username", "");
 
-    generalConfig.getYaml().setComment("general.database.sql.password",
+    generalConfig.getYaml().setComment("database.password",
       "Password for authenticating with the SQL database");
-    database.password = generalConfig.getString("general.database.sql.password", "");
+    database.password = generalConfig.getString("database.password", "");
 
     // Lockdown
-    generalConfig.getYaml().setComment("general.lockdown.enabled",
+    generalConfig.getYaml().setComment("lockdown.enabled",
       "Should Sonar prevent all players from joining the server?");
-    lockdown.enabled = generalConfig.getBoolean("general.lockdown.enabled", false);
+    lockdown.enabled = generalConfig.getBoolean("lockdown.enabled", false);
 
-    generalConfig.getYaml().setComment("general.lockdown.log-attempts",
+    generalConfig.getYaml().setComment("lockdown.log-attempts",
       "Should Sonar log new login attempts during lockdown?");
-    lockdown.logAttempts = generalConfig.getBoolean("general.lockdown.log-attempts", true);
+    lockdown.logAttempts = generalConfig.getBoolean("lockdown.log-attempts", true);
 
-    generalConfig.getYaml().setComment("general.lockdown.notify-admins",
+    generalConfig.getYaml().setComment("lockdown.notify-admins",
       "Should Sonar notify admins when they join the server during lockdown?");
-    lockdown.notifyAdmins = generalConfig.getBoolean("general.lockdown.notify-admins", true);
+    lockdown.notifyAdmins = generalConfig.getBoolean("lockdown.notify-admins", true);
 
     // Queue
-    generalConfig.getYaml().setComment("general.queue.max-polls",
+    generalConfig.getYaml().setComment("queue.max-polls",
       "Maximum number of queue polls per 500 milliseconds");
-    queue.maxQueuePolls = clamp(generalConfig.getInt("general.queue.max-polls", 30), 1, 1000);
+    queue.maxQueuePolls = clamp(generalConfig.getInt("queue.max-polls", 30), 1, 1000);
 
     // Verification
-    generalConfig.getYaml().setComment("general.verification.enabled",
-      "Should Sonar verify new/unknown players? (Recommended)");
-    verification.enabled = generalConfig.getBoolean("general.verification.enabled", true);
+    generalConfig.getYaml().setComment("verification.enabled",
+      "Should Sonar verify new players? (Recommended)");
+    verification.enabled = generalConfig.getBoolean("verification.enabled", true);
 
-    generalConfig.getYaml().setComment("general.verification.check-gravity",
+    generalConfig.getYaml().setComment("verification.checks.gravity",
+      "Checks if the players' falling motion is following Minecraft's gravity formula"
+      + LINE_SEPARATOR + "All predicted motions are precalculated in order to save performance");
+    generalConfig.getYaml().setComment("verification.checks.gravity.enabled",
       "Should Sonar check for valid client gravity? (Recommended)");
-    verification.checkGravity = generalConfig.getBoolean("general.verification.check-gravity", true);
+    verification.checkGravity = generalConfig.getBoolean("verification.checks.gravity.enabled", true);
 
-    generalConfig.getYaml().setComment("general.verification.check-collisions",
+    generalConfig.getYaml().setComment("verification.checks.gravity.max-movement-ticks",
+      "Maximum number of ticks the player has to fall in order to be allowed to hit the platform");
+    verification.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks", 8), 2, 100);
+
+    generalConfig.getYaml().setComment("verification.checks.gravity.max-ignored-ticks",
+      "Maximum number of ignored Y movement changes before a player fails verification");
+    verification.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5), 1, 128);
+
+    generalConfig.getYaml().setComment("verification.checks.collisions",
+      "Checks if the players collides with barrier blocks spawned below the player"
+      + LINE_SEPARATOR + "Note: The collision check will be skipped if the gravity check is disabled");
+    generalConfig.getYaml().setComment("verification.checks.collisions.enabled",
       "Should Sonar check for valid client collisions? (Recommended)");
-    verification.checkCollisions = generalConfig.getBoolean("general.verification.check-collisions", true);
+    verification.checkCollisions = generalConfig.getBoolean("verification.checks.collisions.enabled", true);
 
-    generalConfig.getYaml().setComment("general.verification.gamemode",
+    generalConfig.getYaml().setComment("verification.gamemode",
       "The gamemode of the player during verification (0, 1, 2, or 3)");
-    verification.gamemodeId = (short) clamp(generalConfig.getInt("general.verification.gamemode", 3), 0, 3);
+    verification.gamemodeId = (short) clamp(generalConfig.getInt("verification.gamemode", 3), 0, 3);
 
-    generalConfig.getYaml().setComment("general.verification.log-connections",
+    generalConfig.getYaml().setComment("verification.log-connections",
       "Should Sonar log new verification attempts?");
-    verification.logConnections = generalConfig.getBoolean("general.verification.log-connections", true);
+    verification.logConnections = generalConfig.getBoolean("verification.log-connections", true);
 
-    generalConfig.getYaml().setComment("general.verification.log-during-attack",
+    generalConfig.getYaml().setComment("verification.log-during-attack",
       "Should Sonar log new verification attempts during attacks?");
-    verification.logDuringAttack = generalConfig.getBoolean("general.verification.log-during-attack", false);
+    verification.logDuringAttack = generalConfig.getBoolean("verification.log-during-attack", false);
 
-    generalConfig.getYaml().setComment("general.verification.debug-xyz-positions",
+    generalConfig.getYaml().setComment("verification.debug-xyz-positions",
       "Should Sonar log every single movement/position change during verification?"
         + LINE_SEPARATOR + "This is not recommended for production servers but can be helpful for spotting errors.");
-    verification.debugXYZPositions = generalConfig.getBoolean("general.verification.debug-xyz-positions", false);
+    verification.debugXYZPositions = generalConfig.getBoolean("verification.debug-xyz-positions", false);
 
-    generalConfig.getYaml().setComment("general.verification.valid-name-regex",
+    generalConfig.getYaml().setComment("verification.valid-name-regex",
       "Regex for validating usernames during verification");
     verification.validNameRegex = Pattern.compile(generalConfig.getString(
       "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"));
 
-    generalConfig.getYaml().setComment("general.verification.valid-brand-regex",
+    generalConfig.getYaml().setComment("verification.valid-brand-regex",
       "Regex for validating client brands during verification");
     verification.validBrandRegex = Pattern.compile(generalConfig.getString(
       "general.verification.valid-brand-regex", "^[!-~ ]+$"));
 
-    generalConfig.getYaml().setComment("general.verification.valid-locale-regex",
+    generalConfig.getYaml().setComment("verification.valid-locale-regex",
       "Regex for validating client locale during verification");
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString(
       "general.verification.valid-locale-regex", "^[a-zA-Z_]+$"));
 
-    generalConfig.getYaml().setComment("general.verification.max-brand-length",
+    generalConfig.getYaml().setComment("verification.max-brand-length",
       "Maximum client brand length during verification");
-    verification.maxBrandLength = generalConfig.getInt("general.verification.max-brand-length", 64);
+    verification.maxBrandLength = generalConfig.getInt("verification.max-brand-length", 64);
 
-    generalConfig.getYaml().setComment("general.verification.max-ping",
+    generalConfig.getYaml().setComment("verification.max-ping",
       "Ping (in milliseconds) a player has to have in order to timeout");
-    verification.maxPing = clamp(generalConfig.getInt("general.verification.max-ping", 10000), 500, 30000);
+    verification.maxPing = clamp(generalConfig.getInt("verification.max-ping", 10000), 500, 30000);
 
-    generalConfig.getYaml().setComment("general.verification.read-timeout",
+    generalConfig.getYaml().setComment("verification.read-timeout",
       "Amount of time that has to pass before a player times out");
-    verification.readTimeout = clamp(generalConfig.getInt("general.verification.read-timeout", 3500), 500, 30000);
+    verification.readTimeout = clamp(generalConfig.getInt("verification.read-timeout", 3500), 500, 30000);
 
-    generalConfig.getYaml().setComment("general.verification.max-login-packets",
+    generalConfig.getYaml().setComment("verification.max-login-packets",
       "Maximum number of login packets the player has to send in order to be kicked");
-    verification.maxLoginPackets = clamp(generalConfig.getInt("general.verification.max-login-packets", 256), 128, 8192);
+    verification.maxLoginPackets = clamp(generalConfig.getInt("verification.max-login-packets", 256), 128, 8192);
 
-    generalConfig.getYaml().setComment("general.verification.max-movement-ticks",
-      "Maximum number of ticks the player has to fall in order to hit the platform");
-    verification.maxMovementTicks = clamp(generalConfig.getInt("general.verification.max-movement-ticks", 8), 2, 100);
-
-    generalConfig.getYaml().setComment("general.verification.max-ignored-ticks",
-      "Maximum number of ignored Y movement changes before a player fails verification");
-    verification.maxIgnoredTicks = clamp(generalConfig.getInt("general.verification.max-ignored-ticks", 5), 1, 128);
-
-    generalConfig.getYaml().setComment("general.verification.max-players",
+    generalConfig.getYaml().setComment("verification.max-players",
       "Maximum number of players verifying at the same time");
-    verification.maxVerifyingPlayers = clamp(generalConfig.getInt("general.verification.max-players", 1024), 1,
+    verification.maxVerifyingPlayers = clamp(generalConfig.getInt("verification.max-players", 1024), 1,
       Short.MAX_VALUE);
 
-    generalConfig.getYaml().setComment("general.verification.rejoin-delay",
+    generalConfig.getYaml().setComment("verification.rejoin-delay",
       "Minimum number of rejoin delay during verification");
-    verification.reconnectDelay = clamp(generalConfig.getInt("general.verification.rejoin-delay", 8000), 0, 100000);
+    verification.reconnectDelay = clamp(generalConfig.getInt("verification.rejoin-delay", 8000), 0, 100000);
 
     // load this here otherwise it could cause issues
-    messagesConfig.getYaml().setComment("messages.header",
+    messagesConfig.getYaml().setComment("header",
       "Placeholder for every '%header%' in this configuration file");
-    header = fromList(messagesConfig.getStringList("messages.header",
+    header = fromList(messagesConfig.getStringList("header",
       Arrays.asList(
         "&e&lSonar",
         "&r"
       )));
 
-    messagesConfig.getYaml().setComment("messages.footer",
+    messagesConfig.getYaml().setComment("footer",
       "Placeholder for every '%footer%' in this configuration file");
-    footer = fromList(messagesConfig.getStringList("messages.footer",
+    footer = fromList(messagesConfig.getStringList("footer",
       Arrays.asList("&7If you believe that this is an error, contact an administrator.")));
 
-    messagesConfig.getYaml().setComment("messages.no-permission",
+    messagesConfig.getYaml().setComment("no-permission",
       "Message that is shown when a player tries running /sonar without permission");
-    noPermission = formatString(messagesConfig.getString("messages.no-permission",
+    noPermission = formatString(messagesConfig.getString("no-permission",
       "%prefix%&cYou do not have permission to execute this command."));
 
-    messagesConfig.getYaml().setComment("messages.lockdown.enabled",
+    messagesConfig.getYaml().setComment("incorrect-command-usage",
+      "Message that is shown when someone uses a command incorrectly");
+    commands.incorrectCommandUsage = formatString(messagesConfig.getString("incorrect-command-usage",
+      "%prefix%&cUsage: /sonar %usage%"));
+
+    messagesConfig.getYaml().setComment("invalid-ip-address",
+      "Message that is shown when someone provides an invalid IP address (Invalid characters)");
+    commands.incorrectIpAddress = formatString(messagesConfig.getString("invalid-ip-address",
+      "%prefix%The IP address you provided seems to be invalid."));
+
+    messagesConfig.getYaml().setComment("illegal-ip-address",
+      "Message that is shown when someone provides an illegal IP address (Local IP)");
+    commands.illegalIpAddress = formatString(messagesConfig.getString("illegal-ip-address",
+      "%prefix%The IP address you provided seems to be either a local or loopback IP."));
+
+    messagesConfig.getYaml().setComment("unknown-ip-address",
+      "Message that is shown when someone provides an unknown IP address (Unknown Host)");
+    commands.unknownIpAddress = formatString(messagesConfig.getString("unknown-ip-address",
+      "%prefix%The IP address you provided seems to be unknown."));
+
+    messagesConfig.getYaml().setComment("player-only",
+      "Message that is shown when the console runs a command that is player-only");
+    commands.playersOnly = formatString(messagesConfig.getString("player-only",
+      "%prefix%&cYou can only execute this command as a player."));
+
+    messagesConfig.getYaml().setComment("console-only",
+      "Message that is shown when a player runs a command that is console-only");
+    commands.consoleOnly = formatString(messagesConfig.getString("console-only",
+      "%prefix%&cFor security reasons, you can only execute this command through console."));
+
+    messagesConfig.getYaml().setComment("command-cool-down",
+      "Message that is shown when a player executes Sonar commands too quickly");
+    commands.commandCoolDown = formatString(messagesConfig.getString("command-cool-down",
+      "%prefix%&cYou can only execute this command every 0.5 seconds."));
+    commands.commandCoolDownLeft = formatString(messagesConfig.getString("command-cool-down-left",
+      "%prefix%&cPlease wait another &l%time-left%s&r&c."));
+
+    messagesConfig.getYaml().setComment("sub-command-no-permission",
+      "Message that is shown when a player does not have permission to execute a certain subcommand");
+    commands.subCommandNoPerm = formatString(messagesConfig.getString("sub-command-no-permission",
+      "%prefix%&cYou do not have permission to execute this subcommand. &7(%permission%)"));
+
+    messagesConfig.getYaml().setComment("lockdown.enabled",
       "Message that is shown when a player enables server lockdown");
-    lockdown.activated = formatString(messagesConfig.getString("messages.lockdown.enabled",
+    lockdown.activated = formatString(messagesConfig.getString("lockdown.enabled",
       "%prefix%The server is now in lockdown mode."));
 
-    messagesConfig.getYaml().setComment("messages.lockdown.disabled",
+    messagesConfig.getYaml().setComment("lockdown.disabled",
       "Message that is shown when a player disables server lockdown");
-    lockdown.deactivated = formatString(messagesConfig.getString("messages.lockdown.disabled",
+    lockdown.deactivated = formatString(messagesConfig.getString("lockdown.disabled",
       "%prefix%The server is no longer in lockdown mode."));
 
-    messagesConfig.getYaml().setComment("messages.lockdown.notification",
+    messagesConfig.getYaml().setComment("lockdown.notification",
       "Message that is shown when an admin joins the server during lockdown");
-    lockdown.notification = formatString(messagesConfig.getString("messages.lockdown.notification",
-      "%prefix%&aHey, the server is currently in lockdown mode. If you want to disable the lockdown mode, " +
-        "type " +
-        "&f/sonar" +
-        " lockdown&a."
+    lockdown.notification = formatString(messagesConfig.getString("lockdown.notification",
+      "%prefix%&aHey, the server is currently in lockdown mode. If you want to disable the lockdown mode,"
+        + " type &f/sonar lockdown&a."
     ));
 
-    messagesConfig.getYaml().setComment("messages.lockdown.console-log",
+    messagesConfig.getYaml().setComment("lockdown.console-log",
       "Message that is shown to console when a normal player tries joining the server during lockdown");
-    lockdown.consoleLog = messagesConfig.getString("messages.lockdown.console-log",
+    lockdown.consoleLog = messagesConfig.getString("lockdown.console-log",
       "%player% (%ip%, %protocol%) tried to join during lockdown mode.");
 
-    messagesConfig.getYaml().setComment("messages.lockdown.disconnect-message",
+    messagesConfig.getYaml().setComment("lockdown.disconnect-message",
       "Message that is shown to a normal player when they try joining the server during lockdown");
-    lockdown.disconnect = deserialize(fromList(messagesConfig.getStringList("messages.lockdown.disconnect-message",
+    lockdown.disconnect = deserialize(fromList(messagesConfig.getStringList("lockdown.disconnect-message",
       Arrays.asList(
         "%header%",
         "&cThe server is currently locked down, please try again later.",
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.reload.start",
+    messagesConfig.getYaml().setComment("reload.start",
       "Message that is shown when someone starts reloading Sonar");
-    commands.reloading = formatString(messagesConfig.getString("messages.reload.start",
+    commands.reloading = formatString(messagesConfig.getString("reload.start",
       "%prefix%Reloading Sonar..."));
 
-    messagesConfig.getYaml().setComment("messages.reload.finish",
+    messagesConfig.getYaml().setComment("reload.finish",
       "Message that is shown when Sonar has finished reloading");
-    commands.reloaded = formatString(messagesConfig.getString("messages.reload.finish",
+    commands.reloaded = formatString(messagesConfig.getString("reload.finish",
       "%prefix%&aSuccessfully reloaded &7(%taken%ms)"));
 
-    messagesConfig.getYaml().setComment("messages.verbose.subscribed",
+    messagesConfig.getYaml().setComment("verbose.subscribed",
       "Message that is shown when a player subscribes to Sonar verbose");
-    commands.verboseSubscribed = formatString(messagesConfig.getString("messages.verbose.subscribed",
+    commands.verboseSubscribed = formatString(messagesConfig.getString("verbose.subscribed",
       "%prefix%You are now viewing Sonar verbose."));
 
-    messagesConfig.getYaml().setComment("messages.verbose.unsubscribed",
+    messagesConfig.getYaml().setComment("verbose.unsubscribed",
       "Message that is shown when a player unsubscribes from Sonar verbose");
-    commands.verboseUnsubscribed = formatString(messagesConfig.getString("messages.verbose.unsubscribed",
+    commands.verboseUnsubscribed = formatString(messagesConfig.getString("verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."));
 
-    messagesConfig.getYaml().setComment("messages.verbose.subscribed-other",
+    messagesConfig.getYaml().setComment("verbose.subscribed-other",
       "Message that is shown when a player makes another player subscribe to Sonar verbose");
-    commands.verboseSubscribedOther = formatString(messagesConfig.getString("messages.verbose.subscribed-other",
+    commands.verboseSubscribedOther = formatString(messagesConfig.getString("verbose.subscribed-other",
       "%prefix%%player% is now viewing Sonar verbose."));
 
-    messagesConfig.getYaml().setComment("messages.verbose.unsubscribed-other",
+    messagesConfig.getYaml().setComment("verbose.unsubscribed-other",
       "Message that is shown when a player makes another player unsubscribe from Sonar verbose");
-    commands.verboseUnsubscribedOther = formatString(messagesConfig.getString("messages.verbose.unsubscribed-other",
+    commands.verboseUnsubscribedOther = formatString(messagesConfig.getString("verbose.unsubscribed-other",
       "%prefix%%player% is no longer viewing Sonar verbose."));
 
-    messagesConfig.getYaml().setComment("messages.incorrect-command-usage",
-      "Message that is shown when someone uses a command incorrectly");
-    commands.incorrectCommandUsage = formatString(messagesConfig.getString("messages.incorrect-command-usage",
-      "%prefix%&cUsage: /sonar %usage%"));
-
-    messagesConfig.getYaml().setComment("messages.invalid-ip-address",
-      "Message that is shown when someone provides an invalid IP address (Invalid characters)");
-    commands.incorrectIpAddress = formatString(messagesConfig.getString("messages.invalid-ip-address",
-      "%prefix%The IP address you provided seems to be invalid."));
-
-    messagesConfig.getYaml().setComment("messages.illegal-ip-address",
-      "Message that is shown when someone provides an illegal IP address (Local IP)");
-    commands.illegalIpAddress = formatString(messagesConfig.getString("messages.illegal-ip-address",
-      "%prefix%The IP address you provided seems to be either a local or loopback IP."));
-
-    messagesConfig.getYaml().setComment("messages.unknown-ip-address",
-      "Message that is shown when someone provides an unknown IP address (Unknown Host)");
-    commands.unknownIpAddress = formatString(messagesConfig.getString("messages.unknown-ip-address",
-      "%prefix%The IP address you provided seems to be unknown."));
-
-    messagesConfig.getYaml().setComment("messages.player-only",
-      "Message that is shown when the console runs a command that is player-only");
-    commands.playersOnly = formatString(messagesConfig.getString("messages.player-only",
-      "%prefix%&cYou can only execute this command as a player."));
-
-    messagesConfig.getYaml().setComment("messages.console-only",
-      "Message that is shown when a player runs a command that is console-only");
-    commands.consoleOnly = formatString(messagesConfig.getString("messages.console-only",
-      "%prefix%&cFor security reasons, you can only execute this command through console."));
-
-    messagesConfig.getYaml().setComment("messages.command-cool-down",
-      "Message that is shown when a player executes Sonar commands too quickly");
-    commands.commandCoolDown = formatString(messagesConfig.getString("messages.command-cool-down",
-      "%prefix%&cYou can only execute this command every 0.5 seconds."));
-    commands.commandCoolDownLeft = formatString(messagesConfig.getString("messages.command-cool-down-left",
-      "%prefix%&cPlease wait another &l%time-left%s&r&c."));
-
-    messagesConfig.getYaml().setComment("messages.sub-command-no-permission",
-      "Message that is shown when a player does not have permission to execute a certain subcommand");
-    commands.subCommandNoPerm = formatString(messagesConfig.getString("messages.sub-command-no-permission",
-      "%prefix%&cYou do not have permission to execute this subcommand. &7(%permission%)"));
-
-    messagesConfig.getYaml().setComment("messages.blacklist.empty",
+    messagesConfig.getYaml().setComment("blacklist.empty",
       "Message that is shown when someone tries clearing the blacklist but is is empty");
-    commands.blacklistEmpty = formatString(messagesConfig.getString("messages.blacklist.empty",
+    commands.blacklistEmpty = formatString(messagesConfig.getString("blacklist.empty",
       "%prefix%The blacklist is currently empty. Therefore, no IP addresses were removed from the blacklist."));
 
-    messagesConfig.getYaml().setComment("messages.blacklist.cleared",
+    messagesConfig.getYaml().setComment("blacklist.cleared",
       "Message that is shown when someone clears the blacklist");
-    commands.blacklistCleared = formatString(messagesConfig.getString("messages.blacklist.cleared",
+    commands.blacklistCleared = formatString(messagesConfig.getString("blacklist.cleared",
       "%prefix%You successfully removed a total of %removed% IP address(es) from the blacklist."));
 
-    messagesConfig.getYaml().setComment("messages.blacklist.size",
+    messagesConfig.getYaml().setComment("blacklist.size",
       "Message that is shown when someone checks the size of the blacklist");
-    commands.blacklistSize = formatString(messagesConfig.getString("messages.blacklist.size",
+    commands.blacklistSize = formatString(messagesConfig.getString("blacklist.size",
       "%prefix%The blacklist currently contains %amount% IP address(es)."));
 
-    messagesConfig.getYaml().setComment("messages.blacklist.added",
+    messagesConfig.getYaml().setComment("blacklist.added",
       "Message that is shown when someone adds an IP address to the blacklist");
-    commands.blacklistAdd = formatString(messagesConfig.getString("messages.blacklist.added",
+    commands.blacklistAdd = formatString(messagesConfig.getString("blacklist.added",
       "%prefix%Successfully added %ip% to the blacklist."));
 
-    messagesConfig.getYaml().setComment("messages.blacklist.added-warning",
+    messagesConfig.getYaml().setComment("blacklist.added-warning",
       "Message that is shown when someone adds an IP address to the blacklist that is verified");
-    commands.blacklistAddWarning = formatString(messagesConfig.getString("messages.blacklist.added-warning",
+    commands.blacklistAddWarning = formatString(messagesConfig.getString("blacklist.added-warning",
       "%prefix%&cWarning: &f%ip% is currently whitelisted. " +
         "Consider removing the IP address from the list of verified players to avoid potential issues."));
 
-    messagesConfig.getYaml().setComment("messages.blacklist.removed",
+    messagesConfig.getYaml().setComment("blacklist.removed",
       "Message that is shown when someone removes an IP address from the blacklist");
-    commands.blacklistRemove = formatString(messagesConfig.getString("messages.blacklist.removed",
+    commands.blacklistRemove = formatString(messagesConfig.getString("blacklist.removed",
       "%prefix%Successfully removed %ip% from the blacklist."));
 
-    messagesConfig.getYaml().setComment("messages.blacklist.duplicate-ip",
+    messagesConfig.getYaml().setComment("blacklist.duplicate-ip",
       "Message that is shown when someone adds an IP address to the blacklist but it is already blacklisted");
-    commands.blacklistDuplicate = formatString(messagesConfig.getString("messages.blacklist.duplicate-ip",
+    commands.blacklistDuplicate = formatString(messagesConfig.getString("blacklist.duplicate-ip",
       "%prefix%The IP address you provided is already blacklisted."));
 
-    messagesConfig.getYaml().setComment("messages.blacklist.ip-not-found",
+    messagesConfig.getYaml().setComment("blacklist.ip-not-found",
       "Message that is shown when someone removes an IP address from the blacklist but it is not blacklisted");
-    commands.blacklistNotFound = formatString(messagesConfig.getString("messages.blacklist.ip-not-found",
+    commands.blacklistNotFound = formatString(messagesConfig.getString("blacklist.ip-not-found",
       "%prefix%The IP address you provided is not blacklisted."));
 
-    messagesConfig.getYaml().setComment("messages.verified.empty",
+    messagesConfig.getYaml().setComment("verified.empty",
       "Message that is shown when someone tries clearing the list of verified players but is is empty");
-    commands.verifiedEmpty = formatString(messagesConfig.getString("messages.verified.empty",
+    commands.verifiedEmpty = formatString(messagesConfig.getString("verified.empty",
       "%prefix%The list of verified players is currently empty. Therefore, no players were unverified."));
 
-    messagesConfig.getYaml().setComment("messages.verified.cleared",
+    messagesConfig.getYaml().setComment("verified.cleared",
       "Message that is shown when someone clears the list of verified players");
-    commands.verifiedCleared = formatString(messagesConfig.getString("messages.verified.cleared",
+    commands.verifiedCleared = formatString(messagesConfig.getString("verified.cleared",
       "%prefix%You successfully unverified a total of %removed% unique player(s)."));
 
-    messagesConfig.getYaml().setComment("messages.verified.size",
+    messagesConfig.getYaml().setComment("verified.size",
       "Message that is shown when someone checks the size of the list of verified players");
-    commands.verifiedSize = formatString(messagesConfig.getString("messages.verified.size",
+    commands.verifiedSize = formatString(messagesConfig.getString("verified.size",
       "%prefix%There are currently %amount% unique player(s) verified."));
 
-    messagesConfig.getYaml().setComment("messages.verified.removed",
+    messagesConfig.getYaml().setComment("verified.removed",
       "Message that is shown when someone un-verifies an IP address");
-    commands.verifiedRemove = formatString(messagesConfig.getString("messages.verified.removed",
+    commands.verifiedRemove = formatString(messagesConfig.getString("verified.removed",
       "%prefix%Successfully unverified %ip%."));
 
-    messagesConfig.getYaml().setComment("messages.verified.ip-not-found",
+    messagesConfig.getYaml().setComment("verified.ip-not-found",
       "Message that is shown when someone un-verifies an IP address but it is not verified");
-    commands.verifiedNotFound = formatString(messagesConfig.getString("messages.verified.ip-not-found",
+    commands.verifiedNotFound = formatString(messagesConfig.getString("verified.ip-not-found",
       "%prefix%The IP address you provided is not verified."));
 
-    messagesConfig.getYaml().setComment("messages.verified.blocked",
+    messagesConfig.getYaml().setComment("verified.blocked",
       "Message that is shown when someone tries un-verifying the same IP address twice (double operation)");
-    commands.verifiedBlocked = formatString(messagesConfig.getString("messages.verified.blocked",
+    commands.verifiedBlocked = formatString(messagesConfig.getString("verified.blocked",
       "%prefix%Please wait for the current operation to finish."));
 
-    messagesConfig.getYaml().setComment("messages.verification.too-many-players",
+    messagesConfig.getYaml().setComment("verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time");
-    verification.tooManyPlayers = deserialize(fromList(messagesConfig.getStringList("messages.verification.too-many-players",
+    verification.tooManyPlayers = deserialize(fromList(messagesConfig.getStringList("verification.too-many-players",
       Arrays.asList(
         "%header%",
         "&6Too many players are currently trying to log in, try again later.",
@@ -582,29 +586,29 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.verification.logs.connection",
+    messagesConfig.getYaml().setComment("verification.logs.connection",
       "Message that is logged to console whenever a new player joins the server");
-    verification.connectLog = formatString(messagesConfig.getString("messages.verification.logs.connection",
+    verification.connectLog = formatString(messagesConfig.getString("verification.logs.connection",
       "%name%%ip% (%protocol%) has connected."));
 
-    messagesConfig.getYaml().setComment("messages.verification.logs.failed",
+    messagesConfig.getYaml().setComment("verification.logs.failed",
       "Message that is logged to console whenever a player fails verification");
-    verification.failedLog = formatString(messagesConfig.getString("messages.verification.logs.failed",
+    verification.failedLog = formatString(messagesConfig.getString("verification.logs.failed",
       "%ip% (%protocol%) has failed the bot check for: %reason%"));
 
-    messagesConfig.getYaml().setComment("messages.verification.logs.blacklisted",
+    messagesConfig.getYaml().setComment("verification.logs.blacklisted",
       "Message that is logged to console whenever a player is blacklisted");
-    verification.blacklistLog = formatString(messagesConfig.getString("messages.verification.logs.blacklisted",
+    verification.blacklistLog = formatString(messagesConfig.getString("verification.logs.blacklisted",
       "%ip% (%protocol%) was blacklisted for too many failed attempts"));
 
-    messagesConfig.getYaml().setComment("messages.verification.logs.successful",
+    messagesConfig.getYaml().setComment("verification.logs.successful",
       "Message that is logged to console whenever a player is verified");
-    verification.successLog = formatString(messagesConfig.getString("messages.verification.logs.successful",
+    verification.successLog = formatString(messagesConfig.getString("verification.logs.successful",
       "%name% has been verified successfully (%time%s!)."));
 
-    messagesConfig.getYaml().setComment("messages.verification.too-fast-reconnect",
+    messagesConfig.getYaml().setComment("verification.too-fast-reconnect",
       "Disconnect message that is shown when someone rejoins too fast during verification");
-    verification.tooFastReconnect = deserialize(fromList(messagesConfig.getStringList("messages.verification.too-fast-reconnect",
+    verification.tooFastReconnect = deserialize(fromList(messagesConfig.getStringList("verification.too-fast-reconnect",
       Arrays.asList(
         "%header%",
         "&6You reconnected too fast, try again later.",
@@ -612,9 +616,9 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.verification.already-verifying",
+    messagesConfig.getYaml().setComment("verification.already-verifying",
       "Disconnect message that is shown when someone joins but is already verifying");
-    verification.alreadyVerifying = deserialize(fromList(messagesConfig.getStringList("messages.verification.already-verifying",
+    verification.alreadyVerifying = deserialize(fromList(messagesConfig.getStringList("verification.already-verifying",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently being verified.",
@@ -622,9 +626,9 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.verification.already-queued",
+    messagesConfig.getYaml().setComment("verification.already-queued",
       "Disconnect message that is shown when someone joins but is already queued for verification");
-    verification.alreadyQueued = deserialize(fromList(messagesConfig.getStringList("messages.verification.already-queued",
+    verification.alreadyQueued = deserialize(fromList(messagesConfig.getStringList("verification.already-queued",
       Arrays.asList(
         "%header%",
         "&cYour IP address is currently queued for verification.",
@@ -632,9 +636,9 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.verification.blacklisted",
+    messagesConfig.getYaml().setComment("verification.blacklisted",
       "Disconnect message that is shown when someone joins but is temporarily blacklisted");
-    verification.blacklisted = deserialize(fromList(messagesConfig.getStringList("messages.verification.blacklisted",
+    verification.blacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted",
       Arrays.asList(
         "%header%",
         "&cYou are currently denied from entering the server.",
@@ -643,27 +647,27 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.verification.invalid-username",
+    messagesConfig.getYaml().setComment("verification.invalid-username",
       "Disconnect message that is shown when someone joins with an invalid username");
-    verification.invalidUsername = deserialize(fromList(messagesConfig.getStringList("messages.verification.invalid-username",
+    verification.invalidUsername = deserialize(fromList(messagesConfig.getStringList("verification.invalid-username",
       Arrays.asList(
         "%header%",
         "&cYour username contains invalid characters.",
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.verification.success",
+    messagesConfig.getYaml().setComment("verification.success",
       "Disconnect message that is shown when someone verifies successfully");
-    verification.verificationSuccess = deserialize(fromList(messagesConfig.getStringList("messages.verification.success",
+    verification.verificationSuccess = deserialize(fromList(messagesConfig.getStringList("verification.success",
       Arrays.asList(
         "%header%",
         "&aYou have successfully passed the verification.",
         "&fYou are now able to play on the server when you reconnect."
       ))));
 
-    messagesConfig.getYaml().setComment("messages.verification.failed",
+    messagesConfig.getYaml().setComment("verification.failed",
       "Disconnect message that is shown when someone fails verification");
-    verification.verificationFailed = deserialize(fromList(messagesConfig.getStringList("messages.verification.failed",
+    verification.verificationFailed = deserialize(fromList(messagesConfig.getStringList("verification.failed",
       Arrays.asList(
         "%header%",
         "&cYou have failed the verification.",
@@ -672,17 +676,17 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.verification.too-many-online-per-ip",
+    messagesConfig.getYaml().setComment("verification.too-many-online-per-ip",
       "Disconnect message that is shown when someone joins but there are too many online players with their IP " +
         "address");
-    tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("messages.too-many-online-per-ip",
+    tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("too-many-online-per-ip",
       Arrays.asList(
         "%header%",
         "&cThere are too many players online with your IP address.",
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("messages.action-bar.layout",
+    messagesConfig.getYaml().setComment("action-bar.layout",
       "General layout for the verbose action-bar" +
         LINE_SEPARATOR + "Placeholders and their descriptions:" +
         LINE_SEPARATOR + "- %queued% Number of queued connections" +
@@ -712,7 +716,7 @@ public final class SonarConfiguration {
           " &3| &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
           "  &a&l%animation%"
       ))));
-    verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("messages.action-bar.animation",
+    verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("action-bar.animation",
       Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
     ));
 

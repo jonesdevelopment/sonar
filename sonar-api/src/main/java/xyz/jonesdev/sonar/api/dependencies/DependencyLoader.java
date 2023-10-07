@@ -52,7 +52,7 @@ public class DependencyLoader {
 
     final String type = config.getDatabase().getType().name().toLowerCase();
     final String databaseURL = String.format("jdbc:%s://%s:%d/%s",
-      type, config.getDatabase().getUrl(), config.getDatabase().getPort(), config.getDatabase().getDatabase());
+      type, config.getDatabase().getUrl(), config.getDatabase().getPort(), config.getDatabase().getName());
 
     final ExternalClassLoader classLoader = new ExternalClassLoader(urls);
     final Connection connection = connect(classLoader, databaseURL, config.getDatabase());
