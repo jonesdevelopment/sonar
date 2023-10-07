@@ -40,7 +40,7 @@ import java.util.concurrent.LinkedBlockingQueue;
   }
 )
 public final class VerifiedCommand extends Subcommand {
-  private static final Queue<String> LOCK = new LinkedBlockingQueue<>(10);
+  private static final Queue<String> LOCK = new LinkedBlockingQueue<>(1);
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
