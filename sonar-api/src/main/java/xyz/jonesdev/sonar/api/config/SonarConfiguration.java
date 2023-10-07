@@ -239,7 +239,7 @@ public final class SonarConfiguration {
     // Only create a new messages configuration object if the preferred language changed
     // https://github.com/jonesdevelopment/sonar/issues/26
     if (messagesConfig == null || !messagesConfig.getFile().getName().equals(language + ".yml")) {
-      messagesConfig = new SimpleYamlConfig(pluginFolder, "lang/" + language);
+      messagesConfig = new SimpleYamlConfig(pluginFolder, "translations/" + language);
     }
     try {
       messagesConfig.load();
