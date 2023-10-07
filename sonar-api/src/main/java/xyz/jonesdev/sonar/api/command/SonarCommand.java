@@ -81,14 +81,15 @@ public interface SonarCommand {
         Component.text(sub.getPermission(), NamedTextColor.WHITE)
       );
       if (sub.getInfo().aliases().length > 0) {
-        hoverComponent = hoverComponent.append(Component.newline())
+        hoverComponent = hoverComponent
+          .append(Component.newline())
           .append(Component.text("Aliases: ", NamedTextColor.GRAY))
           .append(Component.text(sub.getAliases(), NamedTextColor.WHITE));
       }
-      component = component.clickEvent(
-        ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-          "/sonar " + sub.getInfo().name() + " ")
-      ).hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponent));
+      component = component
+        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+        "/sonar " + sub.getInfo().name() + " "))
+        .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponent));
       CACHED_HELP_MESSAGE.add(component);
     });
   }

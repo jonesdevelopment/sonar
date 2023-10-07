@@ -55,51 +55,55 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
         type = StatisticType.valueOf(invocation.getRawArguments()[1].toUpperCase());
       } catch (Exception exception) {
         // TODO: make messages configurable/translatable
-        invocation.getSender().sendMessage(SONAR.getConfig().getPrefix()
-          + "<red>Unknown statistics type! Available statistics: <gray>" + getArguments());
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getUnknownStatisticType()
+          .replace("%statistics%", getArguments()));
         return;
       }
     }
 
-    invocation.getSender().sendMessage("<yellow>Showing " + type.name().toLowerCase() + " statistics for this session:");
-    invocation.getSender().sendMessage("<yellow>Please note that session statistics are not saved when the server restarts.");
+    invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getStatisticsHeader()
+      .replace("%type%", type.name().toLowerCase()));
     invocation.getSender().sendMessage();
 
     switch (type) {
       case GENERAL: {
-        invocation.getSender().sendMessage(" <gray>▪ <green>Verified IP addresses: <white>" + DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Verifying IP addresses: <white>" + DECIMAL_FORMAT.format(SONAR.getFallback().getConnected().size()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Blacklisted IP addresses: <white>" + DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Currently queued logins: <white>" + DECIMAL_FORMAT.format(SONAR.getFallback().getQueue().getQueuedPlayers().size()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total non-unique joins: <white>" + DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total verification attempts: <white>" + DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total failed verifications: <white>" + DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()));
-        break;
-      }
-
-      case NETWORK: {
-        invocation.getSender().sendMessage(" <gray>▪ <green>Current incoming used bandwidth: <white>" + TrafficCounter.INCOMING.getCachedSecond());
-        invocation.getSender().sendMessage(" <gray>▪ <green>Current outgoing used bandwidth: <white>" + TrafficCounter.OUTGOING.getCachedSecond());
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total incoming used bandwidth: <white>" + TrafficCounter.INCOMING.getCachedTtl());
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total outgoing used bandwidth: <white>" + TrafficCounter.OUTGOING.getCachedTtl());
-        break;
-      }
-
-      case MEMORY: {
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total free memory (JVM): <white>" + formatMemory(getFreeMemory()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total used memory (JVM): <white>" + formatMemory(getUsedMemory()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total maximum memory (JVM): <white>" + formatMemory(getMaxMemory()));
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total allocated memory (JVM): <white>" + formatMemory(getTotalMemory()));
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getGeneralStatistics()
+          .replace("%verified%", DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize()))
+          .replace("%verifying%", DECIMAL_FORMAT.format(SONAR.getFallback().getConnected().size()))
+          .replace("%blacklisted%", DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize()))
+          .replace("%queued%", DECIMAL_FORMAT.format(SONAR.getFallback().getQueue().getQueuedPlayers().size()))
+          .replace("%total_joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
+          .replace("%total_attempts%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
+          .replace("%total_failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get())));
         break;
       }
 
       case CPU: {
-        invocation.getSender().sendMessage(" <gray>▪ <green>Process CPU usage right now: <white>" + DECIMAL_FORMAT.format(getProcessCPUUsage()) + "%");
-        invocation.getSender().sendMessage(" <gray>▪ <green>System CPU usage right now: <white>" + DECIMAL_FORMAT.format(getSystemCPUUsage()) + "%");
-        invocation.getSender().sendMessage(" <gray>▪ <green>Per-core process CPU usage: <white>" + DECIMAL_FORMAT.format(getAverageProcessCPUUsage()) + "%");
-        invocation.getSender().sendMessage(" <gray>▪ <green>Per-core system CPU usage: <white>" + DECIMAL_FORMAT.format(getAverageSystemCPUUsage()) + "%");
-        invocation.getSender().sendMessage(" <gray>▪ <green>General system load average: <white>" + DECIMAL_FORMAT.format(getSystemLoadAverage()) + "%");
-        invocation.getSender().sendMessage(" <gray>▪ <green>Total virtual cpu cores (JVM): <white>" + DECIMAL_FORMAT.format(getVirtualCores()));
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getMemoryStatistics()
+          .replace("%process_cpu%", DECIMAL_FORMAT.format(getProcessCPUUsage()))
+          .replace("%system_cpu%", DECIMAL_FORMAT.format(getSystemCPUUsage()))
+          .replace("%average_process_cpu%", DECIMAL_FORMAT.format(getAverageProcessCPUUsage()))
+          .replace("%average_system_cpu%", DECIMAL_FORMAT.format(getAverageSystemCPUUsage()))
+          .replace("%load_average%", DECIMAL_FORMAT.format(getSystemLoadAverage()))
+          .replace("%virtual_cores%", DECIMAL_FORMAT.format(getVirtualCores())));
+        break;
+      }
+
+      case MEMORY: {
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getMemoryStatistics()
+          .replace("%free_memory%", formatMemory(getFreeMemory()))
+          .replace("%used_memory%", formatMemory(getUsedMemory()))
+          .replace("%max_memory%", formatMemory(getMaxMemory()))
+          .replace("%total_memory%", formatMemory(getTotalMemory())));
+        break;
+      }
+
+      case NETWORK: {
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNetworkStatistics()
+          .replace("%incoming%", TrafficCounter.INCOMING.getCachedSecond())
+          .replace("%outgoing%", TrafficCounter.OUTGOING.getCachedSecond())
+          .replace("%ttl_incoming%", TrafficCounter.INCOMING.getCachedTtl())
+          .replace("%ttl_outgoing%", TrafficCounter.OUTGOING.getCachedTtl()));
         break;
       }
     }

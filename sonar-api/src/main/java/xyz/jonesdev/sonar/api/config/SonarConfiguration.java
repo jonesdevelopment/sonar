@@ -148,6 +148,13 @@ public final class SonarConfiguration {
     private String verifiedEmpty;
     private String verifiedBlocked;
 
+    private String statisticsHeader;
+    private String unknownStatisticType;
+    private String generalStatistics;
+    private String memoryStatistics;
+    private String networkStatistics;
+    private String cpuStatistics;
+
     private String verboseSubscribed;
     private String verboseUnsubscribed;
     private String verboseSubscribedOther;
@@ -608,6 +615,63 @@ public final class SonarConfiguration {
       "Message that is shown when someone tries un-verifying the same IP address twice (double operation)");
     commands.verifiedBlocked = formatString(messagesConfig.getString("commands.verified.blocked",
       "%prefix%Please wait for the current operation to finish."));
+
+    messagesConfig.getYaml().setComment("commands.statistics",
+      "Translations for '/sonar statistics'");
+    messagesConfig.getYaml().setComment("commands.statistics.header",
+      "Informational message that is shown above everything when viewing the statistics");
+    commands.statisticsHeader = formatString(messagesConfig.getString("commands.statistics.header",
+      "%prefix%<yellow>Showing %type% statistics for this session:"));
+
+    messagesConfig.getYaml().setComment("commands.statistics.unknown-type",
+      "Message that is shown when a player tries viewing an unknown statistic");
+    commands.unknownStatisticType = formatString(messagesConfig.getString("commands.statistics.unknown-type",
+      "%prefix%<red>Unknown statistics type! Available statistics: <gray>%statistics%"));
+
+    messagesConfig.getYaml().setComment("commands.statistics.general",
+      "Format of the general statistics message");
+    commands.generalStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.general",
+      Arrays.asList(
+        " <gray>▪ <green>Verified IP addresses: <white>%verified%",
+        " <gray>▪ <green>Verifying IP addresses: <white>%verifying%",
+        " <gray>▪ <green>Blacklisted IP addresses: <white>%blacklisted%",
+        " <gray>▪ <green>Currently queued logins: <white>%queued%",
+        " <gray>▪ <green>Total non-unique joins: <white>%total_joins%",
+        " <gray>▪ <green>Total verification attempts: <white>%total_attempts%",
+        " <gray>▪ <green>Total failed verifications: <white>%total_failed%"
+      ))));
+
+    messagesConfig.getYaml().setComment("commands.statistics.cpu",
+      "Format of the CPU statistics message");
+    commands.cpuStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.cpu",
+      Arrays.asList(
+        " <gray>▪ <green>Process CPU usage right now: <white>%process_cpu%%",
+        " <gray>▪ <green>System CPU usage right now: <white>%system_cpu%%",
+        " <gray>▪ <green>Per-core process CPU usage: <white>%average_process_cpu%%",
+        " <gray>▪ <green>Per-core system CPU usage: <white>%average_system_cpu%%",
+        " <gray>▪ <green>General system load average: <white>%load_average%%",
+        " <gray>▪ <green>Total amount of virtual cpus: <white>%virtual_cores%"
+      ))));
+
+    messagesConfig.getYaml().setComment("commands.statistics.memory",
+      "Format of the memory statistics message");
+    commands.memoryStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.memory",
+      Arrays.asList(
+        " <gray>▪ <green>Total free memory: <white>%free_memory%",
+        " <gray>▪ <green>Total used memory: <white>%used_memory%",
+        " <gray>▪ <green>Total maximum memory: <white>%max_memory%",
+        " <gray>▪ <green>Total allocated memory: <white>%total_memory%"
+      ))));
+
+    messagesConfig.getYaml().setComment("commands.statistics.network",
+      "Format of the network statistics message");
+    commands.networkStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.network",
+      Arrays.asList(
+        " <gray>▪ <green>Current incoming used bandwidth: <white>%incoming%",
+        " <gray>▪ <green>Current outgoing used bandwidth: <white>%outgoing%",
+        " <gray>▪ <green>Total incoming used bandwidth: <white>%ttl_incoming%",
+        " <gray>▪ <green>Total outgoing used bandwidth: <white>%ttl_outgoing%"
+      ))));
 
     messagesConfig.getYaml().setComment("verification",
       "Translations for all messages during the verification process");
