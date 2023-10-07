@@ -68,27 +68,27 @@ public interface SonarCommand {
         Component.text(sub.getInfo().description(), NamedTextColor.WHITE)
       );
 
+      Component hoverComponent = Component.textOfChildren(
+        Component.text("Only players: ", NamedTextColor.GRAY),
+        Component.text(sub.getInfo().onlyPlayers() ? "✔" : "✗",
+          sub.getInfo().onlyPlayers() ? NamedTextColor.GREEN : NamedTextColor.RED),
+        Component.newline(),
+        Component.text("Require console: ", NamedTextColor.GRAY),
+        Component.text(sub.getInfo().onlyConsole() ? "✔" : "✗",
+          sub.getInfo().onlyConsole() ? NamedTextColor.GREEN : NamedTextColor.RED),
+        Component.newline(),
+        Component.text("Permission: ", NamedTextColor.GRAY),
+        Component.text(sub.getPermission(), NamedTextColor.WHITE)
+      );
+      if (sub.getInfo().aliases().length > 0) {
+        hoverComponent = hoverComponent.append(Component.newline())
+          .append(Component.text("Aliases: ", NamedTextColor.GRAY))
+          .append(Component.text(sub.getAliases(), NamedTextColor.WHITE));
+      }
       component = component.clickEvent(
         ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
           "/sonar " + sub.getInfo().name() + " ")
-      ).hoverEvent(
-        HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.textOfChildren(
-          Component.text("Only players:", NamedTextColor.GRAY),
-          Component.text(sub.getInfo().onlyPlayers() ? "✔" : "✗",
-            sub.getInfo().onlyPlayers() ? NamedTextColor.GREEN : NamedTextColor.RED),
-          Component.newline(),
-          Component.text("Require console:", NamedTextColor.GRAY),
-          Component.text(sub.getInfo().onlyConsole() ? "✔" : "✗",
-            sub.getInfo().onlyConsole() ? NamedTextColor.GREEN : NamedTextColor.RED),
-          Component.newline(),
-          Component.text("Permission:", NamedTextColor.GRAY),
-          Component.text(sub.getPermission(), NamedTextColor.WHITE),
-          Component.newline(),
-          Component.text("Aliases:", NamedTextColor.GRAY),
-          Component.text(sub.getAliases(), NamedTextColor.WHITE),
-          Component.newline()
-        ))
-      );
+      ).hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponent));
       CACHED_HELP_MESSAGE.add(component);
     });
   }
