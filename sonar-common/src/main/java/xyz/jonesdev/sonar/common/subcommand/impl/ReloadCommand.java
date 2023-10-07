@@ -25,7 +25,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 @SubcommandInfo(
   name = "reload",
-  description = "Reload the configuration"
+  description = "Reload all configurations"
 )
 public final class ReloadCommand extends Subcommand {
 

@@ -65,7 +65,7 @@ public final class FallbackListener implements Listener {
   @SuppressWarnings("deprecation")
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
     if (Sonar.get().getConfig().isLockdownEnabled()) {
-      if (!event.getPlayer().hasPermission("sonar.lockdown")) {
+      if (!event.getPlayer().hasPermission("sonar.lockdown.bypass")) {
         final PendingConnection pendingConnection = event.getPlayer().getPendingConnection();
         // Try to close the channel with a custom serialized disconnect component
         if (pendingConnection instanceof FallbackInitialHandler) {

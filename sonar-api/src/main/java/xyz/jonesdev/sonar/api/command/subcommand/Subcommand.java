@@ -19,11 +19,14 @@ package xyz.jonesdev.sonar.api.command.subcommand;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,6 +50,27 @@ public abstract class Subcommand {
       : Arrays.stream(info.arguments())
       .map(Argument::value)
       .collect(Collectors.joining(", "));
+  }
+
+  protected static @Nullable InetAddress checkIP(final InvocationSource source, final String rawIP) {
+    if (!IP_PATTERN.matcher(rawIP).matches()) {
+      source.sendMessage(SONAR.getConfig().getIncorrectIpAddress());
+      return null;
+    }
+
+    final InetAddress inetAddress;
+    try {
+      inetAddress = InetAddress.getByName(rawIP);
+
+      if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress()) {
+        source.sendMessage(SONAR.getConfig().getIllegalIpAddress());
+        return null;
+      }
+    } catch (UnknownHostException exception) {
+      source.sendMessage(SONAR.getConfig().getUnknownIpAddress());
+      return null;
+    }
+    return inetAddress;
   }
 
   protected final void incorrectUsage(final @NotNull InvocationSource sender) {
