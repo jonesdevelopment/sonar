@@ -38,8 +38,8 @@ public class DependencyLoader {
   public ConnectionSource setUpDriverAndConnect() throws Throwable {
     final SonarConfiguration config = Sonar.get().getConfig();
 
-    final URL[] urls = new URL[config.getDatabaseType().getDependencies().length];
-    for (final Dependency dependency : config.getDatabaseType().getDependencies()) {
+    final URL[] urls = new URL[config.getDatabase().getType().getDependencies().length];
+    for (final Dependency dependency : config.getDatabase().getType().getDependencies()) {
       final URL url = dependency.getClassLoaderURL();
       final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
 
@@ -50,12 +50,12 @@ public class DependencyLoader {
       urls[dependency.ordinal()] = url;
     }
 
-    final String type = config.getDatabaseType().name().toLowerCase();
-    final String databaseURL =
-      "jdbc:" + type + "://" + config.getSqlUrl() + ":" + config.getSqlPort() + "/" + config.getSqlDatabase();
+    final String type = config.getDatabase().getType().name().toLowerCase();
+    final String databaseURL = String.format("jdbc:%s://%s:%d/%s",
+      type, config.getDatabase().getUrl(), config.getDatabase().getPort(), config.getDatabase().getName());
 
     final ExternalClassLoader classLoader = new ExternalClassLoader(urls);
-    final Connection connection = connect(classLoader, databaseURL, config);
+    final Connection connection = connect(classLoader, databaseURL, config.getDatabase());
     return new JdbcSingleConnectionSource(databaseURL, connection);
   }
 
@@ -63,18 +63,16 @@ public class DependencyLoader {
   // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/DatabaseLibrary.java#L134
   private Connection connect(final @NotNull ClassLoader classLoader,
                              final @NotNull String databaseURL,
-                             final @NotNull SonarConfiguration configuration) throws Throwable {
-    final Class<?> driverClass = classLoader.loadClass(configuration.getDatabaseType().getDriverClassName());
+                             final @NotNull SonarConfiguration.Database config) throws Throwable {
+    final Class<?> driverClass = classLoader.loadClass(config.getType().getDriverClassName());
     final Object driver = driverClass.getDeclaredConstructor().newInstance();
 
     DriverManager.registerDriver((Driver) driver);
 
     final Properties properties = new Properties();
-    if (!configuration.getSqlUser().isEmpty()) {
-      properties.put("user", configuration.getSqlUser());
-    }
-    if (!configuration.getSqlPassword().isEmpty()) {
-      properties.put("password", configuration.getSqlPassword());
+    properties.put("user", config.getUsername());
+    if (!config.getPassword().isEmpty()) {
+      properties.put("password", config.getPassword());
     }
 
     final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);

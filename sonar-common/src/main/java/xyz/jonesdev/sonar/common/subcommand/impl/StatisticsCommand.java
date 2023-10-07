@@ -54,52 +54,55 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
       try {
         type = StatisticType.valueOf(invocation.getRawArguments()[1].toUpperCase());
       } catch (Exception exception) {
-        // TODO: make messages configurable/translatable
-        invocation.getSender().sendMessage(SONAR.getConfig().getPrefix()
-          + "§cUnknown statistics type! Available statistics: §7" + getArguments());
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getUnknownStatisticType()
+          .replace("%statistics%", getArguments()));
         return;
       }
     }
 
-    invocation.getSender().sendMessage("§eShowing " + type.name().toLowerCase() + " statistics for this session:");
-    invocation.getSender().sendMessage("§ePlease note that session statistics are not saved when the server restarts.");
+    invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getStatisticsHeader()
+      .replace("%type%", type.name().toLowerCase()));
     invocation.getSender().sendMessage();
 
     switch (type) {
       case GENERAL: {
-        invocation.getSender().sendMessage(" §7▪ §aVerified IP addresses: §f" + DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize()));
-        invocation.getSender().sendMessage(" §7▪ §aVerifying IP addresses: §f" + DECIMAL_FORMAT.format(SONAR.getFallback().getConnected().size()));
-        invocation.getSender().sendMessage(" §7▪ §aBlacklisted IP addresses: §f" + DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize()));
-        invocation.getSender().sendMessage(" §7▪ §aCurrently queued logins: §f" + DECIMAL_FORMAT.format(SONAR.getFallback().getQueue().getQueuedPlayers().size()));
-        invocation.getSender().sendMessage(" §7▪ §aTotal non-unique joins: §f" + DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()));
-        invocation.getSender().sendMessage(" §7▪ §aTotal verification attempts: §f" + DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()));
-        invocation.getSender().sendMessage(" §7▪ §aTotal failed verifications: §f" + DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()));
-        break;
-      }
-
-      case NETWORK: {
-        invocation.getSender().sendMessage(" §7▪ §aCurrent incoming used bandwidth: §f" + TrafficCounter.INCOMING.getCachedSecond());
-        invocation.getSender().sendMessage(" §7▪ §aCurrent outgoing used bandwidth: §f" + TrafficCounter.OUTGOING.getCachedSecond());
-        invocation.getSender().sendMessage(" §7▪ §aTotal incoming used bandwidth: §f" + TrafficCounter.INCOMING.getCachedTtl());
-        invocation.getSender().sendMessage(" §7▪ §aTotal outgoing used bandwidth: §f" + TrafficCounter.OUTGOING.getCachedTtl());
-        break;
-      }
-
-      case MEMORY: {
-        invocation.getSender().sendMessage(" §7▪ §aTotal free memory (JVM): §f" + formatMemory(getFreeMemory()));
-        invocation.getSender().sendMessage(" §7▪ §aTotal used memory (JVM): §f" + formatMemory(getUsedMemory()));
-        invocation.getSender().sendMessage(" §7▪ §aTotal maximum memory (JVM): §f" + formatMemory(getMaxMemory()));
-        invocation.getSender().sendMessage(" §7▪ §aTotal allocated memory (JVM): §f" + formatMemory(getTotalMemory()));
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getGeneralStatistics()
+          .replace("%verified%", DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize()))
+          .replace("%verifying%", DECIMAL_FORMAT.format(SONAR.getFallback().getConnected().size()))
+          .replace("%blacklisted%", DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize()))
+          .replace("%queued%", DECIMAL_FORMAT.format(SONAR.getFallback().getQueue().getQueuedPlayers().size()))
+          .replace("%total_joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
+          .replace("%total_attempts%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
+          .replace("%total_failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get())));
         break;
       }
 
       case CPU: {
-        invocation.getSender().sendMessage(" §7▪ §aProcess CPU usage right now: §f" + DECIMAL_FORMAT.format(getProcessCPUUsage()) + "%");
-        invocation.getSender().sendMessage(" §7▪ §aSystem CPU usage right now: §f" + DECIMAL_FORMAT.format(getSystemCPUUsage()) + "%");
-        invocation.getSender().sendMessage(" §7▪ §aPer-core process CPU usage: §f" + DECIMAL_FORMAT.format(getAverageProcessCPUUsage()) + "%");
-        invocation.getSender().sendMessage(" §7▪ §aPer-core system CPU usage: §f" + DECIMAL_FORMAT.format(getAverageSystemCPUUsage()) + "%");
-        invocation.getSender().sendMessage(" §7▪ §aGeneral system load average: §f" + DECIMAL_FORMAT.format(getSystemLoadAverage()) + "%");
-        invocation.getSender().sendMessage(" §7▪ §aTotal virtual cpu cores (JVM): §f" + DECIMAL_FORMAT.format(getVirtualCores()));
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getCpuStatistics()
+          .replace("%process_cpu%", DECIMAL_FORMAT.format(getProcessCPUUsage()))
+          .replace("%system_cpu%", DECIMAL_FORMAT.format(getSystemCPUUsage()))
+          .replace("%average_process_cpu%", DECIMAL_FORMAT.format(getAverageProcessCPUUsage()))
+          .replace("%average_system_cpu%", DECIMAL_FORMAT.format(getAverageSystemCPUUsage()))
+          .replace("%load_average%", DECIMAL_FORMAT.format(getSystemLoadAverage()))
+          .replace("%virtual_cores%", DECIMAL_FORMAT.format(getVirtualCores())));
+        break;
+      }
+
+      case MEMORY: {
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getMemoryStatistics()
+          .replace("%free_memory%", formatMemory(getFreeMemory()))
+          .replace("%used_memory%", formatMemory(getUsedMemory()))
+          .replace("%max_memory%", formatMemory(getMaxMemory()))
+          .replace("%total_memory%", formatMemory(getTotalMemory())));
+        break;
+      }
+
+      case NETWORK: {
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNetworkStatistics()
+          .replace("%incoming%", TrafficCounter.INCOMING.getCachedSecond())
+          .replace("%outgoing%", TrafficCounter.OUTGOING.getCachedSecond())
+          .replace("%ttl_incoming%", TrafficCounter.INCOMING.getCachedTtl())
+          .replace("%ttl_outgoing%", TrafficCounter.OUTGOING.getCachedTtl()));
         break;
       }
     }

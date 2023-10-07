@@ -18,9 +18,8 @@
 package xyz.jonesdev.sonar.bungee.verbose;
 
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.ChatMessageType;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
@@ -28,14 +27,13 @@ import xyz.jonesdev.sonar.api.verbose.Verbose;
 public final class VerboseWrapper extends Verbose {
   private final ProxyServer server;
 
-  public void broadcast(final String message) {
-    final TextComponent component = new TextComponent(message);
-
+  @Override
+  public void broadcast(final Component component) {
     synchronized (subscribers) {
       for (final String subscriber : subscribers) {
         final ProxiedPlayer player = server.getPlayer(subscriber);
         if (player != null) {
-          player.sendMessage(ChatMessageType.ACTION_BAR, component);
+          // TODO: use an adventure audience
         }
       }
     }

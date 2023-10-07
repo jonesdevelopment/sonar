@@ -27,9 +27,7 @@ public final class VerboseWrapper extends Verbose {
   private final ProxyServer server;
 
   @Override
-  public void broadcast(final String message) {
-    final Component component = Component.text(message);
-
+  public void broadcast(final Component component) {
     synchronized (subscribers) {
       for (final String subscriber : subscribers) {
         server.getPlayer(subscriber).ifPresent(player -> {

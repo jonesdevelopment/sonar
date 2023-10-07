@@ -64,13 +64,13 @@ public final class FallbackListener implements Listener {
   @EventHandler
   @SuppressWarnings("deprecation")
   public void handle(final @NotNull PostLoginEvent event) throws Throwable {
-    if (Sonar.get().getConfig().isLockdownEnabled()) {
+    if (Sonar.get().getConfig().getLockdown().isEnabled()) {
       if (!event.getPlayer().hasPermission("sonar.lockdown.bypass")) {
         final PendingConnection pendingConnection = event.getPlayer().getPendingConnection();
         // Try to close the channel with a custom serialized disconnect component
         if (pendingConnection instanceof FallbackInitialHandler) {
           final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) pendingConnection;
-          final Component component = Sonar.get().getConfig().getLockdownDisconnect();
+          final Component component = Sonar.get().getConfig().getLockdown().getDisconnect();
           final String serialized = JSONComponentSerializer.json().serialize(component);
           fallbackInitialHandler.closeWith(new Kick(serialized));
         } else {
@@ -79,8 +79,8 @@ public final class FallbackListener implements Listener {
           Sonar.get().getLogger().warn("Fallback handler of {} is missing", event.getPlayer().getName());
         }
 
-        if (Sonar.get().getConfig().isLockdownLogAttempts()) {
-          Sonar.get().getLogger().info(Sonar.get().getConfig().getLockdownConsoleLog()
+        if (Sonar.get().getConfig().getLockdown().isLogAttempts()) {
+          Sonar.get().getLogger().info(Sonar.get().getConfig().getLockdown().getConsoleLog()
             .replace("%player%", event.getPlayer().getName())
             .replace("%ip%", Sonar.get().getConfig()
               .formatAddress(event.getPlayer().getAddress().getAddress()))
@@ -88,8 +88,8 @@ public final class FallbackListener implements Listener {
               String.valueOf(event.getPlayer().getPendingConnection().getVersion())));
         }
         return;
-      } else if (Sonar.get().getConfig().isLockdownEnableNotify()) {
-        event.getPlayer().sendMessage(new TextComponent(Sonar.get().getConfig().getLockdownNotification()));
+      } else if (Sonar.get().getConfig().getLockdown().isNotifyAdmins()) {
+        event.getPlayer().sendMessage(new TextComponent(Sonar.get().getConfig().getLockdown().getNotification()));
       }
     }
 

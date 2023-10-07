@@ -18,7 +18,7 @@
 package xyz.jonesdev.sonar.bukkit.verbose;
 
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
@@ -27,14 +27,13 @@ import xyz.jonesdev.sonar.api.verbose.Verbose;
 public final class ActionBarVerbose extends Verbose {
   private final Server server;
 
-  public void broadcast(final String message) {
-    final TextComponent component = new TextComponent(message);
-
+  @Override
+  public void broadcast(final Component component) {
     synchronized (subscribers) {
       for (final String subscriber : subscribers) {
         final Player player = server.getPlayer(subscriber);
         if (player != null) {
-          //player.sendMessage(ChatMessageType.ACTION_BAR, component);
+          // TODO: use an adventure audience
         }
       }
     }

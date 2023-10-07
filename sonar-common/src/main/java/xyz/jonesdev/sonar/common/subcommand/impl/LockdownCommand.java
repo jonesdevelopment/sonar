@@ -30,12 +30,12 @@ public final class LockdownCommand extends Subcommand {
 
   @Override
   public void execute(final @NotNull CommandInvocation invocation) {
-    final boolean newState = !SONAR.getConfig().isLockdownEnabled();
-    SONAR.getConfig().setLockdownEnabled(newState);
+    final boolean newState = !SONAR.getConfig().getLockdown().isEnabled();
+    SONAR.getConfig().getLockdown().setEnabled(newState);
     SONAR.getConfig().getGeneralConfig().set("general.lockdown.enabled", newState);
     SONAR.getConfig().getGeneralConfig().save();
 
     invocation.getSender().sendMessage(newState
-      ? SONAR.getConfig().getLockdownActivated() : SONAR.getConfig().getLockdownDeactivated());
+      ? SONAR.getConfig().getLockdown().getActivated() : SONAR.getConfig().getLockdown().getDeactivated());
   }
 }
