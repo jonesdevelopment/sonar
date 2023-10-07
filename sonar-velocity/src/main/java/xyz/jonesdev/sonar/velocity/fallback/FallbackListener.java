@@ -225,7 +225,7 @@ public final class FallbackListener {
     val connectedPlayer = (ConnectedPlayer) event.getPlayer();
 
     if (Sonar.get().getConfig().isLockdownEnabled()) {
-      if (!event.getPlayer().hasPermission("sonar.lockdown")) {
+      if (!event.getPlayer().hasPermission("sonar.lockdown.bypass")) {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
           Sonar.get().getConfig().getLockdownDisconnect(), connectedPlayer.getProtocolVersion()));
 
