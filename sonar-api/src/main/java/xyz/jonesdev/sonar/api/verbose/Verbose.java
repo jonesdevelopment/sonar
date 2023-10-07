@@ -19,6 +19,8 @@ package xyz.jonesdev.sonar.api.verbose;
 
 import lombok.Getter;
 import lombok.val;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
@@ -57,8 +59,8 @@ public abstract class Verbose implements JVMProfiler {
     broadcast(prepareActionBarFormat());
   }
 
-  protected @NotNull String prepareActionBarFormat() {
-    return Sonar.get().getConfig().getVerbose().getActionBarLayout()
+  protected @NotNull Component prepareActionBarFormat() {
+    return MiniMessage.miniMessage().deserialize(Sonar.get().getConfig().getVerbose().getActionBarLayout()
       .replace("%queued%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
       .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
@@ -78,7 +80,7 @@ public abstract class Verbose implements JVMProfiler {
       .replace("%free-memory%", formatMemory(getFreeMemory()))
       .replace("%total-memory%", formatMemory(getTotalMemory()))
       .replace("%max-memory%", formatMemory(getMaxMemory()))
-      .replace("%animation%", nextAnimation());
+      .replace("%animation%", nextAnimation()));
   }
 
   protected final String nextAnimation() {
@@ -88,9 +90,7 @@ public abstract class Verbose implements JVMProfiler {
   }
 
   // Run action bar verbose
-  protected void broadcast(final String message) {
-    // This should be replaced by the wrapper
-  }
+  protected abstract void broadcast(final Component component);
 
   /**
    * @param subscriber Name of the player who subscribed
