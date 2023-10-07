@@ -73,9 +73,7 @@ public final class SimpleYamlConfig {
     }
 
     // Always load the comment format and options
-    yaml.setCommentFormat(YamlCommentFormat.PRETTY);
-
-    yaml.options().headerFormatter().commentPrefix("# ");
+    yaml.setCommentFormat(YamlCommentFormat.DEFAULT);
     yaml.setHeader(String.join(LINE_SEPARATOR, HEADER));
   }
 
