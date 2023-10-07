@@ -110,8 +110,4 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
       .repeat(100L, TimeUnit.MILLISECONDS)
       .schedule();
   }
-
-  @Override
-  public void postReload() {
-  }
 }

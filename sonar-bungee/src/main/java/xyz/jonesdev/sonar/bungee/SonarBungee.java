@@ -114,8 +114,4 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     // Inject base into ProtocolUtils
     BaseInjectionHelper.inject(ChildChannelInitializer.INSTANCE);
   }
-
-  @Override
-  public void postReload() {
-  }
 }

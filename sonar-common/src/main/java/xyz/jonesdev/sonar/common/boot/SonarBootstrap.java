@@ -122,12 +122,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
     // Reinitialize database controller
     verifiedPlayerController = new VerifiedPlayerController();
-
-    // Call post reload task
-    postReload();
   }
-
-  public abstract void postReload();
 
   public void shutdown() {
     getLogger().info("Starting shutdown process...");
