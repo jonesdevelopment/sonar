@@ -36,9 +36,10 @@ public final class SimpleYamlConfig {
 
   private static final List<String> HEADER = Arrays.asList(
     "",
-    "Sonar anti-bot version " + Sonar.get().getVersion(),
-    " Currently running on: " + Sonar.get().getServer().getPlatform().getDisplayName(),
-    " Need help? https://jonesdev.xyz/discord",
+    "Running Sonar version " + Sonar.get().getVersion()
+      + " on " + Sonar.get().getServer().getPlatform().getDisplayName(),
+    "Need help or have questions? https://jonesdev.xyz/discord",
+    "https://github.com/jonesdevelopment/sonar",
     ""
   );
 
