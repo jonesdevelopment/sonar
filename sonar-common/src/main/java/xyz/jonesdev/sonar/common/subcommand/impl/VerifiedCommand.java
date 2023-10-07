@@ -24,6 +24,7 @@ import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
+import java.net.InetAddress;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -52,22 +53,18 @@ public final class VerifiedCommand extends Subcommand {
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-        if (!IP_PATTERN.matcher(rawInetAddress).matches()) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectIpAddress());
-          return;
-        }
+        final InetAddress inetAddress = checkIP(invocation.getSender(), rawInetAddress);
+        // Make sure the given IP address is valid
+        if (inetAddress == null) return;
 
-        // We don't need to parse this, so we can just use the string.
-        final String realInetAddress = "/" + rawInetAddress;
-
-        if (!SONAR.getVerifiedPlayerController().has(realInetAddress)) {
+        // Make sure the IP is verified already
+        if (!SONAR.getVerifiedPlayerController().has(inetAddress.toString())) {
           invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedNotFound());
           return;
         }
 
         invocation.getSender().sendMessage("§ePrevious UUIDs for " + rawInetAddress + ":");
-
-        for (final UUID uuid : SONAR.getVerifiedPlayerController().getUUIDs(realInetAddress)) {
+        for (final UUID uuid : SONAR.getVerifiedPlayerController().getUUIDs(inetAddress.toString())) {
           invocation.getSender().sendMessage(" §7▪ §f" + uuid.toString());
         }
         break;
@@ -81,31 +78,32 @@ public final class VerifiedCommand extends Subcommand {
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-        if (!IP_PATTERN.matcher(rawInetAddress).matches()) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectIpAddress());
-          return;
-        }
 
-        // We don't need to parse this, so we can just use the string.
-        final String realInetAddress = "/" + rawInetAddress;
-
-        if (LOCK.contains(realInetAddress)) {
+        // Make sure we aren't currently locking the IP address to avoid a double I/O operation
+        if (LOCK.contains(rawInetAddress)) {
           invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedBlocked());
           return;
         }
 
-        if (!SONAR.getVerifiedPlayerController().has(realInetAddress)) {
+        final InetAddress inetAddress = checkIP(invocation.getSender(), rawInetAddress);
+        // Make sure the given IP address is valid
+        if (inetAddress == null) return;
+
+        // Make sure the player is verified already
+        if (!SONAR.getVerifiedPlayerController().has(inetAddress.toString())) {
           invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedNotFound());
           return;
         }
 
+        // Lock the IP address
         // Make sure we don't accidentally run 2 operations at the same time
-        LOCK.add(realInetAddress);
-        SONAR.getVerifiedPlayerController().remove(realInetAddress);
-        LOCK.remove(realInetAddress);
+        LOCK.add(rawInetAddress);
+        SONAR.getVerifiedPlayerController().remove(inetAddress.toString());
 
         invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedRemove()
           .replace("%ip%", rawInetAddress));
+        // Unlock the IP address
+        LOCK.remove(rawInetAddress);
         break;
       }
 
@@ -117,6 +115,7 @@ public final class VerifiedCommand extends Subcommand {
           return;
         }
 
+        // Invalidate all cache entries
         SONAR.getVerifiedPlayerController().clearAll();
         invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedCleared()
           .replace("%removed%", Sonar.DECIMAL_FORMAT.format(verified)));

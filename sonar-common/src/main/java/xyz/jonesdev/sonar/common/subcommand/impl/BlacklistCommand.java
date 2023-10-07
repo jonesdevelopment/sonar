@@ -25,7 +25,6 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 @SubcommandInfo(
   name = "blacklist",
@@ -50,34 +49,23 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-        if (!IP_PATTERN.matcher(rawInetAddress).matches()) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectIpAddress());
-          return;
-        }
+        final InetAddress inetAddress = checkIP(invocation.getSender(), rawInetAddress);
+        // Make sure the given IP address is valid
+        if (inetAddress == null) return;
 
-        final InetAddress inetAddress;
-        try {
-          inetAddress = InetAddress.getByName(rawInetAddress);
-
-          if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress()) {
-            invocation.getSender().sendMessage(SONAR.getConfig().getIllegalIpAddress());
-            return;
-          }
-        } catch (UnknownHostException exception) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getIllegalIpAddress());
-          return;
-        }
-
+        // Make sure the IP is not blacklisted already
         if (SONAR.getFallback().getBlacklisted().has(inetAddress.toString())) {
           invocation.getSender().sendMessage(SONAR.getConfig().getBlacklistDuplicate());
           return;
         }
 
+        // Display a warning if the IP is verified but being added to the blacklist
         if (SONAR.getVerifiedPlayerController().has(inetAddress)) {
           invocation.getSender().sendMessage(SONAR.getConfig().getBlacklistAddWarning()
             .replace("%ip%", rawInetAddress));
         }
 
+        // Blacklist the given IP address
         SONAR.getFallback().getBlacklisted().put(inetAddress.toString());
         invocation.getSender().sendMessage(SONAR.getConfig().getBlacklistAdd()
           .replace("%ip%", rawInetAddress));
@@ -92,29 +80,17 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-        if (!IP_PATTERN.matcher(rawInetAddress).matches()) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectIpAddress());
-          return;
-        }
+        final InetAddress inetAddress = checkIP(invocation.getSender(), rawInetAddress);
+        // Make sure the given IP address is valid
+        if (inetAddress == null) return;
 
-        final InetAddress inetAddress;
-        try {
-          inetAddress = InetAddress.getByName(rawInetAddress);
-
-          if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress()) {
-            invocation.getSender().sendMessage(SONAR.getConfig().getIllegalIpAddress());
-            return;
-          }
-        } catch (UnknownHostException exception) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getIllegalIpAddress());
-          return;
-        }
-
+        // Make sure the IP is blacklisted
         if (!SONAR.getFallback().getBlacklisted().has(inetAddress.toString())) {
           invocation.getSender().sendMessage(SONAR.getConfig().getBlacklistNotFound());
           return;
         }
 
+        // Invalidate the cache entry of the blacklisted IP address
         SONAR.getFallback().getBlacklisted().invalidate(inetAddress.toString());
         invocation.getSender().sendMessage(SONAR.getConfig().getBlacklistRemove()
           .replace("%ip%", rawInetAddress));
@@ -129,6 +105,7 @@ public final class BlacklistCommand extends Subcommand {
           return;
         }
 
+        // Invalidate all cache entries
         SONAR.getFallback().getBlacklisted().invalidateAll();
         invocation.getSender().sendMessage(SONAR.getConfig().getBlacklistCleared()
           .replace("%removed%", Sonar.DECIMAL_FORMAT.format(blacklisted)));
