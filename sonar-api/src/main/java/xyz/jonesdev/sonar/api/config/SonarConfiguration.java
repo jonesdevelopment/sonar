@@ -834,7 +834,7 @@ public final class SonarConfiguration {
   }
 
   private @NotNull String fromList(final @NotNull Collection<String> list) {
-    return formatString(String.join(LINE_SEPARATOR, list));
+    return formatString(String.join("<newline>", list));
   }
 
   private static @NotNull Component deserialize(final String legacy) {
