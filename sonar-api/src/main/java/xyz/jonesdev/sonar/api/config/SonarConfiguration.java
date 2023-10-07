@@ -346,17 +346,17 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.valid-name-regex",
       "Regex for validating usernames during verification");
     verification.validNameRegex = Pattern.compile(generalConfig.getString(
-      "general.verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"));
+      "verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"));
 
     generalConfig.getYaml().setComment("verification.valid-brand-regex",
       "Regex for validating client brands during verification");
     verification.validBrandRegex = Pattern.compile(generalConfig.getString(
-      "general.verification.valid-brand-regex", "^[!-~ ]+$"));
+      "verification.valid-brand-regex", "^[!-~ ]+$"));
 
     generalConfig.getYaml().setComment("verification.valid-locale-regex",
       "Regex for validating client locale during verification");
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString(
-      "general.verification.valid-locale-regex", "^[a-zA-Z_]+$"));
+      "verification.valid-locale-regex", "^[a-zA-Z_]+$"));
 
     generalConfig.getYaml().setComment("verification.max-brand-length",
       "Maximum client brand length during verification");
