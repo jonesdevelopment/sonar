@@ -79,7 +79,7 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
       }
 
       case CPU: {
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getMemoryStatistics()
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getCpuStatistics()
           .replace("%process_cpu%", DECIMAL_FORMAT.format(getProcessCPUUsage()))
           .replace("%system_cpu%", DECIMAL_FORMAT.format(getSystemCPUUsage()))
           .replace("%average_process_cpu%", DECIMAL_FORMAT.format(getAverageProcessCPUUsage()))
