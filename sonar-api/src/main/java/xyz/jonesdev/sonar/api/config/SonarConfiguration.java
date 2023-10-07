@@ -91,8 +91,9 @@ public final class SonarConfiguration {
 
   private String incorrectCommandUsage;
   private String incorrectIpAddress;
-  private String subCommandNoPerm;
   private String illegalIpAddress;
+  private String unknownIpAddress;
+  private String subCommandNoPerm;
   private String playersOnly;
   private String consoleOnly;
   private String commandCoolDown;
@@ -428,6 +429,11 @@ public final class SonarConfiguration {
       "Message that is shown when someone provides an illegal IP address (Local IP)");
     illegalIpAddress = formatString(messagesConfig.getString("messages.illegal-ip-address",
       "%prefix%The IP address you provided seems to be either a local or loopback IP."));
+
+    messagesConfig.getYaml().setComment("messages.unknown-ip-address",
+      "Message that is shown when someone provides an unknown IP address (Unknown Host)");
+    unknownIpAddress = formatString(messagesConfig.getString("messages.unknown-ip-address",
+      "%prefix%The IP address you provided seems to be unknown."));
 
     messagesConfig.getYaml().setComment("messages.player-only",
       "Message that is shown when the console runs a command that is player-only");

@@ -67,7 +67,7 @@ public abstract class Subcommand {
         return null;
       }
     } catch (UnknownHostException exception) {
-      source.sendMessage(SONAR.getConfig().getIllegalIpAddress());
+      source.sendMessage(SONAR.getConfig().getUnknownIpAddress());
       return null;
     }
     return inetAddress;
