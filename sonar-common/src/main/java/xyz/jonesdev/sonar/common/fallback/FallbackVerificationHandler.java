@@ -128,9 +128,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     state = State.POSITION;
     // Teleport player into the fake lobby by sending an empty chunk
     user.delayedWrite(EMPTY_CHUNK_DATA);
-    // Send an UpdateSectionBlocks packet with a platform of blocks
-    // to check if the player collides with the solid platform.
-    user.delayedWrite(UPDATE_SECTION_BLOCKS);
+    if (Sonar.get().getConfig().getVerification().isCheckCollisions()) {
+      // Send an UpdateSectionBlocks packet with a platform of blocks
+      // to check if the player collides with the solid platform.
+      user.delayedWrite(UPDATE_SECTION_BLOCKS);
+    }
     // Send all packets in one flush
     user.getChannel().flush();
   }
