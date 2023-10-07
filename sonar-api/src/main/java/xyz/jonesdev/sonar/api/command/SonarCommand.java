@@ -45,16 +45,16 @@ public interface SonarCommand {
         + ".", NamedTextColor.YELLOW),
       Component.text("(C) " + COPYRIGHT_YEAR + " Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
       Component.text("https://github.com/jonesdevelopment/sonar", NamedTextColor.GREEN)
-        .clickEvent(net.kyori.adventure.text.event.ClickEvent.clickEvent(net.kyori.adventure.text.event.ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar")),
+        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar")),
       Component.empty(),
       Component.text("Need help or have any questions?", NamedTextColor.YELLOW),
       Component.textOfChildren(
         Component.text("Open a ticket on the Discord ", NamedTextColor.YELLOW)
-          .hoverEvent(net.kyori.adventure.text.event.HoverEvent.hoverEvent(net.kyori.adventure.text.event.HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open Discord)")))
-          .clickEvent(net.kyori.adventure.text.event.ClickEvent.clickEvent(net.kyori.adventure.text.event.ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")),
+          .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open Discord)")))
+          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")),
         Component.text("or open a new issue on GitHub.", NamedTextColor.YELLOW)
-          .hoverEvent(net.kyori.adventure.text.event.HoverEvent.hoverEvent(net.kyori.adventure.text.event.HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open GitHub)")))
-          .clickEvent(net.kyori.adventure.text.event.ClickEvent.clickEvent(net.kyori.adventure.text.event.ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar" +
+          .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open GitHub)")))
+          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar" +
             "/issues"))
       ),
       Component.empty()
@@ -69,14 +69,24 @@ public interface SonarCommand {
       );
 
       component = component.clickEvent(
-        net.kyori.adventure.text.event.ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+        ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
           "/sonar " + sub.getInfo().name() + " ")
       ).hoverEvent(
-        net.kyori.adventure.text.event.HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text(
-          "§7Only players: §f" + (sub.getInfo().onlyPlayers() ? "§a✔" : "§c✗")
-            + Sonar.LINE_SEPARATOR + "§7Require console: §f" + (sub.getInfo().onlyConsole() ? "§a✔" : "§c✗")
-            + Sonar.LINE_SEPARATOR + "§7Permission: §f" + sub.getPermission()
-            + Sonar.LINE_SEPARATOR + "§7Aliases: §f" + sub.getAliases()
+        HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.textOfChildren(
+          Component.text("Only players:", NamedTextColor.GRAY),
+          Component.text(sub.getInfo().onlyPlayers() ? "✔" : "✗",
+            sub.getInfo().onlyPlayers() ? NamedTextColor.GREEN : NamedTextColor.RED),
+          Component.newline(),
+          Component.text("Require console:", NamedTextColor.GRAY),
+          Component.text(sub.getInfo().onlyConsole() ? "✔" : "✗",
+            sub.getInfo().onlyConsole() ? NamedTextColor.GREEN : NamedTextColor.RED),
+          Component.newline(),
+          Component.text("Permission:", NamedTextColor.GRAY),
+          Component.text(sub.getPermission(), NamedTextColor.WHITE),
+          Component.newline(),
+          Component.text("Aliases:", NamedTextColor.GRAY),
+          Component.text(sub.getAliases(), NamedTextColor.WHITE),
+          Component.newline()
         ))
       );
       CACHED_HELP_MESSAGE.add(component);

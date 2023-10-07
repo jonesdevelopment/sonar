@@ -19,7 +19,7 @@ package xyz.jonesdev.sonar.api.config;
 
 import lombok.*;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.dependencies.Dependency;
@@ -245,7 +245,7 @@ public final class SonarConfiguration {
 
     messagesConfig.getYaml().setComment("prefix",
       "Placeholder for every '%prefix%' in this configuration file");
-    prefix = formatString(messagesConfig.getString("prefix", "&e&lSonar &7» &f"));
+    prefix = formatString(messagesConfig.getString("prefix", "<yellow><bold>Sonar<reset> <gray>» <white>"));
 
     messagesConfig.getYaml().setComment("support-url",
       "Placeholder for every '%support-url%' in this configuration file");
@@ -399,14 +399,14 @@ public final class SonarConfiguration {
       "Placeholder for every '%header%' in this configuration file");
     header = fromList(messagesConfig.getStringList("header",
       Arrays.asList(
-        "&e&lSonar",
-        "&r"
+        "<yellow><bold>Sonar<reset>",
+        "<reset>"
       )));
 
     messagesConfig.getYaml().setComment("footer",
       "Placeholder for every '%footer%' in this configuration file");
     footer = fromList(messagesConfig.getStringList("footer",
-      Arrays.asList("&7If you believe that this is an error, contact an administrator.")));
+      Arrays.asList("<gray>If you believe that this is an error, contact an administrator.")));
 
     messagesConfig.getYaml().setComment("too-many-online-per-ip",
       "Disconnect message that is shown when someone joins but there are too many online players with their IP " +
@@ -414,19 +414,19 @@ public final class SonarConfiguration {
     tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("too-many-online-per-ip",
       Arrays.asList(
         "%header%",
-        "&cThere are too many players online with your IP address.",
+        "<red>There are too many players online with your IP address.",
         "%footer%"
       ))));
 
     messagesConfig.getYaml().setComment("no-permission",
       "Message that is shown when a player tries running /sonar without permission");
     noPermission = formatString(messagesConfig.getString("no-permission",
-      "%prefix%&cYou do not have permission to execute this command."));
+      "%prefix%<red>You do not have permission to execute this command."));
 
     messagesConfig.getYaml().setComment("incorrect-command-usage",
       "Message that is shown when someone uses a command incorrectly");
     commands.incorrectCommandUsage = formatString(messagesConfig.getString("incorrect-command-usage",
-      "%prefix%&cUsage: /sonar %usage%"));
+      "%prefix%<red>Usage: /sonar %usage%"));
 
     messagesConfig.getYaml().setComment("invalid-ip-address",
       "Message that is shown when someone provides an invalid IP address (Invalid characters)");
@@ -446,32 +446,32 @@ public final class SonarConfiguration {
     messagesConfig.getYaml().setComment("player-only",
       "Message that is shown when the console runs a command that is player-only");
     commands.playersOnly = formatString(messagesConfig.getString("player-only",
-      "%prefix%&cYou can only execute this command as a player."));
+      "%prefix%<red>You can only execute this command as a player."));
 
     messagesConfig.getYaml().setComment("console-only",
       "Message that is shown when a player runs a command that is console-only");
     commands.consoleOnly = formatString(messagesConfig.getString("console-only",
-      "%prefix%&cFor security reasons, you can only execute this command through console."));
+      "%prefix%<red>For security reasons, you can only execute this command through console."));
 
     messagesConfig.getYaml().setComment("command-cool-down",
       "Message that is shown when a player executes Sonar commands too quickly");
     commands.commandCoolDown = formatString(messagesConfig.getString("command-cool-down",
-      "%prefix%&cYou can only execute this command every 0.5 seconds."));
+      "%prefix%<red>You can only execute this command every 0.5 seconds."));
     commands.commandCoolDownLeft = formatString(messagesConfig.getString("command-cool-down-left",
-      "%prefix%&cPlease wait another &l%time-left%s&r&c."));
+      "%prefix%<red>Please wait another <bold>%time-left%s<reset><red>."));
 
     messagesConfig.getYaml().setComment("sub-command-no-permission",
       "Message that is shown when a player does not have permission to execute a certain subcommand");
     commands.subCommandNoPerm = formatString(messagesConfig.getString("sub-command-no-permission",
-      "%prefix%&cYou do not have permission to execute this subcommand. &7(%permission%)"));
+      "%prefix%<red>You do not have permission to execute this subcommand. <gray>(%permission%)"));
 
     messagesConfig.getYaml().setComment("lockdown",
       "Translations for '/sonar lockdown'");
     messagesConfig.getYaml().setComment("lockdown.notification",
       "Message that is shown when an admin joins the server during lockdown");
     lockdown.notification = formatString(messagesConfig.getString("lockdown.notification",
-      "%prefix%&aHey, the server is currently in lockdown mode. If you want to disable the lockdown mode,"
-        + " type &f/sonar lockdown&a."
+      "%prefix%<green>Hey, the server is currently in lockdown mode. If you want to disable the lockdown mode,"
+        + " type <white>/sonar lockdown<green>."
     ));
 
     messagesConfig.getYaml().setComment("lockdown.console-log",
@@ -484,7 +484,7 @@ public final class SonarConfiguration {
     lockdown.disconnect = deserialize(fromList(messagesConfig.getStringList("lockdown.disconnect-message",
       Arrays.asList(
         "%header%",
-        "&cThe server is currently locked down, please try again later.",
+        "<red>The server is currently locked down, please try again later.",
         "%footer%"
       ))));
 
@@ -498,7 +498,7 @@ public final class SonarConfiguration {
     messagesConfig.getYaml().setComment("commands.reload.finish",
       "Message that is shown when Sonar has finished reloading");
     commands.reloaded = formatString(messagesConfig.getString("commands.reload.finish",
-      "%prefix%&aSuccessfully reloaded &7(%taken%ms)"));
+      "%prefix%<green>Successfully reloaded <gray>(%taken%ms)"));
 
     messagesConfig.getYaml().setComment("commands.lockdown",
       "Translations for '/sonar lockdown'");
@@ -559,7 +559,7 @@ public final class SonarConfiguration {
     messagesConfig.getYaml().setComment("commands.blacklist.added-warning",
       "Message that is shown when someone adds an IP address to the blacklist that is verified");
     commands.blacklistAddWarning = formatString(messagesConfig.getString("commands.blacklist.added-warning",
-      "%prefix%&cWarning: &f%ip% is currently whitelisted. " +
+      "%prefix%<red>Warning: <white>%ip% is currently whitelisted. " +
         "Consider removing the IP address from the list of verified players to avoid potential issues."));
 
     messagesConfig.getYaml().setComment("commands.blacklist.removed",
@@ -638,8 +638,8 @@ public final class SonarConfiguration {
     verification.tooManyPlayers = deserialize(fromList(messagesConfig.getStringList("verification.too-many-players",
       Arrays.asList(
         "%header%",
-        "&6Too many players are currently trying to log in, try again later.",
-        "&7Please wait a few seconds before trying to join again.",
+        "<gold>Too many players are currently trying to log in, try again later.",
+        "<gray>Please wait a few seconds before trying to join again.",
         "%footer%"
       ))));
 
@@ -648,8 +648,8 @@ public final class SonarConfiguration {
     verification.tooFastReconnect = deserialize(fromList(messagesConfig.getStringList("verification.too-fast-reconnect",
       Arrays.asList(
         "%header%",
-        "&6You reconnected too fast, try again later.",
-        "&7Please wait a few seconds before trying to verify again.",
+        "<gold>You reconnected too fast, try again later.",
+        "<gray>Please wait a few seconds before trying to verify again.",
         "%footer%"
       ))));
 
@@ -658,8 +658,8 @@ public final class SonarConfiguration {
     verification.alreadyVerifying = deserialize(fromList(messagesConfig.getStringList("verification.already-verifying",
       Arrays.asList(
         "%header%",
-        "&cYour IP address is currently being verified.",
-        "&cPlease wait a few seconds before trying to verify again.",
+        "<red>Your IP address is currently being verified.",
+        "<red>Please wait a few seconds before trying to verify again.",
         "%footer%"
       ))));
 
@@ -668,8 +668,8 @@ public final class SonarConfiguration {
     verification.alreadyQueued = deserialize(fromList(messagesConfig.getStringList("verification.already-queued",
       Arrays.asList(
         "%header%",
-        "&cYour IP address is currently queued for verification.",
-        "&cPlease wait a few minutes before trying to verify again.",
+        "<red>Your IP address is currently queued for verification.",
+        "<red>Please wait a few minutes before trying to verify again.",
         "%footer%"
       ))));
 
@@ -678,9 +678,9 @@ public final class SonarConfiguration {
     verification.blacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted",
       Arrays.asList(
         "%header%",
-        "&cYou are currently denied from entering the server.",
-        "&cPlease wait a few minutes to be able to join the server again.",
-        "&6False positive? &7%support-url%",
+        "<red>You are currently denied from entering the server.",
+        "<red>Please wait a few minutes to be able to join the server again.",
+        "<gold>False positive? <gray>%support-url%",
         "%footer%"
       ))));
 
@@ -689,7 +689,7 @@ public final class SonarConfiguration {
     verification.invalidUsername = deserialize(fromList(messagesConfig.getStringList("verification.invalid-username",
       Arrays.asList(
         "%header%",
-        "&cYour username contains invalid characters.",
+        "<red>Your username contains invalid characters.",
         "%footer%"
       ))));
 
@@ -698,8 +698,8 @@ public final class SonarConfiguration {
     verification.verificationSuccess = deserialize(fromList(messagesConfig.getStringList("verification.success",
       Arrays.asList(
         "%header%",
-        "&aYou have successfully passed the verification.",
-        "&fYou are now able to play on the server when you reconnect."
+        "<green>You have successfully passed the verification.",
+        "<white>You are now able to play on the server when you reconnect."
       ))));
 
     messagesConfig.getYaml().setComment("verification.failed",
@@ -707,9 +707,9 @@ public final class SonarConfiguration {
     verification.verificationFailed = deserialize(fromList(messagesConfig.getStringList("verification.failed",
       Arrays.asList(
         "%header%",
-        "&cYou have failed the verification.",
-        "&7Please wait a few seconds before trying to verify again.",
-        "&6Need help? &7%support-url%",
+        "<red>You have failed the verification.",
+        "<gray>Please wait a few seconds before trying to verify again.",
+        "<gold>Need help? <gray>%support-url%",
         "%footer%"
       ))));
 
@@ -737,12 +737,12 @@ public final class SonarConfiguration {
         LINE_SEPARATOR + "- %animation% Animated spinning circle (by default)"
     );
     verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout",
-      String.join(" &3╺ ", Arrays.asList(
-        "%prefix%&7Queued &f%queued%",
-        "&7Verifying &f%verifying%",
-        "&7Blacklisted &f%blacklisted%" +
-          " &3| &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
-          "  &a&l%animation%"
+      String.join(" <dark_aqua>╺ ", Arrays.asList(
+        "%prefix%<gray>Queued <white>%queued%",
+        "<gray>Verifying <white>%verifying%",
+        "<gray>Blacklisted <white>%blacklisted%" +
+          " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s" +
+          "  <green><bold>%animation%<reset>"
       ))));
     messagesConfig.getYaml().setComment("verbose.animation",
       "Alternative symbols:"
@@ -773,28 +773,15 @@ public final class SonarConfiguration {
     return formatString(String.join(LINE_SEPARATOR, list));
   }
 
-  private static Component deserialize(final String legacy) {
-    return LegacyComponentSerializer.legacyAmpersand().deserialize(legacy);
+  private static @NotNull Component deserialize(final String legacy) {
+    return MiniMessage.miniMessage().deserialize(legacy);
   }
 
   private @NotNull String formatString(final @NotNull String str) {
-    return translateAlternateColorCodes(str)
+    return str
       .replace("%prefix%", prefix == null ? "" : prefix)
       .replace("%support-url%", supportUrl == null ? "" : supportUrl)
       .replace("%header%", header == null ? "" : header)
       .replace("%footer%", footer == null ? "" : footer);
-  }
-
-  private static @NotNull String translateAlternateColorCodes(final @NotNull String str) {
-    final char[] b = str.toCharArray();
-
-    for (int i = 0; i < b.length - 1; i++) {
-      if (b[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
-        b[i] = '§';
-        b[i + 1] = Character.toLowerCase(b[i + 1]);
-      }
-    }
-
-    return new String(b);
   }
 }

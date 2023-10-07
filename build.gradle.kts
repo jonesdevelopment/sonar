@@ -43,7 +43,6 @@ subprojects {
     // adventure
     implementation("net.kyori:adventure-text-minimessage:$adventureVersion")
     implementation("net.kyori:adventure-text-serializer-gson:$adventureVersion")
-    implementation("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
     // adventure nbt
     implementation("net.kyori:adventure-nbt:$adventureVersion")
 
