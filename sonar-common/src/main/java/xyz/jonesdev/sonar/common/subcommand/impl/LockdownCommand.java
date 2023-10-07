@@ -24,7 +24,7 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
 @SubcommandInfo(
   name = "lockdown",
-  description = "Lock the server down"
+  description = "Prevent all players from joining"
 )
 public final class LockdownCommand extends Subcommand {
 
