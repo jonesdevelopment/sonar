@@ -54,7 +54,6 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
       try {
         type = StatisticType.valueOf(invocation.getRawArguments()[1].toUpperCase());
       } catch (Exception exception) {
-        // TODO: make messages configurable/translatable
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getUnknownStatisticType()
           .replace("%statistics%", getArguments()));
         return;
