@@ -107,7 +107,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
     // Warn player if they reloaded and changed the database type
     if (getVerifiedPlayerController() != null
-      && getVerifiedPlayerController().getCachedDatabaseType() != getConfig().getDatabaseType()) {
+      && getVerifiedPlayerController().getCachedDatabaseType() != getConfig().getDatabase().getType()) {
       Sonar.get().getLogger().warn("Reloading the server after changing the database type"
         + " is generally not recommended as it can sometimes cause data loss.");
     }
@@ -117,8 +117,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
     // Update ratelimiter
     final ExpiringCache<InetAddress> expiringCache = Cappuccino.buildExpiring(
-      getConfig().getVerificationDelay(), TimeUnit.MILLISECONDS, 250L
-    );
+      getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS, 250L);
     FallbackRatelimiter.INSTANCE.setExpiringCache(expiringCache);
 
     // Reinitialize database controller

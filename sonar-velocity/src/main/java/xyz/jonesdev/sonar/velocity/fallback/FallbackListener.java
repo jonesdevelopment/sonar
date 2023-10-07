@@ -110,14 +110,14 @@ public final class FallbackListener {
     if (fallback.getBlacklisted().has(inetAddress.toString())) {
       markConnectionAsDead(mcConnection.getSessionHandler());
       initialConnection.getConnection().closeWith(Disconnect.create(
-        Sonar.get().getConfig().getBlacklisted(),
+        Sonar.get().getConfig().getVerification().getBlacklisted(),
         inboundConnection.getProtocolVersion()
       ));
       return;
     }
 
     // Don't continue the verification process if the verification is disabled
-    if (!Sonar.get().getConfig().isEnableVerification()) return;
+    if (!Sonar.get().getConfig().getVerification().isEnabled()) return;
 
     // Check if the player is already verified.
     // No one wants to be verified over and over again.
@@ -134,12 +134,21 @@ public final class FallbackListener {
     // We now mark the connection as dead by using our dummy connection
     markConnectionAsDead(mcConnection.getSessionHandler());
 
+    // Check if the player is already queued since we don't want bots to flood the queue
+    if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
+      initialConnection.getConnection().closeWith(Disconnect.create(
+        Sonar.get().getConfig().getVerification().getAlreadyQueued(),
+        inboundConnection.getProtocolVersion()
+      ));
+      return;
+    }
+
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
     if (fallback.getConnected().containsKey(event.getUsername())
       || fallback.getConnected().containsValue(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
-        Sonar.get().getConfig().getAlreadyVerifying(),
+        Sonar.get().getConfig().getVerification().getAlreadyVerifying(),
         inboundConnection.getProtocolVersion()
       ));
       return;
@@ -147,9 +156,9 @@ public final class FallbackListener {
 
     // We cannot allow too many players on our Fallback server
     // There's technically no reason for limiting this, but we'll better stay safe.
-    if (fallback.getConnected().size() > Sonar.get().getConfig().getMaximumVerifyingPlayers()) {
+    if (fallback.getConnected().size() > Sonar.get().getConfig().getVerification().getMaxVerifyingPlayers()) {
       initialConnection.getConnection().closeWith(Disconnect.create(
-        Sonar.get().getConfig().getTooManyPlayers(),
+        Sonar.get().getConfig().getVerification().getTooManyPlayers(),
         inboundConnection.getProtocolVersion()
       ));
       return;
@@ -158,16 +167,7 @@ public final class FallbackListener {
     // Check if the IP address is currently being rate-limited
     if (!fallback.getRatelimiter().attempt(inetAddress)) {
       initialConnection.getConnection().closeWith(Disconnect.create(
-        Sonar.get().getConfig().getTooFastReconnect(),
-        inboundConnection.getProtocolVersion()
-      ));
-      return;
-    }
-
-    // Check if the player is already queued since we don't want bots to flood the queue
-    if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-      initialConnection.getConnection().closeWith(Disconnect.create(
-        Sonar.get().getConfig().getAlreadyQueued(),
+        Sonar.get().getConfig().getVerification().getTooFastReconnect(),
         inboundConnection.getProtocolVersion()
       ));
       return;
@@ -191,8 +191,8 @@ public final class FallbackListener {
 
         // Check if the username matches the valid name regex in order to prevent
         // UTF-16 names or other types of flood attacks
-        if (!Sonar.get().getConfig().getValidNameRegex().matcher(event.getUsername()).matches()) {
-          mcConnection.closeWith(Disconnect.create(Sonar.get().getConfig().getInvalidUsername(),
+        if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(event.getUsername()).matches()) {
+          mcConnection.closeWith(Disconnect.create(Sonar.get().getConfig().getVerification().getInvalidUsername(),
             mcConnection.getProtocolVersion()));
           return;
         }
@@ -202,7 +202,7 @@ public final class FallbackListener {
         pipeline.replace(
           READ_TIMEOUT,
           READ_TIMEOUT,
-          new FallbackTimeoutHandler(Sonar.get().getConfig().getVerificationReadTimeout(), TimeUnit.MILLISECONDS)
+          new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(), TimeUnit.MILLISECONDS)
         );
 
         // We need to determine if the player is premium before we handle the connection,
@@ -224,13 +224,13 @@ public final class FallbackListener {
   public void handle(final @NotNull LoginEvent event) {
     val connectedPlayer = (ConnectedPlayer) event.getPlayer();
 
-    if (Sonar.get().getConfig().isLockdownEnabled()) {
+    if (Sonar.get().getConfig().getLockdown().isEnabled()) {
       if (!event.getPlayer().hasPermission("sonar.lockdown.bypass")) {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
-          Sonar.get().getConfig().getLockdownDisconnect(), connectedPlayer.getProtocolVersion()));
+          Sonar.get().getConfig().getLockdown().getDisconnect(), connectedPlayer.getProtocolVersion()));
 
-        if (Sonar.get().getConfig().isLockdownLogAttempts()) {
-          Sonar.get().getLogger().info(Sonar.get().getConfig().getLockdownConsoleLog()
+        if (Sonar.get().getConfig().getLockdown().isLogAttempts()) {
+          Sonar.get().getLogger().info(Sonar.get().getConfig().getLockdown().getConsoleLog()
             .replace("%player%", event.getPlayer().getUsername())
             .replace("%ip%", Sonar.get().getConfig()
               .formatAddress(event.getPlayer().getRemoteAddress().getAddress()))
@@ -238,8 +238,8 @@ public final class FallbackListener {
               String.valueOf(event.getPlayer().getProtocolVersion().getProtocol())));
         }
         return;
-      } else if (Sonar.get().getConfig().isLockdownEnableNotify()) {
-        event.getPlayer().sendMessage(Component.text(Sonar.get().getConfig().getLockdownNotification()));
+      } else if (Sonar.get().getConfig().getLockdown().isNotifyAdmins()) {
+        event.getPlayer().sendMessage(Component.text(Sonar.get().getConfig().getLockdown().getNotification()));
       }
     }
 
@@ -247,7 +247,7 @@ public final class FallbackListener {
 
     // Check if the number of online players using the same IP address as
     // the connecting player is greater than the configured amount
-    final int maxOnlinePerIp = Sonar.get().getConfig().getMaximumOnlinePerIp();
+    final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
 
     if (maxOnlinePerIp > 0) {
       final long onlinePerIp = SonarVelocity.INSTANCE.getPlugin().getServer().getAllPlayers().stream()

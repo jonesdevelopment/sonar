@@ -45,14 +45,14 @@ public final class VerifiedPlayerController {
   private Dao<VerifiedPlayer, Integer> dao;
   private QueryBuilder<VerifiedPlayer, Integer> queryBuilder;
   @Getter
-  private final @NotNull SonarConfiguration.DatabaseType cachedDatabaseType;
+  private final @NotNull SonarConfiguration.Database.Type cachedDatabaseType;
 
   public VerifiedPlayerController() {
     // Cache selected database type, so we don't need to call Sonar.get() every time
-    cachedDatabaseType = Sonar.get().getConfig().getDatabaseType();
+    cachedDatabaseType = Sonar.get().getConfig().getDatabase().getType();
 
     // Don't establish a database connection if the type is NONE
-    if (cachedDatabaseType == SonarConfiguration.DatabaseType.NONE) {
+    if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
       Sonar.get().getLogger().warn("Make sure to configure a database to save verified players.");
       return;
     }
@@ -87,7 +87,7 @@ public final class VerifiedPlayerController {
     _remove(inetAddress);
 
     // Don't try to update the column if the database type is NONE
-    if (cachedDatabaseType == SonarConfiguration.DatabaseType.NONE) {
+    if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
       return;
     }
 
@@ -129,7 +129,7 @@ public final class VerifiedPlayerController {
     _add(player);
 
     // Don't try to update the column if the database type is NONE
-    if (cachedDatabaseType == SonarConfiguration.DatabaseType.NONE) {
+    if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
       return;
     }
 
@@ -179,7 +179,7 @@ public final class VerifiedPlayerController {
       MAP.clear();
 
       // Only update the column if the database type is not NONE
-      if (cachedDatabaseType != SonarConfiguration.DatabaseType.NONE) {
+      if (cachedDatabaseType != SonarConfiguration.Database.Type.NONE) {
         dao.deleteBuilder().delete();
       }
     } catch (SQLException exception) {

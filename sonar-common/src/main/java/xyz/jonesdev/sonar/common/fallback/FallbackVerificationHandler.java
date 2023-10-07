@@ -138,7 +138,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
                                               final String locale) {
     // Check the client locale by performing a simple regex check on it
-    final Pattern pattern = Sonar.get().getConfig().getValidLocaleRegex();
+    final Pattern pattern = Sonar.get().getConfig().getVerification().getValidLocaleRegex();
     return pattern.matcher(locale).matches(); // Disallow non-ascii characters (by default)
   }
 
@@ -150,11 +150,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // already performs these checks by default.
       final String read = ProtocolUtil.readBrandMessage(content);
       // Check if the decoded client brand string is too long
-      if (read.length() > Sonar.get().getConfig().getMaximumBrandLength()) {
+      if (read.length() > Sonar.get().getConfig().getVerification().getMaxBrandLength()) {
         return false;
       }
       // Regex pattern for validating client brands
-      final Pattern pattern = Sonar.get().getConfig().getValidBrandRegex();
+      final Pattern pattern = Sonar.get().getConfig().getVerification().getValidBrandRegex();
       return !read.equals("Vanilla") // The normal brand is always lowercase
         && pattern.matcher(read).matches(); // Disallow non-ascii characters (by default)
     } catch (DecoderException exception) {
@@ -171,12 +171,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (state == State.SUCCESS) return;
 
     // Check if the player is not sending a ton of packets to the server
-    final int maxPackets = Sonar.get().getConfig().getMaximumLoginPackets()
-      + Sonar.get().getConfig().getMaximumMovementTicks();
+    final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxPredictionTick;
     checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
 
     // Check for timeout since the player could be sending packets but not important ones
-    final long timeout = Sonar.get().getConfig().getVerificationTimeout();
+    final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
     // Check if the time limit has exceeded
     if (login.elapsed(timeout)) {
       user.getChannel().close();
@@ -246,7 +245,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(transaction.getId() == expectedTransactionId, "invalid transaction id");
 
       // Checking gravity is disabled, just finish verification
-      if (!Sonar.get().getConfig().isCheckGravity()) {
+      if (!Sonar.get().getConfig().getVerification().isCheckGravity()) {
         finish();
         return;
       }
@@ -341,13 +340,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // We have to account for this or the player will fail the verification.
     if (deltaY == 0) {
       // Check for too many ignored Y ticks
-      final int maxIgnoredTicks = Sonar.get().getConfig().getMaximumIgnoredTicks();
+      final int maxIgnoredTicks = Sonar.get().getConfig().getVerification().getMaxIgnoredTicks();
       checkFrame(++ignoredMovementTicks < maxIgnoredTicks, "too many ignored ticks");
       return;
     }
 
     if (tick > maxMovementTick) {
-      if (!Sonar.get().getConfig().isCheckCollisions()) {
+      if (!Sonar.get().getConfig().getVerification().isCheckCollisions()) {
         // Checking collisions is disabled, just finish verification
         finish();
         return;
@@ -363,7 +362,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
 
       // Log/debug position if enabled in the configuration
-      if (Sonar.get().getConfig().isDebugXYZPositions()) {
+      if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
         user.getFallback().getLogger().info("{}: {}/{}/{} - offset: {}", username, x, y, z, offsetY);
       }
 
@@ -383,7 +382,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       final double offsetY = Math.abs(deltaY - predictedY);
 
       // Log/debug position if enabled in the configuration
-      if (Sonar.get().getConfig().isDebugXYZPositions()) {
+      if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
         user.getFallback().getLogger().info("{}: {}/{}/{} - deltaY: {} - prediction: {} - offset: {}",
           username, x, y, z, deltaY, predictedY, offsetY);
       }
@@ -422,9 +421,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, playerUuid, user, login.delay()));
 
     // Disconnect player with the verification success message
-    user.disconnect(Sonar.get().getConfig().getVerificationSuccess());
+    user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());
 
-    user.getFallback().getLogger().info(Sonar.get().getConfig().getVerificationSuccessfulLog()
+    user.getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getSuccessLog()
       .replace("%name%", username)
       .replace("%time%", login.toString()));
   }

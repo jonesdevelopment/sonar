@@ -47,7 +47,7 @@ public final class VerifiedCommand extends Subcommand {
     switch (invocation.getRawArguments()[1].toLowerCase()) {
       case "history": {
         if (invocation.getRawArguments().length <= 2) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectCommandUsage()
+          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getIncorrectCommandUsage()
             .replace("%usage%", "verified history <IP address>"));
           return;
         }
@@ -59,7 +59,7 @@ public final class VerifiedCommand extends Subcommand {
 
         // Make sure the IP is verified already
         if (!SONAR.getVerifiedPlayerController().has(inetAddress.toString())) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedNotFound());
+          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedNotFound());
           return;
         }
 
@@ -72,7 +72,7 @@ public final class VerifiedCommand extends Subcommand {
 
       case "remove": {
         if (invocation.getRawArguments().length <= 2) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getIncorrectCommandUsage()
+          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getIncorrectCommandUsage()
             .replace("%usage%", "verified remove <IP address>"));
           return;
         }
@@ -81,7 +81,7 @@ public final class VerifiedCommand extends Subcommand {
 
         // Make sure we aren't currently locking the IP address to avoid a double I/O operation
         if (LOCK.contains(rawInetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedBlocked());
+          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedBlocked());
           return;
         }
 
@@ -91,7 +91,7 @@ public final class VerifiedCommand extends Subcommand {
 
         // Make sure the player is verified already
         if (!SONAR.getVerifiedPlayerController().has(inetAddress.toString())) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedNotFound());
+          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedNotFound());
           return;
         }
 
@@ -100,7 +100,7 @@ public final class VerifiedCommand extends Subcommand {
         LOCK.add(rawInetAddress);
         SONAR.getVerifiedPlayerController().remove(inetAddress.toString());
 
-        invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedRemove()
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedRemove()
           .replace("%ip%", rawInetAddress));
         // Unlock the IP address
         LOCK.remove(rawInetAddress);
@@ -111,19 +111,19 @@ public final class VerifiedCommand extends Subcommand {
         final int verified = SONAR.getVerifiedPlayerController().estimatedSize();
 
         if (verified == 0) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedEmpty());
+          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedEmpty());
           return;
         }
 
         // Invalidate all cache entries
         SONAR.getVerifiedPlayerController().clearAll();
-        invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedCleared()
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedCleared()
           .replace("%removed%", Sonar.DECIMAL_FORMAT.format(verified)));
         break;
       }
 
       case "size": {
-        invocation.getSender().sendMessage(SONAR.getConfig().getVerifiedSize()
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedSize()
           .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize())));
         break;
       }

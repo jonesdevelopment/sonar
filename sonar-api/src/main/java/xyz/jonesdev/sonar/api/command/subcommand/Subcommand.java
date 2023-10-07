@@ -54,7 +54,7 @@ public abstract class Subcommand {
 
   protected static @Nullable InetAddress checkIP(final InvocationSource source, final String rawIP) {
     if (!IP_PATTERN.matcher(rawIP).matches()) {
-      source.sendMessage(SONAR.getConfig().getIncorrectIpAddress());
+      source.sendMessage(SONAR.getConfig().getCommands().getIncorrectIpAddress());
       return null;
     }
 
@@ -63,18 +63,18 @@ public abstract class Subcommand {
       inetAddress = InetAddress.getByName(rawIP);
 
       if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress()) {
-        source.sendMessage(SONAR.getConfig().getIllegalIpAddress());
+        source.sendMessage(SONAR.getConfig().getCommands().getIllegalIpAddress());
         return null;
       }
     } catch (UnknownHostException exception) {
-      source.sendMessage(SONAR.getConfig().getUnknownIpAddress());
+      source.sendMessage(SONAR.getConfig().getCommands().getUnknownIpAddress());
       return null;
     }
     return inetAddress;
   }
 
   protected final void incorrectUsage(final @NotNull InvocationSource sender) {
-    sender.sendMessage(SONAR.getConfig().getIncorrectCommandUsage()
+    sender.sendMessage(SONAR.getConfig().getCommands().getIncorrectCommandUsage()
       .replace("%usage%", info.name() + " (" + arguments + ")"));
   }
 
