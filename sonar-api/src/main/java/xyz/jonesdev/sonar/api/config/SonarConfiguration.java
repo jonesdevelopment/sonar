@@ -228,15 +228,6 @@ public final class SonarConfiguration {
     );
     logPlayerAddresses = generalConfig.getBoolean("log-player-addresses", true);
 
-    // Database
-    generalConfig.getYaml().setComment("database.type",
-      "Type of database Sonar uses to store verified players"
-        + LINE_SEPARATOR + "Possible types: NONE, MYSQL, " +
-        "MARIADB (experimental)"
-    );
-    final String newDatabaseType = generalConfig.getString("database.type", Database.Type.NONE.name());
-    database.type = Database.Type.valueOf(newDatabaseType.toUpperCase());
-
     // Message settings
     // Only create a new messages configuration object if the preferred language changed
     // https://github.com/jonesdevelopment/sonar/issues/26
@@ -260,7 +251,18 @@ public final class SonarConfiguration {
       "Placeholder for every '%support-url%' in this configuration file");
     supportUrl = messagesConfig.getString("support-url", "https://jonesdev.xyz/discord/");
 
-    // SQL
+    // Database
+    generalConfig.getYaml().setComment("database.type",
+      "Type of database Sonar uses to store verified players"
+        + LINE_SEPARATOR + "Possible types: NONE, MYSQL, MARIADB (experimental)"
+    );
+    final String newDatabaseType = generalConfig.getString("database.type", Database.Type.NONE.name());
+    database.type = Database.Type.valueOf(newDatabaseType.toUpperCase());
+
+    generalConfig.getYaml().setComment("database",
+      "You can connect Sonar to a database to keep verified players even after restarting your server"
+      + LINE_SEPARATOR + "Note: IP addresses are saved in plain text. You are responsible for keeping your database safe!"
+      + LINE_SEPARATOR + "However, IP addresses cannot be traced back to players as Sonar uses UUIDs instead of usernames");
     generalConfig.getYaml().setComment("database.url",
       "URL for authenticating with the SQL database");
     database.url = generalConfig.getString("database.url", "localhost");
@@ -282,6 +284,9 @@ public final class SonarConfiguration {
     database.password = generalConfig.getString("database.password", "");
 
     // Lockdown
+    generalConfig.getYaml().setComment("lockdown",
+      "You can lock your server down using '/sonar lockdown' if, for example,"
+     + LINE_SEPARATOR + "bots are bypassing the verification or any other reason");
     generalConfig.getYaml().setComment("lockdown.enabled",
       "Should Sonar prevent all players from joining the server?");
     lockdown.enabled = generalConfig.getBoolean("lockdown.enabled", false);
@@ -295,11 +300,17 @@ public final class SonarConfiguration {
     lockdown.notifyAdmins = generalConfig.getBoolean("lockdown.notify-admins", true);
 
     // Queue
+    generalConfig.getYaml().setComment("queue",
+      "Every new login request will be queued to avoid spam join attacks"
+      + LINE_SEPARATOR + "The queue is updated every 500 milliseconds (10 ticks)");
     generalConfig.getYaml().setComment("queue.max-polls",
-      "Maximum number of queue polls per 500 milliseconds");
+      "Maximum number of concurrent queue polls per 500 milliseconds");
     queue.maxQueuePolls = clamp(generalConfig.getInt("queue.max-polls", 30), 1, 1000);
 
     // Verification
+    generalConfig.getYaml().setComment("verification",
+      "Every new player that joins for the first time will be sent to"
+      + LINE_SEPARATOR + "a lightweight limbo server where advanced bot checks are performed");
     generalConfig.getYaml().setComment("verification.enabled",
       "Should Sonar verify new players? (Recommended)");
     verification.enabled = generalConfig.getBoolean("verification.enabled", true);
@@ -397,6 +408,16 @@ public final class SonarConfiguration {
     footer = fromList(messagesConfig.getStringList("footer",
       Arrays.asList("&7If you believe that this is an error, contact an administrator.")));
 
+    messagesConfig.getYaml().setComment("too-many-online-per-ip",
+      "Disconnect message that is shown when someone joins but there are too many online players with their IP " +
+        "address");
+    tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("too-many-online-per-ip",
+      Arrays.asList(
+        "%header%",
+        "&cThere are too many players online with your IP address.",
+        "%footer%"
+      ))));
+
     messagesConfig.getYaml().setComment("no-permission",
       "Message that is shown when a player tries running /sonar without permission");
     noPermission = formatString(messagesConfig.getString("no-permission",
@@ -444,16 +465,8 @@ public final class SonarConfiguration {
     commands.subCommandNoPerm = formatString(messagesConfig.getString("sub-command-no-permission",
       "%prefix%&cYou do not have permission to execute this subcommand. &7(%permission%)"));
 
-    messagesConfig.getYaml().setComment("lockdown.enabled",
-      "Message that is shown when a player enables server lockdown");
-    lockdown.activated = formatString(messagesConfig.getString("lockdown.enabled",
-      "%prefix%The server is now in lockdown mode."));
-
-    messagesConfig.getYaml().setComment("lockdown.disabled",
-      "Message that is shown when a player disables server lockdown");
-    lockdown.deactivated = formatString(messagesConfig.getString("lockdown.disabled",
-      "%prefix%The server is no longer in lockdown mode."));
-
+    messagesConfig.getYaml().setComment("lockdown",
+      "Translations for '/sonar lockdown'");
     messagesConfig.getYaml().setComment("lockdown.notification",
       "Message that is shown when an admin joins the server during lockdown");
     lockdown.notification = formatString(messagesConfig.getString("lockdown.notification",
@@ -475,122 +488,136 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("reload.start",
+    messagesConfig.getYaml().setComment("commands.reload",
+      "Translations for '/sonar reload'");
+    messagesConfig.getYaml().setComment("commands.reload.start",
       "Message that is shown when someone starts reloading Sonar");
-    commands.reloading = formatString(messagesConfig.getString("reload.start",
+    commands.reloading = formatString(messagesConfig.getString("commands.reload.start",
       "%prefix%Reloading Sonar..."));
 
-    messagesConfig.getYaml().setComment("reload.finish",
+    messagesConfig.getYaml().setComment("commands.reload.finish",
       "Message that is shown when Sonar has finished reloading");
-    commands.reloaded = formatString(messagesConfig.getString("reload.finish",
+    commands.reloaded = formatString(messagesConfig.getString("commands.reload.finish",
       "%prefix%&aSuccessfully reloaded &7(%taken%ms)"));
 
-    messagesConfig.getYaml().setComment("verbose.subscribed",
+    messagesConfig.getYaml().setComment("commands.lockdown",
+      "Translations for '/sonar lockdown'");
+    messagesConfig.getYaml().setComment("commands.lockdown.enabled",
+      "Message that is shown when a player enables server lockdown");
+    lockdown.activated = formatString(messagesConfig.getString("commands.lockdown.enabled",
+      "%prefix%The server is now in lockdown mode."));
+
+    messagesConfig.getYaml().setComment("commands.lockdown.disabled",
+      "Message that is shown when a player disables server lockdown");
+    lockdown.deactivated = formatString(messagesConfig.getString("commands.lockdown.disabled",
+      "%prefix%The server is no longer in lockdown mode."));
+
+    messagesConfig.getYaml().setComment("commands.verbose",
+      "Translations for '/sonar verbose'");
+    messagesConfig.getYaml().setComment("commands.verbose.subscribed",
       "Message that is shown when a player subscribes to Sonar verbose");
-    commands.verboseSubscribed = formatString(messagesConfig.getString("verbose.subscribed",
+    commands.verboseSubscribed = formatString(messagesConfig.getString("commands.verbose.subscribed",
       "%prefix%You are now viewing Sonar verbose."));
 
-    messagesConfig.getYaml().setComment("verbose.unsubscribed",
+    messagesConfig.getYaml().setComment("commands.verbose.unsubscribed",
       "Message that is shown when a player unsubscribes from Sonar verbose");
-    commands.verboseUnsubscribed = formatString(messagesConfig.getString("verbose.unsubscribed",
+    commands.verboseUnsubscribed = formatString(messagesConfig.getString("commands.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."));
 
-    messagesConfig.getYaml().setComment("verbose.subscribed-other",
+    messagesConfig.getYaml().setComment("commands.verbose.subscribed-other",
       "Message that is shown when a player makes another player subscribe to Sonar verbose");
-    commands.verboseSubscribedOther = formatString(messagesConfig.getString("verbose.subscribed-other",
+    commands.verboseSubscribedOther = formatString(messagesConfig.getString("commands.verbose.subscribed-other",
       "%prefix%%player% is now viewing Sonar verbose."));
 
-    messagesConfig.getYaml().setComment("verbose.unsubscribed-other",
+    messagesConfig.getYaml().setComment("commands.verbose.unsubscribed-other",
       "Message that is shown when a player makes another player unsubscribe from Sonar verbose");
-    commands.verboseUnsubscribedOther = formatString(messagesConfig.getString("verbose.unsubscribed-other",
+    commands.verboseUnsubscribedOther = formatString(messagesConfig.getString("commands.verbose.unsubscribed-other",
       "%prefix%%player% is no longer viewing Sonar verbose."));
 
-    messagesConfig.getYaml().setComment("blacklist.empty",
+    messagesConfig.getYaml().setComment("commands.blacklist",
+      "Translations for '/sonar blacklist'");
+    messagesConfig.getYaml().setComment("commands.blacklist.empty",
       "Message that is shown when someone tries clearing the blacklist but is is empty");
-    commands.blacklistEmpty = formatString(messagesConfig.getString("blacklist.empty",
+    commands.blacklistEmpty = formatString(messagesConfig.getString("commands.blacklist.empty",
       "%prefix%The blacklist is currently empty. Therefore, no IP addresses were removed from the blacklist."));
 
-    messagesConfig.getYaml().setComment("blacklist.cleared",
+    messagesConfig.getYaml().setComment("commands.blacklist.cleared",
       "Message that is shown when someone clears the blacklist");
-    commands.blacklistCleared = formatString(messagesConfig.getString("blacklist.cleared",
+    commands.blacklistCleared = formatString(messagesConfig.getString("commands.blacklist.cleared",
       "%prefix%You successfully removed a total of %removed% IP address(es) from the blacklist."));
 
-    messagesConfig.getYaml().setComment("blacklist.size",
+    messagesConfig.getYaml().setComment("commands.blacklist.size",
       "Message that is shown when someone checks the size of the blacklist");
-    commands.blacklistSize = formatString(messagesConfig.getString("blacklist.size",
+    commands.blacklistSize = formatString(messagesConfig.getString("commands.blacklist.size",
       "%prefix%The blacklist currently contains %amount% IP address(es)."));
 
-    messagesConfig.getYaml().setComment("blacklist.added",
+    messagesConfig.getYaml().setComment("commands.blacklist.added",
       "Message that is shown when someone adds an IP address to the blacklist");
-    commands.blacklistAdd = formatString(messagesConfig.getString("blacklist.added",
+    commands.blacklistAdd = formatString(messagesConfig.getString("commands.blacklist.added",
       "%prefix%Successfully added %ip% to the blacklist."));
 
-    messagesConfig.getYaml().setComment("blacklist.added-warning",
+    messagesConfig.getYaml().setComment("commands.blacklist.added-warning",
       "Message that is shown when someone adds an IP address to the blacklist that is verified");
-    commands.blacklistAddWarning = formatString(messagesConfig.getString("blacklist.added-warning",
+    commands.blacklistAddWarning = formatString(messagesConfig.getString("commands.blacklist.added-warning",
       "%prefix%&cWarning: &f%ip% is currently whitelisted. " +
         "Consider removing the IP address from the list of verified players to avoid potential issues."));
 
-    messagesConfig.getYaml().setComment("blacklist.removed",
+    messagesConfig.getYaml().setComment("commands.blacklist.removed",
       "Message that is shown when someone removes an IP address from the blacklist");
-    commands.blacklistRemove = formatString(messagesConfig.getString("blacklist.removed",
+    commands.blacklistRemove = formatString(messagesConfig.getString("commands.blacklist.removed",
       "%prefix%Successfully removed %ip% from the blacklist."));
 
-    messagesConfig.getYaml().setComment("blacklist.duplicate-ip",
+    messagesConfig.getYaml().setComment("commands.blacklist.duplicate-ip",
       "Message that is shown when someone adds an IP address to the blacklist but it is already blacklisted");
-    commands.blacklistDuplicate = formatString(messagesConfig.getString("blacklist.duplicate-ip",
+    commands.blacklistDuplicate = formatString(messagesConfig.getString("commands.blacklist.duplicate-ip",
       "%prefix%The IP address you provided is already blacklisted."));
 
-    messagesConfig.getYaml().setComment("blacklist.ip-not-found",
+    messagesConfig.getYaml().setComment("commands.blacklist.ip-not-found",
       "Message that is shown when someone removes an IP address from the blacklist but it is not blacklisted");
-    commands.blacklistNotFound = formatString(messagesConfig.getString("blacklist.ip-not-found",
+    commands.blacklistNotFound = formatString(messagesConfig.getString("commands.blacklist.ip-not-found",
       "%prefix%The IP address you provided is not blacklisted."));
 
-    messagesConfig.getYaml().setComment("verified.empty",
+    messagesConfig.getYaml().setComment("commands.verified",
+      "Translations for '/sonar verified'");
+    messagesConfig.getYaml().setComment("commands.verified.empty",
       "Message that is shown when someone tries clearing the list of verified players but is is empty");
-    commands.verifiedEmpty = formatString(messagesConfig.getString("verified.empty",
+    commands.verifiedEmpty = formatString(messagesConfig.getString("commands.verified.empty",
       "%prefix%The list of verified players is currently empty. Therefore, no players were unverified."));
 
-    messagesConfig.getYaml().setComment("verified.cleared",
+    messagesConfig.getYaml().setComment("commands.verified.cleared",
       "Message that is shown when someone clears the list of verified players");
-    commands.verifiedCleared = formatString(messagesConfig.getString("verified.cleared",
+    commands.verifiedCleared = formatString(messagesConfig.getString("commands.verified.cleared",
       "%prefix%You successfully unverified a total of %removed% unique player(s)."));
 
-    messagesConfig.getYaml().setComment("verified.size",
+    messagesConfig.getYaml().setComment("commands.verified.size",
       "Message that is shown when someone checks the size of the list of verified players");
-    commands.verifiedSize = formatString(messagesConfig.getString("verified.size",
+    commands.verifiedSize = formatString(messagesConfig.getString("commands.verified.size",
       "%prefix%There are currently %amount% unique player(s) verified."));
 
-    messagesConfig.getYaml().setComment("verified.removed",
+    messagesConfig.getYaml().setComment("commands.verified.removed",
       "Message that is shown when someone un-verifies an IP address");
-    commands.verifiedRemove = formatString(messagesConfig.getString("verified.removed",
+    commands.verifiedRemove = formatString(messagesConfig.getString("commands.verified.removed",
       "%prefix%Successfully unverified %ip%."));
 
-    messagesConfig.getYaml().setComment("verified.ip-not-found",
+    messagesConfig.getYaml().setComment("commands.verified.ip-not-found",
       "Message that is shown when someone un-verifies an IP address but it is not verified");
-    commands.verifiedNotFound = formatString(messagesConfig.getString("verified.ip-not-found",
+    commands.verifiedNotFound = formatString(messagesConfig.getString("commands.verified.ip-not-found",
       "%prefix%The IP address you provided is not verified."));
 
-    messagesConfig.getYaml().setComment("verified.blocked",
+    messagesConfig.getYaml().setComment("commands.verified.blocked",
       "Message that is shown when someone tries un-verifying the same IP address twice (double operation)");
-    commands.verifiedBlocked = formatString(messagesConfig.getString("verified.blocked",
+    commands.verifiedBlocked = formatString(messagesConfig.getString("commands.verified.blocked",
       "%prefix%Please wait for the current operation to finish."));
 
-    messagesConfig.getYaml().setComment("verification.too-many-players",
-      "Disconnect message that is shown when too many players are verifying at the same time");
-    verification.tooManyPlayers = deserialize(fromList(messagesConfig.getStringList("verification.too-many-players",
-      Arrays.asList(
-        "%header%",
-        "&6Too many players are currently trying to log in, try again later.",
-        "&7Please wait a few seconds before trying to join again.",
-        "%footer%"
-      ))));
-
+    messagesConfig.getYaml().setComment("verification",
+      "Translations for all messages during the verification process");
     messagesConfig.getYaml().setComment("verification.logs.connection",
       "Message that is logged to console whenever a new player joins the server");
     verification.connectLog = formatString(messagesConfig.getString("verification.logs.connection",
       "%name%%ip% (%protocol%) has connected."));
 
+    messagesConfig.getYaml().setComment("verification.logs",
+      "Translations for all debug messages during the verification");
     messagesConfig.getYaml().setComment("verification.logs.failed",
       "Message that is logged to console whenever a player fails verification");
     verification.failedLog = formatString(messagesConfig.getString("verification.logs.failed",
@@ -605,6 +632,16 @@ public final class SonarConfiguration {
       "Message that is logged to console whenever a player is verified");
     verification.successLog = formatString(messagesConfig.getString("verification.logs.successful",
       "%name% has been verified successfully (%time%s!)."));
+
+    messagesConfig.getYaml().setComment("verification.too-many-players",
+      "Disconnect message that is shown when too many players are verifying at the same time");
+    verification.tooManyPlayers = deserialize(fromList(messagesConfig.getStringList("verification.too-many-players",
+      Arrays.asList(
+        "%header%",
+        "&6Too many players are currently trying to log in, try again later.",
+        "&7Please wait a few seconds before trying to join again.",
+        "%footer%"
+      ))));
 
     messagesConfig.getYaml().setComment("verification.too-fast-reconnect",
       "Disconnect message that is shown when someone rejoins too fast during verification");
@@ -676,17 +713,9 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("verification.too-many-online-per-ip",
-      "Disconnect message that is shown when someone joins but there are too many online players with their IP " +
-        "address");
-    tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("too-many-online-per-ip",
-      Arrays.asList(
-        "%header%",
-        "&cThere are too many players online with your IP address.",
-        "%footer%"
-      ))));
-
-    messagesConfig.getYaml().setComment("action-bar.layout",
+    messagesConfig.getYaml().setComment("verbose",
+      "Translations for all messages regarding Sonar's verbose output");
+    messagesConfig.getYaml().setComment("verbose.layout",
       "General layout for the verbose action-bar" +
         LINE_SEPARATOR + "Placeholders and their descriptions:" +
         LINE_SEPARATOR + "- %queued% Number of queued connections" +
@@ -707,8 +736,7 @@ public final class SonarConfiguration {
         LINE_SEPARATOR + "- %free-memory% Amount of free memory (JVM process)" +
         LINE_SEPARATOR + "- %animation% Animated spinning circle (by default)"
     );
-    verbose.actionBarLayout = formatString(messagesConfig.getString(
-      "messages.action-bar.layout",
+    verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout",
       String.join(" &3╺ ", Arrays.asList(
         "%prefix%&7Queued &f%queued%",
         "&7Verifying &f%verifying%",
@@ -716,8 +744,14 @@ public final class SonarConfiguration {
           " &3| &a⬆ &f%outgoing-traffic%/s &c⬇ &f%incoming-traffic%/s" +
           "  &a&l%animation%"
       ))));
-    verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("action-bar.animation",
-      Arrays.asList("◜", "◝", "◞", "◟") // ▙ ▛ ▜ ▟
+    messagesConfig.getYaml().setComment("verbose.animation",
+      "Alternative symbols:"
+      + LINE_SEPARATOR + "- ▙"
+      + LINE_SEPARATOR + "- ▛"
+      + LINE_SEPARATOR + "- ▜"
+      + LINE_SEPARATOR + "- ▟");
+    verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation",
+      Arrays.asList("◜", "◝", "◞", "◟")
     ));
 
     generalConfig.save();
