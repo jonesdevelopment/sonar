@@ -418,51 +418,51 @@ public final class SonarConfiguration {
         "%footer%"
       ))));
 
-    messagesConfig.getYaml().setComment("no-permission",
+    messagesConfig.getYaml().setComment("commands.no-permission",
       "Message that is shown when a player tries running /sonar without permission");
-    noPermission = formatString(messagesConfig.getString("no-permission",
+    noPermission = formatString(messagesConfig.getString("commands.no-permission",
       "%prefix%<red>You do not have permission to execute this command."));
 
-    messagesConfig.getYaml().setComment("incorrect-command-usage",
+    messagesConfig.getYaml().setComment("commands.incorrect-usage",
       "Message that is shown when someone uses a command incorrectly");
-    commands.incorrectCommandUsage = formatString(messagesConfig.getString("incorrect-command-usage",
+    commands.incorrectCommandUsage = formatString(messagesConfig.getString("commands.incorrect-usage",
       "%prefix%<red>Usage: /sonar %usage%"));
 
-    messagesConfig.getYaml().setComment("invalid-ip-address",
+    messagesConfig.getYaml().setComment("commands.invalid-ip-address",
       "Message that is shown when someone provides an invalid IP address (Invalid characters)");
-    commands.incorrectIpAddress = formatString(messagesConfig.getString("invalid-ip-address",
+    commands.incorrectIpAddress = formatString(messagesConfig.getString("commands.invalid-ip-address",
       "%prefix%The IP address you provided seems to be invalid."));
 
-    messagesConfig.getYaml().setComment("illegal-ip-address",
+    messagesConfig.getYaml().setComment("commands.illegal-ip-address",
       "Message that is shown when someone provides an illegal IP address (Local IP)");
-    commands.illegalIpAddress = formatString(messagesConfig.getString("illegal-ip-address",
+    commands.illegalIpAddress = formatString(messagesConfig.getString("commands.illegal-ip-address",
       "%prefix%The IP address you provided seems to be either a local or loopback IP."));
 
-    messagesConfig.getYaml().setComment("unknown-ip-address",
+    messagesConfig.getYaml().setComment("commands.unknown-ip-address",
       "Message that is shown when someone provides an unknown IP address (Unknown Host)");
-    commands.unknownIpAddress = formatString(messagesConfig.getString("unknown-ip-address",
+    commands.unknownIpAddress = formatString(messagesConfig.getString("commands.unknown-ip-address",
       "%prefix%The IP address you provided seems to be unknown."));
 
-    messagesConfig.getYaml().setComment("player-only",
+    messagesConfig.getYaml().setComment("commands.player-only",
       "Message that is shown when the console runs a command that is player-only");
-    commands.playersOnly = formatString(messagesConfig.getString("player-only",
+    commands.playersOnly = formatString(messagesConfig.getString("commands.player-only",
       "%prefix%<red>You can only execute this command as a player."));
 
-    messagesConfig.getYaml().setComment("console-only",
+    messagesConfig.getYaml().setComment("commands.console-only",
       "Message that is shown when a player runs a command that is console-only");
-    commands.consoleOnly = formatString(messagesConfig.getString("console-only",
+    commands.consoleOnly = formatString(messagesConfig.getString("commands.console-only",
       "%prefix%<red>For security reasons, you can only execute this command through console."));
 
-    messagesConfig.getYaml().setComment("command-cool-down",
+    messagesConfig.getYaml().setComment("commands.cool-down",
       "Message that is shown when a player executes Sonar commands too quickly");
-    commands.commandCoolDown = formatString(messagesConfig.getString("command-cool-down",
+    commands.commandCoolDown = formatString(messagesConfig.getString("commands.cool-down",
       "%prefix%<red>You can only execute this command every 0.5 seconds."));
-    commands.commandCoolDownLeft = formatString(messagesConfig.getString("command-cool-down-left",
+    commands.commandCoolDownLeft = formatString(messagesConfig.getString("commands.cool-down-left",
       "%prefix%<red>Please wait another <bold>%time-left%s<reset><red>."));
 
-    messagesConfig.getYaml().setComment("sub-command-no-permission",
+    messagesConfig.getYaml().setComment("commands.subcommand-no-permission",
       "Message that is shown when a player does not have permission to execute a certain subcommand");
-    commands.subCommandNoPerm = formatString(messagesConfig.getString("sub-command-no-permission",
+    commands.subCommandNoPerm = formatString(messagesConfig.getString("commands.subcommand-no-permission",
       "%prefix%<red>You do not have permission to execute this subcommand. <gray>(%permission%)"));
 
     messagesConfig.getYaml().setComment("lockdown",
