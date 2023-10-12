@@ -76,6 +76,7 @@ public final class FallbackListener {
   private static final MethodHandle INITIAL_CONNECTION;
   private static final MethodHandle CONNECTED_PLAYER;
   private static final Field CONNECTION_FIELD;
+  private static Field SESSION_HANDLER_FIELD;
 
   static {
     CLOSED_MINECRAFT_CONNECTION = new DummyConnection(null);
@@ -93,6 +94,14 @@ public final class FallbackListener {
             IdentifiedKey.class
           )
         );
+
+      try {
+        SESSION_HANDLER_FIELD = MinecraftConnection.class.getDeclaredField("activeSessionHandler");
+      } catch (Throwable throwable) {
+        // Velocity b266 changed the field name to "activeSessionHandler"
+        SESSION_HANDLER_FIELD = MinecraftConnection.class.getDeclaredField("sessionHandler");
+      }
+      SESSION_HANDLER_FIELD.setAccessible(true);
 
       CONNECTION_FIELD = InitialLoginSessionHandler.class.getDeclaredField("mcConnection");
       CONNECTION_FIELD.setAccessible(true);
@@ -130,8 +139,8 @@ public final class FallbackListener {
     // Hook the custom traffic pipeline, so we can count the incoming and outgoing traffic
     TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
 
-    // TODO: implement backwards compatibility for Velocity <b269
-    final MinecraftSessionHandler activeSessionHandler = mcConnection.getActiveSessionHandler();
+    // Backwards compatibility for Velocity b265 and below
+    val activeSessionHandler = (MinecraftSessionHandler) SESSION_HANDLER_FIELD.get(mcConnection);
 
     // Check the blacklist here since we cannot let the player "ghost join"
     if (fallback.getBlacklisted().has(inetAddress.toString())) {
