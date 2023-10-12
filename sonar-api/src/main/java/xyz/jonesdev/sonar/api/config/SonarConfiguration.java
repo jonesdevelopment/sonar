@@ -197,6 +197,7 @@ public final class SonarConfiguration {
     private boolean notifyAdmins;
     private boolean logAttempts;
     private Component disconnect;
+    private String bypassPermission;
     private String activated;
     private String deactivated;
     private String notification;
@@ -307,6 +308,11 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("lockdown.notify-admins",
       "Should Sonar notify admins when they join the server during lockdown?");
     lockdown.notifyAdmins = generalConfig.getBoolean("lockdown.notify-admins", true);
+
+    generalConfig.getYaml().setComment("lockdown.bypass-permission",
+      "Which permission does a player need in order to bypass the lockdown mode?"
+      + LINE_SEPARATOR + "Players with this permission will also receive admin notifications when joining");
+    lockdown.bypassPermission = generalConfig.getString("lockdown.bypass-permission", "sonar.lockdown.bypass");
 
     // Queue
     generalConfig.getYaml().setComment("queue",
