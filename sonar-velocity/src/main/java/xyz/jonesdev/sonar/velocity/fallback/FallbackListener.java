@@ -269,9 +269,9 @@ public final class FallbackListener {
           return;
         }
 
-        // Check if the player is already connected to the proxy
+        // Check if the player is already connected to the proxy but still tries to verify
         if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {
-          fallbackPlayer.disconnect("Could not find any available servers.");
+          fallbackPlayer.disconnect(Sonar.get().getConfig().getVerification().getAlreadyConnected());
           return;
         }
 

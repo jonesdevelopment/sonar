@@ -113,6 +113,7 @@ public final class SonarConfiguration {
     private Component tooFastReconnect;
     private Component invalidUsername;
     private Component invalidProtocol;
+    private Component alreadyConnected;
     private Component verificationSuccess;
     private Component verificationFailed;
     private Component alreadyVerifying;
@@ -764,6 +765,17 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "<red>Your protocol version is currently unsupported.",
+        "%footer%"
+      ))));
+
+    messagesConfig.getYaml().setComment("verification.already-online",
+      "Disconnect message that is shown when someone tries verifying with an account that is online");
+    verification.alreadyConnected = deserialize(fromList(messagesConfig.getStringList("verification.already-online",
+      Arrays.asList(
+        "%header%",
+        "<red>There is someone already online with your account.",
+        "<gray>Please wait a few seconds before trying to verify again.",
+        "<gray>If this keeps occurring, try restarting your game or contact support.",
         "%footer%"
       ))));
 
