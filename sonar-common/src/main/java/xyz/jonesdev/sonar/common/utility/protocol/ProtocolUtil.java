@@ -24,6 +24,7 @@ import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-// Mostly taken from
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
+
+// Taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
 public class ProtocolUtil {
@@ -48,6 +51,21 @@ public class ProtocolUtil {
   private static final String UNREGISTER_CHANNEL = "minecraft:unregister";
   private static final Pattern INVALID_IDENTIFIER_REGEX = Pattern.compile("[^a-z0-9\\-_]*");
 
+  private static Key readKey(final ByteBuf byteBuf) {
+    return Key.key(readString(byteBuf), Key.DEFAULT_SEPARATOR);
+  }
+
+  public static Key[] readKeyArray(final ByteBuf byteBuf) {
+    final int length = readVarInt(byteBuf);
+    checkFrame(length >= 0, "Got a negative-length array");
+    checkFrame(byteBuf.isReadable(length), "Trying to read an array that is too long");
+    final Key[] keys = new Key[length];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = readKey(byteBuf);
+    }
+    return keys;
+  }
+
   public static @NotNull String readBrandMessage(final @NotNull ByteBuf content) throws DecoderException {
     final ByteBuf slice = content.slice();
     try {
@@ -55,6 +73,17 @@ public class ProtocolUtil {
     } catch (DecoderException exception) {
       return readString(slice, 65536, slice.readableBytes());
     }
+  }
+
+  public static int[] readVarIntArray(ByteBuf buf) {
+    final int length = readVarInt(buf);
+    checkFrame(length >= 0, "Got a negative-length array");
+    checkFrame(buf.isReadable(length), "Trying to read an array that is too long");
+    final int[] ints = new int[length];
+    for (int i = 0; i < length; i++) {
+      ints[i] = readVarInt(buf);
+    }
+    return ints;
   }
 
   public static @NotNull String readString(final ByteBuf byteBuf) throws CorruptedFrameException {

@@ -15,42 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import java.util.Objects;
-
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class Disconnect implements FallbackPacket {
-  private @Nullable String reason;
+public final class StartUpdate implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    writeString(byteBuf, Objects.requireNonNull(reason));
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
   }
 
-  public static @NotNull Disconnect create(final Component component) {
-    return new Disconnect(JSONComponentSerializer.json().serialize(component));
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 0;
   }
 }
