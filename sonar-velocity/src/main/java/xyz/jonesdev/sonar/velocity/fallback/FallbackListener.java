@@ -213,8 +213,8 @@ public final class FallbackListener {
         // Do not continue if the connection is closed or marked as disconnected
         if (mcConnection.isClosed() || mcConnection.isKnownDisconnect()) return;
 
-        // Check if the username matches the valid name regex in order to prevent
-        // UTF-16 names or other types of flood attacks
+        // Check if the username matches the valid name regex to prevent
+        // UTF-16 names or other types of exploits
         if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(event.getUsername()).matches()) {
           mcConnection.closeWith(Disconnect.create(Sonar.get().getConfig().getVerification().getInvalidUsername(),
             mcConnection.getProtocolVersion()));
@@ -262,6 +262,12 @@ public final class FallbackListener {
           mcConnection.getChannel().pipeline(), inetAddress,
           ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
         );
+
+        // Disconnect if the protocol version could not be resolved
+        if (fallbackPlayer.getProtocolVersion().isUnknown()) {
+          fallbackPlayer.disconnect(Sonar.get().getConfig().getVerification().getInvalidProtocol());
+          return;
+        }
 
         // Check if the player is already connected to the proxy
         if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {

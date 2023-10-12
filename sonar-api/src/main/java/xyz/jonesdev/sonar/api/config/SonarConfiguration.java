@@ -112,6 +112,7 @@ public final class SonarConfiguration {
     private Component tooManyPlayers;
     private Component tooFastReconnect;
     private Component invalidUsername;
+    private Component invalidProtocol;
     private Component verificationSuccess;
     private Component verificationFailed;
     private Component alreadyVerifying;
@@ -754,6 +755,15 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "<red>Your username contains invalid characters.",
+        "%footer%"
+      ))));
+
+    messagesConfig.getYaml().setComment("verification.invalid-protocol",
+      "Disconnect message that is shown when someone joins with a too new or too old version");
+    verification.invalidProtocol = deserialize(fromList(messagesConfig.getStringList("verification.invalid-protocol",
+      Arrays.asList(
+        "%header%",
+        "<red>Your protocol version is currently unsupported.",
         "%footer%"
       ))));
 
