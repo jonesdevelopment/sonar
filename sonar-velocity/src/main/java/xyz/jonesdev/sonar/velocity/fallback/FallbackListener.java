@@ -21,7 +21,9 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.api.util.GameProfile;
+import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
@@ -37,23 +39,31 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
+import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.ServerLoginSuccess;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import xyz.jonesdev.sonar.velocity.fallback.dummy.DummyConnection;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.proxy.network.Connections.*;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
 
 @RequiredArgsConstructor
@@ -64,12 +74,26 @@ public final class FallbackListener {
 
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private static final MethodHandle INITIAL_CONNECTION;
+  private static final MethodHandle CONNECTED_PLAYER;
   private static final Field CONNECTION_FIELD;
 
   static {
     CLOSED_MINECRAFT_CONNECTION = new DummyConnection(null);
 
     try {
+      CONNECTED_PLAYER = MethodHandles.privateLookupIn(ConnectedPlayer.class, MethodHandles.lookup())
+        .findConstructor(ConnectedPlayer.class,
+          MethodType.methodType(
+            void.class,
+            VelocityServer.class,
+            GameProfile.class,
+            MinecraftConnection.class,
+            InetSocketAddress.class,
+            boolean.class,
+            IdentifiedKey.class
+          )
+        );
+
       CONNECTION_FIELD = InitialLoginSessionHandler.class.getDeclaredField("mcConnection");
       CONNECTION_FIELD.setAccessible(true);
 
@@ -108,7 +132,7 @@ public final class FallbackListener {
 
     // Check the blacklist here since we cannot let the player "ghost join"
     if (fallback.getBlacklisted().has(inetAddress.toString())) {
-      markConnectionAsDead(mcConnection.getSessionHandler());
+      markConnectionAsDead(mcConnection.getActiveSessionHandler());
       initialConnection.getConnection().closeWith(Disconnect.create(
         Sonar.get().getConfig().getVerification().getBlacklisted(),
         inboundConnection.getProtocolVersion()
@@ -131,8 +155,8 @@ public final class FallbackListener {
       return;
     }
 
-    // We now mark the connection as dead by using our dummy connection
-    markConnectionAsDead(mcConnection.getSessionHandler());
+    // We now mark the connection as dead by using our fake connection
+    markConnectionAsDead(mcConnection.getActiveSessionHandler());
 
     // Check if the player is already queued since we don't want bots to flood the queue
     if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
@@ -211,11 +235,83 @@ public final class FallbackListener {
           && (SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
           || event.getResult().isOnlineModeAllowed());
 
-        // Replace the session handler to intercept all packets and handle them
-        mcConnection.setSessionHandler(new FallbackSessionHandler(
-          fallback, mcConnection, inboundConnection,
-          gameProfile, inetAddress, onlineMode
-        ));
+        // Don't allow exceptions or disconnect messages
+        mcConnection.setAssociation(null);
+
+        // Create an instance for the connected player
+        final ConnectedPlayer connectedPlayer;
+        try {
+          connectedPlayer = (ConnectedPlayer) CONNECTED_PLAYER.invokeExact(
+            mcConnection.server,
+            gameProfile,
+            mcConnection,
+            inboundConnection.getVirtualHost().orElse(null),
+            onlineMode,
+            inboundConnection.getIdentifiedKey()
+          );
+        } catch (Throwable throwable) {
+          // This should not happen
+          fallback.getLogger().error("Error processing {}: {}", gameProfile.getName(), throwable);
+          mcConnection.close(true);
+          return;
+        }
+
+        // Create an instance for the Fallback connection
+        final FallbackUserWrapper fallbackPlayer = new FallbackUserWrapper(
+          fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
+          mcConnection.getChannel().pipeline(), inetAddress,
+          ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
+        );
+
+        // Check if the player is already connected to the proxy
+        if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {
+          fallbackPlayer.disconnect("Could not find any available servers.");
+          return;
+        }
+
+        // The player joined the verification
+        Statistics.REAL_TRAFFIC.increment();
+
+        if (Sonar.get().getConfig().getVerification().isLogConnections()) {
+          // Only log the processing message if the server isn't under attack.
+          // We let the user override this through the configuration.
+          if (!fallback.isPotentiallyUnderAttack() || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+            fallback.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
+              .replace("%name%", connectedPlayer.getUsername())
+              .replace("%ip%", Sonar.get().getConfig().formatAddress(fallbackPlayer.getInetAddress()))
+              .replace("%protocol%", String.valueOf(fallbackPlayer.getProtocolVersion().getProtocol())));
+          }
+        }
+
+        // Call the VerifyJoinEvent for external API usage
+        Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(gameProfile.getName(), fallbackPlayer));
+
+        // Mark the player as connected → verifying players
+        fallback.getConnected().put(gameProfile.getName(), inetAddress);
+
+        // This sometimes happens when the channel hangs, but the player is still connecting
+        // This also fixes a weird issue with TCPShield and other reverse proxies
+        if (fallbackPlayer.getPipeline().get(MINECRAFT_ENCODER) == null
+          || fallbackPlayer.getPipeline().get(MINECRAFT_DECODER) == null) {
+          mcConnection.close(true);
+          return;
+        }
+
+        // Replace normal encoder to allow custom packets
+        final FallbackPacketEncoder encoder = new FallbackPacketEncoder(fallbackPlayer.getProtocolVersion());
+        fallbackPlayer.getPipeline().replace(MINECRAFT_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
+
+        // Send LoginSuccess packet to make the client think they are joining the server
+        fallbackPlayer.write(new ServerLoginSuccess(gameProfile.getName(), gameProfile.getId()));
+
+        // The LoginSuccess packet has been sent, now we can change the registry state
+        encoder.loginSuccess();
+
+        // Replace normal decoder to allow custom packets
+        fallbackPlayer.getPipeline().replace(
+          MINECRAFT_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(fallbackPlayer,
+            new FallbackVerificationHandler(fallbackPlayer, gameProfile.getName(), connectedPlayer.getUniqueId())
+          ));
       }));
     });
   }
