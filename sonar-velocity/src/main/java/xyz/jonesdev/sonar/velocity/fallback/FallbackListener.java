@@ -130,9 +130,12 @@ public final class FallbackListener {
     // Hook the custom traffic pipeline, so we can count the incoming and outgoing traffic
     TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
 
+    // TODO: implement backwards compatibility for Velocity <b269
+    final MinecraftSessionHandler activeSessionHandler = mcConnection.getActiveSessionHandler();
+
     // Check the blacklist here since we cannot let the player "ghost join"
     if (fallback.getBlacklisted().has(inetAddress.toString())) {
-      markConnectionAsDead(mcConnection.getActiveSessionHandler());
+      markConnectionAsDead(activeSessionHandler);
       initialConnection.getConnection().closeWith(Disconnect.create(
         Sonar.get().getConfig().getVerification().getBlacklisted(),
         inboundConnection.getProtocolVersion()
@@ -156,7 +159,7 @@ public final class FallbackListener {
     }
 
     // We now mark the connection as dead by using our fake connection
-    markConnectionAsDead(mcConnection.getActiveSessionHandler());
+    markConnectionAsDead(activeSessionHandler);
 
     // Check if the player is already queued since we don't want bots to flood the queue
     if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {

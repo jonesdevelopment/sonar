@@ -22,12 +22,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionInfo;
-
-import java.util.Objects;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
@@ -49,6 +48,7 @@ public final class JoinGame implements FallbackPacket {
   private int viewDistance; // 1.14+
   private boolean reducedDebugInfo;
   private boolean showRespawnScreen;
+  private boolean doLimitedCrafting; // 1.20.2+
   private String[] levelNames; // 1.16+
   private CompoundBinaryTag registry; // 1.16+
   private DimensionInfo dimensionInfo; // 1.16+
@@ -59,14 +59,20 @@ public final class JoinGame implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0) {
+      // haha funny, they made 1.20.2 more complicated
+      encode1202Up(byteBuf, protocolVersion);
+    } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16) >= 0) {
+      // Minecraft 1.16 and above have significantly more complicated logic for reading this packet,
+      // so separate it out.
       encode116Up(byteBuf, protocolVersion);
     } else {
       encodeLegacy(byteBuf, protocolVersion);
     }
   }
 
-  private void encodeLegacy(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  private void encodeLegacy(final @NotNull ByteBuf byteBuf,
+                            final @NotNull ProtocolVersion protocolVersion) {
     byteBuf.writeInt(entityId);
 
     if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
@@ -92,7 +98,7 @@ public final class JoinGame implements FallbackPacket {
 
     byteBuf.writeByte(1); // max players
 
-    writeString(byteBuf, Objects.requireNonNull(levelType));
+    writeString(byteBuf, levelType);
 
     if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
       writeVarInt(byteBuf, viewDistance);
@@ -107,7 +113,8 @@ public final class JoinGame implements FallbackPacket {
     }
   }
 
-  private void encode116Up(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  private void encode116Up(final @NotNull ByteBuf byteBuf,
+                           final @NotNull ProtocolVersion protocolVersion) {
     byteBuf.writeInt(entityId);
 
     if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
@@ -158,6 +165,38 @@ public final class JoinGame implements FallbackPacket {
     if (protocolVersion.compareTo(MINECRAFT_1_20) >= 0) {
       writeVarInt(byteBuf, portalCooldown);
     }
+  }
+
+  private void encode1202Up(final @NotNull ByteBuf byteBuf,
+                            final @SuppressWarnings("unused") ProtocolVersion protocolVersion) {
+    byteBuf.writeInt(entityId);
+    byteBuf.writeBoolean(isHardcore);
+
+    writeStringArray(byteBuf, levelNames);
+
+    writeVarInt(byteBuf, 1); // max players
+
+    writeVarInt(byteBuf, viewDistance);
+    writeVarInt(byteBuf, simulationDistance);
+
+    byteBuf.writeBoolean(reducedDebugInfo);
+    byteBuf.writeBoolean(showRespawnScreen);
+    byteBuf.writeBoolean(doLimitedCrafting);
+
+    writeString(byteBuf, dimensionInfo.getIdentifier());
+    writeString(byteBuf, dimensionInfo.getLevelName());
+    byteBuf.writeLong(partialHashedSeed);
+
+    byteBuf.writeByte(gamemode);
+    byteBuf.writeByte(previousGamemode);
+
+    byteBuf.writeBoolean(dimensionInfo.isDebug());
+    byteBuf.writeBoolean(dimensionInfo.isFlat());
+
+    // no last death location
+    byteBuf.writeBoolean(false);
+
+    writeVarInt(byteBuf, portalCooldown);
   }
 
   @Override
