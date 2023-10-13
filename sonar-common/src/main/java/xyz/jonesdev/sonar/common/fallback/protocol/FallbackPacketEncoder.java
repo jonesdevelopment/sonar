@@ -20,23 +20,27 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.*;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.CLIENTBOUND;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPacket> {
   private final ProtocolVersion protocolVersion;
-  private FallbackPacketRegistry.ProtocolRegistry registry;
+  private @NotNull FallbackPacketRegistry.ProtocolRegistry registry;
 
   public FallbackPacketEncoder(final ProtocolVersion protocolVersion) {
     this.protocolVersion = protocolVersion;
-    this.registry = FallbackPacketRegistry.LOGIN
-      .getProtocolRegistry(FallbackPacketRegistry.Direction.CLIENTBOUND, protocolVersion);
+    this.registry = LOGIN
+      .getProtocolRegistry(CLIENTBOUND, protocolVersion);
   }
 
   public void loginSuccess() {
-    this.registry = FallbackPacketRegistry.GAME
-      .getProtocolRegistry(FallbackPacketRegistry.Direction.CLIENTBOUND, protocolVersion);
+    this.registry = (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME)
+      .getProtocolRegistry(CLIENTBOUND, protocolVersion);
   }
 
   @Override

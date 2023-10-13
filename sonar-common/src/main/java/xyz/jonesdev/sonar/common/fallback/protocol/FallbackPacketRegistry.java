@@ -23,6 +23,9 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.ActiveFeatures;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishedUpdate;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistrySync;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -34,11 +37,31 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 public enum FallbackPacketRegistry {
   LOGIN {
     {
-      clientbound.fallback = false;
-      serverbound.fallback = false;
-
       clientbound.register(ServerLoginSuccess.class, ServerLoginSuccess::new,
         map(0x02, MINECRAFT_1_7_2, false));
+    }
+  },
+  CONFIG {
+    {
+      serverbound.register(ClientSettings.class, ClientSettings::new,
+        map(0x00, MINECRAFT_1_20_2, false));
+      serverbound.register(PluginMessage.class, PluginMessage::new,
+        map(0x01, MINECRAFT_1_20_2, false));
+      serverbound.register(FinishedUpdate.class, FinishedUpdate::new,
+        map(0x02, MINECRAFT_1_20_2, false));
+      serverbound.register(KeepAlive.class, KeepAlive::new,
+        map(0x03, MINECRAFT_1_20_2, false));
+
+      clientbound.register(Disconnect.class, Disconnect::new,
+        map(0x01, MINECRAFT_1_20_2, false));
+      clientbound.register(FinishedUpdate.class, FinishedUpdate::new,
+        map(0x02, MINECRAFT_1_20_2, false));
+      clientbound.register(KeepAlive.class, KeepAlive::new,
+        map(0x03, MINECRAFT_1_20_2, false));
+      clientbound.register(RegistrySync.class, RegistrySync::new,
+        map(0x05, MINECRAFT_1_20_2, false));
+      clientbound.register(ActiveFeatures.class, ActiveFeatures::new,
+        map(0x07, MINECRAFT_1_20_2, false));
     }
   },
   GAME {
@@ -296,7 +319,6 @@ public enum FallbackPacketRegistry {
 
   public static class PacketRegistry {
     private final Map<ProtocolVersion, ProtocolRegistry> versions;
-    private boolean fallback = true;
 
     PacketRegistry() {
       Map<ProtocolVersion, ProtocolRegistry> mutableVersions = new EnumMap<>(ProtocolVersion.class);
@@ -312,9 +334,6 @@ public enum FallbackPacketRegistry {
     ProtocolRegistry getProtocolRegistry(final ProtocolVersion version) {
       final ProtocolRegistry registry = versions.get(version);
       if (registry == null) {
-        if (fallback) {
-          return getProtocolRegistry(MINIMUM_VERSION);
-        }
         throw new IllegalArgumentException("Could not find data for protocol version " + version);
       }
       return registry;
