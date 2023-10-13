@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
@@ -34,14 +35,14 @@ public class Abilities implements FallbackPacket {
   private float flySpeed, walkSpeed;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     byteBuf.writeByte(encodedFlags);
     byteBuf.writeFloat(flySpeed);
     byteBuf.writeFloat(walkSpeed);
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     encodedFlags = byteBuf.readByte();
     flySpeed = byteBuf.readFloat();
     walkSpeed = byteBuf.readFloat();

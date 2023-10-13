@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
@@ -34,7 +35,7 @@ public final class Position implements FallbackPacket {
   private boolean onGround;
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     x = byteBuf.readDouble();
     // https://github.com/jonesdevelopment/sonar/issues/20
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
@@ -51,7 +52,7 @@ public final class Position implements FallbackPacket {
   }
 
   @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 33 : 25;
   }
 

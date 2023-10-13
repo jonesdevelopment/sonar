@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.netty.FastUUID;
@@ -39,7 +40,7 @@ public final class ServerLoginSuccess implements FallbackPacket {
   private UUID uuid;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       writeUUID(byteBuf, uuid);
     } else if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {

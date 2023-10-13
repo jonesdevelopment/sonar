@@ -80,7 +80,7 @@ public final class EmptyChunkData implements FallbackPacket {
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     byteBuf.writeInt(x);
     byteBuf.writeInt(z);
 
