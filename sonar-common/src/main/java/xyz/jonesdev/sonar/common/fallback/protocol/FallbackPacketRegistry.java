@@ -434,7 +434,7 @@ public enum FallbackPacketRegistry {
       return supplier.get();
     }
 
-    public int getPacketId(final FallbackPacket packet) {
+    public int getPacketId(final @NotNull FallbackPacket packet) {
       final int id = packetClassToId.getOrDefault(packet.getClass(), Integer.MIN_VALUE);
 
       if (id == Integer.MIN_VALUE) {
@@ -462,7 +462,7 @@ public enum FallbackPacketRegistry {
     }
   }
 
-  private static PacketMapping map(final int id,
+  private static @NotNull PacketMapping map(final int id,
                                    final ProtocolVersion version,
                                    final boolean encodeOnly) {
     return new PacketMapping(id, version, null, encodeOnly);

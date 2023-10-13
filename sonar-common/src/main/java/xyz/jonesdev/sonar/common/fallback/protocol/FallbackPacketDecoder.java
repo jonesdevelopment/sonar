@@ -53,40 +53,52 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     if (msg instanceof ByteBuf) {
       final ByteBuf byteBuf = (ByteBuf) msg;
 
+      // Release the ByteBuf if the connection is not active
+      // or the ByteBuf doesn't contain any data to avoid
+      // memory leaks or other potential exploits.
       if (!ctx.channel().isActive() || !byteBuf.isReadable()) {
         byteBuf.release();
         return;
       }
 
       final int originalReaderIndex = byteBuf.readerIndex();
+      // Read the packet ID and then create the packet from it
       final int packetId = readVarInt(byteBuf);
       final FallbackPacket packet = registry.createPacket(packetId);
 
+      // If the packet hasn't been found, skip it
+      // TODO: Can we fail the verification afterwards?
       if (packet == null) {
         byteBuf.readerIndex(originalReaderIndex);
         return;
       }
 
       try {
+        // Ensure that the packet isn't too large or too small
         doLengthSanityChecks(byteBuf, packet);
 
         try {
+          // Try to decode the packet for the given protocol version
           packet.decode(byteBuf, user.getProtocolVersion());
         } catch (Throwable throwable) {
           user.fail("failed to decode packet (" + byteBuf.readableBytes() + " bytes)");
           throw new CorruptedFrameException("Failed to decode packet");
         }
 
+        // Check if the packet still has bytes left after we decoded it
         if (byteBuf.isReadable()) {
           user.fail("could not read packet to end (" + byteBuf.readableBytes() + " bytes left)");
           throw new CorruptedFrameException("Could not read packet to end");
         }
 
+        // Let our verification handler process the packet
         listener.handle(packet);
       } finally {
+        // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
       }
     } else {
+      // Packets are always ByteBufs - if we detect an unknown object, fail verification
       user.fail("packet is not a ByteBuf");
       throw new CorruptedFrameException("Packet is not a ByteBuf?!");
     }
