@@ -124,7 +124,7 @@ public enum FallbackPacketRegistry {
         map(0x39, MINECRAFT_1_19_1, true),
         map(0x38, MINECRAFT_1_19_3, true),
         map(0x3C, MINECRAFT_1_19_4, true),
-        map(0x2D, MINECRAFT_1_20_2, true));
+        map(0x3E, MINECRAFT_1_20_2, true));
       clientbound.register(Abilities.class, Abilities::new,
         map(0x39, MINECRAFT_1_7_2, true),
         map(0x2B, MINECRAFT_1_9, true),
