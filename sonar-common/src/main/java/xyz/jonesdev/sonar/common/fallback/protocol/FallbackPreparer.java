@@ -69,12 +69,12 @@ public class FallbackPreparer {
   public FallbackPacket synchronizeRegistry;
 
   // JoinGame
-  private JoinGame legacyJoinGame;
-  private JoinGame joinGame116;
-  private JoinGame joinGame1162;
-  private JoinGame joinGame1182;
-  private JoinGame joinGame1191;
-  private JoinGame joinGame1194;
+  private FallbackPacket legacyJoinGame;
+  private FallbackPacket joinGame116;
+  private FallbackPacket joinGame1162;
+  private FallbackPacket joinGame1182;
+  private FallbackPacket joinGame1191;
+  private FallbackPacket joinGame1194;
   private JoinGame joinGame120;
 
   // Dimension
@@ -83,8 +83,8 @@ public class FallbackPreparer {
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (max)
-  private final int SPAWN_BUFFER = 10; // player spawns at 255 + 10 (10 blocks above the platform)
-  public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is max
+  private final int SPAWN_BUFFER = 5; // player spawns at 255 + 5 (5 blocks above the platform)
+  public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
 
   public UpdateSectionBlocks UPDATE_SECTION_BLOCKS;
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
@@ -151,7 +151,7 @@ public class FallbackPreparer {
     }
   }
 
-  public static JoinGame getJoinPacketForVersion(final @NotNull ProtocolVersion protocolVersion) {
+  public static FallbackPacket getJoinPacketForVersion(final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
       return legacyJoinGame; // 1.7.2-1.15.2
     }

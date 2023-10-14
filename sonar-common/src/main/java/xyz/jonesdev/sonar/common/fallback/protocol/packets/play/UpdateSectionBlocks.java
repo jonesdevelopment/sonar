@@ -67,15 +67,9 @@ public final class UpdateSectionBlocks implements FallbackPacket {
         }
       }
     } else {
-      final ChangedBlock lastChangedBlock = changedBlocks[changedBlocks.length - 1];
-      final int sectionY = lastChangedBlock.getPosition().getY() >> 4;
+      final int sectionY = changedBlocks[0].getPosition().getY() >> 4;
 
-      // Why is Mojang doing this? :(
-      byteBuf.writeLong(
-        ((long) (sectionX & 0x3FFFFF) << 42)
-          | (sectionY & 0xFFFFF)
-          | ((long) (sectionZ & 0x3FFFFF) << 20)
-      );
+      byteBuf.writeLong(((sectionX & 0x3FFFFFL) << 42) | (sectionY & 0xFFFFF) | ((sectionZ & 0x3FFFFFL) << 20));
 
       // 1.20+ don't have light update suppression
       if (protocolVersion.compareTo(MINECRAFT_1_20) < 0) {
