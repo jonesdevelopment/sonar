@@ -23,7 +23,6 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.ActiveFeatures;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishedUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistrySync;
 
@@ -43,15 +42,6 @@ public enum FallbackPacketRegistry {
   },
   CONFIG {
     {
-      serverbound.register(ClientSettings.class, ClientSettings::new,
-        map(0x00, MINECRAFT_1_20_2, false));
-      serverbound.register(PluginMessage.class, PluginMessage::new,
-        map(0x01, MINECRAFT_1_20_2, false));
-      serverbound.register(FinishedUpdate.class, FinishedUpdate::new,
-        map(0x02, MINECRAFT_1_20_2, false));
-      serverbound.register(KeepAlive.class, KeepAlive::new,
-        map(0x03, MINECRAFT_1_20_2, false));
-
       clientbound.register(Disconnect.class, Disconnect::new,
         map(0x01, MINECRAFT_1_20_2, false));
       clientbound.register(FinishedUpdate.class, FinishedUpdate::new,
@@ -60,8 +50,15 @@ public enum FallbackPacketRegistry {
         map(0x03, MINECRAFT_1_20_2, false));
       clientbound.register(RegistrySync.class, RegistrySync::new,
         map(0x05, MINECRAFT_1_20_2, false));
-      clientbound.register(ActiveFeatures.class, ActiveFeatures::new,
-        map(0x07, MINECRAFT_1_20_2, false));
+
+      serverbound.register(ClientSettings.class, ClientSettings::new,
+        map(0x00, MINECRAFT_1_20_2, false));
+      serverbound.register(PluginMessage.class, PluginMessage::new,
+        map(0x01, MINECRAFT_1_20_2, false));
+      serverbound.register(FinishedUpdate.class, FinishedUpdate::new,
+        map(0x02, MINECRAFT_1_20_2, false));
+      serverbound.register(KeepAlive.class, KeepAlive::new,
+        map(0x03, MINECRAFT_1_20_2, false));
     }
   },
   GAME {
