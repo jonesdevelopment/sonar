@@ -45,10 +45,13 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
                            final Command command,
                            final String label,
                            final String[] args) {
+    // Create our own invocation source wrapper to handle messages properly
+    final InvocationSource invocationSource = new BukkitInvocationSource(sender);
+
     if (!(sender instanceof ConsoleCommandSender)) {
       // Check if the player actually has the permission to run the command
       if (!sender.hasPermission("sonar.command")) {
-        sender.sendMessage(Sonar.get().getConfig().getNoPermission());
+        invocationSource.sendMessage(Sonar.get().getConfig().getNoPermission());
         return false;
       }
       // Checking if it contains will only break more since it can throw
@@ -60,13 +63,13 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        sender.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDown());
+        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDown());
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
-        sender.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
+        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
           .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left)));
         return false;
       }
@@ -75,8 +78,6 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
     }
 
     Optional<Subcommand> subcommand = Optional.empty();
-
-    final InvocationSource invocationSource = new BukkitInvocationSource(sender);
 
     if (args.length > 0) {
       // Search subcommand if command arguments are present

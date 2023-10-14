@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.bungee.command;
 
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
@@ -48,10 +47,13 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
   @Override
   @SuppressWarnings({"redundantSuppression"})
   public void execute(final @NotNull CommandSender sender, final String[] args) {
+    // Create our own invocation source wrapper to handle messages properly
+    final InvocationSource invocationSource = new BungeeInvocationSource(sender);
+
     if (!(sender instanceof ConsoleCommandSender)) {
       // Check if the player actually has the permission to run the command
       if (!sender.hasPermission("sonar.command")) {
-        sender.sendMessage(new TextComponent(Sonar.get().getConfig().getNoPermission()));
+        invocationSource.sendMessage(Sonar.get().getConfig().getNoPermission());
         return;
       }
       // Checking if it contains will only break more since it can throw
@@ -63,14 +65,14 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        sender.sendMessage(new TextComponent(Sonar.get().getConfig().getCommands().getCommandCoolDown()));
+        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDown());
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
-        sender.sendMessage(new TextComponent(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
-          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))));
+        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
+          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left)));
         return;
       }
 
@@ -78,8 +80,6 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
     }
 
     Optional<Subcommand> subcommand = Optional.empty();
-
-    final InvocationSource invocationSource = new BungeeInvocationSource(sender);
 
     if (args.length > 0) {
       // Search subcommand if command arguments are present
