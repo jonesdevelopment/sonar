@@ -33,8 +33,6 @@ import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeArray
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeCompoundTag;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
-// Partially taken from
-// https://github.com/Leymooo/BungeeCord/blob/master/protocol/src/main/java/ru/leymooo/botfilter/packets/EmptyChunkPacket.java
 @Getter
 @ToString
 @NoArgsConstructor
