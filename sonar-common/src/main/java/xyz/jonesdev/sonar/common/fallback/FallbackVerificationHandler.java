@@ -53,6 +53,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private int tick, totalReceivedPackets;
   private int ignoredMovementTicks;
   private double posX, posY, posZ, lastY;
+  private boolean resolvedClientBrand, resolvedClientSettings;
   @Setter
   private @NotNull State state = State.LOGIN_ACK;
   private boolean listenForMovements;
@@ -138,11 +139,19 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void sendJoinGamePacket() {
-    // Set the state to CLIENT_SETTINGS to avoid false positives
-    // and go on with the flow of the verification.
-    state = State.CLIENT_SETTINGS;
+    final boolean v1_20_2 = user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0;
+    if (!v1_20_2) {
+      // Set the state to CLIENT_SETTINGS to avoid false positives
+      // and go on with the flow of the verification.
+      state = State.CLIENT_SETTINGS;
+    }
     // Select the JoinGame packet for the respective protocol version
     user.write(getJoinPacketForVersion(user.getProtocolVersion()));
+    if (v1_20_2) {
+      // Perform the transaction check since the ClientSettings
+      // and PluginMessage packets have already been validated.
+      sendTransaction();
+    }
   }
 
   private void sendAbilitiesAndTeleport() {
@@ -234,6 +243,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Check if we are currently expecting a FinishConfiguration packet
       assertState(State.CONFIGURE);
 
+      // Check if the client has already sent valid ClientSettings and PluginMessage packets
+      checkFrame(resolvedClientBrand, "did not resolve client brand");
+      checkFrame(resolvedClientSettings, "did not resolve client settings");
+
       // Start initializing the actual join process
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);
       initialJoinProcess();
@@ -264,14 +277,20 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (state == State.CLIENT_SETTINGS) {
         state = State.PLUGIN_MESSAGE;
       }
+
+      // Make sure we mark the ClientSettings as valid
+      resolvedClientSettings = true;
     }
 
     if (packet instanceof PluginMessage) {
       final PluginMessage pluginMessage = (PluginMessage) packet;
 
-      // Only the brand channel is important
+      // Only the brand channel is important, drop the rest
       if (pluginMessage.getChannel().equals("MC|Brand")
         || pluginMessage.getChannel().equals("minecraft:brand")) {
+        // Check if the brand packet was sent twice,
+        // which is not possible when using a vanilla Minecraft client.
+        checkFrame(!resolvedClientBrand, "duplicate client brand packet");
 
         // Check if the channel is correct - 1.13 uses the new namespace
         // system ('minecraft:' + channel) and anything below 1.13 uses
@@ -287,6 +306,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           // Send the transaction packet
           sendTransaction();
         }
+
+        // Make sure we mark the PluginMessage as valid
+        resolvedClientBrand = true;
       }
     }
 
