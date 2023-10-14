@@ -43,8 +43,8 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     this.listener = listener;
   }
 
-  public void switchToGameState() {
-    this.registry = GAME.getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
+  public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
+    this.registry = registry.getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
   }
 
   @Override

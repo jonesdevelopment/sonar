@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
 import lombok.Setter;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
@@ -28,7 +29,10 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
 
@@ -36,8 +40,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener {
@@ -51,22 +55,22 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private int ignoredMovementTicks;
   private double posX, posY, posZ, lastY;
   @Setter
-  private State state;
+  private @NotNull State state = State.LOGIN_ACK;
   private boolean listenForMovements;
 
   private final SystemTimer login = new SystemTimer();
   private static final Random RANDOM = new Random();
 
   public enum State {
-    // PRE-JOIN
+    // 1.20.2 configuration state
+    LOGIN_ACK, CONFIGURE,
+    // pre-JOIN ping check
     KEEP_ALIVE,
-    // JOIN
-    CLIENT_SETTINGS, PLUGIN_MESSAGE,
-    // POST-JOIN
-    TRANSACTION,
-    // PLAY
+    // post-JOIN checks
+    CLIENT_SETTINGS, PLUGIN_MESSAGE, TRANSACTION,
+    // PLAY checks
     TELEPORT, POSITION, COLLISIONS,
-    // OTHER
+    // Done
     SUCCESS
   }
 
@@ -76,12 +80,43 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.user = user;
     this.username = username;
     this.playerUuid = playerUuid;
-    this.state = State.KEEP_ALIVE;
 
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
+      // Start initializing the actual join process
+      initialJoinProcess();
+    }
+  }
+
+  private void configure() {
+    // Set the state to CONFIGURE to avoid false positives
+    state = State.CONFIGURE;
+    // Send necessary configuration packets to the client
+    user.delayedWrite(synchronizeRegistry);
+    user.delayedWrite(FINISH_CONFIGURATION);
+    // Send all packets in one flush
+    user.getChannel().flush();
+    // Set decoder state to actually catch all packets
+    val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FALLBACK_PACKET_DECODER);
+    if (decoder != null) {
+      // Update the packet registry state to be able to listen for GAME packets
+      decoder.updateRegistry(FallbackPacketRegistry.GAME);
+      // Start initializing the actual join process
+      initialJoinProcess();
+    } else {
+      // Something went wrong - the decoder should not be null
+      user.getFallback().getLogger().warn("Decoder for {} does not exist?!", username);
+      // Close the channel to prevent bypasses or other potential exploits
+      user.getChannel().close();
+    }
+  }
+
+  private void initialJoinProcess() {
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       // 1.7 players don't have KeepAlive packets in the login process
       sendJoinGamePacket();
     } else {
+      // Set the state to KEEP_ALIVE to avoid false positives
+      state = State.KEEP_ALIVE;
       // Generate a random KeepAlive ID for the pre-join check
       expectedKeepAliveId = RANDOM.nextInt();
       // Send first KeepAlive to check if the connection is somewhat responsive
@@ -184,6 +219,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
+    if (packet instanceof LoginAcknowledged) {
+      // Check if we are currently expecting a LoginAcknowledged packet
+      assertState(State.LOGIN_ACK);
+
+      // Start the configuration process for 1.20.2 clients
+      configure();
+    }
+
     if (packet instanceof KeepAlive) {
       final KeepAlive keepAlive = (KeepAlive) packet;
 
@@ -252,14 +295,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         return;
       }
 
-      // First, send an abilities packet to the client to make
+      // First, send an Abilities packet to the client to make
       // sure the player falls even in spectator mode.
       // Then, teleport the player to the spawn position.
       sendAbilitiesAndTeleport();
 
       // 1.7-1.8 clients do not have a TeleportConfirm packet
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) {
-        // Immediately send the chunk data as 1.7-1.8 can't confirm teleports
+        // Immediately send the chunk data as 1.7-1.8 can't confirm teleport packets
         sendChunkData();
       } else {
         // Send all previously sent packets in one flush since we didn't flush
@@ -285,19 +328,21 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       sendChunkData();
     }
 
-    if (packet instanceof Position) {
-      final Position position = (Position) packet;
-      handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
-    }
+    if (state != State.LOGIN_ACK) {
+      if (packet instanceof Position) {
+        final Position position = (Position) packet;
+        handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
+      }
 
-    if (packet instanceof PositionLook) {
-      final PositionLook position = (PositionLook) packet;
-      handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
-    }
+      if (packet instanceof PositionLook) {
+        final PositionLook position = (PositionLook) packet;
+        handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
+      }
 
-    if (packet instanceof Player) {
-      final Player player = (Player) packet;
-      handlePositionUpdate(posX, posY, posZ, player.isOnGround());
+      if (packet instanceof Player) {
+        final Player player = (Player) packet;
+        handlePositionUpdate(posX, posY, posZ, player.isOnGround());
+      }
     }
   }
 
@@ -369,7 +414,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
 
       // Check if the player is colliding by performing a basic Y offset check.
-      // The offset cannot greater than 0 since the blocks will not let the player fall through them.
+      // The offset cannot be greater than 0 since the blocks will not let the player fall through them.
       checkFrame(offsetY <= 0, "no collisions: " + offsetY);
 
       if (ground) {
