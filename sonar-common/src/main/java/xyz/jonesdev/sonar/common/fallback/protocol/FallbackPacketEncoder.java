@@ -23,24 +23,21 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.CLIENTBOUND;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPacket> {
   private final ProtocolVersion protocolVersion;
-  private @NotNull FallbackPacketRegistry.ProtocolRegistry registry;
+  private FallbackPacketRegistry.ProtocolRegistry registry;
 
   public FallbackPacketEncoder(final ProtocolVersion protocolVersion) {
     this.protocolVersion = protocolVersion;
-    this.registry = LOGIN
-      .getProtocolRegistry(CLIENTBOUND, protocolVersion);
+    updateRegistry(LOGIN);
   }
 
-  public void loginSuccess() {
-    this.registry = (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME)
-      .getProtocolRegistry(CLIENTBOUND, protocolVersion);
+  public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
+    this.registry = registry.getProtocolRegistry(CLIENTBOUND, protocolVersion);
   }
 
   @Override

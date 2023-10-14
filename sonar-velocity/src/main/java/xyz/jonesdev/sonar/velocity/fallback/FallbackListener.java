@@ -48,6 +48,7 @@ import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
@@ -325,7 +326,8 @@ public final class FallbackListener {
           fallbackPlayer.write(new LoginSuccess(gameProfile.getName(), gameProfile.getId()));
 
           // The LoginSuccess packet has been sent, now we can change the registry state
-          encoder.loginSuccess();
+          encoder.updateRegistry(fallbackPlayer.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
+            ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
 
           // Replace normal decoder to allow custom packets
           fallbackPlayer.getPipeline().replace(

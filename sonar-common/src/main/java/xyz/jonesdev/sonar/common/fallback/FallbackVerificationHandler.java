@@ -28,10 +28,8 @@ import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
+import xyz.jonesdev.sonar.common.fallback.protocol.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
@@ -41,6 +39,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -96,15 +95,19 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Send all packets in one flush
     user.getChannel().flush();
     // Set decoder state to actually catch all packets
+    updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
+  }
+
+  private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
     val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FALLBACK_PACKET_DECODER);
-    if (decoder != null) {
-      // Update the packet registry state to be able to listen for GAME packets
-      decoder.updateRegistry(FallbackPacketRegistry.GAME);
-      // Start initializing the actual join process
-      initialJoinProcess();
+    val encoder = (FallbackPacketEncoder) user.getChannel().pipeline().get(FALLBACK_PACKET_ENCODER);
+    if (decoder != null && encoder != null) {
+      // Update the packet registry state to be able to listen for CONFIG packets
+      decoder.updateRegistry(registry);
+      encoder.updateRegistry(registry);
     } else {
       // Something went wrong - the decoder should not be null
-      user.getFallback().getLogger().warn("Decoder for {} does not exist?!", username);
+      user.getFallback().getLogger().warn("Necessary pipelines for {} not found", username);
       // Close the channel to prevent bypasses or other potential exploits
       user.getChannel().close();
     }
@@ -225,6 +228,15 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Start the configuration process for 1.20.2 clients
       configure();
+    }
+
+    if (packet instanceof FinishConfiguration) {
+      // Check if we are currently expecting a FinishConfiguration packet
+      assertState(State.CONFIGURE);
+
+      // Start initializing the actual join process
+      updateEncoderDecoderState(FallbackPacketRegistry.GAME);
+      initialJoinProcess();
     }
 
     if (packet instanceof KeepAlive) {
