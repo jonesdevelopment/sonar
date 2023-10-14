@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
@@ -44,7 +45,7 @@ public final class Chat implements FallbackPacket {
   private byte position;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     final String serialized = JSONComponentSerializer.json().serialize(component);
     writeString(byteBuf, serialized);
 

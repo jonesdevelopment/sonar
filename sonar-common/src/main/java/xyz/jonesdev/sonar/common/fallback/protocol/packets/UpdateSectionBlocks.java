@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
@@ -39,7 +40,7 @@ public final class UpdateSectionBlocks implements FallbackPacket {
   private ChangedBlock[] changedBlocks;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
       byteBuf.writeInt(sectionX);
       byteBuf.writeInt(sectionZ);

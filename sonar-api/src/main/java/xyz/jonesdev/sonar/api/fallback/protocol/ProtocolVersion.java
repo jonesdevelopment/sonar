@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.api.fallback.protocol;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.EnumSet;
@@ -66,10 +67,10 @@ public enum ProtocolVersion {
   MINECRAFT_1_19_3(761),
   MINECRAFT_1_19_4(762),
   MINECRAFT_1_20(763),
-  MINECRAFT_1_20_2(-1);
+  MINECRAFT_1_20_2(764);
 
+  @Getter
   private final int protocol;
-  private final int snapshotProtocol = -1;
 
   public static final ProtocolVersion MINIMUM_VERSION = MINECRAFT_1_7_2;
   public static final Map<Integer, ProtocolVersion> ID_TO_PROTOCOL_CONSTANT;
@@ -81,7 +82,6 @@ public enum ProtocolVersion {
 
       for (final ProtocolVersion version : values()) {
         versions.putIfAbsent(version.protocol, version);
-        versions.put(version.snapshotProtocol, version);
       }
 
       ID_TO_PROTOCOL_CONSTANT = versions;
@@ -102,10 +102,6 @@ public enum ProtocolVersion {
 
   public static ProtocolVersion fromId(final int protocol) {
     return ID_TO_PROTOCOL_CONSTANT.getOrDefault(protocol, UNKNOWN);
-  }
-
-  public int getProtocol() {
-    return protocol == -1 ? snapshotProtocol : protocol;
   }
 
   public boolean isUnknown() {

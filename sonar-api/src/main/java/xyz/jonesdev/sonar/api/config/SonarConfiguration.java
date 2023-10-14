@@ -112,6 +112,8 @@ public final class SonarConfiguration {
     private Component tooManyPlayers;
     private Component tooFastReconnect;
     private Component invalidUsername;
+    private Component invalidProtocol;
+    private Component alreadyConnected;
     private Component verificationSuccess;
     private Component verificationFailed;
     private Component alreadyVerifying;
@@ -195,6 +197,7 @@ public final class SonarConfiguration {
     private boolean notifyAdmins;
     private boolean logAttempts;
     private Component disconnect;
+    private String bypassPermission;
     private String activated;
     private String deactivated;
     private String notification;
@@ -305,6 +308,11 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("lockdown.notify-admins",
       "Should Sonar notify admins when they join the server during lockdown?");
     lockdown.notifyAdmins = generalConfig.getBoolean("lockdown.notify-admins", true);
+
+    generalConfig.getYaml().setComment("lockdown.bypass-permission",
+      "Which permission does a player need in order to bypass the lockdown mode?"
+      + LINE_SEPARATOR + "Players with this permission will also receive admin notifications when joining");
+    lockdown.bypassPermission = generalConfig.getString("lockdown.bypass-permission", "sonar.lockdown.bypass");
 
     // Queue
     generalConfig.getYaml().setComment("queue",
@@ -754,6 +762,26 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "<red>Your username contains invalid characters.",
+        "%footer%"
+      ))));
+
+    messagesConfig.getYaml().setComment("verification.invalid-protocol",
+      "Disconnect message that is shown when someone joins with a too new or too old version");
+    verification.invalidProtocol = deserialize(fromList(messagesConfig.getStringList("verification.invalid-protocol",
+      Arrays.asList(
+        "%header%",
+        "<red>Your protocol version is currently unsupported.",
+        "%footer%"
+      ))));
+
+    messagesConfig.getYaml().setComment("verification.already-online",
+      "Disconnect message that is shown when someone tries verifying with an account that is online");
+    verification.alreadyConnected = deserialize(fromList(messagesConfig.getStringList("verification.already-online",
+      Arrays.asList(
+        "%header%",
+        "<red>There is someone already online with your account.",
+        "<gray>Please wait a few seconds before trying to verify again.",
+        "<gray>If this keeps occurring, try restarting your game or contact support.",
         "%footer%"
       ))));
 

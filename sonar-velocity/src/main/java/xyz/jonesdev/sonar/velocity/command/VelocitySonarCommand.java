@@ -43,10 +43,13 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
 
   @Override
   public void execute(final @NotNull Invocation invocation) {
+    // Create our own invocation source wrapper to handle messages properly
+    final InvocationSource invocationSource = new VelocityInvocationSource(invocation.source());
+
     if (!(invocation.source() instanceof ConsoleCommandSource)) {
       // Check if the player actually has the permission to run the command
       if (!invocation.source().hasPermission("sonar.command")) {
-        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().getNoPermission()));
+        invocationSource.sendMessage(Sonar.get().getConfig().getNoPermission());
         return;
       }
       // Checking if it contains will only break more since it can throw
@@ -58,14 +61,14 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       // Spamming should be prevented, especially if some heavy operations are done,
       // which is not the case here but let's still stay safe!
       if (mapTimestamp > 0L) {
-        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().getCommands().getCommandCoolDown()));
+        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDown());
 
         // Format delay
         final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
-        invocation.source().sendMessage(Component.text(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
-          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left))));
+        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
+          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left)));
         return;
       }
 
@@ -73,8 +76,6 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
     }
 
     Optional<Subcommand> subcommand = Optional.empty();
-
-    final InvocationSource invocationSource = new VelocityInvocationSource(invocation.source());
 
     if (invocation.arguments().length > 0) {
       // Search subcommand if command arguments are present

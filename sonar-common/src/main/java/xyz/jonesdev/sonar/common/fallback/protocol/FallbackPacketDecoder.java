@@ -21,25 +21,30 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.CONFIG;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 
-@RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final FallbackUser<?, ?> user;
-  private final FallbackPacketRegistry.ProtocolRegistry registry;
   private final FallbackPacketListener listener;
+  private @NotNull FallbackPacketRegistry.ProtocolRegistry registry;
 
   public FallbackPacketDecoder(final @NotNull FallbackUser<?, ?> user,
                                final @NotNull FallbackPacketListener listener) {
     this.user = user;
-    this.registry = FallbackPacketRegistry.GAME.getProtocolRegistry(
-      FallbackPacketRegistry.Direction.SERVERBOUND, user.getProtocolVersion()
-    );
+    this.registry = (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME)
+      .getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
     this.listener = listener;
+  }
+
+  public void switchToGameState() {
+    this.registry = GAME.getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
   }
 
   @Override
@@ -48,38 +53,54 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     if (msg instanceof ByteBuf) {
       final ByteBuf byteBuf = (ByteBuf) msg;
 
+      // Release the ByteBuf if the connection is not active
+      // or the ByteBuf doesn't contain any data to avoid
+      // memory leaks or other potential exploits.
       if (!ctx.channel().isActive() || !byteBuf.isReadable()) {
         byteBuf.release();
         return;
       }
 
       final int originalReaderIndex = byteBuf.readerIndex();
+      // Read the packet ID and then create the packet from it
       final int packetId = readVarInt(byteBuf);
       final FallbackPacket packet = registry.createPacket(packetId);
 
+      // If the packet hasn't been found, skip it
+      // TODO: Can we fail the verification afterwards?
       if (packet == null) {
         byteBuf.readerIndex(originalReaderIndex);
-      } else {
-        try {
-          doLengthSanityChecks(byteBuf, packet);
-
-          try {
-            packet.decode(byteBuf, user.getProtocolVersion());
-          } catch (Throwable throwable) {
-            user.fail("could not decode packet");
-            throw new CorruptedFrameException("Failed to decode packet");
-          }
-
-          if (byteBuf.isReadable()) {
-            user.fail("could not read packet to end (" + byteBuf.readableBytes() + " bytes left)");
-            throw new CorruptedFrameException("Could not read packet to end");
-          }
-
-          listener.handle(packet);
-        } finally {
-          byteBuf.release();
-        }
+        return;
       }
+
+      try {
+        // Ensure that the packet isn't too large or too small
+        doLengthSanityChecks(byteBuf, packet);
+
+        try {
+          // Try to decode the packet for the given protocol version
+          packet.decode(byteBuf, user.getProtocolVersion());
+        } catch (Throwable throwable) {
+          user.fail("failed to decode packet (" + byteBuf.readableBytes() + " bytes)");
+          throw new CorruptedFrameException("Failed to decode packet");
+        }
+
+        // Check if the packet still has bytes left after we decoded it
+        if (byteBuf.isReadable()) {
+          user.fail("could not read packet to end (" + byteBuf.readableBytes() + " bytes left)");
+          throw new CorruptedFrameException("Could not read packet to end");
+        }
+
+        // Let our verification handler process the packet
+        listener.handle(packet);
+      } finally {
+        // Release the ByteBuf to avoid memory leaks
+        byteBuf.release();
+      }
+    } else {
+      // Packets are always ByteBufs - if we detect an unknown object, fail verification
+      user.fail("packet is not a ByteBuf");
+      throw new CorruptedFrameException("Packet is not a ByteBuf?!");
     }
   }
 
@@ -87,13 +108,13 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
                                     final @NotNull FallbackPacket packet) throws Exception {
     final int expectedMaxLen = packet.expectedMaxLength(byteBuf, user.getProtocolVersion());
     if (expectedMaxLen != -1 && byteBuf.readableBytes() > expectedMaxLen) {
-      user.fail("packet too large");
+      user.fail("packet too large (" + byteBuf.readableBytes() + " bytes)");
       throw new CorruptedFrameException("Packet too large");
     }
 
     final int expectedMinLen = packet.expectedMinLength(byteBuf, user.getProtocolVersion());
     if (byteBuf.readableBytes() < expectedMinLen) {
-      user.fail("packet too small");
+      user.fail("packet too small (" + byteBuf.readableBytes() + " bytes)");
       throw new CorruptedFrameException("Packet too small");
     }
   }

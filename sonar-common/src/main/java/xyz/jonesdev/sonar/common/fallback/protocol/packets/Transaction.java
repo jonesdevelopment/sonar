@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
@@ -36,7 +37,7 @@ public final class Transaction implements FallbackPacket {
   private boolean accepted;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
       byteBuf.writeByte(windowId);
       byteBuf.writeShort((short) id);
@@ -49,7 +50,7 @@ public final class Transaction implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
       windowId = byteBuf.readByte();
       id = byteBuf.readShort();

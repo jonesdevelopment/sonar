@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol.packets;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.netty.DeferredByteBufHolder;
@@ -50,7 +51,7 @@ public final class PluginMessage extends DeferredByteBufHolder implements Fallba
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     channel = readString(byteBuf);
 
     if (protocolVersion.compareTo(MINECRAFT_1_13) >= 0) {
