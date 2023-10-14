@@ -22,9 +22,11 @@ import io.netty.util.collection.IntObjectMap;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishedUpdate;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistrySync;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -36,7 +38,10 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 public enum FallbackPacketRegistry {
   LOGIN {
     {
-      clientbound.register(ServerLoginSuccess.class, ServerLoginSuccess::new,
+      serverbound.register(LoginAcknowledged.class, LoginAcknowledged::new,
+        map(0x03, MINECRAFT_1_20_2, false));
+
+      clientbound.register(LoginSuccess.class, LoginSuccess::new,
         map(0x02, MINECRAFT_1_7_2, false));
     }
   },
@@ -44,7 +49,7 @@ public enum FallbackPacketRegistry {
     {
       clientbound.register(Disconnect.class, Disconnect::new,
         map(0x01, MINECRAFT_1_20_2, false));
-      clientbound.register(FinishedUpdate.class, FinishedUpdate::new,
+      clientbound.register(FinishConfiguration.class, FinishConfiguration::new,
         map(0x02, MINECRAFT_1_20_2, false));
       clientbound.register(KeepAlive.class, KeepAlive::new,
         map(0x03, MINECRAFT_1_20_2, false));
@@ -55,7 +60,7 @@ public enum FallbackPacketRegistry {
         map(0x00, MINECRAFT_1_20_2, false));
       serverbound.register(PluginMessage.class, PluginMessage::new,
         map(0x01, MINECRAFT_1_20_2, false));
-      serverbound.register(FinishedUpdate.class, FinishedUpdate::new,
+      serverbound.register(FinishConfiguration.class, FinishConfiguration::new,
         map(0x02, MINECRAFT_1_20_2, false));
       serverbound.register(KeepAlive.class, KeepAlive::new,
         map(0x03, MINECRAFT_1_20_2, false));
@@ -162,21 +167,6 @@ public enum FallbackPacketRegistry {
         map(0x3F, MINECRAFT_1_19_3, true),
         map(0x43, MINECRAFT_1_19_4, true),
         map(0x45, MINECRAFT_1_20_2, true));
-      clientbound.register(DefaultSpawnPosition.class, DefaultSpawnPosition::new,
-        map(0x05, MINECRAFT_1_7_2, true),
-        map(0x43, MINECRAFT_1_9, true),
-        map(0x45, MINECRAFT_1_12, true),
-        map(0x46, MINECRAFT_1_12_1, true),
-        map(0x49, MINECRAFT_1_13, true),
-        map(0x4D, MINECRAFT_1_14, true),
-        map(0x4E, MINECRAFT_1_15, true),
-        map(0x42, MINECRAFT_1_16, true),
-        map(0x4B, MINECRAFT_1_17, true),
-        map(0x4A, MINECRAFT_1_19, true),
-        map(0x4D, MINECRAFT_1_19_1, true),
-        map(0x4C, MINECRAFT_1_19_3, true),
-        map(0x50, MINECRAFT_1_19_4, true),
-        map(0x52, MINECRAFT_1_20_2, true));
       clientbound.register(Transaction.class, Transaction::new,
         map(0x32, MINECRAFT_1_7_2, true),
         map(0x11, MINECRAFT_1_9, true),

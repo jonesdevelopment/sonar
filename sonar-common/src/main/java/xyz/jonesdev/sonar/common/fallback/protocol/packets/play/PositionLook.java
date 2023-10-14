@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
@@ -26,12 +26,17 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class Position implements FallbackPacket {
+public final class PositionLook implements FallbackPacket {
   private double x, y, z;
+  private float yaw, pitch;
+  private int teleportId;
   private boolean onGround;
 
   @Override
@@ -43,21 +48,42 @@ public final class Position implements FallbackPacket {
     }
     y = byteBuf.readDouble();
     z = byteBuf.readDouble();
+    yaw = byteBuf.readFloat();
+    pitch = byteBuf.readFloat();
     onGround = byteBuf.readBoolean();
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    byteBuf.writeDouble(x);
+    byteBuf.writeDouble(y);
+    byteBuf.writeDouble(z);
+    byteBuf.writeFloat(yaw);
+    byteBuf.writeFloat(pitch);
+
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+      byteBuf.writeBoolean(onGround);
+    } else {
+      byteBuf.writeByte(0x00);
+
+      if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
+        writeVarInt(byteBuf, teleportId);
+      }
+
+      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0
+        && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+        byteBuf.writeBoolean(true); // Always dismount vehicle
+      }
+    }
   }
 
   @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 33 : 25;
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 41 : 33;
   }
 
   @Override
   public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 25;
+    return 33;
   }
 }

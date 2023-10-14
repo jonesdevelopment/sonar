@@ -15,28 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 @Getter
 @ToString
-public final class StartUpdate implements FallbackPacket {
+@NoArgsConstructor
+@AllArgsConstructor
+public final class Player implements FallbackPacket {
+  private boolean onGround;
+
+  @Override
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    onGround = byteBuf.readBoolean();
+  }
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-  }
-
-  @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-  }
-
-  @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 0;
+    throw new UnsupportedOperationException();
   }
 }

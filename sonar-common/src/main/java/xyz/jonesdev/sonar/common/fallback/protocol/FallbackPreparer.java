@@ -30,10 +30,10 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionInfo;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.Abilities;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.EmptyChunkData;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.JoinGame;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.UpdateSectionBlocks;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.Abilities;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.EmptyChunkData;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.JoinGame;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.UpdateSectionBlocks;
 
 import java.io.InputStream;
 import java.util.Collections;

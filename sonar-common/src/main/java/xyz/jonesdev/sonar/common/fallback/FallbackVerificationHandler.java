@@ -29,7 +29,7 @@ import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
 
 import java.util.Random;

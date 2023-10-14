@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
@@ -26,38 +26,38 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_14;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
-
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class DefaultSpawnPosition implements FallbackPacket {
-  private int x, y, z;
-  private float angle;
+public final class Position implements FallbackPacket {
+  private double x, y, z;
+  private boolean onGround;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    x = byteBuf.readDouble();
+    // https://github.com/jonesdevelopment/sonar/issues/20
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
-      byteBuf.writeInt(x);
-      byteBuf.writeInt(y);
-      byteBuf.writeInt(z);
-    } else {
-      final long encoded = protocolVersion.compareTo(MINECRAFT_1_14) < 0
-        ? ((x & 0x3FFFFFFL) << 38) | ((y & 0xFFFL) << 26) | (z & 0x3FFFFFFL)
-        : ((x & 0x3FFFFFFL) << 38) | ((y & 0x3FFFFFFL) << 12) | (z & 0xFFFL);
-
-      byteBuf.writeLong(encoded);
-
-      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
-        byteBuf.writeFloat(angle);
-      }
+      byteBuf.skipBytes(8);
     }
+    y = byteBuf.readDouble();
+    z = byteBuf.readDouble();
+    onGround = byteBuf.readBoolean();
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 33 : 25;
+  }
+
+  @Override
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 25;
   }
 }
