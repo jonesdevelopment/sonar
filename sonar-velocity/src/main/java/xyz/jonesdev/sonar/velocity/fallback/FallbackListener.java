@@ -239,7 +239,8 @@ public final class FallbackListener {
           pipeline.replace(
             READ_TIMEOUT,
             READ_TIMEOUT,
-            new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(), TimeUnit.MILLISECONDS)
+            new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(),
+              TimeUnit.MILLISECONDS)
           );
 
           // We need to determine if the player is premium before we handle the connection,

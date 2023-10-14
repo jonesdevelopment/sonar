@@ -271,8 +271,10 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("database",
       "You can connect Sonar to a database to keep verified players even after restarting your server"
-      + LINE_SEPARATOR + "Note: IP addresses are saved in plain text. You are responsible for keeping your database safe!"
-      + LINE_SEPARATOR + "However, IP addresses cannot be traced back to players as Sonar uses UUIDs instead of usernames");
+        + LINE_SEPARATOR + "Note: IP addresses are saved in plain text. You are responsible for keeping your database" +
+        " safe!"
+        + LINE_SEPARATOR + "However, IP addresses cannot be traced back to players as Sonar uses UUIDs instead of " +
+        "usernames");
     generalConfig.getYaml().setComment("database.url",
       "URL for authenticating with the SQL database");
     database.url = generalConfig.getString("database.url", "localhost");
@@ -296,7 +298,7 @@ public final class SonarConfiguration {
     // Lockdown
     generalConfig.getYaml().setComment("lockdown",
       "You can lock your server down using '/sonar lockdown' if, for example,"
-     + LINE_SEPARATOR + "bots are bypassing the verification or any other reason");
+        + LINE_SEPARATOR + "bots are bypassing the verification or any other reason");
     generalConfig.getYaml().setComment("lockdown.enabled",
       "Should Sonar prevent all players from joining the server?");
     lockdown.enabled = generalConfig.getBoolean("lockdown.enabled", false);
@@ -311,13 +313,13 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("lockdown.bypass-permission",
       "Which permission does a player need in order to bypass the lockdown mode?"
-      + LINE_SEPARATOR + "Players with this permission will also receive admin notifications when joining");
+        + LINE_SEPARATOR + "Players with this permission will also receive admin notifications when joining");
     lockdown.bypassPermission = generalConfig.getString("lockdown.bypass-permission", "sonar.lockdown.bypass");
 
     // Queue
     generalConfig.getYaml().setComment("queue",
       "Every new login request will be queued to avoid spam join attacks"
-      + LINE_SEPARATOR + "The queue is updated every 500 milliseconds (10 ticks)");
+        + LINE_SEPARATOR + "The queue is updated every 500 milliseconds (10 ticks)");
     generalConfig.getYaml().setComment("queue.max-polls",
       "Maximum number of concurrent queue polls per 500 milliseconds");
     queue.maxQueuePolls = clamp(generalConfig.getInt("queue.max-polls", 30), 1, 1000);
@@ -325,29 +327,31 @@ public final class SonarConfiguration {
     // Verification
     generalConfig.getYaml().setComment("verification",
       "Every new player that joins for the first time will be sent to"
-      + LINE_SEPARATOR + "a lightweight limbo server where advanced bot checks are performed");
+        + LINE_SEPARATOR + "a lightweight limbo server where advanced bot checks are performed");
     generalConfig.getYaml().setComment("verification.enabled",
       "Should Sonar verify new players? (Recommended)");
     verification.enabled = generalConfig.getBoolean("verification.enabled", true);
 
     generalConfig.getYaml().setComment("verification.checks.gravity",
       "Checks if the players' falling motion is following Minecraft's gravity formula"
-      + LINE_SEPARATOR + "All predicted motions are precalculated in order to save performance");
+        + LINE_SEPARATOR + "All predicted motions are precalculated in order to save performance");
     generalConfig.getYaml().setComment("verification.checks.gravity.enabled",
       "Should Sonar check for valid client gravity? (Recommended)");
     verification.checkGravity = generalConfig.getBoolean("verification.checks.gravity.enabled", true);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-movement-ticks",
       "Maximum number of ticks the player has to fall in order to be allowed to hit the platform");
-    verification.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks", 8), 2, 100);
+    verification.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks", 8),
+      2, 100);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-ignored-ticks",
       "Maximum number of ignored Y movement changes before a player fails verification");
-    verification.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5), 1, 128);
+    verification.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5), 1,
+      128);
 
     generalConfig.getYaml().setComment("verification.checks.collisions",
       "Checks if the players collides with barrier blocks spawned below the player"
-      + LINE_SEPARATOR + "Note: The collision check will be skipped if the gravity check is disabled");
+        + LINE_SEPARATOR + "Note: The collision check will be skipped if the gravity check is disabled");
     generalConfig.getYaml().setComment("verification.checks.collisions.enabled",
       "Should Sonar check for valid client collisions? (Recommended)");
     verification.checkCollisions = generalConfig.getBoolean("verification.checks.collisions.enabled", true);
@@ -838,10 +842,10 @@ public final class SonarConfiguration {
       ))));
     messagesConfig.getYaml().setComment("verbose.animation",
       "Alternative symbols:"
-      + LINE_SEPARATOR + "- ▙"
-      + LINE_SEPARATOR + "- ▛"
-      + LINE_SEPARATOR + "- ▜"
-      + LINE_SEPARATOR + "- ▟");
+        + LINE_SEPARATOR + "- ▙"
+        + LINE_SEPARATOR + "- ▛"
+        + LINE_SEPARATOR + "- ▜"
+        + LINE_SEPARATOR + "- ▟");
     verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation",
       Arrays.asList("◜", "◝", "◞", "◟")
     ));

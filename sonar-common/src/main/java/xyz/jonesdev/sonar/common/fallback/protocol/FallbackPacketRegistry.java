@@ -463,8 +463,8 @@ public enum FallbackPacketRegistry {
   }
 
   private static @NotNull PacketMapping map(final int id,
-                                   final ProtocolVersion version,
-                                   final boolean encodeOnly) {
+                                            final ProtocolVersion version,
+                                            final boolean encodeOnly) {
     return new PacketMapping(id, version, null, encodeOnly);
   }
 }
