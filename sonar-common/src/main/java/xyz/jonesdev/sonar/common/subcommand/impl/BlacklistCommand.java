@@ -49,7 +49,7 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-        final InetAddress inetAddress = checkIP(invocation.getSender(), rawInetAddress);
+        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSender(), rawInetAddress);
         // Make sure the given IP address is valid
         if (inetAddress == null) return;
 
@@ -80,7 +80,7 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-        final InetAddress inetAddress = checkIP(invocation.getSender(), rawInetAddress);
+        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSender(), rawInetAddress);
         // Make sure the given IP address is valid
         if (inetAddress == null) return;
 
