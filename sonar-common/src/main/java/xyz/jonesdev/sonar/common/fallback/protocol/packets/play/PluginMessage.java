@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;

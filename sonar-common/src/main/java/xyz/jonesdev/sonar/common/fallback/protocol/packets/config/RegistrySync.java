@@ -18,24 +18,35 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.handler.codec.EncoderException;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import net.kyori.adventure.nbt.BinaryTagTypes;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.netty.DeferredByteBufHolder;
+
+import java.io.IOException;
 
 @Getter
 @ToString
-public final class RegistrySync extends DeferredByteBufHolder implements FallbackPacket {
-
-  public RegistrySync() {
-    super(null);
-  }
+@NoArgsConstructor
+@AllArgsConstructor
+public final class RegistrySync implements FallbackPacket {
+  private CompoundBinaryTag dimensionRegistry;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    replace(byteBuf.readRetainedSlice(byteBuf.readableBytes()));
+    try (final ByteBufOutputStream stream = new ByteBufOutputStream(byteBuf)) {
+      stream.writeByte(10); // CompoundTag ID
+      BinaryTagTypes.COMPOUND.write(dimensionRegistry, stream);
+    } catch (IOException exception) {
+      throw new EncoderException("Cannot write NBT CompoundTag");
+    }
   }
 
   @Override

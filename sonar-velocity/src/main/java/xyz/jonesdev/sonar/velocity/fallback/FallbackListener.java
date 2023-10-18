@@ -48,7 +48,8 @@ import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.ServerLoginSuccess;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import xyz.jonesdev.sonar.velocity.fallback.dummy.DummyConnection;
@@ -239,7 +240,8 @@ public final class FallbackListener {
           pipeline.replace(
             READ_TIMEOUT,
             READ_TIMEOUT,
-            new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(), TimeUnit.MILLISECONDS)
+            new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(),
+              TimeUnit.MILLISECONDS)
           );
 
           // We need to determine if the player is premium before we handle the connection,
@@ -321,10 +323,11 @@ public final class FallbackListener {
           fallbackPlayer.getPipeline().replace(MINECRAFT_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
 
           // Send LoginSuccess packet to make the client think they are joining the server
-          fallbackPlayer.write(new ServerLoginSuccess(gameProfile.getName(), gameProfile.getId()));
+          fallbackPlayer.write(new LoginSuccess(gameProfile.getName(), gameProfile.getId()));
 
           // The LoginSuccess packet has been sent, now we can change the registry state
-          encoder.loginSuccess();
+          encoder.updateRegistry(fallbackPlayer.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
+            ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
 
           // Replace normal decoder to allow custom packets
           fallbackPlayer.getPipeline().replace(

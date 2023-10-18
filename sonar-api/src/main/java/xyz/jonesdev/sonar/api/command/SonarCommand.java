@@ -88,7 +88,7 @@ public interface SonarCommand {
       }
       component = component
         .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-        "/sonar " + sub.getInfo().name() + " "))
+          "/sonar " + sub.getInfo().name() + " "))
         .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponent));
       CACHED_HELP_MESSAGE.add(component);
     });

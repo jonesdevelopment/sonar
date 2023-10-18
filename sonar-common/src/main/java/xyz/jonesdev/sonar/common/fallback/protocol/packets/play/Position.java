@@ -15,25 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.kyori.adventure.key.Key;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.readKeyArray;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class ActiveFeatures implements FallbackPacket {
-  private Key[] activeFeatures;
+public final class Position implements FallbackPacket {
+  private double x, y, z;
+  private boolean onGround;
+
+  @Override
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    x = byteBuf.readDouble();
+    // https://github.com/jonesdevelopment/sonar/issues/20
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.skipBytes(8);
+    }
+    y = byteBuf.readDouble();
+    z = byteBuf.readDouble();
+    onGround = byteBuf.readBoolean();
+  }
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -41,7 +52,12 @@ public final class ActiveFeatures implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    activeFeatures = readKeyArray(byteBuf);
+  public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 33 : 25;
+  }
+
+  @Override
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 25;
   }
 }

@@ -15,28 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.LongArrayBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import java.util.BitSet;
-
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeArray;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeCompoundTag;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
-// Partially taken from
-// https://github.com/Leymooo/BungeeCord/blob/master/protocol/src/main/java/ru/leymooo/botfilter/packets/EmptyChunkPacket.java
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class EmptyChunkData implements FallbackPacket {
@@ -47,35 +45,21 @@ public final class EmptyChunkData implements FallbackPacket {
 
   private static final byte[] LEGACY_FILLER_BYTES_17 = new byte[2];
   private static final byte[] LEGACY_FILLER_BYTES = new byte[256];
-  private static final byte[] MODERN_FILLER_BYTES = new byte[1024];
-
-  private static final long[] MASK;
+  private static final byte[] MODERN_FILLER_BYTES = new byte[256 * 4];
 
   // Prepare nbt for 1.18 and pre-1.18
   private static final CompoundBinaryTag MODERN_TAG, LEGACY_TAG;
 
   static {
-    final BitSet bitSet = new BitSet();
-
-    for (int i = 0; i < 16; i++) {
-      bitSet.set(i, false);
-    }
-
-    MASK = bitSet.toLongArray();
-
     MODERN_TAG = prepareNBT(false);
     LEGACY_TAG = prepareNBT(true);
   }
 
   private static @NotNull CompoundBinaryTag prepareNBT(final boolean legacy) {
-    final long[] arrayData = new long[legacy ? 36 : 37];
-    final LongArrayBinaryTag longArray = LongArrayBinaryTag.longArrayBinaryTag(arrayData);
-
-    final CompoundBinaryTag motion = CompoundBinaryTag.builder()
-      .put("MOTION_BLOCKING", longArray)
-      .build();
     return CompoundBinaryTag.builder()
-      .put("root", motion)
+      .put("root", CompoundBinaryTag.builder()
+        .put("MOTION_BLOCKING", LongArrayBinaryTag.longArrayBinaryTag(new long[legacy ? 36 : 37]))
+        .build())
       .build();
   }
 
@@ -84,26 +68,21 @@ public final class EmptyChunkData implements FallbackPacket {
     byteBuf.writeInt(x);
     byteBuf.writeInt(z);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) >= 0) {
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17_1) <= 0) {
-        writeVarInt(byteBuf, MASK.length);
-
-        for (final long l : MASK) {
-          byteBuf.writeLong(l);
-        }
-      }
+    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0
+      && protocolVersion.compareTo(MINECRAFT_1_17_1) <= 0) {
+      writeVarInt(byteBuf, 0); // mask
     } else {
-      byteBuf.writeBoolean(true); // Full chunk
+      byteBuf.writeBoolean(true); // full chunk
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16) >= 0
-        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) < 0) {
-        byteBuf.writeBoolean(true); // Ignore old data
+      if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
+        && protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
+        byteBuf.writeBoolean(true); // ignore old data
       }
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) > 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
         writeVarInt(byteBuf, 0);
       } else {
-        byteBuf.writeShort(1); // Fix void chunk
+        byteBuf.writeShort(1); // fix void chunk
       }
     }
 
@@ -129,7 +108,7 @@ public final class EmptyChunkData implements FallbackPacket {
       if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
         writeArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
       } else {
-        byteBuf.writeInt(0); // Compressed size
+        byteBuf.writeInt(0); // compressed size
         byteBuf.writeBytes(LEGACY_FILLER_BYTES_17); // 1.7
       }
     } else if (protocolVersion.compareTo(MINECRAFT_1_15) < 0) {

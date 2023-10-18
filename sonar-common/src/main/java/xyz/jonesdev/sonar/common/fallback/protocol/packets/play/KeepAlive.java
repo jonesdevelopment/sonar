@@ -15,32 +15,48 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_12_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class TeleportConfirm implements FallbackPacket {
-  private int teleportId;
+public final class KeepAlive implements FallbackPacket {
+  private long id;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
+      byteBuf.writeLong(id);
+    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+      writeVarInt(byteBuf, (int) id);
+    } else {
+      byteBuf.writeInt((int) id);
+    }
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    teleportId = readVarInt(byteBuf);
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
+      id = byteBuf.readLong();
+    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+      id = readVarInt(byteBuf);
+    } else {
+      id = byteBuf.readInt();
+    }
   }
 }

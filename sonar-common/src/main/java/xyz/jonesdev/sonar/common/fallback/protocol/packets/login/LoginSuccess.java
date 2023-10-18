@@ -15,53 +15,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.login;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.netty.FastUUID;
 
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeUUID;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class Chat implements FallbackPacket {
-  private static final UUID PLACEHOLDER_UUID = new UUID(0L, 0L);
-  private Component component;
-  private byte position;
+public final class LoginSuccess implements FallbackPacket {
+  private String username;
+  private UUID uuid;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    final String serialized = JSONComponentSerializer.json().serialize(component);
-    writeString(byteBuf, serialized);
-
-    // Message type
-    if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-      byteBuf.writeBoolean(position == 2);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeVarInt(byteBuf, position);
+    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
+      writeUUID(byteBuf, uuid);
+    } else if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
+      writeUUIDIntArray(byteBuf, uuid);
+    } else if (protocolVersion.compareTo(MINECRAFT_1_7_6) >= 0) {
+      writeString(byteBuf, uuid.toString());
     } else {
-      byteBuf.writeByte(this.position);
+      writeString(byteBuf, FastUUID.toString(uuid));
     }
 
-    // UUID
-    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_19) < 0) {
-      writeUUID(byteBuf, PLACEHOLDER_UUID);
+    writeString(byteBuf, username);
+
+    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
+      writeVarInt(byteBuf, 0); // properties
     }
   }
 

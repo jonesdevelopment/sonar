@@ -15,51 +15,42 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.netty.FastUUID;
 
-import java.util.UUID;
+import java.util.Objects;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
 
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class ServerLoginSuccess implements FallbackPacket {
-  private String username;
-  private UUID uuid;
+public final class Disconnect implements FallbackPacket {
+  private @Nullable String reason;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeUUID(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
-      writeUUIDIntArray(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_7_6) >= 0) {
-      writeString(byteBuf, uuid.toString());
-    } else {
-      writeString(byteBuf, FastUUID.toString(uuid));
-    }
-
-    writeString(byteBuf, username);
-
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeVarInt(byteBuf, 0); // properties
-    }
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    writeString(byteBuf, Objects.requireNonNull(reason));
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
+  }
+
+  public static @NotNull Disconnect create(final Component component) {
+    return new Disconnect(JSONComponentSerializer.json().serialize(component));
   }
 }

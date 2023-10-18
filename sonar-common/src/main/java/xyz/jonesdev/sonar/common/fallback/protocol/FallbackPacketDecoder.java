@@ -25,9 +25,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.CONFIG;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
@@ -38,13 +38,13 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   public FallbackPacketDecoder(final @NotNull FallbackUser<?, ?> user,
                                final @NotNull FallbackPacketListener listener) {
     this.user = user;
-    this.registry = (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME)
+    this.registry = (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME)
       .getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
     this.listener = listener;
   }
 
-  public void switchToGameState() {
-    this.registry = GAME.getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
+  public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
+    this.registry = registry.getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
   }
 
   @Override

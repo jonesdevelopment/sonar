@@ -30,10 +30,12 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionInfo;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.Abilities;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.EmptyChunkData;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.JoinGame;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.UpdateSectionBlocks;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistrySync;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.Abilities;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.EmptyChunkData;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.JoinGame;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.UpdateSectionBlocks;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -43,10 +45,6 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 
 @UtilityClass
 public class FallbackPreparer {
-  private final DimensionInfo DIMENSION = new DimensionInfo(
-    "minecraft:overworld",
-    "sonar", false, false
-  );
 
   // Mappings
   private final CompoundBinaryTag CHAT_TYPE_119;
@@ -61,25 +59,32 @@ public class FallbackPreparer {
     DAMAGE_TYPE_120 = getMapping("damage_type_1_20.nbt");
   }
 
+  // Abilities
+  public final FallbackPacket DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
+  // Chunks
+  public final FallbackPacket EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
+  // Finish Configuration
+  public final FallbackPacket FINISH_CONFIGURATION = new FinishConfiguration();
+  // Registry Sync
+  public FallbackPacket synchronizeRegistry;
+
   // JoinGame
-  private JoinGame legacyJoinGame;
-  private JoinGame joinGame116;
-  private JoinGame joinGame1162;
-  private JoinGame joinGame1182;
-  private JoinGame joinGame1191;
-  private JoinGame joinGame1194;
+  private FallbackPacket legacyJoinGame;
+  private FallbackPacket joinGame116;
+  private FallbackPacket joinGame1162;
+  private FallbackPacket joinGame1182;
+  private FallbackPacket joinGame1191;
+  private FallbackPacket joinGame1194;
   private JoinGame joinGame120;
 
-  // Abilities
-  public final Abilities DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
-
-  // Chunks
-  public final EmptyChunkData EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
+  // Dimension
+  private final DimensionInfo DIMENSION = new DimensionInfo(
+    "minecraft:overworld", "sonar", false, false);
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (max)
-  private final int SPAWN_BUFFER = 10; // player spawns at 255 + 10 (10 blocks above the platform)
-  public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is max
+  private final int SPAWN_BUFFER = 5; // player spawns at 255 + 5 (5 blocks above the platform)
+  public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
 
   public UpdateSectionBlocks UPDATE_SECTION_BLOCKS;
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
@@ -98,6 +103,7 @@ public class FallbackPreparer {
     joinGame1191 = createJoinGamePacket(MINECRAFT_1_19_1);
     joinGame1194 = createJoinGamePacket(MINECRAFT_1_19_4);
     joinGame120 = createJoinGamePacket(MINECRAFT_1_20);
+    synchronizeRegistry = new RegistrySync(joinGame120.getRegistry());
 
     maxMovementTick = Sonar.get().getConfig().getVerification().getMaxMovementTicks();
     maxPredictionTick = maxMovementTick + 10;
@@ -145,9 +151,9 @@ public class FallbackPreparer {
     }
   }
 
-  public static JoinGame getJoinPacketForVersion(final @NotNull ProtocolVersion protocolVersion) {
+  public static FallbackPacket getJoinPacketForVersion(final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
-      return legacyJoinGame; // 1.7-1.15.2
+      return legacyJoinGame; // 1.7.2-1.15.2
     }
     if (protocolVersion.compareTo(MINECRAFT_1_16_1) <= 0) {
       return joinGame116; // 1.16-1.16.1
@@ -161,13 +167,10 @@ public class FallbackPreparer {
     if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
       return joinGame1191; // 1.19.1-1.19.3
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_19_4) <= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_19_4) == 0) {
       return joinGame1194; // 1.19.4
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_20) <= 0) {
-      return joinGame120; // 1.20-1.20.1
-    }
-    throw new IllegalStateException("Unsupported protocol version");
+    return joinGame120; // 1.20-latest
   }
 
   // Partially taken from
@@ -180,7 +183,7 @@ public class FallbackPreparer {
     joinGame.setDimension(0);
     joinGame.setReducedDebugInfo(true);
 
-    // 1.7/1.8 don't need dimension information
+    // 1.7.2-1.8.9 don't need any dimension information
     if (protocolVersion.compareTo(MINECRAFT_1_8) <= 0) {
       return joinGame;
     }

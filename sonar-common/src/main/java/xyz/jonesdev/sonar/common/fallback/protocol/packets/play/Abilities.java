@@ -15,28 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 @Getter
 @ToString
-public final class FinishedUpdate implements FallbackPacket {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Abilities implements FallbackPacket {
+  private byte encodedFlags;
+  private float flySpeed, walkSpeed;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    byteBuf.writeByte(encodedFlags);
+    byteBuf.writeFloat(flySpeed);
+    byteBuf.writeFloat(walkSpeed);
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-  }
-
-  @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 0;
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    encodedFlags = byteBuf.readByte();
+    flySpeed = byteBuf.readFloat();
+    walkSpeed = byteBuf.readFloat();
   }
 }
