@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -35,10 +36,8 @@ import java.util.stream.Collectors;
 public abstract class Subcommand {
   private final @NotNull SubcommandInfo info;
   private final String permission, aliases, arguments;
+
   protected static final Sonar SONAR = Sonar.get();
-  protected static final Pattern IP_PATTERN = Pattern.compile(
-    "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])([.])){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
-  );
 
   public Subcommand() {
     info = getClass().getAnnotation(SubcommandInfo.class);
@@ -52,8 +51,14 @@ public abstract class Subcommand {
       .collect(Collectors.joining(", "));
   }
 
-  protected static @Nullable InetAddress checkIP(final InvocationSource source, final String rawIP) {
-    if (!IP_PATTERN.matcher(rawIP).matches()) {
+  // https://stackoverflow.com/questions/5284147/validating-ipv4-addresses-with-regexp
+  private static final Pattern IP_PATTERN = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
+
+  protected static @Nullable InetAddress getInetAddressIfValid(final InvocationSource source, final String rawIP) {
+    // We perform a regex check beforehand,
+    // so we don't have to create a new InetAddress,
+    // therefore, potentially saving some performance.
+    if (!IP_PATTERN.matcher(Objects.requireNonNull(rawIP)).matches()) {
       source.sendMessage(SONAR.getConfig().getCommands().getIncorrectIpAddress());
       return null;
     }
