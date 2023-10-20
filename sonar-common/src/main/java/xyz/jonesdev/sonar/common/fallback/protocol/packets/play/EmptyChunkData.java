@@ -34,9 +34,9 @@ import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeCompo
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(of = {"x", "z"})
 public final class EmptyChunkData implements FallbackPacket {
   private int x, z;
 
@@ -56,10 +56,14 @@ public final class EmptyChunkData implements FallbackPacket {
   }
 
   private static @NotNull CompoundBinaryTag prepareNBT(final boolean legacy) {
+    final long[] arrayData = new long[legacy ? 36 : 37];
+    final LongArrayBinaryTag longArray = LongArrayBinaryTag.longArrayBinaryTag(arrayData);
+
+    final CompoundBinaryTag motion = CompoundBinaryTag.builder()
+      .put("MOTION_BLOCKING", longArray)
+      .build();
     return CompoundBinaryTag.builder()
-      .put("root", CompoundBinaryTag.builder()
-        .put("MOTION_BLOCKING", LongArrayBinaryTag.longArrayBinaryTag(new long[legacy ? 36 : 37]))
-        .build())
+      .put("root", motion)
       .build();
   }
 

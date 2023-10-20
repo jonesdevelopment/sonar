@@ -22,12 +22,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionInfo;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
@@ -57,133 +57,131 @@ public final class JoinGame implements FallbackPacket {
   // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/packets/play/PacketJoinGame.java
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0) {
+      // haha funny, they made 1.20.2 more complicated
+      encode1202Up(byteBuf, protocolVersion);
+    } else if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16) >= 0) {
+      // Minecraft 1.16 and above have significantly more complicated logic for reading this packet,
+      // so separate it out.
+      encode116Up(byteBuf, protocolVersion);
+    } else {
+      encodeLegacy(byteBuf, protocolVersion);
+    }
+  }
+
+  private void encodeLegacy(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     byteBuf.writeInt(entityId);
-
-    if (protocolVersion.compareTo(MINECRAFT_1_9) <= 0) {
-      byteBuf.writeByte(gamemode);
-      byteBuf.writeByte(dimension);
-      byteBuf.writeByte(0); // difficulty
-      byteBuf.writeByte(1); // max players
-      writeString(byteBuf, "flat"); // level type
-
-      if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-        byteBuf.writeBoolean(reducedDebugInfo);
-      }
-    }
-
-    if (protocolVersion.compareTo(MINECRAFT_1_9_1) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_13_2) <= 0) {
-      byteBuf.writeByte(gamemode);
-      byteBuf.writeInt(dimension);
-      byteBuf.writeByte(0); // difficulty
-      byteBuf.writeByte(1); // max players
-      writeString(byteBuf, "flat"); // level type
-      byteBuf.writeBoolean(reducedDebugInfo);
-    }
-
-    if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_14_4) <= 0) {
-      byteBuf.writeByte(gamemode);
-      byteBuf.writeInt(dimension);
-      byteBuf.writeByte(1); // max players
-      writeString(byteBuf, "flat"); // level type
-      writeVarInt(byteBuf, viewDistance);
-      byteBuf.writeBoolean(reducedDebugInfo);
-    }
-
-    if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
-      byteBuf.writeByte(gamemode);
-      byteBuf.writeInt(dimension);
-      byteBuf.writeLong(partialHashedSeed);
-      byteBuf.writeByte(1); // max players
-      writeString(byteBuf, "flat"); // level type
-      writeVarInt(byteBuf, viewDistance);
-      byteBuf.writeBoolean(reducedDebugInfo);
-      byteBuf.writeBoolean(showRespawnScreen);
-    }
-
-    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_16_1) <= 0) {
-      byteBuf.writeByte(gamemode);
-      byteBuf.writeByte(previousGamemode);
-      writeStringArray(byteBuf, levelNames);
-      writeCompoundTag(byteBuf, registry);
-      writeString(byteBuf, dimensionInfo.getIdentifier());
-      writeString(byteBuf, dimensionInfo.getLevelName());
-      byteBuf.writeLong(partialHashedSeed);
-      byteBuf.writeByte(1); // max players
-      writeVarInt(byteBuf, viewDistance);
-      byteBuf.writeBoolean(reducedDebugInfo);
-      byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(dimensionInfo.isDebug());
-      byteBuf.writeBoolean(dimensionInfo.isFlat());
-    }
-
-    if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_18_2) <= 0) {
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
       byteBuf.writeBoolean(isHardcore);
       byteBuf.writeByte(gamemode);
-      byteBuf.writeByte(previousGamemode);
-      writeStringArray(byteBuf, levelNames);
-      writeCompoundTag(byteBuf, registry);
+    } else {
+      byteBuf.writeByte(isHardcore ? gamemode | 0x8 : gamemode);
+    }
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_9_1) >= 0) {
+      byteBuf.writeInt(dimension);
+    } else {
+      byteBuf.writeByte(dimension);
+    }
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_13_2) <= 0) {
+      byteBuf.writeByte(difficulty);
+    }
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_15) >= 0) {
+      byteBuf.writeLong(partialHashedSeed);
+    }
+    byteBuf.writeByte(1); // max players
+    if (levelType == null) {
+      throw new IllegalStateException("No level type specified.");
+    }
+    writeString(byteBuf, levelType);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_14) >= 0) {
+      writeVarInt(byteBuf, viewDistance);
+    }
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) >= 0) {
+      byteBuf.writeBoolean(reducedDebugInfo);
+    }
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_15) >= 0) {
+      byteBuf.writeBoolean(showRespawnScreen);
+    }
+  }
+
+  private void encode116Up(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    byteBuf.writeInt(entityId);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+      byteBuf.writeBoolean(isHardcore);
+      byteBuf.writeByte(gamemode);
+    } else {
+      byteBuf.writeByte(isHardcore ? gamemode | 0x8 : gamemode);
+    }
+    byteBuf.writeByte(previousGamemode);
+
+    writeStringArray(byteBuf, levelNames);
+    writeCompoundTag(byteBuf, registry);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0
+      && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) < 0) {
       writeCompoundTag(byteBuf, currentDimensionData);
       writeString(byteBuf, dimensionInfo.getIdentifier());
-      byteBuf.writeLong(partialHashedSeed);
-      writeVarInt(byteBuf, 1); // max players
-      writeVarInt(byteBuf, viewDistance);
-      if (protocolVersion.compareTo(MINECRAFT_1_18) >= 0) {
-        writeVarInt(byteBuf, viewDistance); // simulation distance
-      }
-      byteBuf.writeBoolean(reducedDebugInfo);
-      byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(dimensionInfo.isDebug());
-      byteBuf.writeBoolean(dimensionInfo.isFlat());
-    }
-
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_20) <= 0) {
-      byteBuf.writeBoolean(isHardcore);
-      byteBuf.writeByte(gamemode);
-      byteBuf.writeByte(previousGamemode);
-      writeStringArray(byteBuf, levelNames);
-      writeCompoundTag(byteBuf, registry);
+    } else {
       writeString(byteBuf, dimensionInfo.getIdentifier());
       writeString(byteBuf, dimensionInfo.getLevelName());
-      byteBuf.writeLong(partialHashedSeed);
-      writeVarInt(byteBuf, 1); // max players
-      writeVarInt(byteBuf, viewDistance);
-      writeVarInt(byteBuf, viewDistance); // simulation distance
-      byteBuf.writeBoolean(reducedDebugInfo);
-      byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(dimensionInfo.isDebug());
-      byteBuf.writeBoolean(dimensionInfo.isFlat());
-      byteBuf.writeBoolean(false); // last death location
-
-      if (protocolVersion.compareTo(MINECRAFT_1_20) == 0) {
-        writeVarInt(byteBuf, 0); // portal cooldown
-      }
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0) {
-      byteBuf.writeBoolean(isHardcore);
-      writeStringArray(byteBuf, levelNames);
-      writeVarInt(byteBuf, 1); // max players
-      writeVarInt(byteBuf, viewDistance);
-      writeVarInt(byteBuf, viewDistance); // simulation distance
-      byteBuf.writeBoolean(reducedDebugInfo);
-      byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(limitedCrafting);
-      writeString(byteBuf, dimensionInfo.getIdentifier());
-      writeString(byteBuf, dimensionInfo.getLevelName());
-      byteBuf.writeLong(partialHashedSeed);
-      byteBuf.writeByte(gamemode);
-      byteBuf.writeByte(previousGamemode);
-      byteBuf.writeBoolean(dimensionInfo.isDebug());
-      byteBuf.writeBoolean(dimensionInfo.isFlat());
-      byteBuf.writeBoolean(false); // last death location
+    byteBuf.writeLong(partialHashedSeed);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_16_2) >= 0) {
+      writeVarInt(byteBuf, 0); // max players
+    } else {
+      byteBuf.writeByte(0); // max players
+    }
+
+    writeVarInt(byteBuf, viewDistance);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_18) >= 0) {
+      writeVarInt(byteBuf, simulationDistance);
+    }
+
+    byteBuf.writeBoolean(reducedDebugInfo);
+    byteBuf.writeBoolean(showRespawnScreen);
+
+    byteBuf.writeBoolean(dimensionInfo.isDebug());
+    byteBuf.writeBoolean(dimensionInfo.isFlat());
+
+    // optional death location
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0) {
+      byteBuf.writeBoolean(false); // no last death position
+    }
+
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20) >= 0) {
       writeVarInt(byteBuf, 0); // portal cooldown
     }
+  }
+
+  private void encode1202Up(final @NotNull ByteBuf byteBuf,
+                            final @SuppressWarnings("unused") ProtocolVersion protocolVersion) {
+    byteBuf.writeInt(entityId);
+    byteBuf.writeBoolean(isHardcore);
+
+    writeStringArray(byteBuf, levelNames);
+
+    writeVarInt(byteBuf, 1); // max players
+
+    writeVarInt(byteBuf, viewDistance);
+    writeVarInt(byteBuf, simulationDistance);
+
+    byteBuf.writeBoolean(reducedDebugInfo);
+    byteBuf.writeBoolean(showRespawnScreen);
+    byteBuf.writeBoolean(limitedCrafting);
+
+    writeString(byteBuf, dimensionInfo.getIdentifier());
+    writeString(byteBuf, dimensionInfo.getLevelName());
+    byteBuf.writeLong(partialHashedSeed);
+
+    byteBuf.writeByte(gamemode);
+    byteBuf.writeByte(previousGamemode);
+
+    byteBuf.writeBoolean(dimensionInfo.isDebug());
+    byteBuf.writeBoolean(dimensionInfo.isFlat());
+
+    byteBuf.writeBoolean(false); // no last death position
+
+    writeVarInt(byteBuf, 0); // portal cooldown
   }
 
   @Override
