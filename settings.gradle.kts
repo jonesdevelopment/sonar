@@ -1,4 +1,4 @@
-rootProject.name = "Sonar"
+rootProject.name = "sonar"
 
 sequenceOf("api", "bukkit", "bungee", "common", "velocity").forEach {
   val path = "sonar-$it"
