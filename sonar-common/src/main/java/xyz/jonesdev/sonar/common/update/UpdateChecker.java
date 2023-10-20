@@ -38,24 +38,39 @@ public class UpdateChecker {
     }
   };
 
+  private int convertVersion(final @NotNull String version) throws NumberFormatException, IllegalStateException {
+    final String[] convertedParts = version.split("\\.");
+    // Validate the length of the converted parts
+    if (convertedParts.length != 3) {
+      throw new IllegalStateException("Converted version length mismatch");
+    }
+    // Major updates are more important than minor updates,
+    // and minor updates are more important than patches.
+    final int convertedMajor = Integer.parseInt(convertedParts[0]) * 100000; // multiply by weight
+    final int convertedMinor = Integer.parseInt(convertedParts[1]) * 10000; // multiply by weight
+    final int patch = Integer.parseInt(convertedParts[2]);
+    return convertedMajor + convertedMinor + patch; // sum the converted version parts
+  }
+
   public void checkForUpdates() {
     ASYNC_EXECUTOR.execute(() -> {
       try {
         final URL url = new URL("https://api.github.com/repos/jonesdevelopment/sonar/releases/latest");
         final HttpsURLConnection urlConnection = prepareConnection(url);
         final JsonObject json = parseJson(urlConnection.getInputStream());
-        final String latestStableVersion = json.get("tag_name").getAsString();
+        final String latestStableRelease = json.get("tag_name").getAsString();
+        final int convertedLatestVersion = convertVersion(latestStableRelease);
+        final int convertedCurrentVersion = convertVersion(Sonar.get().getVersion().getSemanticVersion());
 
-        if (!latestStableVersion.equals(Sonar.get().getVersion().getSemanticVersion())) {
-          LOGGER.warn("A new version of Sonar is available: {}", latestStableVersion);
+        if (convertedCurrentVersion < convertedLatestVersion) {
+          LOGGER.warn("A new version of Sonar is available: {}", latestStableRelease);
           LOGGER.warn("Please make sure to update to the latest version to ensure stability and security:");
-          LOGGER.warn("https://github.com/jonesdevelopment/sonar/releases");
-        } else if (Sonar.get().getVersion().isOnMainBranch()) {
-          LOGGER.info("You are currently using the latest stable release of Sonar!");
+          LOGGER.warn("https://github.com/jonesdevelopment/sonar/releases/tag/{}", latestStableRelease);
+        } else if (convertedCurrentVersion > convertedLatestVersion || !Sonar.get().getVersion().isOnMainBranch()) {
+          LOGGER.warn("You are currently using an unreleased version of Sonar!");
+          LOGGER.warn("The contributors of Sonar are not responsible for any damage done by using an unstable version");
         } else {
-          LOGGER.warn("You are currently using the latest development version of Sonar!");
-          LOGGER.warn("The contributors of Sonar are not responsible for any damage done by using an unstable version" +
-            ".");
+          LOGGER.info("You are currently using the latest stable release of Sonar!");
         }
       } catch (Exception exception) {
         LOGGER.warn("Could not retrieve latest version information: {}", exception);
