@@ -15,15 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bukkit.command;
+package xyz.jonesdev.sonar.velocity.audience;
 
-import org.bukkit.command.CommandSender;
+import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.command.InvocationSource;
-import xyz.jonesdev.sonar.bukkit.SonarBukkit;
+import xyz.jonesdev.sonar.api.Sonar;
 
-public final class BukkitInvocationSource extends InvocationSource {
-  public BukkitInvocationSource(final @NotNull CommandSender sender) {
-    super(sender.getName(), SonarBukkit.INSTANCE.getBukkitAudiences().sender(sender));
+public final class AudienceListener {
+
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final @NotNull PostLoginEvent event) {
+    Sonar.get().getVerboseHandler().getAudiences().put(event.getPlayer().getUsername(), event.getPlayer());
+  }
+
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final @NotNull DisconnectEvent event) {
+    Sonar.get().getVerboseHandler().getAudiences().remove(event.getPlayer().getUsername());
   }
 }

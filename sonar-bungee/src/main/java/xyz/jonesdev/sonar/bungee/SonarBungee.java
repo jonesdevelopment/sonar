@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.bungee;
 
 import lombok.Getter;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
@@ -25,12 +26,12 @@ import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
+import xyz.jonesdev.sonar.bungee.audience.AudienceListener;
 import xyz.jonesdev.sonar.bungee.command.BungeeInvocationSource;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
-import xyz.jonesdev.sonar.bungee.verbose.VerboseWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.Optional;
@@ -42,9 +43,14 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   public static SonarBungee INSTANCE;
 
   public SonarBungee(final @NotNull SonarBungeePlugin plugin) {
-    super(plugin, plugin.getDataFolder(), new VerboseWrapper(plugin.getServer()));
+    super(plugin, plugin.getDataFolder());
     INSTANCE = this;
   }
+
+  /**
+   * Wrapper for BungeeCord audiences
+   */
+  private final BungeeAudiences bungeeAudiences = BungeeAudiences.create(getPlugin());
 
   /**
    * Create a wrapper for the plugin logger, so we can use it outside
@@ -98,6 +104,9 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     // Register Fallback listener
     getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new FallbackListener(getFallback()));
+
+    // Register audience register listener
+    getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new AudienceListener());
 
     // Register Fallback queue task
     getPlugin().getServer().getScheduler().schedule(getPlugin(), getFallback().getQueue()::poll,

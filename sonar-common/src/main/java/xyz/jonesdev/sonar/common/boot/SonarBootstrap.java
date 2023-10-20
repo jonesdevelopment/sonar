@@ -52,15 +52,14 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private final SystemTimer launchTimer = new SystemTimer();
 
   public SonarBootstrap(final @NotNull T plugin,
-                        final File dataDirectory,
-                        final Verbose verboseHandler) {
+                        final File dataDirectory) {
     // Set the API to this instance so the config doesn't have issues
     SonarSupplier.set(this);
 
     // Set the plugin instance before anything else
     this.plugin = plugin;
     this.dataDirectory = dataDirectory;
-    this.verboseHandler = verboseHandler;
+    this.verboseHandler = new Verbose();
     this.config = new SonarConfiguration(dataDirectory);
     this.subcommandRegistry = new SubcommandRegistryHolder();
   }

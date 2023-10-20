@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api.verbose;
 
 import lombok.Getter;
 import lombok.val;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
@@ -28,21 +29,24 @@ import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.INCOMING;
 import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.OUTGOING;
 
 @Getter
-public abstract class Verbose implements JVMProfiler {
-  protected final @NotNull Collection<String> subscribers = new Vector<>(0);
+public final class Verbose implements JVMProfiler {
+  private final @NotNull Collection<String> subscribers = new Vector<>(0);
+  private final @NotNull Map<String, Audience> audiences = new ConcurrentHashMap<>();
   private final SystemTimer secondTimer = new SystemTimer();
-  protected int joinsPerSecond, totalJoins;
+  private int joinsPerSecond, totalJoins;
   private int lastTotalJoins, animationIndex;
 
   // Run action bar verbose
-  public final void update() {
+  public void update() {
     // Clean up all blacklisted IPs
     Sonar.get().getFallback().getBlacklisted().cleanUp(false);
 
@@ -55,11 +59,19 @@ public abstract class Verbose implements JVMProfiler {
       lastTotalJoins = totalJoins;
     }
 
+    // Don't prepare component if there are no subscribers
+    if (subscribers.isEmpty()) return;
+    // Prepare the action bar format component
+    final Component component = prepareActionBarFormat();
     // Send the action bar to all online players
-    broadcast(prepareActionBarFormat());
+    for (final String subscriber : subscribers) {
+      final Audience audience = audiences.get(subscriber);
+      if (audience == null) continue;
+      audience.sendActionBar(component);
+    }
   }
 
-  protected @NotNull Component prepareActionBarFormat() {
+  public @NotNull Component prepareActionBarFormat() {
     return MiniMessage.miniMessage().deserialize(Sonar.get().getConfig().getVerbose().getActionBarLayout()
       .replace("%queued%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
@@ -83,34 +95,31 @@ public abstract class Verbose implements JVMProfiler {
       .replace("%animation%", nextAnimation()));
   }
 
-  protected final String nextAnimation() {
+  public String nextAnimation() {
     val animations = Sonar.get().getConfig().getVerbose().getAnimation();
     final int nextIndex = ++animationIndex % animations.size();
     return animations.toArray(new String[0])[nextIndex];
   }
 
-  // Run action bar verbose
-  protected abstract void broadcast(final Component component);
-
   /**
-   * @param subscriber Name of the player who subscribed
-   * @return Whether the player is subscribed or not
+   * @param name Name of the audience
+   * @return Whether the audience is subscribed or not
    */
-  public final boolean isSubscribed(final @NotNull String subscriber) {
-    return subscribers.contains(subscriber);
+  public boolean isSubscribed(final @NotNull String name) {
+    return subscribers.contains(name);
   }
 
   /**
-   * @param subscriber Name of the player to subscribe
+   * @param name Name of the audience to subscribe
    */
-  public final void subscribe(final @NotNull String subscriber) {
-    subscribers.add(subscriber);
+  public void subscribe(final String name) {
+    subscribers.add(name);
   }
 
   /**
-   * @param subscriber Name of the player to unsubscribe
+   * @param name Name of the audience to unsubscribe
    */
-  public final void unsubscribe(final @NotNull String subscriber) {
-    subscribers.remove(subscriber);
+  public void unsubscribe(final String name) {
+    subscribers.remove(name);
   }
 }

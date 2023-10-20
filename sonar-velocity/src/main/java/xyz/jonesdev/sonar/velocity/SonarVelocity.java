@@ -25,10 +25,10 @@ import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
+import xyz.jonesdev.sonar.velocity.audience.AudienceListener;
 import xyz.jonesdev.sonar.velocity.command.VelocityInvocationSource;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
-import xyz.jonesdev.sonar.velocity.verbose.VerboseWrapper;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +38,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
   public static SonarVelocity INSTANCE;
 
   public SonarVelocity(final @NotNull SonarVelocityPlugin plugin) {
-    super(plugin, plugin.getDataDirectory().toFile(), new VerboseWrapper(plugin.getServer()));
+    super(plugin, plugin.getDataDirectory().toFile());
     INSTANCE = this;
   }
 
@@ -94,6 +94,9 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
     // Register Fallback listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackListener(getFallback()));
+
+    // Register audience register listener
+    getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
 
     // Register Fallback queue task
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), getFallback().getQueue()::poll)
