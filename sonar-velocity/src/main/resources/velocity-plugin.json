@@ -1,6 +1,6 @@
 {
   "id": "sonar",
-  "name": "$name",
+  "name": "Sonar",
   "version": "$version",
   "description": "$description",
   "url": "$url",

@@ -20,9 +20,8 @@ dependencies {
 tasks {
   processResources {
     val props = mapOf(
-      "name" to rootProject.name,
       "version" to rootProject.version.toString().split("-")[0],
-      "description" to "Effective Anti-bot plugin for Velocity, BungeeCord, and Bukkit (1.7-latest)",
+      "description" to rootProject.description,
       "url" to "https://jonesdev.xyz/discord/",
       "main" to "xyz.jonesdev.sonar.velocity.SonarVelocityPlugin"
     )
