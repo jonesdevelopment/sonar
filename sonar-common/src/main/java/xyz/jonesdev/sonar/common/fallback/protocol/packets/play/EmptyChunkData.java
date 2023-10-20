@@ -72,9 +72,10 @@ public final class EmptyChunkData implements FallbackPacket {
     byteBuf.writeInt(x);
     byteBuf.writeInt(z);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_17_1) <= 0) {
-      writeVarInt(byteBuf, 0); // mask
+    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_17_1) <= 0) {
+        writeVarInt(byteBuf, 0); // mask
+      }
     } else {
       byteBuf.writeBoolean(true); // full chunk
 
