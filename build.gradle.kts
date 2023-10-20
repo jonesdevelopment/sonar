@@ -72,7 +72,7 @@ tasks {
 
   shadowJar {
     // Set the file name of the shadowed jar
-    archiveFileName.set("${rootProject.name}.jar")
+    archiveFileName.set("Sonar.jar")
 
     // bStats has to be relocated to the Sonar package otherwise it throws an exception
     // https://github.com/Bastian/bstats-metrics/blob/master/base/src/main/java/org/bstats/MetricsBase.java#L251
