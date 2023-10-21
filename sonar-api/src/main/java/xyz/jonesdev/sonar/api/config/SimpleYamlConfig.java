@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.simpleyaml.configuration.comments.format.YamlCommentFormat;
 import org.simpleyaml.configuration.file.YamlFile;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -36,8 +37,8 @@ public final class SimpleYamlConfig {
 
   private static final List<String> HEADER = Arrays.asList(
     "",
-    "Running Sonar version " + Sonar.get().getVersion()
-      + " on " + Sonar.get().getPlatform().getDisplayName(),
+    String.format("Running Sonar version %s on %s",
+      Sonar.get().getVersion(), Sonar.get().getPlatform().getDisplayName()),
     "Need help or have questions? https://jonesdev.xyz/discord",
     "https://github.com/jonesdevelopment/sonar",
     ""
@@ -47,7 +48,7 @@ public final class SimpleYamlConfig {
     this(new File(dataFolder, fileName + ".yml"), dataFolder);
   }
 
-  private SimpleYamlConfig(final File file, final File folder) {
+  private SimpleYamlConfig(final File file, final @NotNull File folder) {
     if (!folder.exists() && !folder.mkdir()) {
       throw new IllegalStateException("Could not create folder?!");
     }
