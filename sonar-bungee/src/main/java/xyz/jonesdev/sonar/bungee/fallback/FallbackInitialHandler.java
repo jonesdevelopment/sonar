@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.bungee.fallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.DecoderException;
 import lombok.val;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
@@ -32,6 +32,7 @@ import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.PlayerPublicKey;
 import net.md_5.bungee.protocol.packet.Kick;
 import net.md_5.bungee.protocol.packet.LoginRequest;
+import net.md_5.bungee.protocol.packet.StatusRequest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
@@ -54,6 +55,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
@@ -72,6 +74,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   private @NotNull final BungeeCord bungee;
   private @Nullable FallbackUserWrapper player;
   private boolean receivedLoginPacket;
+  private boolean receivedStatusPacket;
 
   @Override
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
@@ -85,11 +88,33 @@ public final class FallbackInitialHandler extends InitialHandler {
   }
 
   @Override
+  public void handle(final StatusRequest statusRequest) throws Exception {
+    // Fix status packet spam exploit
+    if (receivedStatusPacket) {
+      throw new ConditionFailedException("Duplicate status packet");
+    }
+    receivedStatusPacket = true;
+    // Run the rest of the method asynchronously
+    CompletableFuture.runAsync(() -> {
+      // The channel always stays open because the client sends
+      // a StatusRequest and a Ping packet after one another
+      if (!isConnected()) {
+        throw new ConditionFailedException("Not connected anymore");
+      }
+      try {
+        super.handle(statusRequest);
+      } catch (Exception exception) {
+        throw new DecoderException(exception);
+      }
+    });
+  }
+
+  @Override
   public void handle(final LoginRequest loginRequest) throws Exception {
     if (Sonar.get().getConfig().getVerification().isEnabled()) {
       // Fix login packet spam exploit
       if (receivedLoginPacket || player != null) {
-        throw new CorruptedFrameException("Duplicate login packet");
+        throw new ConditionFailedException("Duplicate login packet");
       }
       receivedLoginPacket = true;
 

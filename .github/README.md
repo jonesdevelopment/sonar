@@ -42,6 +42,8 @@
 - [Fallback](https://github.com/jonesdevelopment/sonar#fallback) is Sonar's main component designed to prevent
   all types of bots.
 - Spigot & BungeeCord
+  - Duplicate login/status packet spam fix
+  - Run server ping handling asynchronously
   - The Varint decoder is updated to Velocity's
     improved [MinecraftVarintFrameDecoder](https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java).
 
