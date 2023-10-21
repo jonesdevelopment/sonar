@@ -41,15 +41,13 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
 
   private static final boolean REPLACE_VAR_INT_DECODER = !Boolean.getBoolean("sonar.do-not-replace-decoder");
 
-  private static final WriteBufferWaterMark MARK;
+  // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/network/ConnectionManager.java#L57
+  private static final WriteBufferWaterMark SERVER_WRITE_MARK = new WriteBufferWaterMark(1 << 20, 1 << 21);
+
   private static final Varint21LengthFieldPrepender FRAME_ENCODER;
 
   static {
     try {
-      final Field markField = PipelineUtils.class.getDeclaredField("MARK");
-      markField.setAccessible(true);
-      MARK = (WriteBufferWaterMark) markField.get(null);
-
       final Field frameEncoder = PipelineUtils.class.getDeclaredField("framePrepender");
       frameEncoder.setAccessible(true);
       FRAME_ENCODER = (Varint21LengthFieldPrepender) frameEncoder.get(null);
@@ -69,13 +67,12 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
 
     channel.config().setOption(ChannelOption.TCP_NODELAY, true);
     channel.config().setAllocator(PooledByteBufAllocator.DEFAULT);
-    channel.config().setWriteBufferWaterMark(MARK);
+    channel.config().setWriteBufferWaterMark(SERVER_WRITE_MARK);
 
     channel.pipeline().addLast(FRAME_DECODER, REPLACE_VAR_INT_DECODER
       ? new Varint21FrameDecoder() : new net.md_5.bungee.protocol.Varint21FrameDecoder());
     channel.pipeline().addLast(TIMEOUT_HANDLER, new FallbackTimeoutHandler(
-      BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS
-    ));
+      BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
     channel.pipeline().addLast(FRAME_PREPENDER, FRAME_ENCODER);
     channel.pipeline().addLast(BOSS_HANDLER, new FallbackHandlerBoss());
   }
