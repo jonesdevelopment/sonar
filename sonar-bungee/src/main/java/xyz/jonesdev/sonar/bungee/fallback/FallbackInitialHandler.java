@@ -111,7 +111,8 @@ public final class FallbackInitialHandler extends InitialHandler {
 
   @Override
   public void handle(final LoginRequest loginRequest) throws Exception {
-    Statistics.TOTAL_TRAFFIC.increment();
+    // Increase joins per second for the action bar verbose
+    Sonar.get().getVerboseHandler().getJoinsPerSecond().put(System.nanoTime());
 
     // Fix login packet spam exploit
     if (receivedLoginPacket || player != null) {
@@ -125,6 +126,9 @@ public final class FallbackInitialHandler extends InitialHandler {
       try {
         final ChannelPipeline pipeline = channel.pipeline();
         TrafficChannelHooker.hook(pipeline, PACKET_DECODER, PACKET_ENCODER);
+
+        // Increase total traffic statistic
+        Statistics.TOTAL_TRAFFIC.increment();
 
         // Check if the verification is enabled
         if (!Sonar.get().getConfig().getVerification().isEnabled()) {

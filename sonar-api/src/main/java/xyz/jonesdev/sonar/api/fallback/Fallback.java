@@ -41,7 +41,7 @@ public final class Fallback {
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
   // Only block the player for a few minutes to avoid issues
   private final ExpiringCache<String> blacklisted = Cappuccino.buildExpiring(
-    10L, TimeUnit.MINUTES, 2500L
+    10L, TimeUnit.MINUTES, 5000L
   );
   private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;
   private final @NotNull FallbackRatelimiter ratelimiter = FallbackRatelimiter.INSTANCE;
@@ -66,6 +66,6 @@ public final class Fallback {
 
   public boolean isPotentiallyUnderAttack() {
     final int min = SONAR.getConfig().getMinPlayersForAttack();
-    return connected.size() > min || queue.getQueuedPlayers().size() > min;
+    return Sonar.get().getVerboseHandler().getJoinsPerSecond().estimatedSize() > min;
   }
 }
