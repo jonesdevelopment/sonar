@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
-import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -39,7 +38,7 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
     // Create our own invocation source wrapper to handle messages properly
     final InvocationSource invocationSource = new VelocityInvocationSource(invocation.source());
 
-    if (!(invocation.source() instanceof ConsoleCommandSource)) {
+    if (invocationSource.isPlayer()) {
       // Check if the player actually has the permission to run the command
       if (!invocation.source().hasPermission("sonar.command")) {
         invocationSource.sendMessage(Sonar.get().getConfig().getNoPermission());

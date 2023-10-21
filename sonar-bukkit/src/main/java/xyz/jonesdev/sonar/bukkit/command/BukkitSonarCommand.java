@@ -18,7 +18,10 @@
 package xyz.jonesdev.sonar.bukkit.command;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
@@ -41,7 +44,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
     // Create our own invocation source wrapper to handle messages properly
     final InvocationSource invocationSource = new BukkitInvocationSource(sender);
 
-    if (!(sender instanceof ConsoleCommandSender)) {
+    if (invocationSource.isPlayer()) {
       // Check if the player actually has the permission to run the command
       if (!sender.hasPermission("sonar.command")) {
         invocationSource.sendMessage(Sonar.get().getConfig().getNoPermission());
