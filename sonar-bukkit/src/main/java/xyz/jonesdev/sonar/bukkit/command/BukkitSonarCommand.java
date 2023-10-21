@@ -18,27 +18,23 @@
 package xyz.jonesdev.sonar.bukkit.command;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.*;
-import org.bukkit.entity.Player;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
 public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, SonarCommand {
-  {
-    cacheHelpMessage();
-  }
 
   @Override
   public boolean onCommand(final CommandSender sender,
@@ -48,7 +44,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
     // Create our own invocation source wrapper to handle messages properly
     final InvocationSource invocationSource = new BukkitInvocationSource(sender);
 
-    if (!(sender instanceof ConsoleCommandSender)) {
+    if (invocationSource.isPlayer()) {
       // Check if the player actually has the permission to run the command
       if (!sender.hasPermission("sonar.command")) {
         invocationSource.sendMessage(Sonar.get().getConfig().getNoPermission());
@@ -99,31 +95,6 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
       }
     }
 
-    subcommand.ifPresent(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(sender instanceof Player)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getPlayersOnly());
-        return;
-      }
-
-      if (sub.getInfo().onlyConsole() && !(sender instanceof ConsoleCommandSender)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getConsoleOnly());
-        return;
-      }
-
-      final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, sub, args);
-
-      // The subcommands has arguments which are not present in the executed command
-      if (sub.getInfo().arguments().length > 0
-        && commandInvocation.getRawArguments().length <= 1) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getIncorrectCommandUsage()
-          .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")"));
-        return;
-      }
-
-      // Execute the sub command with the custom invocation properties
-      sub.execute(commandInvocation);
-    });
-
     if (!subcommand.isPresent()) {
 
       // Re-use the old, cached help message since we don't want to scan
@@ -132,12 +103,14 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
       for (final Component component : CACHED_HELP_MESSAGE) {
         invocationSource.sendMessage(component);
       }
+    } else {
+      subcommand.get().invoke(invocationSource, args);
     }
     return false;
   }
 
   @Override
-  public List<String> onTabComplete(final CommandSender sender,
+  public List<String> onTabComplete(final @NotNull CommandSender sender,
                                     final Command command,
                                     final String commandAlias,
                                     final String @NotNull [] args) {
@@ -145,33 +118,6 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
     if (!sender.hasPermission("sonar.command")) {
       return emptyList();
     }
-    if (args.length <= 1) {
-      if (TAB_SUGGESTIONS.isEmpty()) {
-        for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-          TAB_SUGGESTIONS.add(subcommand.getInfo().name());
-
-          if (subcommand.getInfo().aliases().length > 0) {
-            TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
-          }
-        }
-      }
-      return TAB_SUGGESTIONS;
-    } else if (args.length == 2) {
-      if (ARG_TAB_SUGGESTIONS.isEmpty()) {
-        for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-          final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
-            .map(Argument::value)
-            .collect(Collectors.toList());
-          ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
-          for (final String alias : subcommand.getInfo().aliases()) {
-            ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
-          }
-        }
-      }
-
-      final String subCommandName = args[0].toLowerCase();
-      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
-    }
-    return emptyList();
+    return getCachedTabSuggestions(args);
   }
 }

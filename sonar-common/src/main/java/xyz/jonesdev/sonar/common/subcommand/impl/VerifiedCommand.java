@@ -43,7 +43,7 @@ public final class VerifiedCommand extends Subcommand {
   private static final Queue<String> LOCK = new LinkedBlockingQueue<>(1);
 
   @Override
-  public void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull CommandInvocation invocation) {
     switch (invocation.getRawArguments()[1].toLowerCase()) {
       case "history": {
         if (invocation.getRawArguments().length <= 2) {

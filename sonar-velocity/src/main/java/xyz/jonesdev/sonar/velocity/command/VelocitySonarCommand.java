@@ -18,35 +18,27 @@
 package xyz.jonesdev.sonar.velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
-import com.velocitypowered.api.proxy.ConsoleCommandSource;
-import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
 public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
-  {
-    cacheHelpMessage();
-  }
 
   @Override
   public void execute(final @NotNull Invocation invocation) {
     // Create our own invocation source wrapper to handle messages properly
     final InvocationSource invocationSource = new VelocityInvocationSource(invocation.source());
 
-    if (!(invocation.source() instanceof ConsoleCommandSource)) {
+    if (invocationSource.isPlayer()) {
       // Check if the player actually has the permission to run the command
       if (!invocation.source().hasPermission("sonar.command")) {
         invocationSource.sendMessage(Sonar.get().getConfig().getNoPermission());
@@ -97,32 +89,6 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       }
     }
 
-    subcommand.ifPresent(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(invocation.source() instanceof Player)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getPlayersOnly());
-        return;
-      }
-
-      if (sub.getInfo().onlyConsole() && !(invocation.source() instanceof ConsoleCommandSource)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getConsoleOnly());
-        return;
-      }
-
-      final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, sub, invocation.arguments());
-
-      // The subcommands has arguments which are not present in the executed command
-      if (sub.getInfo().arguments().length > 0
-        && commandInvocation.getRawArguments().length <= 1
-        && sub.getInfo().argumentsRequired()) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getIncorrectCommandUsage()
-          .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")"));
-        return;
-      }
-
-      // Execute the sub command with the custom invocation properties
-      sub.execute(commandInvocation);
-    });
-
     if (subcommand.isEmpty()) {
 
       // Re-use the old, cached help message since we don't want to scan
@@ -131,6 +97,8 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       for (final Component component : CACHED_HELP_MESSAGE) {
         invocationSource.sendMessage(component);
       }
+    } else {
+      subcommand.get().invoke(invocationSource, invocation.arguments());
     }
   }
 
@@ -140,33 +108,6 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
     if (!invocation.source().hasPermission("sonar.command")) {
       return emptyList();
     }
-    if (invocation.arguments().length <= 1) {
-      if (TAB_SUGGESTIONS.isEmpty()) {
-        for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-          TAB_SUGGESTIONS.add(subcommand.getInfo().name());
-
-          if (subcommand.getInfo().aliases().length > 0) {
-            TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
-          }
-        }
-      }
-      return TAB_SUGGESTIONS;
-    } else if (invocation.arguments().length == 2) {
-      if (ARG_TAB_SUGGESTIONS.isEmpty()) {
-        for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-          final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
-            .map(Argument::value)
-            .collect(Collectors.toUnmodifiableList());
-          ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
-          for (final String alias : subcommand.getInfo().aliases()) {
-            ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
-          }
-        }
-      }
-
-      final String subCommandName = invocation.arguments()[0].toLowerCase();
-      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
-    }
-    return emptyList();
+    return getCachedTabSuggestions(invocation.arguments());
   }
 }

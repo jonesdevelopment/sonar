@@ -18,20 +18,17 @@
 package xyz.jonesdev.sonar.bukkit;
 
 import lombok.Getter;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
-import xyz.jonesdev.sonar.api.server.ServerWrapper;
-import xyz.jonesdev.sonar.bukkit.command.BukkitInvocationSource;
+import xyz.jonesdev.sonar.bukkit.audience.AudienceListener;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
-import xyz.jonesdev.sonar.bukkit.verbose.ActionBarVerbose;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.logging.Level;
 
 @Getter
@@ -39,9 +36,14 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
   public static SonarBukkit INSTANCE;
 
   public SonarBukkit(final @NotNull SonarBukkitPlugin plugin) {
-    super(plugin, plugin.getDataFolder(), new ActionBarVerbose(plugin.getServer()));
+    super(plugin, plugin.getDataFolder(), SonarPlatform.BUKKIT);
     INSTANCE = this;
   }
+
+  /**
+   * Wrapper for Bukkit audiences
+   */
+  private final BukkitAudiences bukkitAudiences = BukkitAudiences.create(getPlugin());
 
   /**
    * Create a wrapper for the plugin logger, so we can use it outside
@@ -67,31 +69,17 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     }
   };
 
-  /**
-   * Create a wrapper object for our server, so we can use it outside
-   * the velocity module.
-   * <br>
-   * We have to do this, so we can access all necessary API functions.
-   */
-  public final ServerWrapper server = new ServerWrapper(SonarPlatform.BUKKIT) {
-
-    @Override
-    public Optional<InvocationSource> getOnlinePlayer(final String username) {
-      return getPlugin().getServer().getOnlinePlayers().stream()
-        .filter(player -> player.getName().equalsIgnoreCase(username))
-        .findFirst()
-        .map(BukkitInvocationSource::new);
-    }
-  };
-
   @Override
   public void enable() {
 
     // Initialize bStats.org metrics
-    new Metrics(getPlugin(), getServer().getPlatform().getMetricsId());
+    new Metrics(getPlugin(), getPlatform().getMetricsId());
 
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
+
+    // Register audience register listener
+    getPlugin().getServer().getPluginManager().registerEvents(new AudienceListener(), getPlugin());
 
     // Register Fallback queue task
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), getFallback().getQueue()::poll,

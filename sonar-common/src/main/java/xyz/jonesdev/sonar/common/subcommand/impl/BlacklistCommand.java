@@ -39,7 +39,7 @@ import java.net.InetAddress;
 public final class BlacklistCommand extends Subcommand {
 
   @Override
-  public void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull CommandInvocation invocation) {
     switch (invocation.getRawArguments()[1].toLowerCase()) {
       case "add": {
         if (invocation.getRawArguments().length <= 2) {

@@ -20,17 +20,13 @@ package xyz.jonesdev.sonar.velocity;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
-import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
-import xyz.jonesdev.sonar.velocity.command.VelocityInvocationSource;
+import xyz.jonesdev.sonar.velocity.audience.AudienceListener;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
-import xyz.jonesdev.sonar.velocity.verbose.VerboseWrapper;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -38,7 +34,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
   public static SonarVelocity INSTANCE;
 
   public SonarVelocity(final @NotNull SonarVelocityPlugin plugin) {
-    super(plugin, plugin.getDataDirectory().toFile(), new VerboseWrapper(plugin.getServer()));
+    super(plugin, plugin.getDataDirectory().toFile(), SonarPlatform.VELOCITY);
     INSTANCE = this;
   }
 
@@ -66,34 +62,20 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     }
   };
 
-  /**
-   * Create a wrapper object for our server, so we can use it outside
-   * the velocity module.
-   * <br>
-   * We have to do this, so we can access all necessary API functions.
-   */
-  public final ServerWrapper server = new ServerWrapper(SonarPlatform.VELOCITY) {
-
-    @Override
-    public Optional<InvocationSource> getOnlinePlayer(final String username) {
-      return getPlugin().getServer().getAllPlayers().stream()
-        .filter(player -> player.getUsername().equalsIgnoreCase(username))
-        .findFirst()
-        .map(VelocityInvocationSource::new);
-    }
-  };
-
   @Override
   public void enable() {
 
     // Initialize bStats.org metrics
-    getPlugin().getMetricsFactory().make(getPlugin(), getServer().getPlatform().getMetricsId());
+    getPlugin().getMetricsFactory().make(getPlugin(), getPlatform().getMetricsId());
 
     // Register Sonar command
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
 
     // Register Fallback listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackListener(getFallback()));
+
+    // Register audience register listener
+    getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
 
     // Register Fallback queue task
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), getFallback().getQueue()::poll)

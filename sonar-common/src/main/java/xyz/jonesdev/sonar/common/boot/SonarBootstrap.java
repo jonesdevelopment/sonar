@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
@@ -48,19 +49,21 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
   private File dataDirectory;
+  private final SonarPlatform platform;
   private final SubcommandRegistry subcommandRegistry;
   private final SystemTimer launchTimer = new SystemTimer();
 
   public SonarBootstrap(final @NotNull T plugin,
                         final File dataDirectory,
-                        final Verbose verboseHandler) {
-    // Set the API to this instance so the config doesn't have issues
+                        final SonarPlatform platform) {
+    // Set the Sonar API
     SonarSupplier.set(this);
 
     // Set the plugin instance before anything else
     this.plugin = plugin;
     this.dataDirectory = dataDirectory;
-    this.verboseHandler = verboseHandler;
+    this.platform = platform;
+    this.verboseHandler = new Verbose();
     this.config = new SonarConfiguration(dataDirectory);
     this.subcommandRegistry = new SubcommandRegistryHolder();
   }

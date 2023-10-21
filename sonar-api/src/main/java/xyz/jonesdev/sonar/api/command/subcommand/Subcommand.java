@@ -83,5 +83,31 @@ public abstract class Subcommand {
       .replace("%usage%", info.name() + " (" + arguments + ")"));
   }
 
-  public abstract void execute(final @NotNull CommandInvocation invocation);
+  public final void invoke(final @NotNull InvocationSource invocationSource, final String @NotNull [] arguments) {
+    // Check if the subcommand can only be executed by players
+    if (getInfo().onlyPlayers() && !invocationSource.isPlayer()) {
+      invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getPlayersOnly());
+      return;
+    }
+
+    // Check if the subcommand can only be executed though console
+    if (getInfo().onlyConsole() && invocationSource.isPlayer()) {
+      invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getConsoleOnly());
+      return;
+    }
+
+    final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, this, arguments);
+
+    // The subcommands has arguments which are not present in the executed command
+    if (getInfo().argumentsRequired() && getInfo().arguments().length > 0 && arguments.length <= 1) {
+      invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getIncorrectCommandUsage()
+        .replace("%usage%", getInfo().name() + " (" + getArguments() + ")"));
+      return;
+    }
+
+    // Execute the sub command
+    execute(commandInvocation);
+  }
+
+  protected abstract void execute(final @NotNull CommandInvocation invocation);
 }

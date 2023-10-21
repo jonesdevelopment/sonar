@@ -15,15 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.command;
+package xyz.jonesdev.sonar.velocity.audience;
 
-import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.command.InvocationSource;
+import xyz.jonesdev.sonar.api.Sonar;
 
-public final class VelocityInvocationSource extends InvocationSource {
-  public VelocityInvocationSource(final @NotNull CommandSource sender) {
-    super(sender instanceof Player ? ((Player) sender).getUsername() : "Console", sender, sender instanceof Player);
+public final class AudienceListener {
+
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final @NotNull PostLoginEvent event) {
+    Sonar.get().getVerboseHandler().getAudiences().put(event.getPlayer().getUsername(), event.getPlayer());
+  }
+
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final @NotNull DisconnectEvent event) {
+    Sonar.get().getVerboseHandler().getAudiences().remove(event.getPlayer().getUsername());
   }
 }

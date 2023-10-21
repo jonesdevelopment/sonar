@@ -18,14 +18,18 @@
 package xyz.jonesdev.sonar.api.command;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
+import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 public interface SonarCommand {
   List<String> TAB_SUGGESTIONS = new ArrayList<>();
@@ -34,63 +38,55 @@ public interface SonarCommand {
 
   ExpiringCache<Object> DELAY = Cappuccino.buildExpiring(500L);
 
-  int COPYRIGHT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
+  List<Component> CACHED_HELP_MESSAGE = new ArrayList<>();
 
-  List<Component> CACHED_HELP_MESSAGE = new Vector<>();
+  static void prepareCachedMessages() {
+    // Cache help message
+    CACHED_HELP_MESSAGE.clear();
+    for (final String message : Sonar.get().getConfig().getCommands().getHelpHeader()) {
+      CACHED_HELP_MESSAGE.add(MiniMessage.miniMessage().deserialize(message
+        .replace("%version%", Sonar.get().getVersion().getFormatted())
+        .replace("%platform%", Sonar.get().getPlatform().getDisplayName())
+        .replace("%copyright_year%", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))));
+    }
 
-  default void cacheHelpMessage() {
-    CACHED_HELP_MESSAGE.addAll(Arrays.asList(
-      Component.text("Running Sonar " + Sonar.get().getVersion()
-        + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
-        + ".", NamedTextColor.YELLOW),
-      Component.text("(C) " + COPYRIGHT_YEAR + " Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
-      Component.text("https://github.com/jonesdevelopment/sonar", NamedTextColor.GREEN)
-        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar")),
-      Component.empty(),
-      Component.text("Need help or have any questions?", NamedTextColor.YELLOW),
-      Component.textOfChildren(
-        Component.text("Open a ticket on the Discord ", NamedTextColor.YELLOW)
-          .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open Discord)")))
-          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://jonesdev.xyz/discord/")),
-        Component.text("or open a new issue on GitHub.", NamedTextColor.YELLOW)
-          .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("(Click to open GitHub)")))
-          .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/jonesdevelopment/sonar" +
-            "/issues"))
-      ),
-      Component.empty()
-    ));
-
-    Sonar.get().getSubcommandRegistry().getSubcommands().forEach(sub -> {
-      Component component = Component.textOfChildren(
-        Component.text(" ▪ ", NamedTextColor.GRAY),
-        Component.text("/sonar " + sub.getInfo().name(), NamedTextColor.GREEN),
-        Component.text(" - ", NamedTextColor.GRAY),
-        Component.text(sub.getInfo().description(), NamedTextColor.WHITE)
-      );
-
-      Component hoverComponent = Component.textOfChildren(
-        Component.text("Only players: ", NamedTextColor.GRAY),
-        Component.text(sub.getInfo().onlyPlayers() ? "✔" : "✗",
-          sub.getInfo().onlyPlayers() ? NamedTextColor.GREEN : NamedTextColor.RED),
-        Component.newline(),
-        Component.text("Require console: ", NamedTextColor.GRAY),
-        Component.text(sub.getInfo().onlyConsole() ? "✔" : "✗",
-          sub.getInfo().onlyConsole() ? NamedTextColor.GREEN : NamedTextColor.RED),
-        Component.newline(),
-        Component.text("Permission: ", NamedTextColor.GRAY),
-        Component.text(sub.getPermission(), NamedTextColor.WHITE)
-      );
-      if (sub.getInfo().aliases().length > 0) {
-        hoverComponent = hoverComponent
-          .append(Component.newline())
-          .append(Component.text("Aliases: ", NamedTextColor.GRAY))
-          .append(Component.text(sub.getAliases(), NamedTextColor.WHITE));
-      }
-      component = component
-        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-          "/sonar " + sub.getInfo().name() + " "))
-        .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponent));
-      CACHED_HELP_MESSAGE.add(component);
+    final String subcommandFormat = Sonar.get().getConfig().getCommands().getHelpSubcommands();
+    Sonar.get().getSubcommandRegistry().getSubcommands().forEach(subcommand -> {
+      final Component deserialized = MiniMessage.miniMessage().deserialize(subcommandFormat
+        .replace("%subcommand%", subcommand.getInfo().name())
+        .replace("%description%", subcommand.getInfo().description())
+        .replace("%only_players%", subcommand.getInfo().onlyPlayers() ? "<green>✔</green>" : "<red>✗</red>")
+        .replace("%require_console%", subcommand.getInfo().onlyConsole() ? "<green>✔</green>" : "<red>✗</red>")
+        .replace("%permission%", subcommand.getPermission())
+        .replace("%aliases%", subcommand.getAliases()));
+      CACHED_HELP_MESSAGE.add(deserialized);
     });
+
+    // Don't re-cache tab suggestions
+    if (!TAB_SUGGESTIONS.isEmpty()) return;
+    // Cache tab suggestions
+    for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
+      TAB_SUGGESTIONS.add(subcommand.getInfo().name());
+      if (subcommand.getInfo().aliases().length > 0) {
+        TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
+      }
+      final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
+        .map(Argument::value)
+        .collect(Collectors.toList());
+      ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
+      for (final String alias : subcommand.getInfo().aliases()) {
+        ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
+      }
+    }
+  }
+
+  default List<String> getCachedTabSuggestions(final String @NotNull [] arguments) {
+    if (arguments.length <= 1) {
+      return TAB_SUGGESTIONS;
+    } else if (arguments.length == 2) {
+      final String subCommandName = arguments[0].toLowerCase();
+      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
+    }
+    return emptyList();
   }
 }
