@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.bungee.fallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.CorruptedFrameException;
 import lombok.val;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
@@ -70,6 +71,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   private ChannelWrapper channelWrapper;
   private @NotNull final BungeeCord bungee;
   private @Nullable FallbackUserWrapper player;
+  private boolean receivedLoginPacket;
 
   @Override
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
@@ -84,7 +86,13 @@ public final class FallbackInitialHandler extends InitialHandler {
 
   @Override
   public void handle(final LoginRequest loginRequest) throws Exception {
-    if (player == null && Sonar.get().getConfig().getVerification().isEnabled()) {
+    if (Sonar.get().getConfig().getVerification().isEnabled()) {
+      // Fix login packet spam exploit
+      if (receivedLoginPacket || player != null) {
+        throw new CorruptedFrameException("Duplicate login packet");
+      }
+      receivedLoginPacket = true;
+
       final InetAddress inetAddress = getAddress().getAddress();
       val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
       if (!Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
