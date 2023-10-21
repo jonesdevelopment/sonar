@@ -62,22 +62,20 @@ public interface SonarCommand {
       CACHED_HELP_MESSAGE.add(deserialized);
     });
 
+    // Don't re-cache tab suggestions
+    if (!TAB_SUGGESTIONS.isEmpty()) return;
     // Cache tab suggestions
     for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-      if (TAB_SUGGESTIONS.isEmpty()) {
-        TAB_SUGGESTIONS.add(subcommand.getInfo().name());
-        if (subcommand.getInfo().aliases().length > 0) {
-          TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
-        }
+      TAB_SUGGESTIONS.add(subcommand.getInfo().name());
+      if (subcommand.getInfo().aliases().length > 0) {
+        TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
       }
-      if (ARG_TAB_SUGGESTIONS.isEmpty()) {
-        final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
-          .map(Argument::value)
-          .collect(Collectors.toList());
-        ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
-        for (final String alias : subcommand.getInfo().aliases()) {
-          ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
-        }
+      final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
+        .map(Argument::value)
+        .collect(Collectors.toList());
+      ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
+      for (final String alias : subcommand.getInfo().aliases()) {
+        ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
       }
     }
   }
