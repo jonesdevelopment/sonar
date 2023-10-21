@@ -111,6 +111,8 @@ public final class FallbackInitialHandler extends InitialHandler {
 
   @Override
   public void handle(final LoginRequest loginRequest) throws Exception {
+    Statistics.TOTAL_TRAFFIC.increment();
+
     // Fix login packet spam exploit
     if (receivedLoginPacket || player != null) {
       throw new ConditionFailedException("Duplicate login packet");
