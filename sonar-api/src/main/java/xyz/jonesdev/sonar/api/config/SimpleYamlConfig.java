@@ -37,7 +37,7 @@ public final class SimpleYamlConfig {
   private static final List<String> HEADER = Arrays.asList(
     "",
     "Running Sonar version " + Sonar.get().getVersion()
-      + " on " + Sonar.get().getServer().getPlatform().getDisplayName(),
+      + " on " + Sonar.get().getPlatform().getDisplayName(),
     "Need help or have questions? https://jonesdev.xyz/discord",
     "https://github.com/jonesdevelopment/sonar",
     ""

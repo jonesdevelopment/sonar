@@ -56,7 +56,7 @@ public final class DumpCommand extends Subcommand implements JVMProfiler {
     val mappings = new WeakHashMap<String, Object>();
     mappings.put("sonar", new Dump.Sonar(
       SONAR.getVersion().getFull(),
-      SONAR.getServer().getPlatform(),
+      SONAR.getPlatform(),
       SONAR.getVersion().isOnMainBranch()
     ));
     mappings.put("runtime", new Dump.Runtime(

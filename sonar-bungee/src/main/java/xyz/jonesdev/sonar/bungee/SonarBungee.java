@@ -22,19 +22,15 @@ import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
-import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.bungee.audience.AudienceListener;
-import xyz.jonesdev.sonar.bungee.command.BungeeInvocationSource;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -43,7 +39,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   public static SonarBungee INSTANCE;
 
   public SonarBungee(final @NotNull SonarBungeePlugin plugin) {
-    super(plugin, plugin.getDataFolder());
+    super(plugin, plugin.getDataFolder(), SonarPlatform.BUNGEE);
     INSTANCE = this;
   }
 
@@ -76,28 +72,11 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     }
   };
 
-  /**
-   * Create a wrapper object for our server, so we can use it outside
-   * the velocity module.
-   * <br>
-   * We have to do this, so we can access all necessary API functions.
-   */
-  public final ServerWrapper server = new ServerWrapper(SonarPlatform.BUNGEE) {
-
-    @Override
-    public Optional<InvocationSource> getOnlinePlayer(final String username) {
-      return getPlugin().getServer().getPlayers().stream()
-        .filter(player -> player.getName().equalsIgnoreCase(username))
-        .findFirst()
-        .map(BungeeInvocationSource::new);
-    }
-  };
-
   @Override
   public void enable() {
 
     // Initialize bStats.org metrics
-    new Metrics(getPlugin(), getServer().getPlatform().getMetricsId());
+    new Metrics(getPlugin(), getPlatform().getMetricsId());
 
     // Register Sonar command
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());

@@ -24,7 +24,6 @@ import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.event.SonarEventManager;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
-import xyz.jonesdev.sonar.api.server.ServerWrapper;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
 import java.io.File;
@@ -35,9 +34,9 @@ public interface Sonar {
   String LINE_SEPARATOR = "\n"; // Using System.lineSeparator is broken, for some reason...
 
   /**
-   * @return A small wrapper for the server
+   * @return The platform the plugin is being run on
    */
-  @NotNull ServerWrapper getServer();
+  @NotNull SonarPlatform getPlatform();
 
   /**
    * @return A small wrapper for the plugin logger so we can use the logger everywhere

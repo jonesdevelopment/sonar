@@ -41,7 +41,7 @@ public interface SonarCommand {
   default void cacheHelpMessage() {
     CACHED_HELP_MESSAGE.addAll(Arrays.asList(
       Component.text("Running Sonar " + Sonar.get().getVersion()
-        + " on " + Sonar.get().getServer().getPlatform().getDisplayName()
+        + " on " + Sonar.get().getPlatform().getDisplayName()
         + ".", NamedTextColor.YELLOW),
       Component.text("(C) " + COPYRIGHT_YEAR + " Jones Development and Sonar Contributors", NamedTextColor.YELLOW),
       Component.text("https://github.com/jonesdevelopment/sonar", NamedTextColor.GREEN)
