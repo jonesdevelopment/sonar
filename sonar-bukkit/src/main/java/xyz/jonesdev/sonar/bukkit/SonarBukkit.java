@@ -29,7 +29,6 @@ import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.Objects;
-import java.util.logging.Level;
 
 @Getter
 public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
@@ -55,17 +54,17 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
     @Override
     public void info(final String message, final Object... args) {
-      getPlugin().getLogger().log(Level.INFO, message, args);
+      getPlugin().getLogger().info(buildFullMessage(message, args));
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      getPlugin().getLogger().log(Level.WARNING, message, args);
+      getPlugin().getLogger().warning(buildFullMessage(message, args));
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      getPlugin().getLogger().log(Level.SEVERE, message, args);
+      getPlugin().getLogger().severe(buildFullMessage(message, args));
     }
   };
 

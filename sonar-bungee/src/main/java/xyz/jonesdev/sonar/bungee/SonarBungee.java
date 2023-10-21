@@ -32,7 +32,6 @@ import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 @Getter
 public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
@@ -58,17 +57,17 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     @Override
     public void info(final String message, final Object... args) {
-      getPlugin().getLogger().log(Level.INFO, message, args);
+      getPlugin().getLogger().info(buildFullMessage(message, args));
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      getPlugin().getLogger().log(Level.WARNING, message, args);
+      getPlugin().getLogger().warning(buildFullMessage(message, args));
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      getPlugin().getLogger().log(Level.SEVERE, message, args);
+      getPlugin().getLogger().severe(buildFullMessage(message, args));
     }
   };
 
