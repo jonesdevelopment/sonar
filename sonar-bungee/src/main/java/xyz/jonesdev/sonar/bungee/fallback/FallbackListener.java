@@ -48,6 +48,7 @@ public final class FallbackListener implements Listener {
           // Fallback by disconnecting without a message
           pendingConnection.disconnect();
           Sonar.get().getLogger().warn("Fallback handler of {} is missing", event.getPlayer().getName());
+          return;
         }
 
         if (Sonar.get().getConfig().getLockdown().isLogAttempts()) {
