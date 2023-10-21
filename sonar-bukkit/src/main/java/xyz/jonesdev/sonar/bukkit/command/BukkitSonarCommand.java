@@ -26,18 +26,16 @@ import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
 public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, SonarCommand {
   {
-    cacheHelpMessage();
+    prepareCachedMessages();
   }
 
   @Override
@@ -137,7 +135,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
   }
 
   @Override
-  public List<String> onTabComplete(final CommandSender sender,
+  public List<String> onTabComplete(final @NotNull CommandSender sender,
                                     final Command command,
                                     final String commandAlias,
                                     final String @NotNull [] args) {
@@ -145,33 +143,6 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
     if (!sender.hasPermission("sonar.command")) {
       return emptyList();
     }
-    if (args.length <= 1) {
-      if (TAB_SUGGESTIONS.isEmpty()) {
-        for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-          TAB_SUGGESTIONS.add(subcommand.getInfo().name());
-
-          if (subcommand.getInfo().aliases().length > 0) {
-            TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
-          }
-        }
-      }
-      return TAB_SUGGESTIONS;
-    } else if (args.length == 2) {
-      if (ARG_TAB_SUGGESTIONS.isEmpty()) {
-        for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-          final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
-            .map(Argument::value)
-            .collect(Collectors.toList());
-          ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
-          for (final String alias : subcommand.getInfo().aliases()) {
-            ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
-          }
-        }
-      }
-
-      final String subCommandName = args[0].toLowerCase();
-      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
-    }
-    return emptyList();
+    return getCachedTabSuggestions(args);
   }
 }

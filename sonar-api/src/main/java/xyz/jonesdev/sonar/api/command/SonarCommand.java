@@ -21,11 +21,17 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
+import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 public interface SonarCommand {
   List<String> TAB_SUGGESTIONS = new ArrayList<>();
@@ -38,7 +44,8 @@ public interface SonarCommand {
 
   List<Component> CACHED_HELP_MESSAGE = new Vector<>();
 
-  default void cacheHelpMessage() {
+  default void prepareCachedMessages() {
+    // Cache help message
     CACHED_HELP_MESSAGE.addAll(Arrays.asList(
       Component.text("Running Sonar " + Sonar.get().getVersion()
         + " on " + Sonar.get().getPlatform().getDisplayName()
@@ -92,5 +99,30 @@ public interface SonarCommand {
         .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponent));
       CACHED_HELP_MESSAGE.add(component);
     });
+
+    // Cache tab suggestions
+    for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
+      TAB_SUGGESTIONS.add(subcommand.getInfo().name());
+      if (subcommand.getInfo().aliases().length > 0) {
+        TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
+      }
+      final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
+        .map(Argument::value)
+        .collect(Collectors.toList());
+      ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
+      for (final String alias : subcommand.getInfo().aliases()) {
+        ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
+      }
+    }
+  }
+
+  default List<String> getCachedTabSuggestions(final String @NotNull [] arguments) {
+    if (arguments.length <= 1) {
+      return TAB_SUGGESTIONS;
+    } else if (arguments.length == 2) {
+      final String subCommandName = arguments[0].toLowerCase();
+      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
+    }
+    return emptyList();
   }
 }
