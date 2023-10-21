@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.subcommand.impl;
 
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
@@ -34,6 +35,8 @@ public final class VerboseCommand extends Subcommand {
     if (SONAR.getVerboseHandler().isSubscribed(invocation.getSender().getName())) {
       SONAR.getVerboseHandler().unsubscribe(invocation.getSender().getName());
       invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerboseUnsubscribed());
+      // Reset ActionBar component when unsubscribing
+      invocation.getSender().getAudience().sendActionBar(Component.empty());
       return;
     }
 
