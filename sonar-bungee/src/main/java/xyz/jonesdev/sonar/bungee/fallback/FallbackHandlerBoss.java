@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.bungee.fallback;
 import io.netty.channel.ChannelHandlerContext;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.connection.DownstreamBridge;
+import net.md_5.bungee.connection.UpstreamBridge;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PacketHandler;
@@ -70,7 +71,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
   @Override
   public void exceptionCaught(final @NotNull ChannelHandlerContext ctx, final Throwable throwable) throws Exception {
     if (ctx.channel().isActive()) {
-      if (handler != null && !(handler instanceof FallbackInitialHandler)) {
+      if (handler instanceof DownstreamBridge || handler instanceof UpstreamBridge) {
         try {
           handler.exception(throwable);
         } catch (Exception exception) {
