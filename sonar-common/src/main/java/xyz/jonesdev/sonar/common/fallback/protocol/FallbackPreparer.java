@@ -47,16 +47,12 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 public class FallbackPreparer {
 
   // Mappings
-  private final CompoundBinaryTag CHAT_TYPE_119;
-  private final CompoundBinaryTag CHAT_TYPE_1191;
   private final CompoundBinaryTag DAMAGE_TYPE_1194;
   private final CompoundBinaryTag DAMAGE_TYPE_120;
 
   static {
-    CHAT_TYPE_119 = getMapping("chat_1_19.nbt");
-    CHAT_TYPE_1191 = getMapping("chat_1_19_1.nbt");
-    DAMAGE_TYPE_1194 = getMapping("damage_1_19_4.nbt");
-    DAMAGE_TYPE_120 = getMapping("damage_type_1_20.nbt");
+    DAMAGE_TYPE_1194 = getMapping("damage_type_1194.nbt");
+    DAMAGE_TYPE_120 = getMapping("damage_type_120.nbt");
   }
 
   // Abilities
@@ -233,12 +229,6 @@ public class FallbackPreparer {
             .build()
         ))).build()
       );
-
-      if (protocolVersion.compareTo(MINECRAFT_1_19) == 0) {
-        registryContainer.put("minecraft:chat_type", CHAT_TYPE_119);
-      } else if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-        registryContainer.put("minecraft:chat_type", CHAT_TYPE_1191);
-      }
 
       if (protocolVersion.compareTo(MINECRAFT_1_19_4) == 0) {
         registryContainer.put("minecraft:damage_type", DAMAGE_TYPE_1194);
