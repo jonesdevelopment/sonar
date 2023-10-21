@@ -56,7 +56,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
   public SonarBootstrap(final @NotNull T plugin,
                         final File dataDirectory,
                         final SonarPlatform platform) {
-    // Set the API to this instance so the config doesn't have issues
+    // Set the Sonar API
     SonarSupplier.set(this);
 
     // Set the plugin instance before anything else
