@@ -23,7 +23,6 @@ import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.event.ClientConnectEvent;
 import net.md_5.bungee.netty.HandlerBoss;
@@ -31,6 +30,7 @@ import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.*;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackInitialHandler;
 
 import java.lang.reflect.Field;
@@ -80,10 +80,10 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
         }
 
         channel.pipeline().addBefore(FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder());
-        channel.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER, new MinecraftDecoder(Protocol.HANDSHAKE, true,
-          ProxyServer.getInstance().getProtocolVersion()));
+        channel.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER, new MinecraftDecoder(Protocol.HANDSHAKE,
+          true, ProtocolVersion.LATEST_VERSION.getProtocol()));
         channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(Protocol.HANDSHAKE,
-          true, ProxyServer.getInstance().getProtocolVersion()));
+          true, ProtocolVersion.LATEST_VERSION.getProtocol()));
         channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
         channel.pipeline().get(HandlerBoss.class).setHandler(new FallbackInitialHandler(BungeeCord.getInstance(),
           listener));
