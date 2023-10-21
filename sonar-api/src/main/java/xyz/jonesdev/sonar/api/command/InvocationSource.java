@@ -28,6 +28,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 public abstract class InvocationSource {
   private final String name;
   private final Audience audience;
+  private final boolean player;
 
   /**
    * Sends an empty chat message to the command executor

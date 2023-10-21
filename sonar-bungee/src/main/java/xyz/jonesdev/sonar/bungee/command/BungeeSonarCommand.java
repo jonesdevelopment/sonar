@@ -19,13 +19,11 @@ package xyz.jonesdev.sonar.bungee.command;
 
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
@@ -97,31 +95,6 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
       }
     }
 
-    subcommand.ifPresent(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(sender instanceof ProxiedPlayer)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getPlayersOnly());
-        return;
-      }
-
-      if (sub.getInfo().onlyConsole() && !(sender instanceof ConsoleCommandSender)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getConsoleOnly());
-        return;
-      }
-
-      final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, sub, args);
-
-      // The subcommands has arguments which are not present in the executed command
-      if (sub.getInfo().arguments().length > 0
-        && commandInvocation.getRawArguments().length <= 1) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getIncorrectCommandUsage()
-          .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")"));
-        return;
-      }
-
-      // Execute the sub command with the custom invocation properties
-      sub.execute(commandInvocation);
-    });
-
     if (!subcommand.isPresent()) {
 
       // Re-use the old, cached help message since we don't want to scan
@@ -130,6 +103,8 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
       for (final Component component : CACHED_HELP_MESSAGE) {
         invocationSource.sendMessage(component);
       }
+    } else {
+      subcommand.get().invoke(invocationSource, args);
     }
   }
 

@@ -29,7 +29,7 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 public final class LockdownCommand extends Subcommand {
 
   @Override
-  public void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull CommandInvocation invocation) {
     final boolean newState = !SONAR.getConfig().getLockdown().isEnabled();
     SONAR.getConfig().getLockdown().setEnabled(newState);
     SONAR.getConfig().getGeneralConfig().set("general.lockdown.enabled", newState);

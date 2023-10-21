@@ -31,7 +31,7 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 public final class VerboseCommand extends Subcommand {
 
   @Override
-  public void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull CommandInvocation invocation) {
     if (SONAR.getVerboseHandler().isSubscribed(invocation.getSender().getName())) {
       SONAR.getVerboseHandler().unsubscribe(invocation.getSender().getName());
       invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerboseUnsubscribed());

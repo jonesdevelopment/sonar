@@ -18,12 +18,13 @@
 package xyz.jonesdev.sonar.bungee.command;
 
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.bungee.SonarBungee;
 
 public final class BungeeInvocationSource extends InvocationSource {
   public BungeeInvocationSource(final @NotNull CommandSender sender) {
-    super(sender.getName(), SonarBungee.INSTANCE.getBungeeAudiences().sender(sender));
+    super(sender.getName(), SonarBungee.INSTANCE.getBungeeAudiences().sender(sender), sender instanceof ProxiedPlayer);
   }
 }

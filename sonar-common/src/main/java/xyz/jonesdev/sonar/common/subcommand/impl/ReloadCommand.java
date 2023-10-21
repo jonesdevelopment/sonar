@@ -30,7 +30,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 public final class ReloadCommand extends Subcommand {
 
   @Override
-  public void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull CommandInvocation invocation) {
     final SystemTimer timer = new SystemTimer();
 
     invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getReloading());

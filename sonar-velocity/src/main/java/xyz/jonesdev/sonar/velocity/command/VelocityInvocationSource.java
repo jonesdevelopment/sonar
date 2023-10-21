@@ -24,8 +24,6 @@ import xyz.jonesdev.sonar.api.command.InvocationSource;
 
 public final class VelocityInvocationSource extends InvocationSource {
   public VelocityInvocationSource(final @NotNull CommandSource sender) {
-    super(sender instanceof Player
-      ? ((Player) sender).getUsername()
-      : "Console", sender);
+    super(sender instanceof Player ? ((Player) sender).getUsername() : "Console", sender, sender instanceof Player);
   }
 }

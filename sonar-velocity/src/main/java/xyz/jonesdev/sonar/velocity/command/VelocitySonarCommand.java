@@ -19,11 +19,9 @@ package xyz.jonesdev.sonar.velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
-import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
@@ -92,32 +90,6 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       }
     }
 
-    subcommand.ifPresent(sub -> {
-      if (sub.getInfo().onlyPlayers() && !(invocation.source() instanceof Player)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getPlayersOnly());
-        return;
-      }
-
-      if (sub.getInfo().onlyConsole() && !(invocation.source() instanceof ConsoleCommandSource)) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getConsoleOnly());
-        return;
-      }
-
-      final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, sub, invocation.arguments());
-
-      // The subcommands has arguments which are not present in the executed command
-      if (sub.getInfo().arguments().length > 0
-        && commandInvocation.getRawArguments().length <= 1
-        && sub.getInfo().argumentsRequired()) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getIncorrectCommandUsage()
-          .replace("%usage%", sub.getInfo().name() + " (" + sub.getArguments() + ")"));
-        return;
-      }
-
-      // Execute the sub command with the custom invocation properties
-      sub.execute(commandInvocation);
-    });
-
     if (subcommand.isEmpty()) {
 
       // Re-use the old, cached help message since we don't want to scan
@@ -126,6 +98,8 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
       for (final Component component : CACHED_HELP_MESSAGE) {
         invocationSource.sendMessage(component);
       }
+    } else {
+      subcommand.get().invoke(invocationSource, invocation.arguments());
     }
   }
 

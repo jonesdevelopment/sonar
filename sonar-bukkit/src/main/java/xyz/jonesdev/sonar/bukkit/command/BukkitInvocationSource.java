@@ -18,12 +18,13 @@
 package xyz.jonesdev.sonar.bukkit.command;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.bukkit.SonarBukkit;
 
 public final class BukkitInvocationSource extends InvocationSource {
   public BukkitInvocationSource(final @NotNull CommandSender sender) {
-    super(sender.getName(), SonarBukkit.INSTANCE.getBukkitAudiences().sender(sender));
+    super(sender.getName(), SonarBukkit.INSTANCE.getBukkitAudiences().sender(sender), sender instanceof Player);
   }
 }

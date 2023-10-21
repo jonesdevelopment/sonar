@@ -46,7 +46,7 @@ public final class DumpCommand extends Subcommand implements JVMProfiler {
     .create();
 
   @Override
-  public void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull CommandInvocation invocation) {
     final String json = GSON.toJson(collectMappedInformation());
     SONAR.getLogger().info("Generated dump: {}", json);
   }

@@ -48,7 +48,7 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
   }
 
   @Override
-  public void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull CommandInvocation invocation) {
     StatisticType type = StatisticType.GENERAL;
     if (invocation.getRawArguments().length >= 2) {
       try {
