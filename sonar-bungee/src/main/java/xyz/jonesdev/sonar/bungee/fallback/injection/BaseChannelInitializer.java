@@ -22,11 +22,11 @@ import io.netty.channel.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.Varint21LengthFieldPrepender;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackHandlerBoss;
 import xyz.jonesdev.sonar.bungee.fallback.varint.Varint21FrameDecoder;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 
@@ -77,6 +77,6 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
       BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS
     ));
     channel.pipeline().addLast(FRAME_PREPENDER, FRAME_ENCODER);
-    channel.pipeline().addLast(BOSS_HANDLER, new HandlerBoss());
+    channel.pipeline().addLast(BOSS_HANDLER, new FallbackHandlerBoss());
   }
 }
