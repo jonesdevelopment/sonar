@@ -44,8 +44,6 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
 
   private static final BaseChannelInitializer BASE = BaseChannelInitializer.INSTANCE;
 
-  private static final boolean DISABLE_LEGACY_PIPELINES = !Boolean.getBoolean("sonar.do-not-remove-legacy-pipes");
-
   private static final KickStringWriter LEGACY_KICK;
 
   static {
@@ -81,16 +79,12 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
           return;
         }
 
-        if (!DISABLE_LEGACY_PIPELINES) {
-          channel.pipeline().addBefore(FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder());
-        }
+        channel.pipeline().addBefore(FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder());
         channel.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER, new MinecraftDecoder(Protocol.HANDSHAKE, true,
           ProxyServer.getInstance().getProtocolVersion()));
         channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(Protocol.HANDSHAKE,
           true, ProxyServer.getInstance().getProtocolVersion()));
-        if (!DISABLE_LEGACY_PIPELINES) {
-          channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
-        }
+        channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
         channel.pipeline().get(HandlerBoss.class).setHandler(new FallbackInitialHandler(BungeeCord.getInstance(),
           listener));
 
