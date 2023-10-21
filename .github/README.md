@@ -42,8 +42,6 @@
 - [Fallback](https://github.com/jonesdevelopment/sonar#fallback) is Sonar's main component designed to prevent
   all types of bots.
 - Spigot & BungeeCord
-  - The compression method is changed
-    to [Velocity's libdeflate](https://github.com/PaperMC/Velocity/tree/dev/3.0.0/native).
   - The Varint decoder is updated to Velocity's
     improved [MinecraftVarintFrameDecoder](https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java).
 
@@ -91,4 +89,4 @@ Sonar is licensed under the [GNU General Public License 3.0](https://www.gnu.org
 
 - Special thanks to the [contributors of Sonar](https://github.com/jonesdevelopment/sonar/graphs/contributors).
 - The nbt mappings were taken from [LimboAPI](https://github.com/Elytrium/LimboAPI).
-- The compression and Varint decoding was taken from [Velocity](https://github.com/PaperMC/Velocity).
+- The Varint decoding was taken from [Velocity](https://github.com/PaperMC/Velocity).

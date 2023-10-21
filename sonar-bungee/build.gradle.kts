@@ -15,12 +15,6 @@ dependencies {
   compileOnly(project(":api"))
   compileOnly(project(":common"))
 
-  implementation("com.velocitypowered:velocity-native:1.1.9") {
-    exclude(group = "com.google.guava")
-    exclude(group = "io.netty")
-    exclude(group = "org.checkerframework")
-  }
-
   compileOnly("net.md_5:bungeecord:1.20.2-rc2-SNAPSHOT")
 
   // MiniMessage platform support

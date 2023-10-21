@@ -82,7 +82,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());
 
     // Register Fallback listener
-    getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new FallbackListener(getFallback()));
+    getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new FallbackListener());
 
     // Register audience register listener
     getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new AudienceListener());

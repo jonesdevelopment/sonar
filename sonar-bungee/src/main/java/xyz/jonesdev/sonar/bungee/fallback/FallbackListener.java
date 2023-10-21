@@ -17,49 +17,21 @@
 
 package xyz.jonesdev.sonar.bungee.fallback;
 
-import com.velocitypowered.natives.compression.VelocityCompressor;
-import com.velocitypowered.natives.util.Natives;
-import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.compress.PacketCompressor;
-import net.md_5.bungee.compress.PacketDecompressor;
-import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.packet.Kick;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.Fallback;
-import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketCompressor;
-import xyz.jonesdev.sonar.bungee.fallback.compress.FallbackPacketDecompressor;
 import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
-
-import java.lang.reflect.Field;
-
-import static net.md_5.bungee.netty.PipelineUtils.FRAME_PREPENDER;
 
 @RequiredArgsConstructor
 public final class FallbackListener implements Listener {
-  private final Fallback fallback;
-
-  private static final Field CHANNEL_WRAPPER;
-
-  static {
-    try {
-      CHANNEL_WRAPPER = InitialHandler.class.getDeclaredField("ch");
-      CHANNEL_WRAPPER.setAccessible(true);
-    } catch (Throwable throwable) {
-      throw new ReflectiveOperationException(throwable);
-    }
-  }
 
   @EventHandler
   @SuppressWarnings("deprecation")
@@ -87,43 +59,9 @@ public final class FallbackListener implements Listener {
             .replace("%protocol%",
               String.valueOf(event.getPlayer().getPendingConnection().getVersion())));
         }
-        return;
       } else if (Sonar.get().getConfig().getLockdown().isNotifyAdmins()) {
         event.getPlayer().sendMessage(new TextComponent(Sonar.get().getConfig().getLockdown().getNotification()));
       }
-    }
-
-    final InitialHandler initialHandler = (InitialHandler) event.getPlayer().getPendingConnection();
-    final ChannelWrapper channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER.get(initialHandler);
-
-    final ChannelPipeline pipeline = channelWrapper.getHandle().pipeline();
-
-    // You don't need the frame decoder anymore
-    if (pipeline.get(FRAME_PREPENDER) != null) {
-      pipeline.remove(FRAME_PREPENDER);
-    }
-
-    final int compressionThreshold = BungeeCord.getInstance().getConfig().getCompressionThreshold();
-
-    // Replace compression handlers
-    if (compressionThreshold > 0
-      && pipeline.get(PacketCompressor.class) != null
-      && pipeline.get(PacketDecompressor.class) != null) {
-      final VelocityCompressor compressor = Natives.compress.get().create(-1);
-
-      // Replace (de)compressor with Velocity's to ensure better performance
-      pipeline.replace(
-        PacketCompressor.class,
-        "compress",
-        // Create a new compressor instance with the Velocity compressor
-        new FallbackPacketCompressor(compressionThreshold, compressor)
-      );
-      pipeline.replace(
-        PacketDecompressor.class,
-        "decompress",
-        // Create a new decompressor instance with the Velocity decompressor
-        new FallbackPacketDecompressor(compressionThreshold, compressor)
-      );
     }
   }
 }
