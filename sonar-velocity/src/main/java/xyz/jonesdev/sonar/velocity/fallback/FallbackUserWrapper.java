@@ -21,7 +21,6 @@ import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -35,9 +34,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.Disconnect;
 import java.net.InetAddress;
 
 @Getter
-@ToString(of = {"protocolVersion"})
-@EqualsAndHashCode
 @RequiredArgsConstructor
+@ToString(of = {"protocolVersion"})
 public final class FallbackUserWrapper implements FallbackUser<ConnectedPlayer, MinecraftConnection> {
   private final Fallback fallback;
   private final ConnectedPlayer player;
