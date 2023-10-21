@@ -99,7 +99,7 @@ public abstract class Subcommand {
     final CommandInvocation commandInvocation = new CommandInvocation(invocationSource, this, arguments);
 
     // The subcommands has arguments which are not present in the executed command
-    if (getInfo().arguments().length > 0 && arguments.length <= 1) {
+    if (getInfo().argumentsRequired() && getInfo().arguments().length > 0 && arguments.length <= 1) {
       invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getIncorrectCommandUsage()
         .replace("%usage%", getInfo().name() + " (" + getArguments() + ")"));
       return;
