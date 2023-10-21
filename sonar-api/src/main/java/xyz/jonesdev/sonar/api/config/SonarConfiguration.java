@@ -159,8 +159,6 @@ public final class SonarConfiguration {
 
     private String verboseSubscribed;
     private String verboseUnsubscribed;
-    private String verboseSubscribedOther;
-    private String verboseUnsubscribedOther;
 
     private String reloading;
     private String reloaded;
@@ -542,16 +540,6 @@ public final class SonarConfiguration {
       "Message that is shown when a player unsubscribes from Sonar verbose");
     commands.verboseUnsubscribed = formatString(messagesConfig.getString("commands.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."));
-
-    messagesConfig.getYaml().setComment("commands.verbose.subscribed-other",
-      "Message that is shown when a player makes another player subscribe to Sonar verbose");
-    commands.verboseSubscribedOther = formatString(messagesConfig.getString("commands.verbose.subscribed-other",
-      "%prefix%%player% is now viewing Sonar verbose."));
-
-    messagesConfig.getYaml().setComment("commands.verbose.unsubscribed-other",
-      "Message that is shown when a player makes another player unsubscribe from Sonar verbose");
-    commands.verboseUnsubscribedOther = formatString(messagesConfig.getString("commands.verbose.unsubscribed-other",
-      "%prefix%%player% is no longer viewing Sonar verbose."));
 
     messagesConfig.getYaml().setComment("commands.blacklist",
       "Translations for '/sonar blacklist'");
