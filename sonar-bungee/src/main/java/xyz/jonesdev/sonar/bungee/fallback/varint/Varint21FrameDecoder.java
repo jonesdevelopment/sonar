@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.CorruptedFrameException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ import java.util.List;
 public final class Varint21FrameDecoder extends ByteToMessageDecoder {
 
   @Override
-  protected void decode(final ChannelHandlerContext ctx,
+  protected void decode(final @NotNull ChannelHandlerContext ctx,
                         final ByteBuf byteBuf,
                         final List<Object> out) throws Exception {
     if (!ctx.channel().isActive() || !byteBuf.isReadable()) {

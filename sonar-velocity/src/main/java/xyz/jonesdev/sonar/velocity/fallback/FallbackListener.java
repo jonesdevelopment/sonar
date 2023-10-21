@@ -311,7 +311,7 @@ public final class FallbackListener {
           fallback.getConnected().put(gameProfile.getName(), inetAddress);
 
           // This sometimes happens when the channel hangs, but the player is still connecting
-          // This also fixes a weird issue with TCPShield and other reverse proxies
+          // This also fixes a unique issue with TCPShield and other reverse proxies
           if (fallbackPlayer.getPipeline().get(MINECRAFT_ENCODER) == null
             || fallbackPlayer.getPipeline().get(MINECRAFT_DECODER) == null) {
             mcConnection.close(true);
