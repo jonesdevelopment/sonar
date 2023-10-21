@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.bungee.fallback.injection;
 
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -66,7 +65,6 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
     }
 
     channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-    channel.config().setAllocator(PooledByteBufAllocator.DEFAULT);
     channel.config().setWriteBufferWaterMark(SERVER_WRITE_MARK);
 
     channel.pipeline().addLast(FRAME_DECODER, REPLACE_VAR_INT_DECODER
