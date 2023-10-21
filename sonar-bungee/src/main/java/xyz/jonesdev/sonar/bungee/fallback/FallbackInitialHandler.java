@@ -117,178 +117,181 @@ public final class FallbackInitialHandler extends InitialHandler {
         throw new ConditionFailedException("Duplicate login packet");
       }
       receivedLoginPacket = true;
+      final Channel channel = channelWrapper.getHandle();
 
-      final InetAddress inetAddress = getAddress().getAddress();
-      val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
-      if (!Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
-        final Channel channel = channelWrapper.getHandle();
+      // Run in the channel's event loop
+      channel.eventLoop().execute(() -> {
+        try {
+          final ChannelPipeline pipeline = channel.pipeline();
+          TrafficChannelHooker.hook(pipeline, PACKET_DECODER, PACKET_ENCODER);
 
-        // Run in the channel's event loop
-        channel.eventLoop().execute(() -> {
-          try {
-            final ChannelPipeline pipeline = channel.pipeline();
-            TrafficChannelHooker.hook(pipeline, PACKET_DECODER, PACKET_ENCODER);
+          final InetAddress inetAddress = getAddress().getAddress();
+          val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
+          // Check if the player is already verified
+          if (Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
+            super.handle(loginRequest);
+            return;
+          }
 
-            // Check the blacklist here since we cannot let the player "ghost join"
-            if (FALLBACK.getBlacklisted().has(inetAddress.toString())) {
-              closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
+          // Check the blacklist here since we cannot let the player "ghost join"
+          if (FALLBACK.getBlacklisted().has(inetAddress.toString())) {
+            closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
+            return;
+          }
+
+          // Completely skip Geyser connections (for now)
+          if (isGeyserConnection(channel)) {
+            // TODO: Do we need to log this?
+            FALLBACK.getLogger().info("Allowing Geyser connection: {}", inetAddress);
+            super.handle(loginRequest);
+            return;
+          }
+
+          // Create wrapped Fallback user
+          player = new FallbackUserWrapper(
+            FALLBACK, channelWrapper, this,
+            channel, channel.pipeline(), inetAddress,
+            ProtocolVersion.fromId(getHandshake().getProtocolVersion())
+          );
+
+          // Perform default BungeeCord checks
+          if (bungee.config.isEnforceSecureProfile()
+            && player.getProtocolVersion().compareTo(MINECRAFT_1_19_3) < 0) {
+            final PlayerPublicKey publicKey = loginRequest.getPublicKey();
+            if (publicKey == null) {
+              disconnect(bungee.getTranslation("secure_profile_required"));
+              return;
+            }
+            if (Instant.ofEpochMilli(publicKey.getExpiry()).isBefore(Instant.now())) {
+              disconnect(bungee.getTranslation("secure_profile_expired"));
+              return;
+            }
+            if (player.getProtocolVersion().compareTo(MINECRAFT_1_19_1) < 0
+              && !EncryptionUtil.check(publicKey, null)) {
+              disconnect(bungee.getTranslation("secure_profile_invalid"));
+              return;
+            }
+          }
+
+          // Check if the player is already queued since we don't want bots to flood the queue
+          if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
+            closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued()));
+            return;
+          }
+
+          // Check if Fallback is already verifying a player
+          // → is another player with the same IP address connected to Fallback?
+          if (FALLBACK.getConnected().containsKey(loginRequest.getData())
+            || FALLBACK.getConnected().containsValue(inetAddress)) {
+            closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying()));
+            return;
+          }
+
+          // We cannot allow too many players on our Fallback server
+          // There's technically no reason for limiting this, but we'll better stay safe.
+          if (FALLBACK.getConnected().size() > Sonar.get().getConfig().getVerification().getMaxVerifyingPlayers()) {
+            closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getTooManyPlayers()));
+            return;
+          }
+
+          // Check if the IP address is currently being rate-limited
+          if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
+            closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect()));
+            return;
+          }
+
+          // We have to add this pipeline to monitor whenever the client disconnects
+          // to remove them from the list of connected and queued players
+          pipeline.addFirst(FALLBACK_HANDLER, new FallbackChannelHandler(loginRequest.getData()));
+
+          // Queue the connection for further processing
+          FALLBACK.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
+
+            // Do not continue if the connection is closed or marked as disconnected
+            if (channelWrapper.isClosed() || channelWrapper.isClosing()) return;
+
+            // Check if the username matches the valid name regex to prevent
+            // UTF-16 names or other types of exploits
+            if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(loginRequest.getData()).matches()) {
+              closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getInvalidUsername()));
               return;
             }
 
-            // Completely skip Geyser connections (for now)
-            if (isGeyserConnection(channel)) {
-              // TODO: Do we need to log this?
-              FALLBACK.getLogger().info("Allowing Geyser connection: {}", inetAddress);
-              super.handle(loginRequest);
-              return;
-            }
-
-            // Create wrapped Fallback user
-            player = new FallbackUserWrapper(
-              FALLBACK, channelWrapper, this,
-              channel, channel.pipeline(), inetAddress,
-              ProtocolVersion.fromId(getHandshake().getProtocolVersion())
+            // Add better timeout handler to avoid known exploits or issues
+            // We also want to timeout bots quickly to avoid flooding
+            pipeline.replace(
+              TIMEOUT_HANDLER,
+              TIMEOUT_HANDLER,
+              new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(),
+                TimeUnit.MILLISECONDS)
             );
 
-            // Perform default BungeeCord checks
-            if (bungee.config.isEnforceSecureProfile()
-              && player.getProtocolVersion().compareTo(MINECRAFT_1_19_3) < 0) {
-              final PlayerPublicKey publicKey = loginRequest.getPublicKey();
-              if (publicKey == null) {
-                disconnect(bungee.getTranslation("secure_profile_required"));
-                return;
-              }
-              if (Instant.ofEpochMilli(publicKey.getExpiry()).isBefore(Instant.now())) {
-                disconnect(bungee.getTranslation("secure_profile_expired"));
-                return;
-              }
-              if (player.getProtocolVersion().compareTo(MINECRAFT_1_19_1) < 0
-                && !EncryptionUtil.check(publicKey, null)) {
-                disconnect(bungee.getTranslation("secure_profile_invalid"));
-                return;
-              }
-            }
-
-            // Check if the player is already queued since we don't want bots to flood the queue
-            if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-              closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued()));
+            // Disconnect if the protocol version could not be resolved
+            if (player.getProtocolVersion().isUnknown()) {
+              closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getInvalidProtocol()));
               return;
             }
 
-            // Check if Fallback is already verifying a player
-            // → is another player with the same IP address connected to Fallback?
-            if (FALLBACK.getConnected().containsKey(loginRequest.getData())
-              || FALLBACK.getConnected().containsValue(inetAddress)) {
-              closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying()));
+            // Check if the player is already connected to the proxy but still tries to verify
+            final int limit = bungee.config.getPlayerLimit();
+            if (limit > 0 && bungee.getOnlineCount() >= limit) {
+              disconnect(bungee.getTranslation("proxy_full"));
+              return;
+            } else if (!isOnlineMode() && bungee.getPlayer(getUniqueId()) != null) {
+              closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyConnected()));
               return;
             }
 
-            // We cannot allow too many players on our Fallback server
-            // There's technically no reason for limiting this, but we'll better stay safe.
-            if (FALLBACK.getConnected().size() > Sonar.get().getConfig().getVerification().getMaxVerifyingPlayers()) {
-              closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getTooManyPlayers()));
+            // The player joined the verification
+            Statistics.REAL_TRAFFIC.increment();
+
+            if (Sonar.get().getConfig().getVerification().isLogConnections()) {
+              // Only log the processing message if the server isn't under attack.
+              // We let the user override this through the configuration.
+              if (!FALLBACK.isPotentiallyUnderAttack() || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+                FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
+                  .replace("%name%", loginRequest.getData())
+                  .replace("%ip%", Sonar.get().getConfig().formatAddress(inetAddress))
+                  .replace("%protocol%", String.valueOf(player.getProtocolVersion().getProtocol())));
+              }
+            }
+
+            // Call the VerifyJoinEvent for external API usage
+            Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(loginRequest.getData(), player));
+
+            // Mark the player as connected → verifying players
+            FALLBACK.getConnected().put(loginRequest.getData(), inetAddress);
+
+            // This sometimes happens when the channel hangs, but the player is still connecting
+            // This also fixes a unique issue with TCPShield and other reverse proxies
+            if (player.getPipeline().get(PACKET_ENCODER) == null
+              || player.getPipeline().get(PACKET_DECODER) == null) {
+              channelWrapper.close();
               return;
             }
 
-            // Check if the IP address is currently being rate-limited
-            if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
-              closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect()));
-              return;
-            }
+            // Replace normal encoder to allow custom packets
+            final FallbackPacketEncoder encoder = new FallbackPacketEncoder(player.getProtocolVersion());
+            player.getPipeline().replace(PACKET_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
 
-            // We have to add this pipeline to monitor whenever the client disconnects
-            // to remove them from the list of connected and queued players
-            pipeline.addFirst(FALLBACK_HANDLER, new FallbackChannelHandler(loginRequest.getData()));
+            // Send LoginSuccess packet to make the client think they are joining the server
+            player.write(new LoginSuccess(loginRequest.getData(), uuid));
 
-            // Queue the connection for further processing
-            FALLBACK.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
+            // The LoginSuccess packet has been sent, now we can change the registry state
+            encoder.updateRegistry(player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
+              ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
 
-              // Do not continue if the connection is closed or marked as disconnected
-              if (channelWrapper.isClosed() || channelWrapper.isClosing()) return;
-
-              // Check if the username matches the valid name regex to prevent
-              // UTF-16 names or other types of exploits
-              if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(loginRequest.getData()).matches()) {
-                closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getInvalidUsername()));
-                return;
-              }
-
-              // Add better timeout handler to avoid known exploits or issues
-              // We also want to timeout bots quickly to avoid flooding
-              pipeline.replace(
-                TIMEOUT_HANDLER,
-                TIMEOUT_HANDLER,
-                new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(),
-                  TimeUnit.MILLISECONDS)
-              );
-
-              // Disconnect if the protocol version could not be resolved
-              if (player.getProtocolVersion().isUnknown()) {
-                closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getInvalidProtocol()));
-                return;
-              }
-
-              // Check if the player is already connected to the proxy but still tries to verify
-              final int limit = bungee.config.getPlayerLimit();
-              if (limit > 0 && bungee.getOnlineCount() >= limit) {
-                disconnect(bungee.getTranslation("proxy_full"));
-                return;
-              } else if (!isOnlineMode() && bungee.getPlayer(getUniqueId()) != null) {
-                closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyConnected()));
-                return;
-              }
-
-              // The player joined the verification
-              Statistics.REAL_TRAFFIC.increment();
-
-              if (Sonar.get().getConfig().getVerification().isLogConnections()) {
-                // Only log the processing message if the server isn't under attack.
-                // We let the user override this through the configuration.
-                if (!FALLBACK.isPotentiallyUnderAttack() || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-                  FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
-                    .replace("%name%", loginRequest.getData())
-                    .replace("%ip%", Sonar.get().getConfig().formatAddress(inetAddress))
-                    .replace("%protocol%", String.valueOf(player.getProtocolVersion().getProtocol())));
-                }
-              }
-
-              // Call the VerifyJoinEvent for external API usage
-              Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(loginRequest.getData(), player));
-
-              // Mark the player as connected → verifying players
-              FALLBACK.getConnected().put(loginRequest.getData(), inetAddress);
-
-              // This sometimes happens when the channel hangs, but the player is still connecting
-              // This also fixes a unique issue with TCPShield and other reverse proxies
-              if (player.getPipeline().get(PACKET_ENCODER) == null
-                || player.getPipeline().get(PACKET_DECODER) == null) {
-                channelWrapper.close();
-                return;
-              }
-
-              // Replace normal encoder to allow custom packets
-              final FallbackPacketEncoder encoder = new FallbackPacketEncoder(player.getProtocolVersion());
-              player.getPipeline().replace(PACKET_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
-
-              // Send LoginSuccess packet to make the client think they are joining the server
-              player.write(new LoginSuccess(loginRequest.getData(), uuid));
-
-              // The LoginSuccess packet has been sent, now we can change the registry state
-              encoder.updateRegistry(player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
-                ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
-
-              // Replace normal decoder to allow custom packets
-              player.getPipeline().replace(
-                PACKET_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(player,
-                  new FallbackVerificationHandler(player, loginRequest.getData(), uuid)
-                ));
-            }));
-          } catch (Throwable throwable) {
-            throw new ReflectiveOperationException(throwable);
-          }
-        });
-        return;
-      }
+            // Replace normal decoder to allow custom packets
+            player.getPipeline().replace(
+              PACKET_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(player,
+                new FallbackVerificationHandler(player, loginRequest.getData(), uuid)
+              ));
+          }));
+        } catch (Throwable throwable) {
+          throw new ReflectiveOperationException(throwable);
+        }
+      });
+      return;
     }
 
     super.handle(loginRequest);
