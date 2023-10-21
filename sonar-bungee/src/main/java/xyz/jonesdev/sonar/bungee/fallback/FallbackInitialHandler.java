@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.fallback.handler;
+package xyz.jonesdev.sonar.bungee.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -39,7 +39,6 @@ import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
-import xyz.jonesdev.sonar.bungee.fallback.FallbackUserWrapper;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
@@ -63,7 +62,7 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
 
 public final class FallbackInitialHandler extends InitialHandler {
-  public FallbackInitialHandler(final BungeeCord bungee, final ListenerInfo listener) {
+  public FallbackInitialHandler(final @NotNull BungeeCord bungee, final ListenerInfo listener) {
     super(bungee, listener);
     this.bungee = bungee;
   }

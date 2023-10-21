@@ -28,7 +28,6 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.packet.Kick;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
 
 @RequiredArgsConstructor
 public final class FallbackListener implements Listener {
