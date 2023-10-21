@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.DecoderException;
+import lombok.Getter;
 import lombok.val;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
@@ -70,9 +71,12 @@ public final class FallbackInitialHandler extends InitialHandler {
     this.bungee = bungee;
   }
   private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
+  @Getter
   private ChannelWrapper channelWrapper;
   private @NotNull final BungeeCord bungee;
   private @Nullable FallbackUserWrapper player;
+  @Getter
+  private ProtocolVersion protocolVersion;
   private boolean receivedLoginPacket;
   private boolean receivedStatusPacket;
 
@@ -119,6 +123,8 @@ public final class FallbackInitialHandler extends InitialHandler {
       throw new ConditionFailedException("Duplicate login packet");
     }
     receivedLoginPacket = true;
+    // Cache protocol version so other handlers don't throw NPEs
+    protocolVersion = ProtocolVersion.fromId(getHandshake().getProtocolVersion());
     final Channel channel = channelWrapper.getHandle();
 
     // Run in the channel's event loop
@@ -161,8 +167,7 @@ public final class FallbackInitialHandler extends InitialHandler {
         // Create wrapped Fallback user
         player = new FallbackUserWrapper(
           FALLBACK, channelWrapper, this,
-          channel, channel.pipeline(), inetAddress,
-          ProtocolVersion.fromId(getHandshake().getProtocolVersion())
+          channel, channel.pipeline(), inetAddress, protocolVersion
         );
 
         // Perform default BungeeCord checks
@@ -306,20 +311,20 @@ public final class FallbackInitialHandler extends InitialHandler {
 
   // Mostly taken from Velocity
   public void closeWith(final Object msg) {
-    if (player != null && player.getChannel().isActive()) {
-      boolean is17 = player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
-        && player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0;
+    if (channelWrapper.getHandle().isActive()) {
+      boolean is17 = protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
+        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0;
       if (is17) {
-        player.getChannel().eventLoop().execute(() -> {
+        channelWrapper.getHandle().eventLoop().execute(() -> {
           channelWrapper.getHandle().config().setAutoRead(false);
-          player.getChannel().eventLoop().schedule(() -> {
+          channelWrapper.getHandle().eventLoop().schedule(() -> {
             channelWrapper.markClosed();
-            player.getChannel().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+            channelWrapper.getHandle().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
           }, 250L, TimeUnit.MILLISECONDS);
         });
       } else {
         channelWrapper.markClosed();
-        player.getChannel().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+        channelWrapper.getHandle().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
       }
     }
   }

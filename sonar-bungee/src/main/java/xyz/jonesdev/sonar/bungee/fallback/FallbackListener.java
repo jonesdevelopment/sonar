@@ -34,7 +34,7 @@ public final class FallbackListener implements Listener {
 
   @EventHandler
   @SuppressWarnings("deprecation")
-  public void handle(final @NotNull PostLoginEvent event) throws Throwable {
+  public void handle(final @NotNull PostLoginEvent event) {
     if (Sonar.get().getConfig().getLockdown().isEnabled()) {
       if (!event.getPlayer().hasPermission(Sonar.get().getConfig().getLockdown().getBypassPermission())) {
         final PendingConnection pendingConnection = event.getPlayer().getPendingConnection();
