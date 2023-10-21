@@ -244,7 +244,7 @@ public final class FallbackInitialHandler extends InitialHandler {
           if (limit > 0 && bungee.getOnlineCount() >= limit) {
             disconnect(bungee.getTranslation("proxy_full"));
             return;
-          } else if (!isOnlineMode() && bungee.getPlayer(getUniqueId()) != null) {
+          } else if (!isOnlineMode() && bungee.getPlayer(loginRequest.getData()) != null) {
             closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyConnected()));
             return;
           }
