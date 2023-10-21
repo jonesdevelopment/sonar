@@ -20,24 +20,23 @@ package xyz.jonesdev.sonar.common.fallback;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 @RequiredArgsConstructor
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
-  private static final Fallback FALLBACK = Sonar.get().getFallback();
-  private final String username;
+  private static final @NotNull Fallback FALLBACK = Sonar.get().getFallback();
+  private final @NotNull String username;
 
   @Override
-  public void channelUnregistered(final ChannelHandlerContext ctx) {
-    final InetAddress inetAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
-
-    // Remove the IP address from the queue
+  public void channelUnregistered(final @NotNull ChannelHandlerContext ctx) {
+    // Remove the username from the connected players
     FALLBACK.getConnected().remove(username);
-    FALLBACK.getQueue().remove(inetAddress);
+    // Remove the IP address from the queue
+    FALLBACK.getQueue().remove(((InetSocketAddress) ctx.channel().remoteAddress()).getAddress());
 
     ctx.fireChannelUnregistered();
   }
