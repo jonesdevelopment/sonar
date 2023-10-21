@@ -34,9 +34,6 @@ import java.util.Optional;
 import static java.util.Collections.emptyList;
 
 public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, SonarCommand {
-  {
-    prepareCachedMessages();
-  }
 
   @Override
   public boolean onCommand(final CommandSender sender,

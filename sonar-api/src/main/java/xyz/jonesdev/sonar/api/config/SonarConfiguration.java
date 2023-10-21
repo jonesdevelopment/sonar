@@ -22,6 +22,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.dependencies.Dependency;
 
 import java.io.File;
@@ -156,6 +157,9 @@ public final class SonarConfiguration {
     private String memoryStatistics;
     private String networkStatistics;
     private String cpuStatistics;
+
+    private List<String> helpHeader;
+    private String helpSubcommands;
 
     private String verboseSubscribed;
     private String verboseUnsubscribed;
@@ -504,6 +508,33 @@ public final class SonarConfiguration {
         "<red>The server is currently locked down, please try again later.",
         "%footer%"
       ))));
+
+    messagesConfig.getYaml().setComment("commands.main",
+      "Translations for '/sonar'");
+    messagesConfig.getYaml().setComment("commands.main.header",
+      "Informational message that is shown above everything when running the main command");
+    commands.helpHeader = messagesConfig.getStringList("commands.main.header",
+      Arrays.asList(
+        "<yellow>Running Sonar %version% on %platform%.",
+        "<yellow>(C) %copyright_year% Jones Development and Sonar Contributors",
+        "<green><click:open_url:'https://github.com/jonesdevelopment/sonar'>https://github.com/jonesdevelopment/sonar",
+        "",
+        "<yellow>Need help or have any questions?",
+        "<yellow><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Click to open Discord)'>Open a " +
+          "ticket on the Discord </hover></click></yellow><yellow><click:open_url:'https://github" +
+          ".com/jonesdevelopment/sonar/issues'><hover:show_text:'(Click to open GitHub)'>or open a new issue on " +
+          "GitHub.",
+        ""
+      ));
+    messagesConfig.getYaml().setComment("commands.main.subcommands",
+      "Formatting of the list of subcommands shown when running the main command");
+    commands.helpSubcommands = formatString(messagesConfig.getString("commands.main.subcommands",
+      "<click:suggest_command:'/sonar %subcommand% '><hover:show_text:'<gray>Only players: " +
+        "</gray>%only_players%<br><gray>Require console: </gray>%require_console%<br><gray>Permission: " +
+        "</gray><white>%permission%<br><gray>Aliases: </gray>%aliases%'><gray> ▪ </gray><green>/sonar " +
+        "%subcommand%</green><gray> - </gray><white>%description%"));
+
+    SonarCommand.prepareCachedMessages();
 
     messagesConfig.getYaml().setComment("commands.reload",
       "Translations for '/sonar reload'");

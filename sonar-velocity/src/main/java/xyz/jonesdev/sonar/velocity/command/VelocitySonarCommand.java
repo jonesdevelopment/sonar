@@ -35,9 +35,6 @@ import java.util.Optional;
 import static java.util.Collections.emptyList;
 
 public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
-  {
-    prepareCachedMessages();
-  }
 
   @Override
   public void execute(final @NotNull Invocation invocation) {

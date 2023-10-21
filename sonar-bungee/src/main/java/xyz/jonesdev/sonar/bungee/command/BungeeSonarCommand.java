@@ -38,7 +38,6 @@ import static java.util.Collections.emptyList;
 public final class BungeeSonarCommand extends Command implements TabExecutor, SonarCommand {
   public BungeeSonarCommand() {
     super("sonar");
-    prepareCachedMessages();
   }
 
   @Override
