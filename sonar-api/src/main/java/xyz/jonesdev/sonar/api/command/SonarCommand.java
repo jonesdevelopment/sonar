@@ -38,8 +38,6 @@ public interface SonarCommand {
 
   ExpiringCache<Object> DELAY = Cappuccino.buildExpiring(500L);
 
-  int COPYRIGHT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
-
   List<Component> CACHED_HELP_MESSAGE = new ArrayList<>();
 
   static void prepareCachedMessages() {
@@ -49,7 +47,7 @@ public interface SonarCommand {
       CACHED_HELP_MESSAGE.add(MiniMessage.miniMessage().deserialize(message
         .replace("%version%", Sonar.get().getVersion().getFormatted())
         .replace("%platform%", Sonar.get().getPlatform().getDisplayName())
-        .replace("%copyright_year%", String.valueOf(COPYRIGHT_YEAR))));
+        .replace("%copyright_year%", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))));
     }
 
     final String subcommandFormat = Sonar.get().getConfig().getCommands().getHelpSubcommands();
