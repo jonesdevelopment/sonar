@@ -22,7 +22,7 @@ allprojects {
   repositories {
     mavenCentral() // Lombok
     maven(url = "https://jitpack.io") // simple-yaml
-    maven(url = "https://repo.papermc.io/repository/maven-public") // Velocity natives
+    maven(url = "https://repo.papermc.io/repository/maven-public") // Velocity API
     maven(url = "https://repo.jonesdev.xyz/releases/") // Bungee & Velocity proxy module
   }
 }
@@ -83,7 +83,6 @@ tasks {
     relocate("net.kyori.adventure.nbt", "xyz.jonesdev.sonar.libs.nbt")
     relocate("com.google.gson", "xyz.jonesdev.sonar.libs.gson")
     relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
-    relocate("com.velocitypowered.natives", "xyz.jonesdev.sonar.libs.natives")
   }
 
   compileJava {

@@ -23,15 +23,15 @@ import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.event.ClientConnectEvent;
-import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.*;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
-import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackHandlerBoss;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackInitialHandler;
 
 import java.lang.reflect.Field;
 import java.net.SocketAddress;
@@ -43,7 +43,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
   public static final ChildChannelInitializer INSTANCE = new ChildChannelInitializer();
 
   private static final BaseChannelInitializer BASE = BaseChannelInitializer.INSTANCE;
-
+  private static final BungeeCord BUNGEE = BungeeCord.getInstance();
   private static final KickStringWriter LEGACY_KICK;
 
   static {
@@ -63,7 +63,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
     final SocketAddress remoteAddress = channel.remoteAddress() == null ? channel.parent().localAddress()
       : channel.remoteAddress();
 
-    if (BungeeCord.getInstance().getConnectionThrottle() != null && BungeeCord.getInstance().getConnectionThrottle().throttle(remoteAddress)) {
+    if (BUNGEE.getConnectionThrottle() != null && BUNGEE.getConnectionThrottle().throttle(remoteAddress)) {
       channel.close();
     } else {
       final ListenerInfo listener = channel.attr(PipelineUtils.LISTENER).get();
@@ -80,13 +80,12 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
         }
 
         channel.pipeline().addBefore(FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder());
-        channel.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER, new MinecraftDecoder(Protocol.HANDSHAKE, true,
-          ProxyServer.getInstance().getProtocolVersion()));
-        channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(Protocol.HANDSHAKE,
-          true, ProxyServer.getInstance().getProtocolVersion()));
+        channel.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER, new MinecraftDecoder(
+          Protocol.HANDSHAKE, true, ProtocolVersion.LATEST_VERSION.getProtocol()));
+        channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(
+          Protocol.HANDSHAKE, true, ProtocolVersion.LATEST_VERSION.getProtocol()));
         channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
-        channel.pipeline().get(HandlerBoss.class).setHandler(new FallbackInitialHandler(BungeeCord.getInstance(),
-          listener));
+        channel.pipeline().get(FallbackHandlerBoss.class).setHandler(new FallbackInitialHandler(BUNGEE, listener));
 
         if (listener.isProxyProtocol()) {
           channel.pipeline().addFirst(new HAProxyMessageDecoder());

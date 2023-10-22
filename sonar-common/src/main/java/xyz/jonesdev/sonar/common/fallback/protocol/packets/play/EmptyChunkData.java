@@ -34,9 +34,9 @@ import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeCompo
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(of = {"x", "z"})
 public final class EmptyChunkData implements FallbackPacket {
   private int x, z;
 

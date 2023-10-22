@@ -23,15 +23,17 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.cappuccino.Cappuccino;
+import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
-import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.INCOMING;
@@ -41,23 +43,14 @@ import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.OUTGOING;
 public final class Verbose implements JVMProfiler {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
   private final @NotNull Map<String, Audience> audiences = new ConcurrentHashMap<>();
-  private final SystemTimer secondTimer = new SystemTimer();
-  private int joinsPerSecond, totalJoins;
-  private int lastTotalJoins, animationIndex;
+  private int animationIndex;
+  private final ExpiringCache<Long> joinsPerSecond = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
 
   // Run action bar verbose
   public void update() {
     // Clean up all blacklisted IPs
     Sonar.get().getFallback().getBlacklisted().cleanUp(false);
-
-    totalJoins = Statistics.TOTAL_TRAFFIC.get();
-
-    // Statistically determine the joins per second without any caches
-    if (totalJoins > 0 && secondTimer.elapsed(1000L)) {
-      secondTimer.reset();
-      joinsPerSecond = totalJoins - lastTotalJoins;
-      lastTotalJoins = totalJoins;
-    }
+    joinsPerSecond.cleanUp(false);
 
     // Don't prepare component if there are no subscribers
     if (subscribers.isEmpty()) return;
@@ -78,8 +71,8 @@ public final class Verbose implements JVMProfiler {
       .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
-      .replace("%total-joins%", DECIMAL_FORMAT.format(totalJoins))
-      .replace("%per-second-joins%", DECIMAL_FORMAT.format(joinsPerSecond))
+      .replace("%total-joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
+      .replace("%per-second-joins%", DECIMAL_FORMAT.format(joinsPerSecond.estimatedSize()))
       .replace("%verify-total%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
       .replace("%verify-success%",
         DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))

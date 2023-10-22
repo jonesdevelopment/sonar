@@ -17,16 +17,15 @@
 
 package xyz.jonesdev.sonar.bungee.fallback.injection;
 
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.Varint21LengthFieldPrepender;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackHandlerBoss;
 import xyz.jonesdev.sonar.bungee.fallback.varint.Varint21FrameDecoder;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 
@@ -41,15 +40,13 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
 
   private static final boolean REPLACE_VAR_INT_DECODER = !Boolean.getBoolean("sonar.do-not-replace-decoder");
 
-  private static final WriteBufferWaterMark MARK;
+  // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/network/ConnectionManager.java#L57
+  private static final WriteBufferWaterMark SERVER_WRITE_MARK = new WriteBufferWaterMark(1 << 20, 1 << 21);
+
   private static final Varint21LengthFieldPrepender FRAME_ENCODER;
 
   static {
     try {
-      final Field markField = PipelineUtils.class.getDeclaredField("MARK");
-      markField.setAccessible(true);
-      MARK = (WriteBufferWaterMark) markField.get(null);
-
       final Field frameEncoder = PipelineUtils.class.getDeclaredField("framePrepender");
       frameEncoder.setAccessible(true);
       FRAME_ENCODER = (Varint21LengthFieldPrepender) frameEncoder.get(null);
@@ -68,15 +65,13 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
     }
 
     channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-    channel.config().setAllocator(PooledByteBufAllocator.DEFAULT);
-    channel.config().setWriteBufferWaterMark(MARK);
+    channel.config().setWriteBufferWaterMark(SERVER_WRITE_MARK);
 
     channel.pipeline().addLast(FRAME_DECODER, REPLACE_VAR_INT_DECODER
       ? new Varint21FrameDecoder() : new net.md_5.bungee.protocol.Varint21FrameDecoder());
     channel.pipeline().addLast(TIMEOUT_HANDLER, new FallbackTimeoutHandler(
-      BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS
-    ));
+      BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
     channel.pipeline().addLast(FRAME_PREPENDER, FRAME_ENCODER);
-    channel.pipeline().addLast(BOSS_HANDLER, new HandlerBoss());
+    channel.pipeline().addLast(BOSS_HANDLER, new FallbackHandlerBoss());
   }
 }
