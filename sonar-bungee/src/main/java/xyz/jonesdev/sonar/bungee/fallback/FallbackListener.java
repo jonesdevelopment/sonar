@@ -50,7 +50,8 @@ public final class FallbackListener implements Listener {
     if (maxOnlinePerIp > 0) {
       final long onlinePerIp = SonarBungee.INSTANCE.getPlugin().getServer().getPlayers().stream()
         .filter(player -> Objects.equals(player.getAddress().getAddress(), inetAddress))
-        .count();
+        .count()
+        + 1 /* add 1 because the player hasn't been added to the list of online players yet */;
 
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
