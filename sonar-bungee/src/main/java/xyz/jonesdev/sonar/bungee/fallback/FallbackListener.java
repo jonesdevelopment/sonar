@@ -55,7 +55,7 @@ public final class FallbackListener implements Listener {
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
         final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) event.getConnection();
-        final Component component = Sonar.get().getConfig().getLockdown().getDisconnect();
+        final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
         final String serialized = JSONComponentSerializer.json().serialize(component);
         fallbackInitialHandler.closeWith(new Kick(serialized));
       }
