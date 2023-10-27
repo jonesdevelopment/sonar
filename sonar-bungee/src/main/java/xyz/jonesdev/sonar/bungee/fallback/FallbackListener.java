@@ -18,10 +18,10 @@
 package xyz.jonesdev.sonar.bungee.fallback;
 
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -91,10 +91,12 @@ public final class FallbackListener implements Listener {
               String.valueOf(event.getPlayer().getPendingConnection().getVersion())));
         }
       } else if (Sonar.get().getConfig().getLockdown().isNotifyAdmins()) {
-        final String notification = Sonar.get().getConfig().getLockdown().getNotification();
-        final Component deserialized = MiniMessage.miniMessage().deserialize(notification);
-        final String serialized = MiniMessage.miniMessage().serialize(deserialized);
-        event.getPlayer().sendMessage(new TextComponent(serialized));
+        final Audience audience = Sonar.get().getVerboseHandler().getAudiences().get(event.getPlayer().getName());
+        if (audience != null) {
+          final String notification = Sonar.get().getConfig().getLockdown().getNotification();
+          final Component deserialized = MiniMessage.miniMessage().deserialize(notification);
+          audience.sendMessage(deserialized);
+        }
       }
     }
   }
