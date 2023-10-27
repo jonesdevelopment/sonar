@@ -22,15 +22,44 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.PendingConnection;
+import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.packet.Kick;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.bungee.SonarBungee;
+
+import java.net.InetAddress;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 public final class FallbackListener implements Listener {
+
+  @EventHandler
+  @SuppressWarnings("deprecation")
+  public void handle(final @NotNull LoginEvent event) {
+    final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
+
+    // Check if the number of online players using the same IP address as
+    // the connecting player is greater than the configured amount
+    final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
+
+    if (maxOnlinePerIp > 0) {
+      final long onlinePerIp = SonarBungee.INSTANCE.getPlugin().getServer().getPlayers().stream()
+        .filter(player -> Objects.equals(player.getAddress().getAddress(), inetAddress))
+        .count();
+
+      // We use '>=' because the player connecting to the server hasn't joined yet
+      if (onlinePerIp >= maxOnlinePerIp) {
+        final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) event.getConnection();
+        final Component component = Sonar.get().getConfig().getLockdown().getDisconnect();
+        final String serialized = JSONComponentSerializer.json().serialize(component);
+        fallbackInitialHandler.closeWith(new Kick(serialized));
+      }
+    }
+  }
 
   @EventHandler
   @SuppressWarnings("deprecation")
