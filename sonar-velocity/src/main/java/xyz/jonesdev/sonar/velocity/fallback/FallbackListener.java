@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.velocity.fallback;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.api.util.GameProfile;
@@ -349,23 +350,20 @@ public final class FallbackListener {
   public void handle(final @NotNull LoginEvent event) {
     val connectedPlayer = (ConnectedPlayer) event.getPlayer();
 
-    if (Sonar.get().getConfig().getLockdown().isEnabled()) {
-      if (!event.getPlayer().hasPermission(Sonar.get().getConfig().getLockdown().getBypassPermission())) {
-        connectedPlayer.getConnection().closeWith(Disconnect.create(
-          Sonar.get().getConfig().getLockdown().getDisconnect(), connectedPlayer.getProtocolVersion()));
+    if (Sonar.get().getConfig().getLockdown().isEnabled()
+      && !event.getPlayer().hasPermission(Sonar.get().getConfig().getLockdown().getBypassPermission())) {
+      connectedPlayer.getConnection().closeWith(Disconnect.create(
+        Sonar.get().getConfig().getLockdown().getDisconnect(), connectedPlayer.getProtocolVersion()));
 
-        if (Sonar.get().getConfig().getLockdown().isLogAttempts()) {
-          Sonar.get().getLogger().info(Sonar.get().getConfig().getLockdown().getConsoleLog()
-            .replace("%player%", event.getPlayer().getUsername())
-            .replace("%ip%", Sonar.get().getConfig()
-              .formatAddress(event.getPlayer().getRemoteAddress().getAddress()))
-            .replace("%protocol%",
-              String.valueOf(event.getPlayer().getProtocolVersion().getProtocol())));
-        }
-        return;
-      } else if (Sonar.get().getConfig().getLockdown().isNotifyAdmins()) {
-        event.getPlayer().sendMessage(Component.text(Sonar.get().getConfig().getLockdown().getNotification()));
+      if (Sonar.get().getConfig().getLockdown().isLogAttempts()) {
+        Sonar.get().getLogger().info(Sonar.get().getConfig().getLockdown().getConsoleLog()
+          .replace("%player%", event.getPlayer().getUsername())
+          .replace("%ip%", Sonar.get().getConfig()
+            .formatAddress(event.getPlayer().getRemoteAddress().getAddress()))
+          .replace("%protocol%",
+            String.valueOf(event.getPlayer().getProtocolVersion().getProtocol())));
       }
+      return;
     }
 
     final InetAddress inetAddress = event.getPlayer().getRemoteAddress().getAddress();
@@ -384,6 +382,15 @@ public final class FallbackListener {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
           Sonar.get().getConfig().getTooManyOnlinePerIp(), connectedPlayer.getProtocolVersion()
         ));
+      }
+    }
+  }
+
+  @Subscribe(order = PostOrder.LAST)
+  public void handle(final @NotNull PostLoginEvent event) {
+    if (Sonar.get().getConfig().getLockdown().isEnabled() && Sonar.get().getConfig().getLockdown().isNotifyAdmins()) {
+      if (event.getPlayer().hasPermission(Sonar.get().getConfig().getLockdown().getBypassPermission())) {
+        event.getPlayer().sendMessage(Component.text(Sonar.get().getConfig().getLockdown().getNotification()));
       }
     }
   }
