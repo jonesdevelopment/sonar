@@ -37,6 +37,7 @@ import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -390,7 +391,9 @@ public final class FallbackListener {
   public void handle(final @NotNull PostLoginEvent event) {
     if (Sonar.get().getConfig().getLockdown().isEnabled() && Sonar.get().getConfig().getLockdown().isNotifyAdmins()) {
       if (event.getPlayer().hasPermission(Sonar.get().getConfig().getLockdown().getBypassPermission())) {
-        event.getPlayer().sendMessage(Component.text(Sonar.get().getConfig().getLockdown().getNotification()));
+        final String notification = Sonar.get().getConfig().getLockdown().getNotification();
+        final Component deserialized = MiniMessage.miniMessage().deserialize(notification);
+        event.getPlayer().sendMessage(deserialized);
       }
     }
   }
