@@ -175,11 +175,10 @@ public final class SonarConfiguration {
     @Getter
     @RequiredArgsConstructor
     public enum Type {
-      MYSQL(new Dependency[]{Dependency.MYSQL}, "com.mysql.cj.jdbc.NonRegisteringDriver"),
-      MARIADB(new Dependency[]{Dependency.MYSQL, Dependency.MARIADB}, "org.mariadb.jdbc.Driver"),
+      MYSQL(Dependency.MYSQL, "com.mysql.cj.jdbc.NonRegisteringDriver"),
       NONE(null, null);
 
-      private final Dependency[] dependencies;
+      private final Dependency dependency;
       private final String driverClassName;
     }
 
@@ -266,7 +265,7 @@ public final class SonarConfiguration {
     // Database
     generalConfig.getYaml().setComment("database.type",
       "Type of database Sonar uses to store verified players"
-        + LINE_SEPARATOR + "Possible types: NONE, MYSQL, MARIADB (experimental)"
+        + LINE_SEPARATOR + "Possible types: NONE, MYSQL"
     );
     final String newDatabaseType = generalConfig.getString("database.type", Database.Type.NONE.name());
     database.type = Database.Type.valueOf(newDatabaseType.toUpperCase());

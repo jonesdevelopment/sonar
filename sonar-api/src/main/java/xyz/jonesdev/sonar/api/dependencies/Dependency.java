@@ -38,8 +38,9 @@ public enum Dependency {
   MYSQL(
     "com/mysql",
     "mysql-connector-j",
-    "8.1.0"
+    "8.2.0"
   ),
+  // TODO: MariaDB still seems to have some issues; investigate!
   // https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
   MARIADB(
     "org/mariadb/jdbc",
@@ -47,10 +48,8 @@ public enum Dependency {
     "3.1.4"
   );
 
-  private @NotNull
-  final Path tempFilePath;
-  private @NotNull
-  final URL mvnRepoURL;
+  private final Path tempFilePath;
+  private final URL mvnRepoURL;
 
   Dependency(final @NotNull String groupId,
              final @NotNull String artifactId,
