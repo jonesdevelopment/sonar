@@ -54,8 +54,10 @@ import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -84,11 +86,6 @@ public final class FallbackInitialHandler extends InitialHandler {
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
     this.channelWrapper = channelWrapper;
     super.connected(channelWrapper);
-  }
-
-  private static @NotNull Kick generateKickPacket(final Component component) {
-    final String serialized = JSONComponentSerializer.json().serialize(component);
-    return new Kick(serialized);
   }
 
   @Override
@@ -152,7 +149,7 @@ public final class FallbackInitialHandler extends InitialHandler {
 
         // Check the blacklist here since we cannot let the player "ghost join"
         if (FALLBACK.getBlacklisted().has(inetAddress.toString())) {
-          closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
           return;
         }
 
@@ -191,7 +188,7 @@ public final class FallbackInitialHandler extends InitialHandler {
 
         // Check if the player is already queued since we don't want bots to flood the queue
         if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-          closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued()));
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued()));
           return;
         }
 
@@ -199,20 +196,20 @@ public final class FallbackInitialHandler extends InitialHandler {
         // → is another player with the same IP address connected to Fallback?
         if (FALLBACK.getConnected().containsKey(loginRequest.getData())
           || FALLBACK.getConnected().containsValue(inetAddress)) {
-          closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying()));
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying()));
           return;
         }
 
         // We cannot allow too many players on our Fallback server
         // There's technically no reason for limiting this, but we'll better stay safe.
         if (FALLBACK.getConnected().size() > Sonar.get().getConfig().getVerification().getMaxVerifyingPlayers()) {
-          closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getTooManyPlayers()));
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getTooManyPlayers()));
           return;
         }
 
         // Check if the IP address is currently being rate-limited
         if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
-          closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect()));
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect()));
           return;
         }
 
@@ -229,7 +226,7 @@ public final class FallbackInitialHandler extends InitialHandler {
           // Check if the username matches the valid name regex to prevent
           // UTF-16 names or other types of exploits
           if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(loginRequest.getData()).matches()) {
-            closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getInvalidUsername()));
+            closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getInvalidUsername()));
             return;
           }
 
@@ -244,7 +241,7 @@ public final class FallbackInitialHandler extends InitialHandler {
 
           // Disconnect if the protocol version could not be resolved
           if (player.getProtocolVersion().isUnknown()) {
-            closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getInvalidProtocol()));
+            closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getInvalidProtocol()));
             return;
           }
 
@@ -254,7 +251,7 @@ public final class FallbackInitialHandler extends InitialHandler {
             disconnect(bungee.getTranslation("proxy_full"));
             return;
           } else if (!isOnlineMode() && bungee.getPlayer(loginRequest.getData()) != null) {
-            closeWith(generateKickPacket(Sonar.get().getConfig().getVerification().getAlreadyConnected()));
+            closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getAlreadyConnected()));
             return;
           }
 
@@ -307,6 +304,18 @@ public final class FallbackInitialHandler extends InitialHandler {
         throw new ReflectiveOperationException(throwable);
       }
     });
+  }
+
+  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new WeakHashMap<>(16, 0.5f);
+
+  private static @NotNull Kick getKickPacket(final @NotNull Component component) {
+    Kick cachedKickPacket = CACHED_KICK_PACKETS.get(component);
+    if (cachedKickPacket == null) {
+      final String serialized = JSONComponentSerializer.json().serialize(component);
+      cachedKickPacket = new Kick(serialized);
+      CACHED_KICK_PACKETS.put(component, cachedKickPacket);
+    }
+    return cachedKickPacket;
   }
 
   // Mostly taken from Velocity
