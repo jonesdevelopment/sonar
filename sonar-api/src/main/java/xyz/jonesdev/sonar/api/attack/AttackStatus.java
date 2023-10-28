@@ -34,7 +34,6 @@ import java.util.Optional;
 public final class AttackStatus implements JVMProfiler {
   public static final AttackStatus INSTANCE = new AttackStatus();
   private @Nullable AttackStatistics currentAttack;
-  private final SystemTimer lastAttack = new SystemTimer();
 
   @Getter
   @RequiredArgsConstructor
@@ -49,15 +48,13 @@ public final class AttackStatus implements JVMProfiler {
 
   public void checkIfUnderAttack() {
     final int joinsPerSecond = Sonar.get().getVerboseHandler().getJoinsPerSecond().estimatedSize();
+    final int verifyingPlayers = Sonar.get().getFallback().getConnected().size();
+    final int queuedPlayers = Sonar.get().getFallback().getQueue().getQueuedPlayers().size();
     final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();
 
-    if (joinsPerSecond > minPlayers) {
-      if (!lastAttack.elapsed(500L)) {
-        // We wait a few milliseconds before we detect another attack
-        // We do this to prevent spamming and other exploits
-        return;
-      }
-
+    if (joinsPerSecond > minPlayers // check the number of bots/joins per second
+      || verifyingPlayers > minPlayers // check the number of verifying players
+      || queuedPlayers > minPlayers) { // check the number of queued players
       // An attack has been detected
       if (currentAttack == null) {
         currentAttack = new AttackStatistics();
@@ -83,14 +80,14 @@ public final class AttackStatus implements JVMProfiler {
       if (processMemoryUsage > currentAttack.peakProcessMemoryUsage) {
         currentAttack.peakProcessMemoryUsage = processMemoryUsage;
       }
-    } else if (currentAttack != null) {
+    } else if (currentAttack != null
+      && currentAttack.duration.delay() > 30000L
+      && currentAttack.timer.delay() > Sonar.get().getConfig().getAttackCooldownDelay()) {
       // An attack has stopped
       Sonar.get().getEventManager().publish(new AttackMitigatedEvent(currentAttack));
       // Post webhook to Discord
       Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> {
         final long deltaInMillis = currentAttack.duration.delay();
-        // Don't log too-short attacks
-        if (deltaInMillis < 1000L) return;
         final String peakCPU = Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage);
         final String peakMem = formatMemory(currentAttack.peakProcessMemoryUsage);
         final String peakBPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond);
@@ -113,7 +110,6 @@ public final class AttackStatus implements JVMProfiler {
       });
       // Reset the attack status
       currentAttack = null;
-      lastAttack.reset();
     }
   }
 
