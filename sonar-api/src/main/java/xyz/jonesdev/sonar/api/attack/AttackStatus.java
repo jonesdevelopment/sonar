@@ -81,7 +81,7 @@ public final class AttackStatus implements JVMProfiler {
         currentAttack.peakProcessMemoryUsage = processMemoryUsage;
       }
     } else if (currentAttack != null
-      && currentAttack.duration.delay() > 30000L
+      && currentAttack.duration.delay() > Sonar.get().getConfig().getMinAttackDuration()
       && currentAttack.timer.delay() > Sonar.get().getConfig().getAttackCooldownDelay()) {
       // An attack has stopped
       Sonar.get().getEventManager().publish(new AttackMitigatedEvent(currentAttack));

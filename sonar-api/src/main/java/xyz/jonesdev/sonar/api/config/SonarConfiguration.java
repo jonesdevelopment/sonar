@@ -73,6 +73,8 @@ public final class SonarConfiguration {
   @Getter
   private int minPlayersForAttack;
   @Getter
+  private int minAttackDuration;
+  @Getter
   private int attackCooldownDelay;
   @Getter
   private Component tooManyOnlinePerIp;
@@ -274,8 +276,13 @@ public final class SonarConfiguration {
     );
     minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 8), 2, 1024);
 
-    generalConfig.getYaml().setComment("attack-cooldown-delay",
+    generalConfig.getYaml().setComment("min-attack-duration",
       "Amount of time (in milliseconds) that has to pass in order for an attack to be over"
+    );
+    minAttackDuration = clamp(generalConfig.getInt("min-attack-duration", 30000), 1000, 900000);
+
+    generalConfig.getYaml().setComment("attack-cooldown-delay",
+      "Amount of time (in milliseconds) that has to pass in order for a new attack to be detected"
     );
     attackCooldownDelay = clamp(generalConfig.getInt("attack-cooldown-delay", 3000), 100, 30000);
 
