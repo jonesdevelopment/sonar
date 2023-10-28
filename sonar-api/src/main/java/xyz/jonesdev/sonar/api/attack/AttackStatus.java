@@ -35,12 +35,11 @@ public final class AttackStatus implements JVMProfiler {
   public static final AttackStatus INSTANCE = new AttackStatus();
   private @Nullable AttackStatistics currentAttack;
   private int attackStartThreshold;
-  private int attackStopThreshold;
 
   @Getter
+  @ToString
   @RequiredArgsConstructor
-  @ToString(exclude = {"duration", "timer"})
-  public static class AttackStatistics {
+  public static final class AttackStatistics {
     private final SystemTimer duration = new SystemTimer();
     private final SystemTimer timer = new SystemTimer();
     private int peakJoinsPerSecond;
@@ -58,20 +57,19 @@ public final class AttackStatus implements JVMProfiler {
       || verifyingPlayers > minPlayers // check the number of verifying players
       || queuedPlayers > minPlayers) { // check the number of queued players
       // Check if we have enough attack proofs
-      if (++attackStartThreshold <= Sonar.get().getConfig().getMinAttackThreshold()) return;
+      if (++attackStartThreshold < Sonar.get().getConfig().getMinAttackThreshold()) return;
       // An attack has been detected
       if (currentAttack == null) {
         currentAttack = new AttackStatistics();
-        Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> {
-          webhook.post(() -> Sonar.get().getConfig().getWebhook().getAttackStartEmbed());
-        });
+        Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> webhook.post(
+          () -> Sonar.get().getConfig().getWebhook().getAttackStartEmbed()));
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
       } else {
         // Reset attack timer if we're still under attack
         currentAttack.timer.reset();
       }
 
-      // Update statistics
+      // Update attack statistics
       final double processCPUUsage = getProcessCPUUsage();
       final long processMemoryUsage = getUsedMemory();
 
@@ -87,42 +85,42 @@ public final class AttackStatus implements JVMProfiler {
     } else if (currentAttack != null) {
       if (currentAttack.duration.delay() > Sonar.get().getConfig().getMinAttackDuration()
         && currentAttack.timer.delay() > Sonar.get().getConfig().getAttackCooldownDelay()) {
-        // Check if we have enough attack proofs
-        if (++attackStopThreshold <= Sonar.get().getConfig().getMinAttackThreshold()) return;
         // An attack has stopped
         Sonar.get().getEventManager().publish(new AttackMitigatedEvent(currentAttack));
-        // Post webhook to Discord
-        Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> {
-          final long deltaInMillis = currentAttack.duration.delay();
-          final String peakCPU = Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage);
-          final String peakMem = formatMemory(currentAttack.peakProcessMemoryUsage);
-          final String peakBPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond);
-          // Run the rest asynchronously
-          webhook.post(() -> {
-            final SonarConfiguration.Webhook.Embed embed = Sonar.get().getConfig().getWebhook().getAttackEndEmbed();
-            final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
-            final double seconds = (deltaInMillis % (60 * 1000)) / 1000D; // Convert remaining milliseconds to seconds
-            final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
-            embed.setDescription(embed.getDescription()
-              .replace("%duration%", formattedDuration)
-              .replace("%peak-cpu%", peakCPU)
-              .replace("%peak-memory%", peakMem)
-              .replace("%peak-bps%", peakBPS)
-              .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
-              .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
-              .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize())));
-            return embed;
-          });
-        });
+
+        // Save attack statistics
+        final long deltaInMillis = currentAttack.duration.delay();
+        final String peakCPU = Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage);
+        final String peakMem = formatMemory(currentAttack.peakProcessMemoryUsage);
+        final String peakBPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond);
+
         // Reset the attack status
         currentAttack = null;
-      } else {
-        // Reset the attack stop threshold
-        attackStopThreshold = 0;
+        // Reset threshold
+        attackStartThreshold = 0;
+
+        // Post webhook to Discord
+        Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> webhook.post(() -> {
+          final SonarConfiguration.Webhook.Embed config = Sonar.get().getConfig().getWebhook().getAttackEndEmbed();
+          // Create a new object
+          final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
+          final double seconds = (deltaInMillis % (60 * 1000)) / 1000D; // Convert remaining milliseconds to seconds
+          final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
+          final String description = config.getDescription()
+            .replace("%duration%", formattedDuration)
+            .replace("%peak-cpu%", peakCPU)
+            .replace("%peak-memory%", peakMem)
+            .replace("%peak-bps%", peakBPS)
+            .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
+            .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
+            .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()));
+            return new SonarConfiguration.Webhook.Embed(
+              config.getTitle(), config.getTitleUrl(), description, config.getR(), config.getG(), config.getB());
+        }));
       }
     } else {
-      // Reset thresholds
-      attackStartThreshold = attackStopThreshold = 0;
+      // Reset threshold
+      attackStartThreshold = 0;
     }
   }
 

@@ -236,7 +236,8 @@ public final class SonarConfiguration {
     private final Embed attackEndEmbed = new Embed();
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static final class Embed {
       private String title;
       private String titleUrl;
@@ -282,7 +283,7 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("min-attack-threshold",
       "Number of times an incident has to be reported in order to be acknowledged as an attack"
       + LINE_SEPARATOR + "This number acts as a buffer to filter out false attack notifications");
-    minAttackThreshold = clamp(generalConfig.getInt("min-attack-threshold", 4), 0, 20);
+    minAttackThreshold = clamp(generalConfig.getInt("min-attack-threshold", 3), 0, 20);
 
     generalConfig.getYaml().setComment("attack-cooldown-delay",
       "Amount of time (in milliseconds) that has to pass in order for a new attack to be detected");
