@@ -89,6 +89,8 @@ public final class AttackStatus implements JVMProfiler {
       // Post webhook to Discord
       Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> {
         final long deltaInMillis = currentAttack.duration.delay();
+        // Don't log too-short attacks
+        if (deltaInMillis < 1000L) return;
         final String peakCPU = Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage);
         final String peakMem = formatMemory(currentAttack.peakProcessMemoryUsage);
         final String peakBPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond);
@@ -98,7 +100,7 @@ public final class AttackStatus implements JVMProfiler {
           final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
           final long seconds = (deltaInMillis % (60 * 1000)) / 1000L; // Convert remaining milliseconds to seconds
           final long milliseconds = deltaInMillis % 1000; // Get remaining milliseconds
-          final String formattedDuration = String.format("%d minutes, %d.%d seconds", minutes, seconds, milliseconds);
+          final String formattedDuration = String.format("%d minutes, %d seconds", minutes, seconds);
           embed.setDescription(embed.getDescription()
             .replace("%duration%", formattedDuration)
             .replace("%peak-cpu%", peakCPU)
