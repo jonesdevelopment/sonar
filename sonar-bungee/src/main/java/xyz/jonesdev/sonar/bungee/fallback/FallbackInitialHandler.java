@@ -153,10 +153,10 @@ public final class FallbackInitialHandler extends InitialHandler {
           return;
         }
 
-        // Completely skip Geyser connections (for now)
-        if (isGeyserConnection(uuid)) {
-          // TODO: Do we need to log this?
-          FALLBACK.getLogger().info("Allowing Geyser connection: {}", inetAddress);
+        // Completely skip Geyser connections
+        if (isGeyserConnection(channel, loginRequest.getData())) {
+          FALLBACK.getLogger().info("Skipping Geyser player: {}{}",
+            loginRequest.getData(), Sonar.get().getConfig().formatAddress(inetAddress));
           super.handle(loginRequest);
           return;
         }
