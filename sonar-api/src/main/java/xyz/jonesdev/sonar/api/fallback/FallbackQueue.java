@@ -66,5 +66,8 @@ public final class FallbackQueue {
       // Remove runnable from iterator
       iterator.remove();
     }
+
+    // Run the attack check task
+    Sonar.get().getAttackStatus().checkIfUnderAttack();
   }
 }

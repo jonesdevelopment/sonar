@@ -261,7 +261,8 @@ public final class FallbackInitialHandler extends InitialHandler {
           if (Sonar.get().getConfig().getVerification().isLogConnections()) {
             // Only log the processing message if the server isn't under attack.
             // We let the user override this through the configuration.
-            if (!FALLBACK.isPotentiallyUnderAttack() || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+            if (!Sonar.get().getAttackStatus().isCurrentlyUnderAttack()
+              || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
               FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
                 .replace("%name%", loginRequest.getData())
                 .replace("%ip%", Sonar.get().getConfig().formatAddress(inetAddress))

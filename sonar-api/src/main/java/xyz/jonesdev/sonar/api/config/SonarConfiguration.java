@@ -73,6 +73,8 @@ public final class SonarConfiguration {
   @Getter
   private int minPlayersForAttack;
   @Getter
+  private int attackCooldownDelay;
+  @Getter
   private Component tooManyOnlinePerIp;
 
   @Getter
@@ -225,6 +227,7 @@ public final class SonarConfiguration {
     public static final class Embed {
       private String title;
       private String titleUrl;
+      @Setter
       private String description;
       private int r, g, b;
     }
@@ -261,6 +264,11 @@ public final class SonarConfiguration {
       "Minimum number of new players in order for an attack to be detected"
     );
     minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 5), 2, 1024);
+
+    generalConfig.getYaml().setComment("attack-cooldown-delay",
+      "Amount of time (in milliseconds) that has to pass in order for an attack to be over"
+    );
+    attackCooldownDelay = clamp(generalConfig.getInt("attack-cooldown-delay", 3000), 100, 30000);
 
     generalConfig.getYaml().setComment("log-player-addresses",
       "Should Sonar log players' IP addresses in console?"
@@ -471,7 +479,7 @@ public final class SonarConfiguration {
         "Embed Discord webhook message that is sent when an attack is detected");
       generalConfig.getYaml().setComment(embedPath + "title",
         "Title of the Discord webhook embed");
-      webhook.attackStartEmbed.title = generalConfig.getString(embedPath + "title", "<:warning:> Attack detected");
+      webhook.attackStartEmbed.title = generalConfig.getString(embedPath + "title", ":warning: Attack detected");
 
       generalConfig.getYaml().setComment(embedPath + "title-url",
         "Clickable URL of the title of the Discord webhook embed");
@@ -483,7 +491,7 @@ public final class SonarConfiguration {
         "An attack has been detected on your server.",
         "",
         "Information on the attack is currently being collected. Please stay patient."
-      )));
+      )), LINE_SEPARATOR);
 
       generalConfig.getYaml().setComment(embedPath + "color",
         "RGB colors of the Discord webhook embed"
@@ -501,7 +509,7 @@ public final class SonarConfiguration {
         "Embed Discord webhook message that is sent when an attack has stopped");
       generalConfig.getYaml().setComment(embedPath + "title",
         "Title of the Discord webhook embed");
-      webhook.attackEndEmbed.title = generalConfig.getString(embedPath + "title", "<:white_check_mark:> Attack mitigated");
+      webhook.attackEndEmbed.title = generalConfig.getString(embedPath + "title", ":white_check_mark: Attack mitigated");
 
       generalConfig.getYaml().setComment(embedPath + "title-url",
         "Clickable URL of the title of the Discord webhook embed");
@@ -511,6 +519,7 @@ public final class SonarConfiguration {
         "Description (content) of the Discord webhook embed");
       webhook.attackEndEmbed.description = fromList(generalConfig.getStringList(embedPath + "description", Arrays.asList(
         "The attack on your server has been mitigated.",
+        "Attack duration: %duration%",
         "",
         "Peak process CPU usage during the attack: %peak-cpu%%",
         "Peak process memory usage during the attack: %peak-memory%",
@@ -519,7 +528,7 @@ public final class SonarConfiguration {
         "Blacklisted IP addresses during the attack: %total-blacklisted%",
         "Failed verifications during the attack: %total-failed%",
         "Successful verifications during the attack: %total-success%"
-      )));
+      )), LINE_SEPARATOR);
 
       generalConfig.getYaml().setComment(embedPath + "color",
         "RGB colors of the Discord webhook embed"
@@ -1006,7 +1015,11 @@ public final class SonarConfiguration {
   }
 
   private @NotNull String fromList(final @NotNull Collection<String> list) {
-    return formatString(String.join("<newline>", list));
+    return fromList(list, "<newline>");
+  }
+
+  private @NotNull String fromList(final @NotNull Collection<String> list, final String newline) {
+    return formatString(String.join(newline, list));
   }
 
   private static @NotNull Component deserialize(final String legacy) {
