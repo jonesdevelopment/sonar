@@ -63,9 +63,4 @@ public final class Fallback {
       SONAR.getLogger().error("[fallback] " + message, args);
     }
   };
-
-  public boolean isPotentiallyUnderAttack() {
-    final int min = SONAR.getConfig().getMinPlayersForAttack();
-    return Sonar.get().getVerboseHandler().getJoinsPerSecond().estimatedSize() > min;
-  }
 }

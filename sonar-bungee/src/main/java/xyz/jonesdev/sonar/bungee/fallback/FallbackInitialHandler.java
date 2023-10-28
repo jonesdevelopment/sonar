@@ -57,8 +57,8 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
@@ -261,7 +261,8 @@ public final class FallbackInitialHandler extends InitialHandler {
           if (Sonar.get().getConfig().getVerification().isLogConnections()) {
             // Only log the processing message if the server isn't under attack.
             // We let the user override this through the configuration.
-            if (!FALLBACK.isPotentiallyUnderAttack() || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+            if (!Sonar.get().getAttackStatus().isCurrentlyUnderAttack()
+              || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
               FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
                 .replace("%name%", loginRequest.getData())
                 .replace("%ip%", Sonar.get().getConfig().formatAddress(inetAddress))
@@ -306,7 +307,7 @@ public final class FallbackInitialHandler extends InitialHandler {
     });
   }
 
-  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new WeakHashMap<>(16, 0.5f);
+  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new ConcurrentHashMap<>(16);
 
   private static @NotNull Kick getKickPacket(final @NotNull Component component) {
     Kick cachedKickPacket = CACHED_KICK_PACKETS.get(component);

@@ -50,14 +50,14 @@ public final class FallbackQueue {
   }
 
   public void poll() {
-    final int max = Sonar.get().getConfig().getQueue().getMaxQueuePolls();
+    final int maxQueuePolls = Sonar.get().getConfig().getQueue().getMaxQueuePolls();
     int index = 0;
 
-    // We need to be very careful here since we don't want any concurrency issues.
+    // We need to be cautious here since we don't want any concurrency issues.
     final Iterator<Map.Entry<InetAddress, Runnable>> iterator = queuedPlayers.entrySet().iterator();
     while (iterator.hasNext()) {
       // Break if we reached our maximum entries
-      if (++index > max) {
+      if (++index > maxQueuePolls) {
         break;
       }
       // Run the cached runnable
@@ -66,5 +66,8 @@ public final class FallbackQueue {
       // Remove runnable from iterator
       iterator.remove();
     }
+
+    // Run the attack check task
+    Sonar.get().getAttackStatus().checkIfUnderAttack();
   }
 }

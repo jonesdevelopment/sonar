@@ -17,7 +17,10 @@
 
 package xyz.jonesdev.sonar.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.attack.AttackStatus;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
@@ -32,6 +35,10 @@ import java.text.DecimalFormat;
 public interface Sonar {
   DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
   String LINE_SEPARATOR = "\n"; // Using System.lineSeparator is broken, for some reason...
+
+  Gson GENERAL_GSON = new GsonBuilder()
+    .disableInnerClassSerialization()
+    .create();
 
   /**
    * @return The platform the plugin is being run on
@@ -73,6 +80,12 @@ public interface Sonar {
   default SonarEventManager getEventManager() {
     // We don't want anyone else to create a new instance.
     return SonarEventManager.INSTANCE;
+  }
+
+  @NotNull
+  default AttackStatus getAttackStatus() {
+    // We don't want anyone else to create a new instance.
+    return AttackStatus.INSTANCE;
   }
 
   @NotNull
