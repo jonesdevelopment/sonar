@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public final class DiscordWebhook {
@@ -37,10 +38,10 @@ public final class DiscordWebhook {
 
   private static final ExecutorService HTTP_REQUEST_SERVICE = Executors.newSingleThreadExecutor();
 
-  public void post(final SonarConfiguration.Webhook.Embed embed) {
+  public void post(final Supplier<SonarConfiguration.Webhook.Embed> embed) {
     HTTP_REQUEST_SERVICE.execute(() -> {
       try {
-        final String serializedContent = prepareSerializedContent(embed);
+        final String serializedContent = prepareSerializedContent(embed.get());
         final HttpsURLConnection urlConnection = prepareConnection(new URL(url), serializedContent);
 
         try (final OutputStream outputStream = urlConnection.getOutputStream()) {

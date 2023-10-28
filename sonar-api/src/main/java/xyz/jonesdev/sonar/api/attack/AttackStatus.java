@@ -61,7 +61,7 @@ public final class AttackStatus implements JVMProfiler {
       if (currentAttack == null) {
         currentAttack = new AttackStatistics();
         Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> {
-          webhook.post(Sonar.get().getConfig().getWebhook().getAttackStartEmbed());
+          webhook.post(() -> Sonar.get().getConfig().getWebhook().getAttackStartEmbed());
         });
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
       } else {
@@ -87,21 +87,27 @@ public final class AttackStatus implements JVMProfiler {
       Sonar.get().getEventManager().publish(new AttackMitigatedEvent(currentAttack));
       // Post webhook to Discord
       Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> {
-        final SonarConfiguration.Webhook.Embed embed = Sonar.get().getConfig().getWebhook().getAttackEndEmbed();
         final long deltaInMillis = currentAttack.duration.delay();
-        final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
-        final long seconds = (deltaInMillis % (60 * 1000)) / 1000L; // Convert remaining milliseconds to seconds
-        final long milliseconds = deltaInMillis % 1000; // Get remaining milliseconds
-        final String formattedDuration = String.format("%d minutes, %d.%d seconds", minutes, seconds, milliseconds);
-        embed.setDescription(embed.getDescription()
-          .replace("%duration%", formattedDuration)
-          .replace("%peak-cpu%", Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage))
-          .replace("%peak-memory%", formatMemory(currentAttack.peakProcessMemoryUsage))
-          .replace("%peak-bps%", Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond))
-          .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
-          .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
-          .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize())));
-        webhook.post(embed);
+        final String peakCPU = Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage);
+        final String peakMem = formatMemory(currentAttack.peakProcessMemoryUsage);
+        final String peakBPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond);
+        // Run the rest asynchronously
+        webhook.post(() -> {
+          final SonarConfiguration.Webhook.Embed embed = Sonar.get().getConfig().getWebhook().getAttackEndEmbed();
+          final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
+          final long seconds = (deltaInMillis % (60 * 1000)) / 1000L; // Convert remaining milliseconds to seconds
+          final long milliseconds = deltaInMillis % 1000; // Get remaining milliseconds
+          final String formattedDuration = String.format("%d minutes, %d.%d seconds", minutes, seconds, milliseconds);
+          embed.setDescription(embed.getDescription()
+            .replace("%duration%", formattedDuration)
+            .replace("%peak-cpu%", peakCPU)
+            .replace("%peak-memory%", peakMem)
+            .replace("%peak-bps%", peakBPS)
+            .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
+            .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
+            .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize())));
+          return embed;
+        });
       });
       // Reset the attack status
       currentAttack = null;
@@ -109,6 +115,7 @@ public final class AttackStatus implements JVMProfiler {
     }
   }
 
+  @SuppressWarnings("all")
   public boolean isCurrentlyUnderAttack() {
     final int minDelay = Sonar.get().getConfig().getAttackCooldownDelay();
     return currentAttack != null && currentAttack.timer.delay() < minDelay;
