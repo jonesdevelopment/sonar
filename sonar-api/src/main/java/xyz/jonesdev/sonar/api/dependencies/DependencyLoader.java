@@ -38,23 +38,18 @@ public class DependencyLoader {
   public ConnectionSource setUpDriverAndConnect() throws Throwable {
     final SonarConfiguration config = Sonar.get().getConfig();
 
-    final URL[] urls = new URL[config.getDatabase().getType().getDependencies().length];
-    for (final Dependency dependency : config.getDatabase().getType().getDependencies()) {
-      final URL url = dependency.getClassLoaderURL();
-      final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
+    final URL url = config.getDatabase().getType().getDependency().getClassLoaderURL();
+    final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
 
-      final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
-      addPath.setAccessible(true);
-      addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
-
-      urls[dependency.ordinal()] = url;
-    }
+    final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
+    addPath.setAccessible(true);
+    addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
 
     final String type = config.getDatabase().getType().name().toLowerCase();
     final String databaseURL = String.format("jdbc:%s://%s:%d/%s",
       type, config.getDatabase().getUrl(), config.getDatabase().getPort(), config.getDatabase().getName());
 
-    final ExternalClassLoader classLoader = new ExternalClassLoader(urls);
+    final ExternalClassLoader classLoader = new ExternalClassLoader(new URL[] {url});
     final Connection connection = connect(classLoader, databaseURL, config.getDatabase());
     return new JdbcSingleConnectionSource(databaseURL, connection);
   }

@@ -65,6 +65,8 @@ public final class VerifiedPlayerController {
         TableUtils.createTableIfNotExists(connectionSource, VerifiedPlayer.class);
       } catch (SQLException exception) {
         // Duplicate index
+        // I know this isn't the best method of handling it,
+        // but I don't know how else I could address this issue.
       }
 
       dao = DaoManager.createDao(connectionSource, VerifiedPlayer.class);
@@ -92,7 +94,12 @@ public final class VerifiedPlayerController {
     }
 
     DB_UPDATE_SERVICE.execute(() -> {
-      Objects.requireNonNull(connectionSource);
+      // We cannot throw a NullPointerException within the executor service
+      // because we want to handle the error instead of simply throwing an exception
+      if (connectionSource == null) {
+        Sonar.get().getLogger().error("Error (DB_UPDATE_SERVICE): connectionSource is null");
+        return;
+      }
 
       try {
         final List<VerifiedPlayer> verifiedPlayer = queryBuilder.where()
@@ -134,7 +141,12 @@ public final class VerifiedPlayerController {
     }
 
     DB_UPDATE_SERVICE.execute(() -> {
-      Objects.requireNonNull(connectionSource);
+      // We cannot throw a NullPointerException within the executor service
+      // because we want to handle the error instead of simply throwing an exception
+      if (connectionSource == null) {
+        Sonar.get().getLogger().error("Error (DB_UPDATE_SERVICE): connectionSource is null");
+        return;
+      }
 
       try {
         dao.create(player);
