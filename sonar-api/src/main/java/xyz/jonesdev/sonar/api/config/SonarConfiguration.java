@@ -272,7 +272,7 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("min-players-for-attack",
       "Minimum number of new players in order for an attack to be detected"
     );
-    minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 5), 2, 1024);
+    minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 8), 2, 1024);
 
     generalConfig.getYaml().setComment("attack-cooldown-delay",
       "Amount of time (in milliseconds) that has to pass in order for an attack to be over"
