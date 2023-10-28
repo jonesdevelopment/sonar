@@ -75,6 +75,8 @@ public final class SonarConfiguration {
   @Getter
   private int minAttackDuration;
   @Getter
+  private int minAttackThreshold;
+  @Getter
   private int attackCooldownDelay;
   @Getter
   private Component tooManyOnlinePerIp;
@@ -262,33 +264,32 @@ public final class SonarConfiguration {
 
     // General options
     generalConfig.getYaml().setComment("language",
-      "Name of the language file Sonar should use for messages"
-    );
+      "Name of the language file Sonar should use for messages");
     String language = generalConfig.getString("language", "en");
 
     generalConfig.getYaml().setComment("max-online-per-ip",
-      "Maximum number of players online with the same IP address"
-    );
+      "Maximum number of players online with the same IP address");
     maxOnlinePerIp = clamp(generalConfig.getInt("max-online-per-ip", 3), 1, Byte.MAX_VALUE);
 
     generalConfig.getYaml().setComment("min-players-for-attack",
-      "Minimum number of new players in order for an attack to be detected"
-    );
+      "Minimum number of new players in order for an attack to be detected");
     minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 8), 2, 1024);
 
     generalConfig.getYaml().setComment("min-attack-duration",
-      "Amount of time (in milliseconds) that has to pass in order for an attack to be over"
-    );
+      "Amount of time (in milliseconds) that has to pass in order for an attack to be over");
     minAttackDuration = clamp(generalConfig.getInt("min-attack-duration", 30000), 1000, 900000);
 
+    generalConfig.getYaml().setComment("min-attack-threshold",
+      "Number of times an incident has to be reported in order to be acknowledged as an attack"
+      + LINE_SEPARATOR + "This number acts as a buffer to filter out false attack notifications");
+    minAttackThreshold = clamp(generalConfig.getInt("min-attack-threshold", 4), 0, 20);
+
     generalConfig.getYaml().setComment("attack-cooldown-delay",
-      "Amount of time (in milliseconds) that has to pass in order for a new attack to be detected"
-    );
+      "Amount of time (in milliseconds) that has to pass in order for a new attack to be detected");
     attackCooldownDelay = clamp(generalConfig.getInt("attack-cooldown-delay", 3000), 100, 30000);
 
     generalConfig.getYaml().setComment("log-player-addresses",
-      "Should Sonar log players' IP addresses in console?"
-    );
+      "Should Sonar log players' IP addresses in console?");
     logPlayerAddresses = generalConfig.getBoolean("log-player-addresses", true);
 
     // Message settings
@@ -317,8 +318,7 @@ public final class SonarConfiguration {
     // Database
     generalConfig.getYaml().setComment("database.type",
       "Type of database Sonar uses to store verified players"
-        + LINE_SEPARATOR + "Possible types: NONE, MYSQL"
-    );
+        + LINE_SEPARATOR + "Possible types: NONE, MYSQL");
     final String newDatabaseType = generalConfig.getString("database.type", Database.Type.NONE.name());
     database.type = Database.Type.valueOf(newDatabaseType.toUpperCase());
 
