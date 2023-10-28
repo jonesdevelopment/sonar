@@ -543,6 +543,9 @@ public final class SonarConfiguration {
         throw new IllegalStateException("Webhook username cannot be empty");
       }
       discordWebhook = new DiscordWebhook(webhook.url);
+    } else if (discordWebhook != null) {
+      // Reset if Discord webhooks were disabled
+      discordWebhook = null;
     }
 
     // load this here otherwise it could cause issues

@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.api.attack;
 
 import lombok.*;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.event.impl.AttackDetectedEvent;
@@ -32,7 +33,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AttackStatus implements JVMProfiler {
   public static final AttackStatus INSTANCE = new AttackStatus();
-  private AttackStatistics currentAttack;
+  private @Nullable AttackStatistics currentAttack;
   private final SystemTimer lastAttack = new SystemTimer();
 
   @Getter
