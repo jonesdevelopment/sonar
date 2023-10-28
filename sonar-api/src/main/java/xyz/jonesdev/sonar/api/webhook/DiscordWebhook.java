@@ -67,7 +67,9 @@ public final class DiscordWebhook {
     rgb = (rgb << 8) + embed.getB();
 
     final Webhook.EmbedMessage embedMessage = new Webhook.EmbedMessage(
-      embed.getTitle(), embed.getDescription(), embed.getTitleUrl(), rgb, new Webhook.Field[0]);
+      embed.getTitle(), embed.getDescription(), embed.getTitleUrl(), rgb, new Webhook.Field[0],
+      new Webhook.Footer(Sonar.get().getConfig().getWebhook().getFooter().getText(),
+        Sonar.get().getConfig().getWebhook().getFooter().getIconUrl()));
     final List<Webhook.EmbedMessage> embeds = Collections.singletonList(embedMessage);
 
     final Webhook webhook = new Webhook(content, username, avatarUrl, false, embeds);
@@ -102,6 +104,7 @@ public final class DiscordWebhook {
       private final String url;
       private final int color;
       private final Field[] fields;
+      private final Footer footer;
     }
 
     @RequiredArgsConstructor
@@ -109,6 +112,12 @@ public final class DiscordWebhook {
       private final String name;
       private final String value;
       private final boolean inline;
+    }
+
+    @RequiredArgsConstructor
+    static final class Footer {
+      private final String text;
+      private final String icon_url;
     }
   }
 }

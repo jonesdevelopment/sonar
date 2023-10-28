@@ -219,6 +219,15 @@ public final class SonarConfiguration {
     private String avatarUrl;
     private String content;
 
+    private final Footer footer = new Footer();
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Footer {
+      private String text;
+      private String iconUrl;
+    }
+
     private final Embed attackStartEmbed = new Embed();
     private final Embed attackEndEmbed = new Embed();
 
@@ -470,6 +479,17 @@ public final class SonarConfiguration {
       + LINE_SEPARATOR + "You can use this to e.g. ping staff members using <@userId>"
       + LINE_SEPARATOR + "If you want to ping roles, you will need to use <@&roleId>");
     webhook.content = generalConfig.getString("webhook.content", "");
+
+    generalConfig.getYaml().setComment("webhook.embeds.footer",
+      "Small footer message of all Discord webhook embeds");
+    generalConfig.getYaml().setComment("webhook.embeds.footer.text",
+      "Content of the footer message of all Discord webhook embeds");
+    webhook.footer.text = generalConfig.getString("webhook.embeds.footer.text",
+      "© Jones Development and Sonar Contributors");
+
+    generalConfig.getYaml().setComment("webhook.embeds.footer.icon-url",
+      "URL of the footer message icon of all Discord webhook embeds");
+    webhook.footer.iconUrl = generalConfig.getString("webhook.embeds.footer.icon-url", "");
 
     {
       final String realEmbedPath = "webhook.embeds.attack-start";
