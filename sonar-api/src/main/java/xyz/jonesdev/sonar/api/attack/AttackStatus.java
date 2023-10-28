@@ -98,9 +98,8 @@ public final class AttackStatus implements JVMProfiler {
         webhook.post(() -> {
           final SonarConfiguration.Webhook.Embed embed = Sonar.get().getConfig().getWebhook().getAttackEndEmbed();
           final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
-          final long seconds = (deltaInMillis % (60 * 1000)) / 1000L; // Convert remaining milliseconds to seconds
-          final long milliseconds = deltaInMillis % 1000; // Get remaining milliseconds
-          final String formattedDuration = String.format("%d minutes, %d seconds", minutes, seconds);
+          final double seconds = (deltaInMillis % (60 * 1000)) / 1000D; // Convert remaining milliseconds to seconds
+          final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
           embed.setDescription(embed.getDescription()
             .replace("%duration%", formattedDuration)
             .replace("%peak-cpu%", peakCPU)
