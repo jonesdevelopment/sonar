@@ -21,9 +21,11 @@ import lombok.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.dependencies.Dependency;
+import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -52,6 +54,8 @@ public final class SonarConfiguration {
   private final Lockdown lockdown = new Lockdown();
   @Getter
   private final Database database = new Database();
+  @Getter
+  private final Webhook webhook = new Webhook();
 
   public SonarConfiguration(final @NotNull File pluginFolder) {
     this.pluginFolder = pluginFolder;
@@ -204,6 +208,30 @@ public final class SonarConfiguration {
     private String notification;
     private String consoleLog;
   }
+
+  @Getter
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  public static final class Webhook {
+    private String url;
+    private String username;
+    private String avatarUrl;
+    private String content;
+
+    private final Embed attackStartEmbed = new Embed();
+    private final Embed attackEndEmbed = new Embed();
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Embed {
+      private String title;
+      private String titleUrl;
+      private String description;
+      private int r, g, b;
+    }
+  }
+
+  @Getter
+  private @Nullable DiscordWebhook discordWebhook;
 
   public void load() {
     if (generalConfig == null) {
@@ -413,6 +441,100 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.rejoin-delay",
       "Minimum number of rejoin delay during verification");
     verification.reconnectDelay = clamp(generalConfig.getInt("verification.rejoin-delay", 8000), 0, 100000);
+
+    // Webhooks
+    generalConfig.getYaml().setComment("webhook",
+      "Bot attack notifications can also be sent to your Discord server using webhooks");
+    generalConfig.getYaml().setComment("webhook.url",
+      "URL of the Discord webhook (Set this to \"\" to disable webhooks)");
+    webhook.url = generalConfig.getString("webhook.url", "");
+
+    generalConfig.getYaml().setComment("webhook.username",
+      "Username of the Discord webhook sender");
+    webhook.username = generalConfig.getString("webhook.username", "Sonar");
+
+    generalConfig.getYaml().setComment("webhook.avatar-url",
+      "URL to the avatar of the Discord webhook sender (Set this to \"\" to disable)");
+    webhook.avatarUrl = generalConfig.getString("webhook.avatar-url", "");
+
+    generalConfig.getYaml().setComment("webhook.content",
+      "Content of the Discord webhook message (Set this to \"\" to disable)"
+      + LINE_SEPARATOR + "You can use this to e.g. ping staff members using <@userId>"
+      + LINE_SEPARATOR + "If you want to ping roles, you will need to use <@&roleId>");
+    webhook.content = generalConfig.getString("webhook.content", "");
+
+    {
+      final String realEmbedPath = "webhook.embeds.attack-start";
+      final String embedPath = realEmbedPath + ".";
+
+      generalConfig.getYaml().setComment(realEmbedPath,
+        "Embed Discord webhook message that is sent when an attack is detected");
+      generalConfig.getYaml().setComment(embedPath + "title",
+        "Title of the Discord webhook embed");
+      webhook.attackStartEmbed.title = generalConfig.getString(embedPath + "title", "<:warning:> Attack detected");
+
+      generalConfig.getYaml().setComment(embedPath + "title-url",
+        "Clickable URL of the title of the Discord webhook embed");
+      webhook.attackStartEmbed.titleUrl = generalConfig.getString(embedPath + "title-url", "");
+
+      generalConfig.getYaml().setComment(embedPath + "description",
+        "Description (content) of the Discord webhook embed");
+      webhook.attackStartEmbed.description = fromList(generalConfig.getStringList(embedPath + "description", Arrays.asList(
+        "An attack has been detected on your server.",
+        "",
+        "Information on the attack is currently being collected. Please stay patient."
+      )));
+
+      generalConfig.getYaml().setComment(embedPath + "color",
+        "RGB colors of the Discord webhook embed"
+        + LINE_SEPARATOR + "Color picker: https://www.rapidtables.com/web/color/RGB_Color.html");
+      webhook.attackStartEmbed.r = generalConfig.getInt(embedPath + "color.red", 255);
+      webhook.attackStartEmbed.g = generalConfig.getInt(embedPath + "color.green", 0);
+      webhook.attackStartEmbed.b = generalConfig.getInt(embedPath + "color.blue", 0);
+    }
+
+    {
+      final String realEmbedPath = "webhook.embeds.attack-end";
+      final String embedPath = realEmbedPath + ".";
+
+      generalConfig.getYaml().setComment(realEmbedPath,
+        "Embed Discord webhook message that is sent when an attack has stopped");
+      generalConfig.getYaml().setComment(embedPath + "title",
+        "Title of the Discord webhook embed");
+      webhook.attackEndEmbed.title = generalConfig.getString(embedPath + "title", "<:white_check_mark:> Attack mitigated");
+
+      generalConfig.getYaml().setComment(embedPath + "title-url",
+        "Clickable URL of the title of the Discord webhook embed");
+      webhook.attackEndEmbed.titleUrl = generalConfig.getString(embedPath + "title-url", "");
+
+      generalConfig.getYaml().setComment(embedPath + "description",
+        "Description (content) of the Discord webhook embed");
+      webhook.attackEndEmbed.description = fromList(generalConfig.getStringList(embedPath + "description", Arrays.asList(
+        "The attack on your server has been mitigated.",
+        "",
+        "Peak process CPU usage during the attack: %peak-cpu%%",
+        "Peak process memory usage during the attack: %peak-memory%",
+        "Peak bots per second during the attack: %peak-bps%",
+        "",
+        "Blacklisted IP addresses during the attack: %total-blacklisted%",
+        "Failed verifications during the attack: %total-failed%",
+        "Successful verifications during the attack: %total-success%"
+      )));
+
+      generalConfig.getYaml().setComment(embedPath + "color",
+        "RGB colors of the Discord webhook embed"
+          + LINE_SEPARATOR + "Color picker: https://www.rapidtables.com/web/color/RGB_Color.html");
+      webhook.attackEndEmbed.r = generalConfig.getInt(embedPath + "color.red", 0);
+      webhook.attackEndEmbed.g = generalConfig.getInt(embedPath + "color.green", 255);
+      webhook.attackEndEmbed.b = generalConfig.getInt(embedPath + "color.blue", 0);
+    }
+
+    if (!webhook.url.isEmpty()) {
+      if (webhook.username.isEmpty()) {
+        throw new IllegalStateException("Webhook username cannot be empty");
+      }
+      discordWebhook = new DiscordWebhook(webhook.url);
+    }
 
     // load this here otherwise it could cause issues
     messagesConfig.getYaml().setComment("header",
