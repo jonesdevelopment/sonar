@@ -463,7 +463,7 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("webhook",
       "Bot attack notifications can also be sent to your Discord server using webhooks");
     generalConfig.getYaml().setComment("webhook.url",
-      "URL of the Discord webhook (Set this to \"\" to disable webhooks)");
+      "URL of the Discord webhook (Set this to '' to disable webhooks)");
     webhook.url = generalConfig.getString("webhook.url", "");
 
     generalConfig.getYaml().setComment("webhook.username",
@@ -471,11 +471,11 @@ public final class SonarConfiguration {
     webhook.username = generalConfig.getString("webhook.username", "Sonar");
 
     generalConfig.getYaml().setComment("webhook.avatar-url",
-      "URL to the avatar of the Discord webhook sender (Set this to \"\" to disable)");
+      "URL to the avatar of the Discord webhook sender (Set this to '' to disable)");
     webhook.avatarUrl = generalConfig.getString("webhook.avatar-url", "");
 
     generalConfig.getYaml().setComment("webhook.content",
-      "Content of the Discord webhook message (Set this to \"\" to disable)"
+      "Content of the Discord webhook message (Set this to '' to disable)"
       + LINE_SEPARATOR + "You can use this to e.g. ping staff members using <@userId>"
       + LINE_SEPARATOR + "If you want to ping roles, you will need to use <@&roleId>");
     webhook.content = generalConfig.getString("webhook.content", "");
