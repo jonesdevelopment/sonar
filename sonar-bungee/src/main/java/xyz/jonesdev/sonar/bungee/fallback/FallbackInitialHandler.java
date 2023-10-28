@@ -57,8 +57,8 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
@@ -306,7 +306,7 @@ public final class FallbackInitialHandler extends InitialHandler {
     });
   }
 
-  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new WeakHashMap<>(16, 0.5f);
+  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new ConcurrentHashMap<>(16);
 
   private static @NotNull Kick getKickPacket(final @NotNull Component component) {
     Kick cachedKickPacket = CACHED_KICK_PACKETS.get(component);
