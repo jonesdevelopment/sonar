@@ -73,6 +73,10 @@ public final class SonarConfiguration {
   @Getter
   private int minPlayersForAttack;
   @Getter
+  private int minAttackDuration;
+  @Getter
+  private int minAttackThreshold;
+  @Getter
   private int attackCooldownDelay;
   @Getter
   private Component tooManyOnlinePerIp;
@@ -228,11 +232,11 @@ public final class SonarConfiguration {
       private String iconUrl;
     }
 
-    private final Embed attackStartEmbed = new Embed();
-    private final Embed attackEndEmbed = new Embed();
+    private final Embed embed = new Embed();
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static final class Embed {
       private String title;
       private String titleUrl;
@@ -260,28 +264,32 @@ public final class SonarConfiguration {
 
     // General options
     generalConfig.getYaml().setComment("language",
-      "Name of the language file Sonar should use for messages"
-    );
+      "Name of the language file Sonar should use for messages");
     String language = generalConfig.getString("language", "en");
 
     generalConfig.getYaml().setComment("max-online-per-ip",
-      "Maximum number of players online with the same IP address"
-    );
+      "Maximum number of players online with the same IP address");
     maxOnlinePerIp = clamp(generalConfig.getInt("max-online-per-ip", 3), 1, Byte.MAX_VALUE);
 
     generalConfig.getYaml().setComment("min-players-for-attack",
-      "Minimum number of new players in order for an attack to be detected"
-    );
-    minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 5), 2, 1024);
+      "Minimum number of new players in order for an attack to be detected");
+    minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 8), 2, 1024);
+
+    generalConfig.getYaml().setComment("min-attack-duration",
+      "Amount of time (in milliseconds) that has to pass in order for an attack to be over");
+    minAttackDuration = clamp(generalConfig.getInt("min-attack-duration", 30000), 1000, 900000);
+
+    generalConfig.getYaml().setComment("min-attack-threshold",
+      "Number of times an incident has to be reported in order to be acknowledged as an attack"
+      + LINE_SEPARATOR + "This number acts as a buffer to filter out false attack notifications");
+    minAttackThreshold = clamp(generalConfig.getInt("min-attack-threshold", 2), 0, 20);
 
     generalConfig.getYaml().setComment("attack-cooldown-delay",
-      "Amount of time (in milliseconds) that has to pass in order for an attack to be over"
-    );
+      "Amount of time (in milliseconds) that has to pass in order for a new attack to be detected");
     attackCooldownDelay = clamp(generalConfig.getInt("attack-cooldown-delay", 3000), 100, 30000);
 
     generalConfig.getYaml().setComment("log-player-addresses",
-      "Should Sonar log players' IP addresses in console?"
-    );
+      "Should Sonar log players' IP addresses in console?");
     logPlayerAddresses = generalConfig.getBoolean("log-player-addresses", true);
 
     // Message settings
@@ -310,8 +318,7 @@ public final class SonarConfiguration {
     // Database
     generalConfig.getYaml().setComment("database.type",
       "Type of database Sonar uses to store verified players"
-        + LINE_SEPARATOR + "Possible types: NONE, MYSQL"
-    );
+        + LINE_SEPARATOR + "Possible types: NONE, MYSQL");
     final String newDatabaseType = generalConfig.getString("database.type", Database.Type.NONE.name());
     database.type = Database.Type.valueOf(newDatabaseType.toUpperCase());
 
@@ -480,83 +487,54 @@ public final class SonarConfiguration {
       + LINE_SEPARATOR + "If you want to ping roles, you will need to use <@&roleId>");
     webhook.content = generalConfig.getString("webhook.content", "");
 
-    generalConfig.getYaml().setComment("webhook.embeds.footer",
-      "Small footer message of all Discord webhook embeds");
-    generalConfig.getYaml().setComment("webhook.embeds.footer.text",
-      "Content of the footer message of all Discord webhook embeds");
-    webhook.footer.text = generalConfig.getString("webhook.embeds.footer.text",
+    generalConfig.getYaml().setComment("webhook.embed.footer",
+      "Small footer message of the Discord webhook embed");
+    generalConfig.getYaml().setComment("webhook.embed.footer.text",
+      "Content of the footer message of the Discord webhook embed");
+    webhook.footer.text = generalConfig.getString("webhook.embed.footer.text",
       "© Jones Development and Sonar Contributors");
 
-    generalConfig.getYaml().setComment("webhook.embeds.footer.icon-url",
-      "URL of the footer message icon of all Discord webhook embeds");
-    webhook.footer.iconUrl = generalConfig.getString("webhook.embeds.footer.icon-url", "");
+    generalConfig.getYaml().setComment("webhook.embed.footer.icon-url",
+      "URL of the footer message icon of the Discord webhook embed");
+    webhook.footer.iconUrl = generalConfig.getString("webhook.embed.footer.icon-url", "");
 
-    {
-      final String realEmbedPath = "webhook.embeds.attack-start";
-      final String embedPath = realEmbedPath + ".";
+    final String realEmbedPath = "webhook.embed";
+    final String embedPath = realEmbedPath + ".";
 
-      generalConfig.getYaml().setComment(realEmbedPath,
-        "Embed Discord webhook message that is sent when an attack is detected");
-      generalConfig.getYaml().setComment(embedPath + "title",
-        "Title of the Discord webhook embed");
-      webhook.attackStartEmbed.title = generalConfig.getString(embedPath + "title", ":warning: Attack detected");
+    generalConfig.getYaml().setComment(realEmbedPath,
+      "Embed Discord webhook message that is sent when an attack has stopped");
+    generalConfig.getYaml().setComment(embedPath + "title",
+      "Title of the Discord webhook embed");
+    webhook.embed.title = generalConfig.getString(embedPath + "title", ":white_check_mark: Attack mitigated");
 
-      generalConfig.getYaml().setComment(embedPath + "title-url",
-        "Clickable URL of the title of the Discord webhook embed");
-      webhook.attackStartEmbed.titleUrl = generalConfig.getString(embedPath + "title-url", "");
+    generalConfig.getYaml().setComment(embedPath + "title-url",
+      "Clickable URL of the title of the Discord webhook embed");
+    webhook.embed.titleUrl = generalConfig.getString(embedPath + "title-url", "");
 
-      generalConfig.getYaml().setComment(embedPath + "description",
-        "Description (content) of the Discord webhook embed");
-      webhook.attackStartEmbed.description = fromList(generalConfig.getStringList(embedPath + "description", Arrays.asList(
-        "An attack has been detected on your server.",
-        "",
-        "Information on the attack is currently being collected. Please stay patient."
-      )), LINE_SEPARATOR);
+    generalConfig.getYaml().setComment(embedPath + "description",
+      "Description (content) of the Discord webhook embed");
+    webhook.embed.description = fromList(generalConfig.getStringList(embedPath + "description", Arrays.asList(
+      "The attack on your server has been mitigated.",
+      "",
+      "Attack start: <t:%start-timestamp%:T>",
+      "Attack end: <t:%end-timestamp%:T>",
+      "Attack duration: %duration%",
+      "",
+      "Peak process CPU usage during the attack: %peak-cpu%%",
+      "Peak process memory usage during the attack: %peak-memory%",
+      "Peak bots per second during the attack: %peak-bps%",
+      "",
+      "Blacklisted IP addresses during the attack: %total-blacklisted%",
+      "Failed verifications during the attack: %total-failed%",
+      "Successful verifications during the attack: %total-success%"
+    )), LINE_SEPARATOR);
 
-      generalConfig.getYaml().setComment(embedPath + "color",
-        "RGB colors of the Discord webhook embed"
+    generalConfig.getYaml().setComment(embedPath + "color",
+      "RGB colors of the Discord webhook embed"
         + LINE_SEPARATOR + "Color picker: https://www.rapidtables.com/web/color/RGB_Color.html");
-      webhook.attackStartEmbed.r = generalConfig.getInt(embedPath + "color.red", 255);
-      webhook.attackStartEmbed.g = generalConfig.getInt(embedPath + "color.green", 0);
-      webhook.attackStartEmbed.b = generalConfig.getInt(embedPath + "color.blue", 0);
-    }
-
-    {
-      final String realEmbedPath = "webhook.embeds.attack-end";
-      final String embedPath = realEmbedPath + ".";
-
-      generalConfig.getYaml().setComment(realEmbedPath,
-        "Embed Discord webhook message that is sent when an attack has stopped");
-      generalConfig.getYaml().setComment(embedPath + "title",
-        "Title of the Discord webhook embed");
-      webhook.attackEndEmbed.title = generalConfig.getString(embedPath + "title", ":white_check_mark: Attack mitigated");
-
-      generalConfig.getYaml().setComment(embedPath + "title-url",
-        "Clickable URL of the title of the Discord webhook embed");
-      webhook.attackEndEmbed.titleUrl = generalConfig.getString(embedPath + "title-url", "");
-
-      generalConfig.getYaml().setComment(embedPath + "description",
-        "Description (content) of the Discord webhook embed");
-      webhook.attackEndEmbed.description = fromList(generalConfig.getStringList(embedPath + "description", Arrays.asList(
-        "The attack on your server has been mitigated.",
-        "Attack duration: %duration%",
-        "",
-        "Peak process CPU usage during the attack: %peak-cpu%%",
-        "Peak process memory usage during the attack: %peak-memory%",
-        "Peak bots per second during the attack: %peak-bps%",
-        "",
-        "Blacklisted IP addresses during the attack: %total-blacklisted%",
-        "Failed verifications during the attack: %total-failed%",
-        "Successful verifications during the attack: %total-success%"
-      )), LINE_SEPARATOR);
-
-      generalConfig.getYaml().setComment(embedPath + "color",
-        "RGB colors of the Discord webhook embed"
-          + LINE_SEPARATOR + "Color picker: https://www.rapidtables.com/web/color/RGB_Color.html");
-      webhook.attackEndEmbed.r = generalConfig.getInt(embedPath + "color.red", 0);
-      webhook.attackEndEmbed.g = generalConfig.getInt(embedPath + "color.green", 255);
-      webhook.attackEndEmbed.b = generalConfig.getInt(embedPath + "color.blue", 0);
-    }
+    webhook.embed.r = generalConfig.getInt(embedPath + "color.red", 0);
+    webhook.embed.g = generalConfig.getInt(embedPath + "color.green", 255);
+    webhook.embed.b = generalConfig.getInt(embedPath + "color.blue", 0);
 
     if (!webhook.url.isEmpty()) {
       if (webhook.username.isEmpty()) {
