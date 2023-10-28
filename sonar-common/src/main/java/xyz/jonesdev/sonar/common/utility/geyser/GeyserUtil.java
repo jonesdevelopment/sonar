@@ -17,9 +17,10 @@
 
 package xyz.jonesdev.sonar.common.utility.geyser;
 
-import io.netty.channel.Channel;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.NotNull;
+import org.geysermc.floodgate.api.FloodgateApi;
+
+import java.util.UUID;
 
 /**
  * Simple utility to determine if someone joins using GeyserMC
@@ -27,20 +28,25 @@ import org.jetbrains.annotations.NotNull;
 @UtilityClass
 public class GeyserUtil {
 
+  private boolean FLOODGATE;
+
+  static {
+    try {
+      Class.forName("org.geysermc.floodgate.api.FloodgateApi");
+      FLOODGATE = true;
+    } catch (Throwable throwable) {
+      FLOODGATE = false;
+    }
+  }
+
   /**
-   * Checks if Geyser holds the parent channel of the player
-   *
-   * @param channel Channel of the player
+   * @param uuid UUID of the player
    * @return Whether the player is on GeyserMC or not
    */
-  public boolean isGeyserConnection(final @NotNull Channel channel) {
-    // Get the parent channel of the original channel
-    final Channel parent = channel.parent();
-    // This shouldn't happen, but we want to stay safe here
-    if (parent == null) return false;
-
-    final Class<? extends Channel> clazz = parent.getClass();
-    // Check if Geyser adapted the channel by checking for the package name
-    return clazz.getCanonicalName().startsWith("org.geysermc");
+  public boolean isGeyserConnection(final UUID uuid) {
+    // First, check if floodgate is even available
+    if (!FLOODGATE) return false;
+    // Check if the UUID is corresponding to a FloodgatePlayer
+    return FloodgateApi.getInstance().isFloodgatePlayer(uuid);
   }
 }
