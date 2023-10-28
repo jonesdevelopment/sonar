@@ -57,7 +57,7 @@ public class UpdateChecker {
       try {
         final URL url = new URL("https://api.github.com/repos/jonesdevelopment/sonar/releases/latest");
         final HttpsURLConnection urlConnection = prepareConnection(url);
-        final JsonObject json = parseJson(urlConnection.getInputStream());
+        final JsonObject json = parseJson(urlConnection);
         final String latestStableRelease = json.get("tag_name").getAsString();
         final int convertedLatestVersion = convertVersion(latestStableRelease);
         final int convertedCurrentVersion = convertVersion(Sonar.get().getVersion().getSemanticVersion());
@@ -78,22 +78,25 @@ public class UpdateChecker {
     });
   }
 
-  private @NotNull JsonObject parseJson(final @NotNull InputStream inputStream) throws IOException {
-    final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-    final StringBuilder content = new StringBuilder();
+  private @NotNull JsonObject parseJson(final @NotNull HttpsURLConnection urlConnection) throws IOException {
+    try (final InputStream inputStream = urlConnection.getInputStream()) {
+      try (final InputStreamReader inputStreamReader = new InputStreamReader(inputStream)) {
+        final StringBuilder content = new StringBuilder();
 
-    // Read the entire page content
-    try (final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-      String line;
+        // Read the entire page content
+        try (final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+          String line;
 
-      while ((line = bufferedReader.readLine()) != null) {
-        content.append(line);
+          while ((line = bufferedReader.readLine()) != null) {
+            content.append(line);
+          }
+        }
+
+        // Parse site content as JSON using Gson
+        final JsonParser jsonParser = new JsonParser();
+        return jsonParser.parse(content.toString()).getAsJsonObject();
       }
     }
-
-    // Parse site content as JSON using Gson
-    final JsonParser jsonParser = new JsonParser();
-    return jsonParser.parse(content.toString()).getAsJsonObject();
   }
 
   private @NotNull HttpsURLConnection prepareConnection(final @NotNull URL url) throws Exception {
