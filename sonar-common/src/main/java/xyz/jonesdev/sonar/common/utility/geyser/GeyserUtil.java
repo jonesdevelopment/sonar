@@ -19,30 +19,19 @@ package xyz.jonesdev.sonar.common.utility.geyser;
 
 import io.netty.channel.Channel;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Simple utility to determine if someone joins using GeyserMC
  */
 @UtilityClass
 public class GeyserUtil {
-  private boolean FLOODGATE;
-
-  static {
-    try {
-      Class.forName("org.geysermc.floodgate.api.FloodgateApi");
-      FLOODGATE = true;
-    } catch (Throwable throwable) {
-      FLOODGATE = false;
-    }
-  }
 
   /**
    * @param channel Channel of the player
    * @return Whether the player is on GeyserMC or not
    */
-  public boolean isGeyserConnection(final Channel channel) {
-    // First, check if floodgate is even available
-    if (!FLOODGATE) return false;
+  public boolean isGeyserConnection(final @NotNull Channel channel) {
     // Get the parent channel of the original channel
     final Channel parent = channel.parent();
     // This shouldn't happen, but we want to stay safe here
