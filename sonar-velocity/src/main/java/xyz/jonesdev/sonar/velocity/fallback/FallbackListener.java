@@ -175,7 +175,7 @@ public final class FallbackListener {
         if (Sonar.get().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
 
         // Completely skip Geyser connections
-        if (isGeyserConnection(channel, gameProfile.getName())) {
+        if (isGeyserConnection(channel)) {
           fallback.getLogger().info("Skipping Geyser player: {}{}",
             gameProfile.getName(), Sonar.get().getConfig().formatAddress(inetAddress));
           return;

@@ -154,7 +154,7 @@ public final class FallbackInitialHandler extends InitialHandler {
         }
 
         // Completely skip Geyser connections
-        if (isGeyserConnection(channel, loginRequest.getData())) {
+        if (isGeyserConnection(channel)) {
           FALLBACK.getLogger().info("Skipping Geyser player: {}{}",
             loginRequest.getData(), Sonar.get().getConfig().formatAddress(inetAddress));
           super.handle(loginRequest);

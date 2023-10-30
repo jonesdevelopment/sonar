@@ -19,8 +19,6 @@ package xyz.jonesdev.sonar.common.utility.geyser;
 
 import io.netty.channel.Channel;
 import lombok.experimental.UtilityClass;
-import org.geysermc.floodgate.api.FloodgateApi;
-import org.geysermc.floodgate.api.player.FloodgatePlayer;
 
 /**
  * Simple utility to determine if someone joins using GeyserMC
@@ -39,30 +37,18 @@ public class GeyserUtil {
   }
 
   /**
-   * @param username Name of the player
+   * @param channel Channel of the player
    * @return Whether the player is on GeyserMC or not
    */
-  public boolean isGeyserConnection(final Channel channel, final String username) {
+  public boolean isGeyserConnection(final Channel channel) {
     // First, check if floodgate is even available
     if (!FLOODGATE) return false;
     // Get the parent channel of the original channel
     final Channel parent = channel.parent();
     // This shouldn't happen, but we want to stay safe here
-    if (parent != null) {
-      final Class<? extends Channel> clazz = parent.getClass();
-      // Check if Geyser adapted the channel by checking for the package name
-      if (clazz.getCanonicalName().startsWith("org.geysermc")) {
-        return true;
-      }
-    }
-    // Also make sure to support standalone Geyser proxies.
-    // This isn't the perfect solution, but I don't know how else I could fix this.
-    for (final FloodgatePlayer player : FloodgateApi.getInstance().getPlayers()) {
-      // Check if there is a Geyser player with the provided username
-      if (player.getJavaUsername().equals("." + username)) {
-        return true;
-      }
-    }
-    return false;
+    if (parent == null) return false;
+    final Class<? extends Channel> clazz = parent.getClass();
+    // Check if Geyser adapted the channel by checking for the package name
+    return clazz.getCanonicalName().startsWith("org.geysermc");
   }
 }
