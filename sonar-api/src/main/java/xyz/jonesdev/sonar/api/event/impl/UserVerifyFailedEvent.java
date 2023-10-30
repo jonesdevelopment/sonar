@@ -19,23 +19,23 @@ package xyz.jonesdev.sonar.api.event.impl;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 import java.util.Optional;
 
+@Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
 public final class UserVerifyFailedEvent implements SonarEvent {
-  @Getter
   private final FallbackUser<?, ?> user;
-  private final String reason;
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  private final Optional<String> reason;
 
-  @SuppressWarnings("unused")
-  public Optional<String> getReason() {
-    return Optional.ofNullable(reason);
+  public UserVerifyFailedEvent(final FallbackUser<?, ?> user, final @Nullable String reason) {
+    this.user = user;
+    this.reason = Optional.ofNullable(reason);
   }
 }
