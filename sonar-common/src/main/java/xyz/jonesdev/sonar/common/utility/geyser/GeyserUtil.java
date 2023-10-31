@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.utility.geyser;
 
 import io.netty.channel.Channel;
+import io.netty.util.AttributeKey;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,17 +28,20 @@ import org.jetbrains.annotations.NotNull;
 @UtilityClass
 public class GeyserUtil {
 
+  /*
+   * Geyser attribute key for every floodgate player
+   */
+  private AttributeKey<Object> playerAttribute() {
+    return AttributeKey.valueOf("floodgate-player");
+  }
+
   /**
    * @param channel Channel of the player
    * @return Whether the player is on GeyserMC or not
    */
   public boolean isGeyserConnection(final @NotNull Channel channel) {
-    // Get the parent channel of the original channel
-    final Channel parent = channel.parent();
-    // This shouldn't happen, but we want to stay safe here
-    if (parent == null) return false;
-    final Class<? extends Channel> clazz = parent.getClass();
-    // Check if Geyser adapted the channel by checking for the package name
-    return clazz.getCanonicalName().startsWith("org.geysermc");
+    // https://discord.com/channels/613163671870242838/613170125696270357/1168599123889504266
+    // Every floodgate player has a channel attribute called "floodgate-player"
+    return channel.hasAttr(playerAttribute());
   }
 }
