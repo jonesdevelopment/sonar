@@ -92,9 +92,6 @@ public interface FallbackUser<X, Y> {
    */
   default void fail(final @Nullable String reason) {
     if (getChannel().isActive()) {
-      // Call the VerifyFailedEvent for external API usage
-      Sonar.get().getEventManager().publish(new UserVerifyFailedEvent(this, reason));
-
       disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
 
       if (reason != null) {
@@ -106,6 +103,9 @@ public interface FallbackUser<X, Y> {
     }
 
     Statistics.FAILED_VERIFICATIONS.increment();
+
+    // Call the VerifyFailedEvent for external API usage
+    Sonar.get().getEventManager().publish(new UserVerifyFailedEvent(this, reason));
 
     // Make sure old entries are removed
     PREVIOUS_FAILS.cleanUp();

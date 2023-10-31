@@ -18,51 +18,30 @@
 package xyz.jonesdev.sonar.common.utility.geyser;
 
 import io.netty.channel.Channel;
+import io.netty.util.AttributeKey;
 import lombok.experimental.UtilityClass;
-import org.geysermc.floodgate.api.FloodgateApi;
-import org.geysermc.floodgate.api.player.FloodgatePlayer;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Simple utility to determine if someone joins using GeyserMC
  */
 @UtilityClass
 public class GeyserUtil {
-  private boolean FLOODGATE;
 
-  static {
-    try {
-      Class.forName("org.geysermc.floodgate.api.FloodgateApi");
-      FLOODGATE = true;
-    } catch (Throwable throwable) {
-      FLOODGATE = false;
-    }
+  /*
+   * Geyser attribute key for every floodgate player
+   */
+  private AttributeKey<Object> playerAttribute() {
+    return AttributeKey.valueOf("floodgate-player");
   }
 
   /**
-   * @param username Name of the player
+   * @param channel Channel of the player
    * @return Whether the player is on GeyserMC or not
    */
-  public boolean isGeyserConnection(final Channel channel, final String username) {
-    // First, check if floodgate is even available
-    if (!FLOODGATE) return false;
-    // Get the parent channel of the original channel
-    final Channel parent = channel.parent();
-    // This shouldn't happen, but we want to stay safe here
-    if (parent != null) {
-      final Class<? extends Channel> clazz = parent.getClass();
-      // Check if Geyser adapted the channel by checking for the package name
-      if (clazz.getCanonicalName().startsWith("org.geysermc")) {
-        return true;
-      }
-    }
-    // Also make sure to support standalone Geyser proxies.
-    // This isn't the perfect solution, but I don't know how else I could fix this.
-    for (final FloodgatePlayer player : FloodgateApi.getInstance().getPlayers()) {
-      // Check if there is a Geyser player with the provided username
-      if (player.getJavaUsername().equals("." + username)) {
-        return true;
-      }
-    }
-    return false;
+  public boolean isGeyserConnection(final @NotNull Channel channel) {
+    // https://discord.com/channels/613163671870242838/613170125696270357/1168599123889504266
+    // Every floodgate player has a channel attribute called "floodgate-player"
+    return channel.hasAttr(playerAttribute());
   }
 }

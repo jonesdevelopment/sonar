@@ -90,7 +90,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void configure() {
     // Set the state to CONFIGURE to avoid false positives
     state = State.CONFIGURE;
-    // Send necessary configuration packets to the client
+    // Send the necessary configuration packets to the client
     user.delayedWrite(synchronizeRegistry);
     user.delayedWrite(FINISH_CONFIGURATION);
     // Send all packets in one flush
