@@ -20,10 +20,12 @@ package xyz.jonesdev.sonar.api.fallback;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.net.InetAddress;
@@ -63,4 +65,12 @@ public final class Fallback {
       SONAR.getLogger().error("[fallback] " + message, args);
     }
   };
+
+  @SuppressWarnings("all")
+  public boolean shouldVerifyNewPlayers() {
+    val timing = Sonar.get().getConfig().getVerification().getTiming();
+    return timing == SonarConfiguration.Verification.Timing.ALWAYS
+      || (timing == SonarConfiguration.Verification.Timing.DURING_ATTACK
+      && Sonar.get().getAttackTracker().isCurrentlyUnderAttack());
+  }
 }

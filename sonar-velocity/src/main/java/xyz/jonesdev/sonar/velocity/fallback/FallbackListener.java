@@ -167,7 +167,7 @@ public final class FallbackListener {
         }
 
         // Don't continue the verification process if the verification is disabled
-        if (!Sonar.get().getConfig().getVerification().isEnabled()) return;
+        if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) return;
 
         // Check if the player is already verified.
         // No one wants to be verified over and over again.

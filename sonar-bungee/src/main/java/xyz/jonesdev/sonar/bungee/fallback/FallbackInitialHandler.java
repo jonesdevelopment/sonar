@@ -134,7 +134,7 @@ public final class FallbackInitialHandler extends InitialHandler {
         Statistics.TOTAL_TRAFFIC.increment();
 
         // Check if the verification is enabled
-        if (!Sonar.get().getConfig().getVerification().isEnabled()) {
+        if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
           super.handle(loginRequest);
           return;
         }

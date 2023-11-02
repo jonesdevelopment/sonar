@@ -97,7 +97,14 @@ public final class SonarConfiguration {
   @Getter
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Verification {
-    private boolean enabled;
+    private Timing timing;
+
+    @Getter
+    @RequiredArgsConstructor
+    public enum Timing {
+      ALWAYS, DURING_ATTACK, NEVER
+    }
+
     private boolean checkGravity;
     private boolean checkCollisions;
     private boolean logConnections;
@@ -381,9 +388,11 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification",
       "Every new player that joins for the first time will be sent to"
         + LINE_SEPARATOR + "a lightweight limbo server where advanced bot checks are performed");
-    generalConfig.getYaml().setComment("verification.enabled",
-      "Should Sonar verify new players? (Recommended)");
-    verification.enabled = generalConfig.getBoolean("verification.enabled", true);
+    generalConfig.getYaml().setComment("verification.timing",
+      "When should Sonar verify new players? (Recommended: ALWAYS)"
+      + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER");
+    verification.timing = Verification.Timing.valueOf(
+      generalConfig.getString("verification.timing", Verification.Timing.ALWAYS.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.checks.gravity",
       "Checks if the players' falling motion is following Minecraft's gravity formula"
