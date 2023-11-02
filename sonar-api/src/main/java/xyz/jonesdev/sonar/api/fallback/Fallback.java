@@ -66,7 +66,7 @@ public final class Fallback {
     }
   };
 
-  @SuppressWarnings("all")
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean shouldVerifyNewPlayers() {
     val timing = Sonar.get().getConfig().getVerification().getTiming();
     return timing == SonarConfiguration.Verification.Timing.ALWAYS

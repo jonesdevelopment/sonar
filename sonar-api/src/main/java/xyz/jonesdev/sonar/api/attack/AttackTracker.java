@@ -129,7 +129,7 @@ public final class AttackTracker implements JVMProfiler {
     }
   }
 
-  @SuppressWarnings("all")
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isCurrentlyUnderAttack() {
     final int minDelay = Sonar.get().getConfig().getAttackCooldownDelay();
     return currentAttack != null && currentAttack.timer.delay() < minDelay;

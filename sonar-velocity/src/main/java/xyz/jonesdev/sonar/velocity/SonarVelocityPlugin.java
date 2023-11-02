@@ -39,7 +39,6 @@ import java.nio.file.Path;
   url = "https://jonesdev.xyz/discord/",
   description = "Effective Anti-bot plugin for Velocity, BungeeCord, and Bukkit (1.7-latest)"
 )
-@SuppressWarnings("all")
 public final class SonarVelocityPlugin {
   private final ProxyServer server;
   private final Logger logger;
