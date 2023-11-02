@@ -21,24 +21,40 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SonarEventManager {
   public static final SonarEventManager INSTANCE = new SonarEventManager();
   private static final Collection<SonarEventListener> EVENT_LISTENERS = new Vector<>(0);
+  private static final ExecutorService EVENT_SERVICE = Executors.newSingleThreadExecutor();
 
   /**
    * Publishes the given event to all listeners
    */
   @ApiStatus.Internal
   public void publish(final @NotNull SonarEvent event) {
-    for (final SonarEventListener eventListener : EVENT_LISTENERS) {
-      eventListener.handle(event);
+    // Don't post a task if there are no listeners
+    if (EVENT_LISTENERS.isEmpty()) {
+      return;
     }
+
+    EVENT_SERVICE.execute(() -> {
+      for (final SonarEventListener eventListener : EVENT_LISTENERS) {
+        try {
+          eventListener.handle(event);
+        } catch (Throwable throwable) {
+          Sonar.get().getLogger().error("Could not pass {} to listener: {}",
+            event.getClass().getSimpleName(), throwable);
+        }
+      }
+    });
   }
 
   /**
@@ -47,6 +63,7 @@ public final class SonarEventManager {
    * @param listeners One (or more) listeners to register
    * @see #unregisterListener(SonarEventListener...) Unregister an event listener
    */
+  @SuppressWarnings("unused") // External API usage
   public synchronized void registerListener(final @NotNull SonarEventListener... listeners) {
     EVENT_LISTENERS.addAll(Arrays.asList(listeners));
   }
@@ -58,6 +75,7 @@ public final class SonarEventManager {
    * @apiNote This does not have any effect if the given listeners are not registered
    * @see #registerListener(SonarEventListener...) Register an event listener
    */
+  @SuppressWarnings("unused") // External API usage
   public synchronized void unregisterListener(final @NotNull SonarEventListener... listeners) {
     EVENT_LISTENERS.removeAll(Arrays.asList(listeners));
   }
