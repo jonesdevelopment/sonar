@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class ServiceRepository {
   private final ScheduledExecutorService QUEUE_SERVICE = Executors.newSingleThreadScheduledExecutor();
   private final ScheduledExecutorService TRAFFIC_SERVICE = Executors.newSingleThreadScheduledExecutor();
+  private final ScheduledExecutorService VERBOSE_SERVICE = Executors.newSingleThreadScheduledExecutor();
   private boolean registered;
 
   public void register() {
@@ -41,6 +42,8 @@ public class ServiceRepository {
       1L, 1L, TimeUnit.SECONDS);
     QUEUE_SERVICE.scheduleAtFixedRate(Sonar.get().getFallback().getQueue()::poll,
       500L, 500L, TimeUnit.MILLISECONDS);
+    VERBOSE_SERVICE.scheduleAtFixedRate(Sonar.get().getVerboseHandler()::update,
+      125L, 125L, TimeUnit.MILLISECONDS);
   }
 
   public synchronized void shutdown() {
@@ -51,5 +54,6 @@ public class ServiceRepository {
 
     QUEUE_SERVICE.shutdown();
     TRAFFIC_SERVICE.shutdown();
+    VERBOSE_SERVICE.shutdown();
   }
 }

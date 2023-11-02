@@ -26,8 +26,6 @@ import xyz.jonesdev.sonar.velocity.audience.AudienceListener;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
 
-import java.util.concurrent.TimeUnit;
-
 @Getter
 public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
   public static SonarVelocity INSTANCE;
@@ -75,10 +73,5 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
     // Register audience register listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
-
-    // Register action bar verbose task
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), getVerboseHandler()::update)
-      .repeat(100L, TimeUnit.MILLISECONDS)
-      .schedule();
   }
 }

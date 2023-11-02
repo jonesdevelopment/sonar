@@ -78,9 +78,5 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
     // Register audience register listener
     getPlugin().getServer().getPluginManager().registerEvents(new AudienceListener(), getPlugin());
-
-    // Register action bar verbose task
-    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), getVerboseHandler()::update,
-      2L, 2L);
   }
 }

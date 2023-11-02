@@ -30,8 +30,6 @@ import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
-import java.util.concurrent.TimeUnit;
-
 @Getter
 public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   public static SonarBungee INSTANCE;
@@ -84,10 +82,6 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     // Register audience register listener
     getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new AudienceListener());
-
-    // Register action bar verbose task
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), getVerboseHandler()::update,
-      100L, 100L, TimeUnit.MILLISECONDS);
 
     // Inject base into ProtocolUtils
     BaseInjectionHelper.inject(ChildChannelInitializer.INSTANCE);
