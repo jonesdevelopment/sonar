@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.velocity;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.velocity.audience.AudienceListener;
@@ -76,16 +75,6 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
     // Register audience register listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
-
-    // Register Fallback queue task
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), getFallback().getQueue()::poll)
-      .repeat(500L, TimeUnit.MILLISECONDS)
-      .schedule();
-
-    // Register traffic counter reset task
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), TrafficCounter::reset)
-      .repeat(1L, TimeUnit.SECONDS)
-      .schedule();
 
     // Register action bar verbose task
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), getVerboseHandler()::update)

@@ -22,7 +22,6 @@ import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bungee.audience.AudienceListener;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
@@ -85,14 +84,6 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     // Register audience register listener
     getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new AudienceListener());
-
-    // Register Fallback queue task
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), getFallback().getQueue()::poll,
-      500L, 500L, TimeUnit.MILLISECONDS);
-
-    // Register traffic counter reset task
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), TrafficCounter::reset,
-      1L, 1L, TimeUnit.SECONDS);
 
     // Register action bar verbose task
     getPlugin().getServer().getScheduler().schedule(getPlugin(), getVerboseHandler()::update,
