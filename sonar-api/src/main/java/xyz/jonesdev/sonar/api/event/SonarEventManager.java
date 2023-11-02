@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,7 +47,12 @@ public final class SonarEventManager {
 
     EVENT_SERVICE.execute(() -> {
       for (final SonarEventListener eventListener : EVENT_LISTENERS) {
-        eventListener.handle(event);
+        try {
+          eventListener.handle(event);
+        } catch (Throwable throwable) {
+          Sonar.get().getLogger().error("Could not pass {} to listener: {}",
+            event.getClass().getSimpleName(), throwable);
+        }
       }
     });
   }
