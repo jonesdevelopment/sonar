@@ -18,16 +18,11 @@
 package xyz.jonesdev.sonar.velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
-import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 
@@ -37,69 +32,8 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
   public void execute(final @NotNull Invocation invocation) {
     // Create our own invocation source wrapper to handle messages properly
     final InvocationSource invocationSource = new VelocityInvocationSource(invocation.source());
-
-    if (invocationSource.isPlayer()) {
-      // Check if the player actually has the permission to run the command
-      if (!invocation.source().hasPermission("sonar.command")) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getNoPermission());
-        return;
-      }
-      // Checking if it contains will only break more since it can throw
-      // a NullPointerException if the cache is being accessed from parallel threads
-      DELAY.cleanUp(); // Clean up the cache
-      final long mapTimestamp = DELAY.asMap().getOrDefault(invocation.source(), -1L);
-
-      // There were some exploits with spamming commands in the past.
-      // Spamming should be prevented, especially if some heavy operations are done,
-      // which is not the case here but let's still stay safe!
-      if (mapTimestamp > 0L) {
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDown());
-
-        // Format delay
-        final long timestamp = System.currentTimeMillis();
-        final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
-
-        invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
-          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left)));
-        return;
-      }
-
-      DELAY.put(invocation.source());
-    }
-
-    Optional<Subcommand> subcommand = Optional.empty();
-
-    if (invocation.arguments().length > 0) {
-      // Search subcommand if command arguments are present
-      subcommand = Sonar.get().getSubcommandRegistry().getSubcommands().parallelStream()
-        .filter(sub -> sub.getInfo().name().equalsIgnoreCase(invocation.arguments()[0])
-          || Arrays.stream(sub.getInfo().aliases())
-          .anyMatch(alias -> alias.equalsIgnoreCase(invocation.arguments()[0])))
-        .findFirst();
-
-      // Check permissions for subcommands
-      if (subcommand.isPresent()) {
-        if (!subcommand.get().getInfo().onlyConsole()
-          && !invocation.source().hasPermission(subcommand.get().getPermission())
-        ) {
-          invocationSource.sendMessage(Sonar.get().getConfig().getCommands().getSubCommandNoPerm()
-            .replace("%permission%", subcommand.get().getPermission()));
-          return;
-        }
-      }
-    }
-
-    if (subcommand.isEmpty()) {
-
-      // Re-use the old, cached help message since we don't want to scan
-      // for each subcommand and it's arguments/attributes every time
-      // someone runs /sonar since the subcommand don't change
-      for (final Component component : CACHED_HELP_MESSAGE) {
-        invocationSource.sendMessage(component);
-      }
-    } else {
-      subcommand.get().invoke(invocationSource, invocation.arguments());
-    }
+    // Pass the invocation source and command arguments to our command handler
+    handle(invocationSource, invocation.arguments());
   }
 
   @Override

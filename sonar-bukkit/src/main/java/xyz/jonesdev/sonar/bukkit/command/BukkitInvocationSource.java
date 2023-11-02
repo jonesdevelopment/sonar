@@ -25,6 +25,9 @@ import xyz.jonesdev.sonar.bukkit.SonarBukkit;
 
 public final class BukkitInvocationSource extends InvocationSource {
   public BukkitInvocationSource(final @NotNull CommandSender sender) {
-    super(sender.getName(), SonarBukkit.INSTANCE.getBukkitAudiences().sender(sender), sender instanceof Player);
+    super(sender.getName(),
+      SonarBukkit.INSTANCE.getBukkitAudiences().sender(sender),
+      sender instanceof Player,
+      sender::hasPermission);
   }
 }
