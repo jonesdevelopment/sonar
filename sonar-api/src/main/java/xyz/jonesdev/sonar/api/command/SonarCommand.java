@@ -40,6 +40,65 @@ public interface SonarCommand {
 
   List<Component> CACHED_HELP_MESSAGE = new ArrayList<>();
 
+  default void handle(final @NotNull InvocationSource source, final String[] args) {
+    if (source.isPlayer()) {
+      // Check if the player actually has the permission to run the command
+      if (!source.getPermissionFunction().test("sonar.command")) {
+        source.sendMessage(Sonar.get().getConfig().getNoPermission());
+        return;
+      }
+      // Checking if it contains will only break more since it can throw
+      // a NullPointerException if the cache is being accessed from parallel threads
+      DELAY.cleanUp(); // Clean up the cache
+      final long mapTimestamp = DELAY.asMap().getOrDefault(source, -1L);
+
+      // There were some exploits with spamming commands in the past.
+      // Spamming should be prevented, especially if some heavy operations are done,
+      // which is not the case here but let's still stay safe!
+      if (mapTimestamp > 0L) {
+        source.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDown());
+
+        // Format delay
+        final long timestamp = System.currentTimeMillis();
+        final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
+
+        source.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
+          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left)));
+        return;
+      }
+
+      DELAY.put(source);
+    }
+
+    if (args.length > 0) {
+      // Search subcommand if command arguments are present
+      final Optional<Subcommand> subcommand = Sonar.get().getSubcommandRegistry().getSubcommands().stream()
+        .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
+          || Arrays.stream(sub.getInfo().aliases())
+          .anyMatch(alias -> alias.equalsIgnoreCase(args[0])))
+        .findFirst();
+
+      // Check permissions for subcommands
+      if (subcommand.isPresent()) {
+        if (!subcommand.get().getInfo().onlyConsole()
+          && !source.getPermissionFunction().test(subcommand.get().getPermission())) {
+          source.sendMessage(Sonar.get().getConfig().getCommands().getSubCommandNoPerm()
+            .replace("%permission%", subcommand.get().getPermission()));
+          return;
+        }
+        subcommand.get().invoke(source, args);
+        return;
+      }
+    }
+
+    // Re-use the old, cached help message since we don't want to scan
+    // for each subcommand and it's arguments/attributes every time
+    // someone runs /sonar since the subcommand don't change
+    for (final Component component : CACHED_HELP_MESSAGE) {
+      source.sendMessage(component);
+    }
+  }
+
   static void prepareCachedMessages() {
     // Cache help message
     CACHED_HELP_MESSAGE.clear();
