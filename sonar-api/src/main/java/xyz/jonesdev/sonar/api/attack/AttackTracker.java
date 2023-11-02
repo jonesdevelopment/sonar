@@ -31,8 +31,8 @@ import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AttackStatus implements JVMProfiler {
-  public static final AttackStatus INSTANCE = new AttackStatus();
+public final class AttackTracker implements JVMProfiler {
+  public static final AttackTracker INSTANCE = new AttackTracker();
   private @Nullable AttackStatistics currentAttack;
   private int attackThreshold;
 

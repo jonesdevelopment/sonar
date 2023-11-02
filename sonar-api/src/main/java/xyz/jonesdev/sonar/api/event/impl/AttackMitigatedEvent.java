@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import xyz.jonesdev.sonar.api.attack.AttackStatus;
+import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
 
 @Getter
@@ -29,5 +29,5 @@ import xyz.jonesdev.sonar.api.event.SonarEvent;
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public final class AttackMitigatedEvent implements SonarEvent {
-  private final AttackStatus.AttackStatistics attackStatistics;
+  private final AttackTracker.AttackStatistics attackStatistics;
 }
