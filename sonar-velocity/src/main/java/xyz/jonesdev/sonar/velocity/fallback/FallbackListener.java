@@ -167,7 +167,7 @@ public final class FallbackListener {
         }
 
         // Don't continue the verification process if the verification is disabled
-        if (!Sonar.get().getConfig().getVerification().isEnabled()) return;
+        if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) return;
 
         // Check if the player is already verified.
         // No one wants to be verified over and over again.
@@ -302,7 +302,7 @@ public final class FallbackListener {
           if (Sonar.get().getConfig().getVerification().isLogConnections()) {
             // Only log the processing message if the server isn't under attack.
             // We let the user override this through the configuration.
-            if (!Sonar.get().getAttackStatus().isCurrentlyUnderAttack()
+            if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
               || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
               fallback.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
                 .replace("%name%", connectedPlayer.getUsername())

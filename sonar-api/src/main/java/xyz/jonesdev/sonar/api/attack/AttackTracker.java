@@ -31,8 +31,8 @@ import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AttackStatus implements JVMProfiler {
-  public static final AttackStatus INSTANCE = new AttackStatus();
+public final class AttackTracker implements JVMProfiler {
+  public static final AttackTracker INSTANCE = new AttackTracker();
   private @Nullable AttackStatistics currentAttack;
   private int attackThreshold;
 
@@ -53,9 +53,9 @@ public final class AttackStatus implements JVMProfiler {
     final int queuedPlayers = Sonar.get().getFallback().getQueue().getQueuedPlayers().size();
     final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();
 
-    if (joinsPerSecond > minPlayers // check the number of bots/joins per second
-      || verifyingPlayers > minPlayers // check the number of verifying players
-      || queuedPlayers > minPlayers) { // check the number of queued players
+    if (joinsPerSecond > minPlayers // Check the number of bots/joins per second.
+      || verifyingPlayers > minPlayers // Check the number of verifying players.
+      || queuedPlayers > minPlayers) { // Check the number of queued players.
       // Increment attack threshold
       ++attackThreshold;
 
@@ -70,20 +70,23 @@ public final class AttackStatus implements JVMProfiler {
 
       // Update attack statistics
       if (joinsPerSecond > currentAttack.peakJoinsPerSecond) {
+        // Update joins per second peak if necessary
         currentAttack.peakJoinsPerSecond = joinsPerSecond;
       }
       final double processCPUUsage = getProcessCPUUsage();
       if (processCPUUsage > currentAttack.peakProcessCPUUsage) {
+        // Update cpu usage peak if necessary
         currentAttack.peakProcessCPUUsage = processCPUUsage;
       }
       final long processMemoryUsage = getUsedMemory();
       if (processMemoryUsage > currentAttack.peakProcessMemoryUsage) {
+        // Update memory consumption peak if necessary
         currentAttack.peakProcessMemoryUsage = processMemoryUsage;
       }
     } else if (currentAttack != null) {
       if (currentAttack.duration.delay() > Sonar.get().getConfig().getMinAttackDuration()
         && currentAttack.timer.delay() > Sonar.get().getConfig().getAttackCooldownDelay()) {
-        // An attack has stopped
+        // The current attack has stopped
         Sonar.get().getEventManager().publish(new AttackMitigatedEvent(currentAttack));
 
         if (++attackThreshold > Sonar.get().getConfig().getMinAttackThreshold()) {
@@ -97,6 +100,9 @@ public final class AttackStatus implements JVMProfiler {
           final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
           final String startTimestamp = String.valueOf(currentAttack.duration.getStart() / 1000L);
           final String endTimestamp = String.valueOf(System.currentTimeMillis() / 1000L);
+          final long blacklisted = Sonar.get().getFallback().getBlacklisted().estimatedSize();
+          final long verified = Sonar.get().getVerifiedPlayerController().estimatedSize();
+          final long failed = Statistics.FAILED_VERIFICATIONS.get();
 
           // Post webhook to Discord
           Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> webhook.post(() -> {
@@ -108,11 +114,9 @@ public final class AttackStatus implements JVMProfiler {
               .replace("%peak-cpu%", peakCPU)
               .replace("%peak-memory%", peakMem)
               .replace("%peak-bps%", peakBPS)
-              .replace("%total-blacklisted%",
-                Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
-              .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
-              .replace("%total-success%",
-                Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()));
+              .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(blacklisted))
+              .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(failed))
+              .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(verified));
             return new SonarConfiguration.Webhook.Embed(
               config.getTitle(), config.getTitleUrl(), description, config.getR(), config.getG(), config.getB());
           }));
@@ -129,7 +133,7 @@ public final class AttackStatus implements JVMProfiler {
     }
   }
 
-  @SuppressWarnings("all")
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isCurrentlyUnderAttack() {
     final int minDelay = Sonar.get().getConfig().getAttackCooldownDelay();
     return currentAttack != null && currentAttack.timer.delay() < minDelay;

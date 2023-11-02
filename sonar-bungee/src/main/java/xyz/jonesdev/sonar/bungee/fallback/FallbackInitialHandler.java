@@ -134,7 +134,7 @@ public final class FallbackInitialHandler extends InitialHandler {
         Statistics.TOTAL_TRAFFIC.increment();
 
         // Check if the verification is enabled
-        if (!Sonar.get().getConfig().getVerification().isEnabled()) {
+        if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
           super.handle(loginRequest);
           return;
         }
@@ -261,7 +261,7 @@ public final class FallbackInitialHandler extends InitialHandler {
           if (Sonar.get().getConfig().getVerification().isLogConnections()) {
             // Only log the processing message if the server isn't under attack.
             // We let the user override this through the configuration.
-            if (!Sonar.get().getAttackStatus().isCurrentlyUnderAttack()
+            if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
               || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
               FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
                 .replace("%name%", loginRequest.getData())

@@ -68,6 +68,6 @@ public final class FallbackQueue {
     }
 
     // Run the attack check task
-    Sonar.get().getAttackStatus().checkIfUnderAttack();
+    Sonar.get().getAttackTracker().checkIfUnderAttack();
   }
 }
