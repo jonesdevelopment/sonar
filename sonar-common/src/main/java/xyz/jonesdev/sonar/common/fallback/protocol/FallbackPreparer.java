@@ -54,7 +54,7 @@ public class FallbackPreparer {
 
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 
-  public int maxMovementTick, maxPredictionTick, dynamicSpawnYPosition;
+  public int maxMovementTick, dynamicSpawnYPosition;
   public double[] preparedCachedYMotions;
   public double maxFallDistance;
 
@@ -70,24 +70,21 @@ public class FallbackPreparer {
       new String[]{"minecraft:overworld"},
       "minecraft:overworld");
 
-    maxMovementTick = Sonar.get().getConfig().getVerification().getMaxMovementTicks();
-    maxPredictionTick = maxMovementTick + 10;
-    preparedCachedYMotions = new double[maxPredictionTick + 1];
-
-    for (int i = 0; i < maxPredictionTick + 1; i++) {
-      preparedCachedYMotions[i] = -((Math.pow(0.98, i) - 1) * 3.92);
-    }
-
-    // Adjust block and collide Y position based on max fall distance
     maxFallDistance = 0;
-    for (int i = 0; i < maxMovementTick; i++) {
-      maxFallDistance += preparedCachedYMotions[i];
+    maxMovementTick = Sonar.get().getConfig().getVerification().getMaxMovementTicks();
+    preparedCachedYMotions = new double[maxMovementTick + 10];
+
+    for (int i = 0; i < preparedCachedYMotions.length; i++) {
+      final double gravity = -((Math.pow(0.98, i) - 1) * 3.92);
+      preparedCachedYMotions[i] = gravity;
+      if (i <= maxMovementTick) {
+        maxFallDistance += gravity;
+      }
     }
 
-    // Set the dynamic spawn buffer
-    final int DYNAMIC_SPAWN_BUFFER = (int) (SPAWN_BUFFER + maxFallDistance);
     // Set the dynamic block and collide Y position based on the maximum fall distance
-    dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + DYNAMIC_SPAWN_BUFFER;
+    dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + 3 + (int) Math.ceil(maxFallDistance);
+    System.out.println(dynamicSpawnYPosition);
 
     // Prepare collision platform positions
     int index = 0;

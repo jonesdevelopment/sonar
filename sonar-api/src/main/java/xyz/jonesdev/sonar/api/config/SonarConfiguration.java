@@ -107,7 +107,6 @@ public final class SonarConfiguration {
     }
 
     private boolean checkGravity;
-    private boolean checkCollisions;
     private boolean logConnections;
     private boolean logDuringAttack;
     private boolean debugXYZPositions;
@@ -411,13 +410,6 @@ public final class SonarConfiguration {
       "Maximum number of ignored Y movement changes before a player fails verification");
     verification.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5), 1,
       128);
-
-    generalConfig.getYaml().setComment("verification.checks.collisions",
-      "Checks if the players collides with barrier blocks spawned below the player"
-        + LINE_SEPARATOR + "Note: The collision check will be skipped if the gravity check is disabled");
-    generalConfig.getYaml().setComment("verification.checks.collisions.enabled",
-      "Should Sonar check for valid client collisions? (Recommended)");
-    verification.checkCollisions = generalConfig.getBoolean("verification.checks.collisions.enabled", true);
 
     generalConfig.getYaml().setComment("verification.gamemode",
       "The gamemode of the player during verification (0, 1, 2, or 3)");
