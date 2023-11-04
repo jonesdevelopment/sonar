@@ -402,9 +402,9 @@ public final class SonarConfiguration {
       "Every new player that joins for the first time will be sent to"
         + LINE_SEPARATOR + "a lightweight limbo server where advanced bot checks are performed");
     generalConfig.getYaml().setComment("verification.timing",
-      "When should Sonar verify new players? (Recommended: ALWAYS)"
+      "When should Sonar verify new players?"
         + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER"
-        + LINE_SEPARATOR + "- ALWAYS: New players will always be checked"
+        + LINE_SEPARATOR + "- ALWAYS: New players will always be checked (Recommended)"
         + LINE_SEPARATOR + "- DURING_ATTACK: New players will only be checked during an attack"
         + LINE_SEPARATOR + "- NEVER: New players will never be checked");
     verification.timing = Verification.Timing.valueOf(
@@ -455,12 +455,12 @@ public final class SonarConfiguration {
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets", 256), 128, 8192);
 
     generalConfig.getYaml().setComment("verification.gamemode",
-      "The gamemode of the player during verification (Recommended: SPECTATOR)"
+      "The gamemode of the player during verification"
         + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR"
         + LINE_SEPARATOR + "- SURVIVAL: all UI components are visible"
         + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
         + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible"
-        + LINE_SEPARATOR + "- SPECTATOR: all UI components are hidden");
+        + LINE_SEPARATOR + "- SPECTATOR: all UI components are hidden (Recommended)");
     verification.gamemode = Verification.Gamemode.valueOf(
       generalConfig.getString("verification.gamemode", Verification.Gamemode.SPECTATOR.name()).toUpperCase());
 
