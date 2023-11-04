@@ -1035,12 +1035,12 @@ public final class SonarConfiguration {
   private static @NotNull String forEnumConstant(final @NotNull SimpleYamlConfig config,
                                           final String path,
                                           final String def) {
-    final Object o = config.getYaml().get(path, def);
-    if (o instanceof String) {
-      return ((String) o).toUpperCase();
+    final Object object = config.getObject(path, def);
+    if (object instanceof String) {
+      return ((String) object).toUpperCase();
     }
-    config.getYaml().set(path, def);
-    config.save();
+    Sonar.get().getLogger().info("[config] Migrated {} to {}", path, def);
+    config.set(path, def);
     return def;
   }
 

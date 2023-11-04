@@ -98,6 +98,11 @@ public final class SimpleYamlConfig {
     return yaml.getString(path, def);
   }
 
+  public Object getObject(final String path, final Object def) {
+    yaml.addDefault(path, def);
+    return yaml.get(path, def);
+  }
+
   public List<String> getStringList(final String path, final List<String> def) {
     yaml.addDefault(path, def);
     return yaml.getStringList(path);
