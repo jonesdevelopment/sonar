@@ -96,7 +96,7 @@ public final class SimpleYamlConfig {
   public String getString(final String path, final String def) {
     final Object object = getObject(path, def);
     if (object instanceof String) {
-      return ((String) object).toUpperCase();
+      return (String) object;
     }
     Sonar.get().getLogger().info("[config] Migrated {} to {}", path, def);
     set(path, def);

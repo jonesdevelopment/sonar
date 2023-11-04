@@ -340,7 +340,7 @@ public final class SonarConfiguration {
       "Type of database Sonar uses to store verified players"
         + LINE_SEPARATOR + "Possible types: NONE, MYSQL");
     database.type = Database.Type.valueOf(
-      generalConfig.getString("database.type", Database.Type.NONE.name()));
+      generalConfig.getString("database.type", Database.Type.NONE.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("database",
       "You can connect Sonar to a database to keep verified players even after restarting your server"
@@ -405,7 +405,7 @@ public final class SonarConfiguration {
       "When should Sonar verify new players? (Recommended: ALWAYS)"
         + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER");
     verification.timing = Verification.Timing.valueOf(
-      generalConfig.getString("verification.timing", Verification.Timing.ALWAYS.name()));
+      generalConfig.getString("verification.timing", Verification.Timing.ALWAYS.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.checks.gravity",
       "Checks if the players' falling motion is following Minecraft's gravity formula"
@@ -455,7 +455,7 @@ public final class SonarConfiguration {
       "The gamemode of the player during verification (Recommended: SPECTATOR)"
         + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR");
     verification.gamemode = Verification.Gamemode.valueOf(
-      generalConfig.getString("verification.gamemode", Verification.Gamemode.SPECTATOR.name()));
+      generalConfig.getString("verification.gamemode", Verification.Gamemode.SPECTATOR.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.log-connections",
       "Should Sonar log new verification attempts?");
