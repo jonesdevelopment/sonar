@@ -42,13 +42,13 @@ public final class DimensionRegistry {
   public final @NotNull CompoundBinaryTag OLD_CODEC;
 
   static {
-    CODEC_1_16 = getMapping("codec_1_16.nbt");
-    CODEC_1_18_2 = getMapping("codec_1_18_2.nbt");
-    CODEC_1_19 = getMapping("codec_1_19.nbt");
-    CODEC_1_19_1 = getMapping("codec_1_19_1.nbt");
-    CODEC_1_19_4 = getMapping("codec_1_19_4.nbt");
-    CODEC_1_20 = getMapping("codec_1_20.nbt");
-    OLD_CODEC = getMapping("codec_old.nbt");
+    CODEC_1_16 = getCodec("codec_1_16.nbt");
+    CODEC_1_18_2 = getCodec("codec_1_18_2.nbt");
+    CODEC_1_19 = getCodec("codec_1_19.nbt");
+    CODEC_1_19_1 = getCodec("codec_1_19_1.nbt");
+    CODEC_1_19_4 = getCodec("codec_1_19_4.nbt");
+    CODEC_1_20 = getCodec("codec_1_20.nbt");
+    OLD_CODEC = getCodec("codec_old.nbt");
 
     DEFAULT_DIMENSION_1_16 = getDimension(CODEC_1_16);
     DEFAULT_DIMENSION_1_18_2 = getDimension(CODEC_1_18_2);
@@ -60,8 +60,8 @@ public final class DimensionRegistry {
     return new DimensionInfo("minecraft:overworld", 0, (CompoundBinaryTag) elementTag);
   }
 
-  private @NotNull CompoundBinaryTag getMapping(final @NotNull String fileName) {
-    try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/" + fileName)) {
+  private @NotNull CompoundBinaryTag getCodec(final @NotNull String fileName) {
+    try (final InputStream inputStream = Sonar.class.getResourceAsStream("/codecs/" + fileName)) {
       return BinaryTagIO.reader().read(Objects.requireNonNull(inputStream), BinaryTagIO.Compression.GZIP);
     } catch (Throwable throwable) {
       Sonar.get().getLogger().error("Could not load mappings for {}: {}", fileName, throwable);
