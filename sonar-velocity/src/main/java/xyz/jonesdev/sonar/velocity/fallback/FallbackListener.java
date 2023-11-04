@@ -183,6 +183,8 @@ public final class FallbackListener {
 
         // We now mark the connection as dead by using our fake connection
         markConnectionAsDead(activeSessionHandler);
+        // Don't allow exceptions or disconnect messages
+        mcConnection.setAssociation(null);
 
         // Check if the player is already queued since we don't want bots to flood the queue
         if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
@@ -255,9 +257,6 @@ public final class FallbackListener {
           final boolean onlineMode = !event.getResult().isForceOfflineMode()
             && (SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().isOnlineMode()
             || event.getResult().isOnlineModeAllowed());
-
-          // Don't allow exceptions or disconnect messages
-          mcConnection.setAssociation(null);
 
           // Create an instance for the connected player
           final ConnectedPlayer connectedPlayer;
