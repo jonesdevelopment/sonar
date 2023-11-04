@@ -27,8 +27,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.EncryptionUtil;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.PlayerPublicKey;
@@ -314,7 +314,7 @@ public final class FallbackInitialHandler extends InitialHandler {
     Kick cachedKickPacket = CACHED_KICK_PACKETS.get(component);
     if (cachedKickPacket == null) {
       final String serialized = JSONComponentSerializer.json().serialize(component);
-      cachedKickPacket = new Kick(new TextComponent(serialized));
+      cachedKickPacket = new Kick(ComponentSerializer.deserialize(serialized));
       CACHED_KICK_PACKETS.put(component, cachedKickPacket);
     }
     return cachedKickPacket;
