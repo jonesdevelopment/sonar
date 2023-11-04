@@ -43,7 +43,7 @@ public class ServiceRepository {
     QUEUE_SERVICE.scheduleAtFixedRate(Sonar.get().getFallback().getQueue()::poll,
       500L, 500L, TimeUnit.MILLISECONDS);
     VERBOSE_SERVICE.scheduleAtFixedRate(Sonar.get().getVerboseHandler()::update,
-      125L, 125L, TimeUnit.MILLISECONDS);
+      200L, 200L, TimeUnit.MILLISECONDS);
   }
 
   public synchronized void shutdown() {

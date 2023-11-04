@@ -113,7 +113,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   @Override
   public void handle(final LoginRequest loginRequest) throws Exception {
     // Increase joins per second for the action bar verbose
-    Sonar.get().getVerboseHandler().getJoinsPerSecond().put(System.nanoTime());
+    Sonar.get().getVerboseHandler().getLoginsPerSecond().put(System.nanoTime());
 
     // Fix login packet spam exploit
     if (receivedLoginPacket || player != null) {

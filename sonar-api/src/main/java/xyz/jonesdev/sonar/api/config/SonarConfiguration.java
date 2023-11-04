@@ -85,6 +85,7 @@ public final class SonarConfiguration {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Verbose {
     private String actionBarLayout;
+    private String actionBarLayoutDuringAttack;
     private List<String> animation;
   }
 
@@ -288,7 +289,7 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("min-attack-threshold",
       "Number of times an incident has to be reported in order to be acknowledged as an attack"
-      + LINE_SEPARATOR + "This number acts as a buffer to filter out false attack notifications");
+        + LINE_SEPARATOR + "This number acts as a buffer to filter out false attack notifications");
     minAttackThreshold = clamp(generalConfig.getInt("min-attack-threshold", 2), 0, 20);
 
     generalConfig.getYaml().setComment("attack-cooldown-delay",
@@ -390,7 +391,7 @@ public final class SonarConfiguration {
         + LINE_SEPARATOR + "a lightweight limbo server where advanced bot checks are performed");
     generalConfig.getYaml().setComment("verification.timing",
       "When should Sonar verify new players? (Recommended: ALWAYS)"
-      + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER");
+        + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER");
     verification.timing = Verification.Timing.valueOf(
       generalConfig.getString("verification.timing", Verification.Timing.ALWAYS.name()).toUpperCase());
 
@@ -492,8 +493,8 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("webhook.content",
       "Content of the Discord webhook message (Set this to '' to disable)"
-      + LINE_SEPARATOR + "You can use this to e.g. ping staff members using <@userId>"
-      + LINE_SEPARATOR + "If you want to ping roles, you will need to use <@&roleId>");
+        + LINE_SEPARATOR + "You can use this to e.g. ping staff members using <@userId>"
+        + LINE_SEPARATOR + "If you want to ping roles, you will need to use <@&roleId>");
     webhook.content = generalConfig.getString("webhook.content", "");
 
     generalConfig.getYaml().setComment("webhook.embed.footer",
@@ -970,28 +971,29 @@ public final class SonarConfiguration {
 
     messagesConfig.getYaml().setComment("verbose",
       "Translations for all messages regarding Sonar's verbose output");
-    messagesConfig.getYaml().setComment("verbose.layout",
-      "General layout for the verbose action-bar" +
-        LINE_SEPARATOR + "Placeholders and their descriptions:" +
-        LINE_SEPARATOR + "- %queued% Number of queued connections" +
-        LINE_SEPARATOR + "- %verifying% Number of verifying connections" +
-        LINE_SEPARATOR + "- %blacklisted% Number of blacklisted IP addresses" +
-        LINE_SEPARATOR + "- %total-joins% Number of total joins (not unique!)" +
-        LINE_SEPARATOR + "- %per-second-joins% Number of joins per second" +
-        LINE_SEPARATOR + "- %verify-total% Number of total verification attempts" +
-        LINE_SEPARATOR + "- %verify-success% Number of verified IP addresses" +
-        LINE_SEPARATOR + "- %verify-failed% Number of failed verifications" +
-        LINE_SEPARATOR + "- %incoming-traffic% Incoming bandwidth usage per second" +
-        LINE_SEPARATOR + "- %outgoing-traffic% Outgoing bandwidth usage per second" +
-        LINE_SEPARATOR + "- %incoming-traffic-ttl% Total incoming bandwidth usage" +
-        LINE_SEPARATOR + "- %outgoing-traffic-ttl% Total outgoing bandwidth usage" +
-        LINE_SEPARATOR + "- %used-memory% Amount of used memory (JVM process)" +
-        LINE_SEPARATOR + "- %total-memory% Amount of total memory (JVM process)" +
-        LINE_SEPARATOR + "- %max-memory% Amount of max memory (JVM process)" +
-        LINE_SEPARATOR + "- %free-memory% Amount of free memory (JVM process)" +
-        LINE_SEPARATOR + "- %animation% Animated spinning circle (by default)"
-    );
-    verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout",
+    messagesConfig.getYaml().setComment("verbose.layout.normal",
+      "General layout for the verbose action-bar"
+        + LINE_SEPARATOR + "Placeholders:"
+        + LINE_SEPARATOR + "- '%queued%' Number of queued connections"
+        + LINE_SEPARATOR + "- '%verifying%' Number of verifying connections"
+        + LINE_SEPARATOR + "- '%blacklisted%' Number of blacklisted IP addresses"
+        + LINE_SEPARATOR + "- '%total-joins%' Number of total attempted joins"
+        + LINE_SEPARATOR + "- '%verify-total%' Number of total verification attempts"
+        + LINE_SEPARATOR + "- '%verify-success%' Number of verified IP addresses"
+        + LINE_SEPARATOR + "- '%verify-failed%' Number of failed verifications"
+        + LINE_SEPARATOR + "- '%logins-per-second%' Number of logins per second"
+        + LINE_SEPARATOR + "- '%attack-duration%' Duration of the current attack"
+        + LINE_SEPARATOR + "- '%incoming-traffic%' Incoming bandwidth usage per second"
+        + LINE_SEPARATOR + "- '%outgoing-traffic%' Outgoing bandwidth usage per second"
+        + LINE_SEPARATOR + "- '%incoming-traffic-ttl%' Total incoming bandwidth usage"
+        + LINE_SEPARATOR + "- '%outgoing-traffic-ttl%' Total outgoing bandwidth usage"
+        + LINE_SEPARATOR + "- '%used-memory%' Amount of used memory of the process"
+        + LINE_SEPARATOR + "- '%total-memory%' Amount of total memory of the process"
+        + LINE_SEPARATOR + "- '%max-memory%' Amount of max memory of the process"
+        + LINE_SEPARATOR + "- '%free-memory%' Amount of free memory of the process"
+        + LINE_SEPARATOR + "- '%animation%' Customizable animated symbol"
+        + LINE_SEPARATOR + "Translations for Sonar's normal verbose output");
+    verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout.normal",
       String.join(" <dark_aqua>╺ ", Arrays.asList(
         "%prefix%<gray>Queued <white>%queued%",
         "<gray>Verifying <white>%verifying%",
@@ -999,12 +1001,22 @@ public final class SonarConfiguration {
           " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s" +
           "  <green><bold>%animation%<reset>"
       ))));
-    messagesConfig.getYaml().setComment("verbose.animation",
-      "Alternative symbols:"
-        + LINE_SEPARATOR + "- ▙"
-        + LINE_SEPARATOR + "- ▛"
-        + LINE_SEPARATOR + "- ▜"
-        + LINE_SEPARATOR + "- ▟");
+    messagesConfig.getYaml().setComment("verbose.layout.attack",
+      "Translations for Sonar's verbose output during an active attack");
+    verbose.actionBarLayoutDuringAttack = formatString(messagesConfig.getString("verbose.layout.attack",
+      String.join(" <dark_aqua>╺ ", Arrays.asList(
+        "%prefix%<gray>BPS <white>%logins-per-second%",
+        "<gray>Queued <white>%queued%",
+        "<gray>Verifying <white>%verifying%",
+        "<gray>Blacklisted <white>%blacklisted%",
+        "<gray>Duration <white>%attack-duration%" +
+          " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s" +
+          "  <green><bold>%animation%<reset>"
+      ))));
+    messagesConfig.getYaml().setComment("verbose.animation", "Animation for the action bar"
+        + LINE_SEPARATOR + "Alternatives:"
+        + LINE_SEPARATOR + "- ▙, ▛, ▜, ▟"
+        + LINE_SEPARATOR + "- ⬈, ⬊, ⬋, ⬉");
     verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation",
       Arrays.asList("◜", "◝", "◞", "◟")
     ));

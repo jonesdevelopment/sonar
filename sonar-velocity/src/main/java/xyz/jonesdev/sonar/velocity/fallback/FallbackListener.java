@@ -129,7 +129,7 @@ public final class FallbackListener {
   @Subscribe(order = PostOrder.LAST)
   public void handle(final @NotNull PreLoginEvent event) throws Throwable {
     // Increase joins per second for the action bar verbose
-    Sonar.get().getVerboseHandler().getJoinsPerSecond().put(System.nanoTime());
+    Sonar.get().getVerboseHandler().getLoginsPerSecond().put(System.nanoTime());
 
     val inboundConnection = (LoginInboundConnection) event.getConnection();
     val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);

@@ -26,8 +26,10 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
 import java.util.Map;
@@ -44,13 +46,13 @@ public final class Verbose implements JVMProfiler {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
   private final @NotNull Map<String, Audience> audiences = new ConcurrentHashMap<>();
   private int animationIndex;
-  private final ExpiringCache<Long> joinsPerSecond = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
+  private final ExpiringCache<Long> loginsPerSecond = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
 
   // Run action bar verbose
   public void update() {
     // Clean up all blacklisted IPs
     Sonar.get().getFallback().getBlacklisted().cleanUp(false);
-    joinsPerSecond.cleanUp(false);
+    loginsPerSecond.cleanUp(false);
 
     // Don't prepare component if there are no subscribers
     if (subscribers.isEmpty()) return;
@@ -65,18 +67,23 @@ public final class Verbose implements JVMProfiler {
   }
 
   public @NotNull Component prepareActionBarFormat() {
-    return MiniMessage.miniMessage().deserialize(Sonar.get().getConfig().getVerbose().getActionBarLayout()
+    final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
+    final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
+    return MiniMessage.miniMessage().deserialize((attackDuration != null
+      ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
+      : Sonar.get().getConfig().getVerbose().getActionBarLayout())
       .replace("%queued%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
       .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
       .replace("%total-joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
-      .replace("%per-second-joins%", DECIMAL_FORMAT.format(joinsPerSecond.estimatedSize()))
+      .replace("%logins-per-second%", DECIMAL_FORMAT.format(loginsPerSecond.estimatedSize()))
       .replace("%verify-total%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
       .replace("%verify-success%",
         DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
       .replace("%verify-failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
+      .replace("%attack-duration%", attackDuration == null ? "00:00" : attackDuration.formattedDelay())
       .replace("%incoming-traffic%", INCOMING.getCachedSecond())
       .replace("%outgoing-traffic%", OUTGOING.getCachedSecond())
       .replace("%incoming-traffic-ttl%", INCOMING.getCachedTtl())
