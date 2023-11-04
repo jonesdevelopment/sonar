@@ -91,7 +91,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to CONFIGURE to avoid false positives
     state = State.CONFIGURE;
     // Send the necessary configuration packets to the client
-    user.delayedWrite(synchronizeRegistry);
+    user.delayedWrite(REGISTRY_SYNC);
     user.delayedWrite(FINISH_CONFIGURATION);
     // Send all packets in one flush
     user.getChannel().flush();
@@ -146,7 +146,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       state = State.CLIENT_SETTINGS;
     }
     // Select the JoinGame packet for the respective protocol version
-    user.write(getJoinPacketForVersion(user.getProtocolVersion()));
+    user.write(joinGame);
     if (v1_20_2) {
       // Perform the transaction check since the ClientSettings
       // and PluginMessage packets have already been validated.
@@ -178,7 +178,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (Sonar.get().getConfig().getVerification().isCheckCollisions()) {
       // Send an UpdateSectionBlocks packet with a platform of blocks
       // to check if the player collides with the solid platform.
-      user.delayedWrite(UPDATE_SECTION_BLOCKS);
+      user.delayedWrite(updateSectionBlocks);
     }
     // Send all packets in one flush
     user.getChannel().flush();

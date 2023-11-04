@@ -103,6 +103,10 @@ public enum ProtocolVersion {
     return ID_TO_PROTOCOL_CONSTANT.getOrDefault(protocol, UNKNOWN);
   }
 
+  public boolean inBetween(final ProtocolVersion first, final ProtocolVersion last) {
+    return compareTo(first) >= 0 && compareTo(last) <= 0;
+  }
+
   public boolean isUnknown() {
     return this == UNKNOWN;
   }
