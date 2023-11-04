@@ -59,7 +59,7 @@ public class FallbackPreparer {
 
   public void prepare() {
     joinGame = new JoinGame(5,
-      Sonar.get().getConfig().getVerification().getGamemodeId(),
+      Sonar.get().getConfig().getVerification().getGamemode().getId(),
       0,
       false,
       0,
