@@ -19,18 +19,14 @@ package xyz.jonesdev.sonar.common.fallback.protocol.dimension;
 
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import net.kyori.adventure.nbt.TagStringIO;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @UtilityClass
 public final class DimensionRegistry {
@@ -45,14 +41,14 @@ public final class DimensionRegistry {
   public final @NotNull CompoundBinaryTag CODEC_1_20;
   public final @NotNull CompoundBinaryTag OLD_CODEC;
 
-  static  {
-    CODEC_1_16 = getMapping("codec_1_16.snbt");
-    CODEC_1_18_2 = getMapping("codec_1_18_2.snbt");
-    CODEC_1_19 = getMapping("codec_1_19.snbt");
-    CODEC_1_19_1 = getMapping("codec_1_19_1.snbt");
-    CODEC_1_19_4 = getMapping("codec_1_19_4.snbt");
-    CODEC_1_20 = getMapping("codec_1_20.snbt");
-    OLD_CODEC = getMapping("codec_old.snbt");
+  static {
+    CODEC_1_16 = getCodec("codec_1_16.nbt");
+    CODEC_1_18_2 = getCodec("codec_1_18_2.nbt");
+    CODEC_1_19 = getCodec("codec_1_19.nbt");
+    CODEC_1_19_1 = getCodec("codec_1_19_1.nbt");
+    CODEC_1_19_4 = getCodec("codec_1_19_4.nbt");
+    CODEC_1_20 = getCodec("codec_1_20.nbt");
+    OLD_CODEC = getCodec("codec_old.nbt");
 
     DEFAULT_DIMENSION_1_16 = getDimension(CODEC_1_16);
     DEFAULT_DIMENSION_1_18_2 = getDimension(CODEC_1_18_2);
@@ -64,19 +60,12 @@ public final class DimensionRegistry {
     return new DimensionInfo("minecraft:overworld", 0, (CompoundBinaryTag) elementTag);
   }
 
-  private static CompoundBinaryTag getMapping(final @NotNull String resPath) {
-    try (final InputStream inputStream = Sonar.class.getResourceAsStream("/mappings/" + resPath)) {
-      return TagStringIO.get().asCompound(streamToString(inputStream));
-    } catch (IOException exception) {
-      throw new IllegalStateException("Could not find mappings for " + resPath);
-    }
-  }
-
-  private static @NotNull String streamToString(final InputStream inputStream) throws IOException {
-    try (final InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-      try (final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-        return bufferedReader.lines().collect(Collectors.joining(Sonar.LINE_SEPARATOR));
-      }
+  private @NotNull CompoundBinaryTag getCodec(final @NotNull String fileName) {
+    try (final InputStream inputStream = Sonar.class.getResourceAsStream("/codecs/" + fileName)) {
+      return BinaryTagIO.reader().read(Objects.requireNonNull(inputStream), BinaryTagIO.Compression.GZIP);
+    } catch (Throwable throwable) {
+      Sonar.get().getLogger().error("Could not load mappings for {}: {}", fileName, throwable);
+      throw new IllegalStateException(throwable);
     }
   }
 }
