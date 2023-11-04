@@ -77,7 +77,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   @Getter
   private ChannelWrapper channelWrapper;
   private @NotNull final BungeeCord bungee;
-  private @Nullable FallbackUserWrapper player;
+  private @Nullable FallbackUserWrapper user;
   @Getter
   private ProtocolVersion protocolVersion;
   private boolean receivedLoginPacket;
@@ -117,7 +117,7 @@ public final class FallbackInitialHandler extends InitialHandler {
     Sonar.get().getVerboseHandler().getLoginsPerSecond().put(System.nanoTime());
 
     // Fix login packet spam exploit
-    if (receivedLoginPacket || player != null) {
+    if (receivedLoginPacket || user != null) {
       throw new ConditionFailedException("Duplicate login packet");
     }
     receivedLoginPacket = true;
@@ -163,14 +163,14 @@ public final class FallbackInitialHandler extends InitialHandler {
         }
 
         // Create wrapped Fallback user
-        player = new FallbackUserWrapper(
+        user = new FallbackUserWrapper(
           FALLBACK, channelWrapper, this,
           channel, channel.pipeline(), inetAddress, protocolVersion
         );
 
         // Perform default BungeeCord checks
         if (bungee.config.isEnforceSecureProfile()
-          && player.getProtocolVersion().compareTo(MINECRAFT_1_19_3) < 0) {
+          && user.getProtocolVersion().compareTo(MINECRAFT_1_19_3) < 0) {
           final PlayerPublicKey publicKey = loginRequest.getPublicKey();
           if (publicKey == null) {
             disconnect(bungee.getTranslation("secure_profile_required"));
@@ -180,7 +180,7 @@ public final class FallbackInitialHandler extends InitialHandler {
             disconnect(bungee.getTranslation("secure_profile_expired"));
             return;
           }
-          if (player.getProtocolVersion().compareTo(MINECRAFT_1_19_1) < 0
+          if (user.getProtocolVersion().compareTo(MINECRAFT_1_19_1) < 0
             && !EncryptionUtil.check(publicKey, null)) {
             disconnect(bungee.getTranslation("secure_profile_invalid"));
             return;
@@ -241,7 +241,7 @@ public final class FallbackInitialHandler extends InitialHandler {
           );
 
           // Disconnect if the protocol version could not be resolved
-          if (player.getProtocolVersion().isUnknown()) {
+          if (user.getProtocolVersion().isUnknown()) {
             closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getInvalidProtocol()));
             return;
           }
@@ -267,39 +267,39 @@ public final class FallbackInitialHandler extends InitialHandler {
               FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
                 .replace("%name%", loginRequest.getData())
                 .replace("%ip%", Sonar.get().getConfig().formatAddress(inetAddress))
-                .replace("%protocol%", String.valueOf(player.getProtocolVersion().getProtocol())));
+                .replace("%protocol%", String.valueOf(user.getProtocolVersion().getProtocol())));
             }
           }
 
           // Call the VerifyJoinEvent for external API usage
-          Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(loginRequest.getData(), player));
+          Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(loginRequest.getData(), user));
 
           // Mark the player as connected → verifying players
           FALLBACK.getConnected().put(loginRequest.getData(), inetAddress);
 
           // This sometimes happens when the channel hangs, but the player is still connecting
           // This also fixes a unique issue with TCPShield and other reverse proxies
-          if (player.getPipeline().get(PACKET_ENCODER) == null
-            || player.getPipeline().get(PACKET_DECODER) == null) {
+          if (user.getPipeline().get(PACKET_ENCODER) == null
+            || user.getPipeline().get(PACKET_DECODER) == null) {
             channelWrapper.close();
             return;
           }
 
           // Replace normal encoder to allow custom packets
-          final FallbackPacketEncoder encoder = new FallbackPacketEncoder(player.getProtocolVersion());
-          player.getPipeline().replace(PACKET_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
+          final FallbackPacketEncoder encoder = new FallbackPacketEncoder(user.getProtocolVersion());
+          user.getPipeline().replace(PACKET_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
 
           // Send LoginSuccess packet to make the client think they are joining the server
-          player.write(new LoginSuccess(loginRequest.getData(), uuid));
+          user.write(new LoginSuccess(loginRequest.getData(), uuid));
 
           // The LoginSuccess packet has been sent, now we can change the registry state
-          encoder.updateRegistry(player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
+          encoder.updateRegistry(user.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
             ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
 
           // Replace normal decoder to allow custom packets
-          player.getPipeline().replace(
-            PACKET_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(player,
-              new FallbackVerificationHandler(player, loginRequest.getData(), uuid)
+          user.getPipeline().replace(
+            PACKET_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(user,
+              new FallbackVerificationHandler(user, loginRequest.getData(), uuid)
             ));
         }));
       } catch (Throwable throwable) {

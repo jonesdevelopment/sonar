@@ -277,21 +277,21 @@ public final class FallbackListener {
           }
 
           // Create an instance for the Fallback connection
-          final FallbackUserWrapper fallbackPlayer = new FallbackUserWrapper(
+          final FallbackUserWrapper user = new FallbackUserWrapper(
             fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
             mcConnection.getChannel().pipeline(), inetAddress,
             ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
           );
 
           // Disconnect if the protocol version could not be resolved
-          if (fallbackPlayer.getProtocolVersion().isUnknown()) {
-            fallbackPlayer.disconnect(Sonar.get().getConfig().getVerification().getInvalidProtocol());
+          if (user.getProtocolVersion().isUnknown()) {
+            user.disconnect(Sonar.get().getConfig().getVerification().getInvalidProtocol());
             return;
           }
 
           // Check if the player is already connected to the proxy but still tries to verify
           if (!mcConnection.server.canRegisterConnection(connectedPlayer)) {
-            fallbackPlayer.disconnect(Sonar.get().getConfig().getVerification().getAlreadyConnected());
+            user.disconnect(Sonar.get().getConfig().getVerification().getAlreadyConnected());
             return;
           }
 
@@ -305,40 +305,40 @@ public final class FallbackListener {
               || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
               fallback.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
                 .replace("%name%", connectedPlayer.getUsername())
-                .replace("%ip%", Sonar.get().getConfig().formatAddress(fallbackPlayer.getInetAddress()))
-                .replace("%protocol%", String.valueOf(fallbackPlayer.getProtocolVersion().getProtocol())));
+                .replace("%ip%", Sonar.get().getConfig().formatAddress(user.getInetAddress()))
+                .replace("%protocol%", String.valueOf(user.getProtocolVersion().getProtocol())));
             }
           }
 
           // Call the VerifyJoinEvent for external API usage
-          Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(gameProfile.getName(), fallbackPlayer));
+          Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(gameProfile.getName(), user));
 
           // Mark the player as connected → verifying players
           fallback.getConnected().put(gameProfile.getName(), inetAddress);
 
           // This sometimes happens when the channel hangs, but the player is still connecting
           // This also fixes a unique issue with TCPShield and other reverse proxies
-          if (fallbackPlayer.getPipeline().get(MINECRAFT_ENCODER) == null
-            || fallbackPlayer.getPipeline().get(MINECRAFT_DECODER) == null) {
+          if (user.getPipeline().get(MINECRAFT_ENCODER) == null
+            || user.getPipeline().get(MINECRAFT_DECODER) == null) {
             mcConnection.close(true);
             return;
           }
 
           // Replace normal encoder to allow custom packets
-          final FallbackPacketEncoder encoder = new FallbackPacketEncoder(fallbackPlayer.getProtocolVersion());
-          fallbackPlayer.getPipeline().replace(MINECRAFT_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
+          final FallbackPacketEncoder encoder = new FallbackPacketEncoder(user.getProtocolVersion());
+          user.getPipeline().replace(MINECRAFT_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
 
           // Send LoginSuccess packet to make the client think they are joining the server
-          fallbackPlayer.write(new LoginSuccess(gameProfile.getName(), gameProfile.getId()));
+          user.write(new LoginSuccess(gameProfile.getName(), gameProfile.getId()));
 
           // The LoginSuccess packet has been sent, now we can change the registry state
-          encoder.updateRegistry(fallbackPlayer.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
+          encoder.updateRegistry(user.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
             ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
 
           // Replace normal decoder to allow custom packets
-          fallbackPlayer.getPipeline().replace(
-            MINECRAFT_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(fallbackPlayer,
-              new FallbackVerificationHandler(fallbackPlayer, gameProfile.getName(), connectedPlayer.getUniqueId())
+          user.getPipeline().replace(
+            MINECRAFT_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(user,
+              new FallbackVerificationHandler(user, gameProfile.getName(), connectedPlayer.getUniqueId())
             ));
         }));
       } catch (Throwable throwable) {
