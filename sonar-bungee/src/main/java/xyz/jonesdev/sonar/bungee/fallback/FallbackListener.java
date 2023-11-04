@@ -21,13 +21,11 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.protocol.packet.Kick;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.bungee.SonarBungee;
@@ -57,8 +55,7 @@ public final class FallbackListener implements Listener {
       if (onlinePerIp >= maxOnlinePerIp) {
         final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) event.getConnection();
         final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
-        final String serialized = JSONComponentSerializer.json().serialize(component);
-        fallbackInitialHandler.closeWith(new Kick(serialized));
+        fallbackInitialHandler.closeWith(FallbackInitialHandler.getKickPacket(component));
       }
     }
   }
@@ -73,8 +70,7 @@ public final class FallbackListener implements Listener {
         if (pendingConnection instanceof FallbackInitialHandler) {
           final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) pendingConnection;
           final Component component = Sonar.get().getConfig().getLockdown().getDisconnect();
-          final String serialized = JSONComponentSerializer.json().serialize(component);
-          fallbackInitialHandler.closeWith(new Kick(serialized));
+          fallbackInitialHandler.closeWith(FallbackInitialHandler.getKickPacket(component));
         } else {
           // Fallback by disconnecting without a message
           pendingConnection.disconnect();

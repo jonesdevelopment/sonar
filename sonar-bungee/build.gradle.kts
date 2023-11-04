@@ -15,7 +15,8 @@ dependencies {
   compileOnly(project(":api"))
   compileOnly(project(":common"))
 
-  compileOnly("net.md_5:bungeecord:1.20.2-rc2-SNAPSHOT")
+  compileOnly("net.md_5:bungeecord-proxy:master-SNAPSHOT")
+  testCompileOnly("net.md_5:bungeecord-proxy:master-SNAPSHOT")
 
   // MiniMessage platform support
   implementation("net.kyori:adventure-platform-bungeecord:4.3.1")

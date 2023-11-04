@@ -21,7 +21,6 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
@@ -31,14 +30,6 @@ import org.slf4j.Logger;
 import java.nio.file.Path;
 
 @Getter
-@Plugin(
-  id = "sonar",
-  name = "Sonar",
-  version = "$version",
-  authors = {"Jones Development", "Sonar Contributors"},
-  url = "https://jonesdev.xyz/discord/",
-  description = "Effective Anti-bot plugin for Velocity, BungeeCord, and Bukkit (1.7-latest)"
-)
 public final class SonarVelocityPlugin {
   private final ProxyServer server;
   private final Logger logger;

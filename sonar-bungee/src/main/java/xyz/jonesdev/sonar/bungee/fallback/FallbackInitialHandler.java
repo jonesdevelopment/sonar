@@ -27,6 +27,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.EncryptionUtil;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
@@ -309,11 +310,11 @@ public final class FallbackInitialHandler extends InitialHandler {
 
   private static final Map<Component, Kick> CACHED_KICK_PACKETS = new ConcurrentHashMap<>(16);
 
-  private static @NotNull Kick getKickPacket(final @NotNull Component component) {
+  public static @NotNull Kick getKickPacket(final @NotNull Component component) {
     Kick cachedKickPacket = CACHED_KICK_PACKETS.get(component);
     if (cachedKickPacket == null) {
       final String serialized = JSONComponentSerializer.json().serialize(component);
-      cachedKickPacket = new Kick(serialized);
+      cachedKickPacket = new Kick(new TextComponent(serialized));
       CACHED_KICK_PACKETS.put(component, cachedKickPacket);
     }
     return cachedKickPacket;
