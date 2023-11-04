@@ -90,5 +90,5 @@ Sonar is licensed under the [GNU General Public License 3.0](https://www.gnu.org
 ## Credits
 
 - Special thanks to the [contributors of Sonar](https://github.com/jonesdevelopment/sonar/graphs/contributors).
-- The nbt mappings were taken from [LimboAPI](https://github.com/Elytrium/LimboAPI).
+- The dimension codecs were taken from [NanoLimbo](https://github.com/Nan1t/NanoLimbo).
 - The Varint decoding was taken from [Velocity](https://github.com/PaperMC/Velocity).

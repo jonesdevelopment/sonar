@@ -94,8 +94,18 @@ public final class SimpleYamlConfig {
   }
 
   public String getString(final String path, final String def) {
+    final Object object = getObject(path, def);
+    if (object instanceof String) {
+      return (String) object;
+    }
+    Sonar.get().getLogger().info("[config] Migrated {} to {}", path, def);
+    set(path, def);
+    return def;
+  }
+
+  public Object getObject(final String path, final Object def) {
     yaml.addDefault(path, def);
-    return yaml.getString(path, def);
+    return yaml.get(path, def);
   }
 
   public List<String> getStringList(final String path, final List<String> def) {

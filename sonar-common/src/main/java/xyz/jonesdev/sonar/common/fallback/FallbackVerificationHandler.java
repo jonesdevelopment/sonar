@@ -69,7 +69,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // post-JOIN checks
     CLIENT_SETTINGS, PLUGIN_MESSAGE, TRANSACTION,
     // PLAY checks
-    TELEPORT, POSITION, COLLISIONS,
+    TELEPORT, POSITION,
     // Done
     SUCCESS
   }
@@ -91,7 +91,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to CONFIGURE to avoid false positives
     state = State.CONFIGURE;
     // Send the necessary configuration packets to the client
-    user.delayedWrite(synchronizeRegistry);
+    user.delayedWrite(REGISTRY_SYNC);
     user.delayedWrite(FINISH_CONFIGURATION);
     // Send all packets in one flush
     user.getChannel().flush();
@@ -146,7 +146,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       state = State.CLIENT_SETTINGS;
     }
     // Select the JoinGame packet for the respective protocol version
-    user.write(getJoinPacketForVersion(user.getProtocolVersion()));
+    user.write(joinGame);
     if (v1_20_2) {
       // Perform the transaction check since the ClientSettings
       // and PluginMessage packets have already been validated.
@@ -175,11 +175,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     state = State.POSITION;
     // Teleport player into the fake lobby by sending an empty chunk
     user.delayedWrite(EMPTY_CHUNK_DATA);
-    if (Sonar.get().getConfig().getVerification().isCheckCollisions()) {
-      // Send an UpdateSectionBlocks packet with a platform of blocks
-      // to check if the player collides with the solid platform.
-      user.delayedWrite(UPDATE_SECTION_BLOCKS);
-    }
+    // Send an UpdateSectionBlocks packet with a platform of blocks
+    // to check if the player collides with the solid platform.
+    user.delayedWrite(updateSectionBlocks);
     // Send all packets in one flush
     user.getChannel().flush();
   }
@@ -220,7 +218,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (state == State.SUCCESS) return;
 
     // Check if the player is not sending a ton of packets to the server
-    final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxPredictionTick;
+    final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxMovementTick;
     checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
 
     // Check for timeout since the player could be sending packets but not important ones
@@ -329,7 +327,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         return;
       }
 
-      // TODO: implement ChunkData packet for 1.20.2 and fix block state Ids for barriers
+      // TODO: implement ChunkData packet for 1.20.2
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0) {
         finish();
         return;
@@ -405,11 +403,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // The player is not allowed to move away from the collision platform.
     // This should not happen unless the max movement tick is configured to a high number.
-    checkFrame(Math.abs(x - BLOCKS_PER_ROW) <= BLOCKS_PER_ROW, "moved too far (x)");
-    checkFrame(Math.abs(z - BLOCKS_PER_ROW) <= BLOCKS_PER_ROW, "moved too far (z)");
-
-    // The onGround property can never be true when we aren't checking for collisions
-    checkFrame(!ground || state == State.COLLISIONS, "invalid ground state");
+    checkFrame(Math.abs(x - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (x)");
+    checkFrame(Math.abs(z - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (z)");
 
     // Check if the client hasn't moved before sending the first movement packet
     if (!listenForMovements) {
@@ -432,39 +427,34 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
+    // Calculate the difference between the player's Y coordinate and the expected Y coordinate
+    final double collisionOffsetY = DEFAULT_Y_COLLIDE_POSITION - y;
+
+    // Check if the player is colliding by performing a basic Y offset check.
+    // The offset cannot be greater than 0 since the blocks will not let the player fall through them.
+    checkFrame(collisionOffsetY <= 0, "fell through blocks: " + collisionOffsetY);
+
     if (tick > maxMovementTick) {
-      if (!Sonar.get().getConfig().getVerification().isCheckCollisions()) {
-        // Checking collisions is disabled, just finish verification
-        finish();
-        return;
-      }
-
-      if (state != State.COLLISIONS) {
-        // Now we don't care about gravity anymore,
-        // we just want the player to collide with the blocks.
-        state = State.COLLISIONS;
-      }
-
-      // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-      final double offsetY = DEFAULT_Y_COLLIDE_POSITION - y;
-
       // Log/debug position if enabled in the configuration
       if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-        user.getFallback().getLogger().info("{}: {}/{}/{} - offset: {}", username, x, y, z, offsetY);
+        user.getFallback().getLogger().info("{}: {}/{}/{} - deltaY: {} - ground: {} - collision: {}",
+          username, x, y, z, deltaY, ground, collisionOffsetY);
       }
 
-      // Check if the player is colliding by performing a basic Y offset check.
-      // The offset cannot be greater than 0 since the blocks will not let the player fall through them.
-      checkFrame(offsetY <= 0, "no collisions: " + offsetY);
-
+      // The player is colliding to blocks, finish verification
       if (ground) {
-        // The player is colliding to blocks, finish verification
         finish();
         return;
       }
+    } else {
+      // Check if the player is spoofing the ground state
+      checkFrame(!ground, "spoofed ground state");
     }
 
-    if (!ground && tick < maxPredictionTick) {
+    // Make sure we don't run out of predicted Y motions
+    checkFrame(tick < preparedCachedYMotions.length, "too many movements");
+
+    if (!ground) {
       final double predictedY = preparedCachedYMotions[tick];
       final double offsetY = Math.abs(deltaY - predictedY);
 

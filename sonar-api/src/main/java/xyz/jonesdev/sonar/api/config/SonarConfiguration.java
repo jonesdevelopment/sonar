@@ -107,7 +107,6 @@ public final class SonarConfiguration {
     }
 
     private boolean checkGravity;
-    private boolean checkCollisions;
     private boolean logConnections;
     private boolean logDuringAttack;
     private boolean debugXYZPositions;
@@ -118,7 +117,20 @@ public final class SonarConfiguration {
     private String failedLog;
     private String successLog;
     private String blacklistLog;
-    private short gamemodeId;
+
+    private Gamemode gamemode;
+
+    @Getter
+    @RequiredArgsConstructor
+    public enum Gamemode {
+      SURVIVAL(0),
+      CREATIVE(1),
+      ADVENTURE(2),
+      SPECTATOR(3);
+
+      private final int id;
+    }
+
     private int maxBrandLength;
     private int maxMovementTicks;
     private int maxIgnoredTicks;
@@ -327,8 +339,8 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("database.type",
       "Type of database Sonar uses to store verified players"
         + LINE_SEPARATOR + "Possible types: NONE, MYSQL");
-    final String newDatabaseType = generalConfig.getString("database.type", Database.Type.NONE.name());
-    database.type = Database.Type.valueOf(newDatabaseType.toUpperCase());
+    database.type = Database.Type.valueOf(
+      generalConfig.getString("database.type", Database.Type.NONE.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("database",
       "You can connect Sonar to a database to keep verified players even after restarting your server"
@@ -390,8 +402,11 @@ public final class SonarConfiguration {
       "Every new player that joins for the first time will be sent to"
         + LINE_SEPARATOR + "a lightweight limbo server where advanced bot checks are performed");
     generalConfig.getYaml().setComment("verification.timing",
-      "When should Sonar verify new players? (Recommended: ALWAYS)"
-        + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER");
+      "When should Sonar verify new players?"
+        + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER"
+        + LINE_SEPARATOR + "- ALWAYS: New players will always be checked (Recommended)"
+        + LINE_SEPARATOR + "- DURING_ATTACK: New players will only be checked during an attack"
+        + LINE_SEPARATOR + "- NEVER: New players will never be checked");
     verification.timing = Verification.Timing.valueOf(
       generalConfig.getString("verification.timing", Verification.Timing.ALWAYS.name()).toUpperCase());
 
@@ -412,16 +427,42 @@ public final class SonarConfiguration {
     verification.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5), 1,
       128);
 
-    generalConfig.getYaml().setComment("verification.checks.collisions",
-      "Checks if the players collides with barrier blocks spawned below the player"
-        + LINE_SEPARATOR + "Note: The collision check will be skipped if the gravity check is disabled");
-    generalConfig.getYaml().setComment("verification.checks.collisions.enabled",
-      "Should Sonar check for valid client collisions? (Recommended)");
-    verification.checkCollisions = generalConfig.getBoolean("verification.checks.collisions.enabled", true);
+    generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
+      "Regex for validating usernames during verification");
+    verification.validNameRegex = Pattern.compile(generalConfig.getString(
+      "verification.checks.valid-name-regex", "^[a-zA-Z0-9_]+$"));
+
+    generalConfig.getYaml().setComment("verification.checks.valid-brand-regex",
+      "Regex for validating client brands during verification");
+    verification.validBrandRegex = Pattern.compile(generalConfig.getString(
+      "verification.checks.valid-brand-regex", "^[!-~ ]+$"));
+
+    generalConfig.getYaml().setComment("verification.checks.valid-locale-regex",
+      "Regex for validating client locale during verification");
+    verification.validLocaleRegex = Pattern.compile(generalConfig.getString(
+      "verification.checks.valid-locale-regex", "^[a-zA-Z_]+$"));
+
+    generalConfig.getYaml().setComment("verification.checks.max-brand-length",
+      "Maximum client brand length during verification");
+    verification.maxBrandLength = generalConfig.getInt("verification.checks.max-brand-length", 64);
+
+    generalConfig.getYaml().setComment("verification.checks.max-ping",
+      "Ping (in milliseconds) a player has to have in order to timeout");
+    verification.maxPing = clamp(generalConfig.getInt("verification.checks.max-ping", 10000), 500, 30000);
+
+    generalConfig.getYaml().setComment("verification.checks.max-login-packets",
+      "Maximum number of login packets the player has to send in order to be kicked");
+    verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets", 256), 128, 8192);
 
     generalConfig.getYaml().setComment("verification.gamemode",
-      "The gamemode of the player during verification (0, 1, 2, or 3)");
-    verification.gamemodeId = (short) clamp(generalConfig.getInt("verification.gamemode", 3), 0, 3);
+      "The gamemode of the player during verification"
+        + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR"
+        + LINE_SEPARATOR + "- SURVIVAL: all UI components are visible"
+        + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
+        + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible"
+        + LINE_SEPARATOR + "- SPECTATOR: all UI components are hidden (Recommended)");
+    verification.gamemode = Verification.Gamemode.valueOf(
+      generalConfig.getString("verification.gamemode", Verification.Gamemode.SPECTATOR.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.log-connections",
       "Should Sonar log new verification attempts?");
@@ -436,36 +477,9 @@ public final class SonarConfiguration {
         + LINE_SEPARATOR + "This is not recommended for production servers but can be helpful for spotting errors.");
     verification.debugXYZPositions = generalConfig.getBoolean("verification.debug-xyz-positions", false);
 
-    generalConfig.getYaml().setComment("verification.valid-name-regex",
-      "Regex for validating usernames during verification");
-    verification.validNameRegex = Pattern.compile(generalConfig.getString(
-      "verification.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"));
-
-    generalConfig.getYaml().setComment("verification.valid-brand-regex",
-      "Regex for validating client brands during verification");
-    verification.validBrandRegex = Pattern.compile(generalConfig.getString(
-      "verification.valid-brand-regex", "^[!-~ ]+$"));
-
-    generalConfig.getYaml().setComment("verification.valid-locale-regex",
-      "Regex for validating client locale during verification");
-    verification.validLocaleRegex = Pattern.compile(generalConfig.getString(
-      "verification.valid-locale-regex", "^[a-zA-Z_]+$"));
-
-    generalConfig.getYaml().setComment("verification.max-brand-length",
-      "Maximum client brand length during verification");
-    verification.maxBrandLength = generalConfig.getInt("verification.max-brand-length", 64);
-
-    generalConfig.getYaml().setComment("verification.max-ping",
-      "Ping (in milliseconds) a player has to have in order to timeout");
-    verification.maxPing = clamp(generalConfig.getInt("verification.max-ping", 10000), 500, 30000);
-
     generalConfig.getYaml().setComment("verification.read-timeout",
       "Amount of time that has to pass before a player times out");
     verification.readTimeout = clamp(generalConfig.getInt("verification.read-timeout", 3500), 500, 30000);
-
-    generalConfig.getYaml().setComment("verification.max-login-packets",
-      "Maximum number of login packets the player has to send in order to be kicked");
-    verification.maxLoginPackets = clamp(generalConfig.getInt("verification.max-login-packets", 256), 128, 8192);
 
     generalConfig.getYaml().setComment("verification.max-players",
       "Maximum number of players verifying at the same time");
@@ -1014,9 +1028,9 @@ public final class SonarConfiguration {
           "  <green><bold>%animation%<reset>"
       ))));
     messagesConfig.getYaml().setComment("verbose.animation", "Animation for the action bar"
-        + LINE_SEPARATOR + "Alternatives:"
-        + LINE_SEPARATOR + "- ▙, ▛, ▜, ▟"
-        + LINE_SEPARATOR + "- ⬈, ⬊, ⬋, ⬉");
+      + LINE_SEPARATOR + "Alternatives:"
+      + LINE_SEPARATOR + "- ▙, ▛, ▜, ▟"
+      + LINE_SEPARATOR + "- ⬈, ⬊, ⬋, ⬉");
     verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation",
       Arrays.asList("◜", "◝", "◞", "◟")
     ));

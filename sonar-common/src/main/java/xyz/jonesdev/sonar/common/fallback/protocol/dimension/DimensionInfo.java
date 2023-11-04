@@ -20,11 +20,13 @@ package xyz.jonesdev.sonar.common.fallback.protocol.dimension;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 @Getter
 @ToString
 @RequiredArgsConstructor
 public final class DimensionInfo {
-  private final String identifier, levelName;
-  private final boolean flat, debug;
+  private final String identifier;
+  private final int id;
+  private final CompoundBinaryTag tag;
 }

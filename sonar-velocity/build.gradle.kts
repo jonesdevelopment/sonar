@@ -7,12 +7,6 @@ dependencies {
   compileOnly("com.velocitypowered:velocity-proxy:$velocityVersion")
   testCompileOnly("com.velocitypowered:velocity-proxy:$velocityVersion")
 
-  compileOnly("com.velocitypowered:velocity-api:$velocityVersion")
-  //annotationProcessor("com.velocitypowered:velocity-api:$velocityVersion")
-
-  testCompileOnly("com.velocitypowered:velocity-api:$velocityVersion")
-  //testAnnotationProcessor("com.velocitypowered:velocity-api:$velocityVersion")
-
   // Implement bStats.org for metrics
   implementation("org.bstats:bstats-velocity:3.0.2")
 }

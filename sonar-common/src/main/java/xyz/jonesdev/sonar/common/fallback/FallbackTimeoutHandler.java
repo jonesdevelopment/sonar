@@ -21,24 +21,26 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
 public final class FallbackTimeoutHandler extends IdleStateHandler {
-  private boolean closed;
+  private boolean knownDisconnect;
 
   public FallbackTimeoutHandler(final long timeout, final TimeUnit timeUnit) {
     super(timeout, 0L, 0L, timeUnit);
   }
 
   @Override
-  protected void channelIdle(final ChannelHandlerContext ctx, final IdleStateEvent idleStateEvent) throws Exception {
+  protected void channelIdle(final ChannelHandlerContext ctx,
+                             final @NotNull IdleStateEvent idleStateEvent) throws Exception {
     assert idleStateEvent.state() == IdleState.READER_IDLE;
     readTimedOut(ctx);
   }
 
   private void readTimedOut(final ChannelHandlerContext ctx) {
-    if (!closed) {
+    if (!knownDisconnect) {
 
       // The netty (default) ReadTimeoutHandler would normally just throw an Exception
       // The default ReadTimeoutHandler does only check for the boolean 'closed' and
@@ -47,7 +49,7 @@ public final class FallbackTimeoutHandler extends IdleStateHandler {
         ctx.close();
       }
 
-      closed = true;
+      knownDisconnect = true;
     }
   }
 }

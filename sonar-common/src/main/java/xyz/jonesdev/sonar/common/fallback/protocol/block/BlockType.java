@@ -73,7 +73,7 @@ public enum BlockType {
       case MINECRAFT_1_20:
         return 10225;
       case MINECRAFT_1_20_2:
-        return 1; // TODO: https://github.com/PrismarineJS/minecraft-data/issues/779
+        return 10365;
     }
   });
 
