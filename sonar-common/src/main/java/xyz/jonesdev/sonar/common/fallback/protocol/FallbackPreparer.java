@@ -76,13 +76,11 @@ public class FallbackPreparer {
     for (int i = 0; i < preparedCachedYMotions.length; i++) {
       final double gravity = -((Math.pow(0.98, i) - 1) * 3.92);
       preparedCachedYMotions[i] = gravity;
-      if (i <= maxMovementTick) {
-        maxFallDistance += gravity;
-      }
+      maxFallDistance += gravity;
     }
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
-    dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + 3 + (int) Math.ceil(maxFallDistance);
+    dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + (int) Math.ceil(maxFallDistance);
 
     // Prepare collision platform positions
     int index = 0;
