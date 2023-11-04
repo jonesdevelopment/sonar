@@ -48,7 +48,7 @@ public final class AttackTracker implements JVMProfiler {
   }
 
   public void checkIfUnderAttack() {
-    final int joinsPerSecond = Sonar.get().getVerboseHandler().getJoinsPerSecond().estimatedSize();
+    final int joinsPerSecond = Sonar.get().getVerboseHandler().getLoginsPerSecond().estimatedSize();
     final int verifyingPlayers = Sonar.get().getFallback().getConnected().size();
     final int queuedPlayers = Sonar.get().getFallback().getQueue().getQueuedPlayers().size();
     final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();

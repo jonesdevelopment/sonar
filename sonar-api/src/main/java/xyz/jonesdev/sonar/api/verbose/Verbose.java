@@ -46,13 +46,13 @@ public final class Verbose implements JVMProfiler {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
   private final @NotNull Map<String, Audience> audiences = new ConcurrentHashMap<>();
   private int animationIndex;
-  private final ExpiringCache<Long> joinsPerSecond = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
+  private final ExpiringCache<Long> loginsPerSecond = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
 
   // Run action bar verbose
   public void update() {
     // Clean up all blacklisted IPs
     Sonar.get().getFallback().getBlacklisted().cleanUp(false);
-    joinsPerSecond.cleanUp(false);
+    loginsPerSecond.cleanUp(false);
 
     // Don't prepare component if there are no subscribers
     if (subscribers.isEmpty()) return;
@@ -78,7 +78,7 @@ public final class Verbose implements JVMProfiler {
       .replace("%blacklisted%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
       .replace("%total-joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
-      .replace("%per-second-joins%", DECIMAL_FORMAT.format(joinsPerSecond.estimatedSize()))
+      .replace("%logins-per-second%", DECIMAL_FORMAT.format(loginsPerSecond.estimatedSize()))
       .replace("%verify-total%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
       .replace("%verify-success%",
         DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
