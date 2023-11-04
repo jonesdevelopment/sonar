@@ -427,7 +427,7 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
       "Regex for validating usernames during verification");
     verification.validNameRegex = Pattern.compile(generalConfig.getString(
-      "verification.checks.valid-name-regex", "^[a-zA-Z0-9_.*!]+$"));
+      "verification.checks.valid-name-regex", "^[a-zA-Z0-9_]+$"));
 
     generalConfig.getYaml().setComment("verification.checks.valid-brand-regex",
       "Regex for validating client brands during verification");
