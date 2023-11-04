@@ -46,10 +46,9 @@ public class FallbackPreparer {
   public FallbackPacket updateSectionBlocks;
 
   // Collisions
-  public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (max)
-  private final int SPAWN_BUFFER = 5; // player spawns at 255 + 5 (5 blocks above the platform)
-  public final int SPAWN_X_POSITION = BLOCKS_PER_ROW; // middle of the chunk
-  public final int SPAWN_Z_POSITION = BLOCKS_PER_ROW;
+  public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
+  public final int SPAWN_X_POSITION = 16 / 2; // middle of the chunk
+  public final int SPAWN_Z_POSITION = 16 / 2; // middle of the chunk
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
 
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
@@ -72,7 +71,7 @@ public class FallbackPreparer {
 
     maxFallDistance = 0;
     maxMovementTick = Sonar.get().getConfig().getVerification().getMaxMovementTicks();
-    preparedCachedYMotions = new double[maxMovementTick + 10];
+    preparedCachedYMotions = new double[maxMovementTick + 8];
 
     for (int i = 0; i < preparedCachedYMotions.length; i++) {
       final double gravity = -((Math.pow(0.98, i) - 1) * 3.92);
@@ -84,7 +83,6 @@ public class FallbackPreparer {
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
     dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + 3 + (int) Math.ceil(maxFallDistance);
-    System.out.println(dynamicSpawnYPosition);
 
     // Prepare collision platform positions
     int index = 0;
