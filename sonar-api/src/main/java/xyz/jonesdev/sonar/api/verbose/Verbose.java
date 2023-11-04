@@ -26,8 +26,10 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
 import java.util.Map;
@@ -65,7 +67,11 @@ public final class Verbose implements JVMProfiler {
   }
 
   public @NotNull Component prepareActionBarFormat() {
-    return MiniMessage.miniMessage().deserialize(Sonar.get().getConfig().getVerbose().getActionBarLayout()
+    final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
+    final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
+    return MiniMessage.miniMessage().deserialize((attackDuration != null
+      ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
+      : Sonar.get().getConfig().getVerbose().getActionBarLayout())
       .replace("%queued%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
       .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
@@ -77,6 +83,7 @@ public final class Verbose implements JVMProfiler {
       .replace("%verify-success%",
         DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
       .replace("%verify-failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
+      .replace("%attack-duration%", attackDuration == null ? "00:00" : attackDuration.formattedDelay())
       .replace("%incoming-traffic%", INCOMING.getCachedSecond())
       .replace("%outgoing-traffic%", OUTGOING.getCachedSecond())
       .replace("%incoming-traffic-ttl%", INCOMING.getCachedTtl())

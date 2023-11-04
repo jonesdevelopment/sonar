@@ -18,9 +18,14 @@
 package xyz.jonesdev.sonar.api.timer;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+import java.text.SimpleDateFormat;
 
 @Getter
 public final class SystemTimer {
+  private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("mm:ss");
+
   private long start = System.currentTimeMillis();
 
   public void reset() {
@@ -33,6 +38,10 @@ public final class SystemTimer {
 
   public boolean elapsed(final long amount) {
     return delay() >= amount;
+  }
+
+  public @NotNull String formattedDelay() {
+    return FORMATTER.format(delay());
   }
 
   @Override
