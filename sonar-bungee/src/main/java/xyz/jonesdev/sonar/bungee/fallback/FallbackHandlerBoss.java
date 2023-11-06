@@ -40,23 +40,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
   public void channelActive(final ChannelHandlerContext ctx) throws Exception {
     if (handler != null) {
       channel = new ChannelWrapper(ctx);
-      handler.connected(channel);
-
-      if (handler instanceof DownstreamBridge) {
-        ProxyServer.getInstance().getLogger().info(handler + " has connected");
-      }
-    }
-  }
-
-  @Override
-  public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-    if (handler != null) {
-      channel.markClosed();
-      handler.disconnected(channel);
-
-      if (handler instanceof DownstreamBridge) {
-        ProxyServer.getInstance().getLogger().info(handler + " has disconnected");
-      }
+      super.channelActive(ctx);
     }
   }
 
