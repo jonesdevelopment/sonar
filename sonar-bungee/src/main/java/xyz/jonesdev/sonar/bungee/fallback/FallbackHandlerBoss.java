@@ -45,6 +45,14 @@ public final class FallbackHandlerBoss extends HandlerBoss {
   }
 
   @Override
+  public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+    if (handler != null) {
+      channel.markClosed();
+      super.channelInactive(ctx);
+    }
+  }
+
+  @Override
   public void channelWritabilityChanged(final ChannelHandlerContext ctx) throws Exception {
     if (handler != null) {
       handler.writabilityChanged(channel);
