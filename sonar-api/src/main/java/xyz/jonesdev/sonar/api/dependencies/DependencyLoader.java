@@ -72,9 +72,7 @@ public class DependencyLoader {
 
     final Properties properties = new Properties();
     properties.put("user", database.getUsername());
-    if (!database.getPassword().isEmpty()) {
-      properties.put("password", database.getPassword());
-    }
+    properties.put("password", database.getPassword());
 
     final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);
     connect.setAccessible(true);

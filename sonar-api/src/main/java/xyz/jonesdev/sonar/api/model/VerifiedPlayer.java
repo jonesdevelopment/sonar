@@ -24,12 +24,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DatabaseTable(tableName = "verified_players")
+@DatabaseTable(tableName = "sonar_verified_players")
 public final class VerifiedPlayer {
   @SuppressWarnings("unused")
   @DatabaseField(generatedId = true)
@@ -51,12 +52,15 @@ public final class VerifiedPlayer {
   )
   private UUID playerUUID;
 
-  @DatabaseField(columnName = "timestamp", canBeNull = false)
-  private long timestamp;
+  @DatabaseField(
+    columnName = "timestamp",
+    canBeNull = false
+  )
+  private Timestamp timestamp;
 
   public VerifiedPlayer(final String inetAddress, final UUID playerUUID, final long timestamp) {
     this.inetAddress = inetAddress;
     this.playerUUID = playerUUID;
-    this.timestamp = timestamp;
+    this.timestamp = new Timestamp(timestamp);
   }
 }
