@@ -49,7 +49,7 @@ public class DependencyLoader {
     final String databaseURL = String.format("jdbc:%s://%s:%d/%s",
       type, config.getDatabase().getUrl(), config.getDatabase().getPort(), config.getDatabase().getName());
 
-    final ExternalClassLoader classLoader = new ExternalClassLoader(new URL[] {url});
+    final ExternalClassLoader classLoader = new ExternalClassLoader(new URL[]{url});
     final Connection connection = connect(classLoader, databaseURL, config.getDatabase());
     return new JdbcSingleConnectionSource(databaseURL, connection);
   }
