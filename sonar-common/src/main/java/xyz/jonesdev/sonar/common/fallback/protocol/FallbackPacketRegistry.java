@@ -385,7 +385,7 @@ public enum FallbackPacketRegistry {
     }
   }
 
-  static class ProtocolRegistry {
+  public static class ProtocolRegistry {
     private final ProtocolVersion version;
     private final IntObjectMap<Supplier<? extends FallbackPacket>> packetIdToSupplier =
       new IntObjectHashMap<>(16, 0.5f);

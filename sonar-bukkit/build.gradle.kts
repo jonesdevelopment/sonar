@@ -16,7 +16,7 @@ bukkit {
 
   commands {
     register("sonar") {
-      // No permission check here
+      // No permission checks here
     }
   }
 }

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-// This command is only used to display helpful information in order to help
+// This command is only used to display helpful information to help
 // the Sonar contributors to fix issues more quickly
 @SubcommandInfo(
   name = "dump",
