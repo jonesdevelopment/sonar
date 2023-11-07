@@ -78,6 +78,7 @@ tasks {
     // https://github.com/jonesdevelopment/sonar/issues/46
     // Relocate some packages, so we don't run into issues where we accidentally use Velocity's classes
     relocate("net.kyori.adventure.nbt", "xyz.jonesdev.sonar.libs.nbt")
+    relocate("org.simpleyaml", "xyz.jonesdev.sonar.libs.yaml")
     relocate("com.google.gson", "xyz.jonesdev.sonar.libs.gson")
     relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
   }
