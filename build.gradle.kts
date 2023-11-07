@@ -22,12 +22,9 @@ allprojects {
   repositories {
     mavenCentral() // Lombok
     maven(url = "https://jitpack.io") // simple-yaml
-    maven(url = "https://repo.papermc.io/repository/maven-public") // Velocity API
     maven(url = "https://repo.jonesdev.xyz/releases/") // Bungee & Velocity proxy module
   }
-}
 
-subprojects {
   apply(plugin = "java")
   apply(plugin = "com.github.johnrengelman.shadow")
 
