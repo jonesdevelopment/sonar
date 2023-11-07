@@ -42,7 +42,7 @@ public class DependencyLoader {
     final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
     ClassLoader classLoader = currentClassLoader;
 
-    // Velocity doesn't include the MySQL library, which is why we need to load it manually
+    // Velocity doesn't include the JDBC driver, which is why we need to load it manually
     if (Sonar.get().getPlatform() == SonarPlatform.VELOCITY) {
       final URL url = database.getType().getDependency().getClassLoaderURL();
 
@@ -53,16 +53,15 @@ public class DependencyLoader {
       classLoader = new ExternalClassLoader(new URL[]{url});
     }
 
-    final String type = database.getType().name().toLowerCase();
-    final String databaseURL = String.format("jdbc:%s://%s:%d/%s",
-      type, database.getUrl(), database.getPort(), database.getName());
+    final String jdbcURL = String.format("jdbc:%s://%s:%d/%s",
+      database.getType().name().toLowerCase(), database.getUrl(), database.getPort(), database.getName());
 
-    final Connection connection = connect(classLoader, databaseURL, database);
-    return new JdbcSingleConnectionSource(databaseURL, connection);
+    final Connection connection = connect(classLoader, jdbcURL, database);
+    return new JdbcSingleConnectionSource(jdbcURL, connection);
   }
 
   // Mostly taken from
-  // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/DatabaseLibrary.java#L134
+  // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/DatabaseLibrary.java#L137
   private Connection connect(final @NotNull ClassLoader classLoader,
                              final @NotNull String databaseURL,
                              final @NotNull SonarConfiguration.Database database) throws Throwable {
