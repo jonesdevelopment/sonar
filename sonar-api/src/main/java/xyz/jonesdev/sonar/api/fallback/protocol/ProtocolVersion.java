@@ -111,6 +111,7 @@ public enum ProtocolVersion {
     return this == UNKNOWN;
   }
 
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isLegacy() {
     return this == LEGACY;
   }

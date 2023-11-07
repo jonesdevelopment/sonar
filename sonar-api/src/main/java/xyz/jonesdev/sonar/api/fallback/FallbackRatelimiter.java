@@ -37,6 +37,7 @@ public final class FallbackRatelimiter {
    * @param inetAddress IP address of the player
    * @return Whether the player is allowed to verify
    */
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean attempt(final @NotNull InetAddress inetAddress) {
     // Clean up the cache
     expiringCache.cleanUp(false);
