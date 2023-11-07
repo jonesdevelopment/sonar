@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
@@ -55,11 +56,11 @@ public final class VerifiedPlayer {
     columnName = "timestamp",
     canBeNull = false
   )
-  private long timestamp;
+  private Timestamp timestamp;
 
   public VerifiedPlayer(final String inetAddress, final UUID playerUUID, final long timestamp) {
     this.inetAddress = inetAddress;
     this.playerUUID = playerUUID;
-    this.timestamp = timestamp;
+    this.timestamp = new Timestamp(timestamp);
   }
 }
