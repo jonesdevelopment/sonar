@@ -97,7 +97,6 @@ public final class VerifiedPlayerController {
       // We cannot throw a NullPointerException within the executor service
       // because we want to handle the error instead of simply throwing an exception
       if (connectionSource == null) {
-        Sonar.get().getLogger().error("Error (DB_UPDATE_SERVICE): connectionSource is null");
         return;
       }
 
@@ -144,7 +143,6 @@ public final class VerifiedPlayerController {
       // We cannot throw a NullPointerException within the executor service
       // because we want to handle the error instead of simply throwing an exception
       if (connectionSource == null) {
-        Sonar.get().getLogger().error("Error (DB_UPDATE_SERVICE): connectionSource is null");
         return;
       }
 

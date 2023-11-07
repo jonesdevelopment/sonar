@@ -22,6 +22,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 
 import java.io.File;
@@ -36,38 +37,43 @@ import java.util.Properties;
 @UtilityClass
 public class DependencyLoader {
   public ConnectionSource setUpDriverAndConnect() throws Throwable {
-    final SonarConfiguration config = Sonar.get().getConfig();
+    final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
 
-    final URL url = config.getDatabase().getType().getDependency().getClassLoaderURL();
     final ClassLoader currentClassLoader = DependencyLoader.class.getClassLoader();
+    ClassLoader classLoader = currentClassLoader;
 
-    final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
-    addPath.setAccessible(true);
-    addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
+    // Velocity doesn't include the JDBC driver, which is why we need to load it manually
+    if (Sonar.get().getPlatform() == SonarPlatform.VELOCITY) {
+      final URL url = database.getType().getDependency().getClassLoaderURL();
 
-    final String type = config.getDatabase().getType().name().toLowerCase();
-    final String databaseURL = String.format("jdbc:%s://%s:%d/%s",
-      type, config.getDatabase().getUrl(), config.getDatabase().getPort(), config.getDatabase().getName());
+      final Method addPath = currentClassLoader.getClass().getDeclaredMethod("addPath", Path.class);
+      addPath.setAccessible(true);
+      addPath.invoke(currentClassLoader, new File(url.toURI()).toPath());
 
-    final ExternalClassLoader classLoader = new ExternalClassLoader(new URL[]{url});
-    final Connection connection = connect(classLoader, databaseURL, config.getDatabase());
-    return new JdbcSingleConnectionSource(databaseURL, connection);
+      classLoader = new ExternalClassLoader(new URL[]{url});
+    }
+
+    final String jdbcURL = String.format("jdbc:%s://%s:%d/%s",
+      database.getType().name().toLowerCase(), database.getUrl(), database.getPort(), database.getName());
+
+    final Connection connection = connect(classLoader, jdbcURL, database);
+    return new JdbcSingleConnectionSource(jdbcURL, connection);
   }
 
   // Mostly taken from
-  // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/DatabaseLibrary.java#L134
+  // https://github.com/Elytrium/LimboAuth/blob/master/src/main/java/net/elytrium/limboauth/dependencies/DatabaseLibrary.java#L137
   private Connection connect(final @NotNull ClassLoader classLoader,
                              final @NotNull String databaseURL,
-                             final @NotNull SonarConfiguration.Database config) throws Throwable {
-    final Class<?> driverClass = classLoader.loadClass(config.getType().getDriverClassName());
+                             final @NotNull SonarConfiguration.Database database) throws Throwable {
+    final Class<?> driverClass = classLoader.loadClass(database.getType().getDriverClassName());
     final Object driver = driverClass.getDeclaredConstructor().newInstance();
 
     DriverManager.registerDriver((Driver) driver);
 
     final Properties properties = new Properties();
-    properties.put("user", config.getUsername());
-    if (!config.getPassword().isEmpty()) {
-      properties.put("password", config.getPassword());
+    properties.put("user", database.getUsername());
+    if (!database.getPassword().isEmpty()) {
+      properties.put("password", database.getPassword());
     }
 
     final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);
