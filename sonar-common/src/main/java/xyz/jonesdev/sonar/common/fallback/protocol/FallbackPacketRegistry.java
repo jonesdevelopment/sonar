@@ -374,26 +374,10 @@ public enum FallbackPacketRegistry {
     private static ProtocolVersion getProtocolVersion(final @NotNull PacketMapping current,
                                                       final @NotNull PacketMapping next,
                                                       final @NotNull ProtocolVersion from) {
-      final ProtocolVersion lastValid = current.lastValidProtocolVersion;
-
-      if (lastValid != null) {
-        if (next != current) {
-          throw new IllegalArgumentException("Cannot add a mapping after last valid mapping");
-        }
-
-        if (from.compareTo(lastValid) > 0) {
-          throw new IllegalArgumentException(
-            "Last mapping version cannot be higher than highest mapping version");
-        }
-      }
-
       final ProtocolVersion last = (ProtocolVersion) SUPPORTED_VERSIONS.toArray()[SUPPORTED_VERSIONS.size() - 1];
-      final ProtocolVersion to = current == next ? lastValid != null
-        ? lastValid : last : next.protocolVersion;
+      final ProtocolVersion to = current == next ? last : next.protocolVersion;
 
-      final ProtocolVersion lastInList = lastValid != null ? lastValid : last;
-
-      if (from.compareTo(to) >= 0 && from != lastInList) {
+      if (from.compareTo(to) >= 0 && from != last) {
         throw new IllegalArgumentException(String.format(
           "Next mapping version (%s) should be lower then current (%s)", to, from));
       }
@@ -402,7 +386,7 @@ public enum FallbackPacketRegistry {
   }
 
   public static class ProtocolRegistry {
-    public final ProtocolVersion version;
+    private final ProtocolVersion version;
     private final IntObjectMap<Supplier<? extends FallbackPacket>> packetIdToSupplier =
       new IntObjectHashMap<>(16, 0.5f);
     private final Map<Class<? extends FallbackPacket>, Integer> packetClassToId =
@@ -436,15 +420,12 @@ public enum FallbackPacketRegistry {
     private final int id;
     private final ProtocolVersion protocolVersion;
     private final boolean encodeOnly;
-    private final ProtocolVersion lastValidProtocolVersion;
 
     PacketMapping(final int id,
                   final ProtocolVersion protocolVersion,
-                  final ProtocolVersion lastValidProtocolVersion,
                   final boolean packetDecoding) {
       this.id = id;
       this.protocolVersion = protocolVersion;
-      this.lastValidProtocolVersion = lastValidProtocolVersion;
       this.encodeOnly = packetDecoding;
     }
   }
@@ -452,6 +433,6 @@ public enum FallbackPacketRegistry {
   private static @NotNull PacketMapping map(final int id,
                                             final ProtocolVersion version,
                                             final boolean encodeOnly) {
-    return new PacketMapping(id, version, null, encodeOnly);
+    return new PacketMapping(id, version, encodeOnly);
   }
 }

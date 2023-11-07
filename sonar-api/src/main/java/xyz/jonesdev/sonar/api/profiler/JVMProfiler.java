@@ -26,11 +26,16 @@ public interface JVMProfiler {
   Runtime RUNTIME = Runtime.getRuntime();
   OperatingSystemMXBean OPERATING_SYSTEM_MX_BEAN = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
   RuntimeMXBean RUNTIME_MX_BEAN = ManagementFactory.getRuntimeMXBean();
+  char[] MEMORY_UNITS = {'k', 'M', 'G', 'T', 'P', 'E'};
 
-  default String formatMemory(final long m) {
-    if (m < 1024L) return m + " B";
-    final int z = (63 - Long.numberOfLeadingZeros(m)) / 10;
-    return String.format("%.1f %sB", (double) m / (1L << (z * 10)), " KMGTPE".charAt(z));
+  default String formatMemory(final long size) {
+    if (size < 1024L) {
+      return size + " B";
+    }
+    final int group = (63 - Long.numberOfLeadingZeros(size)) / 10;
+    final double formattedSize = (double) size / (1L << (group * 10));
+    final char unit = MEMORY_UNITS[group - 1];
+    return String.format("%.1f %sB", formattedSize, unit);
   }
 
   default int getVirtualCores() {

@@ -95,8 +95,7 @@ public final class FallbackListener {
             InetSocketAddress.class,
             boolean.class,
             IdentifiedKey.class
-          )
-        );
+          ));
 
       try {
         SESSION_HANDLER_FIELD = MinecraftConnection.class.getDeclaredField("activeSessionHandler");
@@ -112,8 +111,7 @@ public final class FallbackListener {
       INITIAL_CONNECTION = MethodHandles.privateLookupIn(LoginInboundConnection.class, LOOKUP)
         .findGetter(LoginInboundConnection.class,
           "delegate",
-          InitialInboundConnection.class
-        );
+          InitialInboundConnection.class);
     } catch (Throwable throwable) {
       throw new ReflectiveOperationException(throwable);
     }

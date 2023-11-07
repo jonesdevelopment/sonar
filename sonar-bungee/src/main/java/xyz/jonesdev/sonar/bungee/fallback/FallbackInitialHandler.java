@@ -73,10 +73,11 @@ public final class FallbackInitialHandler extends InitialHandler {
     super(bungee, listener);
     this.bungee = bungee;
   }
+
   private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
   @Getter
   private ChannelWrapper channelWrapper;
-  private @NotNull final BungeeCord bungee;
+  private final @NotNull BungeeCord bungee;
   private @Nullable FallbackUserWrapper user;
   @Getter
   private ProtocolVersion protocolVersion;
