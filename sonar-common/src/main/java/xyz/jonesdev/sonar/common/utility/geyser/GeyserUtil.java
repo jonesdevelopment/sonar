@@ -42,6 +42,6 @@ public class GeyserUtil {
   public boolean isGeyserConnection(final @NotNull Channel channel) {
     // https://discord.com/channels/613163671870242838/613170125696270357/1168599123889504266
     // Every floodgate player has a channel attribute called "floodgate-player"
-    return channel.hasAttr(playerAttribute());
+    return channel.attr(playerAttribute()).get() != null;
   }
 }
