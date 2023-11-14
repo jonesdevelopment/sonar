@@ -167,17 +167,17 @@ public final class FallbackListener {
         // Don't continue the verification process if the verification is disabled
         if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) return;
 
+        // Completely skip Geyser connections
+        if (isGeyserConnection(channel)) {
+          fallback.getLogger().info("Skipping Geyser player: {}{}",
+            event.getUsername(), Sonar.get().getConfig().formatAddress(inetAddress));
+          return;
+        }
+
         // Check if the player is already verified.
         // No one wants to be verified over and over again.
         final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
         if (Sonar.get().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
-
-        // Completely skip Geyser connections
-        if (isGeyserConnection(channel)) {
-          fallback.getLogger().info("Skipping Geyser player: {}{}",
-            gameProfile.getName(), Sonar.get().getConfig().formatAddress(inetAddress));
-          return;
-        }
 
         final int protocolId = inboundConnection.getProtocolVersion().getProtocol();
         // Check if the protocol ID of the player is allowed to bypass verification

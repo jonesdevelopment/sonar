@@ -149,17 +149,17 @@ public final class FallbackInitialHandler extends InitialHandler {
           return;
         }
 
-        val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
-        // Check if the player is already verified
-        if (Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
-          super.handle(loginRequest);
-          return;
-        }
-
         // Completely skip Geyser connections
         if (isGeyserConnection(channel)) {
           FALLBACK.getLogger().info("Skipping Geyser player: {}{}",
             loginRequest.getData(), Sonar.get().getConfig().formatAddress(inetAddress));
+          super.handle(loginRequest);
+          return;
+        }
+
+        val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
+        // Check if the player is already verified
+        if (Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
           super.handle(loginRequest);
           return;
         }
