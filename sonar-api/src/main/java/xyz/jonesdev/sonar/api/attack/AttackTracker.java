@@ -45,6 +45,8 @@ public final class AttackTracker implements JVMProfiler {
     private int peakJoinsPerSecond;
     private double peakProcessCPUUsage;
     private long peakProcessMemoryUsage;
+    // Calculate during-attack-statistics using their deltas
+    private int successfulVerifications, failedVerifications;
   }
 
   public void checkIfUnderAttack() {
@@ -62,6 +64,8 @@ public final class AttackTracker implements JVMProfiler {
       // An attack has been detected
       if (currentAttack == null) {
         currentAttack = new AttackStatistics();
+        currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().estimatedSize();
+        currentAttack.failedVerifications = Statistics.FAILED_VERIFICATIONS.get();
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
       } else {
         // Reset attack timer if we're still under attack
@@ -101,8 +105,11 @@ public final class AttackTracker implements JVMProfiler {
           final String startTimestamp = String.valueOf(currentAttack.duration.getStart() / 1000L);
           final String endTimestamp = String.valueOf(System.currentTimeMillis() / 1000L);
           final long blacklisted = Sonar.get().getFallback().getBlacklisted().estimatedSize();
-          final long verified = Sonar.get().getVerifiedPlayerController().estimatedSize();
-          final long failed = Statistics.FAILED_VERIFICATIONS.get();
+          // Calculate during-attack-statistics using their deltas
+          final long totalVerified = Sonar.get().getVerifiedPlayerController().estimatedSize();
+          final long verified = Math.max(totalVerified - currentAttack.successfulVerifications, 0);
+          final long totalFailed = Statistics.FAILED_VERIFICATIONS.get();
+          final long failed = Math.max(totalFailed - currentAttack.failedVerifications, 0);
 
           // Post webhook to Discord
           Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> webhook.post(() -> {
