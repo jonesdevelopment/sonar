@@ -155,7 +155,7 @@ public final class FallbackListener {
         val activeSessionHandler = (MinecraftSessionHandler) SESSION_HANDLER_FIELD.get(mcConnection);
 
         // Check the blacklist here since we cannot let the player "ghost join"
-        if (fallback.getBlacklisted().has(inetAddress.toString())) {
+        if (fallback.getBlacklisted().has(inetAddress)) {
           markConnectionAsDead(activeSessionHandler);
           initialConnection.getConnection().closeWith(Disconnect.create(
             Sonar.get().getConfig().getVerification().getBlacklisted(),

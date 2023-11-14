@@ -138,7 +138,7 @@ public final class FallbackInitialHandler extends InitialHandler {
 
         final InetAddress inetAddress = getAddress().getAddress();
         // Check the blacklist here since we cannot let the player "ghost join"
-        if (FALLBACK.getBlacklisted().has(inetAddress.toString())) {
+        if (FALLBACK.getBlacklisted().has(inetAddress)) {
           closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
           return;
         }
