@@ -156,7 +156,6 @@ public final class SonarConfiguration {
     private String incorrectCommandUsage;
     private String incorrectIpAddress;
     private String illegalIpAddress;
-    private String unknownIpAddress;
     private String subCommandNoPerm;
     private String playersOnly;
     private String consoleOnly;
@@ -610,7 +609,7 @@ public final class SonarConfiguration {
       "%prefix%<red>Usage: /sonar %usage%"));
 
     messagesConfig.getYaml().setComment("commands.invalid-ip-address",
-      "Message that is shown when someone provides an invalid IP address (Invalid characters)");
+      "Message that is shown when someone provides an invalid IP address (Invalid format)");
     commands.incorrectIpAddress = formatString(messagesConfig.getString("commands.invalid-ip-address",
       "%prefix%The IP address you provided seems to be invalid."));
 
@@ -618,11 +617,6 @@ public final class SonarConfiguration {
       "Message that is shown when someone provides an illegal IP address (Local IP)");
     commands.illegalIpAddress = formatString(messagesConfig.getString("commands.illegal-ip-address",
       "%prefix%The IP address you provided seems to be either a local or loopback IP."));
-
-    messagesConfig.getYaml().setComment("commands.unknown-ip-address",
-      "Message that is shown when someone provides an unknown IP address (Unknown Host)");
-    commands.unknownIpAddress = formatString(messagesConfig.getString("commands.unknown-ip-address",
-      "%prefix%The IP address you provided seems to be unknown."));
 
     messagesConfig.getYaml().setComment("commands.player-only",
       "Message that is shown when the console runs a command that is player-only");
