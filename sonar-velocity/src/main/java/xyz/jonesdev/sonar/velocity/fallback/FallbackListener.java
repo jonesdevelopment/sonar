@@ -179,6 +179,10 @@ public final class FallbackListener {
           return;
         }
 
+        final int protocolId = inboundConnection.getProtocolVersion().getProtocol();
+        // Check if the protocol ID of the player is allowed to bypass verification
+        if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols().contains(protocolId)) return;
+
         // We now mark the connection as dead by using our fake connection
         markConnectionAsDead(activeSessionHandler);
         // Don't allow exceptions or disconnect messages
@@ -278,7 +282,7 @@ public final class FallbackListener {
           final FallbackUserWrapper user = new FallbackUserWrapper(
             fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
             mcConnection.getChannel().pipeline(), inetAddress,
-            ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
+            ProtocolVersion.fromId(protocolId)
           );
 
           // Disconnect if the protocol version could not be resolved

@@ -123,7 +123,8 @@ public final class FallbackInitialHandler extends InitialHandler {
     }
     receivedLoginPacket = true;
     // Cache protocol version so other handlers don't throw NPEs
-    protocolVersion = ProtocolVersion.fromId(getHandshake().getProtocolVersion());
+    final int protocolId = getHandshake().getProtocolVersion();
+    protocolVersion = ProtocolVersion.fromId(protocolId);
     final Channel channel = channelWrapper.getHandle();
 
     // Run in the channel's event loop
@@ -159,6 +160,12 @@ public final class FallbackInitialHandler extends InitialHandler {
         if (isGeyserConnection(channel)) {
           FALLBACK.getLogger().info("Skipping Geyser player: {}{}",
             loginRequest.getData(), Sonar.get().getConfig().formatAddress(inetAddress));
+          super.handle(loginRequest);
+          return;
+        }
+
+        // Check if the protocol ID of the player is allowed to bypass verification
+        if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols().contains(protocolId)) {
           super.handle(loginRequest);
           return;
         }

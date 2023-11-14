@@ -29,10 +29,7 @@ import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.api.Sonar.LINE_SEPARATOR;
@@ -139,6 +136,7 @@ public final class SonarConfiguration {
     private int maxPing;
     private int readTimeout;
     private int reconnectDelay;
+    private final Collection<Integer> whitelistedProtocols = new Vector<>(0);
 
     private Component tooManyPlayers;
     private Component tooFastReconnect;
@@ -490,7 +488,14 @@ public final class SonarConfiguration {
       "Minimum number of rejoin delay during verification");
     verification.reconnectDelay = clamp(generalConfig.getInt("verification.rejoin-delay", 8000), 0, 100000);
 
-    // Webhooks
+    generalConfig.getYaml().setComment("verification.whitelisted-protocols",
+      "List of protocol IDs which are not checked by Sonar (verification bypass)"
+      + LINE_SEPARATOR + "You can find the full list of all protocol IDs here:"
+      + LINE_SEPARATOR + "https://wiki.vg/Protocol_version_numbers"
+      + LINE_SEPARATOR + "For example, Minecraft 1.20 has the ID 763.");
+    verification.whitelistedProtocols.clear();
+    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols", Collections.emptyList()));
+
     generalConfig.getYaml().setComment("webhook",
       "Bot attack notifications can also be sent to your Discord server using webhooks");
     generalConfig.getYaml().setComment("webhook.url",

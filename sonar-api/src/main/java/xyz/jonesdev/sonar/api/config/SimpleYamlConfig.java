@@ -112,4 +112,9 @@ public final class SimpleYamlConfig {
     yaml.addDefault(path, def);
     return yaml.getStringList(path);
   }
+
+  public List<Integer> getIntList(final String path, final List<Integer> def) {
+    yaml.addDefault(path, def);
+    return yaml.getIntegerList(path);
+  }
 }
