@@ -136,23 +136,23 @@ public final class FallbackInitialHandler extends InitialHandler {
         // Increase total traffic statistic
         Statistics.TOTAL_TRAFFIC.increment();
 
+        final InetAddress inetAddress = getAddress().getAddress();
+        // Check the blacklist here since we cannot let the player "ghost join"
+        if (FALLBACK.getBlacklisted().has(inetAddress.toString())) {
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
+          return;
+        }
+
         // Check if the verification is enabled
         if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
           super.handle(loginRequest);
           return;
         }
 
-        final InetAddress inetAddress = getAddress().getAddress();
         val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
         // Check if the player is already verified
         if (Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
           super.handle(loginRequest);
-          return;
-        }
-
-        // Check the blacklist here since we cannot let the player "ghost join"
-        if (FALLBACK.getBlacklisted().has(inetAddress.toString())) {
-          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
           return;
         }
 
