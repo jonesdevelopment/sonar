@@ -137,6 +137,7 @@ public final class SonarConfiguration {
     private int readTimeout;
     private int reconnectDelay;
     private final Collection<Integer> whitelistedProtocols = new Vector<>(0);
+    private final Collection<Integer> blacklistedProtocols = new Vector<>(0);
 
     private Component tooManyPlayers;
     private Component tooFastReconnect;
@@ -148,6 +149,7 @@ public final class SonarConfiguration {
     private Component alreadyVerifying;
     private Component alreadyQueued;
     private Component blacklisted;
+    private Component protocolBlacklisted;
   }
 
   @Getter
@@ -494,6 +496,11 @@ public final class SonarConfiguration {
       + LINE_SEPARATOR + "For example, Minecraft 1.20 has the ID 763.");
     verification.whitelistedProtocols.clear();
     verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols", Collections.emptyList()));
+
+    generalConfig.getYaml().setComment("verification.blacklisted-protocols",
+      "List of protocol IDs which are unable to join the server at all");
+    verification.blacklistedProtocols.clear();
+    verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols", Collections.emptyList()));
 
     generalConfig.getYaml().setComment("webhook",
       "Bot attack notifications can also be sent to your Discord server using webhooks");
@@ -948,6 +955,16 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "<red>Your protocol version is currently unsupported.",
+        "%footer%"
+      ))));
+
+    messagesConfig.getYaml().setComment("verification.blacklisted-protocol",
+      "Disconnect message that is shown when someone joins with a blacklisted version");
+    verification.protocolBlacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted-protocol",
+      Arrays.asList(
+        "%header%",
+        "<red>You are using a version that is not allowed on our server.",
+        "<gold>Need help logging in? <gray>%support-url%",
         "%footer%"
       ))));
 

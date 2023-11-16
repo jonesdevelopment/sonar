@@ -157,6 +157,12 @@ public final class FallbackInitialHandler extends InitialHandler {
           return;
         }
 
+        // Check if the protocol ID of the player is not allowed to enter the server
+        if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols().contains(protocolId)) {
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getProtocolBlacklisted()));
+          return;
+        }
+
         val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
         // Check if the player is already verified
         if (Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {

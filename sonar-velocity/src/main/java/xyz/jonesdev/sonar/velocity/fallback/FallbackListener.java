@@ -156,6 +156,7 @@ public final class FallbackListener {
 
         // Check the blacklist here since we cannot let the player "ghost join"
         if (fallback.getBlacklisted().has(inetAddress)) {
+          // Mark the connection as dead to avoid unnecessary console logs
           markConnectionAsDead(activeSessionHandler);
           initialConnection.getConnection().closeWith(Disconnect.create(
             Sonar.get().getConfig().getVerification().getBlacklisted(),
@@ -174,12 +175,23 @@ public final class FallbackListener {
           return;
         }
 
+        // Check if the protocol ID of the player is not allowed to enter the server
+        final int protocolId = inboundConnection.getProtocolVersion().getProtocol();
+        if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols().contains(protocolId)) {
+          // Mark the connection as dead to avoid unnecessary console logs
+          markConnectionAsDead(activeSessionHandler);
+          initialConnection.getConnection().closeWith(Disconnect.create(
+            Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
+            inboundConnection.getProtocolVersion()
+          ));
+          return;
+        }
+
         // Check if the player is already verified.
         // No one wants to be verified over and over again.
         final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
         if (Sonar.get().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
 
-        final int protocolId = inboundConnection.getProtocolVersion().getProtocol();
         // Check if the protocol ID of the player is allowed to bypass verification
         if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols().contains(protocolId)) return;
 
