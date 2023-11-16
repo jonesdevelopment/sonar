@@ -220,16 +220,6 @@ public final class FallbackListener {
           return;
         }
 
-        // We cannot allow too many players on our Fallback server
-        // There's technically no reason for limiting this, but we'll better stay safe.
-        if (fallback.getConnected().size() > Sonar.get().getConfig().getVerification().getMaxVerifyingPlayers()) {
-          initialConnection.getConnection().closeWith(Disconnect.create(
-            Sonar.get().getConfig().getVerification().getTooManyPlayers(),
-            inboundConnection.getProtocolVersion()
-          ));
-          return;
-        }
-
         // Check if the IP address is currently being rate-limited
         if (!fallback.getRatelimiter().attempt(inetAddress)) {
           initialConnection.getConnection().closeWith(Disconnect.create(

@@ -131,7 +131,6 @@ public final class SonarConfiguration {
     private int maxBrandLength;
     private int maxMovementTicks;
     private int maxIgnoredTicks;
-    private int maxVerifyingPlayers;
     private int maxLoginPackets;
     private int maxPing;
     private int readTimeout;
@@ -479,11 +478,6 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.read-timeout",
       "Amount of time that has to pass before a player times out");
     verification.readTimeout = clamp(generalConfig.getInt("verification.read-timeout", 3500), 500, 30000);
-
-    generalConfig.getYaml().setComment("verification.max-players",
-      "Maximum number of players verifying at the same time");
-    verification.maxVerifyingPlayers = clamp(generalConfig.getInt("verification.max-players", 1024), 1,
-      Short.MAX_VALUE);
 
     generalConfig.getYaml().setComment("verification.rejoin-delay",
       "Minimum number of rejoin delay during verification");
