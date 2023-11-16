@@ -40,11 +40,10 @@ public final class Fallback {
   public static final Fallback INSTANCE = new Fallback();
   private static final @NotNull Sonar SONAR = Objects.requireNonNull(Sonar.get());
 
-  private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
+  private final Map<String, InetAddress> connected = new ConcurrentHashMap<>(64, 0.75f);
   // Only block the player for a few minutes to avoid issues
   private final ExpiringCache<InetAddress> blacklisted = Cappuccino.buildExpiring(
-    10L, TimeUnit.MINUTES, 5000L
-  );
+    10L, TimeUnit.MINUTES, 5000L);
   private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;
   private final @NotNull FallbackRatelimiter ratelimiter = FallbackRatelimiter.INSTANCE;
 
