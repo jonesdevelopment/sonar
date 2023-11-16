@@ -489,12 +489,12 @@ public final class SonarConfiguration {
       + LINE_SEPARATOR + "https://wiki.vg/Protocol_version_numbers"
       + LINE_SEPARATOR + "For example, Minecraft 1.20 has the ID 763.");
     verification.whitelistedProtocols.clear();
-    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols", Collections.emptyList()));
+    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols", new ArrayList<>(0)));
 
     generalConfig.getYaml().setComment("verification.blacklisted-protocols",
       "List of protocol IDs which are unable to join the server at all");
     verification.blacklistedProtocols.clear();
-    verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols", Collections.emptyList()));
+    verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols", new ArrayList<>(0)));
 
     generalConfig.getYaml().setComment("webhook",
       "Bot attack notifications can also be sent to your Discord server using webhooks");
