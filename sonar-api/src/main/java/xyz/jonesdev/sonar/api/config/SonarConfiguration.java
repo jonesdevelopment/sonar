@@ -131,13 +131,12 @@ public final class SonarConfiguration {
     private int maxBrandLength;
     private int maxMovementTicks;
     private int maxIgnoredTicks;
-    private int maxVerifyingPlayers;
     private int maxLoginPackets;
     private int maxPing;
     private int readTimeout;
     private int reconnectDelay;
-    private final Collection<Integer> whitelistedProtocols = new Vector<>(0);
-    private final Collection<Integer> blacklistedProtocols = new Vector<>(0);
+    private final Collection<Integer> whitelistedProtocols = new HashSet<>(0);
+    private final Collection<Integer> blacklistedProtocols = new HashSet<>(0);
 
     private Component tooManyPlayers;
     private Component tooFastReconnect;
@@ -480,11 +479,6 @@ public final class SonarConfiguration {
       "Amount of time that has to pass before a player times out");
     verification.readTimeout = clamp(generalConfig.getInt("verification.read-timeout", 3500), 500, 30000);
 
-    generalConfig.getYaml().setComment("verification.max-players",
-      "Maximum number of players verifying at the same time");
-    verification.maxVerifyingPlayers = clamp(generalConfig.getInt("verification.max-players", 1024), 1,
-      Short.MAX_VALUE);
-
     generalConfig.getYaml().setComment("verification.rejoin-delay",
       "Minimum number of rejoin delay during verification");
     verification.reconnectDelay = clamp(generalConfig.getInt("verification.rejoin-delay", 8000), 0, 100000);
@@ -495,12 +489,12 @@ public final class SonarConfiguration {
       + LINE_SEPARATOR + "https://wiki.vg/Protocol_version_numbers"
       + LINE_SEPARATOR + "For example, Minecraft 1.20 has the ID 763.");
     verification.whitelistedProtocols.clear();
-    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols", Collections.emptyList()));
+    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols", new ArrayList<>(0)));
 
     generalConfig.getYaml().setComment("verification.blacklisted-protocols",
       "List of protocol IDs which are unable to join the server at all");
     verification.blacklistedProtocols.clear();
-    verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols", Collections.emptyList()));
+    verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols", new ArrayList<>(0)));
 
     generalConfig.getYaml().setComment("webhook",
       "Bot attack notifications can also be sent to your Discord server using webhooks");

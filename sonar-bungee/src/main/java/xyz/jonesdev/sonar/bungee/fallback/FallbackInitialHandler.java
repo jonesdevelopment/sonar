@@ -215,13 +215,6 @@ public final class FallbackInitialHandler extends InitialHandler {
           return;
         }
 
-        // We cannot allow too many players on our Fallback server
-        // There's technically no reason for limiting this, but we'll better stay safe.
-        if (FALLBACK.getConnected().size() > Sonar.get().getConfig().getVerification().getMaxVerifyingPlayers()) {
-          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getTooManyPlayers()));
-          return;
-        }
-
         // Check if the IP address is currently being rate-limited
         if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
           closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect()));
