@@ -28,8 +28,6 @@ import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Objects;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Getter
@@ -51,18 +49,7 @@ public abstract class Subcommand {
       .collect(Collectors.joining(", "));
   }
 
-  // https://stackoverflow.com/questions/5284147/validating-ipv4-addresses-with-regexp
-  private static final Pattern IP_PATTERN = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
-
   protected static @Nullable InetAddress getInetAddressIfValid(final InvocationSource source, final String rawIP) {
-    // We perform a regex check beforehand,
-    // so we don't have to create a new InetAddress,
-    // therefore, potentially saving some performance.
-    if (!IP_PATTERN.matcher(Objects.requireNonNull(rawIP)).matches()) {
-      source.sendMessage(SONAR.getConfig().getCommands().getIncorrectIpAddress());
-      return null;
-    }
-
     final InetAddress inetAddress;
     try {
       inetAddress = InetAddress.getByName(rawIP);
@@ -72,7 +59,7 @@ public abstract class Subcommand {
         return null;
       }
     } catch (UnknownHostException exception) {
-      source.sendMessage(SONAR.getConfig().getCommands().getUnknownIpAddress());
+      source.sendMessage(SONAR.getConfig().getCommands().getIncorrectIpAddress());
       return null;
     }
     return inetAddress;

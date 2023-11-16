@@ -42,7 +42,7 @@ public final class Fallback {
 
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>();
   // Only block the player for a few minutes to avoid issues
-  private final ExpiringCache<String> blacklisted = Cappuccino.buildExpiring(
+  private final ExpiringCache<InetAddress> blacklisted = Cappuccino.buildExpiring(
     10L, TimeUnit.MINUTES, 5000L
   );
   private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;

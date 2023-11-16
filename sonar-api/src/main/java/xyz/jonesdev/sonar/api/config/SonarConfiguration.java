@@ -29,10 +29,7 @@ import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.api.Sonar.LINE_SEPARATOR;
@@ -139,6 +136,8 @@ public final class SonarConfiguration {
     private int maxPing;
     private int readTimeout;
     private int reconnectDelay;
+    private final Collection<Integer> whitelistedProtocols = new Vector<>(0);
+    private final Collection<Integer> blacklistedProtocols = new Vector<>(0);
 
     private Component tooManyPlayers;
     private Component tooFastReconnect;
@@ -150,6 +149,7 @@ public final class SonarConfiguration {
     private Component alreadyVerifying;
     private Component alreadyQueued;
     private Component blacklisted;
+    private Component protocolBlacklisted;
   }
 
   @Getter
@@ -158,7 +158,6 @@ public final class SonarConfiguration {
     private String incorrectCommandUsage;
     private String incorrectIpAddress;
     private String illegalIpAddress;
-    private String unknownIpAddress;
     private String subCommandNoPerm;
     private String playersOnly;
     private String consoleOnly;
@@ -490,7 +489,19 @@ public final class SonarConfiguration {
       "Minimum number of rejoin delay during verification");
     verification.reconnectDelay = clamp(generalConfig.getInt("verification.rejoin-delay", 8000), 0, 100000);
 
-    // Webhooks
+    generalConfig.getYaml().setComment("verification.whitelisted-protocols",
+      "List of protocol IDs which are not checked by Sonar (verification bypass)"
+      + LINE_SEPARATOR + "You can find the full list of all protocol IDs here:"
+      + LINE_SEPARATOR + "https://wiki.vg/Protocol_version_numbers"
+      + LINE_SEPARATOR + "For example, Minecraft 1.20 has the ID 763.");
+    verification.whitelistedProtocols.clear();
+    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols", Collections.emptyList()));
+
+    generalConfig.getYaml().setComment("verification.blacklisted-protocols",
+      "List of protocol IDs which are unable to join the server at all");
+    verification.blacklistedProtocols.clear();
+    verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols", Collections.emptyList()));
+
     generalConfig.getYaml().setComment("webhook",
       "Bot attack notifications can also be sent to your Discord server using webhooks");
     generalConfig.getYaml().setComment("webhook.url",
@@ -605,7 +616,7 @@ public final class SonarConfiguration {
       "%prefix%<red>Usage: /sonar %usage%"));
 
     messagesConfig.getYaml().setComment("commands.invalid-ip-address",
-      "Message that is shown when someone provides an invalid IP address (Invalid characters)");
+      "Message that is shown when someone provides an invalid IP address (Invalid format)");
     commands.incorrectIpAddress = formatString(messagesConfig.getString("commands.invalid-ip-address",
       "%prefix%The IP address you provided seems to be invalid."));
 
@@ -613,11 +624,6 @@ public final class SonarConfiguration {
       "Message that is shown when someone provides an illegal IP address (Local IP)");
     commands.illegalIpAddress = formatString(messagesConfig.getString("commands.illegal-ip-address",
       "%prefix%The IP address you provided seems to be either a local or loopback IP."));
-
-    messagesConfig.getYaml().setComment("commands.unknown-ip-address",
-      "Message that is shown when someone provides an unknown IP address (Unknown Host)");
-    commands.unknownIpAddress = formatString(messagesConfig.getString("commands.unknown-ip-address",
-      "%prefix%The IP address you provided seems to be unknown."));
 
     messagesConfig.getYaml().setComment("commands.player-only",
       "Message that is shown when the console runs a command that is player-only");
@@ -949,6 +955,16 @@ public final class SonarConfiguration {
       Arrays.asList(
         "%header%",
         "<red>Your protocol version is currently unsupported.",
+        "%footer%"
+      ))));
+
+    messagesConfig.getYaml().setComment("verification.blacklisted-protocol",
+      "Disconnect message that is shown when someone joins with a blacklisted version");
+    verification.protocolBlacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted-protocol",
+      Arrays.asList(
+        "%header%",
+        "<red>You are using a version that is not allowed on our server.",
+        "<gold>Need help logging in? <gray>%support-url%",
         "%footer%"
       ))));
 

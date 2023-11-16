@@ -123,7 +123,8 @@ public final class FallbackInitialHandler extends InitialHandler {
     }
     receivedLoginPacket = true;
     // Cache protocol version so other handlers don't throw NPEs
-    protocolVersion = ProtocolVersion.fromId(getHandshake().getProtocolVersion());
+    final int protocolId = getHandshake().getProtocolVersion();
+    protocolVersion = ProtocolVersion.fromId(protocolId);
     final Channel channel = channelWrapper.getHandle();
 
     // Run in the channel's event loop
@@ -135,23 +136,16 @@ public final class FallbackInitialHandler extends InitialHandler {
         // Increase total traffic statistic
         Statistics.TOTAL_TRAFFIC.increment();
 
+        final InetAddress inetAddress = getAddress().getAddress();
+        // Check the blacklist here since we cannot let the player "ghost join"
+        if (FALLBACK.getBlacklisted().has(inetAddress)) {
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
+          return;
+        }
+
         // Check if the verification is enabled
         if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
           super.handle(loginRequest);
-          return;
-        }
-
-        final InetAddress inetAddress = getAddress().getAddress();
-        val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
-        // Check if the player is already verified
-        if (Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
-          super.handle(loginRequest);
-          return;
-        }
-
-        // Check the blacklist here since we cannot let the player "ghost join"
-        if (FALLBACK.getBlacklisted().has(inetAddress.toString())) {
-          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
           return;
         }
 
@@ -159,6 +153,25 @@ public final class FallbackInitialHandler extends InitialHandler {
         if (isGeyserConnection(channel)) {
           FALLBACK.getLogger().info("Skipping Geyser player: {}{}",
             loginRequest.getData(), Sonar.get().getConfig().formatAddress(inetAddress));
+          super.handle(loginRequest);
+          return;
+        }
+
+        // Check if the protocol ID of the player is not allowed to enter the server
+        if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols().contains(protocolId)) {
+          closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getProtocolBlacklisted()));
+          return;
+        }
+
+        val uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + loginRequest.getData()).getBytes(StandardCharsets.UTF_8));
+        // Check if the player is already verified
+        if (Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
+          super.handle(loginRequest);
+          return;
+        }
+
+        // Check if the protocol ID of the player is allowed to bypass verification
+        if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols().contains(protocolId)) {
           super.handle(loginRequest);
           return;
         }

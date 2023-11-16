@@ -54,7 +54,7 @@ public final class BlacklistCommand extends Subcommand {
         if (inetAddress == null) return;
 
         // Make sure the IP is not blacklisted already
-        if (SONAR.getFallback().getBlacklisted().has(inetAddress.toString())) {
+        if (SONAR.getFallback().getBlacklisted().has(inetAddress)) {
           invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistDuplicate());
           return;
         }
@@ -66,7 +66,7 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         // Blacklist the given IP address
-        SONAR.getFallback().getBlacklisted().put(inetAddress.toString());
+        SONAR.getFallback().getBlacklisted().put(inetAddress);
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistAdd()
           .replace("%ip%", rawInetAddress));
         break;
@@ -85,13 +85,13 @@ public final class BlacklistCommand extends Subcommand {
         if (inetAddress == null) return;
 
         // Make sure the IP is blacklisted
-        if (!SONAR.getFallback().getBlacklisted().has(inetAddress.toString())) {
+        if (!SONAR.getFallback().getBlacklisted().has(inetAddress)) {
           invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistNotFound());
           return;
         }
 
         // Invalidate the cache entry of the blacklisted IP address
-        SONAR.getFallback().getBlacklisted().invalidate(inetAddress.toString());
+        SONAR.getFallback().getBlacklisted().invalidate(inetAddress);
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistRemove()
           .replace("%ip%", rawInetAddress));
         break;

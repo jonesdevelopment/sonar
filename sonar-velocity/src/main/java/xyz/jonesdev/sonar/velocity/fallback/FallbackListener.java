@@ -155,7 +155,8 @@ public final class FallbackListener {
         val activeSessionHandler = (MinecraftSessionHandler) SESSION_HANDLER_FIELD.get(mcConnection);
 
         // Check the blacklist here since we cannot let the player "ghost join"
-        if (fallback.getBlacklisted().has(inetAddress.toString())) {
+        if (fallback.getBlacklisted().has(inetAddress)) {
+          // Mark the connection as dead to avoid unnecessary console logs
           markConnectionAsDead(activeSessionHandler);
           initialConnection.getConnection().closeWith(Disconnect.create(
             Sonar.get().getConfig().getVerification().getBlacklisted(),
@@ -167,17 +168,32 @@ public final class FallbackListener {
         // Don't continue the verification process if the verification is disabled
         if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) return;
 
+        // Completely skip Geyser connections
+        if (isGeyserConnection(channel)) {
+          fallback.getLogger().info("Skipping Geyser player: {}{}",
+            event.getUsername(), Sonar.get().getConfig().formatAddress(inetAddress));
+          return;
+        }
+
+        // Check if the protocol ID of the player is not allowed to enter the server
+        final int protocolId = inboundConnection.getProtocolVersion().getProtocol();
+        if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols().contains(protocolId)) {
+          // Mark the connection as dead to avoid unnecessary console logs
+          markConnectionAsDead(activeSessionHandler);
+          initialConnection.getConnection().closeWith(Disconnect.create(
+            Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
+            inboundConnection.getProtocolVersion()
+          ));
+          return;
+        }
+
         // Check if the player is already verified.
         // No one wants to be verified over and over again.
         final GameProfile gameProfile = GameProfile.forOfflinePlayer(event.getUsername());
         if (Sonar.get().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) return;
 
-        // Completely skip Geyser connections
-        if (isGeyserConnection(channel)) {
-          fallback.getLogger().info("Skipping Geyser player: {}{}",
-            gameProfile.getName(), Sonar.get().getConfig().formatAddress(inetAddress));
-          return;
-        }
+        // Check if the protocol ID of the player is allowed to bypass verification
+        if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols().contains(protocolId)) return;
 
         // We now mark the connection as dead by using our fake connection
         markConnectionAsDead(activeSessionHandler);
@@ -278,7 +294,7 @@ public final class FallbackListener {
           final FallbackUserWrapper user = new FallbackUserWrapper(
             fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
             mcConnection.getChannel().pipeline(), inetAddress,
-            ProtocolVersion.fromId(connectedPlayer.getProtocolVersion().getProtocol())
+            ProtocolVersion.fromId(protocolId)
           );
 
           // Disconnect if the protocol version could not be resolved
