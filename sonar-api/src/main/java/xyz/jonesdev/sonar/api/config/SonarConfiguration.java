@@ -135,8 +135,8 @@ public final class SonarConfiguration {
     private int maxPing;
     private int readTimeout;
     private int reconnectDelay;
-    private final Collection<Integer> whitelistedProtocols = new Vector<>(0);
-    private final Collection<Integer> blacklistedProtocols = new Vector<>(0);
+    private final Collection<Integer> whitelistedProtocols = new HashSet<>(0);
+    private final Collection<Integer> blacklistedProtocols = new HashSet<>(0);
 
     private Component tooManyPlayers;
     private Component tooFastReconnect;
