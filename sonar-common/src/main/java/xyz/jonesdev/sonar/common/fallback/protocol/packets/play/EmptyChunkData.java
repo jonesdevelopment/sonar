@@ -29,8 +29,7 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeArray;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeCompoundTag;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
@@ -92,7 +91,11 @@ public final class EmptyChunkData implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      writeCompoundTag(byteBuf, protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? LEGACY_TAG : MODERN_TAG);
+      if (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0) {
+        writeNamelessCompoundTag(byteBuf, MODERN_TAG);
+      } else {
+        writeCompoundTag(byteBuf, protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? LEGACY_TAG : MODERN_TAG);
+      }
 
       if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0 && protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
         if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {

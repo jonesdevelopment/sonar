@@ -25,6 +25,7 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTagIO;
+import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
 
@@ -113,7 +114,17 @@ public class ProtocolUtil {
   public static void writeCompoundTag(final ByteBuf byteBuf, final CompoundBinaryTag compoundTag) {
     try {
       BinaryTagIO.writer().write(compoundTag, (DataOutput) new ByteBufOutputStream(byteBuf));
-    } catch (IOException e) {
+    } catch (IOException exception) {
+      throw new EncoderException("Unable to encode NBT CompoundTag");
+    }
+  }
+
+  public static void writeNamelessCompoundTag(final @NotNull ByteBuf byteBuf, final CompoundBinaryTag compoundTag) {
+    try {
+      final DataOutput output = new ByteBufOutputStream(byteBuf);
+      output.writeByte(BinaryTagTypes.COMPOUND.id());
+      BinaryTagTypes.COMPOUND.write(compoundTag, output);
+    } catch (IOException exception) {
       throw new EncoderException("Unable to encode NBT CompoundTag");
     }
   }
