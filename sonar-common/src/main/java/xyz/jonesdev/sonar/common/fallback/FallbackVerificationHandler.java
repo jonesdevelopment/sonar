@@ -327,12 +327,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         return;
       }
 
-      // TODO: implement ChunkData packet for 1.20.2
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0) {
-        finish();
-        return;
-      }
-
       // First, send an Abilities packet to the client to make
       // sure the player falls even in spectator mode.
       // Then, teleport the player to the spawn position.
