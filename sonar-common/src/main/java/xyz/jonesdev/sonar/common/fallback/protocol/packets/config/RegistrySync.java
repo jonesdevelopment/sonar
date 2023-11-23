@@ -18,17 +18,14 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
-import io.netty.handler.codec.EncoderException;
 import lombok.Getter;
 import lombok.ToString;
-import net.kyori.adventure.nbt.BinaryTagTypes;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 
-import java.io.IOException;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
 
 @Getter
 @ToString
@@ -36,15 +33,11 @@ public final class RegistrySync implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    try (final ByteBufOutputStream stream = new ByteBufOutputStream(byteBuf)) {
-      stream.writeByte(10); // CompoundTag ID
-      BinaryTagTypes.COMPOUND.write(DimensionRegistry.CODEC_1_20, stream);
-    } catch (IOException exception) {
-      throw new EncoderException("Cannot write NBT CompoundTag");
-    }
+    writeNamelessCompoundTag(byteBuf, DimensionRegistry.CODEC_1_20);
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 }
