@@ -120,8 +120,7 @@ public class ProtocolUtil {
   }
 
   public static void writeNamelessCompoundTag(final @NotNull ByteBuf byteBuf, final CompoundBinaryTag compoundTag) {
-    try {
-      final DataOutput output = new ByteBufOutputStream(byteBuf);
+    try (final ByteBufOutputStream output = new ByteBufOutputStream(byteBuf)) {
       output.writeByte(BinaryTagTypes.COMPOUND.id());
       BinaryTagTypes.COMPOUND.write(compoundTag, output);
     } catch (IOException exception) {
