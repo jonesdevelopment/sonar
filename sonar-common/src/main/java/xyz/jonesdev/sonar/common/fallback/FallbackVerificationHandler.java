@@ -466,9 +466,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void assertState(final @NotNull State expectedState) {
-    if (expectedState != state) {
-      user.fail("expected " + expectedState + ", got " + state);
-    }
+    checkFrame(state == expectedState, "expected " + expectedState + ", got " + state);
   }
 
   private void checkFrame(final boolean condition, final String message) {
