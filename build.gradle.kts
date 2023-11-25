@@ -81,6 +81,7 @@ tasks {
     relocate("org.simpleyaml", "xyz.jonesdev.sonar.libs.yaml")
     relocate("com.google.gson", "xyz.jonesdev.sonar.libs.gson")
     relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
+    relocate("xyz.jonesdev.cappuccino", "xyz.jonesdev.sonar.libs.cappuccino")
   }
 
   compileJava {
