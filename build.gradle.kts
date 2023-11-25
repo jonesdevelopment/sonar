@@ -71,6 +71,9 @@ tasks {
     // Set the file name of the shadowed jar
     archiveFileName.set("Sonar.jar")
 
+    // Remove file timestamps
+    isPreserveFileTimestamps = false
+
     // bStats has to be relocated to the Sonar package otherwise it throws an exception
     // https://github.com/Bastian/bstats-metrics/blob/master/base/src/main/java/org/bstats/MetricsBase.java#L251
     relocate("org.bstats", "xyz.jonesdev.sonar.libs.bstats")
@@ -87,6 +90,9 @@ tasks {
       exclude("net.kyori.adventure.text.**")
       exclude("net.kyori.adventure.audience.**")
     }
+
+    // Exclude unnecessary metadata information
+    exclude("META-INF/versions/**")
   }
 
   compileJava {
