@@ -87,6 +87,9 @@ tasks {
       exclude("net.kyori.adventure.text.**")
       exclude("net.kyori.adventure.audience.**")
     }
+
+    // Exclude unnecessary metadata information
+    exclude("META-INF/versions/**")
   }
 
   compileJava {
