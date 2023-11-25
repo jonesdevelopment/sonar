@@ -77,11 +77,16 @@ tasks {
 
     // https://github.com/jonesdevelopment/sonar/issues/46
     // Relocate some packages, so we don't run into issues where we accidentally use Velocity's classes
-    relocate("net.kyori.adventure.nbt", "xyz.jonesdev.sonar.libs.nbt")
     relocate("org.simpleyaml", "xyz.jonesdev.sonar.libs.yaml")
     relocate("com.google.gson", "xyz.jonesdev.sonar.libs.gson")
     relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
     relocate("xyz.jonesdev.cappuccino", "xyz.jonesdev.sonar.libs.cappuccino")
+    relocate("net.kyori.examination", "xyz.jonesdev.sonar.libs.examination")
+    // We have to be careful here, so we don't accidentally break adventure
+    relocate("net.kyori.adventure", "xyz.jonesdev.sonar.libs.adventure") {
+      exclude("net.kyori.adventure.text.**")
+      exclude("net.kyori.adventure.audience.**")
+    }
   }
 
   compileJava {
