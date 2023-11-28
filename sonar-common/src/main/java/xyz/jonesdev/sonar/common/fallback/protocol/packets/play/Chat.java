@@ -53,7 +53,7 @@ public final class Chat implements FallbackPacket {
       byteBuf.writeBoolean(position == 2);
     } else if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       writeVarInt(byteBuf, position);
-    } else {
+    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
       byteBuf.writeByte(position);
     }
 
