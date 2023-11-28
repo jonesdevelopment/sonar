@@ -53,6 +53,18 @@ public class MapPreparer {
       45,
       46,
       47,
+    },
+    new int[] { // Green
+      4,
+      5,
+      6,
+      7,
+    },
+    new int[] { // Red
+      16,
+      17,
+      18,
+      19
     }
   };
 
@@ -73,7 +85,7 @@ public class MapPreparer {
 
       final String fontType = FONT_TYPES[RANDOM.nextInt(FONT_TYPES.length)];
       final int fontStyle = FONT_STYLES[RANDOM.nextInt(FONT_STYLES.length)];
-      final int fontSize = 32 + RANDOM.nextInt(10);
+      final int fontSize = 33 + RANDOM.nextInt(10);
       @SuppressWarnings("all")
       final Font answerFont = new Font(fontType, fontStyle, fontSize);
       graphics.setFont(answerFont);

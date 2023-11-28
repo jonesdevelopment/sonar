@@ -463,7 +463,7 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
       "How long should Sonar wait until the player fails the captcha?");
-    verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration", 60000);
+    verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration", 45000);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.dictionary",
       "Characters (letters and numbers) that are allowed to appear in the answer to the captcha");
