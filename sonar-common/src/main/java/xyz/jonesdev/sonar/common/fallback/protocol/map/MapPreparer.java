@@ -28,14 +28,27 @@ import java.util.Random;
 public class MapPreparer {
   private final Random RANDOM = new Random();
 
-  private final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 20);
-  private final Font CODE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 43);
+  private final String[] FONT_TYPES = new String[] {
+    Font.DIALOG_INPUT,
+    Font.DIALOG,
+    Font.SANS_SERIF,
+    Font.SERIF
+  };
+
+  private final int[] FONT_STYLES = new int[] {
+    Font.PLAIN,
+    Font.BOLD,
+    Font.ITALIC,
+    Font.ITALIC | Font.BOLD
+  };
 
   private MapInfo[] cached;
 
   public void prepare() {
     cached = new MapInfo[Sonar.get().getConfig().getVerification().getMap().getPrecomputeAmount()];
+
     final String dictionary = Sonar.get().getConfig().getVerification().getMap().getDictionary();
+    final Font titleFont = new Font(Font.SANS_SERIF, Font.BOLD, 16);
 
     for (int i = 0; i < cached.length; i++) {
       // Send map data
@@ -45,22 +58,31 @@ public class MapPreparer {
       graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       graphics.setColor(Color.WHITE);
 
+      final String fontType = FONT_TYPES[RANDOM.nextInt(FONT_TYPES.length)];
+      final int fontStyle = FONT_STYLES[RANDOM.nextInt(FONT_STYLES.length)];
+      final int fontSize = 32 + RANDOM.nextInt(10);
+      @SuppressWarnings("all")
+      final Font answerFont = new Font(fontType, fontStyle, fontSize);
+
       // Please enter captcha
-      graphics.setFont(TITLE_FONT);
+      graphics.setFont(titleFont);
       graphics.drawString("Your code:", 5, 20);
 
       // Captcha
-      graphics.setFont(CODE_FONT);
+      graphics.setFont(answerFont);
 
       final char[] captcha = new char[4];
       for (int _i = 0; _i < captcha.length; _i++) {
         captcha[_i] = dictionary.charAt(RANDOM.nextInt(dictionary.length()));
       }
       final String answer = new String(captcha);
+      System.out.println(answer + " generated /// font size:" + fontSize + "  font: ");
 
       // Center captcha string
       final int stringWidth = graphics.getFontMetrics().stringWidth(answer);
-      graphics.drawString(answer, image.getWidth() / 2 - stringWidth / 2, image.getHeight() / 2 + 21);
+      graphics.drawString(answer,
+        image.getWidth() / 2 - stringWidth / 2,
+        image.getHeight() / 2 + fontSize / 2);
 
       // Store image in buffer
       final byte[] buffer = new byte[MapInfo.SCALE];
