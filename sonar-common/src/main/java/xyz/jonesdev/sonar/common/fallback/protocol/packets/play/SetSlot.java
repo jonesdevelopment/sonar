@@ -79,7 +79,11 @@ public final class SetSlot implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      byteBuf.writeByte(0); //No Nbt
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+        byteBuf.writeShort(-1);
+      } else {
+        byteBuf.writeByte(0);
+      }
     } else {
       if (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0) {
         writeNamelessCompoundTag(byteBuf, compoundBinaryTag);
