@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.IntBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -43,6 +44,10 @@ public final class SetSlot implements FallbackPacket {
   private int data;
   private int itemId;
   private CompoundBinaryTag compoundBinaryTag;
+
+  public static final CompoundBinaryTag MAP_NBT = CompoundBinaryTag.builder()
+    .put("map", IntBinaryTag.intBinaryTag(0))
+    .build();
 
   @Override
   public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {

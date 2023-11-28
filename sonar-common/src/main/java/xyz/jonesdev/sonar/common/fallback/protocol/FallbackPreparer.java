@@ -19,15 +19,14 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistrySync;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.Abilities;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.EmptyChunkData;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.JoinGame;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.UpdateSectionBlocks;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 @UtilityClass
 public class FallbackPreparer {
@@ -51,6 +50,10 @@ public class FallbackPreparer {
   public final int SPAWN_X_POSITION = 16 / 2; // middle of the chunk
   public final int SPAWN_Z_POSITION = 16 / 2; // middle of the chunk
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
+
+  // Captcha position
+  public final FallbackPacket CAPTCHA_POSITION = new PositionLook(
+    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false);
 
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 
@@ -91,13 +94,20 @@ public class FallbackPreparer {
           x + (BLOCKS_PER_ROW / 2),
           DEFAULT_Y_COLLIDE_POSITION,
           z + (BLOCKS_PER_ROW / 2),
-          0, 0
-        );
+          0, 0);
         CHANGED_BLOCKS[index++] = new ChangedBlock(position, BlockType.BARRIER);
       }
     }
 
     // Prepare UpdateSectionBlocks packet
     updateSectionBlocks = new UpdateSectionBlocks(0, 0, CHANGED_BLOCKS);
+
+    // Pre-compute captcha
+    if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
+      final SystemTimer timer = new SystemTimer();
+      Sonar.get().getLogger().info("Pre-computing map captcha answers...");
+      MapPreparer.prepare();
+      Sonar.get().getLogger().info("Done ({}s)!", timer);
+    }
   }
 }

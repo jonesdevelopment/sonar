@@ -30,6 +30,9 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapPreparer;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapType;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
@@ -58,7 +61,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Setter
   private @NotNull State state = State.LOGIN_ACK;
   private boolean listenForMovements;
-  private @Nullable String currentCaptcha;
+  private @Nullable MapInfo captcha;
 
   private final SystemTimer login = new SystemTimer();
   private static final Random RANDOM = new Random();
@@ -499,11 +502,15 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void handleMapCaptcha() {
     state = State.MAP_CAPTCHA;
 
+    // Set slot to map
+    user.delayedWrite(new SetSlot(0, 36, 1, 0,
+      MapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlot.MAP_NBT));
+
+    captcha = MapPreparer.getRandomCaptcha();
+    user.delayedWrite(new MapData(0, captcha));
 
     // Teleport the player to the position above the platform
-    user.delayedWrite(new PositionLook(
-      SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION,
-      0f, 90f, 0, false));
+    user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
     user.delayedWrite(CAPTCHA_ABILITIES);
     // Send all packets in one flush
