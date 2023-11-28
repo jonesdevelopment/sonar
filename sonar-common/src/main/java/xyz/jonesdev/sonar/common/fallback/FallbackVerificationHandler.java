@@ -165,8 +165,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Teleport the player to the spawn position
     user.delayedWrite(new PositionLook(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
-      0f, 0f, expectedTeleportId, false
-    ));
+      0f, 0f, expectedTeleportId, false));
+    user.delayedWrite(new DefaultSpawnPosition(
+      SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION, 0f));
   }
 
   private void sendChunkData() {

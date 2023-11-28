@@ -22,46 +22,37 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import java.util.UUID;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeUUID;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_14;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class Chat implements FallbackPacket {
-  private static final UUID PLACEHOLDER_UUID = new UUID(0L, 0L);
-  private Component component;
-  private byte position;
+public final class DefaultSpawnPosition implements FallbackPacket {
+  private int x, y, z;
+  private float angle;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    final String serialized = JSONComponentSerializer.json().serialize(component);
-    writeString(byteBuf, serialized);
-
-    // Message type
-    if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-      byteBuf.writeBoolean(position == 2);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeVarInt(byteBuf, position);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.writeInt(x);
+      byteBuf.writeInt(y);
+      byteBuf.writeInt(z);
     } else {
-      byteBuf.writeByte(this.position);
-    }
+      final long encoded = protocolVersion.compareTo(MINECRAFT_1_14) < 0
+        ? ((x & 0x3FFFFFFL) << 38) | ((y & 0xFFFL) << 26) | (z & 0x3FFFFFFL)
+        : ((x & 0x3FFFFFFL) << 38) | ((y & 0x3FFFFFFL) << 12) | (z & 0xFFFL);
 
-    // UUID
-    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_19) < 0) {
-      writeUUID(byteBuf, PLACEHOLDER_UUID);
+      byteBuf.writeLong(encoded);
+
+      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
+        byteBuf.writeFloat(angle);
+      }
     }
   }
 
