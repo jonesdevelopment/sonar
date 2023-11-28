@@ -58,7 +58,7 @@ public class FallbackPreparer {
   public double maxFallDistance;
 
   public void prepare() {
-    joinGame = new JoinGame(5,
+    joinGame = new JoinGame(0,
       Sonar.get().getConfig().getVerification().getGamemode().getId(),
       0,
       false,
