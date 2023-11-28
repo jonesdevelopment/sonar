@@ -180,6 +180,21 @@ public enum FallbackPacketRegistry {
         map(0x2E, MINECRAFT_1_19_3, true),
         map(0x32, MINECRAFT_1_19_4, true),
         map(0x33, MINECRAFT_1_20_2, true));
+      clientbound.register(DefaultSpawnPosition.class, DefaultSpawnPosition::new,
+        map(0x05, MINECRAFT_1_7_2, true),
+        map(0x43, MINECRAFT_1_9, true),
+        map(0x45, MINECRAFT_1_12, true),
+        map(0x46, MINECRAFT_1_12_1, true),
+        map(0x49, MINECRAFT_1_13, true),
+        map(0x4D, MINECRAFT_1_14, true),
+        map(0x4E, MINECRAFT_1_15, true),
+        map(0x42, MINECRAFT_1_16, true),
+        map(0x4B, MINECRAFT_1_17, true),
+        map(0x4A, MINECRAFT_1_19, true),
+        map(0x4D, MINECRAFT_1_19_1, true),
+        map(0x4C, MINECRAFT_1_19_3, true),
+        map(0x50, MINECRAFT_1_19_4, true),
+        map(0x52, MINECRAFT_1_20_2, true));
 
       serverbound.register(KeepAlive.class, KeepAlive::new,
         map(0x00, MINECRAFT_1_7_2, false),
