@@ -38,6 +38,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledg
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
 
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -507,9 +508,25 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set slot to map
     user.delayedWrite(new SetSlot(0, 36, 1, 0,
       MapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlot.MAP_NBT));
-    // Send map data
+    // Get random captcha
     captcha = MapPreparer.getRandomCaptcha();
-    user.delayedWrite(new MapData(0, captcha));
+    Objects.requireNonNull(captcha);
+    // Send map data
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+      byte[][] grid = new byte[MapInfo.DIMENSIONS][MapInfo.DIMENSIONS];
+      for (int i = 0; i < captcha.getBuffer().length; i++) {
+        final byte buf = captcha.getBuffer()[i];
+        grid[i & 127][i >> 7] = buf;
+      }
+
+      for (int i = 0; i < MapInfo.DIMENSIONS; ++i) {
+        final MapInfo mapInfo_v1_7 = new MapInfo(
+          captcha.getAnswer(), MapInfo.DIMENSIONS, MapInfo.DIMENSIONS, i, 0, grid[i]);
+        user.delayedWrite(new MapData(0, mapInfo_v1_7));
+      }
+    } else {
+      user.delayedWrite(new MapData(0, captcha));
+    }
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
