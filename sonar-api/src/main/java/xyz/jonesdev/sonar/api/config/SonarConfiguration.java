@@ -467,7 +467,7 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.dictionary",
       "Characters (letters and numbers) that are allowed to appear in the answer to the captcha");
-    verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary", "0123456789");
+    verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary", "123456789");
 
     generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
       "Regex for validating usernames during verification");
