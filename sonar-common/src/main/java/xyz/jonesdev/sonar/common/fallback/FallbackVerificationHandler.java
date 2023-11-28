@@ -57,6 +57,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Setter
   private @NotNull State state = State.LOGIN_ACK;
   private boolean listenForMovements;
+  private String currentCaptcha;
 
   private final SystemTimer login = new SystemTimer();
   private static final Random RANDOM = new Random();
@@ -165,7 +166,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Teleport the player to the spawn position
     user.delayedWrite(new PositionLook(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
-      0f, 0f, expectedTeleportId, false));
+      0f, -90f, expectedTeleportId, false));
+    // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
     user.delayedWrite(new DefaultSpawnPosition(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION, 0f));
   }
@@ -323,7 +325,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(transaction.getId() == expectedTransactionId, "invalid transaction id");
 
       // Checking gravity is disabled, just finish verification
-      if (!Sonar.get().getConfig().getVerification().isCheckGravity()) {
+      if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
         finish();
         return;
       }
@@ -417,7 +419,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // We have to account for this or the player will fail the verification.
     if (deltaY == 0) {
       // Check for too many ignored Y ticks
-      final int maxIgnoredTicks = Sonar.get().getConfig().getVerification().getMaxIgnoredTicks();
+      final int maxIgnoredTicks = Sonar.get().getConfig().getVerification().getGravity().getMaxIgnoredTicks();
       checkFrame(++ignoredMovementTicks < maxIgnoredTicks, "too many ignored ticks");
       return;
     }

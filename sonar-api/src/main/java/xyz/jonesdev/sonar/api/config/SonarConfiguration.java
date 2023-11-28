@@ -98,12 +98,38 @@ public final class SonarConfiguration {
     private Timing timing;
 
     @Getter
-    @RequiredArgsConstructor
     public enum Timing {
       ALWAYS, DURING_ATTACK, NEVER
     }
 
-    private boolean checkGravity;
+    private final Map map = new Map();
+    private final Gravity gravity = new Gravity();
+
+    @Getter
+    public static final class Map {
+      private boolean enabled;
+    }
+
+    @Getter
+    public static final class Gravity {
+      private boolean enabled;
+      private Gamemode gamemode;
+      private int maxMovementTicks;
+      private int maxIgnoredTicks;
+
+      @Getter
+      @RequiredArgsConstructor
+      public enum Gamemode {
+        SURVIVAL(0),
+        CREATIVE(1),
+        ADVENTURE(2),
+        // Keep this for backwards compatibility
+        SPECTATOR(2);
+
+        private final int id;
+      }
+    }
+
     private boolean logConnections;
     private boolean logDuringAttack;
     private boolean debugXYZPositions;
@@ -115,22 +141,7 @@ public final class SonarConfiguration {
     private String successLog;
     private String blacklistLog;
 
-    private Gamemode gamemode;
-
-    @Getter
-    @RequiredArgsConstructor
-    public enum Gamemode {
-      SURVIVAL(0),
-      CREATIVE(1),
-      ADVENTURE(2),
-      SPECTATOR(3);
-
-      private final int id;
-    }
-
     private int maxBrandLength;
-    private int maxMovementTicks;
-    private int maxIgnoredTicks;
     private int maxLoginPackets;
     private int maxPing;
     private int readTimeout;
@@ -413,17 +424,32 @@ public final class SonarConfiguration {
         + LINE_SEPARATOR + "All predicted motions are precalculated in order to save performance");
     generalConfig.getYaml().setComment("verification.checks.gravity.enabled",
       "Should Sonar check for valid client gravity? (Recommended)");
-    verification.checkGravity = generalConfig.getBoolean("verification.checks.gravity.enabled", true);
+    verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled", true);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-movement-ticks",
       "Maximum number of ticks the player has to fall in order to be allowed to hit the platform");
-    verification.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks", 8),
+    verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks", 8),
       2, 100);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-ignored-ticks",
       "Maximum number of ignored Y movement changes before a player fails verification");
-    verification.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5), 1,
-      128);
+    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5),
+      1, 128);
+
+    generalConfig.getYaml().setComment("verification.checks.gravity.gamemode",
+      "The gamemode of the player during verification"
+        + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR"
+        + LINE_SEPARATOR + "- SURVIVAL: all UI components are visible"
+        + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
+        + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible");
+    verification.gravity.gamemode = Verification.Gravity.Gamemode.valueOf(
+      generalConfig.getString("verification.checks.gravity.gamemode", Verification.Gravity.Gamemode.ADVENTURE.name()).toUpperCase());
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha",
+      "Make the player type a code from a virtual map in chat after the gravity check");
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.enabled",
+      "Should Sonar make the player pass a captcha?");
+    verification.map.enabled = generalConfig.getBoolean("verification.checks.map-captcha.enabled", false);
 
     generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
       "Regex for validating usernames during verification");
@@ -451,16 +477,6 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.max-login-packets",
       "Maximum number of login packets the player has to send in order to be kicked");
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets", 256), 128, 8192);
-
-    generalConfig.getYaml().setComment("verification.gamemode",
-      "The gamemode of the player during verification"
-        + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR"
-        + LINE_SEPARATOR + "- SURVIVAL: all UI components are visible"
-        + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
-        + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible"
-        + LINE_SEPARATOR + "- SPECTATOR: all UI components are hidden (Recommended)");
-    verification.gamemode = Verification.Gamemode.valueOf(
-      generalConfig.getString("verification.gamemode", Verification.Gamemode.SPECTATOR.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.log-connections",
       "Should Sonar log new verification attempts?");

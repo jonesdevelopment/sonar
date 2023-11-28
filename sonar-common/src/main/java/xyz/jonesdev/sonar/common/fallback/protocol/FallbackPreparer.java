@@ -34,6 +34,7 @@ public class FallbackPreparer {
 
   // Abilities
   public final FallbackPacket DEFAULT_ABILITIES = new Abilities(0x00, 0f, 0f);
+  public final FallbackPacket CAPTCHA_ABILITIES = new Abilities(0x02, 0f, 0f);
   // Chunks
   public final FallbackPacket EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
   // Finish Configuration
@@ -59,7 +60,7 @@ public class FallbackPreparer {
 
   public void prepare() {
     joinGame = new JoinGame(0,
-      Sonar.get().getConfig().getVerification().getGamemode().getId(),
+      Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
       0,
       false,
       0,
@@ -70,7 +71,7 @@ public class FallbackPreparer {
       "minecraft:overworld");
 
     maxFallDistance = 0;
-    maxMovementTick = Sonar.get().getConfig().getVerification().getMaxMovementTicks();
+    maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
     preparedCachedYMotions = new double[maxMovementTick + 8];
 
     for (int i = 0; i < preparedCachedYMotions.length; i++) {
