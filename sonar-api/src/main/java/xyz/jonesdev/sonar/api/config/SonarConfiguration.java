@@ -110,8 +110,10 @@ public final class SonarConfiguration {
       private boolean enabled;
       private int precomputeAmount;
       private int maxDuration;
+      private int maxTries;
       private String dictionary;
       private Component enterCode;
+      private Component failedCaptcha;
       private String enterCodeActionBar;
     }
 
@@ -464,6 +466,10 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
       "How long should Sonar wait until the player fails the captcha?");
     verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration", 45000);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.max-tries",
+      "How many times must a player fail the captcha before failing the verification?");
+    verification.map.maxTries = generalConfig.getInt("verification.checks.map-captcha.max-tries", 3);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.dictionary",
       "Characters (letters and numbers) that are allowed to appear in the answer to the captcha");
@@ -931,6 +937,10 @@ public final class SonarConfiguration {
       + LINE_SEPARATOR + "(Set this to '' to disable the action bar message)");
     verification.map.enterCodeActionBar = messagesConfig.getString("verification.captcha.action-bar",
       "<green>You have %time-left% seconds left to enter the code in chat");
+    messagesConfig.getYaml().setComment("verification.captcha.incorrect",
+      "Message that is shown to the player when they enter the wrong answer in chat");
+    verification.map.failedCaptcha = deserialize(messagesConfig.getString("verification.captcha.incorrect",
+      "<red>You have entered the wrong code. Please try again."));
 
     messagesConfig.getYaml().setComment("verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time");

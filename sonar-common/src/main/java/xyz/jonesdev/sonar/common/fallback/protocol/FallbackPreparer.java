@@ -45,6 +45,7 @@ public class FallbackPreparer {
   // Chat
   public FallbackPacket enterCodeMessage;
   public FallbackPacket youAreBeingChecked;
+  public FallbackPacket incorrectCaptcha;
   // JoinGame
   public FallbackPacket joinGame;
   // Update Section Blocks
@@ -111,18 +112,18 @@ public class FallbackPreparer {
 
     // "You are being checked" message
     if (Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
-      youAreBeingChecked = new Chat(Sonar.get().getConfig().getVerification().getGravity().getYouAreBeingChecked(), 1);
+      youAreBeingChecked = new Chat(Sonar.get().getConfig().getVerification().getGravity().getYouAreBeingChecked());
     }
 
     if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
-      // "Enter your code" message
-      enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCode(), 1);
+      enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCode());
+      incorrectCaptcha = new Chat(Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha());
 
       final SystemTimer timer = new SystemTimer();
       Sonar.get().getLogger().info("Precomputing map captcha answers...");
       // Precompute captcha answers
       MapPreparer.prepare();
-      Sonar.get().getLogger().info("Successfully precomputed captcha answers in {}!", timer);
+      Sonar.get().getLogger().info("Successfully precomputed captcha answers in {}s!", timer);
     }
   }
 }

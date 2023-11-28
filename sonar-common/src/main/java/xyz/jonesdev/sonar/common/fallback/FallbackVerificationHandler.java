@@ -64,6 +64,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private @NotNull State state = State.LOGIN_ACK;
   private boolean listenForMovements;
   private @Nullable MapInfo captcha;
+  private int captchaTriesLeft;
 
   private final SystemTimer login = new SystemTimer();
   private final SystemTimer keepAlive = new SystemTimer();
@@ -245,6 +246,20 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
       checkFrame(!login.elapsed(maxDuration), "took too long to enter captcha");
 
+      // Handle incoming chat messages
+      if (packet instanceof Chat) {
+        final Chat chat = (Chat) packet;
+        Objects.requireNonNull(captcha);
+        if (!chat.getMessage().equals(captcha.getAnswer())) {
+          // Captcha is incorrect
+          checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
+          user.write(incorrectCaptcha);
+          return;
+        }
+        // Captcha is correct
+        finish();
+      }
+
       // Every second
       if (actionBar.elapsed(1000L)) {
         final String actionBarMessage = Sonar.get().getConfig().getVerification().getMap().getEnterCodeActionBar();
@@ -252,7 +267,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         if (!actionBarMessage.isEmpty()) {
           final String timeLeft = String.format("%.0f", (maxDuration - login.delay()) / 1000D);
           user.write(new Chat(MiniMessage.miniMessage().deserialize(
-            actionBarMessage.replace("%time-left%", timeLeft)), 2));
+            actionBarMessage.replace("%time-left%", timeLeft)), Chat.GAME_INFO_TYPE));
           // Make sure to reset the timer
           actionBar.reset();
         }
@@ -537,6 +552,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private void handleMapCaptcha() {
     state = State.MAP_CAPTCHA;
+
+    // Reset max tries
+    captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
     // Set slot to map
     user.delayedWrite(new SetSlot(0, 36, 1, 0,

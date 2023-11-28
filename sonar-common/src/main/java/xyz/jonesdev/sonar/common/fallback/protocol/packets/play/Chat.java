@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.CorruptedFrameException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,11 +28,12 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeUUID;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Data
@@ -40,7 +42,31 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 public final class Chat implements FallbackPacket {
   private static final UUID PLACEHOLDER_UUID = new UUID(0L, 0L);
   private Component component;
-  private int position;
+  private String message;
+  private byte position;
+  private boolean signedPreview;
+  private boolean unsigned = false;
+  private Instant timestamp;
+  private Instant expiry;
+  private long salt;
+  private boolean signed;
+  private byte[] signature;
+  private static final int DIV_FLOOR = -Math.floorDiv(-20, 8);
+
+  public static final byte CHAT_TYPE = (byte) 0;
+  public static final byte SYSTEM_TYPE = (byte) 1;
+  public static final byte GAME_INFO_TYPE = (byte) 2;
+
+  // Clientbound LegacyChat
+  public Chat(final Component component) {
+    this(component, SYSTEM_TYPE);
+  }
+
+  // Clientbound LegacyChat
+  public Chat(final Component component, final byte position) {
+    this(component, null, position, false, false,
+      null, null, 0L, false, null);
+  }
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
@@ -50,7 +76,7 @@ public final class Chat implements FallbackPacket {
 
     // Type
     if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-      byteBuf.writeBoolean(position == 2);
+      byteBuf.writeBoolean(position == GAME_INFO_TYPE);
     } else if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       writeVarInt(byteBuf, position);
     } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
@@ -65,7 +91,61 @@ public final class Chat implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    message = readString(byteBuf, 256);
+
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0
+      && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) <= 0) {
+      final long expiresAt = byteBuf.readLong();
+      final long saltLong = byteBuf.readLong();
+      final byte[] signatureBytes = readByteArray(byteBuf);
+
+      if (saltLong != 0L && signatureBytes.length > 0) {
+        signature = signatureBytes;
+        expiry = Instant.ofEpochMilli(expiresAt);
+      } else if ((protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0
+        || saltLong == 0L) && signatureBytes.length == 0) {
+        unsigned = true;
+      } else {
+        throw new CorruptedFrameException("Invalid signature");
+      }
+
+      signedPreview = byteBuf.readBoolean();
+      if (signedPreview && unsigned) {
+        throw new CorruptedFrameException("Signature missing");
+      }
+
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
+        final int size = readVarInt(byteBuf);
+        if (size < 0 || size > 5) {
+          throw new CorruptedFrameException("Invalid previous messages");
+        }
+
+        for (int i = 0; i < size; i++) {
+          readUUID(byteBuf);
+          readByteArray(byteBuf);
+        }
+
+        if (byteBuf.readBoolean()) {
+          readUUID(byteBuf);
+          readByteArray(byteBuf);
+        }
+      }
+    } else {
+      timestamp = Instant.ofEpochMilli(byteBuf.readLong());
+      salt = byteBuf.readLong();
+      signed = byteBuf.readBoolean();
+      if (signed) {
+        byte[] sign = new byte[256];
+        byteBuf.readBytes(sign);
+        signature = sign;
+      } else {
+        signature = new byte[0];
+      }
+
+      readVarInt(byteBuf);
+      byte[] bytes = new byte[DIV_FLOOR];
+      byteBuf.readBytes(bytes);
+    }
   }
 }
