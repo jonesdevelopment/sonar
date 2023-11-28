@@ -40,6 +40,9 @@ public class FallbackPreparer {
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfiguration();
   // Synchronize Registry
   public final FallbackPacket REGISTRY_SYNC = new RegistrySync();
+  // Chat
+  public FallbackPacket enterCodeMessage;
+  public FallbackPacket youAreBeingChecked;
   // JoinGame
   public FallbackPacket joinGame;
   // Update Section Blocks
@@ -104,12 +107,20 @@ public class FallbackPreparer {
     // Prepare UpdateSectionBlocks packet
     updateSectionBlocks = new UpdateSectionBlocks(0, 0, CHANGED_BLOCKS);
 
-    // Pre-compute captcha
+    // "You are being checked" message
+    if (Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
+      youAreBeingChecked = new Chat(Sonar.get().getConfig().getVerification().getGravity().getYouAreBeingChecked(), 1);
+    }
+
     if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
+      // "Enter your code" message
+      enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCodeMessage(), 1);
+
       final SystemTimer timer = new SystemTimer();
       Sonar.get().getLogger().info("Pre-computing map captcha answers...");
+      // Pre-compute captcha answers
       MapPreparer.prepare();
-      Sonar.get().getLogger().info("Done ({}s)!", timer);
+      Sonar.get().getLogger().info("Successfully computed captcha answers in {}!", timer);
     }
   }
 }

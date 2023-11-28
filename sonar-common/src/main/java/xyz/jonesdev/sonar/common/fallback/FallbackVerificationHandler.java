@@ -187,12 +187,15 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Send an UpdateSectionBlocks packet with a platform of blocks
     // to check if the player collides with the solid platform.
     user.delayedWrite(updateSectionBlocks);
-    // Send all packets in one flush
-    user.getChannel().flush();
     // Checking gravity is disabled, just finish verification
     if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
       // Switch to captcha state if needed
       captchaOrFinish();
+    } else {
+      // Make sure the player knows we are checking them
+      user.delayedWrite(youAreBeingChecked);
+      // Send all packets in one flush
+      user.getChannel().flush();
     }
   }
 
@@ -512,6 +515,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
     user.delayedWrite(CAPTCHA_ABILITIES);
+    // Make sure the player knows what to do
+    user.delayedWrite(enterCodeMessage);
     // Send all packets in one flush
     user.getChannel().flush();
   }

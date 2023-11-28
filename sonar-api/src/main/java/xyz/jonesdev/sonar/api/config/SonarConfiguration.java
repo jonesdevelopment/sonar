@@ -108,6 +108,7 @@ public final class SonarConfiguration {
     @Getter
     public static final class Map {
       private boolean enabled;
+      private Component enterCodeMessage;
     }
 
     @Getter
@@ -116,6 +117,7 @@ public final class SonarConfiguration {
       private Gamemode gamemode;
       private int maxMovementTicks;
       private int maxIgnoredTicks;
+      private Component youAreBeingChecked;
 
       @Getter
       @RequiredArgsConstructor
@@ -898,6 +900,16 @@ public final class SonarConfiguration {
       "Message that is logged to console whenever a player is verified");
     verification.successLog = formatString(messagesConfig.getString("verification.logs.successful",
       "%name% has been verified successfully (%time%s!)."));
+
+    messagesConfig.getYaml().setComment("verification.welcome",
+      "Message that is shown to the player when they are being checked for valid gravity");
+    verification.gravity.youAreBeingChecked = deserialize(messagesConfig.getString("verification.welcome",
+      "<gray>Please wait a moment for the verification to finish..."));
+
+    messagesConfig.getYaml().setComment("verification.enter-code",
+      "Message that is shown to the player when they have to enter the answer to the captcha");
+    verification.map.enterCodeMessage = deserialize(messagesConfig.getString("verification.enter-code",
+      "<green>Please enter the code in chat that is displayed on the map:"));
 
     messagesConfig.getYaml().setComment("verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time");

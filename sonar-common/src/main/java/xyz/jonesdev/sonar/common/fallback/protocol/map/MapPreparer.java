@@ -28,6 +28,11 @@ public class MapPreparer {
   private final MapInfo[] CACHED = new MapInfo[10000];
   private final Random RANDOM = new Random();
 
+  private final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 20);
+  private final Font CODE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 43);
+
+  private final String POSSIBLE = "0123456789";
+
   public void prepare() {
     for (int i = 0; i < CACHED.length; i++) {
       // Send map data
@@ -38,24 +43,23 @@ public class MapPreparer {
       graphics.setColor(Color.WHITE);
 
       // Please enter captcha
-      graphics.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+      graphics.setFont(TITLE_FONT);
       graphics.drawString("Your code:", 5, 20);
 
       // Captcha
-      graphics.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 43));
+      graphics.setFont(CODE_FONT);
 
-      final Random random = new Random();
-      final String possible = "0123456789";
       final char[] captcha = new char[4];
       for (int _i = 0; _i < captcha.length; _i++) {
-        captcha[_i] = possible.charAt(random.nextInt(possible.length()));
+        captcha[_i] = POSSIBLE.charAt(RANDOM.nextInt(POSSIBLE.length()));
       }
       final String answer = new String(captcha);
 
-      final FontMetrics fontMetrics = graphics.getFontMetrics();
-      final int stringWidth = fontMetrics.stringWidth(answer);
+      // Center captcha string
+      final int stringWidth = graphics.getFontMetrics().stringWidth(answer);
       graphics.drawString(answer, image.getWidth() / 2 - stringWidth / 2, image.getHeight() / 2 + 21);
 
+      // Store image in buffer
       final byte[] buffer = new byte[MapInfo.SCALE];
       for (int x = 0; x < image.getWidth(); x++) {
         for (int y = 0; y < image.getHeight(); y++) {
