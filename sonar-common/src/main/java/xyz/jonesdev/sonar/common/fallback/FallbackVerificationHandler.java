@@ -23,6 +23,7 @@ import io.netty.handler.codec.DecoderException;
 import lombok.Setter;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
@@ -57,7 +58,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Setter
   private @NotNull State state = State.LOGIN_ACK;
   private boolean listenForMovements;
-  private String currentCaptcha;
+  private @Nullable String currentCaptcha;
 
   private final SystemTimer login = new SystemTimer();
   private static final Random RANDOM = new Random();
@@ -71,6 +72,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     CLIENT_SETTINGS, PLUGIN_MESSAGE, TRANSACTION,
     // PLAY checks
     TELEPORT, POSITION,
+    // Captcha
+    MAP_CAPTCHA,
     // Done
     SUCCESS
   }
@@ -183,6 +186,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.delayedWrite(updateSectionBlocks);
     // Send all packets in one flush
     user.getChannel().flush();
+    // Checking gravity is disabled, just finish verification
+    if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
+      // Switch to captcha state if needed
+      captchaOrFinish();
+    }
   }
 
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?, ?> user,
@@ -219,6 +227,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   public void handle(final @NotNull FallbackPacket packet) {
     // The player has already been verified, drop all other packets
     if (state == State.SUCCESS) return;
+    // We are expecting a captcha code in chat, drop all other packets
+    if (state == State.MAP_CAPTCHA) return;
 
     // Check if the player is not sending a ton of packets to the server
     final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxMovementTick;
@@ -323,12 +333,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(transaction.isAccepted(), "transaction not accepted?!");
       // Check if the transaction ID is valid
       checkFrame(transaction.getId() == expectedTransactionId, "invalid transaction id");
-
-      // Checking gravity is disabled, just finish verification
-      if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
-        finish();
-        return;
-      }
 
       // First, send an Abilities packet to the client to make
       // sure the player falls even in spectator mode.
@@ -440,7 +444,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // The player is colliding to blocks, finish verification
       if (ground) {
-        finish();
+        captchaOrFinish();
         return;
       }
     } else {
@@ -477,6 +481,33 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       user.fail(message);
       throw new CorruptedFrameException(message);
     }
+  }
+
+  private void captchaOrFinish() {
+    if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
+      if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
+        // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
+        user.delayedWrite(new DefaultSpawnPosition(
+          SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f));
+      }
+      handleMapCaptcha();
+    } else {
+      finish();
+    }
+  }
+
+  private void handleMapCaptcha() {
+    state = State.MAP_CAPTCHA;
+
+
+    // Teleport the player to the position above the platform
+    user.delayedWrite(new PositionLook(
+      SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION,
+      0f, 90f, 0, false));
+    // Make sure the player cannot move
+    user.delayedWrite(CAPTCHA_ABILITIES);
+    // Send all packets in one flush
+    user.getChannel().flush();
   }
 
   private void finish() {

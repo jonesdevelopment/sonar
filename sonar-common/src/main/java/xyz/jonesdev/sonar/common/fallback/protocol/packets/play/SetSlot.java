@@ -41,6 +41,7 @@ public final class SetSlot implements FallbackPacket {
   private int slot;
   private int count;
   private int data;
+  private int itemId;
   private CompoundBinaryTag compoundBinaryTag;
 
   @Override
@@ -62,11 +63,10 @@ public final class SetSlot implements FallbackPacket {
       byteBuf.writeBoolean(true);
     }
 
-    final int id = 941;
     if (protocolVersion.compareTo(MINECRAFT_1_13_2) < 0) {
-      byteBuf.writeShort(id);
+      byteBuf.writeShort(itemId);
     } else {
-      writeVarInt(byteBuf, id);
+      writeVarInt(byteBuf, itemId);
     }
     byteBuf.writeByte(count);
     if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
