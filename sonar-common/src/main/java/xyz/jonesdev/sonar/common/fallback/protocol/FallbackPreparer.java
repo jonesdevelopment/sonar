@@ -33,7 +33,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.UpdateSectionBlo
 public class FallbackPreparer {
 
   // Abilities
-  public final FallbackPacket DEFAULT_ABILITIES = new Abilities((byte) 0, 0f, 0f);
+  public final FallbackPacket DEFAULT_ABILITIES = new Abilities(0x00, 0f, 0f);
   // Chunks
   public final FallbackPacket EMPTY_CHUNK_DATA = new EmptyChunkData(0, 0);
   // Finish Configuration

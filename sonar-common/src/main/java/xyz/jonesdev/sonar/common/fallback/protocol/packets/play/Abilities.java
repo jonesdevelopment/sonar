@@ -31,7 +31,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Abilities implements FallbackPacket {
-  private byte encodedFlags;
+  private int encodedFlags;
   private float flySpeed, walkSpeed;
 
   @Override
