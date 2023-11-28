@@ -109,8 +109,10 @@ public final class SonarConfiguration {
     public static final class Map {
       private boolean enabled;
       private int precomputeAmount;
+      private int maxDuration;
       private String dictionary;
-      private Component enterCodeMessage;
+      private Component enterCode;
+      private String enterCodeActionBar;
     }
 
     @Getter
@@ -458,6 +460,10 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
       "How many answers should Sonar precompute (prepare)?");
     verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 10000);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
+      "How long should Sonar wait until the player fails the captcha?");
+    verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration", 60000);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.dictionary",
       "Characters (letters and numbers) that are allowed to appear in the answer to the captcha");
@@ -916,10 +922,15 @@ public final class SonarConfiguration {
     verification.gravity.youAreBeingChecked = deserialize(messagesConfig.getString("verification.welcome",
       "<gray>Please wait a moment for the verification to finish..."));
 
-    messagesConfig.getYaml().setComment("verification.enter-code",
+    messagesConfig.getYaml().setComment("verification.captcha.enter-code",
       "Message that is shown to the player when they have to enter the answer to the captcha");
-    verification.map.enterCodeMessage = deserialize(messagesConfig.getString("verification.enter-code",
-      "<green>Please enter the code in chat that is displayed on the map:"));
+    verification.map.enterCode = deserialize(messagesConfig.getString("verification.captcha.enter-code",
+      "<green>Please enter the code in chat that is displayed on the map."));
+    messagesConfig.getYaml().setComment("verification.captcha.action-bar",
+      "Timer that is shown to the player when they have to enter the answer to the captcha"
+      + LINE_SEPARATOR + "(Set this to '' to disable the action bar message)");
+    verification.map.enterCodeActionBar = messagesConfig.getString("verification.captcha.action-bar",
+      "<green>You have %time-left% seconds left to enter the code in chat");
 
     messagesConfig.getYaml().setComment("verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time");

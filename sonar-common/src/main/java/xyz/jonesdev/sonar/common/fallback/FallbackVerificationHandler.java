@@ -22,6 +22,7 @@ import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
 import lombok.Setter;
 import lombok.val;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -65,6 +66,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private @Nullable MapInfo captcha;
 
   private final SystemTimer login = new SystemTimer();
+  private final SystemTimer keepAlive = new SystemTimer();
+  private final SystemTimer actionBar = new SystemTimer();
   private static final Random RANDOM = new Random();
 
   public enum State {
@@ -234,15 +237,45 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   public void handle(final @NotNull FallbackPacket packet) {
     // The player has already been verified, drop all other packets
     if (state == State.SUCCESS) return;
+    // Check for timeout since the player could be sending packets but not important ones
+    final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
     // We are expecting a captcha code in chat, drop all other packets
-    if (state == State.MAP_CAPTCHA) return;
+    if (state == State.MAP_CAPTCHA) {
+      // Check if the player took too long to enter the captcha
+      final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
+      checkFrame(!login.elapsed(maxDuration), "took too long to enter captcha");
+
+      // Every second
+      if (actionBar.elapsed(1000L)) {
+        final String actionBarMessage = Sonar.get().getConfig().getVerification().getMap().getEnterCodeActionBar();
+        // Only send action bar if the message is actually supposed to be sent
+        if (!actionBarMessage.isEmpty()) {
+          final String timeLeft = String.format("%.0f", (maxDuration - login.delay()) / 1000D);
+          user.write(new Chat(MiniMessage.miniMessage().deserialize(
+            actionBarMessage.replace("%time-left%", timeLeft)), 2));
+          // Make sure to reset the timer
+          actionBar.reset();
+        }
+      }
+
+      // Every about 10 seconds
+      if (keepAlive.elapsed(timeout)) {
+        // Send the message again to remind the player
+        user.delayedWrite(enterCodeMessage);
+        // Send a KeepAlive packet to prevent timeout
+        user.delayedWrite(CAPTCHA_KEEP_ALIVE);
+        // Send both packets in one flush
+        user.getChannel().flush();
+        // Make sure to reset the timer
+        keepAlive.reset();
+      }
+      return;
+    }
 
     // Check if the player is not sending a ton of packets to the server
     final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxMovementTick;
     checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
 
-    // Check for timeout since the player could be sending packets but not important ones
-    final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
     // Check if the time limit has exceeded
     if (login.elapsed(timeout)) {
       user.getChannel().close();

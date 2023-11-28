@@ -40,6 +40,8 @@ public class FallbackPreparer {
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfiguration();
   // Synchronize Registry
   public final FallbackPacket REGISTRY_SYNC = new RegistrySync();
+  // Keep Alive
+  public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlive(0L);
   // Chat
   public FallbackPacket enterCodeMessage;
   public FallbackPacket youAreBeingChecked;
@@ -114,7 +116,7 @@ public class FallbackPreparer {
 
     if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
       // "Enter your code" message
-      enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCodeMessage(), 1);
+      enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCode(), 1);
 
       final SystemTimer timer = new SystemTimer();
       Sonar.get().getLogger().info("Precomputing map captcha answers...");
