@@ -108,6 +108,8 @@ public final class SonarConfiguration {
     @Getter
     public static final class Map {
       private boolean enabled;
+      private int precomputeAmount;
+      private String dictionary;
       private Component enterCodeMessage;
     }
 
@@ -452,6 +454,14 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.map-captcha.enabled",
       "Should Sonar make the player pass a captcha?");
     verification.map.enabled = generalConfig.getBoolean("verification.checks.map-captcha.enabled", false);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
+      "How many answers should Sonar precompute (prepare)?");
+    verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 10000);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.dictionary",
+      "Characters (letters and numbers) that are allowed to appear in the answer to the captcha");
+    verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary", "0123456789");
 
     generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
       "Regex for validating usernames during verification");

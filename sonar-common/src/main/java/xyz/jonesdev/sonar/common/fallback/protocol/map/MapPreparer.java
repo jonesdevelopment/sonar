@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.map;
 
 import lombok.experimental.UtilityClass;
+import xyz.jonesdev.sonar.api.Sonar;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -25,16 +26,18 @@ import java.util.Random;
 
 @UtilityClass
 public class MapPreparer {
-  private final MapInfo[] CACHED = new MapInfo[10000];
   private final Random RANDOM = new Random();
 
   private final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 20);
   private final Font CODE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 43);
 
-  private final String POSSIBLE = "0123456789";
+  private MapInfo[] cached;
 
   public void prepare() {
-    for (int i = 0; i < CACHED.length; i++) {
+    cached = new MapInfo[Sonar.get().getConfig().getVerification().getMap().getPrecomputeAmount()];
+    final String dictionary = Sonar.get().getConfig().getVerification().getMap().getDictionary();
+
+    for (int i = 0; i < cached.length; i++) {
       // Send map data
       final BufferedImage image = new BufferedImage(MapInfo.DIMENSIONS, MapInfo.DIMENSIONS, BufferedImage.TYPE_INT_RGB);
       final Graphics2D graphics = image.createGraphics();
@@ -51,7 +54,7 @@ public class MapPreparer {
 
       final char[] captcha = new char[4];
       for (int _i = 0; _i < captcha.length; _i++) {
-        captcha[_i] = POSSIBLE.charAt(RANDOM.nextInt(POSSIBLE.length()));
+        captcha[_i] = dictionary.charAt(RANDOM.nextInt(dictionary.length()));
       }
       final String answer = new String(captcha);
 
@@ -71,11 +74,11 @@ public class MapPreparer {
         }
       }
 
-      CACHED[i] = new MapInfo(answer, image.getWidth(), image.getHeight(), 0, 0, buffer);
+      cached[i] = new MapInfo(answer, image.getWidth(), image.getHeight(), 0, 0, buffer);
     }
   }
 
   public MapInfo getRandomCaptcha() {
-    return CACHED[RANDOM.nextInt(CACHED.length)];
+    return cached[RANDOM.nextInt(cached.length)];
   }
 }

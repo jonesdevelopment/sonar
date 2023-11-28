@@ -507,10 +507,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set slot to map
     user.delayedWrite(new SetSlot(0, 36, 1, 0,
       MapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlot.MAP_NBT));
-
+    // Send map data
     captcha = MapPreparer.getRandomCaptcha();
     user.delayedWrite(new MapData(0, captcha));
-
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move

@@ -117,10 +117,10 @@ public class FallbackPreparer {
       enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCodeMessage(), 1);
 
       final SystemTimer timer = new SystemTimer();
-      Sonar.get().getLogger().info("Pre-computing map captcha answers...");
-      // Pre-compute captcha answers
+      Sonar.get().getLogger().info("Precomputing map captcha answers...");
+      // Precompute captcha answers
       MapPreparer.prepare();
-      Sonar.get().getLogger().info("Successfully computed captcha answers in {}!", timer);
+      Sonar.get().getLogger().info("Successfully precomputed captcha answers in {}!", timer);
     }
   }
 }
