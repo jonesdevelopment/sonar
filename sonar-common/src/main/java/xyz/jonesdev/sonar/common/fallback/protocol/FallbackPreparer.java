@@ -54,6 +54,8 @@ public class FallbackPreparer {
   // Captcha position
   public final FallbackPacket CAPTCHA_POSITION = new PositionLook(
     SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false);
+  public final FallbackPacket CAPTCHA_SPAWN_POSITION = new DefaultSpawnPosition(
+    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f);
 
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 

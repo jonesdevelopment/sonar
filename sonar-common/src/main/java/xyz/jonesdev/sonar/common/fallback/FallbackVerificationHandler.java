@@ -490,8 +490,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
       if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
         // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
-        user.delayedWrite(new DefaultSpawnPosition(
-          SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f));
+        user.delayedWrite(CAPTCHA_SPAWN_POSITION);
       }
       handleMapCaptcha();
     } else {
