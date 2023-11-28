@@ -180,18 +180,6 @@ public enum FallbackPacketRegistry {
         map(0x2E, MINECRAFT_1_19_3, true),
         map(0x32, MINECRAFT_1_19_4, true),
         map(0x33, MINECRAFT_1_20_2, true));
-      clientbound.register(Chat.class, Chat::new,
-        map(0x02, MINECRAFT_1_7_2, true),
-        map(0x0F, MINECRAFT_1_9, true),
-        map(0x0E, MINECRAFT_1_13, true),
-        map(0x0F, MINECRAFT_1_15, true),
-        map(0x0E, MINECRAFT_1_16, true),
-        map(0x0F, MINECRAFT_1_18_2, true),
-        map(0x5F, MINECRAFT_1_19, true),
-        map(0x62, MINECRAFT_1_19_1, true),
-        map(0x60, MINECRAFT_1_19_3, true),
-        map(0x64, MINECRAFT_1_19_4, true),
-        map(0x67, MINECRAFT_1_20_2, true));
 
       serverbound.register(KeepAlive.class, KeepAlive::new,
         map(0x00, MINECRAFT_1_7_2, false),
