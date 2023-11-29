@@ -76,11 +76,10 @@ public class MapPreparer {
     final String dictionary = Sonar.get().getConfig().getVerification().getMap().getDictionary();
 
     for (int i = 0; i < cached.length; i++) {
-      // Send map data
-      final BufferedImage image = new BufferedImage(MapInfo.DIMENSIONS, MapInfo.DIMENSIONS, BufferedImage.TYPE_INT_RGB);
+      // Create image
+      final BufferedImage image = new BufferedImage(MapInfo.DIMENSIONS, MapInfo.DIMENSIONS, BufferedImage.TYPE_3BYTE_BGR);
       final Graphics2D graphics = image.createGraphics();
 
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       graphics.setColor(Color.WHITE);
 
       final String fontType = FONT_TYPES[RANDOM.nextInt(FONT_TYPES.length)];
@@ -90,23 +89,24 @@ public class MapPreparer {
       final Font answerFont = new Font(fontType, fontStyle, fontSize);
       graphics.setFont(answerFont);
 
-      final char[] captcha = new char[4];
-      for (int _i = 0; _i < captcha.length; _i++) {
-        captcha[_i] = dictionary.charAt(RANDOM.nextInt(dictionary.length()));
+      final StringBuilder answerBuilder = new StringBuilder();
+      for (int _i = 0; _i < 4; _i++) {
+        answerBuilder.append(dictionary.charAt(RANDOM.nextInt(dictionary.length())));
       }
-      final String answer = new String(captcha);
+      final String answer = answerBuilder.toString();
 
       // Calculate text position
       final int stringWidth = graphics.getFontMetrics().stringWidth(answer);
       int _x = image.getWidth() / 2 - stringWidth / 2;
       int _y = image.getHeight() / 2 + fontSize / 3;
+      int randomOffsetX = -3, randomOffsetY = -1;
 
       // Draw each character one by one
-      for (final char c : captcha) {
-        final String character = String.valueOf(c);
-        final int randomOffsetX = -3 + RANDOM.nextInt(6);
-        final int randomOffsetY = -7 + RANDOM.nextInt(14);
+      for (final char c : answer.toCharArray()) {
+        randomOffsetX = randomOffsetX < 0 ? RANDOM.nextInt(4) : -RANDOM.nextInt(4);
+        randomOffsetY = randomOffsetY < 0 ? RANDOM.nextInt(5) : -RANDOM.nextInt(5);
 
+        final String character = String.valueOf(c);
         graphics.drawString(character, _x, _y);
         _x += graphics.getFontMetrics().stringWidth(character);
         _x += randomOffsetX;
@@ -115,10 +115,15 @@ public class MapPreparer {
 
       // Select random color palette
       final int randomColorPalette = RANDOM.nextInt(COLOR_PALETTE.length);
+      // Calculate x, y, width, and height
+      final int __x = image.getWidth() / 2 - stringWidth / 2;
+      final int __w = __x + stringWidth;
+      final int __y = image.getHeight() / 2 - fontSize / 2;
+      final int __h = __y + fontSize;
       // Store image in buffer
       final byte[] buffer = new byte[MapInfo.SCALE];
-      for (int x = 0; x < image.getWidth(); x++) {
-        for (int y = 0; y < image.getHeight(); y++) {
+      for (int x = __x; x < __w; x++) {
+        for (int y = __y; y < __h; y++) {
           final int colorIndex = y * image.getWidth() + x;
           final int pixel = image.getRGB(x, y);
           if (pixel == -16777216) continue;
