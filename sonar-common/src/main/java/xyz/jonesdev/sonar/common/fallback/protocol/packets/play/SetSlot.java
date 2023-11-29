@@ -46,7 +46,7 @@ public final class SetSlot implements FallbackPacket {
   private CompoundBinaryTag compoundBinaryTag;
 
   public static final CompoundBinaryTag MAP_NBT = CompoundBinaryTag.builder()
-    .put("map", IntBinaryTag.intBinaryTag(0))
+    .put("map", IntBinaryTag.intBinaryTag(0)) // map type
     .build();
 
   @Override

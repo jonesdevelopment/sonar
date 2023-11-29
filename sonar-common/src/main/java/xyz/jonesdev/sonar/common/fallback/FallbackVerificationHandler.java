@@ -570,7 +570,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         grid[i & 127][i >> 7] = buf;
       }
 
-      for (int i = 0; i < MapInfo.DIMENSIONS; ++i) {
+      for (int i = 0; i < grid.length; i++) {
         final MapInfo mapInfo_v1_7 = new MapInfo(
           captcha.getAnswer(), MapInfo.DIMENSIONS, MapInfo.DIMENSIONS, i, 0, grid[i]);
         user.delayedWrite(new MapData(0, mapInfo_v1_7));

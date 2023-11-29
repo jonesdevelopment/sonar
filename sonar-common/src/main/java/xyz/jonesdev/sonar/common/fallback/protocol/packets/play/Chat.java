@@ -94,58 +94,59 @@ public final class Chat implements FallbackPacket {
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     message = readString(byteBuf, 256);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0
-      && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) <= 0) {
-      final long expiresAt = byteBuf.readLong();
-      final long saltLong = byteBuf.readLong();
-      final byte[] signatureBytes = readByteArray(byteBuf);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0) {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) <= 0) {
+        final long expiresAt = byteBuf.readLong();
+        final long saltLong = byteBuf.readLong();
+        final byte[] signatureBytes = readByteArray(byteBuf);
 
-      if (saltLong != 0L && signatureBytes.length > 0) {
-        signature = signatureBytes;
-        expiry = Instant.ofEpochMilli(expiresAt);
-      } else if ((protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0
-        || saltLong == 0L) && signatureBytes.length == 0) {
-        unsigned = true;
+        if (saltLong != 0L && signatureBytes.length > 0) {
+          signature = signatureBytes;
+          expiry = Instant.ofEpochMilli(expiresAt);
+        } else if ((protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0
+          || saltLong == 0L) && signatureBytes.length == 0) {
+          unsigned = true;
+        } else {
+          throw new CorruptedFrameException("Invalid signature");
+        }
+
+        signedPreview = byteBuf.readBoolean();
+        if (signedPreview && unsigned) {
+          throw new CorruptedFrameException("Signature missing");
+        }
+
+        if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
+          final int size = readVarInt(byteBuf);
+          if (size < 0 || size > 5) {
+            throw new CorruptedFrameException("Invalid previous messages");
+          }
+
+          for (int i = 0; i < size; i++) {
+            readUUID(byteBuf);
+            readByteArray(byteBuf);
+          }
+
+          if (byteBuf.readBoolean()) {
+            readUUID(byteBuf);
+            readByteArray(byteBuf);
+          }
+        }
       } else {
-        throw new CorruptedFrameException("Invalid signature");
-      }
-
-      signedPreview = byteBuf.readBoolean();
-      if (signedPreview && unsigned) {
-        throw new CorruptedFrameException("Signature missing");
-      }
-
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
-        final int size = readVarInt(byteBuf);
-        if (size < 0 || size > 5) {
-          throw new CorruptedFrameException("Invalid previous messages");
+        timestamp = Instant.ofEpochMilli(byteBuf.readLong());
+        salt = byteBuf.readLong();
+        signed = byteBuf.readBoolean();
+        if (signed) {
+          byte[] sign = new byte[256];
+          byteBuf.readBytes(sign);
+          signature = sign;
+        } else {
+          signature = new byte[0];
         }
 
-        for (int i = 0; i < size; i++) {
-          readUUID(byteBuf);
-          readByteArray(byteBuf);
-        }
-
-        if (byteBuf.readBoolean()) {
-          readUUID(byteBuf);
-          readByteArray(byteBuf);
-        }
+        readVarInt(byteBuf);
+        byte[] bytes = new byte[DIV_FLOOR];
+        byteBuf.readBytes(bytes);
       }
-    } else {
-      timestamp = Instant.ofEpochMilli(byteBuf.readLong());
-      salt = byteBuf.readLong();
-      signed = byteBuf.readBoolean();
-      if (signed) {
-        byte[] sign = new byte[256];
-        byteBuf.readBytes(sign);
-        signature = sign;
-      } else {
-        signature = new byte[0];
-      }
-
-      readVarInt(byteBuf);
-      byte[] bytes = new byte[DIV_FLOOR];
-      byteBuf.readBytes(bytes);
     }
   }
 }
