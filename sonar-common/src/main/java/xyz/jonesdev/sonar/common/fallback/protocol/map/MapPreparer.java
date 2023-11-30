@@ -49,16 +49,17 @@ public class MapPreparer {
       50,
       51
     },
-    new int[] { // Gray
+    new int[] { // Black
+      27,
       45,
       46,
       47,
     },
     new int[] { // Green
       4,
-      5,
-      6,
-      7,
+      28,
+      29,
+      30,
     },
     new int[] { // Red
       16,
@@ -82,13 +83,15 @@ public class MapPreparer {
 
       graphics.setColor(Color.WHITE);
 
+      // Create random font
       final String fontType = FONT_TYPES[RANDOM.nextInt(FONT_TYPES.length)];
       final int fontStyle = FONT_STYLES[RANDOM.nextInt(FONT_STYLES.length)];
-      final int fontSize = 33 + RANDOM.nextInt(10);
+      final int fontSize = 26 + RANDOM.nextInt(5);
       @SuppressWarnings("all")
       final Font answerFont = new Font(fontType, fontStyle, fontSize);
       graphics.setFont(answerFont);
 
+      // Build answer to the captcha
       final StringBuilder answerBuilder = new StringBuilder();
       for (int _i = 0; _i < 4; _i++) {
         answerBuilder.append(dictionary.charAt(RANDOM.nextInt(dictionary.length())));
@@ -99,18 +102,18 @@ public class MapPreparer {
       final int stringWidth = graphics.getFontMetrics().stringWidth(answer);
       int _x = image.getWidth() / 2 - stringWidth / 2;
       int _y = image.getHeight() / 2 + fontSize / 3;
-      int randomOffsetX = -3, randomOffsetY = -1;
+      int randomOffsetX = 0, randomOffsetY = 3;
 
       // Draw each character one by one
       for (final char c : answer.toCharArray()) {
-        randomOffsetX = randomOffsetX < 0 ? RANDOM.nextInt(4) : -RANDOM.nextInt(4);
-        randomOffsetY = randomOffsetY < 0 ? RANDOM.nextInt(5) : -RANDOM.nextInt(5);
+        _x += randomOffsetX;
+        _y += randomOffsetY;
+        randomOffsetX = randomOffsetX < 0 ? 1 + RANDOM.nextInt(2) : -1 - RANDOM.nextInt(2);
+        randomOffsetY = randomOffsetY < 0 ? 1 + RANDOM.nextInt(4) : -1 - RANDOM.nextInt(4);
 
         final String character = String.valueOf(c);
         graphics.drawString(character, _x, _y);
         _x += graphics.getFontMetrics().stringWidth(character);
-        _x += randomOffsetX;
-        _y += randomOffsetY;
       }
 
       // Select random color palette
@@ -124,15 +127,17 @@ public class MapPreparer {
       final byte[] buffer = new byte[MapInfo.SCALE];
       for (int x = __x; x < __w; x++) {
         for (int y = __y; y < __h; y++) {
-          final int pixel = image.getRGB(x, y);
-          if (pixel == -16777216) continue;
           final int gridIndex = y * image.getWidth() + x;
-          final int randomColor = colorPalette[RANDOM.nextInt(colorPalette.length)];
-          buffer[gridIndex] = (byte) randomColor;
+          final int pixel = image.getRGB(x, y);
+          // If the pixel has no color set, set it to white/light gray
+          if (pixel == -16777216) continue;
+          // Set color of pixel to random color from the palette
+          buffer[gridIndex] = (byte) colorPalette[RANDOM.nextInt(colorPalette.length)];
         }
       }
-
-      cached[i] = new MapInfo(answer, image.getWidth(), image.getHeight(), 0, 0, buffer);
+      // Cache buffer to map
+      cached[i] = new MapInfo(answer, image.getWidth(), image.getHeight(),
+        image.getWidth() / 4, image.getHeight() / 4, buffer);
     }
   }
 
