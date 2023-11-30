@@ -114,7 +114,7 @@ public class MapPreparer {
       }
 
       // Select random color palette
-      final int randomColorPalette = RANDOM.nextInt(COLOR_PALETTE.length);
+      final int[] colorPalette = COLOR_PALETTE[RANDOM.nextInt(COLOR_PALETTE.length)];
       // Calculate x, y, width, and height
       final int __x = image.getWidth() / 2 - stringWidth / 2;
       final int __w = __x + stringWidth;
@@ -124,11 +124,11 @@ public class MapPreparer {
       final byte[] buffer = new byte[MapInfo.SCALE];
       for (int x = __x; x < __w; x++) {
         for (int y = __y; y < __h; y++) {
-          final int colorIndex = y * image.getWidth() + x;
           final int pixel = image.getRGB(x, y);
           if (pixel == -16777216) continue;
-          final int randomColor = COLOR_PALETTE[randomColorPalette][RANDOM.nextInt(COLOR_PALETTE[randomColorPalette].length)];
-          buffer[colorIndex] = (byte) randomColor;
+          final int gridIndex = y * image.getWidth() + x;
+          final int randomColor = colorPalette[RANDOM.nextInt(colorPalette.length)];
+          buffer[gridIndex] = (byte) randomColor;
         }
       }
 
