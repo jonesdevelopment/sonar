@@ -25,7 +25,7 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 @UtilityClass
-public class MapPreparer {
+public class MapInfoPreparer {
   private final Random RANDOM = new Random();
 
   private final String[] FONT_TYPES = new String[] {
@@ -69,16 +69,16 @@ public class MapPreparer {
     }
   };
 
-  private MapInfo[] cached;
+  private PreparedMapInfo[] cached;
 
   public void prepare() {
-    cached = new MapInfo[Sonar.get().getConfig().getVerification().getMap().getPrecomputeAmount()];
+    cached = new PreparedMapInfo[Sonar.get().getConfig().getVerification().getMap().getPrecomputeAmount()];
 
     final String dictionary = Sonar.get().getConfig().getVerification().getMap().getDictionary();
 
     for (int i = 0; i < cached.length; i++) {
       // Create image
-      final BufferedImage image = new BufferedImage(MapInfo.DIMENSIONS, MapInfo.DIMENSIONS, BufferedImage.TYPE_3BYTE_BGR);
+      final BufferedImage image = new BufferedImage(PreparedMapInfo.DIMENSIONS, PreparedMapInfo.DIMENSIONS, BufferedImage.TYPE_3BYTE_BGR);
       final Graphics2D graphics = image.createGraphics();
 
       graphics.setColor(Color.WHITE);
@@ -103,8 +103,10 @@ public class MapPreparer {
       int _x = image.getWidth() / 2 - stringWidth / 2;
       int _y = image.getHeight() / 2 + fontSize / 3;
       int randomOffsetX = 0, randomOffsetY = 3;
+      final int firstPixelX = _x, firstPixelY = _y;
 
       // Draw each character one by one
+      final FontMetrics fontMetrics = graphics.getFontMetrics();
       for (final char c : answer.toCharArray()) {
         _x += randomOffsetX;
         _y += randomOffsetY;
@@ -113,38 +115,36 @@ public class MapPreparer {
 
         final String character = String.valueOf(c);
         graphics.drawString(character, _x, _y);
-        _x += graphics.getFontMetrics().stringWidth(character);
+        _x += fontMetrics.stringWidth(character);
       }
 
       // Select random color palette
-      final int[] colorPalette = COLOR_PALETTE[RANDOM.nextInt(COLOR_PALETTE.length)];
-      // Calculate x, y, width, and height
-      final int __x = image.getWidth() / 2 - stringWidth / 2;
-      final int __w = __x + stringWidth;
-      final int __y = image.getHeight() / 2 - fontSize / 2;
-      final int __h = __y + fontSize;
+      final int[] colorPalette = COLOR_PALETTE[i % COLOR_PALETTE.length];
+      // Calculate y and height
+      final int pixelY = firstPixelY - fontSize;
+      final int height = firstPixelY + fontSize / 3;
       // Store image in buffer
-      final byte[] buffer = new byte[MapInfo.SCALE];
-      for (int x = __x; x < __w; x++) {
-        for (int y = __y; y < __h; y++) {
-          final int gridIndex = y * image.getWidth() + x;
+      final byte[] buffer = new byte[PreparedMapInfo.SCALE];
+      for (int x = firstPixelX; x < _x; x++) {
+        for (int y = pixelY; y < height; y++) {
+          final int index = y * image.getWidth() + x;
           final int pixel = image.getRGB(x, y);
           // If the pixel has no color set, set it to white/light gray
           if (pixel == -16777216) {
-            buffer[gridIndex] = (byte) (RANDOM.nextBoolean() ? 14 : 26);
+            buffer[index] = (byte) (RANDOM.nextInt(100) < 70 ? 14 : 26);
             continue;
           }
           // Set color of pixel to random color from the palette
-          buffer[gridIndex] = (byte) colorPalette[RANDOM.nextInt(colorPalette.length)];
+          buffer[index] = (byte) colorPalette[RANDOM.nextInt(colorPalette.length)];
         }
       }
       // Cache buffer to map
-      cached[i] = new MapInfo(answer, image.getWidth(), image.getHeight(),
+      cached[i] = new PreparedMapInfo(answer, image.getWidth(), image.getHeight(),
         image.getWidth() / 4, image.getHeight() / 4, buffer);
     }
   }
 
-  public MapInfo getRandomCaptcha() {
+  public PreparedMapInfo getRandomCaptcha() {
     return cached[RANDOM.nextInt(cached.length)];
   }
 }

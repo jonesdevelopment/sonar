@@ -23,9 +23,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public final class MapInfo {
-  public static final int DIMENSIONS = 86;
-  public static final int SCALE = DIMENSIONS * DIMENSIONS;
-
   private final String answer;
   private final int columns, rows;
   private final int x, y;

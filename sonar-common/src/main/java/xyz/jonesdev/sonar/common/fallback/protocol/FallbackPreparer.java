@@ -23,7 +23,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapPreparer;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfoPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistrySync;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
@@ -122,7 +122,7 @@ public class FallbackPreparer {
       final SystemTimer timer = new SystemTimer();
       Sonar.get().getLogger().info("Precomputing map captcha answers...");
       // Precompute captcha answers
-      MapPreparer.prepare();
+      MapInfoPreparer.prepare();
       Sonar.get().getLogger().info("Successfully precomputed captcha answers in {}s!", timer);
     }
   }

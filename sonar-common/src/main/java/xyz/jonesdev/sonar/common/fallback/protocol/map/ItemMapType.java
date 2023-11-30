@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
-public enum MapType {
+public enum ItemMapType {
   FILLED_MAP(protocolVersion -> {
     // Link: https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/1.20/items.json
     switch (protocolVersion) {

@@ -31,9 +31,9 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.*;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfo;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapPreparer;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapType;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.ItemMapType;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfoPreparer;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.PreparedMapInfo;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
@@ -63,7 +63,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   @Setter
   private @NotNull State state = State.LOGIN_ACK;
   private boolean listenForMovements;
-  private @Nullable MapInfo captcha;
+  private @Nullable PreparedMapInfo captcha;
   private int captchaTriesLeft;
 
   private final SystemTimer login = new SystemTimer();
@@ -250,7 +250,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (packet instanceof Chat) {
         final Chat chat = (Chat) packet;
         Objects.requireNonNull(captcha);
-        if (!chat.getMessage().equals(captcha.getAnswer())) {
+        if (!chat.getMessage().equals(captcha.getInfo().getAnswer())) {
           // Captcha is incorrect
           checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
           user.write(incorrectCaptcha);
@@ -558,26 +558,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // Set slot to map
     user.delayedWrite(new SetSlot(0, 36, 1, 0,
-      MapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlot.MAP_NBT));
-    // Get random captcha
-    captcha = MapPreparer.getRandomCaptcha();
-    Objects.requireNonNull(captcha);
-    // Send map data
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-      byte[][] grid = new byte[MapInfo.DIMENSIONS][MapInfo.DIMENSIONS];
-      for (int i = 0; i < captcha.getBuffer().length; i++) {
-        final byte buf = captcha.getBuffer()[i];
-        grid[i & 127][i >> 7] = buf;
-      }
-
-      for (int i = 0; i < grid.length; i++) {
-        final MapInfo mapInfo_v1_7 = new MapInfo(
-          captcha.getAnswer(), MapInfo.DIMENSIONS, MapInfo.DIMENSIONS, i, 0, grid[i]);
-        user.delayedWrite(new MapData(0, mapInfo_v1_7));
-      }
-    } else {
-      user.delayedWrite(new MapData(0, captcha));
-    }
+      ItemMapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlot.MAP_NBT));
+    // Send random captcha to the player
+    captcha = MapInfoPreparer.getRandomCaptcha();
+    Objects.requireNonNull(captcha).write(user);
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
