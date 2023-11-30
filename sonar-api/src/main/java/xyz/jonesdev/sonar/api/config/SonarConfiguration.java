@@ -108,6 +108,9 @@ public final class SonarConfiguration {
     @Getter
     public static final class Map {
       private boolean enabled;
+      private boolean drawBackgroundNoise;
+      private boolean randomizePositions;
+      private boolean randomizeFontSize;
       private int precomputeAmount;
       private int maxDuration;
       private int maxTries;
@@ -458,6 +461,18 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.map-captcha.enabled",
       "Should Sonar make the player pass a captcha?");
     verification.map.enabled = generalConfig.getBoolean("verification.checks.map-captcha.enabled", false);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.background-noise",
+      "Should Sonar draw a white/light gray rectangle behind the captcha?");
+    verification.map.drawBackgroundNoise = generalConfig.getBoolean("verification.checks.map-captcha.background-noise", true);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.random-position",
+      "Should Sonar randomize the X and Y position of the captcha?");
+    verification.map.randomizePositions = generalConfig.getBoolean("verification.checks.map-captcha.random-position", true);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.random-font-size",
+      "Should Sonar randomize the size of the font used for rendering the captcha?");
+    verification.map.randomizeFontSize = generalConfig.getBoolean("verification.checks.map-captcha.random-font-size", true);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
       "How many answers should Sonar precompute (prepare)?");

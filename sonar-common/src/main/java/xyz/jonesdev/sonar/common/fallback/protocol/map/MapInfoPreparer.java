@@ -86,7 +86,8 @@ public class MapInfoPreparer {
       // Create random font
       final String fontType = FONT_TYPES[RANDOM.nextInt(FONT_TYPES.length)];
       final int fontStyle = FONT_STYLES[RANDOM.nextInt(FONT_STYLES.length)];
-      final int fontSize = 26 + RANDOM.nextInt(5);
+      final int fontSize = 30
+        + (Sonar.get().getConfig().getVerification().getMap().isRandomizeFontSize() ? RANDOM.nextInt(11) : 10);
       @SuppressWarnings("all")
       final Font answerFont = new Font(fontType, fontStyle, fontSize);
       graphics.setFont(answerFont);
@@ -108,10 +109,12 @@ public class MapInfoPreparer {
       // Draw each character one by one
       final FontMetrics fontMetrics = graphics.getFontMetrics();
       for (final char c : answer.toCharArray()) {
-        _x += randomOffsetX;
-        _y += randomOffsetY;
-        randomOffsetX = randomOffsetX < 0 ? 1 + RANDOM.nextInt(2) : -1 - RANDOM.nextInt(2);
-        randomOffsetY = randomOffsetY < 0 ? 1 + RANDOM.nextInt(4) : -1 - RANDOM.nextInt(4);
+        if (Sonar.get().getConfig().getVerification().getMap().isRandomizePositions()) {
+          _x += randomOffsetX;
+          _y += randomOffsetY;
+          randomOffsetX = randomOffsetX < 0 ? 1 + RANDOM.nextInt(2) : -1 - RANDOM.nextInt(2);
+          randomOffsetY = randomOffsetY < 0 ? 1 + RANDOM.nextInt(4) : -1 - RANDOM.nextInt(4);
+        }
 
         final String character = String.valueOf(c);
         graphics.drawString(character, _x, _y);
@@ -129,9 +132,11 @@ public class MapInfoPreparer {
         for (int y = pixelY; y < height; y++) {
           final int index = y * image.getWidth() + x;
           final int pixel = image.getRGB(x, y);
-          // If the pixel has no color set, set it to white/light gray
+          // If the pixel has no color set, set it to white/light gray (if enabled in the config)
           if (pixel == -16777216) {
-            buffer[index] = (byte) (RANDOM.nextInt(100) < 70 ? 14 : 26);
+            if (Sonar.get().getConfig().getVerification().getMap().isDrawBackgroundNoise()) {
+              buffer[index] = (byte) (RANDOM.nextInt(100) < 70 ? 14 : 26);
+            }
             continue;
           }
           // Set color of pixel to random color from the palette
