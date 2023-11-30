@@ -130,7 +130,10 @@ public class MapPreparer {
           final int gridIndex = y * image.getWidth() + x;
           final int pixel = image.getRGB(x, y);
           // If the pixel has no color set, set it to white/light gray
-          if (pixel == -16777216) continue;
+          if (pixel == -16777216) {
+            buffer[gridIndex] = (byte) (RANDOM.nextBoolean() ? 14 : 26);
+            continue;
+          }
           // Set color of pixel to random color from the palette
           buffer[gridIndex] = (byte) colorPalette[RANDOM.nextInt(colorPalette.length)];
         }
