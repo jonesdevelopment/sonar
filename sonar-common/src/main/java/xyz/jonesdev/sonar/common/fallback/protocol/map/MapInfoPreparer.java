@@ -87,7 +87,7 @@ public class MapInfoPreparer {
       final String fontType = FONT_TYPES[RANDOM.nextInt(FONT_TYPES.length)];
       final int fontStyle = FONT_STYLES[RANDOM.nextInt(FONT_STYLES.length)];
       final int fontSize = 30
-        + (Sonar.get().getConfig().getVerification().getMap().isRandomizeFontSize() ? RANDOM.nextInt(11) : 10);
+        + (Sonar.get().getConfig().getVerification().getMap().isRandomizeFontSize() ? RANDOM.nextInt(11) : 5);
       @SuppressWarnings("all")
       final Font answerFont = new Font(fontType, fontStyle, fontSize);
       graphics.setFont(answerFont);
