@@ -925,22 +925,22 @@ public final class SonarConfiguration {
 
     messagesConfig.getYaml().setComment("verification.welcome",
       "Message that is shown to the player when they are being checked for valid gravity");
-    verification.gravity.youAreBeingChecked = deserialize(messagesConfig.getString("verification.welcome",
-      "<gray>Please wait a moment for the verification to finish..."));
+    verification.gravity.youAreBeingChecked = deserialize(formatString(messagesConfig.getString("verification.welcome",
+      "%prefix%<gray>Please wait a moment for the verification to finish...")));
 
     messagesConfig.getYaml().setComment("verification.captcha.enter-code",
       "Message that is shown to the player when they have to enter the answer to the captcha");
-    verification.map.enterCode = deserialize(messagesConfig.getString("verification.captcha.enter-code",
-      "<green>Please enter the code in chat that is displayed on the map."));
+    verification.map.enterCode = deserialize(formatString(messagesConfig.getString("verification.captcha.enter-code",
+      "%prefix%<green>Please enter the code in chat that is displayed on the map.")));
     messagesConfig.getYaml().setComment("verification.captcha.action-bar",
       "Timer that is shown to the player when they have to enter the answer to the captcha"
       + LINE_SEPARATOR + "(Set this to '' to disable the action bar message)");
-    verification.map.enterCodeActionBar = messagesConfig.getString("verification.captcha.action-bar",
-      "<green>You have %time-left% seconds left to enter the code in chat");
+    verification.map.enterCodeActionBar = formatString(messagesConfig.getString("verification.captcha.action-bar",
+      "%prefix%<green>You have %time-left% seconds left to enter the code in chat"));
     messagesConfig.getYaml().setComment("verification.captcha.incorrect",
       "Message that is shown to the player when they enter the wrong answer in chat");
-    verification.map.failedCaptcha = deserialize(messagesConfig.getString("verification.captcha.incorrect",
-      "<red>You have entered the wrong code. Please try again."));
+    verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect",
+      "%prefix%<red>You have entered the wrong code. Please try again.")));
 
     messagesConfig.getYaml().setComment("verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time");
