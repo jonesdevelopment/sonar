@@ -139,8 +139,7 @@ public class MapInfoPreparer {
         }
       }
       // Cache buffer to map
-      cached[i] = new PreparedMapInfo(answer, image.getWidth(), image.getHeight(),
-        image.getWidth() / 4, image.getHeight() / 4, buffer);
+      cached[i] = new PreparedMapInfo(answer, image.getWidth(), image.getHeight(), buffer);
     }
   }
 

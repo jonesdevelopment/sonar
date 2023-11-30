@@ -34,23 +34,21 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class MapData implements FallbackPacket {
-  private int scale;
   private MapInfo mapInfo;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     writeVarInt(byteBuf, 0);
 
-    final byte[] data = mapInfo.getBuffer();
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
-      byteBuf.writeShort(data.length + 3);
-      byteBuf.writeByte(0);
+      byteBuf.writeShort(mapInfo.getBuffer().length + 3);
+      byteBuf.writeByte(0); // scaling
       byteBuf.writeByte(mapInfo.getX());
       byteBuf.writeByte(mapInfo.getY());
 
-      byteBuf.writeBytes(data);
+      byteBuf.writeBytes(mapInfo.getBuffer());
     } else {
-      byteBuf.writeByte(scale);
+      byteBuf.writeByte(0); // scaling
 
       if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0
         && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) < 0) {
@@ -72,8 +70,8 @@ public final class MapData implements FallbackPacket {
       byteBuf.writeByte(mapInfo.getX());
       byteBuf.writeByte(mapInfo.getY());
 
-      writeVarInt(byteBuf, data.length);
-      byteBuf.writeBytes(data);
+      writeVarInt(byteBuf, mapInfo.getBuffer().length);
+      byteBuf.writeBytes(mapInfo.getBuffer());
     }
   }
 

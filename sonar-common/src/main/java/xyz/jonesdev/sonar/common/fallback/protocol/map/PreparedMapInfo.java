@@ -35,9 +35,8 @@ public final class PreparedMapInfo {
 
   public PreparedMapInfo(final String answer,
                          final int columns, final int rows,
-                         final int x, final int y,
                          final byte @NotNull [] buffer) {
-    this.info = new MapInfo(answer, columns, rows, x, y, buffer);
+    this.info = new MapInfo(answer, columns, rows, 0, 0, buffer);
 
     // Prepare 1.7 map data using a grid
     final byte[][] grid = new byte[DIMENSIONS][DIMENSIONS];
@@ -47,11 +46,11 @@ public final class PreparedMapInfo {
     }
     this.legacy = new MapData[grid.length];
     for (int i = 0; i < grid.length; i++) {
-      this.legacy[i] = new MapData(0, new MapInfo(answer, DIMENSIONS, DIMENSIONS, i, 0, grid[i]));
+      this.legacy[i] = new MapData(new MapInfo(answer, DIMENSIONS, DIMENSIONS, i, 0, grid[i]));
     }
 
     // Prepare 1.8+ map data
-    this.modern = new MapData(0, info);
+    this.modern = new MapData(info);
   }
 
   public void write(final @NotNull FallbackUser<?, ?> user) {
