@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.common.fallback;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
-import lombok.Setter;
 import lombok.val;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
@@ -50,26 +49,28 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener {
+  private static final Random RANDOM = new Random();
+
+  // General
+  private final SystemTimer login = new SystemTimer();
   private final @NotNull FallbackUser<?, ?> user;
   private final String username;
   private final UUID playerUuid;
+  private @NotNull State state = State.LOGIN_ACK; // 1.20.2
+
+  // Checks
   private short expectedTransactionId;
-  private long expectedKeepAliveId;
-  private int expectedTeleportId = -1;
-  private int tick, totalReceivedPackets;
-  private int ignoredMovementTicks;
+  private int expectedKeepAliveId, expectedTeleportId = -1;
+  private int tick, totalReceivedPackets, ignoredMovementTicks;
   private double posX, posY, posZ, lastY;
   private boolean resolvedClientBrand, resolvedClientSettings;
-  @Setter
-  private @NotNull State state = State.LOGIN_ACK;
   private boolean listenForMovements;
-  private @Nullable PreparedMapInfo captcha;
-  private int captchaTriesLeft;
 
-  private final SystemTimer login = new SystemTimer();
+  // Map captcha
   private final SystemTimer keepAlive = new SystemTimer();
   private final SystemTimer actionBar = new SystemTimer();
-  private static final Random RANDOM = new Random();
+  private @Nullable PreparedMapInfo captcha;
+  private int captchaTriesLeft;
 
   public enum State {
     // 1.20.2 configuration state
@@ -154,7 +155,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     final boolean v1_20_2 = user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0;
     if (!v1_20_2) {
       // Set the state to CLIENT_SETTINGS to avoid false positives
-      // and go on with the flow of the verification.
+      // (1.20.2 needs the LOGIN_ACK state) and go on with
+      // the flow of the verification.
       state = State.CLIENT_SETTINGS;
     }
     // Select the JoinGame packet for the respective protocol version
@@ -179,8 +181,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
       0f, -90f, expectedTeleportId, false));
     // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
-    user.delayedWrite(new DefaultSpawnPosition(
-      SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION, 0f));
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
+      user.delayedWrite(new DefaultSpawnPosition(
+        SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION, 0f));
+    }
   }
 
   private void sendChunkData() {
@@ -527,32 +531,24 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     tick++;
   }
 
-  private void assertState(final @NotNull State expectedState) {
-    checkFrame(state == expectedState, "expected " + expectedState + ", got " + state);
-  }
-
-  private void checkFrame(final boolean condition, final String message) {
-    if (!condition) {
-      user.fail(message);
-      throw new CorruptedFrameException(message);
-    }
-  }
-
   private void captchaOrFinish() {
     if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
-      if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
+      // Set the state to MAP_CAPTCHA, so we don't handle any unnecessary packets
+      state = State.MAP_CAPTCHA;
+      if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
+        && user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
         // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
         user.delayedWrite(CAPTCHA_SPAWN_POSITION);
       }
+      // Initialize the map captcha
       handleMapCaptcha();
     } else {
+      // Finish the verification
       finish();
     }
   }
 
   private void handleMapCaptcha() {
-    state = State.MAP_CAPTCHA;
-
     // Reset max tries
     captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
@@ -591,5 +587,27 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getSuccessLog()
       .replace("%name%", username)
       .replace("%time%", login.toString()));
+  }
+
+  /**
+   * Fails the verification if a certain state is unexpected.
+   *
+   * @param expectedState Expected state
+   */
+  private void assertState(final @NotNull State expectedState) {
+    checkFrame(state == expectedState, "expected " + expectedState + ", got " + state);
+  }
+
+  /**
+   * Checks if a certain condition is met, fails the verification if not.
+   *
+   * @param condition Condition to fail if it's false
+   * @param message Messages displayed in the stacktrace
+   */
+  private void checkFrame(final boolean condition, final String message) {
+    if (!condition) {
+      user.fail(message);
+      throw new CorruptedFrameException(message);
+    }
   }
 }
