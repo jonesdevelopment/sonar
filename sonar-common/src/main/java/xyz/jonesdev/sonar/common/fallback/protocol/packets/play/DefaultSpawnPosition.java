@@ -35,7 +35,6 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 @AllArgsConstructor
 public final class DefaultSpawnPosition implements FallbackPacket {
   private int x, y, z;
-  private float angle;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
@@ -51,7 +50,7 @@ public final class DefaultSpawnPosition implements FallbackPacket {
       byteBuf.writeLong(encoded);
 
       if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
-        byteBuf.writeFloat(angle);
+        byteBuf.writeFloat(0f);
       }
     }
   }

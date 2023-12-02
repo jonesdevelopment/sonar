@@ -50,6 +50,8 @@ public class FallbackPreparer {
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
+  // Default Spawn Position
+  public FallbackPacket dynamicSpawnPosition;
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
@@ -61,8 +63,9 @@ public class FallbackPreparer {
   public final FallbackPacket CAPTCHA_POSITION = new PositionLook(
     SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false);
   public final FallbackPacket CAPTCHA_SPAWN_POSITION = new DefaultSpawnPosition(
-    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f);
+    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION);
 
+  // Blocks
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 
   public int maxMovementTick, dynamicSpawnYPosition;
@@ -93,6 +96,7 @@ public class FallbackPreparer {
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
     dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + (int) Math.ceil(maxFallDistance);
+    dynamicSpawnPosition = new DefaultSpawnPosition(SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION);
 
     // Prepare collision platform positions
     int index = 0;

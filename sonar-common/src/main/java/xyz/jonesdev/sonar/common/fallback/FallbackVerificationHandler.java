@@ -182,8 +182,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       0f, -90f, expectedTeleportId, false));
     // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
-      user.delayedWrite(new DefaultSpawnPosition(
-        SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION, 0f));
+      user.delayedWrite(dynamicSpawnPosition);
     }
   }
 
