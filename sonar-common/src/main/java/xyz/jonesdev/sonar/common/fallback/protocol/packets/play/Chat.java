@@ -41,9 +41,15 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @AllArgsConstructor
 public final class Chat implements FallbackPacket {
   private static final UUID PLACEHOLDER_UUID = new UUID(0L, 0L);
+  private static final int DIV_FLOOR = -Math.floorDiv(-20, 8);
+
+  public static final byte CHAT_TYPE = (byte) 0;
+  public static final byte SYSTEM_TYPE = (byte) 1;
+  public static final byte GAME_INFO_TYPE = (byte) 2;
+
   private Component component;
   private String message;
-  private byte position;
+  private byte type;
   private boolean signedPreview;
   private boolean unsigned = false;
   private Instant timestamp;
@@ -51,11 +57,6 @@ public final class Chat implements FallbackPacket {
   private long salt;
   private boolean signed;
   private byte[] signature;
-  private static final int DIV_FLOOR = -Math.floorDiv(-20, 8);
-
-  public static final byte CHAT_TYPE = (byte) 0;
-  public static final byte SYSTEM_TYPE = (byte) 1;
-  public static final byte GAME_INFO_TYPE = (byte) 2;
 
   // Clientbound LegacyChat
   public Chat(final Component component) {
@@ -63,8 +64,8 @@ public final class Chat implements FallbackPacket {
   }
 
   // Clientbound LegacyChat
-  public Chat(final Component component, final byte position) {
-    this(component, null, position, false, false,
+  public Chat(final Component component, final byte type) {
+    this(component, null, type, false, false,
       null, null, 0L, false, null);
   }
 
@@ -76,11 +77,11 @@ public final class Chat implements FallbackPacket {
 
     // Type
     if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-      byteBuf.writeBoolean(position == GAME_INFO_TYPE);
+      byteBuf.writeBoolean(type == GAME_INFO_TYPE);
     } else if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeVarInt(byteBuf, position);
+      writeVarInt(byteBuf, type);
     } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-      byteBuf.writeByte(position);
+      byteBuf.writeByte(type);
     }
 
     // Sender

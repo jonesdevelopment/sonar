@@ -227,7 +227,7 @@ public enum FallbackPacketRegistry {
         map(0x0E, MINECRAFT_1_13, false),
         map(0x0F, MINECRAFT_1_15, false),
         map(0x0E, MINECRAFT_1_16, false),
-        map(0x0F, MINECRAFT_1_18_2, false),
+        map(0x0F, MINECRAFT_1_17, false),
         map(0x5F, MINECRAFT_1_19, false),
         map(0x62, MINECRAFT_1_19_1, false),
         map(0x60, MINECRAFT_1_19_3, false),
