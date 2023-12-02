@@ -25,33 +25,53 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfo;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_14;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class DefaultSpawnPosition implements FallbackPacket {
-  private int x, y, z;
+public final class MapData implements FallbackPacket {
+  private MapInfo mapInfo;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    writeVarInt(byteBuf, 0);
+
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
-      byteBuf.writeInt(x);
-      byteBuf.writeInt(y);
-      byteBuf.writeInt(z);
+      byteBuf.writeShort(mapInfo.getBuffer().length + 3);
+      byteBuf.writeByte(0); // scaling
+      byteBuf.writeByte(mapInfo.getX());
+      byteBuf.writeByte(mapInfo.getY());
+
+      byteBuf.writeBytes(mapInfo.getBuffer());
     } else {
-      final long encoded = protocolVersion.compareTo(MINECRAFT_1_14) < 0
-        ? ((x & 0x3FFFFFFL) << 38) | ((y & 0xFFFL) << 26) | (z & 0x3FFFFFFL)
-        : ((x & 0x3FFFFFFL) << 38) | ((y & 0x3FFFFFFL) << 12) | (z & 0xFFFL);
+      byteBuf.writeByte(0); // scaling
 
-      byteBuf.writeLong(encoded);
-
-      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
-        byteBuf.writeFloat(0f);
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0
+        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) < 0) {
+        byteBuf.writeBoolean(false);
       }
+
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_14) >= 0) {
+        byteBuf.writeBoolean(false);
+      }
+
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) >= 0) {
+        byteBuf.writeBoolean(false);
+      } else {
+        writeVarInt(byteBuf, 0);
+      }
+
+      byteBuf.writeByte(mapInfo.getColumns());
+      byteBuf.writeByte(mapInfo.getRows());
+      byteBuf.writeByte(mapInfo.getX());
+      byteBuf.writeByte(mapInfo.getY());
+
+      writeVarInt(byteBuf, mapInfo.getBuffer().length);
+      byteBuf.writeBytes(mapInfo.getBuffer());
     }
   }
 

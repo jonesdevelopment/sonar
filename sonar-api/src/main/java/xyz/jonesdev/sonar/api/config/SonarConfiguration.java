@@ -98,12 +98,49 @@ public final class SonarConfiguration {
     private Timing timing;
 
     @Getter
-    @RequiredArgsConstructor
     public enum Timing {
       ALWAYS, DURING_ATTACK, NEVER
     }
 
-    private boolean checkGravity;
+    private final Map map = new Map();
+    private final Gravity gravity = new Gravity();
+
+    @Getter
+    public static final class Map {
+      private boolean enabled;
+      private boolean drawBackgroundNoise;
+      private boolean randomizePositions;
+      private boolean randomizeFontSize;
+      private int precomputeAmount;
+      private int maxDuration;
+      private int maxTries;
+      private String dictionary;
+      private Component enterCode;
+      private Component failedCaptcha;
+      private String enterCodeActionBar;
+    }
+
+    @Getter
+    public static final class Gravity {
+      private boolean enabled;
+      private Gamemode gamemode;
+      private int maxMovementTicks;
+      private int maxIgnoredTicks;
+      private Component youAreBeingChecked;
+
+      @Getter
+      @RequiredArgsConstructor
+      public enum Gamemode {
+        SURVIVAL(0),
+        CREATIVE(1),
+        ADVENTURE(2),
+        // Keep this for backwards compatibility
+        SPECTATOR(2);
+
+        private final int id;
+      }
+    }
+
     private boolean logConnections;
     private boolean logDuringAttack;
     private boolean debugXYZPositions;
@@ -115,22 +152,7 @@ public final class SonarConfiguration {
     private String successLog;
     private String blacklistLog;
 
-    private Gamemode gamemode;
-
-    @Getter
-    @RequiredArgsConstructor
-    public enum Gamemode {
-      SURVIVAL(0),
-      CREATIVE(1),
-      ADVENTURE(2),
-      SPECTATOR(3);
-
-      private final int id;
-    }
-
     private int maxBrandLength;
-    private int maxMovementTicks;
-    private int maxIgnoredTicks;
     private int maxLoginPackets;
     private int maxPing;
     private int readTimeout;
@@ -413,17 +435,60 @@ public final class SonarConfiguration {
         + LINE_SEPARATOR + "All predicted motions are precalculated in order to save performance");
     generalConfig.getYaml().setComment("verification.checks.gravity.enabled",
       "Should Sonar check for valid client gravity? (Recommended)");
-    verification.checkGravity = generalConfig.getBoolean("verification.checks.gravity.enabled", true);
+    verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled", true);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-movement-ticks",
       "Maximum number of ticks the player has to fall in order to be allowed to hit the platform");
-    verification.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks", 8),
+    verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks", 8),
       2, 100);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-ignored-ticks",
       "Maximum number of ignored Y movement changes before a player fails verification");
-    verification.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5), 1,
-      128);
+    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5),
+      1, 128);
+
+    generalConfig.getYaml().setComment("verification.checks.gravity.gamemode",
+      "The gamemode of the player during verification"
+        + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR"
+        + LINE_SEPARATOR + "- SURVIVAL: all UI components are visible"
+        + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
+        + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible");
+    verification.gravity.gamemode = Verification.Gravity.Gamemode.valueOf(
+      generalConfig.getString("verification.checks.gravity.gamemode", Verification.Gravity.Gamemode.ADVENTURE.name()).toUpperCase());
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha",
+      "Make the player type a code from a virtual map in chat after the gravity check");
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.enabled",
+      "Should Sonar make the player pass a captcha?");
+    verification.map.enabled = generalConfig.getBoolean("verification.checks.map-captcha.enabled", false);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.background-noise",
+      "Should Sonar draw a white/light gray rectangle behind the captcha?");
+    verification.map.drawBackgroundNoise = generalConfig.getBoolean("verification.checks.map-captcha.background-noise", true);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.random-position",
+      "Should Sonar randomize the X and Y position of the captcha?");
+    verification.map.randomizePositions = generalConfig.getBoolean("verification.checks.map-captcha.random-position", true);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.random-font-size",
+      "Should Sonar randomize the size of the font used for rendering the captcha?");
+    verification.map.randomizeFontSize = generalConfig.getBoolean("verification.checks.map-captcha.random-font-size", true);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
+      "How many answers should Sonar precompute (prepare)?");
+    verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 10000);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
+      "How long should Sonar wait until the player fails the captcha?");
+    verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration", 45000);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.max-tries",
+      "How many times must a player fail the captcha before failing the verification?");
+    verification.map.maxTries = generalConfig.getInt("verification.checks.map-captcha.max-tries", 3);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.dictionary",
+      "Characters (letters and numbers) that are allowed to appear in the answer to the captcha");
+    verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary", "123456789");
 
     generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
       "Regex for validating usernames during verification");
@@ -451,16 +516,6 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.max-login-packets",
       "Maximum number of login packets the player has to send in order to be kicked");
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets", 256), 128, 8192);
-
-    generalConfig.getYaml().setComment("verification.gamemode",
-      "The gamemode of the player during verification"
-        + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR"
-        + LINE_SEPARATOR + "- SURVIVAL: all UI components are visible"
-        + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
-        + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible"
-        + LINE_SEPARATOR + "- SPECTATOR: all UI components are hidden (Recommended)");
-    verification.gamemode = Verification.Gamemode.valueOf(
-      generalConfig.getString("verification.gamemode", Verification.Gamemode.SPECTATOR.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.log-connections",
       "Should Sonar log new verification attempts?");
@@ -882,6 +937,25 @@ public final class SonarConfiguration {
       "Message that is logged to console whenever a player is verified");
     verification.successLog = formatString(messagesConfig.getString("verification.logs.successful",
       "%name% has been verified successfully (%time%s!)."));
+
+    messagesConfig.getYaml().setComment("verification.welcome",
+      "Message that is shown to the player when they are being checked for valid gravity");
+    verification.gravity.youAreBeingChecked = deserialize(formatString(messagesConfig.getString("verification.welcome",
+      "%prefix%<gray>Please wait a moment for the verification to finish...")));
+
+    messagesConfig.getYaml().setComment("verification.captcha.enter-code",
+      "Message that is shown to the player when they have to enter the answer to the captcha");
+    verification.map.enterCode = deserialize(formatString(messagesConfig.getString("verification.captcha.enter-code",
+      "%prefix%<green>Please enter the code in chat that is displayed on the map.")));
+    messagesConfig.getYaml().setComment("verification.captcha.action-bar",
+      "Timer that is shown to the player when they have to enter the answer to the captcha"
+      + LINE_SEPARATOR + "(Set this to '' to disable the action bar message)");
+    verification.map.enterCodeActionBar = formatString(messagesConfig.getString("verification.captcha.action-bar",
+      "%prefix%<green>You have %time-left% seconds left to enter the code in chat"));
+    messagesConfig.getYaml().setComment("verification.captcha.incorrect",
+      "Message that is shown to the player when they enter the wrong answer in chat");
+    verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect",
+      "%prefix%<red>You have entered the wrong code. Please try again.")));
 
     messagesConfig.getYaml().setComment("verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time");

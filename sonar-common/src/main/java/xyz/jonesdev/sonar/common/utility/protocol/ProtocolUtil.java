@@ -35,6 +35,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
+
 // Taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
@@ -48,6 +50,24 @@ public class ProtocolUtil {
   private static final String UNREGISTER_CHANNEL_LEGACY = "UNREGISTER";
   private static final String UNREGISTER_CHANNEL = "minecraft:unregister";
   private static final Pattern INVALID_IDENTIFIER_REGEX = Pattern.compile("[^a-z0-9\\-_]*");
+
+  public static @NotNull UUID readUUID(final @NotNull ByteBuf byteBuf) {
+    return new UUID(byteBuf.readLong(), byteBuf.readLong());
+  }
+
+  public static byte @NotNull [] readByteArray(final ByteBuf byteBuf) {
+    return readByteArray(byteBuf, Short.MAX_VALUE);
+  }
+
+  public static byte @NotNull [] readByteArray(final ByteBuf byteBuf, final int cap) {
+    int length = readVarInt(byteBuf);
+    checkFrame(length >= 0, "Got a negative-length array");
+    checkFrame(length <= cap, "Bad array size");
+    checkFrame(byteBuf.isReadable(length), "Trying to read an array that is too long");
+    byte[] array = new byte[length];
+    byteBuf.readBytes(array);
+    return array;
+  }
 
   public static @NotNull String readBrandMessage(final @NotNull ByteBuf content) throws DecoderException {
     final ByteBuf slice = content.slice();
