@@ -262,6 +262,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         }
         // Captcha is correct
         finish();
+        return;
       }
 
       // Every second
