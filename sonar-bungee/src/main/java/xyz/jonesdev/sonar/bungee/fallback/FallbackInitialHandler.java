@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.bungee.fallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
 import lombok.Getter;
 import lombok.val;
@@ -94,7 +95,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   public void handle(final StatusRequest statusRequest) throws Exception {
     // Fix status packet spam exploit
     if (receivedStatusPacket) {
-      throw new ConditionFailedException("Duplicate status packet");
+      throw new CorruptedFrameException("Duplicate status packet");
     }
     receivedStatusPacket = true;
     // Run the rest of the method asynchronously
@@ -102,7 +103,7 @@ public final class FallbackInitialHandler extends InitialHandler {
       // The channel always stays open because the client sends
       // a StatusRequest and a Ping packet after one another
       if (!isConnected()) {
-        throw new ConditionFailedException("Not connected anymore");
+        throw new CorruptedFrameException("Not connected anymore");
       }
       try {
         super.handle(statusRequest);
@@ -119,7 +120,7 @@ public final class FallbackInitialHandler extends InitialHandler {
 
     // Fix login packet spam exploit
     if (receivedLoginPacket || user != null) {
-      throw new ConditionFailedException("Duplicate login packet");
+      throw new CorruptedFrameException("Duplicate login packet");
     }
     receivedLoginPacket = true;
     // Cache protocol version so other handlers don't throw NPEs
