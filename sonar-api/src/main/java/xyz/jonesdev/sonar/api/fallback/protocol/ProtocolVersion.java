@@ -96,7 +96,7 @@ public enum ProtocolVersion {
       }
 
       SUPPORTED_VERSIONS = Collections.unmodifiableSet(versions);
-      LATEST_VERSION = new ArrayList<>(versions).get(versions.size() - 1);
+      LATEST_VERSION = (ProtocolVersion) versions.toArray()[versions.size() - 1];
     }
   }
 

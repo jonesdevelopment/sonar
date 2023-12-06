@@ -23,7 +23,7 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistrySync;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryData;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
@@ -48,13 +48,13 @@ public enum FallbackPacketRegistry {
   CONFIG {
     {
       clientbound.register(Disconnect.class, Disconnect::new,
-        map(0x01, MINECRAFT_1_20_2, false));
+        map(0x01, MINECRAFT_1_20_2, true));
       clientbound.register(FinishConfiguration.class, FinishConfiguration::new,
         map(0x02, MINECRAFT_1_20_2, false));
       clientbound.register(KeepAlive.class, KeepAlive::new,
         map(0x03, MINECRAFT_1_20_2, false));
-      clientbound.register(RegistrySync.class, RegistrySync::new,
-        map(0x05, MINECRAFT_1_20_2, false));
+      clientbound.register(RegistryData.class, RegistryData::new,
+        map(0x05, MINECRAFT_1_20_2, true));
 
       serverbound.register(ClientSettings.class, ClientSettings::new,
         map(0x00, MINECRAFT_1_20_2, false));
@@ -166,7 +166,8 @@ public enum FallbackPacketRegistry {
         map(0x40, MINECRAFT_1_19_1, true),
         map(0x3F, MINECRAFT_1_19_3, true),
         map(0x43, MINECRAFT_1_19_4, true),
-        map(0x45, MINECRAFT_1_20_2, true));
+        map(0x45, MINECRAFT_1_20_2, true),
+        map(0x47, MINECRAFT_1_20_3, true));
       clientbound.register(Transaction.class, Transaction::new,
         map(0x32, MINECRAFT_1_7_2, true),
         map(0x11, MINECRAFT_1_9, true),
@@ -194,7 +195,8 @@ public enum FallbackPacketRegistry {
         map(0x4D, MINECRAFT_1_19_1, true),
         map(0x4C, MINECRAFT_1_19_3, true),
         map(0x50, MINECRAFT_1_19_4, true),
-        map(0x52, MINECRAFT_1_20_2, true));
+        map(0x52, MINECRAFT_1_20_2, true),
+        map(0x54, MINECRAFT_1_20_3, true));
       clientbound.register(MapData.class, MapData::new,
         map(0x34, MINECRAFT_1_7_2, true),
         map(0x24, MINECRAFT_1_9, true),
@@ -232,7 +234,8 @@ public enum FallbackPacketRegistry {
         map(0x62, MINECRAFT_1_19_1, false),
         map(0x60, MINECRAFT_1_19_3, false),
         map(0x64, MINECRAFT_1_19_4, false),
-        map(0x67, MINECRAFT_1_20_2, false));
+        map(0x67, MINECRAFT_1_20_2, false),
+        map(0x69, MINECRAFT_1_20_2, false));
 
       serverbound.register(Chat.class, Chat::new,
         map(0x01, MINECRAFT_1_7_2, false),
@@ -256,7 +259,8 @@ public enum FallbackPacketRegistry {
         map(0x12, MINECRAFT_1_19_1, false),
         map(0x11, MINECRAFT_1_19_3, false),
         map(0x12, MINECRAFT_1_19_4, false),
-        map(0x14, MINECRAFT_1_20_2, false));
+        map(0x14, MINECRAFT_1_20_2, false),
+        map(0x15, MINECRAFT_1_20_3, false));
       serverbound.register(ClientSettings.class, ClientSettings::new,
         map(0x15, MINECRAFT_1_7_2, false),
         map(0x04, MINECRAFT_1_9, false),
@@ -294,7 +298,9 @@ public enum FallbackPacketRegistry {
         map(0x15, MINECRAFT_1_19_1, false),
         map(0x14, MINECRAFT_1_19_3, false),
         map(0x15, MINECRAFT_1_19_4, false),
-        map(0x17, MINECRAFT_1_20_2, false));
+        map(0x17, MINECRAFT_1_20_2, false),
+        map(0x18, MINECRAFT_1_20_3, false),
+        map(0x3E, MINECRAFT_1_20_3, false));
       serverbound.register(TeleportConfirm.class, TeleportConfirm::new,
         map(0x00, MINECRAFT_1_9, false));
       serverbound.register(Position.class, Position::new,
@@ -310,7 +316,8 @@ public enum FallbackPacketRegistry {
         map(0x14, MINECRAFT_1_19_1, false),
         map(0x13, MINECRAFT_1_19_3, false),
         map(0x14, MINECRAFT_1_19_4, false),
-        map(0x16, MINECRAFT_1_20_2, false));
+        map(0x16, MINECRAFT_1_20_2, false),
+        map(0x17, MINECRAFT_1_20_3, false));
       serverbound.register(Player.class, Player::new,
         map(0x03, MINECRAFT_1_7_2, false),
         map(0x0F, MINECRAFT_1_9, false),
@@ -324,7 +331,8 @@ public enum FallbackPacketRegistry {
         map(0x17, MINECRAFT_1_19_1, false),
         map(0x16, MINECRAFT_1_19_3, false),
         map(0x17, MINECRAFT_1_19_4, false),
-        map(0x19, MINECRAFT_1_20_2, false));
+        map(0x19, MINECRAFT_1_20_2, false),
+        map(0x1A, MINECRAFT_1_20_3, false));
       serverbound.register(Transaction.class, Transaction::new,
         map(0x0F, MINECRAFT_1_7_2, false),
         map(0x05, MINECRAFT_1_9, false),
@@ -337,7 +345,8 @@ public enum FallbackPacketRegistry {
         map(0x20, MINECRAFT_1_19_1, false),
         map(0x1F, MINECRAFT_1_19_3, false),
         map(0x20, MINECRAFT_1_19_4, false),
-        map(0x23, MINECRAFT_1_20_2, false));
+        map(0x23, MINECRAFT_1_20_2, false),
+        map(0x24, MINECRAFT_1_20_3, false));
     }
   };
 
@@ -358,14 +367,13 @@ public enum FallbackPacketRegistry {
     private final Map<ProtocolVersion, ProtocolRegistry> versions;
 
     PacketRegistry() {
-      Map<ProtocolVersion, ProtocolRegistry> mutableVersions = new EnumMap<>(ProtocolVersion.class);
-      for (ProtocolVersion version : ProtocolVersion.values()) {
+      final Map<ProtocolVersion, ProtocolRegistry> mutableVersions = new EnumMap<>(ProtocolVersion.class);
+      for (final ProtocolVersion version : ProtocolVersion.values()) {
         if (!version.isLegacy() && !version.isUnknown()) {
           mutableVersions.put(version, new ProtocolRegistry(version));
         }
       }
-
-      versions = Collections.unmodifiableMap(mutableVersions);
+      this.versions = Collections.unmodifiableMap(mutableVersions);
     }
 
     ProtocolRegistry getProtocolRegistry(final ProtocolVersion version) {
@@ -395,7 +403,7 @@ public enum FallbackPacketRegistry {
             break;
           }
 
-          final ProtocolRegistry registry = this.versions.get(protocol);
+          final ProtocolRegistry registry = versions.get(protocol);
           if (registry == null) {
             throw new IllegalArgumentException("Unknown protocol version "
               + current.protocolVersion);
@@ -424,14 +432,7 @@ public enum FallbackPacketRegistry {
     private static ProtocolVersion getProtocolVersion(final @NotNull PacketMapping current,
                                                       final @NotNull PacketMapping next,
                                                       final @NotNull ProtocolVersion from) {
-      final ProtocolVersion last = (ProtocolVersion) SUPPORTED_VERSIONS.toArray()[SUPPORTED_VERSIONS.size() - 1];
-      final ProtocolVersion to = current == next ? last : next.protocolVersion;
-
-      if (from.compareTo(to) >= 0 && from != last) {
-        throw new IllegalArgumentException(String.format(
-          "Next mapping version (%s) should be lower then current (%s)", to, from));
-      }
-      return to;
+      return current == next ? LATEST_VERSION : next.protocolVersion;
     }
   }
 
