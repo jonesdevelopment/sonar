@@ -159,7 +159,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // the flow of the verification.
       state = State.CLIENT_SETTINGS;
     }
-    // Select the JoinGame packet for the respective protocol version
+    // Send the JoinGame packet so we can continue the verification
     user.write(joinGame);
     if (v1_20_2) {
       // Perform the transaction check since the ClientSettings

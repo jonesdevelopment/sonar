@@ -29,7 +29,7 @@ import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamel
 
 @Getter
 @ToString
-public final class RegistrySync implements FallbackPacket {
+public final class RegistryData implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {

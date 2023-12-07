@@ -64,7 +64,8 @@ public enum ProtocolVersion {
   MINECRAFT_1_19_3(761),
   MINECRAFT_1_19_4(762),
   MINECRAFT_1_20(763),
-  MINECRAFT_1_20_2(764);
+  MINECRAFT_1_20_2(764),
+  MINECRAFT_1_20_3(765);
 
   @Getter
   private final int protocol;
@@ -95,7 +96,7 @@ public enum ProtocolVersion {
       }
 
       SUPPORTED_VERSIONS = Collections.unmodifiableSet(versions);
-      LATEST_VERSION = new ArrayList<>(versions).get(versions.size() - 1);
+      LATEST_VERSION = (ProtocolVersion) versions.toArray()[versions.size() - 1];
     }
   }
 

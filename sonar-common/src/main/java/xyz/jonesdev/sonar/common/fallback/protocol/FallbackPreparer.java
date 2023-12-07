@@ -25,7 +25,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfoPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistrySync;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryData;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 @UtilityClass
@@ -39,7 +39,7 @@ public class FallbackPreparer {
   // Finish Configuration
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfiguration();
   // Synchronize Registry
-  public final FallbackPacket REGISTRY_SYNC = new RegistrySync();
+  public final FallbackPacket REGISTRY_SYNC = new RegistryData();
   // Keep Alive
   public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlive(0L);
   // Chat
