@@ -1,14 +1,15 @@
 <div align="center">
   <!-- Introduction -->
-  <p>
+  <div>
     <h1>💫 Sonar</h1>
     Lightweight and easy-to-use anti-bot plugin for your Minecraft server. Supporting every client and server version.
     <br>
     An effective and extensible solution for protecting your Minecraft server against all kinds of bot attacks
-  </p>
+  </div>
   
   <!-- Badges & icons -->
   [![](https://github.com/jonesdevelopment/sonar/actions/workflows/gradle.yml/badge.svg)](https://github.com/jonesdevelopment/sonar/actions/workflows/gradle.yml)
+  [![](https://www.codefactor.io/repository/github/jonesdevelopment/sonar/badge/main)](https://www.codefactor.io/repository/github/jonesdevelopment/sonar/overview/main)
   [![](https://img.shields.io/github/v/release/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/releases)
   [![](https://img.shields.io/github/issues/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/issues)
   [![](https://img.shields.io/discord/923308209769426994.svg?logo=discord)](https://jonesdev.xyz/discord)
