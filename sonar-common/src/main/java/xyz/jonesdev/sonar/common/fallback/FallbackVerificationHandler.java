@@ -602,7 +602,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
    * Checks if a certain condition is met, fails the verification if not.
    *
    * @param condition Condition to fail if it's false
-   * @param message Messages displayed in the stacktrace
+   * @param message   Messages displayed in the stacktrace
    */
   private void checkFrame(final boolean condition, final String message) {
     if (!condition) {
