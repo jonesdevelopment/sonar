@@ -28,40 +28,40 @@ import java.util.Random;
 public class MapInfoPreparer {
   private final Random RANDOM = new Random();
 
-  private final String[] FONT_TYPES = new String[] {
+  private final String[] FONT_TYPES = new String[]{
     Font.DIALOG_INPUT,
     Font.DIALOG,
     Font.SANS_SERIF,
     Font.SERIF
   };
 
-  private final int[] FONT_STYLES = new int[] {
+  private final int[] FONT_STYLES = new int[]{
     Font.PLAIN,
     Font.BOLD,
     Font.ITALIC,
     Font.ITALIC | Font.BOLD
   };
 
-  private final int[][] COLOR_PALETTE = new int[][] {
-    new int[] { // Blue
+  private final int[][] COLOR_PALETTE = new int[][]{
+    new int[]{ // Blue
       48,
       49,
       50,
       51
     },
-    new int[] { // Black
+    new int[]{ // Black
       27,
       45,
       46,
       47,
     },
-    new int[] { // Green
+    new int[]{ // Green
       4,
       28,
       29,
       30,
     },
-    new int[] { // Red
+    new int[]{ // Red
       16,
       17,
       18,
@@ -78,7 +78,8 @@ public class MapInfoPreparer {
 
     for (int i = 0; i < cached.length; i++) {
       // Create image
-      final BufferedImage image = new BufferedImage(PreparedMapInfo.DIMENSIONS, PreparedMapInfo.DIMENSIONS, BufferedImage.TYPE_3BYTE_BGR);
+      final BufferedImage image = new BufferedImage(PreparedMapInfo.DIMENSIONS, PreparedMapInfo.DIMENSIONS,
+        BufferedImage.TYPE_3BYTE_BGR);
       final Graphics2D graphics = image.createGraphics();
 
       graphics.setColor(Color.WHITE);
@@ -88,8 +89,7 @@ public class MapInfoPreparer {
       final int fontStyle = FONT_STYLES[RANDOM.nextInt(FONT_STYLES.length)];
       final int fontSize = 30
         + (Sonar.get().getConfig().getVerification().getMap().isRandomizeFontSize() ? RANDOM.nextInt(11) : 5);
-      @SuppressWarnings("all")
-      final Font answerFont = new Font(fontType, fontStyle, fontSize);
+      @SuppressWarnings("all") final Font answerFont = new Font(fontType, fontStyle, fontSize);
       graphics.setFont(answerFont);
 
       // Build answer to the captcha

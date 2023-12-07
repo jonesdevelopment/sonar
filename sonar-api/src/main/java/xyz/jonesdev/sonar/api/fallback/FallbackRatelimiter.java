@@ -32,6 +32,15 @@ public final class FallbackRatelimiter {
   private ExpiringCache<InetAddress> expiringCache;
 
   /**
+   * We don't want to clean up the cache in the
+   * {@link #attempt(InetAddress)} method because
+   * it would take up too many resources.
+   */
+  public void cleanUpCache() {
+    expiringCache.cleanUp(false);
+  }
+
+  /**
    * Checks if the player has tried verifying too fast
    *
    * @param inetAddress IP address of the player
@@ -39,11 +48,9 @@ public final class FallbackRatelimiter {
    */
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean attempt(final @NotNull InetAddress inetAddress) {
-    // Clean up the cache
-    expiringCache.cleanUp(false);
-
     // Cache the IP address if it's not already cached
     if (!expiringCache.has(inetAddress)) {
+      // Cache the IP address
       expiringCache.put(inetAddress);
       return true;
     }

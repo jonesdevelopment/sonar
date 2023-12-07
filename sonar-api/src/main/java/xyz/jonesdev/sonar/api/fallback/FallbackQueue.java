@@ -69,5 +69,7 @@ public final class FallbackQueue {
 
     // Run the attack check task
     Sonar.get().getAttackTracker().checkIfUnderAttack();
+    // Clean up the cache of rate-limited IPs
+    Sonar.get().getFallback().getRatelimiter().cleanUpCache();
   }
 }

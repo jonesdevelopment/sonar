@@ -439,12 +439,14 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-movement-ticks",
       "Maximum number of ticks the player has to fall in order to be allowed to hit the platform");
-    verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks", 8),
+    verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity" +
+        ".max-movement-ticks", 8),
       2, 100);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-ignored-ticks",
       "Maximum number of ignored Y movement changes before a player fails verification");
-    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks", 5),
+    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks"
+        , 5),
       1, 128);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.gamemode",
@@ -464,15 +466,18 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.background-noise",
       "Should Sonar draw a white/light gray rectangle behind the captcha?");
-    verification.map.drawBackgroundNoise = generalConfig.getBoolean("verification.checks.map-captcha.background-noise", true);
+    verification.map.drawBackgroundNoise = generalConfig.getBoolean("verification.checks.map-captcha" +
+      ".background-noise", true);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-position",
       "Should Sonar randomize the X and Y position of the captcha?");
-    verification.map.randomizePositions = generalConfig.getBoolean("verification.checks.map-captcha.random-position", true);
+    verification.map.randomizePositions = generalConfig.getBoolean("verification.checks.map-captcha.random-position",
+      true);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-font-size",
       "Should Sonar randomize the size of the font used for rendering the captcha?");
-    verification.map.randomizeFontSize = generalConfig.getBoolean("verification.checks.map-captcha.random-font-size", true);
+    verification.map.randomizeFontSize = generalConfig.getBoolean("verification.checks.map-captcha.random-font-size",
+      true);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
       "How many answers should Sonar precompute (prepare)?");
@@ -540,16 +545,18 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.whitelisted-protocols",
       "List of protocol IDs which are not checked by Sonar (verification bypass)"
-      + LINE_SEPARATOR + "You can find the full list of all protocol IDs here:"
-      + LINE_SEPARATOR + "https://wiki.vg/Protocol_version_numbers"
-      + LINE_SEPARATOR + "For example, Minecraft 1.20 has the ID 763.");
+        + LINE_SEPARATOR + "You can find the full list of all protocol IDs here:"
+        + LINE_SEPARATOR + "https://wiki.vg/Protocol_version_numbers"
+        + LINE_SEPARATOR + "For example, Minecraft 1.20 has the ID 763.");
     verification.whitelistedProtocols.clear();
-    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols", new ArrayList<>(0)));
+    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols",
+      new ArrayList<>(0)));
 
     generalConfig.getYaml().setComment("verification.blacklisted-protocols",
       "List of protocol IDs which are unable to join the server at all");
     verification.blacklistedProtocols.clear();
-    verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols", new ArrayList<>(0)));
+    verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols",
+      new ArrayList<>(0)));
 
     generalConfig.getYaml().setComment("webhook",
       "Bot attack notifications can also be sent to your Discord server using webhooks");
@@ -949,7 +956,7 @@ public final class SonarConfiguration {
       "%prefix%<green>Please enter the code in chat that is displayed on the map.")));
     messagesConfig.getYaml().setComment("verification.captcha.action-bar",
       "Timer that is shown to the player when they have to enter the answer to the captcha"
-      + LINE_SEPARATOR + "(Set this to '' to disable the action bar message)");
+        + LINE_SEPARATOR + "(Set this to '' to disable the action bar message)");
     verification.map.enterCodeActionBar = formatString(messagesConfig.getString("verification.captcha.action-bar",
       "%prefix%<green>You have %time-left% seconds left to enter the code in chat"));
     messagesConfig.getYaml().setComment("verification.captcha.incorrect",
@@ -1028,7 +1035,8 @@ public final class SonarConfiguration {
 
     messagesConfig.getYaml().setComment("verification.blacklisted-protocol",
       "Disconnect message that is shown when someone joins with a blacklisted version");
-    verification.protocolBlacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted-protocol",
+    verification.protocolBlacklisted = deserialize(fromList(messagesConfig.getStringList("verification" +
+        ".blacklisted-protocol",
       Arrays.asList(
         "%header%",
         "<red>You are using a version that is not allowed on our server.",

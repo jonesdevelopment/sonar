@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 
+@Getter
 @RequiredArgsConstructor
 public enum ProtocolVersion {
   UNKNOWN(-1),
@@ -67,7 +68,6 @@ public enum ProtocolVersion {
   MINECRAFT_1_20_2(764),
   MINECRAFT_1_20_3(765);
 
-  @Getter
   private final int protocol;
 
   public static final ProtocolVersion MINIMUM_VERSION = MINECRAFT_1_7_2;
