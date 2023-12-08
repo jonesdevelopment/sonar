@@ -155,7 +155,6 @@ public final class SonarConfiguration {
     private int maxBrandLength;
     private int maxLoginPackets;
     private int maxPing;
-    private int readTimeout;
     private int reconnectDelay;
     private final Collection<Integer> whitelistedProtocols = new HashSet<>(0);
     private final Collection<Integer> blacklistedProtocols = new HashSet<>(0);
@@ -534,10 +533,6 @@ public final class SonarConfiguration {
       "Should Sonar log every single movement/position change during verification?"
         + LINE_SEPARATOR + "This is not recommended for production servers but can be helpful for spotting errors.");
     verification.debugXYZPositions = generalConfig.getBoolean("verification.debug-xyz-positions", false);
-
-    generalConfig.getYaml().setComment("verification.read-timeout",
-      "Amount of time that has to pass before a player times out");
-    verification.readTimeout = clamp(generalConfig.getInt("verification.read-timeout", 3500), 500, 30000);
 
     generalConfig.getYaml().setComment("verification.rejoin-delay",
       "Minimum number of rejoin delay during verification");

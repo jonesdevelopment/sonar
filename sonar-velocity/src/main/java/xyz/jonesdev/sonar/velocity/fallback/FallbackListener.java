@@ -249,12 +249,8 @@ public final class FallbackListener {
 
           // Add better timeout handler to avoid known exploits or issues
           // We also want to timeout bots quickly to avoid flooding
-          pipeline.replace(
-            READ_TIMEOUT,
-            READ_TIMEOUT,
-            new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(),
-              TimeUnit.MILLISECONDS)
-          );
+          final int readTimeout = SonarVelocity.INSTANCE.getPlugin().getServer().getConfiguration().getReadTimeout();
+          pipeline.replace(READ_TIMEOUT, READ_TIMEOUT, new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
 
           // We need to determine if the player is premium before we handle the connection,
           // so we can create a ConnectedPlayer instance without having to spoof this

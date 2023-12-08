@@ -45,7 +45,6 @@ import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
-import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
@@ -63,7 +62,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import static net.md_5.bungee.netty.PipelineUtils.*;
+import static net.md_5.bungee.netty.PipelineUtils.PACKET_DECODER;
+import static net.md_5.bungee.netty.PipelineUtils.PACKET_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_19_1;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_19_3;
@@ -239,15 +239,6 @@ public final class FallbackInitialHandler extends InitialHandler {
             return;
           }
 
-          // Add better timeout handler to avoid known exploits or issues
-          // We also want to timeout bots quickly to avoid flooding
-          pipeline.replace(
-            TIMEOUT_HANDLER,
-            TIMEOUT_HANDLER,
-            new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(),
-              TimeUnit.MILLISECONDS)
-          );
-
           // Disconnect if the protocol version could not be resolved
           if (user.getProtocolVersion().isUnknown()) {
             closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getInvalidProtocol()));
@@ -305,10 +296,8 @@ public final class FallbackInitialHandler extends InitialHandler {
             ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
 
           // Replace normal decoder to allow custom packets
-          user.getPipeline().replace(
-            PACKET_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(user,
-              new FallbackVerificationHandler(user, loginRequest.getData(), uuid)
-            ));
+          user.getPipeline().replace(PACKET_DECODER, FALLBACK_PACKET_DECODER,
+            new FallbackPacketDecoder(user, new FallbackVerificationHandler(user, loginRequest.getData(), uuid)));
         }));
       } catch (Throwable throwable) {
         throw new ReflectiveOperationException(throwable);

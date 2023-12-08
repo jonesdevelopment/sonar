@@ -33,14 +33,13 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final FallbackUser<?, ?> user;
   private final FallbackPacketListener listener;
-  private @NotNull FallbackPacketRegistry.ProtocolRegistry registry;
+  private FallbackPacketRegistry.ProtocolRegistry registry;
 
   public FallbackPacketDecoder(final @NotNull FallbackUser<?, ?> user,
                                final @NotNull FallbackPacketListener listener) {
     this.user = user;
-    this.registry = (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME)
-      .getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
     this.listener = listener;
+    updateRegistry(user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME);
   }
 
   public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
