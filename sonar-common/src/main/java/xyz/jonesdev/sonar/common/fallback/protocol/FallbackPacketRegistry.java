@@ -236,6 +236,8 @@ public enum FallbackPacketRegistry {
         map(0x64, MINECRAFT_1_19_4, false),
         map(0x67, MINECRAFT_1_20_2, false),
         map(0x69, MINECRAFT_1_20_2, false));
+      clientbound.register(GameEvent.class, GameEvent::new,
+        map(0x20, MINECRAFT_1_20_3, true));
 
       serverbound.register(Chat.class, Chat::new,
         map(0x01, MINECRAFT_1_7_2, false),

@@ -42,6 +42,8 @@ public class FallbackPreparer {
   public final FallbackPacket REGISTRY_SYNC = new RegistryData();
   // Keep Alive
   public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlive(0L);
+  // Game Event (1.20.3+)
+  public final FallbackPacket START_WRITING_CHUNKS = new GameEvent(13, 0);
   // Chat
   public FallbackPacket enterCodeMessage;
   public FallbackPacket youAreBeingChecked;
