@@ -301,8 +301,7 @@ public enum FallbackPacketRegistry {
         map(0x14, MINECRAFT_1_19_3, false),
         map(0x15, MINECRAFT_1_19_4, false),
         map(0x17, MINECRAFT_1_20_2, false),
-        map(0x18, MINECRAFT_1_20_3, false),
-        map(0x3E, MINECRAFT_1_20_3, false));
+        map(0x18, MINECRAFT_1_20_3, false));
       serverbound.register(TeleportConfirm.class, TeleportConfirm::new,
         map(0x00, MINECRAFT_1_9, false));
       serverbound.register(Position.class, Position::new,
