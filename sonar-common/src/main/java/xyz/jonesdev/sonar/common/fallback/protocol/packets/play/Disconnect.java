@@ -17,11 +17,13 @@
 
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
+import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -29,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import java.util.Objects;
-
+import static xyz.jonesdev.sonar.common.utility.nbt.NBTMessageUtil.fromJson;
+import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
 
 @Getter
@@ -39,10 +41,15 @@ import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeStrin
 @AllArgsConstructor
 public final class Disconnect implements FallbackPacket {
   private @Nullable String reason;
+  private BinaryTag binaryTag;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    writeString(byteBuf, Objects.requireNonNull(reason));
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_3) >= 0) {
+      writeNamelessCompoundTag(byteBuf, binaryTag);
+    } else {
+      writeString(byteBuf, reason);
+    }
   }
 
   @Override
@@ -51,6 +58,8 @@ public final class Disconnect implements FallbackPacket {
   }
 
   public static @NotNull Disconnect create(final Component component) {
-    return new Disconnect(JSONComponentSerializer.json().serialize(component));
+    final String serialized = JSONComponentSerializer.json().serialize(component);
+    final BinaryTag binaryTag = fromJson(new JsonParser().parse(serialized));
+    return new Disconnect(serialized, binaryTag);
   }
 }

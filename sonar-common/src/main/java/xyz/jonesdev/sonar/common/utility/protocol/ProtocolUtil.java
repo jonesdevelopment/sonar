@@ -24,9 +24,7 @@ import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import lombok.experimental.UtilityClass;
-import net.kyori.adventure.nbt.BinaryTagIO;
-import net.kyori.adventure.nbt.BinaryTagTypes;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
@@ -139,10 +137,40 @@ public class ProtocolUtil {
     }
   }
 
-  public static void writeNamelessCompoundTag(final @NotNull ByteBuf byteBuf, final CompoundBinaryTag compoundTag) {
+  // Taken from
+  // https://github.com/Nan1t/NanoLimbo/pull/79/files#diff-4aa8208044741102c6326c7e85086e6fa8fcc7c064f7df6fd0411baf5f2b4504
+  public static void writeNamelessCompoundTag(final @NotNull ByteBuf byteBuf, final @NotNull BinaryTag binaryTag) {
     try (final ByteBufOutputStream output = new ByteBufOutputStream(byteBuf)) {
-      output.writeByte(BinaryTagTypes.COMPOUND.id());
-      BinaryTagTypes.COMPOUND.write(compoundTag, output);
+      // TODO: Find a way to improve this...
+      output.writeByte(binaryTag.type().id());
+      if (binaryTag instanceof CompoundBinaryTag) {
+        CompoundBinaryTag tag = (CompoundBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      } else if (binaryTag instanceof ByteBinaryTag) {
+        ByteBinaryTag tag = (ByteBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      } else if (binaryTag instanceof ShortBinaryTag) {
+        ShortBinaryTag tag = (ShortBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      } else if (binaryTag instanceof IntBinaryTag) {
+        IntBinaryTag tag = (IntBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      } else if (binaryTag instanceof LongBinaryTag) {
+        LongBinaryTag tag = (LongBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      } else if (binaryTag instanceof DoubleBinaryTag) {
+        DoubleBinaryTag tag = (DoubleBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      } else if (binaryTag instanceof StringBinaryTag) {
+        StringBinaryTag tag = (StringBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      } else if (binaryTag instanceof ListBinaryTag) {
+        ListBinaryTag tag = (ListBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      } else if (binaryTag instanceof EndBinaryTag) {
+        EndBinaryTag tag = (EndBinaryTag) binaryTag;
+        tag.type().write(tag, output);
+      }
     } catch (IOException exception) {
       throw new EncoderException("Unable to encode NBT CompoundTag");
     }

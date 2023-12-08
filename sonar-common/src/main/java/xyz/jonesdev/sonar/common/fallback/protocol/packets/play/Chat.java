@@ -17,11 +17,13 @@
 
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
+import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +34,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
+import static xyz.jonesdev.sonar.common.utility.nbt.NBTMessageUtil.fromJson;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
@@ -58,6 +61,9 @@ public final class Chat implements FallbackPacket {
   private boolean signed;
   private byte[] signature;
 
+  // 1.20.3
+  private BinaryTag nbtMessage;
+
   // Clientbound LegacyChat
   public Chat(final Component component) {
     this(component, SYSTEM_TYPE);
@@ -65,15 +71,23 @@ public final class Chat implements FallbackPacket {
 
   // Clientbound LegacyChat
   public Chat(final Component component, final byte type) {
-    this(component, null, type, false, false,
-      null, null, 0L, false, null);
+    this(component, JSONComponentSerializer.json().serialize(component), type);
+  }
+
+  public Chat(final Component component, final String message, final byte type) {
+    this(component, message, type,
+      false, false, null, null,
+      0L, false, null, fromJson(new JsonParser().parse(message)));
   }
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     // Serialized message
-    final String serialized = JSONComponentSerializer.json().serialize(component);
-    writeString(byteBuf, serialized);
+    if (protocolVersion.compareTo(MINECRAFT_1_20_3) >= 0) {
+      writeNamelessCompoundTag(byteBuf, nbtMessage);
+    } else {
+      writeString(byteBuf, message);
+    }
 
     // Type
     if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
