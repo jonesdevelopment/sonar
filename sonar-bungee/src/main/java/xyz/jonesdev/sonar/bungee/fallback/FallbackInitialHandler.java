@@ -311,7 +311,7 @@ public final class FallbackInitialHandler extends InitialHandler {
     });
   }
 
-  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new ConcurrentHashMap<>(16);
+  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new ConcurrentHashMap<>(10);
 
   public static @NotNull Kick getKickPacket(final @NotNull Component component) {
     Kick cachedKickPacket = CACHED_KICK_PACKETS.get(component);
