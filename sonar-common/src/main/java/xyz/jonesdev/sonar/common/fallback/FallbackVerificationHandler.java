@@ -195,7 +195,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Make sure the client knows that we're sending chunks next
       user.delayedWrite(START_WRITING_CHUNKS);
     }
-    user.delayedWrite(EMPTY_CHUNK_DATA);
     // Teleport player into the fake lobby by sending an empty chunk
     user.delayedWrite(EMPTY_CHUNK_DATA);
     // Send an UpdateSectionBlocks packet with a platform of blocks
