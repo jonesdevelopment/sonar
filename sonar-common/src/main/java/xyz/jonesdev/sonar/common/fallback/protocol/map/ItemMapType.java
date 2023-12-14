@@ -67,6 +67,8 @@ public enum ItemMapType {
       case MINECRAFT_1_20:
       case MINECRAFT_1_20_2:
         return 941;
+      case MINECRAFT_1_20_3:
+        return 979;
     }
   });
 

@@ -481,7 +481,7 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
       "How many answers should Sonar precompute (prepare)?");
-    verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 10000);
+    verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 1000);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
       "How long should Sonar wait until the player fails the captcha?");

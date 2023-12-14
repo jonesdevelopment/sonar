@@ -67,8 +67,10 @@ public final class UpdateSectionBlocks implements FallbackPacket {
         }
       }
     } else {
+      // We only need one Y position
       final int sectionY = changedBlocks[0].getPosition().getY() >> 4;
 
+      // https://wiki.vg/Protocol#Update_Section_Blocks
       byteBuf.writeLong(((sectionX & 0x3FFFFFL) << 42) | (sectionY & 0xFFFFF) | ((sectionZ & 0x3FFFFFL) << 20));
 
       // 1.20+ don't have light update suppression
