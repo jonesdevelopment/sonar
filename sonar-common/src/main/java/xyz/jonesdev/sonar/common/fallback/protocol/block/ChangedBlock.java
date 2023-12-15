@@ -24,16 +24,15 @@ import org.jetbrains.annotations.NotNull;
 public final class ChangedBlock {
   private final @NotNull BlockPosition position;
   private final BlockType type;
-  private final int legacyChunkPosCrammed, modernChunkPosCrammed;
+  private final int legacyBlockState, blockState;
 
   public ChangedBlock(final @NotNull BlockPosition position, final BlockType type) {
     this.position = position;
     this.type = type;
-    this.legacyChunkPosCrammed = position.getX() - (position.getChunkX() << 4) << 12
-      | position.getZ() - (position.getChunkZ() << 4) << 8
-      | position.getY();
-    this.modernChunkPosCrammed = position.getX() - (position.getChunkX() << 4) << 8
-      | position.getZ() - (position.getChunkZ() << 4) << 4
-      | position.getY() - ((position.getY() >> 4) << 4);
+    final int x = position.getX() - (position.getChunkX() << 4);
+    final int y = position.getY();
+    final int z = position.getZ() - (position.getChunkZ() << 4);
+    this.legacyBlockState = x << 12 | z << 8 | y;
+    this.blockState = x << 8 | z << 4 | y - ((y >> 4) << 4);
   }
 }
