@@ -26,7 +26,6 @@ public final class SubcommandRegistryHolder implements SubcommandRegistry {
       new BlacklistCommand(),
       new VerifiedCommand(),
       new StatisticsCommand(),
-      new LockdownCommand(),
       new VerboseCommand(),
       new ReloadCommand(),
       new DumpCommand()

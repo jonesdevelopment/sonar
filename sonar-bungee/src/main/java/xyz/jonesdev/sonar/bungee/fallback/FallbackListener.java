@@ -18,12 +18,8 @@
 package xyz.jonesdev.sonar.bungee.fallback;
 
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.event.LoginEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
@@ -56,43 +52,6 @@ public final class FallbackListener implements Listener {
         final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) event.getConnection();
         final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
         fallbackInitialHandler.closeWith(FallbackInitialHandler.getKickPacket(component));
-      }
-    }
-  }
-
-  @EventHandler
-  @SuppressWarnings("deprecation")
-  public void handle(final @NotNull PostLoginEvent event) {
-    if (Sonar.get().getConfig().getLockdown().isEnabled()) {
-      if (!event.getPlayer().hasPermission(Sonar.get().getConfig().getLockdown().getBypassPermission())) {
-        final PendingConnection pendingConnection = event.getPlayer().getPendingConnection();
-        // Try to close the channel with a custom serialized disconnect component
-        if (pendingConnection instanceof FallbackInitialHandler) {
-          final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) pendingConnection;
-          final Component component = Sonar.get().getConfig().getLockdown().getDisconnect();
-          fallbackInitialHandler.closeWith(FallbackInitialHandler.getKickPacket(component));
-        } else {
-          // Fallback by disconnecting without a message
-          pendingConnection.disconnect();
-          Sonar.get().getLogger().warn("Fallback handler of {} is missing", event.getPlayer().getName());
-          return;
-        }
-
-        if (Sonar.get().getConfig().getLockdown().isLogAttempts()) {
-          Sonar.get().getLogger().info(Sonar.get().getConfig().getLockdown().getConsoleLog()
-            .replace("%player%", event.getPlayer().getName())
-            .replace("%ip%", Sonar.get().getConfig()
-              .formatAddress(event.getPlayer().getAddress().getAddress()))
-            .replace("%protocol%",
-              String.valueOf(event.getPlayer().getPendingConnection().getVersion())));
-        }
-      } else if (Sonar.get().getConfig().getLockdown().isNotifyAdmins()) {
-        final Audience audience = Sonar.get().getVerboseHandler().getAudiences().get(event.getPlayer().getName());
-        if (audience != null) {
-          final String notification = Sonar.get().getConfig().getLockdown().getNotification();
-          final Component deserialized = MiniMessage.miniMessage().deserialize(notification);
-          audience.sendMessage(deserialized);
-        }
       }
     }
   }
