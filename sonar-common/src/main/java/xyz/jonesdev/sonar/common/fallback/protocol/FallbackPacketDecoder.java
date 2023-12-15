@@ -33,14 +33,13 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final FallbackUser<?, ?> user;
   private final FallbackPacketListener listener;
-  private @NotNull FallbackPacketRegistry.ProtocolRegistry registry;
+  private FallbackPacketRegistry.ProtocolRegistry registry;
 
   public FallbackPacketDecoder(final @NotNull FallbackUser<?, ?> user,
                                final @NotNull FallbackPacketListener listener) {
     this.user = user;
-    this.registry = (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME)
-      .getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
     this.listener = listener;
+    updateRegistry(user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME);
   }
 
   public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
@@ -66,8 +65,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       final int packetId = readVarInt(byteBuf);
       final FallbackPacket packet = registry.createPacket(packetId);
 
-      // If the packet hasn't been found, skip it
-      // TODO: Can we fail the verification afterwards?
+      // If the packet isn't found, skip it
       if (packet == null) {
         byteBuf.readerIndex(originalReaderIndex);
         return;
@@ -93,6 +91,9 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         // Let our verification handler process the packet
         listener.handle(packet);
+
+        // Fire channel read to avoid timeout
+        ctx.fireChannelRead(packet);
       } finally {
         // Release the ByteBuf to avoid memory leaks
         byteBuf.release();

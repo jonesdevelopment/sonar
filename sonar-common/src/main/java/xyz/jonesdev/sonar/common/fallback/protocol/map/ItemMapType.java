@@ -27,7 +27,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public enum ItemMapType {
   FILLED_MAP(protocolVersion -> {
-    // Link: https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/1.20/items.json
+    // Useful resources:
+    // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
+    // - https://pokechu22.github.io/Burger/1.20.4.html
+    // - https://github.com/ViaVersion/Mappings/tree/main/mappings
     switch (protocolVersion) {
       default:
         // 1.7-1.12.2
@@ -67,6 +70,8 @@ public enum ItemMapType {
       case MINECRAFT_1_20:
       case MINECRAFT_1_20_2:
         return 941;
+      case MINECRAFT_1_20_3:
+        return 979;
     }
   });
 

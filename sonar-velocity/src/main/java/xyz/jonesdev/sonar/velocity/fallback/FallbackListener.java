@@ -249,12 +249,8 @@ public final class FallbackListener {
 
           // Add better timeout handler to avoid known exploits or issues
           // We also want to timeout bots quickly to avoid flooding
-          pipeline.replace(
-            READ_TIMEOUT,
-            READ_TIMEOUT,
-            new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(),
-              TimeUnit.MILLISECONDS)
-          );
+          final int readTimeout = Sonar.get().getConfig().getVerification().getReadTimeout();
+          pipeline.replace(READ_TIMEOUT, READ_TIMEOUT, new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
 
           // We need to determine if the player is premium before we handle the connection,
           // so we can create a ConnectedPlayer instance without having to spoof this
@@ -340,10 +336,8 @@ public final class FallbackListener {
             ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
 
           // Replace normal decoder to allow custom packets
-          user.getPipeline().replace(
-            MINECRAFT_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(user,
-              new FallbackVerificationHandler(user, gameProfile.getName(), connectedPlayer.getUniqueId())
-            ));
+          user.getPipeline().replace(MINECRAFT_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(user,
+            new FallbackVerificationHandler(user, gameProfile.getName(), connectedPlayer.getUniqueId())));
         }));
       } catch (Throwable throwable) {
         throw new ReflectiveOperationException(throwable);

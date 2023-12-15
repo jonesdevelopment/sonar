@@ -28,7 +28,10 @@ import java.util.function.Function;
 public enum BlockType {
   STONE(protocolVersion -> 1),
   BARRIER(protocolVersion -> {
-    // Link: https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/1.20/blocks.json
+    // Useful resources:
+    // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
+    // - https://pokechu22.github.io/Burger/1.20.4.html
+    // - https://github.com/ViaVersion/Mappings/tree/main/mappings
     switch (protocolVersion) {
       case MINECRAFT_1_7_2:
       case MINECRAFT_1_7_6:
@@ -73,6 +76,7 @@ public enum BlockType {
       case MINECRAFT_1_20:
         return 10225;
       case MINECRAFT_1_20_2:
+      case MINECRAFT_1_20_3:
         return 10366;
     }
   });

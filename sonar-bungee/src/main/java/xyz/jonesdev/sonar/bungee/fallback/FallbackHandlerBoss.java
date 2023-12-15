@@ -18,12 +18,14 @@
 package xyz.jonesdev.sonar.bungee.fallback;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.haproxy.HAProxyMessage;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.connection.DownstreamBridge;
 import net.md_5.bungee.connection.UpstreamBridge;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PacketHandler;
+import net.md_5.bungee.protocol.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
 
 public final class FallbackHandlerBoss extends HandlerBoss {
@@ -57,6 +59,13 @@ public final class FallbackHandlerBoss extends HandlerBoss {
     if (handler != null) {
       handler.writabilityChanged(channel);
       super.channelWritabilityChanged(ctx);
+    }
+  }
+
+  @Override
+  public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+    if (msg instanceof HAProxyMessage || msg instanceof PacketWrapper) {
+      super.channelRead(ctx, msg);
     }
   }
 

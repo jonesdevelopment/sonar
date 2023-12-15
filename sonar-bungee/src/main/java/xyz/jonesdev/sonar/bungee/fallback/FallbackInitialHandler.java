@@ -241,12 +241,9 @@ public final class FallbackInitialHandler extends InitialHandler {
 
           // Add better timeout handler to avoid known exploits or issues
           // We also want to timeout bots quickly to avoid flooding
-          pipeline.replace(
-            TIMEOUT_HANDLER,
-            TIMEOUT_HANDLER,
-            new FallbackTimeoutHandler(Sonar.get().getConfig().getVerification().getReadTimeout(),
-              TimeUnit.MILLISECONDS)
-          );
+          final int readTimeout = Sonar.get().getConfig().getVerification().getReadTimeout();
+          pipeline.replace(TIMEOUT_HANDLER, TIMEOUT_HANDLER,
+            new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
 
           // Disconnect if the protocol version could not be resolved
           if (user.getProtocolVersion().isUnknown()) {
@@ -305,10 +302,8 @@ public final class FallbackInitialHandler extends InitialHandler {
             ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
 
           // Replace normal decoder to allow custom packets
-          user.getPipeline().replace(
-            PACKET_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(user,
-              new FallbackVerificationHandler(user, loginRequest.getData(), uuid)
-            ));
+          user.getPipeline().replace(PACKET_DECODER, FALLBACK_PACKET_DECODER,
+            new FallbackPacketDecoder(user, new FallbackVerificationHandler(user, loginRequest.getData(), uuid)));
         }));
       } catch (Throwable throwable) {
         throw new ReflectiveOperationException(throwable);
@@ -316,7 +311,7 @@ public final class FallbackInitialHandler extends InitialHandler {
     });
   }
 
-  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new ConcurrentHashMap<>(16);
+  private static final Map<Component, Kick> CACHED_KICK_PACKETS = new ConcurrentHashMap<>(10);
 
   public static @NotNull Kick getKickPacket(final @NotNull Component component) {
     Kick cachedKickPacket = CACHED_KICK_PACKETS.get(component);

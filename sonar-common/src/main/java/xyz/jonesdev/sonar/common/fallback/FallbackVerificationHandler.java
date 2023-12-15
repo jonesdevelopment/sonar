@@ -190,6 +190,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to POSITION to avoid false positives
     // and go on with the flow of the verification.
     state = State.POSITION;
+    // 1.20.3 packets introduced game events
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_3) >= 0) {
+      // Make sure the client knows that we're sending chunks next
+      user.delayedWrite(START_WRITING_CHUNKS);
+    }
     // Teleport player into the fake lobby by sending an empty chunk
     user.delayedWrite(EMPTY_CHUNK_DATA);
     // Send an UpdateSectionBlocks packet with a platform of blocks
