@@ -48,8 +48,6 @@ public final class SonarConfiguration {
   @Getter
   private final Verification verification = new Verification();
   @Getter
-  private final Lockdown lockdown = new Lockdown();
-  @Getter
   private final Database database = new Database();
   @Getter
   private final Webhook webhook = new Webhook();
@@ -242,21 +240,6 @@ public final class SonarConfiguration {
 
   @Getter
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static final class Lockdown {
-    @Setter
-    private boolean enabled;
-    private boolean notifyAdmins;
-    private boolean logAttempts;
-    private Component disconnect;
-    private String bypassPermission;
-    private String activated;
-    private String deactivated;
-    private String notification;
-    private String consoleLog;
-  }
-
-  @Getter
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Webhook {
     private String url;
     private String username;
@@ -387,27 +370,6 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("database.password",
       "Password for authenticating with the SQL database");
     database.password = generalConfig.getString("database.password", "");
-
-    // Lockdown
-    generalConfig.getYaml().setComment("lockdown",
-      "You can lock your server down using '/sonar lockdown' if, for example,"
-        + LINE_SEPARATOR + "bots are bypassing the verification or any other reason");
-    generalConfig.getYaml().setComment("lockdown.enabled",
-      "Should Sonar prevent all players from joining the server?");
-    lockdown.enabled = generalConfig.getBoolean("lockdown.enabled", false);
-
-    generalConfig.getYaml().setComment("lockdown.log-attempts",
-      "Should Sonar log new login attempts during lockdown?");
-    lockdown.logAttempts = generalConfig.getBoolean("lockdown.log-attempts", true);
-
-    generalConfig.getYaml().setComment("lockdown.notify-admins",
-      "Should Sonar notify admins when they join the server during lockdown?");
-    lockdown.notifyAdmins = generalConfig.getBoolean("lockdown.notify-admins", true);
-
-    generalConfig.getYaml().setComment("lockdown.bypass-permission",
-      "Which permission does a player need in order to bypass the lockdown mode?"
-        + LINE_SEPARATOR + "Players with this permission will also receive admin notifications when joining");
-    lockdown.bypassPermission = generalConfig.getString("lockdown.bypass-permission", "sonar.lockdown.bypass");
 
     // Queue
     generalConfig.getYaml().setComment("queue",
@@ -703,29 +665,6 @@ public final class SonarConfiguration {
     commands.subCommandNoPerm = formatString(messagesConfig.getString("commands.subcommand-no-permission",
       "%prefix%<red>You do not have permission to execute this subcommand. <gray>(%permission%)"));
 
-    messagesConfig.getYaml().setComment("lockdown",
-      "Translations for '/sonar lockdown'");
-    messagesConfig.getYaml().setComment("lockdown.notification",
-      "Message that is shown when an admin joins the server during lockdown");
-    lockdown.notification = formatString(messagesConfig.getString("lockdown.notification",
-      "%prefix%<green>Hey, the server is currently in lockdown mode. If you want to disable the lockdown mode,"
-        + " type <white>/sonar lockdown<green>."
-    ));
-
-    messagesConfig.getYaml().setComment("lockdown.console-log",
-      "Message that is shown to console when a normal player tries joining the server during lockdown");
-    lockdown.consoleLog = messagesConfig.getString("lockdown.console-log",
-      "%player% (%ip%, %protocol%) tried to join during lockdown mode.");
-
-    messagesConfig.getYaml().setComment("lockdown.disconnect-message",
-      "Message that is shown to a normal player when they try joining the server during lockdown");
-    lockdown.disconnect = deserialize(fromList(messagesConfig.getStringList("lockdown.disconnect-message",
-      Arrays.asList(
-        "%header%",
-        "<red>The server is currently locked down, please try again later.",
-        "%footer%"
-      ))));
-
     messagesConfig.getYaml().setComment("commands.main",
       "Translations for '/sonar'");
     messagesConfig.getYaml().setComment("commands.main.header",
@@ -764,18 +703,6 @@ public final class SonarConfiguration {
       "Message that is shown when Sonar has finished reloading");
     commands.reloaded = formatString(messagesConfig.getString("commands.reload.finish",
       "%prefix%<green>Successfully reloaded <gray>(%taken%ms)"));
-
-    messagesConfig.getYaml().setComment("commands.lockdown",
-      "Translations for '/sonar lockdown'");
-    messagesConfig.getYaml().setComment("commands.lockdown.enabled",
-      "Message that is shown when a player enables server lockdown");
-    lockdown.activated = formatString(messagesConfig.getString("commands.lockdown.enabled",
-      "%prefix%The server is now in lockdown mode."));
-
-    messagesConfig.getYaml().setComment("commands.lockdown.disabled",
-      "Message that is shown when a player disables server lockdown");
-    lockdown.deactivated = formatString(messagesConfig.getString("commands.lockdown.disabled",
-      "%prefix%The server is no longer in lockdown mode."));
 
     messagesConfig.getYaml().setComment("commands.verbose",
       "Translations for '/sonar verbose'");
