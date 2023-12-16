@@ -222,7 +222,7 @@ public class MapInfoPreparer {
               final int index = y * image.getWidth() + x;
               if (pixel == -16777216 && RANDOM.nextInt(100) < 97) continue;
               // Set color of pixel to random color from the palette
-              final byte color = (byte) (pixel == -16777216 ? RANDOM.nextInt(100) < 75 ? 14 : index
+              final byte color = (byte) (pixel == -16777216 ? RANDOM.nextInt(100) < 75 ? 14 : RANDOM.nextInt(Byte.MAX_VALUE)
                 : pixel != -65536 ? colorPalette[RANDOM.nextInt(colorPalette.length)]
                 : nextColorPalette[RANDOM.nextInt(nextColorPalette.length)]);
               // Write pixel color to buffer
