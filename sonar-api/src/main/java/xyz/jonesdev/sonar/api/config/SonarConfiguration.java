@@ -175,6 +175,7 @@ public final class SonarConfiguration {
     private Component alreadyQueued;
     private Component blacklisted;
     private Component protocolBlacklisted;
+    private Component currentlyPreparing;
   }
 
   @Getter
@@ -459,7 +460,9 @@ public final class SonarConfiguration {
       true);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
-      "How many answers should Sonar precompute (prepare)?");
+      "How many answers should Sonar precompute (prepare)?"
+      + LINE_SEPARATOR + "This task happens asynchronously in the background;"
+      + LINE_SEPARATOR + "Players are able to join once one captcha has been prepared");
     verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 1000);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
@@ -912,6 +915,16 @@ public final class SonarConfiguration {
       "Message that is shown to the player when they enter the wrong answer in chat");
     verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect",
       "%prefix%<red>You have entered the wrong code. Please try again.")));
+
+    messagesConfig.getYaml().setComment("verification.currently-preparing",
+      "Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet");
+    verification.currentlyPreparing = deserialize(fromList(messagesConfig.getStringList("verification.currently-preparing",
+      Arrays.asList(
+        "%header%",
+        "<yellow>Your anti-bot data has not been prepared yet.",
+        "<gray>Please wait a few seconds before trying to verify again.",
+        "%footer%"
+      ))));
 
     messagesConfig.getYaml().setComment("verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time");

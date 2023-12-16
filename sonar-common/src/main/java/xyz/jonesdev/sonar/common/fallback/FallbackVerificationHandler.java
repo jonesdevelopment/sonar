@@ -538,6 +538,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private void captchaOrFinish() {
     if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
+      if (MapInfoPreparer.getPreparedCAPTCHAs() == 0) {
+        // This should not happen, but we have to return if there is no captcha prepared
+        user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
+        return;
+      }
       // Set the state to MAP_CAPTCHA, so we don't handle any unnecessary packets
       state = State.MAP_CAPTCHA;
       if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
@@ -554,12 +559,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void handleMapCaptcha() {
-    if (MapInfoPreparer.getPreparedCAPTCHAs() == 0) {
-      // This should never happen
-      user.getChannel().close();
-      return;
-    }
-
     // Reset max tries
     captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
