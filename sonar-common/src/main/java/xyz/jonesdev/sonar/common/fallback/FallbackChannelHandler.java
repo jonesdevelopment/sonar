@@ -24,20 +24,21 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
 
 @RequiredArgsConstructor
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
   private static final @NotNull Fallback FALLBACK = Sonar.get().getFallback();
   private final @NotNull String username;
+  private final @NotNull InetAddress inetAddress;
 
   @Override
   public void channelUnregistered(final @NotNull ChannelHandlerContext ctx) {
     // Remove the username from the connected players
     FALLBACK.getConnected().remove(username);
     // Remove the IP address from the queue
-    FALLBACK.getQueue().remove(((InetSocketAddress) ctx.channel().remoteAddress()).getAddress());
-
+    FALLBACK.getQueue().remove(inetAddress);
+    // Make sure other handlers also know we've disconnected
     ctx.fireChannelUnregistered();
   }
 }

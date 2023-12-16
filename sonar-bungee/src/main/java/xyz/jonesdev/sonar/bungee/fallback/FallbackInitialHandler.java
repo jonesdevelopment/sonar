@@ -224,7 +224,7 @@ public final class FallbackInitialHandler extends InitialHandler {
 
         // We have to add this pipeline to monitor whenever the client disconnects
         // to remove them from the list of connected and queued players
-        pipeline.addFirst(FALLBACK_HANDLER, new FallbackChannelHandler(loginRequest.getData()));
+        pipeline.addFirst(FALLBACK_HANDLER, new FallbackChannelHandler(loginRequest.getData(), inetAddress));
 
         // Queue the connection for further processing
         FALLBACK.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
