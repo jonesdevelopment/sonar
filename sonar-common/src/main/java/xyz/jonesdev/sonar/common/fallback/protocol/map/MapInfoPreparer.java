@@ -135,9 +135,9 @@ public class MapInfoPreparer {
           // Create random font
           final String fontType = fontTypes[RANDOM.nextInt(fontTypes.length)];
           final int fontStyle = FONT_STYLES[RANDOM.nextInt(FONT_STYLES.length)];
-          final int fontSize = 30
+          final int fontSize = 27
             + (config.isRandomizeFontSize()
-            ? RANDOM.nextInt(7) - 3 : 3);
+            ? RANDOM.nextInt(6) - 2 : 5);
           @SuppressWarnings("all") final Font answerFont = new Font(fontType, fontStyle, fontSize);
           graphics.setFont(answerFont);
 
