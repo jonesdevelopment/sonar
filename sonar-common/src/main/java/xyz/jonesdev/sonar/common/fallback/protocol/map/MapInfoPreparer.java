@@ -161,7 +161,6 @@ public class MapInfoPreparer {
           for (final char c : answer.toCharArray()) {
             // Randomize x and y
             if (config.isRandomizePositions()) {
-              _x += RANDOM.nextInt(2) - 1;
               _y += RANDOM.nextInt(8) - 4;
             }
 
