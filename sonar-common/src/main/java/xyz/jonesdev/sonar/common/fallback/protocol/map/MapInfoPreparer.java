@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol.map;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.awt.*;
@@ -94,26 +95,34 @@ public class MapInfoPreparer {
   public void prepare() {
     final SystemTimer timer = new SystemTimer();
     Sonar.get().getLogger().info("Precomputing map captcha answers...");
-    System.out.println(preparedCAPTCHAs + " | " + currentlyPreparing);
+
+    // Make sure we're not running into concurrency issues
     if (currentlyPreparing) {
       Sonar.get().getLogger().warn("Did not precompute map captcha answers as another task is running.");
       return;
     }
+
+    // Reset all statistics
     preparedCAPTCHAs = 0;
     currentlyPreparing = true;
+    final SonarConfiguration.Verification.Map config = Sonar.get().getConfig().getVerification().getMap();
     cached = null;
-    cached = new PreparedMapInfo[Sonar.get().getConfig().getVerification().getMap().getPrecomputeAmount()];
+    cached = new PreparedMapInfo[config.getPrecomputeAmount()];
 
-    final String dictionary = Sonar.get().getConfig().getVerification().getMap().getDictionary();
-    final List<String> fonts = Sonar.get().getConfig().getVerification().getMap().getFonts();
+    // Prepare fonts from config
+    final String dictionary = config.getDictionary();
+    final List<String> fonts = config.getFonts();
     if (fonts.isEmpty()) {
       Sonar.get().getLogger().warn("No fonts found, using fallback font...");
       fonts.add(DIALOG);
     }
     final String[] fontTypes = fonts.toArray(new String[0]);
 
-    final double distortionsFactorX = Sonar.get().getConfig().getVerification().getMap().getDistortionsFactorX();
-    final double distortionsFactorY = Sonar.get().getConfig().getVerification().getMap().getDistortionsFactorY();
+    // Prepare distortions values from config
+    final double distortionsFactorX = config.getDistortionsFactorX();
+    final double distortionsFactorY = config.getDistortionsFactorY();
+    final double halfDistortionsFactorX = distortionsFactorX / 2D;
+    final double halfDistortionsFactorY = distortionsFactorY / 2D;
 
     for (int _i = 0; _i < cached.length; _i++) {
       final int currentIndex = _i;
@@ -127,7 +136,7 @@ public class MapInfoPreparer {
           final String fontType = fontTypes[RANDOM.nextInt(fontTypes.length)];
           final int fontStyle = FONT_STYLES[RANDOM.nextInt(FONT_STYLES.length)];
           final int fontSize = 30
-            + (Sonar.get().getConfig().getVerification().getMap().isRandomizeFontSize()
+            + (config.isRandomizeFontSize()
             ? RANDOM.nextInt(7) - 3 : 3);
           @SuppressWarnings("all") final Font answerFont = new Font(fontType, fontStyle, fontSize);
           graphics.setFont(answerFont);
@@ -143,7 +152,7 @@ public class MapInfoPreparer {
           final int stringWidth = graphics.getFontMetrics().stringWidth(answer);
           final int halfWidth = image.getWidth() / 2;
           final int halfHeight = image.getHeight() / 2;
-          final int spacing = 6;
+          final int spacing = 5;
           double _x = halfWidth - stringWidth / 2f - spacing;
           double _y = halfHeight + fontSize / 3f;
 
@@ -151,14 +160,14 @@ public class MapInfoPreparer {
           final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
           for (final char c : answer.toCharArray()) {
             // Randomize x and y
-            if (Sonar.get().getConfig().getVerification().getMap().isRandomizePositions()) {
+            if (config.isRandomizePositions()) {
               _x += RANDOM.nextInt(2) - 1;
               _y += RANDOM.nextInt(8) - 4;
             }
 
             // Apply random distortion
-            final double distortionFactorX = RANDOM.nextDouble() * distortionsFactorX - (distortionsFactorX / 2D);
-            final double distortionFactorY = RANDOM.nextDouble() * distortionsFactorY - (distortionsFactorY / 2D);
+            final double distortionFactorX = RANDOM.nextDouble() * distortionsFactorX - halfDistortionsFactorX;
+            final double distortionFactorY = RANDOM.nextDouble() * distortionsFactorY - halfDistortionsFactorY;
 
             // Create a GlyphVector for the character
             final String character = String.valueOf(c);
@@ -181,7 +190,7 @@ public class MapInfoPreparer {
           graphics.setColor(Color.RED);
 
           // Draw random lines
-          for (int i = 0; i < Sonar.get().getConfig().getVerification().getMap().getRandomLinesAmount(); i++) {
+          for (int i = 0; i < config.getRandomLinesAmount(); i++) {
             final int startX = RANDOM.nextInt(halfWidth);
             final int startY = RANDOM.nextInt(halfHeight);
             final int endX = halfWidth + RANDOM.nextInt(halfWidth);
@@ -191,7 +200,7 @@ public class MapInfoPreparer {
           }
 
           // Draw random ovals
-          for (int i = 0; i < Sonar.get().getConfig().getVerification().getMap().getRandomOvalsAmount(); i++) {
+          for (int i = 0; i < config.getRandomOvalsAmount(); i++) {
             final int startX = RANDOM.nextInt(halfWidth);
             final int startY = RANDOM.nextInt(halfHeight);
             final int endX = halfWidth + RANDOM.nextInt(halfWidth);
@@ -202,7 +211,7 @@ public class MapInfoPreparer {
 
           // Select random color palette
           final int[] colorPalette = COLOR_PALETTE[currentIndex % COLOR_PALETTE.length];
-          // Select random color palette
+          // Select the next color palette for geometry
           final int[] nextColorPalette = COLOR_PALETTE[(currentIndex + 1) % COLOR_PALETTE.length];
           // Clear background
           Arrays.fill(buffer, (byte) 57);

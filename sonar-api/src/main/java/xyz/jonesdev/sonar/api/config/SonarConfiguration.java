@@ -440,11 +440,13 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.distortions-factor-x",
       "How much should Sonar distort characters (factor for randomization)?");
-    verification.map.distortionsFactorX = clamp(generalConfig.getInt("verification.checks.map-captcha.distortions-factor-x", 50), 0, 100) / 100D;
+    verification.map.distortionsFactorX = clamp(generalConfig.getInt(
+      "verification.checks.map-captcha.distortions-factor-x", 50), 0, 100) / 100D;
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.distortions-factor-y",
       "How much should Sonar distort characters (factor for randomization)?");
-    verification.map.distortionsFactorY = clamp(generalConfig.getInt("verification.checks.map-captcha.distortions-factor-y", 50), 0, 100) / 100D;
+    verification.map.distortionsFactorY = clamp(generalConfig.getInt(
+      "verification.checks.map-captcha.distortions-factor-y", 50), 0, 100) / 100D;
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-lines",
       "How many random lines behind the captcha should Sonar draw?");
@@ -461,8 +463,8 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
       "How many answers should Sonar precompute (prepare)?"
-      + LINE_SEPARATOR + "This task happens asynchronously in the background;"
-      + LINE_SEPARATOR + "Players are able to join once one captcha has been prepared");
+        + LINE_SEPARATOR + "This task happens asynchronously in the background;"
+        + LINE_SEPARATOR + "Players are able to join once one captcha has been prepared");
     verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 1000);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
@@ -918,7 +920,8 @@ public final class SonarConfiguration {
 
     messagesConfig.getYaml().setComment("verification.currently-preparing",
       "Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet");
-    verification.currentlyPreparing = deserialize(fromList(messagesConfig.getStringList("verification.currently-preparing",
+    verification.currentlyPreparing = deserialize(fromList(messagesConfig.getStringList(
+      "verification.currently-preparing",
       Arrays.asList(
         "%header%",
         "<yellow>Your anti-bot data has not been prepared yet.",
