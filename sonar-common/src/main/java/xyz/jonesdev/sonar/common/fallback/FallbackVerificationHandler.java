@@ -554,6 +554,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void handleMapCaptcha() {
+    if (MapInfoPreparer.getPreparedCAPTCHAs() == 0) {
+      // This should never happen
+      user.getChannel().close();
+      return;
+    }
+
     // Reset max tries
     captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 

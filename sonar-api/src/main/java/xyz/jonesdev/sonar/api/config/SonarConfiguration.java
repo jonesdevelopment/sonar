@@ -27,8 +27,10 @@ import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.dependencies.Dependency;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
+import java.awt.*;
 import java.io.File;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -106,9 +108,10 @@ public final class SonarConfiguration {
     @Getter
     public static final class Map {
       private boolean enabled;
-      private boolean drawBackgroundNoise;
       private boolean randomizePositions;
       private boolean randomizeFontSize;
+      private int randomLinesAmount;
+      private int randomOvalsAmount;
       private int precomputeAmount;
       private int maxDuration;
       private int maxTries;
@@ -116,6 +119,7 @@ public final class SonarConfiguration {
       private Component enterCode;
       private Component failedCaptcha;
       private String enterCodeActionBar;
+      private List<String> fonts;
     }
 
     @Getter
@@ -426,15 +430,18 @@ public final class SonarConfiguration {
       "Should Sonar make the player pass a captcha?");
     verification.map.enabled = generalConfig.getBoolean("verification.checks.map-captcha.enabled", false);
 
-    generalConfig.getYaml().setComment("verification.checks.map-captcha.background-noise",
-      "Should Sonar draw a white/light gray rectangle behind the captcha?");
-    verification.map.drawBackgroundNoise = generalConfig.getBoolean("verification.checks.map-captcha" +
-      ".background-noise", true);
-
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-position",
       "Should Sonar randomize the X and Y position of the captcha?");
     verification.map.randomizePositions = generalConfig.getBoolean("verification.checks.map-captcha.random-position",
       true);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.random-lines",
+      "How many random lines behind the captcha should Sonar draw?");
+    verification.map.randomLinesAmount = generalConfig.getInt("verification.checks.map-captcha.random-lines", 4);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.random-ovals",
+      "How many random ovals behind the captcha should Sonar draw?");
+    verification.map.randomOvalsAmount = generalConfig.getInt("verification.checks.map-captcha.random-ovals", 1);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-font-size",
       "Should Sonar randomize the size of the font used for rendering the captcha?");
@@ -456,6 +463,11 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.map-captcha.dictionary",
       "Characters (letters and numbers) that are allowed to appear in the answer to the captcha");
     verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary", "123456789");
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.fonts",
+      "Which font types should Sonar use for the map captcha codes?");
+    verification.map.fonts = generalConfig.getStringList("verification.checks.map-captcha.fonts",
+      Arrays.asList(Font.DIALOG, Font.DIALOG_INPUT, Font.SERIF, Font.SANS_SERIF));
 
     generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
       "Regex for validating usernames during verification");
