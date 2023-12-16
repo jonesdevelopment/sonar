@@ -98,6 +98,9 @@ public class MapInfoPreparer {
     }
     final String[] fontTypes = fonts.toArray(new String[0]);
 
+    final double distortionsFactorX = Sonar.get().getConfig().getVerification().getMap().getDistortionsFactorX();
+    final double distortionsFactorY = Sonar.get().getConfig().getVerification().getMap().getDistortionsFactorY();
+
     for (preparedCAPTCHAs = 0; preparedCAPTCHAs < cached.length; preparedCAPTCHAs++) {
       final int currentIndex = preparedCAPTCHAs;
       final byte[] buffer = new byte[PreparedMapInfo.SCALE];
@@ -141,8 +144,8 @@ public class MapInfoPreparer {
           }
 
           // Apply random distortion
-          final double distortionFactorX = RANDOM.nextDouble() * 0.5 - 0.25;
-          final double distortionFactorY = RANDOM.nextDouble() * 0.5 - 0.25;
+          final double distortionFactorX = RANDOM.nextDouble() * distortionsFactorX - (distortionsFactorX / 2D);
+          final double distortionFactorY = RANDOM.nextDouble() * distortionsFactorY - (distortionsFactorY / 2D);
 
           // Create a GlyphVector for the character
           final String character = String.valueOf(c);

@@ -110,6 +110,8 @@ public final class SonarConfiguration {
       private boolean enabled;
       private boolean randomizePositions;
       private boolean randomizeFontSize;
+      private double distortionsFactorX;
+      private double distortionsFactorY;
       private int randomLinesAmount;
       private int randomOvalsAmount;
       private int precomputeAmount;
@@ -434,6 +436,14 @@ public final class SonarConfiguration {
       "Should Sonar randomize the X and Y position of the captcha?");
     verification.map.randomizePositions = generalConfig.getBoolean("verification.checks.map-captcha.random-position",
       true);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.distortions-factor-x",
+      "How much should Sonar distort characters (factor for randomization)?");
+    verification.map.distortionsFactorX = clamp(generalConfig.getInt("verification.checks.map-captcha.distortions-factor-x", 50), 0, 100) / 50D;
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.distortions-factor-y",
+      "How much should Sonar distort characters (factor for randomization)?");
+    verification.map.distortionsFactorY = clamp(generalConfig.getInt("verification.checks.map-captcha.distortions-factor-y", 50), 0, 100) / 50D;
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-lines",
       "How many random lines behind the captcha should Sonar draw?");
