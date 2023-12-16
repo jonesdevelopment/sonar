@@ -439,11 +439,11 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.distortions-factor-x",
       "How much should Sonar distort characters (factor for randomization)?");
-    verification.map.distortionsFactorX = clamp(generalConfig.getInt("verification.checks.map-captcha.distortions-factor-x", 50), 0, 100) / 50D;
+    verification.map.distortionsFactorX = clamp(generalConfig.getInt("verification.checks.map-captcha.distortions-factor-x", 50), 0, 100) / 100D;
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.distortions-factor-y",
       "How much should Sonar distort characters (factor for randomization)?");
-    verification.map.distortionsFactorY = clamp(generalConfig.getInt("verification.checks.map-captcha.distortions-factor-y", 50), 0, 100) / 50D;
+    verification.map.distortionsFactorY = clamp(generalConfig.getInt("verification.checks.map-captcha.distortions-factor-y", 50), 0, 100) / 100D;
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-lines",
       "How many random lines behind the captcha should Sonar draw?");
