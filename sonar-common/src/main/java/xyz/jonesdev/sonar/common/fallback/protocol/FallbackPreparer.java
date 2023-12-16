@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
@@ -120,7 +121,7 @@ public class FallbackPreparer {
       youAreBeingChecked = new Chat(Sonar.get().getConfig().getVerification().getGravity().getYouAreBeingChecked());
     }
 
-    if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
+    if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER) {
       enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCode());
       incorrectCaptcha = new Chat(Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha());
 

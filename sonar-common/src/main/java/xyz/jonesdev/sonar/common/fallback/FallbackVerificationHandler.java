@@ -537,7 +537,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void captchaOrFinish() {
-    if (Sonar.get().getConfig().getVerification().getMap().isEnabled()) {
+    if (user.getFallback().shouldDoMapCaptcha()) {
       if (MapInfoPreparer.getPreparedCAPTCHAs() == 0) {
         // This should not happen, but we have to return if there is no captcha prepared
         user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());

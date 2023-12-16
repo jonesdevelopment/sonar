@@ -107,7 +107,7 @@ public final class SonarConfiguration {
 
     @Getter
     public static final class Map {
-      private boolean enabled;
+      private Timing timing;
       private boolean randomizePositions;
       private boolean randomizeFontSize;
       private double distortionsFactorX;
@@ -408,15 +408,13 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-movement-ticks",
       "Maximum number of ticks the player has to fall in order to be allowed to hit the platform");
-    verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity" +
-        ".max-movement-ticks", 8),
-      2, 100);
+    verification.gravity.maxMovementTicks = clamp(generalConfig.getInt(
+      "verification.checks.gravity.max-movement-ticks", 8), 2, 100);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-ignored-ticks",
       "Maximum number of ignored Y movement changes before a player fails verification");
-    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks"
-        , 5),
-      1, 128);
+    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt(
+      "verification.checks.gravity.max-ignored-ticks", 5), 1, 128);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.gamemode",
       "The gamemode of the player during verification"
@@ -425,13 +423,20 @@ public final class SonarConfiguration {
         + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
         + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible");
     verification.gravity.gamemode = Verification.Gravity.Gamemode.valueOf(
-      generalConfig.getString("verification.checks.gravity.gamemode", Verification.Gravity.Gamemode.ADVENTURE.name()).toUpperCase());
+      generalConfig.getString("verification.checks.gravity.gamemode",
+        Verification.Gravity.Gamemode.ADVENTURE.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha",
-      "Make the player type a code from a virtual map in chat after the gravity check");
-    generalConfig.getYaml().setComment("verification.checks.map-captcha.enabled",
-      "Should Sonar make the player pass a captcha?");
-    verification.map.enabled = generalConfig.getBoolean("verification.checks.map-captcha.enabled", false);
+      "Make the player type a code from a virtual map in chat");
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.timing",
+      "When should Sonar make the player solve a captcha?"
+        + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER"
+        + LINE_SEPARATOR + "- ALWAYS: New players will always receive a captcha"
+        + LINE_SEPARATOR + "- DURING_ATTACK: New players will only receive a captcha during an attack"
+        + LINE_SEPARATOR + "- NEVER: New players will never receive a captcha (Recommended)");
+    verification.map.timing = Verification.Timing.valueOf(
+      generalConfig.getString("verification.checks.map-captcha.timing",
+        Verification.Timing.NEVER.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-position",
       "Should Sonar randomize the X and Y position of the captcha?");
