@@ -228,7 +228,7 @@ public final class FallbackListener {
 
         // We have to add this pipeline to monitor whenever the client disconnects
         // to remove them from the list of connected and queued players
-        pipeline.addFirst(FALLBACK_HANDLER, new FallbackChannelHandler(event.getUsername()));
+        pipeline.addFirst(FALLBACK_HANDLER, new FallbackChannelHandler(event.getUsername(), inetAddress));
 
         // Queue the connection for further processing
         fallback.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
@@ -277,8 +277,7 @@ public final class FallbackListener {
           final FallbackUserWrapper user = new FallbackUserWrapper(
             fallback, connectedPlayer, mcConnection, mcConnection.getChannel(),
             mcConnection.getChannel().pipeline(), inetAddress,
-            ProtocolVersion.fromId(protocolId)
-          );
+            ProtocolVersion.fromId(protocolId));
 
           // Disconnect if the protocol version could not be resolved
           if (user.getProtocolVersion().isUnknown()) {

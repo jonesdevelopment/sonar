@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.api.fallback;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.cappuccino.ExpiringCache;
@@ -67,7 +66,14 @@ public final class Fallback {
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean shouldVerifyNewPlayers() {
-    val timing = Sonar.get().getConfig().getVerification().getTiming();
+    return performTimingCheck(Sonar.get().getConfig().getVerification().getTiming());
+  }
+
+  public boolean shouldDoMapCaptcha() {
+    return performTimingCheck(Sonar.get().getConfig().getVerification().getMap().getTiming());
+  }
+
+  private boolean performTimingCheck(final SonarConfiguration.Verification.Timing timing) {
     return timing == SonarConfiguration.Verification.Timing.ALWAYS
       || (timing == SonarConfiguration.Verification.Timing.DURING_ATTACK
       && Sonar.get().getAttackTracker().isCurrentlyUnderAttack());

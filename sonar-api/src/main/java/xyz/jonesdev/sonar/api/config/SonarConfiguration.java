@@ -27,8 +27,10 @@ import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.dependencies.Dependency;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
+import java.awt.*;
 import java.io.File;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -105,10 +107,13 @@ public final class SonarConfiguration {
 
     @Getter
     public static final class Map {
-      private boolean enabled;
-      private boolean drawBackgroundNoise;
+      private Timing timing;
       private boolean randomizePositions;
       private boolean randomizeFontSize;
+      private double distortionsFactorX;
+      private double distortionsFactorY;
+      private int randomLinesAmount;
+      private int randomOvalsAmount;
       private int precomputeAmount;
       private int maxDuration;
       private int maxTries;
@@ -116,6 +121,7 @@ public final class SonarConfiguration {
       private Component enterCode;
       private Component failedCaptcha;
       private String enterCodeActionBar;
+      private List<String> fonts;
     }
 
     @Getter
@@ -169,6 +175,7 @@ public final class SonarConfiguration {
     private Component alreadyQueued;
     private Component blacklisted;
     private Component protocolBlacklisted;
+    private Component currentlyPreparing;
   }
 
   @Getter
@@ -401,15 +408,13 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-movement-ticks",
       "Maximum number of ticks the player has to fall in order to be allowed to hit the platform");
-    verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity" +
-        ".max-movement-ticks", 8),
-      2, 100);
+    verification.gravity.maxMovementTicks = clamp(generalConfig.getInt(
+      "verification.checks.gravity.max-movement-ticks", 8), 2, 100);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-ignored-ticks",
       "Maximum number of ignored Y movement changes before a player fails verification");
-    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks"
-        , 5),
-      1, 128);
+    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt(
+      "verification.checks.gravity.max-ignored-ticks", 5), 1, 128);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.gamemode",
       "The gamemode of the player during verification"
@@ -418,23 +423,43 @@ public final class SonarConfiguration {
         + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
         + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible");
     verification.gravity.gamemode = Verification.Gravity.Gamemode.valueOf(
-      generalConfig.getString("verification.checks.gravity.gamemode", Verification.Gravity.Gamemode.ADVENTURE.name()).toUpperCase());
+      generalConfig.getString("verification.checks.gravity.gamemode",
+        Verification.Gravity.Gamemode.ADVENTURE.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha",
-      "Make the player type a code from a virtual map in chat after the gravity check");
-    generalConfig.getYaml().setComment("verification.checks.map-captcha.enabled",
-      "Should Sonar make the player pass a captcha?");
-    verification.map.enabled = generalConfig.getBoolean("verification.checks.map-captcha.enabled", false);
-
-    generalConfig.getYaml().setComment("verification.checks.map-captcha.background-noise",
-      "Should Sonar draw a white/light gray rectangle behind the captcha?");
-    verification.map.drawBackgroundNoise = generalConfig.getBoolean("verification.checks.map-captcha" +
-      ".background-noise", true);
+      "Make the player type a code from a virtual map in chat");
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.timing",
+      "When should Sonar make the player solve a captcha?"
+        + LINE_SEPARATOR + "Possible types: ALWAYS, DURING_ATTACK, NEVER"
+        + LINE_SEPARATOR + "- ALWAYS: New players will always receive a captcha"
+        + LINE_SEPARATOR + "- DURING_ATTACK: New players will only receive a captcha during an attack"
+        + LINE_SEPARATOR + "- NEVER: New players will never receive a captcha (Recommended)");
+    verification.map.timing = Verification.Timing.valueOf(
+      generalConfig.getString("verification.checks.map-captcha.timing",
+        Verification.Timing.NEVER.name()).toUpperCase());
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-position",
       "Should Sonar randomize the X and Y position of the captcha?");
     verification.map.randomizePositions = generalConfig.getBoolean("verification.checks.map-captcha.random-position",
       true);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.distortions-factor-x",
+      "How much should Sonar distort characters (factor for randomization)?");
+    verification.map.distortionsFactorX = clamp(generalConfig.getInt(
+      "verification.checks.map-captcha.distortions-factor-x", 50), 0, 100) / 100D;
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.distortions-factor-y",
+      "How much should Sonar distort characters (factor for randomization)?");
+    verification.map.distortionsFactorY = clamp(generalConfig.getInt(
+      "verification.checks.map-captcha.distortions-factor-y", 50), 0, 100) / 100D;
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.random-lines",
+      "How many random lines behind the captcha should Sonar draw?");
+    verification.map.randomLinesAmount = generalConfig.getInt("verification.checks.map-captcha.random-lines", 4);
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.random-ovals",
+      "How many random ovals behind the captcha should Sonar draw?");
+    verification.map.randomOvalsAmount = generalConfig.getInt("verification.checks.map-captcha.random-ovals", 1);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.random-font-size",
       "Should Sonar randomize the size of the font used for rendering the captcha?");
@@ -442,7 +467,9 @@ public final class SonarConfiguration {
       true);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.precompute",
-      "How many answers should Sonar precompute (prepare)?");
+      "How many answers should Sonar precompute (prepare)?"
+        + LINE_SEPARATOR + "This task happens asynchronously in the background;"
+        + LINE_SEPARATOR + "Players are able to join once one captcha has been prepared");
     verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 1000);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
@@ -456,6 +483,11 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.map-captcha.dictionary",
       "Characters (letters and numbers) that are allowed to appear in the answer to the captcha");
     verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary", "123456789");
+
+    generalConfig.getYaml().setComment("verification.checks.map-captcha.fonts",
+      "Which font types should Sonar use for the map captcha codes?");
+    verification.map.fonts = generalConfig.getStringList("verification.checks.map-captcha.fonts",
+      Arrays.asList(Font.DIALOG, Font.DIALOG_INPUT, Font.SERIF, Font.SANS_SERIF));
 
     generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
       "Regex for validating usernames during verification");
@@ -890,6 +922,17 @@ public final class SonarConfiguration {
       "Message that is shown to the player when they enter the wrong answer in chat");
     verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect",
       "%prefix%<red>You have entered the wrong code. Please try again.")));
+
+    messagesConfig.getYaml().setComment("verification.currently-preparing",
+      "Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet");
+    verification.currentlyPreparing = deserialize(fromList(messagesConfig.getStringList(
+      "verification.currently-preparing",
+      Arrays.asList(
+        "%header%",
+        "<yellow>Your anti-bot data has not been prepared yet.",
+        "<gray>Please wait a few seconds before trying to verify again.",
+        "%footer%"
+      ))));
 
     messagesConfig.getYaml().setComment("verification.too-many-players",
       "Disconnect message that is shown when too many players are verifying at the same time");
