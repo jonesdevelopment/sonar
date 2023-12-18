@@ -46,7 +46,7 @@ allprojects {
     implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
     implementation("xyz.jonesdev:cappuccino:0.1.6-SNAPSHOT") // expiring cache
 
-    compileOnly("io.netty:netty-all:4.1.101.Final") // netty
+    compileOnly("io.netty:netty-all:4.1.104.Final") // netty
   }
 }
 
