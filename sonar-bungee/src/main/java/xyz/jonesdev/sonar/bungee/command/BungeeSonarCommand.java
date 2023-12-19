@@ -32,7 +32,6 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
   }
 
   @Override
-  @SuppressWarnings({"redundantSuppression"})
   public void execute(final @NotNull CommandSender sender, final String[] args) {
     // Create our own invocation source wrapper to handle messages properly
     final InvocationSource invocationSource = new BungeeInvocationSource(sender);

@@ -22,6 +22,7 @@ import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.bungee.SonarBungee;
@@ -32,8 +33,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public final class FallbackListener implements Listener {
 
-  @EventHandler
   @SuppressWarnings("deprecation")
+  @EventHandler(priority = EventPriority.LOWEST)
   public void handle(final @NotNull LoginEvent event) {
     final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
 

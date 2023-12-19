@@ -29,13 +29,13 @@ import xyz.jonesdev.sonar.bungee.SonarBungee;
 
 public final class AudienceListener implements Listener {
 
-  @EventHandler(priority = EventPriority.LOWEST)
+  @EventHandler(priority = EventPriority.HIGHEST)
   public void handle(final @NotNull PostLoginEvent event) {
     final Audience audience = SonarBungee.INSTANCE.getBungeeAudiences().player(event.getPlayer());
     Sonar.get().getVerboseHandler().getAudiences().put(event.getPlayer().getName(), audience);
   }
 
-  @EventHandler(priority = EventPriority.LOWEST)
+  @EventHandler(priority = EventPriority.HIGHEST)
   public void handle(final @NotNull PlayerDisconnectEvent event) {
     Sonar.get().getVerboseHandler().getAudiences().remove(event.getPlayer().getName());
   }
