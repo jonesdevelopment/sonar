@@ -24,25 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 @UtilityClass
 public class VarIntUtil {
-  private static final int[] EXACT_BYTE_LENGTHS = new int[33];
-
-  static {
-    for (int i = 0; i <= 32; ++i) {
-      EXACT_BYTE_LENGTHS[i] = (int) Math.ceil((31d - (i - 1)) / 7d);
-    }
-    EXACT_BYTE_LENGTHS[32] = 1;
-  }
-
-  public static int varIntBytes(final int value) {
-    return EXACT_BYTE_LENGTHS[Integer.numberOfLeadingZeros(value)];
-  }
-
-  public static void write21BitVarInt(final @NotNull ByteBuf byteBuf, final int value) {
-    // See https://steinborn.me/posts/performance/how-fast-can-you-write-a-varint/
-    int w = (value & 0x7F | 0x80) << 16 | ((value >>> 7) & 0x7F | 0x80) << 8 | (value >>> 14);
-    byteBuf.writeMedium(w);
-  }
-
   public static int readVarInt(final ByteBuf byteBuf) {
     int read = readVarIntSafely(byteBuf);
     if (read == Integer.MIN_VALUE) {
