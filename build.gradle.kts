@@ -35,7 +35,7 @@ allprojects {
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    val adventureVersion = "4.14.0"
+    val adventureVersion = "4.15.0"
 
     // adventure
     implementation("net.kyori:adventure-text-minimessage:$adventureVersion")
@@ -85,6 +85,7 @@ tasks {
     relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
     relocate("xyz.jonesdev.cappuccino", "xyz.jonesdev.sonar.libs.cappuccino")
     relocate("net.kyori.examination", "xyz.jonesdev.sonar.libs.examination")
+    relocate("net.kyori.option", "xyz.jonesdev.sonar.libs.option")
     // We have to be careful here, so we don't accidentally break adventure
     relocate("net.kyori.adventure", "xyz.jonesdev.sonar.libs.adventure") {
       exclude("net.kyori.adventure.text.**")

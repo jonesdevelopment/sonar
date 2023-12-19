@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.common.utility.nbt.NBTMessageUtil.fromJson;
+import static xyz.jonesdev.sonar.common.utility.component.ComponentSerializer.serialize;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
 
@@ -59,7 +59,7 @@ public final class Disconnect implements FallbackPacket {
 
   public static @NotNull Disconnect create(final Component component) {
     final String serialized = JSONComponentSerializer.json().serialize(component);
-    final BinaryTag binaryTag = fromJson(new JsonParser().parse(serialized));
+    final BinaryTag binaryTag = serialize(new JsonParser().parse(serialized));
     return new Disconnect(serialized, binaryTag);
   }
 }

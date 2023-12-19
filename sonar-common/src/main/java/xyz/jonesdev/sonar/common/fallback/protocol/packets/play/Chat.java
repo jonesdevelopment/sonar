@@ -34,7 +34,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.nbt.NBTMessageUtil.fromJson;
+import static xyz.jonesdev.sonar.common.utility.component.ComponentSerializer.serialize;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
@@ -77,7 +77,7 @@ public final class Chat implements FallbackPacket {
   public Chat(final Component component, final String message, final byte type) {
     this(component, message, type,
       false, false, null, null,
-      0L, false, null, fromJson(new JsonParser().parse(message)));
+      0L, false, null, serialize(new JsonParser().parse(message)));
   }
 
   @Override
