@@ -25,6 +25,7 @@ import com.j256.ormlite.table.TableUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.dependencies.DependencyLoader;
@@ -32,6 +33,9 @@ import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
 import java.net.InetAddress;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -72,6 +76,9 @@ public final class VerifiedPlayerController {
       dao = DaoManager.createDao(connectionSource, VerifiedPlayer.class);
       queryBuilder = dao.queryBuilder();
 
+      // Make sure to clear all outdated entries first
+      clearOld(Sonar.get().getConfig().getDatabase().getMaximumAge());
+      // Add all entries from the database to the cache
       dao.queryForAll().forEach(this::_add);
     } catch (Throwable throwable) {
       Sonar.get().getLogger().error("Error setting up database connection: {}", throwable);
@@ -195,6 +202,44 @@ public final class VerifiedPlayerController {
     } catch (SQLException exception) {
       Sonar.get().getLogger().error("Error trying to clear entries: {}", exception);
     }
+  }
+
+  /**
+   * Clear all old entries using the given timestamp.
+   */
+  public void clearOld(final @Range(from = 1, to = 365) int maximumAge) {
+    // Don't try to update the column if the database type is NONE
+    if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
+      return;
+    }
+
+    DB_UPDATE_SERVICE.execute(() -> {
+      // We cannot throw a NullPointerException within the executor service
+      // because we want to handle the error instead of simply throwing an exception
+      if (connectionSource == null) {
+        return;
+      }
+
+      try {
+        final long timestamp = Instant.now()
+          .minus(maximumAge, ChronoUnit.DAYS)
+          .getEpochSecond() * 1000L; // convert to ms
+
+        final List<VerifiedPlayer> oldEntries = queryBuilder.where()
+          .lt("timestamp", new Timestamp(timestamp))
+          .query();
+
+        if (oldEntries != null) {
+          for (final VerifiedPlayer player : oldEntries) {
+            dao.delete(player);
+          }
+          Sonar.get().getLogger().info("Removed {} database entries older than {} days.",
+            oldEntries.size(), maximumAge);
+        }
+      } catch (SQLException exception) {
+        Sonar.get().getLogger().error("Error trying to clear old entries: {}", exception);
+      }
+    });
   }
 
   /**
