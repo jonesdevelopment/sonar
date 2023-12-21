@@ -243,6 +243,7 @@ public final class SonarConfiguration {
     private String name;
     private String username;
     private String password;
+    private int maximumAge;
   }
 
   @Getter
@@ -377,6 +378,10 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("database.password",
       "Password for authenticating with the SQL database");
     database.password = generalConfig.getString("database.password", "");
+
+    generalConfig.getYaml().setComment("database.maximum-age",
+      "How many days should Sonar keep verified players in the database?");
+    database.maximumAge = clamp(generalConfig.getInt("database.maximum-age", 5), 1, 365);
 
     // Queue
     generalConfig.getYaml().setComment("queue",
