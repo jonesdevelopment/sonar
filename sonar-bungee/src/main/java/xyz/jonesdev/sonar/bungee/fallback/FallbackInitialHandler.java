@@ -144,7 +144,12 @@ public final class FallbackInitialHandler extends InitialHandler {
 
     // Run in the channel's event loop
     channel.eventLoop().execute(() -> {
+
+      // Do not continue if the connection is closed or marked as disconnected
+      if (channelWrapper.isClosed() || channelWrapper.isClosing()) return;
+
       try {
+        // Hook the custom traffic pipeline, so we can count the incoming and outgoing traffic
         final ChannelPipeline pipeline = channel.pipeline();
         TrafficChannelHooker.hook(pipeline, PACKET_DECODER, PACKET_ENCODER);
 

@@ -106,16 +106,15 @@ public final class FallbackMinecraftConnection extends MinecraftConnection {
         // Do not continue if the connection is closed or marked as disconnected
         if (isClosed() || isKnownDisconnect()) return;
 
-        // Hook the custom traffic pipeline, so we can count the incoming and outgoing traffic
-        final ChannelPipeline pipeline = channel.pipeline();
-        TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
-
-        final InetAddress inetAddress = ((InetSocketAddress) getRemoteAddress()).getAddress();
-
-        // Increase total traffic statistic
-        Statistics.TOTAL_TRAFFIC.increment();
-
         try {
+          // Hook the custom traffic pipeline, so we can count the incoming and outgoing traffic
+          final ChannelPipeline pipeline = channel.pipeline();
+          TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
+
+          final InetAddress inetAddress = ((InetSocketAddress) getRemoteAddress()).getAddress();
+
+          // Increase total traffic statistic
+          Statistics.TOTAL_TRAFFIC.increment();
 
           // Check the blacklist here since we cannot let the player "ghost join"
           if (FALLBACK.getBlacklisted().has(inetAddress)) {
