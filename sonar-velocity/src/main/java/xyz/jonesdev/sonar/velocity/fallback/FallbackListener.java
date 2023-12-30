@@ -76,7 +76,6 @@ public final class FallbackListener {
   private static final MethodHandle INITIAL_CONNECTION;
   private static final MethodHandle CONNECTED_PLAYER;
   private static final Field CONNECTION_FIELD;
-  private static Field SESSION_HANDLER_FIELD;
 
   static {
     CLOSED_MINECRAFT_CONNECTION = new DummyConnection(null);
@@ -93,14 +92,6 @@ public final class FallbackListener {
             boolean.class,
             IdentifiedKey.class
           ));
-
-      try {
-        SESSION_HANDLER_FIELD = MinecraftConnection.class.getDeclaredField("activeSessionHandler");
-      } catch (Throwable throwable) {
-        // Velocity b266 changed the field name to "activeSessionHandler"
-        SESSION_HANDLER_FIELD = MinecraftConnection.class.getDeclaredField("sessionHandler");
-      }
-      SESSION_HANDLER_FIELD.setAccessible(true);
 
       CONNECTION_FIELD = InitialLoginSessionHandler.class.getDeclaredField("mcConnection");
       CONNECTION_FIELD.setAccessible(true);
@@ -148,8 +139,7 @@ public final class FallbackListener {
       Statistics.TOTAL_TRAFFIC.increment();
 
       try {
-        // Backwards compatibility for Velocity b265 and below
-        val activeSessionHandler = (MinecraftSessionHandler) SESSION_HANDLER_FIELD.get(mcConnection);
+        val activeSessionHandler = mcConnection.getActiveSessionHandler();
 
         // Check the blacklist here since we cannot let the player "ghost join"
         if (fallback.getBlacklisted().has(inetAddress)) {
@@ -157,7 +147,7 @@ public final class FallbackListener {
           markConnectionAsDead(activeSessionHandler);
           initialConnection.getConnection().closeWith(Disconnect.create(
             Sonar.get().getConfig().getVerification().getBlacklisted(),
-            inboundConnection.getProtocolVersion()
+            inboundConnection.getProtocolVersion(), false
           ));
           return;
         }
@@ -179,7 +169,7 @@ public final class FallbackListener {
           markConnectionAsDead(activeSessionHandler);
           initialConnection.getConnection().closeWith(Disconnect.create(
             Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
-            inboundConnection.getProtocolVersion()
+            inboundConnection.getProtocolVersion(), false
           ));
           return;
         }
@@ -201,7 +191,7 @@ public final class FallbackListener {
         if (fallback.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
           initialConnection.getConnection().closeWith(Disconnect.create(
             Sonar.get().getConfig().getVerification().getAlreadyQueued(),
-            inboundConnection.getProtocolVersion()
+            inboundConnection.getProtocolVersion(), false
           ));
           return;
         }
@@ -212,7 +202,7 @@ public final class FallbackListener {
           || fallback.getConnected().containsValue(inetAddress)) {
           initialConnection.getConnection().closeWith(Disconnect.create(
             Sonar.get().getConfig().getVerification().getAlreadyVerifying(),
-            inboundConnection.getProtocolVersion()
+            inboundConnection.getProtocolVersion(), false
           ));
           return;
         }
@@ -221,7 +211,7 @@ public final class FallbackListener {
         if (!fallback.getRatelimiter().attempt(inetAddress)) {
           initialConnection.getConnection().closeWith(Disconnect.create(
             Sonar.get().getConfig().getVerification().getTooFastReconnect(),
-            inboundConnection.getProtocolVersion()
+            inboundConnection.getProtocolVersion(), false
           ));
           return;
         }
@@ -240,7 +230,7 @@ public final class FallbackListener {
           // UTF-16 names or other types of exploits
           if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(event.getUsername()).matches()) {
             mcConnection.closeWith(Disconnect.create(Sonar.get().getConfig().getVerification().getInvalidUsername(),
-              mcConnection.getProtocolVersion()));
+              mcConnection.getProtocolVersion(), false));
             return;
           }
 
@@ -359,8 +349,7 @@ public final class FallbackListener {
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
         connectedPlayer.getConnection().closeWith(Disconnect.create(
-          Sonar.get().getConfig().getTooManyOnlinePerIp(), connectedPlayer.getProtocolVersion()
-        ));
+          Sonar.get().getConfig().getTooManyOnlinePerIp(), connectedPlayer.getProtocolVersion(), false));
       }
     }
   }
