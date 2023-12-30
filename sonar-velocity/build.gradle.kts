@@ -1,4 +1,4 @@
-val velocityVersion = "3.2.0-SNAPSHOT"
+val velocityVersion = "3.3.0-SNAPSHOT"
 
 dependencies {
   compileOnly(project(":api"))
@@ -26,5 +26,5 @@ tasks {
   }
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
