@@ -27,6 +27,7 @@ import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.event.SonarEventManager;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
 import java.io.File;
@@ -59,6 +60,8 @@ public interface Sonar {
   VerifiedPlayerController getVerifiedPlayerController();
 
   @NotNull Verbose getVerboseHandler();
+
+  @NotNull SystemTimer getLaunchTimer();
 
   /**
    * Set a custom verbose handler

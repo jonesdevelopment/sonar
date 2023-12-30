@@ -208,7 +208,8 @@ public final class FallbackMinecraftConnection extends MinecraftConnection {
             // Add better timeout handler to avoid known exploits or issues
             // We also want to timeout bots quickly to avoid flooding
             final int readTimeout = Sonar.get().getConfig().getVerification().getReadTimeout();
-            pipeline.replace(READ_TIMEOUT, READ_TIMEOUT, new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
+            pipeline.replace(READ_TIMEOUT, READ_TIMEOUT, new FallbackTimeoutHandler(readTimeout,
+              TimeUnit.MILLISECONDS));
 
             // Create an instance for the Fallback connection
             user = new FallbackUserWrapper(FALLBACK, this, channel, channel.pipeline(),

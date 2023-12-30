@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.subcommand.impl;
 
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
@@ -66,11 +67,16 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
 
     switch (type) {
       case GENERAL: {
+        final long seconds = Sonar.get().getLaunchTimer().delay() / 1000L;
+        final long days = seconds / (24L * 60L * 60L);
+        final long hours = (seconds % (24L * 60L * 60L)) / (60L * 60L);
+        final long minutes = (seconds % (60L * 60L)) / 60L;
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getGeneralStatistics()
           .replace("%verified%", DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize()))
           .replace("%verifying%", DECIMAL_FORMAT.format(SONAR.getFallback().getConnected().size()))
           .replace("%blacklisted%", DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize()))
           .replace("%queued%", DECIMAL_FORMAT.format(SONAR.getFallback().getQueue().getQueuedPlayers().size()))
+          .replace("%uptime%", String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L))
           .replace("%total_joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
           .replace("%total_attempts%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
           .replace("%total_failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get())));
