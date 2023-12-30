@@ -44,6 +44,7 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.statistics.Counters;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
@@ -76,7 +77,6 @@ public final class FallbackInitialHandler extends InitialHandler {
     this.bungee = bungee;
   }
 
-  private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
   @Getter
   private ChannelWrapper channelWrapper;
   private final @NotNull BungeeCord bungee;
@@ -86,10 +86,14 @@ public final class FallbackInitialHandler extends InitialHandler {
   private boolean receivedLoginPacket;
   private boolean receivedStatusPacket;
 
+  private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
+
   @Override
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
     this.channelWrapper = channelWrapper;
     super.connected(channelWrapper);
+    // Increase connections per second for the action bar verbose
+    Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime());
   }
 
   @Override
@@ -126,7 +130,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   @Override
   public void handle(final LoginRequest loginRequest) throws Exception {
     // Increase joins per second for the action bar verbose
-    Sonar.get().getVerboseHandler().getLoginsPerSecond().put(System.nanoTime());
+    Counters.LOGINS_PER_SECOND.put(System.nanoTime());
 
     // Fix login packet spam exploit
     if (receivedLoginPacket || user != null) {

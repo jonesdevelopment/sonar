@@ -24,6 +24,7 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.event.impl.AttackDetectedEvent;
 import xyz.jonesdev.sonar.api.event.impl.AttackMitigatedEvent;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
+import xyz.jonesdev.sonar.api.statistics.Counters;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
@@ -43,6 +44,7 @@ public final class AttackTracker implements JVMProfiler {
     private final SystemTimer duration = new SystemTimer();
     private final SystemTimer timer = new SystemTimer();
     private int peakJoinsPerSecond;
+    private int peakConnectionsPerSecond;
     private double peakProcessCPUUsage;
     private long peakProcessMemoryUsage;
     // Calculate during-attack-statistics using their deltas
@@ -50,7 +52,7 @@ public final class AttackTracker implements JVMProfiler {
   }
 
   public void checkIfUnderAttack() {
-    final int joinsPerSecond = Sonar.get().getVerboseHandler().getLoginsPerSecond().estimatedSize();
+    final int joinsPerSecond = Counters.LOGINS_PER_SECOND.estimatedSize();
     final int verifyingPlayers = Sonar.get().getFallback().getConnected().size();
     final int queuedPlayers = Sonar.get().getFallback().getQueue().getQueuedPlayers().size();
     final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();
@@ -77,6 +79,11 @@ public final class AttackTracker implements JVMProfiler {
         // Update joins per second peak if necessary
         currentAttack.peakJoinsPerSecond = joinsPerSecond;
       }
+      final int connectionsPerSecond = Counters.CONNECTIONS_PER_SECOND.estimatedSize();
+      if (connectionsPerSecond > currentAttack.peakConnectionsPerSecond) {
+        // Update connections per second peak if necessary
+        currentAttack.peakConnectionsPerSecond = connectionsPerSecond;
+      }
       final double processCPUUsage = getProcessCPUUsage();
       if (processCPUUsage > currentAttack.peakProcessCPUUsage) {
         // Update cpu usage peak if necessary
@@ -99,6 +106,7 @@ public final class AttackTracker implements JVMProfiler {
           final String peakCPU = Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage);
           final String peakMem = formatMemory(currentAttack.peakProcessMemoryUsage);
           final String peakBPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond);
+          final String peakCPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakConnectionsPerSecond);
           final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
           final double seconds = (deltaInMillis % (60 * 1000)) / 1000D; // Convert remaining milliseconds to seconds
           final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
@@ -121,6 +129,7 @@ public final class AttackTracker implements JVMProfiler {
               .replace("%peak-cpu%", peakCPU)
               .replace("%peak-memory%", peakMem)
               .replace("%peak-bps%", peakBPS)
+              .replace("%peak-cps%", peakCPS)
               .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(blacklisted))
               .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(failed))
               .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(verified));

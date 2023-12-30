@@ -17,9 +17,11 @@
 
 package xyz.jonesdev.sonar.velocity.fallback;
 
+import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
+import com.velocitypowered.proxy.crypto.IdentifiedKeyImpl;
 import com.velocitypowered.proxy.protocol.packet.Disconnect;
 import com.velocitypowered.proxy.protocol.packet.Handshake;
 import com.velocitypowered.proxy.protocol.packet.ServerLogin;
@@ -27,11 +29,14 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.CorruptedFrameException;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.statistics.Counters;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
@@ -44,8 +49,11 @@ import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19;
+import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_3;
 import static com.velocitypowered.proxy.network.Connections.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
@@ -55,11 +63,24 @@ public final class FallbackMinecraftConnection extends MinecraftConnection {
     super(channel, server);
     this.channel = channel;
   }
+
   private final Channel channel;
   private FallbackUserWrapper user;
   private boolean receivedLoginPacket;
 
-  private static final Fallback FALLBACK = Sonar.get().getFallback();
+  private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
+  private static final boolean FORCE_SECURE_PROFILES;
+
+  static {
+    FORCE_SECURE_PROFILES = Boolean.getBoolean("auth.forceSecureProfiles");
+  }
+
+  @Override
+  public void channelActive(final ChannelHandlerContext ctx) throws Exception {
+    super.channelActive(ctx);
+    // Increase connections per second for the action bar verbose
+    Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime());
+  }
 
   @Override
   public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
@@ -71,7 +92,7 @@ public final class FallbackMinecraftConnection extends MinecraftConnection {
     }
     if (msg instanceof ServerLogin login) {
       // Increase joins per second for the action bar verbose
-      Sonar.get().getVerboseHandler().getLoginsPerSecond().put(System.nanoTime());
+      Counters.LOGINS_PER_SECOND.put(System.nanoTime());
 
       // Fix login packet spam exploit
       if (receivedLoginPacket || user != null) {
@@ -191,10 +212,40 @@ public final class FallbackMinecraftConnection extends MinecraftConnection {
             pipeline.replace(READ_TIMEOUT, READ_TIMEOUT, new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
 
             // Create an instance for the Fallback connection
-            user = new FallbackUserWrapper(
-              FALLBACK, this, channel,
-              channel.pipeline(), inetAddress,
-              ProtocolVersion.fromId(protocolId));
+            user = new FallbackUserWrapper(FALLBACK, this, channel, channel.pipeline(),
+              inetAddress, ProtocolVersion.fromId(protocolId));
+
+            // Perform default Velocity checks
+            final IdentifiedKey playerKey = login.getPlayerKey();
+            if (playerKey != null) {
+              if (playerKey.hasExpired()) {
+                closeWith(Disconnect.create(
+                  Component.translatable("multiplayer.disconnect.invalid_public_key_signature"),
+                  getProtocolVersion(), false));
+                return;
+              }
+
+              boolean isKeyValid;
+              if (playerKey.getKeyRevision() == IdentifiedKey.Revision.LINKED_V2 && playerKey instanceof IdentifiedKeyImpl keyImpl) {
+                isKeyValid = keyImpl.internalAddHolder(login.getHolderUuid());
+              } else {
+                isKeyValid = playerKey.isSignatureValid();
+              }
+
+              if (!isKeyValid) {
+                closeWith(Disconnect.create(
+                  Component.translatable("multiplayer.disconnect.invalid_public_key"),
+                  getProtocolVersion(), false));
+                return;
+              }
+            } else if ((FORCE_SECURE_PROFILES || server.getConfiguration().isForceKeyAuthentication())
+              && getProtocolVersion().compareTo(MINECRAFT_1_19) >= 0
+              && getProtocolVersion().compareTo(MINECRAFT_1_19_3) < 0) {
+              closeWith(Disconnect.create(
+                Component.translatable("multiplayer.disconnect.missing_public_key"),
+                getProtocolVersion(), false));
+              return;
+            }
 
             // Disconnect if the protocol version could not be resolved
             if (user.getProtocolVersion().isUnknown()) {
