@@ -850,7 +850,8 @@ public final class SonarConfiguration {
         " <gray>▪ <green>Currently queued logins: <white>%queued%",
         " <gray>▪ <green>Total non-unique joins: <white>%total_joins%",
         " <gray>▪ <green>Total verification attempts: <white>%total_attempts%",
-        " <gray>▪ <green>Total failed verifications: <white>%total_failed%"
+        " <gray>▪ <green>Total failed verifications: <white>%total_failed%",
+        " <gray>▪ <green>Server uptime: <white>%uptime%"
       ))));
 
     messagesConfig.getYaml().setComment("commands.statistics.cpu",
