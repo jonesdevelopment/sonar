@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.velocity.fallback;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
@@ -28,7 +27,6 @@ import xyz.jonesdev.sonar.velocity.SonarVelocity;
 import java.net.InetAddress;
 import java.util.Objects;
 
-@RequiredArgsConstructor
 public final class FallbackListener {
 
   @Subscribe(order = PostOrder.LAST)
