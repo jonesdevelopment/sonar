@@ -33,6 +33,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.PlayerPublicKey;
+import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.Kick;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import net.md_5.bungee.protocol.packet.StatusRequest;
@@ -89,6 +90,15 @@ public final class FallbackInitialHandler extends InitialHandler {
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
     this.channelWrapper = channelWrapper;
     super.connected(channelWrapper);
+  }
+
+  @Override
+  public void handle(final @NotNull Handshake handshake) throws Exception {
+    // Check if the host is invalid
+    if (handshake.getHost().isEmpty()) {
+      throw new CorruptedFrameException("Hostname is empty");
+    }
+    super.handle(handshake);
   }
 
   @Override
