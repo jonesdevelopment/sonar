@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.velocity.fallback;
 
 import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
@@ -36,9 +35,8 @@ import java.net.InetAddress;
 @Getter
 @RequiredArgsConstructor
 @ToString(of = {"protocolVersion"})
-public final class FallbackUserWrapper implements FallbackUser<ConnectedPlayer, MinecraftConnection> {
+public final class FallbackUserWrapper implements FallbackUser<MinecraftConnection> {
   private final Fallback fallback;
-  private final ConnectedPlayer player;
   private final MinecraftConnection connection;
   private final Channel channel;
   private final ChannelPipeline pipeline;

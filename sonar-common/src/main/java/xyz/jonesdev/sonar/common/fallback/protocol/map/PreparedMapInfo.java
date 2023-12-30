@@ -53,7 +53,7 @@ public final class PreparedMapInfo {
     this.modern = new MapData(info);
   }
 
-  public void write(final @NotNull FallbackUser<?, ?> user) {
+  public void write(final @NotNull FallbackUser<?> user) {
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       for (final MapData data : legacy) {
         user.delayedWrite(data);

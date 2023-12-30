@@ -189,8 +189,8 @@ public final class FallbackInitialHandler extends InitialHandler {
 
         // Create wrapped Fallback user
         user = new FallbackUserWrapper(
-          FALLBACK, channelWrapper, this,
-          channel, channel.pipeline(), inetAddress, protocolVersion
+          FALLBACK, this, channel, channel.pipeline(),
+          inetAddress, protocolVersion
         );
 
         // Perform default BungeeCord checks

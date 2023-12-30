@@ -23,7 +23,6 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
@@ -34,9 +33,8 @@ import java.net.InetAddress;
 
 @Getter
 @RequiredArgsConstructor
-public final class FallbackUserWrapper implements FallbackUser<ChannelWrapper, FallbackInitialHandler> {
+public final class FallbackUserWrapper implements FallbackUser<FallbackInitialHandler> {
   private final Fallback fallback;
-  private final ChannelWrapper player;
   private final FallbackInitialHandler connection;
   private final Channel channel;
   private final ChannelPipeline pipeline;

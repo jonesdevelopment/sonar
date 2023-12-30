@@ -31,5 +31,5 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 @RequiredArgsConstructor
 public final class UserBlacklistedEvent implements SonarEvent {
   @ApiStatus.Experimental
-  private final FallbackUser<?, ?> user;
+  private final FallbackUser<?> user;
 }

@@ -33,12 +33,10 @@ import xyz.jonesdev.sonar.api.statistics.Statistics;
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
-public interface FallbackUser<X, Y> {
+public interface FallbackUser<T> {
   @NotNull Fallback getFallback();
 
-  @NotNull X getPlayer();
-
-  @NotNull Y getConnection();
+  @NotNull T getConnection();
 
   @NotNull Channel getChannel();
 
