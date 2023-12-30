@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.velocity;
 
+import com.velocitypowered.proxy.VelocityServer;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
@@ -25,6 +26,8 @@ import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.velocity.audience.AudienceListener;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
+import xyz.jonesdev.sonar.velocity.fallback.injection.BaseChannelInitializer;
+import xyz.jonesdev.sonar.velocity.fallback.injection.BaseInjectionHelper;
 
 @Getter
 public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
@@ -69,9 +72,13 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
 
     // Register Fallback listener
-    getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackListener(getFallback()));
+    getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackListener());
 
     // Register audience register listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
+
+    // Inject new channel initializer
+    final VelocityServer server = (VelocityServer) getPlugin().getServer();
+    BaseInjectionHelper.inject(server, new BaseChannelInitializer(server));
   }
 }

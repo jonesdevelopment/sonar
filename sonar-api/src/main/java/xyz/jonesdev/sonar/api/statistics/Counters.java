@@ -15,27 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.event.impl;
+package xyz.jonesdev.sonar.api.statistics;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.cappuccino.Cappuccino;
+import xyz.jonesdev.cappuccino.ExpiringCache;
 
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
-@Getter
-@ToString
-@EqualsAndHashCode
-public final class UserVerifyFailedEvent implements SonarEvent {
-  private final FallbackUser<?> user;
-  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-  private final Optional<String> reason;
-
-  public UserVerifyFailedEvent(final FallbackUser<?> user, final @Nullable String reason) {
-    this.user = user;
-    this.reason = Optional.ofNullable(reason);
-  }
+public interface Counters {
+  ExpiringCache<Long> LOGINS_PER_SECOND = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
+  ExpiringCache<Long> CONNECTIONS_PER_SECOND = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
 }

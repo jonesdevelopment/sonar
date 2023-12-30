@@ -1063,6 +1063,7 @@ public final class SonarConfiguration {
         + LINE_SEPARATOR + "- '%verify-success%' Number of verified IP addresses"
         + LINE_SEPARATOR + "- '%verify-failed%' Number of failed verifications"
         + LINE_SEPARATOR + "- '%logins-per-second%' Number of logins per second"
+        + LINE_SEPARATOR + "- '%connections-per-second%' Number of connections per second"
         + LINE_SEPARATOR + "- '%attack-duration%' Duration of the current attack"
         + LINE_SEPARATOR + "- '%incoming-traffic%' Incoming bandwidth usage per second"
         + LINE_SEPARATOR + "- '%outgoing-traffic%' Outgoing bandwidth usage per second"
@@ -1076,7 +1077,8 @@ public final class SonarConfiguration {
         + LINE_SEPARATOR + "Translations for Sonar's normal verbose output");
     verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout.normal",
       String.join(" <dark_aqua>╺ ", Arrays.asList(
-        "%prefix%<gray>Queued <white>%queued%",
+        "%prefix%<gray>CPS <white>%connections-per-second%",
+        "<gray>Queued <white>%queued%",
         "<gray>Verifying <white>%verifying%",
         "<gray>Blacklisted <white>%blacklisted%" +
           " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s" +
@@ -1086,7 +1088,8 @@ public final class SonarConfiguration {
       "Translations for Sonar's verbose output during an active attack");
     verbose.actionBarLayoutDuringAttack = formatString(messagesConfig.getString("verbose.layout.attack",
       String.join(" <dark_aqua>╺ ", Arrays.asList(
-        "%prefix%<gray>BPS <white>%logins-per-second%",
+        "%prefix%<gray>CPS <white>%connections-per-second%",
+        "<gray>Logins/s <white>%logins-per-second%",
         "<gray>Queued <white>%queued%",
         "<gray>Verifying <white>%verifying%",
         "<gray>Blacklisted <white>%blacklisted%",
