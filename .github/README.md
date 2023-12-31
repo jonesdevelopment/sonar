@@ -25,7 +25,7 @@
   |
   [Discord](https://jonesdev.xyz/discord)
   |
-  [License](https://github.com/jonesdevelopment/sonar/blob/main/README.md#license)
+  [License](https://github.com/jonesdevelopment/sonar/?tab=readme-ov-file#license)
 </div>
 
 ## Design and Goal
