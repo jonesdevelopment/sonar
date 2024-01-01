@@ -340,7 +340,8 @@ public final class SonarConfiguration {
 
     messagesConfig.getYaml().setComment("prefix",
       "Placeholder for every '%prefix%' in this configuration file");
-    prefix = formatString(messagesConfig.getString("prefix", "<yellow><bold>Sonar<reset> <gray>» <white>"));
+    prefix = formatString(messagesConfig.getString("prefix",
+      "<b><yellow>Sonar</b> <gray>» <white>"));
 
     messagesConfig.getYaml().setComment("support-url",
       "Placeholder for every '%support-url%' in this configuration file");
@@ -641,8 +642,8 @@ public final class SonarConfiguration {
       "Placeholder for every '%header%' in this configuration file");
     header = fromList(messagesConfig.getStringList("header",
       Arrays.asList(
-        "<yellow><bold>Sonar<reset>",
-        "<reset>"
+        "<b><yellow>Sonar</b><reset>",
+        ""
       )));
 
     messagesConfig.getYaml().setComment("footer",
@@ -708,15 +709,15 @@ public final class SonarConfiguration {
       "Informational message that is shown above everything when running the main command");
     commands.helpHeader = messagesConfig.getStringList("commands.main.header",
       Arrays.asList(
-        "<yellow>Running Sonar %version% on %platform%.",
-        "<yellow>(C) %copyright_year% Jones Development and Sonar Contributors",
-        "<green><click:open_url:'https://github.com/jonesdevelopment/sonar'>https://github.com/jonesdevelopment/sonar",
+        "<yellow>Running <b>Sonar</b> %version% on %platform%.",
+        "<gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) %copyright_year% Jones Development and" +
+          " Sonar Contributors</click>",
         "",
-        "<yellow>Need help or have any questions?",
-        "<yellow><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Click to open Discord)'>Open a " +
-          "ticket on the Discord </hover></click></yellow><yellow><click:open_url:'https://github" +
-          ".com/jonesdevelopment/sonar/issues'><hover:show_text:'(Click to open GitHub)'>or open a new issue on " +
-          "GitHub.",
+        "<gray>Need help or have any questions?",
+        "<white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Click to open Discord)'>Open a " +
+          "ticket on the Discord </hover></click><click:open_url:'https://github" +
+          ".com/jonesdevelopment/sonar/issues'><hover:show_text:'(Click to open GitHub)'>or open a new issue on" +
+          " GitHub.",
         ""
       ));
     messagesConfig.getYaml().setComment("commands.main.subcommands",
@@ -724,8 +725,8 @@ public final class SonarConfiguration {
     commands.helpSubcommands = formatString(messagesConfig.getString("commands.main.subcommands",
       "<click:suggest_command:'/sonar %subcommand% '><hover:show_text:'<gray>Only players: " +
         "</gray>%only_players%<br><gray>Require console: </gray>%require_console%<br><gray>Permission: " +
-        "</gray><white>%permission%<br><gray>Aliases: </gray>%aliases%'><gray> ▪ </gray><green>/sonar " +
-        "%subcommand%</green><gray> - </gray><white>%description%"));
+        "</gray><white>%permission%<br><gray>Aliases: </gray>%aliases%'><dark_aqua> ▪ <gray>/sonar " +
+        "%subcommand%  <white>%description%"));
 
     SonarCommand.prepareCachedMessages();
 
@@ -833,7 +834,7 @@ public final class SonarConfiguration {
     messagesConfig.getYaml().setComment("commands.statistics.header",
       "Informational message that is shown above everything when viewing the statistics");
     commands.statisticsHeader = formatString(messagesConfig.getString("commands.statistics.header",
-      "%prefix%<yellow>Showing %type% statistics for this session:"));
+      "%prefix%Showing %type% statistics for this session:"));
 
     messagesConfig.getYaml().setComment("commands.statistics.unknown-type",
       "Message that is shown when a player tries viewing an unknown statistic");
@@ -844,46 +845,46 @@ public final class SonarConfiguration {
       "Format of the general statistics message");
     commands.generalStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.general",
       Arrays.asList(
-        " <gray>▪ <green>Verified IP addresses: <white>%verified%",
-        " <gray>▪ <green>Verifying IP addresses: <white>%verifying%",
-        " <gray>▪ <green>Blacklisted IP addresses: <white>%blacklisted%",
-        " <gray>▪ <green>Currently queued logins: <white>%queued%",
-        " <gray>▪ <green>Total non-unique joins: <white>%total_joins%",
-        " <gray>▪ <green>Total verification attempts: <white>%total_attempts%",
-        " <gray>▪ <green>Total failed verifications: <white>%total_failed%",
-        " <gray>▪ <green>Server uptime: <white>%uptime%"
+        " <dark_aqua>▪ <gray>Verified IP addresses: <white>%verified%",
+        " <dark_aqua>▪ <gray>Verifying IP addresses: <white>%verifying%",
+        " <dark_aqua>▪ <gray>Blacklisted IP addresses: <white>%blacklisted%",
+        " <dark_aqua>▪ <gray>Currently queued logins: <white>%queued%",
+        " <dark_aqua>▪ <gray>Total non-unique joins: <white>%total_joins%",
+        " <dark_aqua>▪ <gray>Total verification attempts: <white>%total_attempts%",
+        " <dark_aqua>▪ <gray>Total failed verifications: <white>%total_failed%",
+        " <dark_aqua>▪ <gray>Server uptime: <white>%uptime%"
       ))));
 
     messagesConfig.getYaml().setComment("commands.statistics.cpu",
       "Format of the CPU statistics message");
     commands.cpuStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.cpu",
       Arrays.asList(
-        " <gray>▪ <green>Process CPU usage right now: <white>%process_cpu%%",
-        " <gray>▪ <green>System CPU usage right now: <white>%system_cpu%%",
-        " <gray>▪ <green>Per-core process CPU usage: <white>%average_process_cpu%%",
-        " <gray>▪ <green>Per-core system CPU usage: <white>%average_system_cpu%%",
-        " <gray>▪ <green>General system load average: <white>%load_average%%",
-        " <gray>▪ <green>Total amount of virtual cpus: <white>%virtual_cores%"
+        " <dark_aqua>▪ <gray>Process CPU usage right now: <white>%process_cpu%%",
+        " <dark_aqua>▪ <gray>System CPU usage right now: <white>%system_cpu%%",
+        " <dark_aqua>▪ <gray>Per-core process CPU usage: <white>%average_process_cpu%%",
+        " <dark_aqua>▪ <gray>Per-core system CPU usage: <white>%average_system_cpu%%",
+        " <dark_aqua>▪ <gray>General system load average: <white>%load_average%%",
+        " <dark_aqua>▪ <gray>Total amount of virtual cpus: <white>%virtual_cores%"
       ))));
 
     messagesConfig.getYaml().setComment("commands.statistics.memory",
       "Format of the memory statistics message");
     commands.memoryStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.memory",
       Arrays.asList(
-        " <gray>▪ <green>Total free memory: <white>%free_memory%",
-        " <gray>▪ <green>Total used memory: <white>%used_memory%",
-        " <gray>▪ <green>Total maximum memory: <white>%max_memory%",
-        " <gray>▪ <green>Total allocated memory: <white>%total_memory%"
+        " <dark_aqua>▪ <gray>Total free memory: <white>%free_memory%",
+        " <dark_aqua>▪ <gray>Total used memory: <white>%used_memory%",
+        " <dark_aqua>▪ <gray>Total maximum memory: <white>%max_memory%",
+        " <dark_aqua>▪ <gray>Total allocated memory: <white>%total_memory%"
       ))));
 
     messagesConfig.getYaml().setComment("commands.statistics.network",
       "Format of the network statistics message");
     commands.networkStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.network",
       Arrays.asList(
-        " <gray>▪ <green>Current incoming used bandwidth: <white>%incoming%",
-        " <gray>▪ <green>Current outgoing used bandwidth: <white>%outgoing%",
-        " <gray>▪ <green>Total incoming used bandwidth: <white>%ttl_incoming%",
-        " <gray>▪ <green>Total outgoing used bandwidth: <white>%ttl_outgoing%"
+        " <dark_aqua>▪ <gray>Current incoming used bandwidth: <white>%incoming%",
+        " <dark_aqua>▪ <gray>Current outgoing used bandwidth: <white>%outgoing%",
+        " <dark_aqua>▪ <gray>Total incoming used bandwidth: <white>%ttl_incoming%",
+        " <dark_aqua>▪ <gray>Total outgoing used bandwidth: <white>%ttl_outgoing%"
       ))));
 
     messagesConfig.getYaml().setComment("verification",
@@ -1079,25 +1080,21 @@ public final class SonarConfiguration {
     verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout.normal",
       String.join(" <dark_aqua>╺ ", Arrays.asList(
         "%prefix%<gray>CPS <white>%connections-per-second%",
-        "<gray>Queued <white>%queued%",
-        "<gray>Verifying <white>%verifying%",
-        "<gray>Blacklisted <white>%blacklisted%" +
-          " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s" +
-          "  <green><bold>%animation%<reset>"
-      ))));
+          "<gray>Logins/s <white>%logins-per-second%",
+          "<gray>Verifying <white>%verifying%"
+            + " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s"
+            + "  <green><bold>%animation%<reset>"))));
     messagesConfig.getYaml().setComment("verbose.layout.attack",
       "Translations for Sonar's verbose output during an active attack");
     verbose.actionBarLayoutDuringAttack = formatString(messagesConfig.getString("verbose.layout.attack",
       String.join(" <dark_aqua>╺ ", Arrays.asList(
         "%prefix%<gray>CPS <white>%connections-per-second%",
         "<gray>Logins/s <white>%logins-per-second%",
-        "<gray>Queued <white>%queued%",
+        "<gray>Queue <white>%queued%",
         "<gray>Verifying <white>%verifying%",
-        "<gray>Blacklisted <white>%blacklisted%",
-        "<gray>Duration <white>%attack-duration%" +
-          " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s" +
-          "  <green><bold>%animation%<reset>"
-      ))));
+        "<gray>Duration <white>%attack-duration%"
+          + " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s"
+          + "  <green><bold>%animation%<reset>"))));
     messagesConfig.getYaml().setComment("verbose.animation", "Animation for the action bar"
       + LINE_SEPARATOR + "Alternatives:"
       + LINE_SEPARATOR + "- ▙, ▛, ▜, ▟"
