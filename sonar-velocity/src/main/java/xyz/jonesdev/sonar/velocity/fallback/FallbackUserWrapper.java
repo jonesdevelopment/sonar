@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.velocity.fallback;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -50,11 +51,19 @@ public final class FallbackUserWrapper implements FallbackUser<MinecraftConnecti
 
   @Override
   public void write(final @NotNull Object packet) {
-    connection.write(packet);
+    if (channel.isActive()) {
+      channel.writeAndFlush(packet, channel.voidPromise());
+    } else {
+      ReferenceCountUtil.release(packet);
+    }
   }
 
   @Override
   public void delayedWrite(final @NotNull Object packet) {
-    connection.delayedWrite(packet);
+    if (channel.isActive()) {
+      channel.write(packet, channel.voidPromise());
+    } else {
+      ReferenceCountUtil.release(packet);
+    }
   }
 }

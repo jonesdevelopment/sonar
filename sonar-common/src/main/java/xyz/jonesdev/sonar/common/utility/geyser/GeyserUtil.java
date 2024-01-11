@@ -18,22 +18,16 @@
 package xyz.jonesdev.sonar.common.utility.geyser;
 
 import io.netty.channel.Channel;
-import io.netty.util.AttributeKey;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
+
+import java.net.InetSocketAddress;
 
 /**
  * Simple utility to determine if someone joins using GeyserMC
  */
 @UtilityClass
 public class GeyserUtil {
-
-  /*
-   * Geyser attribute key for every floodgate player
-   */
-  private AttributeKey<Object> playerAttribute() {
-    return AttributeKey.valueOf("floodgate-player");
-  }
 
   /**
    * @param channel Channel of the player
@@ -42,6 +36,9 @@ public class GeyserUtil {
   public boolean isGeyserConnection(final @NotNull Channel channel) {
     // https://discord.com/channels/613163671870242838/613170125696270357/1168599123889504266
     // Every floodgate player has a channel attribute called "floodgate-player"
-    return channel.attr(playerAttribute()).get() != null;
+    // However, this is not safe to use as even Java players sometimes have this attribute.
+    // Instead, we should check if the port is 0, since TCP didn't resolve a port (UDP)
+    // Thanks to @dbruni on Discord who reported it in ticket-0072
+    return ((InetSocketAddress) channel.remoteAddress()).getPort() == 0;
   }
 }
