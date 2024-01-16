@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.cappuccino.Cappuccino;
@@ -57,6 +58,8 @@ public interface FallbackUser<T> {
    * @param reason Legacy disconnect message string
    * @see #disconnect(Component)
    */
+  @Deprecated
+  @ApiStatus.ScheduledForRemoval(inVersion = "2.0.17")
   default void disconnect(final @NotNull String reason) {
     disconnect(Component.text(reason));
   }
