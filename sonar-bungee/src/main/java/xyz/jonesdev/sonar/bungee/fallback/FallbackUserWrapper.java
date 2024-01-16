@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.bungee.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
-import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -44,23 +43,5 @@ public final class FallbackUserWrapper implements FallbackUser<FallbackInitialHa
   @Override
   public void disconnect(final @NotNull Component reason) {
     connection.closeWith(Disconnect.create(reason));
-  }
-
-  @Override
-  public void write(final @NotNull Object packet) {
-    if (channel.isActive()) {
-      channel.writeAndFlush(packet, channel.voidPromise());
-    } else {
-      ReferenceCountUtil.release(packet);
-    }
-  }
-
-  @Override
-  public void delayedWrite(final @NotNull Object packet) {
-    if (channel.isActive()) {
-      channel.write(packet, channel.voidPromise());
-    } else {
-      ReferenceCountUtil.release(packet);
-    }
   }
 }

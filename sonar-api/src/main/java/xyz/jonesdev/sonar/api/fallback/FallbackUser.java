@@ -19,7 +19,9 @@ package xyz.jonesdev.sonar.api.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.cappuccino.Cappuccino;
@@ -36,6 +38,9 @@ import java.util.concurrent.TimeUnit;
 public interface FallbackUser<T> {
   @NotNull Fallback getFallback();
 
+  /**
+   * @return Per-platform connection object used internally
+   */
   @NotNull T getConnection();
 
   @NotNull Channel getChannel();
@@ -53,6 +58,8 @@ public interface FallbackUser<T> {
    * @param reason Legacy disconnect message string
    * @see #disconnect(Component)
    */
+  @Deprecated
+  @ApiStatus.ScheduledForRemoval(inVersion = "2.0.17")
   default void disconnect(final @NotNull String reason) {
     disconnect(Component.text(reason));
   }
@@ -70,13 +77,25 @@ public interface FallbackUser<T> {
    *
    * @param msg Message to send to the player
    */
-  void write(final @NotNull Object msg);
+  default void write(final @NotNull Object msg) {
+    if (getChannel().isActive()) {
+      getChannel().writeAndFlush(msg, getChannel().voidPromise());
+    } else {
+      ReferenceCountUtil.release(msg);
+    }
+  }
 
   /**
    * Queues a buffered message that will be
    * sent once all messages are flushed.
    */
-  void delayedWrite(final @NotNull Object msg);
+  default void delayedWrite(final @NotNull Object msg) {
+    if (getChannel().isActive()) {
+      getChannel().write(msg, getChannel().voidPromise());
+    } else {
+      ReferenceCountUtil.release(msg);
+    }
+  }
 
   ExpiringCache<String> PREVIOUS_FAILS = Cappuccino.buildExpiring(3L, TimeUnit.MINUTES);
 
