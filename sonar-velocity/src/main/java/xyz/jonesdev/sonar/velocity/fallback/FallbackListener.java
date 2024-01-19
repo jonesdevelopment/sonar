@@ -29,7 +29,7 @@ import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.client.InitialInboundConnection;
 import com.velocitypowered.proxy.connection.client.InitialLoginSessionHandler;
 import com.velocitypowered.proxy.connection.client.LoginInboundConnection;
-import com.velocitypowered.proxy.protocol.packet.Disconnect;
+import com.velocitypowered.proxy.protocol.packet.DisconnectPacket;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import lombok.val;
@@ -133,7 +133,7 @@ public final class FallbackListener {
         if (FALLBACK.getBlacklisted().has(inetAddress)) {
           // Mark the connection as dead to avoid unnecessary console logs
           markConnectionAsDead(activeSessionHandler);
-          mcConnection.closeWith(Disconnect.create(
+          mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getBlacklisted(),
             mcConnection.getProtocolVersion(), false));
           return;
@@ -154,7 +154,7 @@ public final class FallbackListener {
         if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols().contains(protocolId)) {
           // Mark the connection as dead to avoid unnecessary console logs
           markConnectionAsDead(activeSessionHandler);
-          mcConnection.closeWith(Disconnect.create(
+          mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
             mcConnection.getProtocolVersion(), false));
           return;
@@ -175,7 +175,7 @@ public final class FallbackListener {
 
         // Check if the player is already queued since we don't want bots to flood the queue
         if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-          mcConnection.closeWith(Disconnect.create(
+          mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getAlreadyQueued(),
             mcConnection.getProtocolVersion(), false));
           return;
@@ -185,7 +185,7 @@ public final class FallbackListener {
         // → is another player with the same IP address connected to Fallback?
         if (FALLBACK.getConnected().containsKey(event.getUsername())
           || FALLBACK.getConnected().containsValue(inetAddress)) {
-          mcConnection.closeWith(Disconnect.create(
+          mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getAlreadyVerifying(),
             mcConnection.getProtocolVersion(), false));
           return;
@@ -193,7 +193,7 @@ public final class FallbackListener {
 
         // Check if the IP address is currently being rate-limited
         if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
-          mcConnection.closeWith(Disconnect.create(
+          mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getTooFastReconnect(),
             mcConnection.getProtocolVersion(), false));
           return;
@@ -212,7 +212,7 @@ public final class FallbackListener {
           // Check if the username matches the valid name regex to prevent
           // UTF-16 names or other types of exploits
           if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(event.getUsername()).matches()) {
-            mcConnection.closeWith(Disconnect.create(Sonar.get().getConfig().getVerification().getInvalidUsername(),
+            mcConnection.closeWith(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidUsername(),
               mcConnection.getProtocolVersion(), false));
             return;
           }
@@ -300,7 +300,7 @@ public final class FallbackListener {
 
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
-        connectedPlayer.getConnection().closeWith(Disconnect.create(
+        connectedPlayer.getConnection().closeWith(DisconnectPacket.create(
           Sonar.get().getConfig().getTooManyOnlinePerIp(), connectedPlayer.getProtocolVersion(), false));
       }
     }
