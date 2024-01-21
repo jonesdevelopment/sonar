@@ -31,6 +31,8 @@ import java.util.Collection;
 import java.util.Vector;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
+import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.INCOMING;
+import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.OUTGOING;
 
 @Getter
 public final class Notification implements Observable, Counters {
@@ -57,7 +59,11 @@ public final class Notification implements Observable, Counters {
       .replace("%verify-total%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
       .replace("%verify-success%",
         DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
-      .replace("%verify-failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get())));
+      .replace("%verify-failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
+      .replace("%incoming-traffic%", INCOMING.getCachedSecond())
+      .replace("%outgoing-traffic%", OUTGOING.getCachedSecond())
+      .replace("%incoming-traffic-ttl%", INCOMING.getCachedTtl())
+      .replace("%outgoing-traffic-ttl%", OUTGOING.getCachedTtl()));
     // Send the title and chat messages to all online players
     for (final String subscriber : Sonar.get().getNotificationHandler().getSubscribers()) {
       final Audience audience = Sonar.AUDIENCES.get(subscriber);
