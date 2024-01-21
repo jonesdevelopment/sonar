@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
@@ -32,6 +33,8 @@ import xyz.jonesdev.sonar.api.verbose.Verbose;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface Sonar {
   DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
@@ -40,6 +43,12 @@ public interface Sonar {
   Gson GENERAL_GSON = new GsonBuilder()
     .disableInnerClassSerialization()
     .create();
+
+  /**
+   * Since we want to use Adventure on every server platform,
+   * we have to use their platform module to support BungeeCord and Bukkit
+   */
+  Map<String, Audience> AUDIENCES = new ConcurrentHashMap<>();
 
   /**
    * @return The platform the plugin is being run on

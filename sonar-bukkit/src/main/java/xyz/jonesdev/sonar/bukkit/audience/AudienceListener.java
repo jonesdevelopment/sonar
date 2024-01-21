@@ -32,11 +32,11 @@ public final class AudienceListener implements Listener {
   @EventHandler(priority = EventPriority.HIGHEST)
   public void handle(final @NotNull PlayerJoinEvent event) {
     final Audience audience = SonarBukkit.INSTANCE.getBukkitAudiences().player(event.getPlayer());
-    Sonar.get().getVerboseHandler().getAudiences().put(event.getPlayer().getName(), audience);
+    Sonar.AUDIENCES.put(event.getPlayer().getName(), audience);
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void handle(final @NotNull PlayerQuitEvent event) {
-    Sonar.get().getVerboseHandler().getAudiences().remove(event.getPlayer().getName());
+    Sonar.AUDIENCES.remove(event.getPlayer().getName());
   }
 }

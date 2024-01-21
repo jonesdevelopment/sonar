@@ -31,9 +31,7 @@ import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.INCOMING;
@@ -42,7 +40,6 @@ import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.OUTGOING;
 @Getter
 public final class Verbose implements JVMProfiler, Counters {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
-  private final @NotNull Map<String, Audience> audiences = new ConcurrentHashMap<>();
   private int animationIndex;
 
   // Run action bar verbose
@@ -59,7 +56,7 @@ public final class Verbose implements JVMProfiler, Counters {
     final Component component = prepareActionBarFormat();
     // Send the action bar to all online players
     for (final String subscriber : subscribers) {
-      final Audience audience = audiences.get(subscriber);
+      final Audience audience = Sonar.AUDIENCES.get(subscriber);
       if (audience == null) continue;
       audience.sendActionBar(component);
     }
