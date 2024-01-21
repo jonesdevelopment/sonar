@@ -31,6 +31,7 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.fallback.FallbackRatelimiter;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
+import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.service.ServiceRepository;
@@ -47,6 +48,8 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private T plugin;
   @Setter
   private Verbose verboseHandler;
+  @Setter
+  private Notification notificationHandler;
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
   private File dataDirectory;
@@ -65,6 +68,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     this.dataDirectory = dataDirectory;
     this.platform = platform;
     this.verboseHandler = new Verbose();
+    this.notificationHandler = new Notification();
     this.config = new SonarConfiguration(dataDirectory);
     this.subcommandRegistry = new SubcommandRegistryHolder();
   }

@@ -28,11 +28,11 @@ public final class AudienceListener {
 
   @Subscribe(order = PostOrder.LAST)
   public void handle(final @NotNull PostLoginEvent event) {
-    Sonar.get().getVerboseHandler().getAudiences().put(event.getPlayer().getUsername(), event.getPlayer());
+    Sonar.AUDIENCES.put(event.getPlayer().getUsername(), event.getPlayer());
   }
 
   @Subscribe(order = PostOrder.LAST)
   public void handle(final @NotNull DisconnectEvent event) {
-    Sonar.get().getVerboseHandler().getAudiences().remove(event.getPlayer().getUsername());
+    Sonar.AUDIENCES.remove(event.getPlayer().getUsername());
   }
 }

@@ -32,11 +32,11 @@ public final class AudienceListener implements Listener {
   @EventHandler(priority = EventPriority.HIGHEST)
   public void handle(final @NotNull PostLoginEvent event) {
     final Audience audience = SonarBungee.INSTANCE.getBungeeAudiences().player(event.getPlayer());
-    Sonar.get().getVerboseHandler().getAudiences().put(event.getPlayer().getName(), audience);
+    Sonar.AUDIENCES.put(event.getPlayer().getName(), audience);
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void handle(final @NotNull PlayerDisconnectEvent event) {
-    Sonar.get().getVerboseHandler().getAudiences().remove(event.getPlayer().getName());
+    Sonar.AUDIENCES.remove(event.getPlayer().getName());
   }
 }

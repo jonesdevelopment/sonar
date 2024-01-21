@@ -69,6 +69,7 @@ public final class AttackTracker implements JVMProfiler {
         currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().estimatedSize();
         currentAttack.failedVerifications = Statistics.FAILED_VERIFICATIONS.get();
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
+        Sonar.get().getNotificationHandler().sendAttackNotification();
       } else {
         // Reset attack timer if we're still under attack
         currentAttack.timer.reset();

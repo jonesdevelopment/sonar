@@ -53,6 +53,8 @@ public final class SonarConfiguration {
   private final Database database = new Database();
   @Getter
   private final Webhook webhook = new Webhook();
+  @Getter
+  private final Notifications notifications = new Notifications();
 
   public SonarConfiguration(final @NotNull File pluginFolder) {
     this.pluginFolder = pluginFolder;
@@ -84,6 +86,14 @@ public final class SonarConfiguration {
     private String actionBarLayout;
     private String actionBarLayoutDuringAttack;
     private List<String> animation;
+  }
+
+  @Getter
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  public static final class Notifications {
+    private Component notificationTitle;
+    private Component notificationSubtitle;
+    private String notificationChat;
   }
 
   @Getter
@@ -218,6 +228,9 @@ public final class SonarConfiguration {
 
     private String verboseSubscribed;
     private String verboseUnsubscribed;
+
+    private String notificationsSubscribed;
+    private String notificationsUnsubscribed;
 
     private String reloading;
     private String reloaded;
@@ -754,6 +767,18 @@ public final class SonarConfiguration {
     commands.verboseUnsubscribed = formatString(messagesConfig.getString("commands.verbose.unsubscribed",
       "%prefix%You are no longer viewing Sonar verbose."));
 
+    messagesConfig.getYaml().setComment("commands.notify",
+      "Translations for '/sonar notify'");
+    messagesConfig.getYaml().setComment("commands.notify.subscribed",
+      "Message that is shown when a player subscribes to Sonar attack notifications");
+    commands.notificationsSubscribed = formatString(messagesConfig.getString("commands.notify.subscribed",
+      "%prefix%You are now viewing Sonar attack notifications."));
+
+    messagesConfig.getYaml().setComment("commands.notify.unsubscribed",
+      "Message that is shown when a player unsubscribes from Sonar attack notifications");
+    commands.notificationsUnsubscribed = formatString(messagesConfig.getString("commands.notify.unsubscribed",
+      "%prefix%You are no longer viewing Sonar attack notifications."));
+
     messagesConfig.getYaml().setComment("commands.blacklist",
       "Translations for '/sonar blacklist'");
     messagesConfig.getYaml().setComment("commands.blacklist.empty",
@@ -1053,9 +1078,9 @@ public final class SonarConfiguration {
       ))));
 
     messagesConfig.getYaml().setComment("verbose",
-      "Translations for all messages regarding Sonar's verbose output");
+      "Translations for Sonar's actionbar verbose messages");
     messagesConfig.getYaml().setComment("verbose.layout.normal",
-      "General layout for the verbose action-bar"
+      "Layout for Sonar's actionbar verbose"
         + LINE_SEPARATOR + "Placeholders:"
         + LINE_SEPARATOR + "- '%queued%' Number of queued connections"
         + LINE_SEPARATOR + "- '%verifying%' Number of verifying connections"
@@ -1085,7 +1110,7 @@ public final class SonarConfiguration {
             + " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s"
             + "  <green><bold>%animation%<reset>"))));
     messagesConfig.getYaml().setComment("verbose.layout.attack",
-      "Translations for Sonar's verbose output during an active attack");
+      "Layout for Sonar's actionbar verbose during an attack");
     verbose.actionBarLayoutDuringAttack = formatString(messagesConfig.getString("verbose.layout.attack",
       String.join(" <dark_aqua>╺ ", Arrays.asList(
         "%prefix%<gray>CPS <white>%connections-per-second%",
@@ -1102,6 +1127,39 @@ public final class SonarConfiguration {
     verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation",
       Arrays.asList("◜", "◝", "◞", "◟")
     ));
+
+    messagesConfig.getYaml().setComment("notifications",
+      "Translations for Sonar's attack notification messages");
+    messagesConfig.getYaml().setComment("notifications.title",
+      "Layout for Sonar's attack notification title");
+    notifications.notificationTitle = deserialize(formatString(messagesConfig.getString("notifications.title",
+      "<yellow><b>Sonar<reset>")));
+    messagesConfig.getYaml().setComment("notifications.subtitle",
+      "Layout for Sonar's attack notification subtitle");
+    notifications.notificationSubtitle = deserialize(formatString(messagesConfig.getString("notifications.subtitle",
+      "<gray>A bot attack has been detected")));
+    messagesConfig.getYaml().setComment("notifications.chat",
+      "Layout for Sonar's attack notification in chat");
+    notifications.notificationChat = formatString(fromList(
+      messagesConfig.getStringList("notifications.chat",
+        Arrays.asList(
+          "",
+          "<yellow><b>Sonar<reset>",
+          "",
+          "<gray>A bot attack has been detected.",
+          " <dark_aqua>▪ <gray>Logins per second: <white>%logins-per-second%",
+          " <dark_aqua>▪ <gray>Verifying players: <white>%verifying%",
+          " <dark_aqua>▪ <gray>Queued players: <white>%queued%",
+          "",
+          "<gray>View more information using " +
+            "<white><click:run_command:'/sonar verbose'><hover:show_text:'(Click to run)'>/sonar verbose</hover></click>" +
+            "<gray> or " +
+            "<white><click:run_command:'/sonar stats'><hover:show_text:'(Click to run)'>/sonar stats</hover></click>" +
+            "<gray>.",
+          //"<gray>If you have any questions regarding attack mitigation or experience issues,",
+          //"<gray>you can join the Jones Development Discord server or open a GitHub issue.",
+          ""
+        ))));
 
     generalConfig.save();
     messagesConfig.save();

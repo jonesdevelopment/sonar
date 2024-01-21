@@ -28,7 +28,8 @@ public final class SubcommandRegistryHolder implements SubcommandRegistry {
       new StatisticsCommand(),
       new VerboseCommand(),
       new ReloadCommand(),
-      new DumpCommand()
+      new DumpCommand(),
+      new NotifyCommand()
     );
   }
 }

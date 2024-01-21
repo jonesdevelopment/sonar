@@ -89,7 +89,8 @@ tasks {
     // We have to be careful here, so we don't accidentally break adventure
     relocate("net.kyori.adventure", "xyz.jonesdev.sonar.libs.adventure") {
       exclude("net.kyori.adventure.text.**")
-      exclude("net.kyori.adventure.audience.**")
+      exclude("net.kyori.adventure.audience.Audience")
+      exclude("net.kyori.adventure.title.Title")
     }
 
     // Exclude unnecessary metadata information

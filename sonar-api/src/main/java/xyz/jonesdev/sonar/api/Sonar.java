@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
@@ -28,10 +29,13 @@ import xyz.jonesdev.sonar.api.event.SonarEventManager;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
+import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface Sonar {
   DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
@@ -40,6 +44,12 @@ public interface Sonar {
   Gson GENERAL_GSON = new GsonBuilder()
     .disableInnerClassSerialization()
     .create();
+
+  /**
+   * Since we want to use Adventure on every server platform,
+   * we have to use their platform module to support BungeeCord and Bukkit
+   */
+  Map<String, Audience> AUDIENCES = new ConcurrentHashMap<>();
 
   /**
    * @return The platform the plugin is being run on
@@ -61,6 +71,8 @@ public interface Sonar {
 
   @NotNull Verbose getVerboseHandler();
 
+  @NotNull Notification getNotificationHandler();
+
   @NotNull SystemTimer getLaunchTimer();
 
   /**
@@ -68,6 +80,12 @@ public interface Sonar {
    */
   @SuppressWarnings("unused")
   void setVerboseHandler(final @NotNull Verbose verboseHandler);
+
+  /**
+   * Set a custom notification handler
+   */
+  @SuppressWarnings("unused")
+  void setNotificationHandler(final @NotNull Notification notificationHandler);
 
   /**
    * Reloads the entire plugin

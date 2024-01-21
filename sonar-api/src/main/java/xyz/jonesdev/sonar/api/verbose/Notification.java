@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Sonar Contributors
+ * Copyright (C) 2024 Sonar Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,17 +18,14 @@
 package xyz.jonesdev.sonar.api.verbose;
 
 import lombok.Getter;
-import lombok.val;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.attack.AttackTracker;
-import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 import xyz.jonesdev.sonar.api.statistics.Counters;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
-import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
 import java.util.Vector;
@@ -38,36 +35,19 @@ import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.INCOMING;
 import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.OUTGOING;
 
 @Getter
-public final class Verbose implements Observable, JVMProfiler, Counters {
+public final class Notification implements Observable, Counters {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
-  private int animationIndex;
 
-  // Run action bar verbose
-  public void update() {
-    // Clean up all blacklisted IPs
-    Sonar.get().getFallback().getBlacklisted().cleanUp(false);
-    // Clean up all counters
-    LOGINS_PER_SECOND.cleanUp(false);
-    CONNECTIONS_PER_SECOND.cleanUp(false);
-
-    // Don't prepare component if there are no subscribers
-    if (subscribers.isEmpty()) return;
-    // Prepare the action bar format component
-    final Component component = prepareActionBarFormat();
-    // Send the action bar to all online players
-    for (final String subscriber : subscribers) {
-      final Audience audience = Sonar.AUDIENCES.get(subscriber);
-      if (audience == null) continue;
-      audience.sendActionBar(component);
-    }
-  }
-
-  public @NotNull Component prepareActionBarFormat() {
-    final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
-    final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
-    return MiniMessage.miniMessage().deserialize((attackDuration != null
-      ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
-      : Sonar.get().getConfig().getVerbose().getActionBarLayout())
+  public void sendAttackNotification() {
+    // Prepare the title
+    // TODO: Why do custom title times not work?
+    //  Title.Times.times(Ticks.duration(5L), Ticks.duration(60L), Ticks.duration(10L));
+    final Title title = Title.title(
+      Sonar.get().getConfig().getNotifications().getNotificationTitle(),
+      Sonar.get().getConfig().getNotifications().getNotificationSubtitle());
+    // Prepare the chat message
+    final Component chat = MiniMessage.miniMessage().deserialize(
+      Sonar.get().getConfig().getNotifications().getNotificationChat()
       .replace("%queued%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
       .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
@@ -80,21 +60,16 @@ public final class Verbose implements Observable, JVMProfiler, Counters {
       .replace("%verify-success%",
         DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
       .replace("%verify-failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
-      .replace("%attack-duration%", attackDuration == null ? "00:00" : attackDuration.formattedDelay())
       .replace("%incoming-traffic%", INCOMING.getCachedSecond())
       .replace("%outgoing-traffic%", OUTGOING.getCachedSecond())
       .replace("%incoming-traffic-ttl%", INCOMING.getCachedTtl())
-      .replace("%outgoing-traffic-ttl%", OUTGOING.getCachedTtl())
-      .replace("%used-memory%", formatMemory(getUsedMemory()))
-      .replace("%free-memory%", formatMemory(getFreeMemory()))
-      .replace("%total-memory%", formatMemory(getTotalMemory()))
-      .replace("%max-memory%", formatMemory(getMaxMemory()))
-      .replace("%animation%", nextAnimation()));
-  }
-
-  public String nextAnimation() {
-    val animations = Sonar.get().getConfig().getVerbose().getAnimation();
-    final int nextIndex = ++animationIndex % animations.size();
-    return animations.toArray(new String[0])[nextIndex];
+      .replace("%outgoing-traffic-ttl%", OUTGOING.getCachedTtl()));
+    // Send the title and chat messages to all online players
+    for (final String subscriber : Sonar.get().getNotificationHandler().getSubscribers()) {
+      final Audience audience = Sonar.AUDIENCES.get(subscriber);
+      if (audience == null) continue;
+      audience.showTitle(title);
+      audience.sendMessage(chat);
+    }
   }
 }
