@@ -135,7 +135,7 @@ public final class FallbackListener {
           markConnectionAsDead(activeSessionHandler);
           mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getBlacklisted(),
-            mcConnection.getProtocolVersion(), false));
+            mcConnection.getProtocolVersion(), true));
           return;
         }
 
@@ -156,7 +156,7 @@ public final class FallbackListener {
           markConnectionAsDead(activeSessionHandler);
           mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
-            mcConnection.getProtocolVersion(), false));
+            mcConnection.getProtocolVersion(), true));
           return;
         }
 
@@ -177,7 +177,7 @@ public final class FallbackListener {
         if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
           mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getAlreadyQueued(),
-            mcConnection.getProtocolVersion(), false));
+            mcConnection.getProtocolVersion(), true));
           return;
         }
 
@@ -187,7 +187,7 @@ public final class FallbackListener {
           || FALLBACK.getConnected().containsValue(inetAddress)) {
           mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getAlreadyVerifying(),
-            mcConnection.getProtocolVersion(), false));
+            mcConnection.getProtocolVersion(), true));
           return;
         }
 
@@ -195,7 +195,7 @@ public final class FallbackListener {
         if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
           mcConnection.closeWith(DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getTooFastReconnect(),
-            mcConnection.getProtocolVersion(), false));
+            mcConnection.getProtocolVersion(), true));
           return;
         }
 
@@ -213,7 +213,7 @@ public final class FallbackListener {
           // UTF-16 names or other types of exploits
           if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(event.getUsername()).matches()) {
             mcConnection.closeWith(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidUsername(),
-              mcConnection.getProtocolVersion(), false));
+              mcConnection.getProtocolVersion(), true));
             return;
           }
 
