@@ -24,7 +24,8 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
 @SubcommandInfo(
   name = "notify",
-  description = "Enable or disable attack notifications"
+  description = "Enable or disable attack notifications",
+  onlyPlayers = true
 )
 public final class NotifyCommand extends Subcommand {
 
