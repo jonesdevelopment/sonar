@@ -38,7 +38,7 @@ import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.INCOMING;
 import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.OUTGOING;
 
 @Getter
-public final class Verbose implements JVMProfiler, Counters {
+public final class Verbose implements Observable, JVMProfiler, Counters {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
   private int animationIndex;
 
@@ -96,27 +96,5 @@ public final class Verbose implements JVMProfiler, Counters {
     val animations = Sonar.get().getConfig().getVerbose().getAnimation();
     final int nextIndex = ++animationIndex % animations.size();
     return animations.toArray(new String[0])[nextIndex];
-  }
-
-  /**
-   * @param name Name of the audience
-   * @return Whether the audience is subscribed or not
-   */
-  public boolean isSubscribed(final @NotNull String name) {
-    return subscribers.contains(name);
-  }
-
-  /**
-   * @param name Name of the audience to subscribe
-   */
-  public void subscribe(final String name) {
-    subscribers.add(name);
-  }
-
-  /**
-   * @param name Name of the audience to unsubscribe
-   */
-  public void unsubscribe(final String name) {
-    subscribers.remove(name);
   }
 }

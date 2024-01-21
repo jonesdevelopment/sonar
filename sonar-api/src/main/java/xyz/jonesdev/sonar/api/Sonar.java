@@ -29,6 +29,7 @@ import xyz.jonesdev.sonar.api.event.SonarEventManager;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
+import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
 import java.io.File;
@@ -70,6 +71,8 @@ public interface Sonar {
 
   @NotNull Verbose getVerboseHandler();
 
+  @NotNull Notification getNotificationHandler();
+
   @NotNull SystemTimer getLaunchTimer();
 
   /**
@@ -77,6 +80,12 @@ public interface Sonar {
    */
   @SuppressWarnings("unused")
   void setVerboseHandler(final @NotNull Verbose verboseHandler);
+
+  /**
+   * Set a custom notification handler
+   */
+  @SuppressWarnings("unused")
+  void setNotificationHandler(final @NotNull Notification notificationHandler);
 
   /**
    * Reloads the entire plugin
