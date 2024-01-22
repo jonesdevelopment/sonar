@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.velocity;
 
+import com.alessiodp.libby.VelocityLibraryManager;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
@@ -31,7 +32,9 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
   public static SonarVelocity INSTANCE;
 
   public SonarVelocity(final @NotNull SonarVelocityPlugin plugin) {
-    super(plugin, plugin.getDataDirectory().toFile(), SonarPlatform.VELOCITY);
+    super(plugin, new VelocityLibraryManager<>(
+      plugin, plugin.getLogger(), plugin.getDataDirectory(), plugin.getServer().getPluginManager()),
+      plugin.getDataDirectory().toFile(), SonarPlatform.VELOCITY);
     INSTANCE = this;
   }
 

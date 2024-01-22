@@ -23,6 +23,9 @@ dependencies {
 
   // Implement bStats.org for metrics
   implementation("org.bstats:bstats-bungeecord:3.0.2")
+
+  // Library/dependency loading
+  implementation("com.alessiodp.libby:libby-bungee:2.0.0-SNAPSHOT")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8

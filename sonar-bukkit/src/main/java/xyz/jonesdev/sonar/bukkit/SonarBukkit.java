@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.bukkit;
 
+import com.alessiodp.libby.BukkitLibraryManager;
 import lombok.Getter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
@@ -34,7 +35,9 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
   public static SonarBukkit INSTANCE;
 
   public SonarBukkit(final @NotNull SonarBukkitPlugin plugin) {
-    super(plugin, plugin.getDataFolder(), SonarPlatform.BUKKIT);
+    super(plugin, new BukkitLibraryManager(
+      plugin, plugin.getDataFolder().getName()),
+      plugin.getDataFolder(), SonarPlatform.BUKKIT);
     INSTANCE = this;
   }
 
