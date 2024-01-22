@@ -55,6 +55,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -71,9 +72,13 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_19_3;
 import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
 
-public final class FallbackInitialHandler extends InitialHandler {
+public final class FallbackInitialHandler extends DummyInitialHandler {
+
+  private final InitialHandler original;
+
   public FallbackInitialHandler(final @NotNull BungeeCord bungee, final ListenerInfo listener) {
     super(bungee, listener);
+    original = this.getTarget();
     this.bungee = bungee;
   }
 
@@ -90,10 +95,35 @@ public final class FallbackInitialHandler extends InitialHandler {
   @SuppressWarnings({"FieldCanBeLocal", "unused"})
   private UUID uniqueId;
 
+  private static final Field uniqueIdField;
+
+  static {
+    try {
+      uniqueIdField = InitialHandler.class.getDeclaredField("uniqueId");
+      uniqueIdField.setAccessible(true);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @Override
   public void setUniqueId(final UUID uniqueId) {
     this.uniqueId = uniqueId;
-    super.setUniqueId(uniqueId);
+    //super.setUniqueId(uniqueId);
+    try {
+      super.setUniqueId(uniqueId);
+    } catch (final IllegalStateException ignore) {
+      try {
+        uniqueIdField.set(original, uniqueId);
+      } catch (final Exception exception) {
+        throw new RuntimeException(exception);
+      }
+    }
+  }
+
+  @Override
+  public UUID getUniqueId() {
+    return uniqueId == null ? super.getUniqueId() : uniqueId;
   }
 
   private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
@@ -102,6 +132,11 @@ public final class FallbackInitialHandler extends InitialHandler {
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
     this.channelWrapper = channelWrapper;
     super.connected(channelWrapper);
+    recordMaps.put(original, this);
+    channelWrapper
+      .getHandle()
+      .pipeline()
+      .addAfter(BOSS_HANDLER, "disconnect-handler", new DisconnectHandler(this, original));
     // Increase connections per second for the action bar verbose
     Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime());
   }
@@ -138,7 +173,7 @@ public final class FallbackInitialHandler extends InitialHandler {
   }
 
   @Override
-  public void handle(final LoginRequest loginRequest) throws Exception {
+  public void handle(final LoginRequest loginRequest) {
     // Increase joins per second for the action bar verbose
     Counters.LOGINS_PER_SECOND.put(System.nanoTime());
 
@@ -371,4 +406,7 @@ public final class FallbackInitialHandler extends InitialHandler {
       }
     }
   }
+
+  public static final Map<InitialHandler, FallbackInitialHandler> recordMaps = new ConcurrentHashMap<>();
+
 }

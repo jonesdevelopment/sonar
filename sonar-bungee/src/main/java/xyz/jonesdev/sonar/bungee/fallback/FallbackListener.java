@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +43,9 @@ public final class FallbackListener implements Listener {
     // the connecting player is greater than the configured amount
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
 
+    // Not FallbackInitialHandler. It just original InitialHandler.
+    final InitialHandler original = (InitialHandler) event.getConnection();
+    final FallbackInitialHandler initialHandler = Objects.requireNonNull(FallbackInitialHandler.recordMaps.get(original));
     if (maxOnlinePerIp > 0) {
       final long onlinePerIp = SonarBungee.INSTANCE.getPlugin().getServer().getPlayers().stream()
         .filter(player -> Objects.equals(player.getAddress().getAddress(), inetAddress))
@@ -50,10 +54,12 @@ public final class FallbackListener implements Listener {
 
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
-        final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) event.getConnection();
         final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
-        fallbackInitialHandler.closeWith(FallbackInitialHandler.getKickPacket(component));
+        initialHandler.closeWith(FallbackInitialHandler.getKickPacket(component));
       }
+    }
+    if (!event.isCancelled() && initialHandler.isConnected()) {
+      initialHandler.setUniqueId(initialHandler.getUniqueId());
     }
   }
 }

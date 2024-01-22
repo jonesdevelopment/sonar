@@ -86,6 +86,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
           Protocol.HANDSHAKE, true, ProtocolVersion.LATEST_VERSION.getProtocol()));
         channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
         channel.pipeline().get(FallbackHandlerBoss.class).setHandler(new FallbackInitialHandler(BUNGEE, listener));
+        //channel.pipeline().addBefore(BOSS_HANDLER, "debug-handler", new DebugHandler());
 
         if (listener.isProxyProtocol()) {
           channel.pipeline().addFirst(new HAProxyMessageDecoder());
