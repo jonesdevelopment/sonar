@@ -230,7 +230,8 @@ public final class FallbackListener {
 
           // Disconnect if the protocol version could not be resolved
           if (user.getProtocolVersion().isUnknown()) {
-            user.disconnect(Sonar.get().getConfig().getVerification().getInvalidProtocol());
+            mcConnection.closeWith(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidProtocol(),
+              mcConnection.getProtocolVersion(), true));
             return;
           }
 

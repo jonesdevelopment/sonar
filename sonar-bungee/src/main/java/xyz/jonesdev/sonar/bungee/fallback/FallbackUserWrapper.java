@@ -40,6 +40,12 @@ public final class FallbackUserWrapper implements FallbackUser<FallbackInitialHa
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
 
+  /**
+   * Disconnect the player during/after verification
+   * using our custom {@link Disconnect} packet.
+   *
+   * @param reason Disconnect message component
+   */
   @Override
   public void disconnect(final @NotNull Component reason) {
     connection.closeWith(Disconnect.create(reason));
