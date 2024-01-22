@@ -85,6 +85,16 @@ public final class FallbackInitialHandler extends InitialHandler {
   private ProtocolVersion protocolVersion;
   private boolean receivedLoginPacket;
   private boolean receivedStatusPacket;
+  // Implement uniqueId field to allow reflection on this class
+  // https://github.com/jonesdevelopment/sonar/issues/163
+  @SuppressWarnings({"FieldCanBeLocal", "unused"})
+  private UUID uniqueId;
+
+  @Override
+  public void setUniqueId(final UUID uniqueId) {
+    this.uniqueId = uniqueId;
+    super.setUniqueId(uniqueId);
+  }
 
   private static final @NotNull Fallback FALLBACK = Objects.requireNonNull(Sonar.get().getFallback());
 
