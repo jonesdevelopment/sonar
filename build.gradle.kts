@@ -44,7 +44,7 @@ allprojects {
     // adventure nbt
     implementation("net.kyori:adventure-nbt:$adventureVersion")
 
-    implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
+    compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
     implementation("xyz.jonesdev:cappuccino:0.1.6-SNAPSHOT") // expiring cache
 
     compileOnly("io.netty:netty-all:4.1.106.Final") // netty

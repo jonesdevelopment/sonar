@@ -28,13 +28,6 @@ class LibraryLoader {
     libraryManager.addMavenCentral();
     libraryManager.addJitPack();
     libraryManager.loadLibraries(
-      // MySQL driver
-      Library.builder()
-        .groupId("com{}mysql")
-        .artifactId("mysql-connector-j")
-        .version("8.3.0")
-        .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
-        .build(),
       // Simple-YAML
       // TODO: use a different library for config management?
       Library.builder()
@@ -49,6 +42,19 @@ class LibraryLoader {
         .artifactId("gson")
         .version("2.10.1")
         .relocate("com{}google{}code{}gson", "xyz{}jonesdev{}sonar{}libs{}gson")
+        .build(),
+      // ORMLite
+      Library.builder()
+        .groupId("com{}j256{}ormlite")
+        .artifactId("ormlite-jdbc")
+        .version("6.1")
+        .relocate("com{}j256{}ormlite", "xyz{}jonesdev{}sonar{}libs{}ormlite")
+        .build(),
+      // MySQL
+      Library.builder()
+        .groupId("com{}mysql")
+        .artifactId("mysql-connector-j")
+        .version("8.3.0")
         .build()
     );
   }

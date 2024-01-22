@@ -33,9 +33,7 @@ import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -99,11 +97,15 @@ public final class VerifiedPlayerController {
   private @NotNull ConnectionSource setupDriverAndConnect() throws Throwable {
     final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
 
+    // Prepare the JDBC connection string
+    // TODO: automatically build best connection string for database type
     final String jdbcURL = String.format("jdbc:%s://%s:%d/%s",
       database.getType().name().toLowerCase(), database.getUrl(), database.getPort(), database.getName());
 
+    // Use reflection to uncover the driver class
     final Class<?> driverClass = Class.forName(database.getType().getDriverClassName());
 
+    // Make sure we send the username and password
     final Properties credentials = new Properties();
     credentials.put("user", database.getUsername());
     credentials.put("password", database.getPassword());
@@ -115,6 +117,8 @@ public final class VerifiedPlayerController {
                             final @NotNull Class<?> driverClass,
                             final @NotNull Properties credentials) throws Throwable {
     final Object driver = driverClass.getDeclaredConstructor().newInstance();
+    System.out.println(driver);
+    DriverManager.registerDriver((Driver) driver);
     final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);
     connect.setAccessible(true);
     return (Connection) connect.invoke(driver, databaseURL, credentials);
