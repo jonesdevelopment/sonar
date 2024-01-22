@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.boot;
 
+import com.alessiodp.libby.LibraryManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -53,17 +54,22 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
   private File dataDirectory;
+  private final LibraryManager libraryManager;
   private final SonarPlatform platform;
   private final SubcommandRegistry subcommandRegistry;
   private final SystemTimer launchTimer = new SystemTimer();
 
   public SonarBootstrap(final @NotNull T plugin,
+                        final LibraryManager libraryManager,
                         final File dataDirectory,
                         final SonarPlatform platform) {
     // Set the Sonar API
     SonarSupplier.set(this);
-
-    // Set the plugin instance before anything else
+    // Store our library manager for the API
+    this.libraryManager = libraryManager;
+    // Load all libraries before anything else
+    LibraryLoader.loadLibraries(libraryManager);
+    // Set the plugin instance
     this.plugin = plugin;
     this.dataDirectory = dataDirectory;
     this.platform = platform;

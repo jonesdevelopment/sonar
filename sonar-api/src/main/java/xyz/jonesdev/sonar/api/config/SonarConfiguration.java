@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
-import xyz.jonesdev.sonar.api.dependencies.Dependency;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.awt.*;
@@ -243,10 +242,9 @@ public final class SonarConfiguration {
     @Getter
     @RequiredArgsConstructor
     public enum Type {
-      MYSQL(Dependency.MYSQL, "com.mysql.cj.jdbc.NonRegisteringDriver"),
-      NONE(null, null);
+      MYSQL("com.mysql.cj.jdbc.NonRegisteringDriver"),
+      NONE(null);
 
-      private final Dependency dependency;
       private final String driverClassName;
     }
 

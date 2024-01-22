@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.api;
 
+import com.alessiodp.libby.LibraryManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kyori.adventure.audience.Audience;
@@ -74,6 +75,8 @@ public interface Sonar {
   @NotNull Notification getNotificationHandler();
 
   @NotNull SystemTimer getLaunchTimer();
+
+  @NotNull LibraryManager getLibraryManager();
 
   /**
    * Set a custom verbose handler

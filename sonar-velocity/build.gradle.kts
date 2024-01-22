@@ -9,6 +9,9 @@ dependencies {
 
   // Implement bStats.org for metrics
   implementation("org.bstats:bstats-velocity:3.0.2")
+
+  // Library/dependency loading
+  implementation("com.alessiodp.libby:libby-velocity:2.0.0-SNAPSHOT")
 }
 
 tasks {

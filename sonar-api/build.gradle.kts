@@ -1,5 +1,5 @@
 dependencies {
-  implementation("com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
+  compileOnly("com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
     exclude(group = "org.yaml")
   }
 

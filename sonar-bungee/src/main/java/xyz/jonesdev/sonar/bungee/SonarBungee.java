@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.bungee;
 
+import com.alessiodp.libby.BungeeLibraryManager;
 import lombok.Getter;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import org.bstats.bungeecord.Metrics;
@@ -35,7 +36,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   public static SonarBungee INSTANCE;
 
   public SonarBungee(final @NotNull SonarBungeePlugin plugin) {
-    super(plugin, plugin.getDataFolder(), SonarPlatform.BUNGEE);
+    super(plugin, new BungeeLibraryManager(plugin), plugin.getDataFolder(), SonarPlatform.BUNGEE);
     INSTANCE = this;
   }
 
