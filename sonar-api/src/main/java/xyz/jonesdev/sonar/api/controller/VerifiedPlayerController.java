@@ -97,7 +97,7 @@ public final class VerifiedPlayerController {
   /**
    * Automatically sets up the database connection using the configured credentials
    */
-  private @NotNull ConnectionSource setupDriverAndConnect() throws Throwable {
+  private static @NotNull ConnectionSource setupDriverAndConnect() throws Throwable {
     final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
 
     // Prepare the JDBC connection string
@@ -120,18 +120,18 @@ public final class VerifiedPlayerController {
   /**
    * Uses reflection to load the database driver from the injected library
    *
-   * @param databaseURL Connection string of the database
-   * @param driverClass Class of the database driver
-   * @param credentials Credentials for the database connection
+   * @param connectionString URL of the database
+   * @param driverClass      Class of the database driver
+   * @param credentials      Credentials for the database
    */
-  private Connection invoke(final @NotNull String databaseURL,
-                            final @NotNull Class<?> driverClass,
-                            final @NotNull Properties credentials) throws Throwable {
+  private static Connection invoke(final @NotNull String connectionString,
+                                   final @NotNull Class<?> driverClass,
+                                   final @NotNull Properties credentials) throws Throwable {
     final Object driver = driverClass.getDeclaredConstructor().newInstance();
     DriverManager.registerDriver((Driver) driver);
     final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);
     connect.setAccessible(true);
-    return (Connection) connect.invoke(driver, databaseURL, credentials);
+    return (Connection) connect.invoke(driver, connectionString, credentials);
   }
 
   /**
