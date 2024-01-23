@@ -22,7 +22,6 @@ import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.connection.InitialHandler;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
@@ -33,17 +32,16 @@ import java.net.InetAddress;
 
 @Getter
 @RequiredArgsConstructor
-public final class FallbackUserWrapper implements FallbackUser<InitialHandler> {
+public final class FallbackUserWrapper implements FallbackUser<FallbackHandlerBoss> {
   private final Fallback fallback;
-  private final InitialHandler connection;
+  private final FallbackHandlerBoss connection;
   private final Channel channel;
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
-  private final FallbackHandlerBoss handlerBoss;
 
   @Override
   public void disconnect(final @NotNull Component reason) {
-    handlerBoss.closeWith(Disconnect.create(reason));
+    connection.closeWith(Disconnect.create(reason));
   }
 }

@@ -39,12 +39,12 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public final class FallbackListener implements Listener {
 
-  private static final Field getCh;
+  private static final Field CHANNEL_FIELD;
 
   static {
     try {
-      getCh = InitialHandler.class.getDeclaredField("ch");
-      getCh.setAccessible(true);
+      CHANNEL_FIELD = InitialHandler.class.getDeclaredField("ch");
+      CHANNEL_FIELD.setAccessible(true);
     } catch (NoSuchFieldException exception) {
       throw new ReflectiveOperationException(exception);
     }
@@ -69,11 +69,8 @@ public final class FallbackListener implements Listener {
       if (onlinePerIp >= maxOnlinePerIp) {
         final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
         final PendingConnection connection = event.getConnection();
-        FallbackHandlerBoss.closeWith(
-          (ChannelWrapper) getCh.get(connection),
-          ProtocolVersion.fromId(connection.getVersion()),
-          FallbackHandlerBoss.getKickPacket(component)
-        );
+        FallbackHandlerBoss.closeWith((ChannelWrapper) CHANNEL_FIELD.get(connection),
+          ProtocolVersion.fromId(connection.getVersion()), FallbackHandlerBoss.getKickPacket(component));
       }
     }
   }
