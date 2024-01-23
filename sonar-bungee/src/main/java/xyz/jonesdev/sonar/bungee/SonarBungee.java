@@ -22,7 +22,9 @@ import lombok.Getter;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
+import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bungee.audience.AudienceListener;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
@@ -30,6 +32,8 @@ import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
 import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
+
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
@@ -86,5 +90,17 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     // Inject base into ProtocolUtils
     BaseInjectionHelper.inject(ChildChannelInitializer.INSTANCE);
+
+    // Register traffic service
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), TrafficCounter::reset,
+      1L, 1L, TimeUnit.SECONDS);
+
+    // Register queue service
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), getFallback().getQueue().getPollTask(),
+      500L, 500L, TimeUnit.MILLISECONDS);
+
+    // Register verbose service
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), Sonar.get().getVerboseHandler()::update,
+      200L, 200L, TimeUnit.MILLISECONDS);
   }
 }

@@ -39,6 +39,10 @@ public final class Notification implements Observable, Counters {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
 
   public void sendAttackNotification() {
+    // No need to do anything if we have no subscribers
+    if (subscribers.isEmpty()) {
+      return;
+    }
     // Prepare the title
     // TODO: Why do custom title times not work?
     //  Title.Times.times(Ticks.duration(5L), Ticks.duration(60L), Ticks.duration(10L));
