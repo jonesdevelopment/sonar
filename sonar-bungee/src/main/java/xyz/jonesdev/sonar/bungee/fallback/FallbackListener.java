@@ -19,23 +19,40 @@ package xyz.jonesdev.sonar.bungee.fallback;
 
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.bungee.SonarBungee;
 
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.util.Objects;
 
 @RequiredArgsConstructor
 public final class FallbackListener implements Listener {
 
+  private static final Field getCh;
+
+  static {
+    try {
+      getCh = InitialHandler.class.getDeclaredField("ch");
+      getCh.setAccessible(true);
+    } catch (NoSuchFieldException exception) {
+      throw new ReflectiveOperationException(exception);
+    }
+  }
+
   @SuppressWarnings("deprecation")
   @EventHandler(priority = EventPriority.LOWEST)
-  public void handle(final @NotNull LoginEvent event) {
+  public void handle(final @NotNull LoginEvent event) throws IllegalAccessException {
     final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
 
     // Check if the number of online players using the same IP address as
@@ -50,9 +67,13 @@ public final class FallbackListener implements Listener {
 
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
-        final FallbackInitialHandler fallbackInitialHandler = (FallbackInitialHandler) event.getConnection();
         final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
-        fallbackInitialHandler.closeWith(FallbackInitialHandler.getKickPacket(component));
+        final PendingConnection connection = event.getConnection();
+        FallbackHandlerBoss.closeWith(
+          (ChannelWrapper) getCh.get(connection),
+          ProtocolVersion.fromId(connection.getVersion()),
+          FallbackHandlerBoss.getKickPacket(component)
+        );
       }
     }
   }

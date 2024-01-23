@@ -25,13 +25,13 @@ import lombok.NoArgsConstructor;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.event.ClientConnectEvent;
+import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.*;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackHandlerBoss;
-import xyz.jonesdev.sonar.bungee.fallback.FallbackInitialHandler;
 
 import java.lang.reflect.Field;
 import java.net.SocketAddress;
@@ -85,7 +85,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
         channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(
           Protocol.HANDSHAKE, true, ProtocolVersion.LATEST_VERSION.getProtocol()));
         channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
-        channel.pipeline().get(FallbackHandlerBoss.class).setHandler(new FallbackInitialHandler(BUNGEE, listener));
+        channel.pipeline().get(FallbackHandlerBoss.class).setHandler(new InitialHandler(BUNGEE, listener));
 
         if (listener.isProxyProtocol()) {
           channel.pipeline().addFirst(new HAProxyMessageDecoder());

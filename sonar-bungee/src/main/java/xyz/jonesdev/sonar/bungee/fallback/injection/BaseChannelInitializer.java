@@ -72,6 +72,6 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
     channel.pipeline().addLast(TIMEOUT_HANDLER, new FallbackTimeoutHandler(
       BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
     channel.pipeline().addLast(FRAME_PREPENDER, FRAME_ENCODER);
-    channel.pipeline().addLast(BOSS_HANDLER, new FallbackHandlerBoss());
+    channel.pipeline().addLast(BOSS_HANDLER, new FallbackHandlerBoss(channel));
   }
 }
