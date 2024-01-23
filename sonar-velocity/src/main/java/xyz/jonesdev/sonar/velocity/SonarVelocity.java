@@ -20,12 +20,16 @@ package xyz.jonesdev.sonar.velocity;
 import com.alessiodp.libby.VelocityLibraryManager;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
+import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.velocity.audience.AudienceListener;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
+
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
@@ -76,5 +80,17 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
     // Register audience register listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
+
+    // Register traffic service
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), TrafficCounter::reset)
+      .repeat(1L, TimeUnit.SECONDS);
+
+    // Register queue service
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), getFallback().getQueue().getPollTask())
+      .repeat(500L, TimeUnit.MILLISECONDS);
+
+    // Register verbose service
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), Sonar.get().getVerboseHandler()::update)
+      .repeat(200L, TimeUnit.MILLISECONDS);
   }
 }
