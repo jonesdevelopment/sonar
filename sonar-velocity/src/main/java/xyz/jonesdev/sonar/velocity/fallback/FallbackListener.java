@@ -302,7 +302,7 @@ public final class FallbackListener {
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
         connectedPlayer.getConnection().closeWith(DisconnectPacket.create(
-          Sonar.get().getConfig().getTooManyOnlinePerIp(), connectedPlayer.getProtocolVersion(), false));
+          Sonar.get().getConfig().getTooManyOnlinePerIp(), connectedPlayer.getProtocolVersion(), true));
       }
     }
   }

@@ -35,7 +35,6 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
-import xyz.jonesdev.sonar.common.service.ServiceRepository;
 import xyz.jonesdev.sonar.common.subcommand.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.update.UpdateChecker;
 
@@ -96,9 +95,6 @@ public abstract class SonarBootstrap<T> implements Sonar {
     getLogger().info("Successfully initialized components in {}s!", launchTimer);
     getLogger().info("Enabling all tasks and features...");
 
-    // Start all service threads
-    ServiceRepository.register();
-
     try {
       // Run the per-platform initialization method
       enable();
@@ -144,8 +140,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
   public void shutdown() {
     getLogger().info("Starting shutdown process...");
 
-    // Shut down service threads
-    ServiceRepository.shutdown();
+    // ...
 
     getLogger().info("Successfully shut down. Goodbye!");
   }
