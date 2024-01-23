@@ -21,8 +21,9 @@ versioner {
 allprojects {
   repositories {
     mavenCentral() // Lombok
-    maven(url = "https://jitpack.io") // simple-yaml
+    maven(url = "https://jitpack.io/") // simple-yaml
     maven(url = "https://repo.jonesdev.xyz/releases/") // Bungee & Velocity proxy module
+    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") // libby
   }
 
   apply(plugin = "java")
@@ -43,10 +44,13 @@ allprojects {
     // adventure nbt
     implementation("net.kyori:adventure-nbt:$adventureVersion")
 
-    implementation("com.j256.ormlite:ormlite-jdbc:6.1") // ORM
+    compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
     implementation("xyz.jonesdev:cappuccino:0.1.6-SNAPSHOT") // expiring cache
 
     compileOnly("io.netty:netty-all:4.1.106.Final") // netty
+
+    // Library/dependency loading
+    compileOnly("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
   }
 }
 
@@ -80,8 +84,7 @@ tasks {
 
     // https://github.com/jonesdevelopment/sonar/issues/46
     // Relocate some packages, so we don't run into issues where we accidentally use Velocity's classes
-    relocate("org.simpleyaml", "xyz.jonesdev.sonar.libs.yaml")
-    relocate("com.google.gson", "xyz.jonesdev.sonar.libs.gson")
+    relocate("com.alessiodp.libby", "xyz.jonesdev.sonar.libs.libby")
     relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
     relocate("xyz.jonesdev.cappuccino", "xyz.jonesdev.sonar.libs.cappuccino")
     relocate("net.kyori.examination", "xyz.jonesdev.sonar.libs.examination")
@@ -95,6 +98,8 @@ tasks {
 
     // Exclude unnecessary metadata information
     exclude("META-INF/versions/**")
+    // We want to load our own Gson dynamically
+    exclude("com/google/gson/**")
   }
 
   compileJava {

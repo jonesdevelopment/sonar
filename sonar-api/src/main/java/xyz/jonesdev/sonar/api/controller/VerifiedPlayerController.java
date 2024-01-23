@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api.controller;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.jdbc.JdbcSingleConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -28,12 +29,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.api.dependencies.DependencyLoader;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
+import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -61,7 +61,7 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    try (final ConnectionSource connectionSource = DependencyLoader.setUpDriverAndConnect()) {
+    try (final ConnectionSource connectionSource = setupDriverAndConnect()) {
       this.connectionSource = connectionSource;
 
       // Create table
@@ -92,6 +92,46 @@ public final class VerifiedPlayerController {
       Sonar.get().getLogger().error("Error setting up database: {}", throwable);
       throwable.printStackTrace(System.err);
     }
+  }
+
+  /**
+   * Automatically sets up the database connection using the configured credentials
+   */
+  private static @NotNull ConnectionSource setupDriverAndConnect() throws Throwable {
+    final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
+
+    // Prepare the JDBC connection string
+    // TODO: automatically build best connection string for database type
+    final String jdbcURL = String.format("jdbc:%s://%s:%d/%s",
+      database.getType().name().toLowerCase(), database.getUrl(), database.getPort(), database.getName());
+
+    // Use reflection to uncover the driver class
+    final Class<?> driverClass = Class.forName(database.getType().getDriverClassName());
+
+    // Make sure we send the username and password
+    final Properties credentials = new Properties();
+    credentials.put("user", database.getUsername());
+    credentials.put("password", database.getPassword());
+
+    // Return new JDBC connection instance for our controller to handle
+    return new JdbcSingleConnectionSource(jdbcURL, invoke(jdbcURL, driverClass, credentials));
+  }
+
+  /**
+   * Uses reflection to load the database driver from the injected library
+   *
+   * @param connectionString URL of the database
+   * @param driverClass      Class of the database driver
+   * @param credentials      Credentials for the database
+   */
+  private static Connection invoke(final @NotNull String connectionString,
+                                   final @NotNull Class<?> driverClass,
+                                   final @NotNull Properties credentials) throws Throwable {
+    final Object driver = driverClass.getDeclaredConstructor().newInstance();
+    DriverManager.registerDriver((Driver) driver);
+    final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);
+    connect.setAccessible(true);
+    return (Connection) connect.invoke(driver, connectionString, credentials);
   }
 
   /**
