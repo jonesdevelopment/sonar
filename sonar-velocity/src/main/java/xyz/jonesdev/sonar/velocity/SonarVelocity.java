@@ -83,14 +83,17 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
     // Register traffic service
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), TrafficCounter::reset)
-      .repeat(1L, TimeUnit.SECONDS);
+      .repeat(1L, TimeUnit.SECONDS)
+      .schedule();
 
     // Register queue service
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), getFallback().getQueue().getPollTask())
-      .repeat(500L, TimeUnit.MILLISECONDS);
+      .repeat(500L, TimeUnit.MILLISECONDS)
+      .schedule();
 
     // Register verbose service
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), Sonar.get().getVerboseHandler()::update)
-      .repeat(200L, TimeUnit.MILLISECONDS);
+      .repeat(200L, TimeUnit.MILLISECONDS)
+      .schedule();
   }
 }
