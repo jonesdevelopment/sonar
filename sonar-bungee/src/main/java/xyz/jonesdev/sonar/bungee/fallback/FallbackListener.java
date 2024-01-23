@@ -48,7 +48,7 @@ public final class FallbackListener implements Listener {
 
   @SuppressWarnings("deprecation")
   @EventHandler(priority = EventPriority.LOWEST)
-  public void handle(final @NotNull LoginEvent event) {
+  public void handle(final @NotNull LoginEvent event) throws ReflectiveOperationException {
     final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
 
     // Check if the number of online players using the same IP address as
@@ -72,7 +72,7 @@ public final class FallbackListener implements Listener {
             FallbackInitialHandler.getKickPacket(component)
           );
         } catch (IllegalAccessException e) {
-          throw new RuntimeException(e);
+          throw new ReflectiveOperationException(e);
         }
       }
     }

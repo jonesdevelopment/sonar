@@ -103,7 +103,7 @@ public final class FallbackInitialHandler extends ReplaceInitialHandler {
       uniqueIdField = InitialHandler.class.getDeclaredField("uniqueId");
       uniqueIdField.setAccessible(true);
     } catch (NoSuchFieldException e) {
-      throw new RuntimeException(e);
+      throw new ReflectiveOperationException(e);
     }
   }
 
