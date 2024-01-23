@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.bungee.fallback.injection;
 
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -55,16 +56,18 @@ public final class BaseChannelInitializer extends ChannelInitializer<Channel> {
     }
   }
 
-  // Mostly taken from BungeeCord
+  // Taken from BungeeCord
   // https://github.com/SpigotMC/BungeeCord/blob/master/proxy/src/main/java/net/md_5/bungee/netty/PipelineUtils.java#L162
   @Override
   protected void initChannel(final @NotNull Channel channel) throws Exception {
     try {
       channel.config().setOption(ChannelOption.IP_TOS, 0x18);
-    } catch (ChannelException ignored) {
+      // Use TCPNoDelay
+      channel.config().setOption(ChannelOption.TCP_NODELAY, true);
+    } catch (ChannelException exception) {
+      // IP_TOS is not supported (Windows XP / Windows Server 2003)
     }
-
-    channel.config().setOption(ChannelOption.TCP_NODELAY, true);
+    channel.config().setAllocator(PooledByteBufAllocator.DEFAULT);
     channel.config().setWriteBufferWaterMark(SERVER_WRITE_MARK);
 
     channel.pipeline().addLast(FRAME_DECODER, REPLACE_VAR_INT_DECODER
