@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.fallback;
+package xyz.jonesdev.sonar.bungee.fallback.handler;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -46,6 +46,7 @@ import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Counters;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackUserWrapper;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
@@ -72,7 +73,7 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_19_3;
 import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
 
-public final class FallbackInitialHandler extends DummyInitialHandler {
+public final class FallbackInitialHandler extends ReplaceInitialHandler {
 
   private final InitialHandler original;
 
@@ -132,11 +133,6 @@ public final class FallbackInitialHandler extends DummyInitialHandler {
   public void connected(final ChannelWrapper channelWrapper) throws Exception {
     this.channelWrapper = channelWrapper;
     super.connected(channelWrapper);
-    recordMaps.put(original, this);
-    channelWrapper
-      .getHandle()
-      .pipeline()
-      .addAfter(BOSS_HANDLER, "disconnect-handler", new DisconnectHandler(this, original));
     // Increase connections per second for the action bar verbose
     Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime());
   }
@@ -389,24 +385,26 @@ public final class FallbackInitialHandler extends DummyInitialHandler {
 
   // Mostly taken from Velocity
   public void closeWith(final Object msg) {
-    if (channelWrapper.getHandle().isActive()) {
-      boolean is17 = protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
-        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0;
+    closeWith(channelWrapper, protocolVersion, msg);
+  }
+
+  public static void closeWith(final ChannelWrapper wrapper, final ProtocolVersion version, final Object msg) {
+    if (wrapper.getHandle().isActive()) {
+      boolean is17 = version.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
+        && version.compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0;
       if (is17) {
-        channelWrapper.getHandle().eventLoop().execute(() -> {
-          channelWrapper.getHandle().config().setAutoRead(false);
-          channelWrapper.getHandle().eventLoop().schedule(() -> {
-            channelWrapper.markClosed();
-            channelWrapper.getHandle().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+        wrapper.getHandle().eventLoop().execute(() -> {
+          wrapper.getHandle().config().setAutoRead(false);
+          wrapper.getHandle().eventLoop().schedule(() -> {
+            wrapper.markClosed();
+            wrapper.getHandle().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
           }, 250L, TimeUnit.MILLISECONDS);
         });
       } else {
-        channelWrapper.markClosed();
-        channelWrapper.getHandle().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+        wrapper.markClosed();
+        wrapper.getHandle().writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
       }
     }
   }
-
-  public static final Map<InitialHandler, FallbackInitialHandler> recordMaps = new ConcurrentHashMap<>();
 
 }

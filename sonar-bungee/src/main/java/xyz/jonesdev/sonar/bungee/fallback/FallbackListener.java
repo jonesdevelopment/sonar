@@ -17,22 +17,34 @@
 
 package xyz.jonesdev.sonar.bungee.fallback;
 
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import net.md_5.bungee.netty.ChannelWrapper;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.bungee.SonarBungee;
+import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
 
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.util.Objects;
 
-@RequiredArgsConstructor
 public final class FallbackListener implements Listener {
+
+  private static final Field chField;
+
+  static {
+    try {
+      chField = InitialHandler.class.getDeclaredField("ch");
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   @SuppressWarnings("deprecation")
   @EventHandler(priority = EventPriority.LOWEST)
@@ -43,9 +55,6 @@ public final class FallbackListener implements Listener {
     // the connecting player is greater than the configured amount
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
 
-    // Not FallbackInitialHandler. It just original InitialHandler.
-    final InitialHandler original = (InitialHandler) event.getConnection();
-    final FallbackInitialHandler initialHandler = Objects.requireNonNull(FallbackInitialHandler.recordMaps.get(original));
     if (maxOnlinePerIp > 0) {
       final long onlinePerIp = SonarBungee.INSTANCE.getPlugin().getServer().getPlayers().stream()
         .filter(player -> Objects.equals(player.getAddress().getAddress(), inetAddress))
@@ -55,11 +64,17 @@ public final class FallbackListener implements Listener {
       // We use '>=' because the player connecting to the server hasn't joined yet
       if (onlinePerIp >= maxOnlinePerIp) {
         final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
-        initialHandler.closeWith(FallbackInitialHandler.getKickPacket(component));
+        final InitialHandler initialHandler = (InitialHandler) event.getConnection();
+        try {
+          FallbackInitialHandler.closeWith(
+            (ChannelWrapper) chField.get(initialHandler),
+            ProtocolVersion.fromId(initialHandler.getVersion()),
+            FallbackInitialHandler.getKickPacket(component)
+          );
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
       }
-    }
-    if (!event.isCancelled() && initialHandler.isConnected()) {
-      initialHandler.setUniqueId(initialHandler.getUniqueId());
     }
   }
 }

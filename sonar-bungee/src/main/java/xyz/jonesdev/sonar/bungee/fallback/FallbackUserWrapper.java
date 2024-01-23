@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.bungee.fallback.handler.FallbackInitialHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.Disconnect;
 
 import java.net.InetAddress;

@@ -1,4 +1,4 @@
-package xyz.jonesdev.sonar.bungee.fallback;
+package xyz.jonesdev.sonar.bungee.fallback.handler;
 
 import lombok.Getter;
 import net.md_5.bungee.BungeeCord;
@@ -19,6 +19,8 @@ import java.util.UUID;
 public class DummyInitialHandler extends InitialHandler {
 
   private final InitialHandler target;
+  @Getter
+  private ChannelWrapper channelWrapper;
 
   public DummyInitialHandler(BungeeCord bungee, ListenerInfo listener) {
     this(bungee, listener, new InitialHandler(bungee, listener));
@@ -156,6 +158,7 @@ public class DummyInitialHandler extends InitialHandler {
 
   @Override
   public void disconnected(ChannelWrapper channel) throws Exception {
+    this.channelWrapper=channel;
     target.disconnected(channel);
   }
 
