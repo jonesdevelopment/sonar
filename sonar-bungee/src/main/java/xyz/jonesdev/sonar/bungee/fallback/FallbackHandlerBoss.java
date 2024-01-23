@@ -116,22 +116,6 @@ public final class FallbackHandlerBoss extends HandlerBoss {
   }
 
   @Override
-  public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-    if (handler != null) {
-      channelWrapper.markClosed();
-      super.channelInactive(ctx);
-    }
-  }
-
-  @Override
-  public void channelWritabilityChanged(final ChannelHandlerContext ctx) throws Exception {
-    if (handler != null) {
-      handler.writabilityChanged(channelWrapper);
-      super.channelWritabilityChanged(ctx);
-    }
-  }
-
-  @Override
   public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
     if (msg instanceof HAProxyMessage || msg instanceof PacketWrapper) {
       if (msg instanceof PacketWrapper) {
