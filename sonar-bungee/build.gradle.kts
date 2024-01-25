@@ -19,7 +19,7 @@ dependencies {
   testCompileOnly("net.md_5:bungeecord-proxy:master-SNAPSHOT")
 
   // MiniMessage platform support
-  implementation("net.kyori:adventure-platform-bungeecord:4.3.1")
+  implementation("net.kyori:adventure-platform-bungeecord:4.3.2")
 
   // Implement bStats.org for metrics
   implementation("org.bstats:bstats-bungeecord:3.0.2")
