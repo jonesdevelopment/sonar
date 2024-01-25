@@ -32,9 +32,9 @@ import java.net.InetAddress;
 
 @Getter
 @RequiredArgsConstructor
-public final class FallbackUserWrapper implements FallbackUser<FallbackInitialHandler> {
+public final class FallbackUserWrapper implements FallbackUser<FallbackHandlerBoss> {
   private final Fallback fallback;
-  private final FallbackInitialHandler connection;
+  private final FallbackHandlerBoss connection;
   private final Channel channel;
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;

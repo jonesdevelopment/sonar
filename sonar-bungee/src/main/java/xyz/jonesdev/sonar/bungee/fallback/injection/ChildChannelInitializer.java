@@ -25,13 +25,12 @@ import lombok.NoArgsConstructor;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.event.ClientConnectEvent;
+import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.*;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
-import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackHandlerBoss;
-import xyz.jonesdev.sonar.bungee.fallback.FallbackInitialHandler;
 
 import java.lang.reflect.Field;
 import java.net.SocketAddress;
@@ -56,7 +55,7 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
     }
   }
 
-  // Mostly taken from BungeeCord
+  // Taken from BungeeCord
   // https://github.com/SpigotMC/BungeeCord/blob/master/proxy/src/main/java/net/md_5/bungee/netty/PipelineUtils.java
   @Override
   protected void initChannel(final @NotNull Channel channel) throws Exception {
@@ -65,32 +64,27 @@ public final class ChildChannelInitializer extends ChannelInitializer<Channel> {
 
     if (BUNGEE.getConnectionThrottle() != null && BUNGEE.getConnectionThrottle().throttle(remoteAddress)) {
       channel.close();
-    } else {
-      final ListenerInfo listener = channel.attr(PipelineUtils.LISTENER).get();
+      return;
+    }
 
-      if (BungeeCord.getInstance().getPluginManager().callEvent(new ClientConnectEvent(remoteAddress, listener)).isCancelled()) {
-        channel.close();
-      } else {
-        try {
-          BASE.initChannel(channel);
-        } catch (Exception exception) {
-          exception.printStackTrace(System.err);
-          channel.close();
-          return;
-        }
+    final ListenerInfo listener = channel.attr(PipelineUtils.LISTENER).get();
 
-        channel.pipeline().addBefore(FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder());
-        channel.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER, new MinecraftDecoder(
-          Protocol.HANDSHAKE, true, ProtocolVersion.LATEST_VERSION.getProtocol()));
-        channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(
-          Protocol.HANDSHAKE, true, ProtocolVersion.LATEST_VERSION.getProtocol()));
-        channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
-        channel.pipeline().get(FallbackHandlerBoss.class).setHandler(new FallbackInitialHandler(BUNGEE, listener));
+    if (BungeeCord.getInstance().getPluginManager().callEvent(new ClientConnectEvent(remoteAddress, listener)).isCancelled()) {
+      channel.close();
+      return;
+    }
 
-        if (listener.isProxyProtocol()) {
-          channel.pipeline().addFirst(new HAProxyMessageDecoder());
-        }
-      }
+    BASE.initChannel(channel);
+    channel.pipeline().addBefore(FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder());
+    channel.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER, new MinecraftDecoder(
+      Protocol.HANDSHAKE, true, BUNGEE.getProtocolVersion()));
+    channel.pipeline().addAfter(FRAME_PREPENDER, PACKET_ENCODER, new MinecraftEncoder(
+      Protocol.HANDSHAKE, true, BUNGEE.getProtocolVersion()));
+    channel.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, LEGACY_KICK);
+    channel.pipeline().get(FallbackHandlerBoss.class).setHandler(new InitialHandler(BUNGEE, listener));
+
+    if (listener.isProxyProtocol()) {
+      channel.pipeline().addFirst(new HAProxyMessageDecoder());
     }
   }
 }
