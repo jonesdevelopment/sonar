@@ -85,16 +85,15 @@ tasks {
     // https://github.com/jonesdevelopment/sonar/issues/46
     // Relocate some packages, so we don't run into issues where we accidentally use Velocity's classes
     relocate("com.alessiodp.libby", "xyz.jonesdev.sonar.libs.libby")
-    relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
     relocate("xyz.jonesdev.cappuccino", "xyz.jonesdev.sonar.libs.cappuccino")
-    relocate("net.kyori.examination", "xyz.jonesdev.sonar.libs.examination")
-    relocate("net.kyori.option", "xyz.jonesdev.sonar.libs.option")
     // We have to be careful here, so we don't accidentally break adventure
     relocate("net.kyori.adventure", "xyz.jonesdev.sonar.libs.adventure") {
       exclude("net.kyori.adventure.text.**")
       exclude("net.kyori.adventure.audience.Audience")
       exclude("net.kyori.adventure.title.*")
     }
+    relocate("net.kyori.examination", "xyz.jonesdev.sonar.libs.examination")
+    relocate("net.kyori.option", "xyz.jonesdev.sonar.libs.option")
 
     // Exclude unnecessary metadata information
     exclude("META-INF/versions/**")
