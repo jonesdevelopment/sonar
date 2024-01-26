@@ -8,6 +8,23 @@
     "Jones Development",
     "Sonar Contributors"
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "id": "Geyser-Velocity",
+      "optional": true
+    },
+    {
+      "id": "floodgate",
+      "optional": true
+    },
+    {
+      "id": "Protocolize",
+      "optional": true
+    },
+    {
+      "id": "ViaVersion",
+      "optional": true
+    }
+  ],
   "main": "$main"
 }
