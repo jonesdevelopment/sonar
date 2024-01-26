@@ -94,11 +94,15 @@ tasks {
     }
     relocate("net.kyori.examination", "xyz.jonesdev.sonar.libs.examination")
     relocate("net.kyori.option", "xyz.jonesdev.sonar.libs.option")
+    // Relocate dynamically loaded libraries
+    relocate("com.simpleyaml", "xyz.jonesdev.sonar.libs.yaml")
+    relocate("com.google.code.gson", "xyz.jonesdev.sonar.libs.gson")
+    relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
+    // We want to load our own Gson dynamically
+    exclude("com/google/gson/**")
 
     // Exclude unnecessary metadata information
     exclude("META-INF/versions/**")
-    // We want to load our own Gson dynamically
-    exclude("com/google/gson/**")
   }
 
   compileJava {
