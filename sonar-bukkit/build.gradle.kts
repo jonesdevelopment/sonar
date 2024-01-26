@@ -13,6 +13,7 @@ bukkit {
   authors = listOf("Jones Development", "Sonar Contributors")
   website = "https://jonesdev.xyz/discord/"
   load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+  softDepend = listOf("Geyser-Spigot", "floodgate", "Protocolize", "packetevents", "ProtocolLib", "ViaVersion")
 
   commands {
     register("sonar") {
