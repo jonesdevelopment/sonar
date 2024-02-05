@@ -17,12 +17,12 @@
 
 package xyz.jonesdev.sonar.api.fallback;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
@@ -42,7 +42,9 @@ public final class Fallback {
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>(64, 0.75f);
   // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
   @Setter
-  private ExpiringCache<InetAddress> blacklist;
+  private Cache<InetAddress, Byte> blacklist;
+  @Setter
+  private long blacklistTime;
 
   private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;
   private final @NotNull FallbackRatelimiter ratelimiter = FallbackRatelimiter.INSTANCE;

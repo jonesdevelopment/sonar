@@ -17,11 +17,11 @@
 
 package xyz.jonesdev.sonar.api.fallback;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuccino.ExpiringCache;
 
 import java.net.InetAddress;
 
@@ -29,7 +29,7 @@ import java.net.InetAddress;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FallbackRatelimiter {
   static final FallbackRatelimiter INSTANCE = new FallbackRatelimiter();
-  private ExpiringCache<InetAddress> expiringCache;
+  private Cache<InetAddress, Byte> expiringCache;
 
   /**
    * We don't want to clean up the cache in the
@@ -37,7 +37,7 @@ public final class FallbackRatelimiter {
    * it would take up too many resources.
    */
   public void cleanUpCache() {
-    expiringCache.cleanUp(false);
+    expiringCache.cleanUp();
   }
 
   /**
@@ -49,9 +49,9 @@ public final class FallbackRatelimiter {
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean attempt(final @NotNull InetAddress inetAddress) {
     // Cache the IP address if it's not already cached
-    if (!expiringCache.has(inetAddress)) {
+    if (!expiringCache.asMap().containsKey(inetAddress)) {
       // Cache the IP address
-      expiringCache.put(inetAddress);
+      expiringCache.put(inetAddress, (byte) 0);
       return true;
     }
     // Deny the connection attempt

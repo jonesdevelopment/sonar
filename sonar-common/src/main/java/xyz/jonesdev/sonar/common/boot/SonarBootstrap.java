@@ -18,11 +18,11 @@
 package xyz.jonesdev.sonar.common.boot;
 
 import com.alessiodp.libby.LibraryManager;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuccino.Cappuccino;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
@@ -126,17 +126,22 @@ public abstract class SonarBootstrap<T> implements Sonar {
     FallbackPreparer.prepare();
 
     // Update ratelimiter cache
-    getFallback().getRatelimiter().setExpiringCache(Cappuccino.buildExpiring(
-      getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS, 250L));
+    getFallback().getRatelimiter().setExpiringCache(Caffeine.newBuilder()
+      .expireAfterWrite(getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS)
+      .build());
 
     // Update blacklist cache
     final long blacklistTime = getConfig().getVerification().getBlacklistTime();
     final boolean blacklistExists = getFallback().getBlacklist() != null;
     // Make sure the blacklist is only set when we need it to prevent data loss
-    if (!blacklistExists // make sure we create a new cache if it doesn't exist yet
-      || getFallback().getBlacklist().getDuration() != blacklistTime) {
-      getFallback().setBlacklist(Cappuccino.buildExpiring(
-        blacklistTime, TimeUnit.MILLISECONDS, 5000L));
+    if (!blacklistExists // Make sure we create a new cache if it doesn't exist yet
+      || getFallback().getBlacklistTime() != blacklistTime) {
+      // Create new cache with the configured blacklist time
+      getFallback().setBlacklist(Caffeine.newBuilder()
+        .expireAfterWrite(getConfig().getVerification().getBlacklistTime(), TimeUnit.MILLISECONDS)
+        .build());
+      // Store the new blacklist time, so we don't have to reset the blacklist every reload
+      getFallback().setBlacklistTime(blacklistTime);
       // Warn the user about changing the expiry of the blacklist values
       if (blacklistExists) {
         getLogger().warn("The blacklist has been reset as the duration of entries has changed.");

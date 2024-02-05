@@ -43,8 +43,8 @@ public final class AttackTracker implements JVMProfiler {
   public static final class AttackStatistics {
     private final SystemTimer duration = new SystemTimer();
     private final SystemTimer timer = new SystemTimer();
-    private int peakJoinsPerSecond;
-    private int peakConnectionsPerSecond;
+    private long peakJoinsPerSecond;
+    private long peakConnectionsPerSecond;
     private double peakProcessCPUUsage;
     private long peakProcessMemoryUsage;
     // Calculate during-attack-statistics using their deltas
@@ -52,7 +52,7 @@ public final class AttackTracker implements JVMProfiler {
   }
 
   public void checkIfUnderAttack() {
-    final int joinsPerSecond = Counters.LOGINS_PER_SECOND.estimatedSize();
+    final long joinsPerSecond = Counters.LOGINS_PER_SECOND.estimatedSize();
     final int verifyingPlayers = Sonar.get().getFallback().getConnected().size();
     final int queuedPlayers = Sonar.get().getFallback().getQueue().getQueuedPlayers().size();
     final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();
@@ -80,7 +80,7 @@ public final class AttackTracker implements JVMProfiler {
         // Update joins per second peak if necessary
         currentAttack.peakJoinsPerSecond = joinsPerSecond;
       }
-      final int connectionsPerSecond = Counters.CONNECTIONS_PER_SECOND.estimatedSize();
+      final long connectionsPerSecond = Counters.CONNECTIONS_PER_SECOND.estimatedSize();
       if (connectionsPerSecond > currentAttack.peakConnectionsPerSecond) {
         // Update connections per second peak if necessary
         currentAttack.peakConnectionsPerSecond = connectionsPerSecond;

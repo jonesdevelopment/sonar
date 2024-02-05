@@ -111,7 +111,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
       // Use the same channel wrapper as the "real" HandlerBoss
       channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER_FIELD.get(this);
       // Increase connections per second for the action bar verbose
-      Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime());
+      Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime(), (byte) 0);
     }
   }
 
@@ -143,7 +143,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
           final LoginRequest loginRequest = (LoginRequest) packetWrapper.packet;
 
           // Increase joins per second for the action bar verbose
-          Counters.LOGINS_PER_SECOND.put(System.nanoTime());
+          Counters.LOGINS_PER_SECOND.put(System.nanoTime(), (byte) 0);
 
           // Fix login packet spam exploit
           if (receivedLoginPacket || user != null) {
@@ -170,7 +170,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
               // Use the ChannelWrapper's remote address to automatically handle proxy protocol
               final InetAddress inetAddress = ((InetSocketAddress) channelWrapper.getRemoteAddress()).getAddress();
               // Check the blacklist here since we cannot let the player "ghost join"
-              if (FALLBACK.getBlacklist().has(inetAddress)) {
+              if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
                 closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
                 return;
               }

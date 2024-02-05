@@ -17,12 +17,17 @@
 
 package xyz.jonesdev.sonar.api.statistics;
 
-import xyz.jonesdev.cappuccino.Cappuccino;
-import xyz.jonesdev.cappuccino.ExpiringCache;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 import java.util.concurrent.TimeUnit;
 
 public interface Counters {
-  ExpiringCache<Long> LOGINS_PER_SECOND = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
-  ExpiringCache<Long> CONNECTIONS_PER_SECOND = Cappuccino.buildExpiring(1L, TimeUnit.SECONDS);
+  Cache<Long, Byte> LOGINS_PER_SECOND = Caffeine.newBuilder()
+    .expireAfterWrite(1L, TimeUnit.SECONDS)
+    .build();
+
+  Cache<Long, Byte> CONNECTIONS_PER_SECOND = Caffeine.newBuilder()
+    .expireAfterWrite(1L, TimeUnit.SECONDS)
+    .build();
 }

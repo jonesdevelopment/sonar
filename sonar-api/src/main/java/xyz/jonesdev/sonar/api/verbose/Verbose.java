@@ -45,10 +45,10 @@ public final class Verbose implements Observable, JVMProfiler, Counters {
   // Run action bar verbose
   public void update() {
     // Clean up all blacklisted IPs
-    Sonar.get().getFallback().getBlacklist().cleanUp(false);
+    Sonar.get().getFallback().getBlacklist().cleanUp();
     // Clean up all counters
-    LOGINS_PER_SECOND.cleanUp(false);
-    CONNECTIONS_PER_SECOND.cleanUp(false);
+    LOGINS_PER_SECOND.cleanUp();
+    CONNECTIONS_PER_SECOND.cleanUp();
 
     // Don't prepare component if there are no subscribers
     if (subscribers.isEmpty()) return;
