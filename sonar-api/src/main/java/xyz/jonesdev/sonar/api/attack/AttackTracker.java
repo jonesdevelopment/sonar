@@ -113,7 +113,7 @@ public final class AttackTracker implements JVMProfiler {
           final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
           final String startTimestamp = String.valueOf(currentAttack.duration.getStart() / 1000L);
           final String endTimestamp = String.valueOf(System.currentTimeMillis() / 1000L);
-          final long blacklisted = Sonar.get().getFallback().getBlacklisted().estimatedSize();
+          final long blacklisted = Sonar.get().getFallback().getBlacklist().estimatedSize();
           // Calculate during-attack-statistics using their deltas
           final long totalVerified = Sonar.get().getVerifiedPlayerController().estimatedSize();
           final long verified = Math.max(totalVerified - currentAttack.successfulVerifications, 0);

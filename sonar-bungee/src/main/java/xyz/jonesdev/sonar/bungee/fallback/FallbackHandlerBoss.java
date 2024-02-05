@@ -170,7 +170,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
               // Use the ChannelWrapper's remote address to automatically handle proxy protocol
               final InetAddress inetAddress = ((InetSocketAddress) channelWrapper.getRemoteAddress()).getAddress();
               // Check the blacklist here since we cannot let the player "ghost join"
-              if (FALLBACK.getBlacklisted().has(inetAddress)) {
+              if (FALLBACK.getBlacklist().has(inetAddress)) {
                 closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
                 return;
               }

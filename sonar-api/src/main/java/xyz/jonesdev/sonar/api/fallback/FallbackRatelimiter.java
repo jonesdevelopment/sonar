@@ -25,10 +25,10 @@ import xyz.jonesdev.cappuccino.ExpiringCache;
 
 import java.net.InetAddress;
 
+@Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FallbackRatelimiter {
-  public static final FallbackRatelimiter INSTANCE = new FallbackRatelimiter();
-  @Setter
+  static final FallbackRatelimiter INSTANCE = new FallbackRatelimiter();
   private ExpiringCache<InetAddress> expiringCache;
 
   /**

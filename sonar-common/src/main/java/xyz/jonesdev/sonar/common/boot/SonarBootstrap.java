@@ -23,14 +23,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.cappuccino.Cappuccino;
-import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
-import xyz.jonesdev.sonar.api.fallback.FallbackRatelimiter;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
@@ -39,7 +37,6 @@ import xyz.jonesdev.sonar.common.subcommand.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.update.UpdateChecker;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -121,17 +118,30 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Warn player if they reloaded and changed the database type
     if (getVerifiedPlayerController() != null
       && getVerifiedPlayerController().getCachedDatabaseType() != getConfig().getDatabase().getType()) {
-      Sonar.get().getLogger().warn("Reloading the server after changing the database type"
+      getLogger().warn("Reloading the server after changing the database type"
         + " is generally not recommended as it can sometimes cause data loss.");
     }
 
     // Prepare cached packets
     FallbackPreparer.prepare();
 
-    // Update ratelimiter
-    final ExpiringCache<InetAddress> expiringCache = Cappuccino.buildExpiring(
-      getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS, 250L);
-    FallbackRatelimiter.INSTANCE.setExpiringCache(expiringCache);
+    // Update ratelimiter cache
+    getFallback().getRatelimiter().setExpiringCache(Cappuccino.buildExpiring(
+      getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS, 250L));
+
+    // Update blacklist cache
+    final long blacklistTime = getConfig().getVerification().getBlacklistTime();
+    final boolean blacklistExists = getFallback().getBlacklist() != null;
+    // Make sure the blacklist is only set when we need it to prevent data loss
+    if (!blacklistExists // make sure we create a new cache if it doesn't exist yet
+      || getFallback().getBlacklist().getDuration() != blacklistTime) {
+      getFallback().setBlacklist(Cappuccino.buildExpiring(
+        blacklistTime, TimeUnit.MILLISECONDS, 5000L));
+      // Warn the user about changing the expiry of the blacklist values
+      if (blacklistExists) {
+        getLogger().warn("The blacklist has been reset as the duration of entries has changed.");
+      }
+    }
 
     // Reinitialize database controller
     verifiedPlayerController = new VerifiedPlayerController();

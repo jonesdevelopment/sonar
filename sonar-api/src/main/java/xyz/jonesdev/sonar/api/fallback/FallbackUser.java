@@ -132,7 +132,7 @@ public interface FallbackUser<T> {
       // Call the BotBlacklistedEvent for external API usage
       Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
 
-      getFallback().getBlacklisted().put(getInetAddress());
+      getFallback().getBlacklist().put(getInetAddress());
       getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
         .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
         .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));

@@ -170,6 +170,7 @@ public final class SonarConfiguration {
     private int maxPing;
     private int readTimeout;
     private int reconnectDelay;
+    private int blacklistTime;
     private final Collection<Integer> whitelistedProtocols = new HashSet<>(0);
     private final Collection<Integer> blacklistedProtocols = new HashSet<>(0);
 
@@ -318,7 +319,8 @@ public final class SonarConfiguration {
     minPlayersForAttack = clamp(generalConfig.getInt("min-players-for-attack", 8), 2, 1024);
 
     generalConfig.getYaml().setComment("min-attack-duration",
-      "Amount of time (in milliseconds) that has to pass in order for an attack to be over");
+      "Amount of time that has to pass in order for an attack to be over"
+        + LINE_SEPARATOR + "(This value represents the time in milliseconds: 1 second = 1000 milliseconds)");
     minAttackDuration = clamp(generalConfig.getInt("min-attack-duration", 30000), 1000, 900000);
 
     generalConfig.getYaml().setComment("min-attack-threshold",
@@ -327,7 +329,8 @@ public final class SonarConfiguration {
     minAttackThreshold = clamp(generalConfig.getInt("min-attack-threshold", 2), 0, 20);
 
     generalConfig.getYaml().setComment("attack-cooldown-delay",
-      "Amount of time (in milliseconds) that has to pass in order for a new attack to be detected");
+      "Amount of time that has to pass in order for a new attack to be detected"
+        + LINE_SEPARATOR + "(This value represents the time in milliseconds: 1 second = 1000 milliseconds)");
     attackCooldownDelay = clamp(generalConfig.getInt("attack-cooldown-delay", 3000), 100, 30000);
 
     generalConfig.getYaml().setComment("log-player-addresses",
@@ -490,7 +493,8 @@ public final class SonarConfiguration {
     verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute", 1000);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.max-duration",
-      "How long should Sonar wait until the player fails the captcha?");
+      "How long should Sonar wait until the player fails the captcha?"
+        + LINE_SEPARATOR + "(This value represents the time in milliseconds: 1 second = 1000 milliseconds)");
     verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration", 45000);
 
     generalConfig.getYaml().setComment("verification.checks.map-captcha.max-tries",
@@ -526,7 +530,8 @@ public final class SonarConfiguration {
     verification.maxBrandLength = generalConfig.getInt("verification.checks.max-brand-length", 64);
 
     generalConfig.getYaml().setComment("verification.checks.max-ping",
-      "Ping (in milliseconds) a player has to have in order to timeout");
+      "Ping a player has to have in order to timeout"
+        + LINE_SEPARATOR + "(This value represents the time in milliseconds: 1 second = 1000 milliseconds)");
     verification.maxPing = clamp(generalConfig.getInt("verification.checks.max-ping", 10000), 500, 30000);
 
     generalConfig.getYaml().setComment("verification.checks.max-login-packets",
@@ -547,12 +552,19 @@ public final class SonarConfiguration {
     verification.debugXYZPositions = generalConfig.getBoolean("verification.debug-xyz-positions", false);
 
     generalConfig.getYaml().setComment("verification.read-timeout",
-      "Amount of time that has to pass before a player times out");
+      "Amount of time that has to pass before a player times out"
+        + LINE_SEPARATOR + "(This value represents the time in milliseconds: 1 second = 1000 milliseconds)");
     verification.readTimeout = clamp(generalConfig.getInt("verification.read-timeout", 3500), 500, 30000);
 
     generalConfig.getYaml().setComment("verification.rejoin-delay",
-      "Minimum number of rejoin delay during verification");
+      "How long should a player wait before reconnecting during verification"
+        + LINE_SEPARATOR + "(This value represents the time in milliseconds: 1 second = 1000 milliseconds)");
     verification.reconnectDelay = clamp(generalConfig.getInt("verification.rejoin-delay", 8000), 0, 100000);
+
+    generalConfig.getYaml().setComment("verification.blacklist-time",
+      "How long should an IP address be denied from logging in when failing the verification too often?"
+        + LINE_SEPARATOR + "(This value represents the time in milliseconds: 1 second = 1000 milliseconds)");
+    verification.blacklistTime = clamp(generalConfig.getInt("verification.blacklist-time", 600000), 0, 86400000);
 
     generalConfig.getYaml().setComment("verification.whitelisted-protocols",
       "List of protocol IDs which are not checked by Sonar (verification bypass)"
@@ -1103,10 +1115,10 @@ public final class SonarConfiguration {
     verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout.normal",
       String.join(" <dark_aqua>╺ ", Arrays.asList(
         "%prefix%<gray>CPS <white>%connections-per-second%",
-          "<gray>Logins/s <white>%logins-per-second%",
-          "<gray>Verifying <white>%verifying%"
-            + " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s"
-            + "  <green><bold>%animation%<reset>"))));
+        "<gray>Logins/s <white>%logins-per-second%",
+        "<gray>Verifying <white>%verifying%"
+          + " <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s"
+          + "  <green><bold>%animation%<reset>"))));
     messagesConfig.getYaml().setComment("verbose.layout.attack",
       "Layout for Sonar's actionbar verbose during an attack");
     verbose.actionBarLayoutDuringAttack = formatString(messagesConfig.getString("verbose.layout.attack",
@@ -1150,7 +1162,8 @@ public final class SonarConfiguration {
           " <dark_aqua>▪ <gray>Queued players: <white>%queued%",
           "",
           "<gray>View more information using " +
-            "<white><click:run_command:'/sonar verbose'><hover:show_text:'(Click to run)'>/sonar verbose</hover></click>" +
+            "<white><click:run_command:'/sonar verbose'><hover:show_text:'(Click to run)'>/sonar " +
+                  "verbose</hover></click>" +
             "<gray> or " +
             "<white><click:run_command:'/sonar stats'><hover:show_text:'(Click to run)'>/sonar stats</hover></click>" +
             "<gray>.",

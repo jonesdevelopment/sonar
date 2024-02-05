@@ -74,7 +74,7 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getGeneralStatistics()
           .replace("%verified%", DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize()))
           .replace("%verifying%", DECIMAL_FORMAT.format(SONAR.getFallback().getConnected().size()))
-          .replace("%blacklisted%", DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize()))
+          .replace("%blacklisted%", DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklist().estimatedSize()))
           .replace("%queued%", DECIMAL_FORMAT.format(SONAR.getFallback().getQueue().getQueuedPlayers().size()))
           .replace("%uptime%", String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L))
           .replace("%total_joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))

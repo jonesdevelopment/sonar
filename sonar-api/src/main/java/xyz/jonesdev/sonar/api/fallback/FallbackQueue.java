@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FallbackQueue {
-  public static final FallbackQueue INSTANCE = new FallbackQueue();
+  static final FallbackQueue INSTANCE = new FallbackQueue();
   private final Map<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(64);
 
   // Runnable task executed for polling the queue

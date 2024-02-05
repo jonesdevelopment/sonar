@@ -130,7 +130,7 @@ public final class FallbackListener {
         val activeSessionHandler = mcConnection.getActiveSessionHandler();
 
         // Check the blacklist here since we cannot let the player "ghost join"
-        if (FALLBACK.getBlacklisted().has(inetAddress)) {
+        if (FALLBACK.getBlacklist().has(inetAddress)) {
           // Mark the connection as dead to avoid unnecessary console logs
           markConnectionAsDead(activeSessionHandler);
           mcConnection.closeWith(DisconnectPacket.create(
