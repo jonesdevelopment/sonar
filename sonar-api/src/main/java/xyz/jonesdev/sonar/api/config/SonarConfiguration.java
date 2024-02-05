@@ -171,6 +171,7 @@ public final class SonarConfiguration {
     private int readTimeout;
     private int reconnectDelay;
     private int blacklistTime;
+    private int blacklistThreshold;
     private final Collection<Integer> whitelistedProtocols = new HashSet<>(0);
     private final Collection<Integer> blacklistedProtocols = new HashSet<>(0);
 
@@ -565,6 +566,11 @@ public final class SonarConfiguration {
       "How long should an IP address be denied from logging in when failing the verification too often?"
         + LINE_SEPARATOR + "(This value represents the time in milliseconds: 1 second = 1000 milliseconds)");
     verification.blacklistTime = clamp(generalConfig.getInt("verification.blacklist-time", 600000), 0, 86400000);
+
+    generalConfig.getYaml().setComment("verification.blacklist-threshold",
+      "How often does a player have to fail the verification in order to be blacklisted?"
+      + LINE_SEPARATOR + "(Set this value to 0 to disable the blacklist entirely)");
+    verification.blacklistThreshold = clamp(generalConfig.getInt("verification.blacklist-threshold", 2), 0, 100);
 
     generalConfig.getYaml().setComment("verification.whitelisted-protocols",
       "List of protocol IDs which are not checked by Sonar (verification bypass)"

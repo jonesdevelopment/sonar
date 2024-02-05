@@ -24,8 +24,6 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.cappuccino.Cappuccino;
-import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserBlacklistedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
@@ -33,7 +31,9 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 
 import java.net.InetAddress;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface FallbackUser<T> {
   @NotNull Fallback getFallback();
@@ -97,7 +97,35 @@ public interface FallbackUser<T> {
     }
   }
 
-  ExpiringCache<String> PREVIOUS_FAILS = Cappuccino.buildExpiring(3L, TimeUnit.MINUTES);
+  Map<InetAddress, Integer> GLOBAL_FAIL_COUNT = new ConcurrentHashMap<>(8);
+
+  /**
+   * Increments the number of times this user (by IP address) has failed the verification
+   */
+  default void incrementFails() {
+    final InetAddress inetAddress = Objects.requireNonNull(getInetAddress());
+    final int failCount = GLOBAL_FAIL_COUNT.getOrDefault(inetAddress, -1);
+    if (failCount == -1) {
+      GLOBAL_FAIL_COUNT.put(inetAddress, 1);
+    } else {
+      GLOBAL_FAIL_COUNT.replace(inetAddress, failCount + 1);
+    }
+  }
+
+  /**
+   * @return The number of times this user (by IP address) has failed the verification
+   * @apiNote Returns 0 if not present
+   */
+  default int getFailedCount() {
+    return GLOBAL_FAIL_COUNT.getOrDefault(Objects.requireNonNull(getInetAddress()), 0);
+  }
+
+  /**
+   * Removes all previously failed verifications
+   */
+  default void invalidateFails() {
+    GLOBAL_FAIL_COUNT.remove(Objects.requireNonNull(getInetAddress()));
+  }
 
   /**
    * Disconnects the player who failed the verification
@@ -124,21 +152,32 @@ public interface FallbackUser<T> {
     // Call the VerifyFailedEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifyFailedEvent(this, reason));
 
-    // Make sure old entries are removed
-    PREVIOUS_FAILS.cleanUp();
+    // Use a label, so we can easily add more code beneath this method
+    blacklist: {
+      // Check if the player has too many failed attempts
+      final int blacklistThreshold = Sonar.get().getConfig().getVerification().getBlacklistThreshold();
+      // The user is allowed to disable the blacklist entirely by setting the threshold to 0
+      if (blacklistThreshold <= 0) break blacklist;
 
-    // Check if the player has too many failed attempts
-    if (PREVIOUS_FAILS.has(getInetAddress().toString())) {
-      // Call the BotBlacklistedEvent for external API usage
-      Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
+      // Add 1 to the amount of fails since we haven't updated the cached entries yet (for performance)
+      final int failCount = getFailedCount() + 1;
+      // Now we simply need to check if the threshold is reached
+      if (failCount >= blacklistThreshold) {
+        // Call the BotBlacklistedEvent for external API usage
+        Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
 
-      getFallback().getBlacklist().put(getInetAddress());
-      getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
-        .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
-    } else {
-      // Cache the InetAddress for 3 minutes
-      PREVIOUS_FAILS.put(getInetAddress().toString());
+        getFallback().getBlacklist().put(getInetAddress());
+        getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
+          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
+
+        // Invalidate the cached entry to ensure memory safety
+        invalidateFails();
+        break blacklist;
+      }
+
+      // Make sure we increment the number of fails
+      incrementFails();
     }
   }
 }
