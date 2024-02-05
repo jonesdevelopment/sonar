@@ -54,7 +54,7 @@ public final class BlacklistCommand extends Subcommand {
         if (inetAddress == null) return;
 
         // Make sure the IP is not blacklisted already
-        if (SONAR.getFallback().getBlacklisted().has(inetAddress)) {
+        if (SONAR.getFallback().getBlacklist().asMap().containsKey(inetAddress)) {
           invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistDuplicate());
           return;
         }
@@ -66,7 +66,7 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         // Blacklist the given IP address
-        SONAR.getFallback().getBlacklisted().put(inetAddress);
+        SONAR.getFallback().getBlacklist().put(inetAddress, (byte) 0);
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistAdd()
           .replace("%ip%", rawInetAddress));
         break;
@@ -85,20 +85,20 @@ public final class BlacklistCommand extends Subcommand {
         if (inetAddress == null) return;
 
         // Make sure the IP is blacklisted
-        if (!SONAR.getFallback().getBlacklisted().has(inetAddress)) {
+        if (!SONAR.getFallback().getBlacklist().asMap().containsKey(inetAddress)) {
           invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistNotFound());
           return;
         }
 
         // Invalidate the cache entry of the blacklisted IP address
-        SONAR.getFallback().getBlacklisted().invalidate(inetAddress);
+        SONAR.getFallback().getBlacklist().invalidate(inetAddress);
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistRemove()
           .replace("%ip%", rawInetAddress));
         break;
       }
 
       case "clear": {
-        final int blacklisted = SONAR.getFallback().getBlacklisted().estimatedSize();
+        final long blacklisted = SONAR.getFallback().getBlacklist().estimatedSize();
 
         if (blacklisted == 0) {
           invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistEmpty());
@@ -106,7 +106,7 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         // Invalidate all cache entries
-        SONAR.getFallback().getBlacklisted().invalidateAll();
+        SONAR.getFallback().getBlacklist().invalidateAll();
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistCleared()
           .replace("%removed%", Sonar.DECIMAL_FORMAT.format(blacklisted)));
         break;
@@ -114,7 +114,7 @@ public final class BlacklistCommand extends Subcommand {
 
       case "size": {
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistSize()
-          .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklisted().estimatedSize())));
+          .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklist().estimatedSize())));
         break;
       }
 

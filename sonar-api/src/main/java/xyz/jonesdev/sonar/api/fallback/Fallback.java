@@ -17,12 +17,12 @@
 
 package xyz.jonesdev.sonar.api.fallback;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuccino.Cappuccino;
-import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
@@ -31,7 +31,6 @@ import java.net.InetAddress;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -39,10 +38,14 @@ public final class Fallback {
   public static final Fallback INSTANCE = new Fallback();
   private static final @NotNull Sonar SONAR = Objects.requireNonNull(Sonar.get());
 
+  // Map of all connected usernames and their respective IP addresses (used for fast checking)
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>(64, 0.75f);
-  // Only block the player for a few minutes to avoid issues
-  private final ExpiringCache<InetAddress> blacklisted = Cappuccino.buildExpiring(
-    10L, TimeUnit.MINUTES, 5000L);
+  // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
+  @Setter
+  private Cache<InetAddress, Byte> blacklist;
+  @Setter
+  private long blacklistTime;
+
   private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;
   private final @NotNull FallbackRatelimiter ratelimiter = FallbackRatelimiter.INSTANCE;
 

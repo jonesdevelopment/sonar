@@ -43,6 +43,13 @@ class LibraryLoader {
         .version("2.10.1")
         .relocate("com{}google{}code{}gson", "xyz{}jonesdev{}sonar{}libs{}gson")
         .build(),
+      // Caffeine
+      Library.builder()
+        .groupId("com.github.ben-manes.caffeine")
+        .artifactId("caffeine")
+        .version("3.1.8")
+        .relocate("com{}github{}benmanes{}caffeine", "xyz{}jonesdev{}sonar{}libs{}caffeine")
+        .build(),
       // ORMLite
       Library.builder()
         .groupId("com{}j256{}ormlite")

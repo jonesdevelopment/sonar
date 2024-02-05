@@ -56,7 +56,7 @@ public final class Notification implements Observable, Counters {
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
       .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%",
-        DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklisted().estimatedSize()))
+        DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize()))
       .replace("%total-joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
       .replace("%logins-per-second%", DECIMAL_FORMAT.format(LOGINS_PER_SECOND.estimatedSize()))
       .replace("%connections-per-second%", DECIMAL_FORMAT.format(CONNECTIONS_PER_SECOND.estimatedSize()))

@@ -21,7 +21,6 @@ versioner {
 allprojects {
   repositories {
     mavenCentral() // Lombok
-    maven(url = "https://jitpack.io/") // simple-yaml
     maven(url = "https://repo.jonesdev.xyz/releases/") // Bungee & Velocity proxy module
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") // libby
   }
@@ -45,8 +44,7 @@ allprojects {
     implementation("net.kyori:adventure-nbt:$adventureVersion")
 
     compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
-    implementation("xyz.jonesdev:cappuccino:0.1.6-SNAPSHOT") // expiring cache
-
+    compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.8") // caching
     compileOnly("io.netty:netty-all:4.1.106.Final") // netty
 
     // Library/dependency loading
@@ -98,6 +96,7 @@ tasks {
     relocate("com.simpleyaml", "xyz.jonesdev.sonar.libs.yaml")
     relocate("com.google.code.gson", "xyz.jonesdev.sonar.libs.gson")
     relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
+    relocate("com.github.benmanes.caffeine", "xyz.jonesdev.sonar.libs.caffeine")
     // We want to load our own Gson dynamically
     exclude("com/google/gson/**")
 

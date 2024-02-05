@@ -97,13 +97,13 @@ public final class FallbackListener {
   @Subscribe(order = PostOrder.LAST)
   public void handle(final @NotNull ConnectionHandshakeEvent event) throws Throwable {
     // Increase connections per second for the action bar verbose
-    Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime());
+    Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime(), (byte) 0);
   }
 
   @Subscribe(order = PostOrder.LAST)
   public void handle(final @NotNull PreLoginEvent event) throws Throwable {
     // Increase joins per second for the action bar verbose
-    Counters.LOGINS_PER_SECOND.put(System.nanoTime());
+    Counters.LOGINS_PER_SECOND.put(System.nanoTime(), (byte) 0);
 
     final LoginInboundConnection inboundConnection = (LoginInboundConnection) event.getConnection();
     val initialConnection = (InitialInboundConnection) INITIAL_CONNECTION.invokeExact(inboundConnection);
@@ -130,7 +130,7 @@ public final class FallbackListener {
         val activeSessionHandler = mcConnection.getActiveSessionHandler();
 
         // Check the blacklist here since we cannot let the player "ghost join"
-        if (FALLBACK.getBlacklisted().has(inetAddress)) {
+        if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
           // Mark the connection as dead to avoid unnecessary console logs
           markConnectionAsDead(activeSessionHandler);
           mcConnection.closeWith(DisconnectPacket.create(

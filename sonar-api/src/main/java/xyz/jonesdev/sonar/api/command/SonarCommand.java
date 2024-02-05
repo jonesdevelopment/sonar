@@ -17,16 +17,17 @@
 
 package xyz.jonesdev.sonar.api.command;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.cappuccino.Cappuccino;
-import xyz.jonesdev.cappuccino.ExpiringCache;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -36,7 +37,9 @@ public interface SonarCommand {
 
   Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
 
-  ExpiringCache<Object> DELAY = Cappuccino.buildExpiring(500L);
+  Cache<Object, Long> DELAY = Caffeine.newBuilder()
+    .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
+    .build();
 
   List<Component> CACHED_HELP_MESSAGE = new ArrayList<>();
 
@@ -50,6 +53,7 @@ public interface SonarCommand {
       // Checking if it contains will only break more since it can throw
       // a NullPointerException if the cache is being accessed from parallel threads
       DELAY.cleanUp(); // Clean up the cache
+      final long timestamp = System.currentTimeMillis();
       final long mapTimestamp = DELAY.asMap().getOrDefault(source, -1L);
 
       // There were some exploits with spamming commands in the past.
@@ -59,7 +63,6 @@ public interface SonarCommand {
         source.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDown());
 
         // Format delay
-        final long timestamp = System.currentTimeMillis();
         final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
 
         source.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
@@ -67,7 +70,7 @@ public interface SonarCommand {
         return;
       }
 
-      DELAY.put(source);
+      DELAY.put(source, timestamp);
     }
 
     if (args.length > 0) {
