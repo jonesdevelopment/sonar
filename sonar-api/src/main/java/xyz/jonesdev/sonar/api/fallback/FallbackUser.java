@@ -21,7 +21,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -50,19 +49,6 @@ public interface FallbackUser<T> {
   @NotNull InetAddress getInetAddress();
 
   @NotNull ProtocolVersion getProtocolVersion();
-
-  /**
-   * Kicks the player from the server with
-   * the given disconnect message.
-   *
-   * @param reason Legacy disconnect message string
-   * @see #disconnect(Component)
-   */
-  @Deprecated
-  @ApiStatus.ScheduledForRemoval(inVersion = "2.0.17")
-  default void disconnect(final @NotNull String reason) {
-    disconnect(Component.text(reason));
-  }
 
   /**
    * Kicks the player from the server with
