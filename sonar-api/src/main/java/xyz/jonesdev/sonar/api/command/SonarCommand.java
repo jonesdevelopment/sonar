@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api.command;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,7 @@ public interface SonarCommand {
 
   Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
 
-  Cache<Object, Long> DELAY = Caffeine.newBuilder()
+  Cache<Audience, Long> COMMAND_DELAY = Caffeine.newBuilder()
     .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
     .build();
 
@@ -50,11 +51,11 @@ public interface SonarCommand {
         source.sendMessage(Sonar.get().getConfig().getNoPermission());
         return;
       }
-      // Checking if it contains will only break more since it can throw
-      // a NullPointerException if the cache is being accessed from parallel threads
-      DELAY.cleanUp(); // Clean up the cache
+
+      COMMAND_DELAY.cleanUp(); // Clean up the cache
+
       final long timestamp = System.currentTimeMillis();
-      final long mapTimestamp = DELAY.asMap().getOrDefault(source, -1L);
+      final long mapTimestamp = COMMAND_DELAY.asMap().getOrDefault(source.getAudience(), -1L);
 
       // There were some exploits with spamming commands in the past.
       // Spamming should be prevented, especially if some heavy operations are done,
@@ -70,7 +71,7 @@ public interface SonarCommand {
         return;
       }
 
-      DELAY.put(source, timestamp);
+      COMMAND_DELAY.put(source.getAudience(), timestamp);
     }
 
     if (args.length > 0) {
