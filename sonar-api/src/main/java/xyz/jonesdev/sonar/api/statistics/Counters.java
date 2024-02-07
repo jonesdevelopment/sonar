@@ -20,14 +20,14 @@ package xyz.jonesdev.sonar.api.statistics;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public interface Counters {
   Cache<Long, Byte> LOGINS_PER_SECOND = Caffeine.newBuilder()
-    .expireAfterWrite(1L, TimeUnit.SECONDS)
+    .expireAfterWrite(Duration.ofSeconds(1))
     .build();
 
   Cache<Long, Byte> CONNECTIONS_PER_SECOND = Caffeine.newBuilder()
-    .expireAfterWrite(1L, TimeUnit.SECONDS)
+    .expireAfterWrite(Duration.ofSeconds(1))
     .build();
 }

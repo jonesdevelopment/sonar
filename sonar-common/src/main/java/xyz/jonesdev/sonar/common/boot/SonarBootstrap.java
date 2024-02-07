@@ -37,7 +37,7 @@ import xyz.jonesdev.sonar.common.subcommand.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.update.UpdateChecker;
 
 import java.io.File;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 @Getter
 @RequiredArgsConstructor
@@ -127,7 +127,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
     // Update ratelimiter cache
     getFallback().getRatelimiter().setExpiringCache(Caffeine.newBuilder()
-      .expireAfterWrite(getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS)
+      .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getReconnectDelay()))
       .build());
 
     // Update blacklist cache
@@ -138,7 +138,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
       || getFallback().getBlacklistTime() != blacklistTime) {
       // Create new cache with the configured blacklist time
       getFallback().setBlacklist(Caffeine.newBuilder()
-        .expireAfterWrite(getConfig().getVerification().getBlacklistTime(), TimeUnit.MILLISECONDS)
+        .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getBlacklistTime()))
         .build());
       // Store the new blacklist time, so we don't have to reset the blacklist every reload
       getFallback().setBlacklistTime(blacklistTime);

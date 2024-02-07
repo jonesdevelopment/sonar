@@ -27,8 +27,8 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
+import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -39,7 +39,7 @@ public interface SonarCommand {
   Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
 
   Cache<Audience, Long> COMMAND_DELAY = Caffeine.newBuilder()
-    .expireAfterWrite(500L, TimeUnit.MILLISECONDS)
+    .expireAfterWrite(Duration.ofMillis(500))
     .build();
 
   List<Component> CACHED_HELP_MESSAGE = new ArrayList<>();
