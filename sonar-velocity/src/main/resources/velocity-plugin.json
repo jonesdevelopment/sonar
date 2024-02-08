@@ -10,7 +10,7 @@
   ],
   "dependencies": [
     {
-      "id": "Geyser-Velocity",
+      "id": "geyser",
       "optional": true
     },
     {
@@ -18,11 +18,11 @@
       "optional": true
     },
     {
-      "id": "Protocolize",
+      "id": "protocolize",
       "optional": true
     },
     {
-      "id": "ViaVersion",
+      "id": "viaversion",
       "optional": true
     }
   ],
