@@ -7,7 +7,7 @@ plugins {
 apply(plugin = "net.minecrell.plugin-yml.bukkit")
 
 bukkit {
-  name = "Sonar"
+  name = rootProject.name
   version = rootProject.version.toString().split("-")[0]
   main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
   authors = listOf("Jones Development", "Sonar Contributors")

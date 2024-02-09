@@ -5,7 +5,7 @@ plugins {
 apply(plugin = "net.minecrell.plugin-yml.bungee")
 
 bungee {
-  name = "Sonar"
+  name = rootProject.name
   version = rootProject.version.toString().split("-")[0]
   main = "xyz.jonesdev.sonar.bungee.SonarBungeePlugin"
   author = "Jones Development, Sonar Contributors"
