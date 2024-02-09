@@ -168,7 +168,9 @@ public final class FallbackHandlerBoss extends HandlerBoss {
               Statistics.TOTAL_TRAFFIC.increment();
 
               // Use the ChannelWrapper's remote address to automatically handle proxy protocol
-              final InetAddress inetAddress = ((InetSocketAddress) channelWrapper.getRemoteAddress()).getAddress();
+              final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
+              final InetAddress inetAddress = socketAddress.getAddress();
+
               // Check the blacklist here since we cannot let the player "ghost join"
               if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
                 closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
@@ -182,7 +184,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
               }
 
               // Completely skip Geyser connections
-              if (isGeyserConnection(channel)) {
+              if (isGeyserConnection(channel, socketAddress)) {
                 FALLBACK.getLogger().info("Skipping Geyser player: {}{}",
                   loginRequest.getData(), Sonar.get().getConfig().formatAddress(inetAddress));
                 super.channelRead(ctx, msg);

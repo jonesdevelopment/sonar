@@ -55,6 +55,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -121,7 +122,8 @@ public final class FallbackListener {
       final ChannelPipeline pipeline = channel.pipeline();
       TrafficChannelHooker.hook(pipeline, MINECRAFT_DECODER, MINECRAFT_ENCODER);
 
-      final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
+      final InetSocketAddress socketAddress = event.getConnection().getRemoteAddress();
+      final InetAddress inetAddress = socketAddress.getAddress();
 
       // Increase total traffic statistic
       Statistics.TOTAL_TRAFFIC.increment();
@@ -143,7 +145,7 @@ public final class FallbackListener {
         if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) return;
 
         // Completely skip Geyser connections
-        if (isGeyserConnection(channel)) {
+        if (isGeyserConnection(channel, socketAddress)) {
           FALLBACK.getLogger().info("Skipping Geyser player: {}{}",
             event.getUsername(), Sonar.get().getConfig().formatAddress(inetAddress));
           return;
