@@ -71,7 +71,7 @@ tasks {
 
   shadowJar {
     // Set the file name of the shadowed jar
-    archiveFileName.set("Sonar.jar")
+    archiveFileName.set("${rootProject.name}.jar")
 
     // Remove file timestamps
     isPreserveFileTimestamps = false
