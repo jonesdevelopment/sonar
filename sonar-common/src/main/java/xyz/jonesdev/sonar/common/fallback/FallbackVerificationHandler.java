@@ -247,57 +247,60 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
+  private void handlePacketDuringCaptcha(final @NotNull FallbackPacket packet) {
+    // Check if the player took too long to enter the captcha
+    final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
+    checkFrame(!login.elapsed(maxDuration), "took too long to enter captcha");
+
+    // Handle incoming chat messages
+    if (packet instanceof Chat) {
+      final Chat chat = (Chat) packet;
+      Objects.requireNonNull(captcha);
+      if (!chat.getMessage().equals(captcha.getInfo().getAnswer())) {
+        // Captcha is incorrect
+        checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
+        user.write(incorrectCaptcha);
+        return;
+      }
+      // Captcha is correct
+      finish();
+      return;
+    }
+
+    // Every second
+    if (actionBar.elapsed(1000L)) {
+      final String actionBarMessage = Sonar.get().getConfig().getVerification().getMap().getEnterCodeActionBar();
+      // Only send action bar if the message is actually supposed to be sent
+      if (!actionBarMessage.isEmpty()) {
+        final String timeLeft = String.format("%.0f", (maxDuration - login.delay()) / 1000D);
+        user.write(new Chat(MiniMessage.miniMessage().deserialize(
+          actionBarMessage.replace("%time-left%", timeLeft)), Chat.GAME_INFO_TYPE));
+        // Make sure to reset the timer
+        actionBar.reset();
+      }
+    }
+
+    // Every 10 seconds
+    if (keepAlive.elapsed(10_000L)) {
+      // Send the message again to remind the player
+      user.delayedWrite(enterCodeMessage);
+      // Send a KeepAlive packet to prevent timeout
+      user.delayedWrite(CAPTCHA_KEEP_ALIVE);
+      // Send both packets in one flush
+      user.getChannel().flush();
+      // Make sure to reset the timer
+      keepAlive.reset();
+    }
+  }
+
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     // The player has already been verified, drop all other packets
     if (state == State.SUCCESS) return;
-    // Check for timeout since the player could be sending packets but not important ones
-    final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
+
     // We are expecting a captcha code in chat, drop all other packets
     if (state == State.MAP_CAPTCHA) {
-      // Check if the player took too long to enter the captcha
-      final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
-      checkFrame(!login.elapsed(maxDuration), "took too long to enter captcha");
-
-      // Handle incoming chat messages
-      if (packet instanceof Chat) {
-        final Chat chat = (Chat) packet;
-        Objects.requireNonNull(captcha);
-        if (!chat.getMessage().equals(captcha.getInfo().getAnswer())) {
-          // Captcha is incorrect
-          checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
-          user.write(incorrectCaptcha);
-          return;
-        }
-        // Captcha is correct
-        finish();
-        return;
-      }
-
-      // Every second
-      if (actionBar.elapsed(1000L)) {
-        final String actionBarMessage = Sonar.get().getConfig().getVerification().getMap().getEnterCodeActionBar();
-        // Only send action bar if the message is actually supposed to be sent
-        if (!actionBarMessage.isEmpty()) {
-          final String timeLeft = String.format("%.0f", (maxDuration - login.delay()) / 1000D);
-          user.write(new Chat(MiniMessage.miniMessage().deserialize(
-            actionBarMessage.replace("%time-left%", timeLeft)), Chat.GAME_INFO_TYPE));
-          // Make sure to reset the timer
-          actionBar.reset();
-        }
-      }
-
-      // Every about 10 seconds
-      if (keepAlive.elapsed(timeout)) {
-        // Send the message again to remind the player
-        user.delayedWrite(enterCodeMessage);
-        // Send a KeepAlive packet to prevent timeout
-        user.delayedWrite(CAPTCHA_KEEP_ALIVE);
-        // Send both packets in one flush
-        user.getChannel().flush();
-        // Make sure to reset the timer
-        keepAlive.reset();
-      }
+      handlePacketDuringCaptcha(packet);
       return;
     }
 
@@ -305,11 +308,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxMovementTick;
     checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
 
-    // Check if the time limit has exceeded
-    if (login.elapsed(timeout)) {
-      user.getChannel().close();
-      return;
-    }
+    // Check for timeout since the player could be sending packets but not important ones
+    final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
+    checkFrame(!login.elapsed(timeout), "time limit exceeded");
 
     if (packet instanceof LoginAcknowledged) {
       // Check if we are currently expecting a LoginAcknowledged packet
