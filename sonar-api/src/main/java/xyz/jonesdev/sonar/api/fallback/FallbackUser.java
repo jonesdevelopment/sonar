@@ -34,14 +34,10 @@ import xyz.jonesdev.sonar.api.statistics.Statistics;
 import java.net.InetAddress;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.UUID;
 
-public interface FallbackUser<T> {
+public interface FallbackUser {
   @NotNull Fallback getFallback();
-
-  /**
-   * @return Per-platform connection object used internally
-   */
-  @NotNull T getConnection();
 
   @NotNull Channel getChannel();
 
@@ -58,6 +54,19 @@ public interface FallbackUser<T> {
    * @param reason Disconnect message component
    */
   void disconnect(final @NotNull Component reason);
+
+  /**
+   * Takes over the channel and begins the verification process
+   *
+   * @param username Username of the player
+   * @param uuid     UUID of the player
+   * @param encoder  Name of the encoder pipeline
+   * @param decoder  Name of the decoder pipeline
+   * @param timeout  Name of the read timeout pipeline
+   */
+  void hijack(final @NotNull String username, final @NotNull UUID uuid,
+              final @NotNull String encoder, final @NotNull String decoder,
+              final @NotNull String timeout);
 
   /**
    * Sends a packet/message to the player

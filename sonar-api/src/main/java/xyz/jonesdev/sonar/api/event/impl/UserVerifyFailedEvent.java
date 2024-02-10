@@ -30,11 +30,11 @@ import java.util.Optional;
 @ToString
 @EqualsAndHashCode
 public final class UserVerifyFailedEvent implements SonarEvent {
-  private final FallbackUser<?> user;
+  private final FallbackUser user;
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   private final Optional<String> reason;
 
-  public UserVerifyFailedEvent(final FallbackUser<?> user, final @Nullable String reason) {
+  public UserVerifyFailedEvent(final FallbackUser user, final @Nullable String reason) {
     this.user = user;
     this.reason = Optional.ofNullable(reason);
   }

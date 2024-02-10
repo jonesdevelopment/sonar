@@ -31,11 +31,11 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
-  private final FallbackUser<?> user;
+  private final FallbackUser user;
   private final FallbackPacketListener listener;
   private FallbackPacketRegistry.ProtocolRegistry registry;
 
-  public FallbackPacketDecoder(final @NotNull FallbackUser<?> user,
+  public FallbackPacketDecoder(final @NotNull FallbackUser user,
                                final @NotNull FallbackPacketListener listener) {
     this.user = user;
     this.listener = listener;
