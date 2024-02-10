@@ -137,6 +137,7 @@ public final class SonarConfiguration {
     @Getter
     public static final class Gravity {
       private boolean enabled;
+      private boolean checkCollisions;
       private Gamemode gamemode;
       private int maxMovementTicks;
       private int maxIgnoredTicks;
@@ -432,6 +433,10 @@ public final class SonarConfiguration {
     generalConfig.getYaml().setComment("verification.checks.gravity.enabled",
       "Should Sonar check for valid client gravity? (Recommended)");
     verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled", true);
+
+    generalConfig.getYaml().setComment("verification.checks.gravity.check-collisions",
+      "Should Sonar check if the player collides with blocks? (Recommended)");
+    verification.gravity.checkCollisions = generalConfig.getBoolean("verification.checks.gravity.check-collisions", true);
 
     generalConfig.getYaml().setComment("verification.checks.gravity.max-movement-ticks",
       "Maximum number of ticks the player has to fall in order to be allowed to hit the platform");

@@ -192,6 +192,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void sendChunkData() {
+    // If we don't have gravity and captcha enabled, simply finish verification
+    if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
+      && !user.getFallback().shouldDoMapCaptcha()) {
+      // Save some work by finishing before sending even more packets
+      finish();
+      return;
+    }
     // Set the state to POSITION to avoid false positives
     // and go on with the flow of the verification.
     state = State.POSITION;
@@ -515,6 +522,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
         user.getFallback().getLogger().info("{}: {}/{}/{} - deltaY: {} - ground: {} - collision: {}",
           username, x, y, z, deltaY, ground, collisionOffsetY);
+      }
+
+      // If the collision check is disabled, finish verification
+      if (!Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions()) {
+        captchaOrFinish();
+        return;
       }
 
       // Perform the collision check
