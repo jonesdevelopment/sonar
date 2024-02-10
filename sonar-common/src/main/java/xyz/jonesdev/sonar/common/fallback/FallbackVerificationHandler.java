@@ -178,7 +178,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       user.delayedWrite(DEFAULT_ABILITIES);
     }
     // Generate the current teleport ID
-    expectedTeleportId = RANDOM.nextInt(Short.MAX_VALUE);
+    expectedTeleportId = RANDOM.nextInt();
     // Teleport the player to the spawn position
     user.delayedWrite(new PositionLook(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
