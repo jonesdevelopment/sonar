@@ -131,10 +131,15 @@ public interface FallbackUser<T> {
       disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
 
       if (reason != null) {
-        getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
-          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
-          .replace("%reason%", reason));
+        // Only log the failed message if the server isn't under attack.
+        // We let the user override this through the configuration.
+        if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
+          || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+          getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
+            .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+            .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
+            .replace("%reason%", reason));
+        }
       }
     }
 
