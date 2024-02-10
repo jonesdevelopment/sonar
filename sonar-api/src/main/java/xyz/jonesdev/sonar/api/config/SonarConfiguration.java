@@ -439,7 +439,7 @@ public final class SonarConfiguration {
 
     generalConfig.getYaml().setComment("verification.checks.gravity.gamemode",
       "The gamemode of the player during verification"
-        + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR"
+        + LINE_SEPARATOR + "Possible types: SURVIVAL, CREATIVE, ADVENTURE"
         + LINE_SEPARATOR + "- SURVIVAL: all UI components are visible"
         + LINE_SEPARATOR + "- CREATIVE: health and hunger are hidden"
         + LINE_SEPARATOR + "- ADVENTURE: all UI components are visible");
