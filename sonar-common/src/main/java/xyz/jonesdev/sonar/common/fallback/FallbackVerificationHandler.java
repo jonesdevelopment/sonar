@@ -517,10 +517,16 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           username, x, y, z, deltaY, ground, collisionOffsetY);
       }
 
-      // The player is colliding to blocks, finish verification
+      // Perform the collision check
       if (ground) {
+        // Make sure the player is actually colliding with the blocks and not only spoofing ground
+        checkFrame(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
+        // The player is colliding to blocks, finish verification
         captchaOrFinish();
         return;
+      } else {
+        // Make sure the player is colliding with blocks but is sending an invalid ground state
+        checkFrame(collisionOffsetY != 0, "no ground: " + collisionOffsetY);
       }
     } else {
       // Check if the player is spoofing the ground state
