@@ -43,6 +43,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Gravity.Gamemode.CREATIVE;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
@@ -172,8 +173,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to TELEPORT to avoid false positives
     // and go on with the flow of the verification.
     state = State.TELEPORT;
-    // Make sure the player is unable to fly (the player is in spectator mode)
-    user.delayedWrite(DEFAULT_ABILITIES);
+    // Make sure the player is unable to fly (e.g. if the player is in creative mode)
+    if (Sonar.get().getConfig().getVerification().getGravity().getGamemode() == CREATIVE) {
+      user.delayedWrite(DEFAULT_ABILITIES);
+    }
     // Generate the current teleport ID
     expectedTeleportId = RANDOM.nextInt(Short.MAX_VALUE);
     // Teleport the player to the spawn position
