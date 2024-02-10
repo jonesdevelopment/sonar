@@ -43,6 +43,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Gravity.Gamemode.CREATIVE;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
@@ -62,7 +63,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private short expectedTransactionId;
   private int expectedKeepAliveId, expectedTeleportId = -1;
   private int tick, totalReceivedPackets, ignoredMovementTicks;
-  private double posX, posY, posZ, lastY;
+  private double posX, posY, posZ, lastY, spawnYPosition;
   private boolean resolvedClientBrand, resolvedClientSettings;
   private boolean listenForMovements;
 
@@ -172,13 +173,17 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to TELEPORT to avoid false positives
     // and go on with the flow of the verification.
     state = State.TELEPORT;
-    // Make sure the player is unable to fly (the player is in spectator mode)
-    user.delayedWrite(DEFAULT_ABILITIES);
+    // Make sure the player is unable to fly (e.g. if the player is in creative mode)
+    if (Sonar.get().getConfig().getVerification().getGravity().getGamemode() == CREATIVE) {
+      user.delayedWrite(DEFAULT_ABILITIES);
+    }
     // Generate the current teleport ID
-    expectedTeleportId = RANDOM.nextInt(Short.MAX_VALUE);
+    expectedTeleportId = RANDOM.nextInt();
+    // Add a little randomization to the spawn y coordinate
+    spawnYPosition = dynamicSpawnYPosition + RANDOM.nextDouble(0.4);
     // Teleport the player to the spawn position
     user.delayedWrite(new PositionLook(
-      SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
+      SPAWN_X_POSITION, spawnYPosition, SPAWN_Z_POSITION,
       0f, -90f, expectedTeleportId, false));
     // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
@@ -187,6 +192,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void sendChunkData() {
+    // If we don't have gravity and captcha enabled, simply finish verification
+    if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
+      && !user.getFallback().shouldDoMapCaptcha()) {
+      // Save some work by finishing before sending even more packets
+      finish();
+      return;
+    }
     // Set the state to POSITION to avoid false positives
     // and go on with the flow of the verification.
     state = State.POSITION;
@@ -227,11 +239,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // already performs these checks by default.
       final String read = ProtocolUtil.readBrandMessage(content);
       // Check if the decoded client brand string is too long
-      if (read.length() > Sonar.get().getConfig().getVerification().getMaxBrandLength()) {
+      if (read.length() > Sonar.get().getConfig().getVerification().getBrand().getMaxLength()) {
         return false;
       }
       // Regex pattern for validating client brands
-      final Pattern pattern = Sonar.get().getConfig().getVerification().getValidBrandRegex();
+      final Pattern pattern = Sonar.get().getConfig().getVerification().getBrand().getValidRegex();
       return !read.equals("Vanilla") // The normal brand is always lowercase
         && pattern.matcher(read).matches(); // Disallow non-ascii characters (by default)
     } catch (DecoderException exception) {
@@ -242,57 +254,60 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
+  private void handlePacketDuringCaptcha(final @NotNull FallbackPacket packet) {
+    // Check if the player took too long to enter the captcha
+    final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
+    checkFrame(!login.elapsed(maxDuration), "took too long to enter captcha");
+
+    // Handle incoming chat messages
+    if (packet instanceof Chat) {
+      final Chat chat = (Chat) packet;
+      Objects.requireNonNull(captcha);
+      if (!chat.getMessage().equals(captcha.getInfo().getAnswer())) {
+        // Captcha is incorrect
+        checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
+        user.write(incorrectCaptcha);
+        return;
+      }
+      // Captcha is correct
+      finish();
+      return;
+    }
+
+    // Every second
+    if (actionBar.elapsed(1000L)) {
+      final String actionBarMessage = Sonar.get().getConfig().getVerification().getMap().getEnterCodeActionBar();
+      // Only send action bar if the message is actually supposed to be sent
+      if (!actionBarMessage.isEmpty()) {
+        final String timeLeft = String.format("%.0f", (maxDuration - login.delay()) / 1000D);
+        user.write(new Chat(MiniMessage.miniMessage().deserialize(
+          actionBarMessage.replace("%time-left%", timeLeft)), Chat.GAME_INFO_TYPE));
+        // Make sure to reset the timer
+        actionBar.reset();
+      }
+    }
+
+    // Every 10 seconds
+    if (keepAlive.elapsed(10_000L)) {
+      // Send the message again to remind the player
+      user.delayedWrite(enterCodeMessage);
+      // Send a KeepAlive packet to prevent timeout
+      user.delayedWrite(CAPTCHA_KEEP_ALIVE);
+      // Send both packets in one flush
+      user.getChannel().flush();
+      // Make sure to reset the timer
+      keepAlive.reset();
+    }
+  }
+
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     // The player has already been verified, drop all other packets
     if (state == State.SUCCESS) return;
-    // Check for timeout since the player could be sending packets but not important ones
-    final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
+
     // We are expecting a captcha code in chat, drop all other packets
     if (state == State.MAP_CAPTCHA) {
-      // Check if the player took too long to enter the captcha
-      final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
-      checkFrame(!login.elapsed(maxDuration), "took too long to enter captcha");
-
-      // Handle incoming chat messages
-      if (packet instanceof Chat) {
-        final Chat chat = (Chat) packet;
-        Objects.requireNonNull(captcha);
-        if (!chat.getMessage().equals(captcha.getInfo().getAnswer())) {
-          // Captcha is incorrect
-          checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
-          user.write(incorrectCaptcha);
-          return;
-        }
-        // Captcha is correct
-        finish();
-        return;
-      }
-
-      // Every second
-      if (actionBar.elapsed(1000L)) {
-        final String actionBarMessage = Sonar.get().getConfig().getVerification().getMap().getEnterCodeActionBar();
-        // Only send action bar if the message is actually supposed to be sent
-        if (!actionBarMessage.isEmpty()) {
-          final String timeLeft = String.format("%.0f", (maxDuration - login.delay()) / 1000D);
-          user.write(new Chat(MiniMessage.miniMessage().deserialize(
-            actionBarMessage.replace("%time-left%", timeLeft)), Chat.GAME_INFO_TYPE));
-          // Make sure to reset the timer
-          actionBar.reset();
-        }
-      }
-
-      // Every about 10 seconds
-      if (keepAlive.elapsed(timeout)) {
-        // Send the message again to remind the player
-        user.delayedWrite(enterCodeMessage);
-        // Send a KeepAlive packet to prevent timeout
-        user.delayedWrite(CAPTCHA_KEEP_ALIVE);
-        // Send both packets in one flush
-        user.getChannel().flush();
-        // Make sure to reset the timer
-        keepAlive.reset();
-      }
+      handlePacketDuringCaptcha(packet);
       return;
     }
 
@@ -300,11 +315,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxMovementTick;
     checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
 
-    // Check if the time limit has exceeded
-    if (login.elapsed(timeout)) {
-      user.getChannel().close();
-      return;
-    }
+    // Check for timeout since the player could be sending packets but not important ones
+    final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
+    checkFrame(!login.elapsed(timeout), "time limit exceeded");
 
     if (packet instanceof LoginAcknowledged) {
       // Check if we are currently expecting a LoginAcknowledged packet
@@ -374,7 +387,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         checkFrame(pluginMessage.getChannel().equals("MC|Brand") || v1_13, "invalid channel");
 
         // Validate the client branding using a regex to filter unwanted characters.
-        checkFrame(validateClientBrand(user, pluginMessage.content()), "invalid client brand");
+        if (Sonar.get().getConfig().getVerification().getBrand().isEnabled()) {
+          checkFrame(validateClientBrand(user, pluginMessage.content()), "invalid client brand");
+        }
 
         // Clients sometimes mess up the ClientSettings or PluginMessage packet.
         if (state == State.PLUGIN_MESSAGE) {
@@ -454,7 +469,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0
       && expectedTeleportId != -1 // Check if the teleport ID is currently unset
       // Then, check if the position is equal to the spawn position
-      && x == SPAWN_X_POSITION && y == dynamicSpawnYPosition && z == SPAWN_Z_POSITION) {
+      && x == SPAWN_X_POSITION && y == spawnYPosition && z == SPAWN_Z_POSITION) {
       // Reset all values to ensure safety on teleport
       tick = 1;
       posY = -1;
@@ -478,7 +493,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         listenForMovements = true;
       }
 
-      lastY = dynamicSpawnYPosition;
+      lastY = spawnYPosition;
       return;
     }
 
@@ -493,7 +508,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-    final double collisionOffsetY = DEFAULT_Y_COLLIDE_POSITION - y;
+    double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockType.getBlockHeight()) - y;
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+      collisionOffsetY += 1.62f; // 1.7 is weird and sends the head position instead of the AABB minY
+    }
 
     // Check if the player is colliding by performing a basic Y offset check.
     // The offset cannot be greater than 0 since the blocks will not let the player fall through them.
@@ -506,10 +524,22 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           username, x, y, z, deltaY, ground, collisionOffsetY);
       }
 
-      // The player is colliding to blocks, finish verification
-      if (ground) {
+      // If the collision check is disabled, finish verification
+      if (!Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions()) {
         captchaOrFinish();
         return;
+      }
+
+      // Perform the collision check
+      if (ground) {
+        // Make sure the player is actually colliding with the blocks and not only spoofing ground
+        checkFrame(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
+        // The player is colliding to blocks, finish verification
+        captchaOrFinish();
+        return;
+      } else {
+        // Make sure the player is colliding with blocks but is sending an invalid ground state
+        checkFrame(collisionOffsetY != 0, "no ground: " + collisionOffsetY);
       }
     } else {
       // Check if the player is spoofing the ground state
