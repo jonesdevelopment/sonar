@@ -69,6 +69,7 @@ public class FallbackPreparer {
 
   // Blocks
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
+  public BlockType blockType = BlockType.BARRIER;
 
   public int maxMovementTick, dynamicSpawnYPosition;
   public double[] preparedCachedYMotions;
@@ -109,7 +110,7 @@ public class FallbackPreparer {
           DEFAULT_Y_COLLIDE_POSITION,
           z + (BLOCKS_PER_ROW / 2),
           0, 0);
-        CHANGED_BLOCKS[index++] = new ChangedBlock(position, BlockType.BARRIER);
+        CHANGED_BLOCKS[index++] = new ChangedBlock(position, blockType);
       }
     }
 

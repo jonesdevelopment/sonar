@@ -501,7 +501,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-    final double collisionOffsetY = DEFAULT_Y_COLLIDE_POSITION - y;
+    double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockType.getBlockHeight()) - y;
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+      collisionOffsetY += 1.62f; // 1.7 is weird and sends the head position instead of the AABB minY
+    }
 
     // Check if the player is colliding by performing a basic Y offset check.
     // The offset cannot be greater than 0 since the blocks will not let the player fall through them.

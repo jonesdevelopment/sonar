@@ -37,11 +37,10 @@ public final class Position implements FallbackPacket {
   @Override
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     x = byteBuf.readDouble();
-    // https://github.com/jonesdevelopment/sonar/issues/20
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
-      byteBuf.skipBytes(8);
-    }
     y = byteBuf.readDouble();
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      y = byteBuf.readDouble(); // Account for weird y positions on 1.7
+    }
     z = byteBuf.readDouble();
     onGround = byteBuf.readBoolean();
   }

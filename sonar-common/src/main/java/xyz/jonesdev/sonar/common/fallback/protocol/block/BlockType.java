@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.fallback.protocol.block;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
@@ -26,7 +27,7 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
 public enum BlockType {
-  STONE(protocolVersion -> 1),
+  STONE(protocolVersion -> 1, 1D),
   BARRIER(protocolVersion -> {
     // Useful resources:
     // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
@@ -79,11 +80,14 @@ public enum BlockType {
       case MINECRAFT_1_20_3:
         return 10366;
     }
-  });
+  }, 1D);
 
-  private final Function<ProtocolVersion, Integer> function;
+  private final Function<ProtocolVersion, Integer> idFunction;
+  // TODO: Implement per-version block heights?
+  @Getter
+  private final double blockHeight;
 
   public int getId(final @NotNull ProtocolVersion protocolVersion) {
-    return function.apply(protocolVersion);
+    return idFunction.apply(protocolVersion);
   }
 }
