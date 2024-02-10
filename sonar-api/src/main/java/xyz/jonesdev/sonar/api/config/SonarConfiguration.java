@@ -113,6 +113,7 @@ public final class SonarConfiguration {
 
     private final Map map = new Map();
     private final Gravity gravity = new Gravity();
+    private final Brand brand = new Brand();
 
     @Getter
     public static final class Map {
@@ -154,18 +155,23 @@ public final class SonarConfiguration {
       }
     }
 
+    @Getter
+    public static final class Brand {
+      private boolean enabled;
+      private int maxLength;
+      private Pattern validRegex;
+    }
+
     private boolean logConnections;
     private boolean logDuringAttack;
     private boolean debugXYZPositions;
     private Pattern validNameRegex;
-    private Pattern validBrandRegex;
     private Pattern validLocaleRegex;
     private String connectLog;
     private String failedLog;
     private String successLog;
     private String blacklistLog;
 
-    private int maxBrandLength;
     private int maxLoginPackets;
     private int maxPing;
     private int readTimeout;
@@ -511,24 +517,30 @@ public final class SonarConfiguration {
     verification.map.fonts = generalConfig.getStringList("verification.checks.map-captcha.fonts",
       Arrays.asList(Font.DIALOG, Font.DIALOG_INPUT, Font.SERIF, Font.SANS_SERIF));
 
+    generalConfig.getYaml().setComment("verification.checks.client-brand",
+      "Checks if the players is sending a valid client brand to the server");
+    generalConfig.getYaml().setComment("verification.checks.client-brand.enabled",
+      "Should Sonar check for valid client brands? (Recommended)");
+    verification.brand.enabled = generalConfig.getBoolean("verification.checks.client-brand.enabled", true);
+
+    generalConfig.getYaml().setComment("verification.checks.client-brand.valid-regex",
+      "Regex for validating client brands during verification");
+    verification.brand.validRegex = Pattern.compile(generalConfig.getString(
+      "verification.checks.client-brand.valid-regex", "^[!-~ ]+$"));
+
+    generalConfig.getYaml().setComment("verification.checks.client-brand.max-length",
+      "Maximum client brand length during verification");
+    verification.brand.maxLength = generalConfig.getInt("verification.checks.client-brand.max-length", 64);
+
     generalConfig.getYaml().setComment("verification.checks.valid-name-regex",
       "Regex for validating usernames during verification");
     verification.validNameRegex = Pattern.compile(generalConfig.getString(
       "verification.checks.valid-name-regex", "^[a-zA-Z0-9_]+$"));
 
-    generalConfig.getYaml().setComment("verification.checks.valid-brand-regex",
-      "Regex for validating client brands during verification");
-    verification.validBrandRegex = Pattern.compile(generalConfig.getString(
-      "verification.checks.valid-brand-regex", "^[!-~ ]+$"));
-
     generalConfig.getYaml().setComment("verification.checks.valid-locale-regex",
       "Regex for validating client locale during verification");
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString(
       "verification.checks.valid-locale-regex", "^[a-zA-Z_]+$"));
-
-    generalConfig.getYaml().setComment("verification.checks.max-brand-length",
-      "Maximum client brand length during verification");
-    verification.maxBrandLength = generalConfig.getInt("verification.checks.max-brand-length", 64);
 
     generalConfig.getYaml().setComment("verification.checks.max-ping",
       "Ping a player has to have in order to timeout"

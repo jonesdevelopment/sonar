@@ -227,11 +227,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // already performs these checks by default.
       final String read = ProtocolUtil.readBrandMessage(content);
       // Check if the decoded client brand string is too long
-      if (read.length() > Sonar.get().getConfig().getVerification().getMaxBrandLength()) {
+      if (read.length() > Sonar.get().getConfig().getVerification().getBrand().getMaxLength()) {
         return false;
       }
       // Regex pattern for validating client brands
-      final Pattern pattern = Sonar.get().getConfig().getVerification().getValidBrandRegex();
+      final Pattern pattern = Sonar.get().getConfig().getVerification().getBrand().getValidRegex();
       return !read.equals("Vanilla") // The normal brand is always lowercase
         && pattern.matcher(read).matches(); // Disallow non-ascii characters (by default)
     } catch (DecoderException exception) {
@@ -374,7 +374,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         checkFrame(pluginMessage.getChannel().equals("MC|Brand") || v1_13, "invalid channel");
 
         // Validate the client branding using a regex to filter unwanted characters.
-        checkFrame(validateClientBrand(user, pluginMessage.content()), "invalid client brand");
+        if (Sonar.get().getConfig().getVerification().getBrand().isEnabled()) {
+          checkFrame(validateClientBrand(user, pluginMessage.content()), "invalid client brand");
+        }
 
         // Clients sometimes mess up the ClientSettings or PluginMessage packet.
         if (state == State.PLUGIN_MESSAGE) {
