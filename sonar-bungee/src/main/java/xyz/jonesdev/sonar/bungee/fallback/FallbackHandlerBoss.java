@@ -42,21 +42,15 @@ import net.md_5.bungee.protocol.packet.Kick;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import net.md_5.bungee.protocol.packet.StatusRequest;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Counters;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
-import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
-import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
+import xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 
 import java.lang.reflect.Field;
@@ -70,7 +64,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_19_1;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_19_3;
 import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
@@ -92,7 +86,6 @@ public final class FallbackHandlerBoss extends HandlerBoss {
 
   private ChannelWrapper channelWrapper;
   private PacketHandler handler;
-  private @Nullable FallbackUserWrapper user;
   @Getter
   private ProtocolVersion protocolVersion;
   private boolean receivedLoginPacket;
@@ -146,7 +139,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
           Counters.LOGINS_PER_SECOND.put(System.nanoTime(), (byte) 0);
 
           // Fix login packet spam exploit
-          if (receivedLoginPacket || user != null) {
+          if (receivedLoginPacket) {
             throw new CorruptedFrameException("Duplicate login packet");
           }
           receivedLoginPacket = true;
@@ -213,14 +206,9 @@ public final class FallbackHandlerBoss extends HandlerBoss {
                 return;
               }
 
-              // Create wrapped Fallback user
-              user = new FallbackUserWrapper(
-                FALLBACK, this, channel, channel.pipeline(),
-                inetAddress, protocolVersion);
-
               // Perform default BungeeCord checks
               if (BUNGEE.config.isEnforceSecureProfile()
-                && user.getProtocolVersion().compareTo(MINECRAFT_1_19_3) < 0) {
+                && protocolVersion.compareTo(MINECRAFT_1_19_3) < 0) {
                 final PlayerPublicKey publicKey = loginRequest.getPublicKey();
                 if (publicKey == null) {
                   closeWith(getKickPacket(Component.text(BUNGEE.getTranslation("secure_profile_required"))));
@@ -230,7 +218,7 @@ public final class FallbackHandlerBoss extends HandlerBoss {
                   closeWith(getKickPacket(BUNGEE.getTranslation("secure_profile_expired")));
                   return;
                 }
-                if (user.getProtocolVersion().compareTo(MINECRAFT_1_19_1) < 0
+                if (protocolVersion.compareTo(MINECRAFT_1_19_1) < 0
                   && !EncryptionUtil.check(publicKey, null)) {
                   closeWith(getKickPacket(BUNGEE.getTranslation("secure_profile_invalid")));
                   return;
@@ -274,18 +262,6 @@ public final class FallbackHandlerBoss extends HandlerBoss {
                   return;
                 }
 
-                // Add better timeout handler to avoid known exploits or issues
-                // We also want to timeout bots quickly to avoid flooding
-                final int readTimeout = Sonar.get().getConfig().getVerification().getReadTimeout();
-                pipeline.replace(TIMEOUT_HANDLER, TIMEOUT_HANDLER,
-                  new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
-
-                // Disconnect if the protocol version could not be resolved
-                if (user.getProtocolVersion().isUnknown()) {
-                  closeWith(getKickPacket(Sonar.get().getConfig().getVerification().getInvalidProtocol()));
-                  return;
-                }
-
                 // Check if the player is already connected to the proxy but still tries to verify
                 final int limit = BUNGEE.config.getPlayerLimit();
                 if (limit > 0 && BUNGEE.getOnlineCount() >= limit) {
@@ -296,49 +272,12 @@ public final class FallbackHandlerBoss extends HandlerBoss {
                   return;
                 }
 
-                // The player joined the verification
-                Statistics.REAL_TRAFFIC.increment();
+                // Create wrapped Fallback user
+                final FallbackUser user = new FallbackUserWrapper(
+                  FALLBACK, channel, channel.pipeline(), inetAddress, protocolVersion);
 
-                if (Sonar.get().getConfig().getVerification().isLogConnections()) {
-                  // Only log the processing message if the server isn't under attack.
-                  // We let the user override this through the configuration.
-                  if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
-                    || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-                    FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
-                      .replace("%name%", loginRequest.getData())
-                      .replace("%ip%", Sonar.get().getConfig().formatAddress(inetAddress))
-                      .replace("%protocol%", String.valueOf(user.getProtocolVersion().getProtocol())));
-                  }
-                }
-
-                // Call the VerifyJoinEvent for external API usage
-                Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(loginRequest.getData(), user));
-
-                // Mark the player as connected → verifying players
-                FALLBACK.getConnected().put(loginRequest.getData(), inetAddress);
-
-                // This sometimes happens when the channel hangs, but the player is still connecting
-                // This also fixes a unique issue with TCPShield and other reverse proxies
-                if (user.getPipeline().get(PACKET_ENCODER) == null
-                  || user.getPipeline().get(PACKET_DECODER) == null) {
-                  channelWrapper.close();
-                  return;
-                }
-
-                // Replace normal encoder to allow custom packets
-                final FallbackPacketEncoder encoder = new FallbackPacketEncoder(user.getProtocolVersion());
-                user.getPipeline().replace(PACKET_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
-
-                // Send LoginSuccess packet to make the client think they are joining the server
-                user.write(new LoginSuccess(loginRequest.getData(), uuid));
-
-                // The LoginSuccess packet has been sent, now we can change the registry state
-                encoder.updateRegistry(user.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
-                  ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
-
-                // Replace normal decoder to allow custom packets
-                user.getPipeline().replace(PACKET_DECODER, FALLBACK_PACKET_DECODER,
-                  new FallbackPacketDecoder(user, new FallbackVerificationHandler(user, loginRequest.getData(), uuid)));
+                // Take control over the channel
+                user.hijack(loginRequest.getData(), uuid, PACKET_ENCODER, PACKET_DECODER, TIMEOUT_HANDLER);
               }));
             } catch (Throwable throwable) {
               throw new ReflectiveOperationException(throwable);

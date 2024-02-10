@@ -33,6 +33,6 @@ import java.util.UUID;
 public final class UserVerifySuccessEvent implements SonarEvent {
   private final String username;
   private final UUID offlineUuid;
-  private final FallbackUser<?> user;
+  private final FallbackUser user;
   private final long timeTakenToVerify;
 }

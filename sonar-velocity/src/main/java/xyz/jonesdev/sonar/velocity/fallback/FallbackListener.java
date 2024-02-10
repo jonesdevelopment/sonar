@@ -36,18 +36,13 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Counters;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandler;
-import xyz.jonesdev.sonar.common.fallback.FallbackTimeoutHandler;
-import xyz.jonesdev.sonar.common.fallback.FallbackVerificationHandler;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
+import xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
 
@@ -57,10 +52,9 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import static com.velocitypowered.proxy.network.Connections.*;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
 import static xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil.isGeyserConnection;
 
 public final class FallbackListener {
@@ -219,67 +213,12 @@ public final class FallbackListener {
             return;
           }
 
-          // Add better timeout handler to avoid known exploits or issues
-          // We also want to timeout bots quickly to avoid flooding
-          final int readTimeout = Sonar.get().getConfig().getVerification().getReadTimeout();
-          pipeline.replace(READ_TIMEOUT, READ_TIMEOUT, new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
-
           // Create an instance for the Fallback connection
-          final FallbackUserWrapper user = new FallbackUserWrapper(
-            FALLBACK, mcConnection, mcConnection.getChannel(),
-            mcConnection.getChannel().pipeline(), inetAddress,
-            ProtocolVersion.fromId(protocolId));
+          final FallbackUser user = new FallbackUserWrapper(
+            FALLBACK, channel, pipeline, inetAddress, ProtocolVersion.fromId(protocolId));
 
-          // Disconnect if the protocol version could not be resolved
-          if (user.getProtocolVersion().isUnknown()) {
-            mcConnection.closeWith(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidProtocol(),
-              mcConnection.getProtocolVersion(), true));
-            return;
-          }
-
-          // The player joined the verification
-          Statistics.REAL_TRAFFIC.increment();
-
-          if (Sonar.get().getConfig().getVerification().isLogConnections()) {
-            // Only log the processing message if the server isn't under attack.
-            // We let the user override this through the configuration.
-            if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
-              || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-              FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
-                .replace("%name%", gameProfile.getName())
-                .replace("%ip%", Sonar.get().getConfig().formatAddress(user.getInetAddress()))
-                .replace("%protocol%", String.valueOf(user.getProtocolVersion().getProtocol())));
-            }
-          }
-
-          // Call the VerifyJoinEvent for external API usage
-          Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(gameProfile.getName(), user));
-
-          // Mark the player as connected → verifying players
-          FALLBACK.getConnected().put(gameProfile.getName(), inetAddress);
-
-          // This sometimes happens when the channel hangs, but the player is still connecting
-          // This also fixes a unique issue with TCPShield and other reverse proxies
-          if (user.getPipeline().get(MINECRAFT_ENCODER) == null
-            || user.getPipeline().get(MINECRAFT_DECODER) == null) {
-            mcConnection.close(true);
-            return;
-          }
-
-          // Replace normal encoder to allow custom packets
-          final FallbackPacketEncoder encoder = new FallbackPacketEncoder(user.getProtocolVersion());
-          user.getPipeline().replace(MINECRAFT_ENCODER, FALLBACK_PACKET_ENCODER, encoder);
-
-          // Send LoginSuccess packet to make the client think they are joining the server
-          user.write(new LoginSuccess(gameProfile.getName(), gameProfile.getId()));
-
-          // The LoginSuccess packet has been sent, now we can change the registry state
-          encoder.updateRegistry(user.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
-            ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
-
-          // Replace normal decoder to allow custom packets
-          user.getPipeline().replace(MINECRAFT_DECODER, FALLBACK_PACKET_DECODER, new FallbackPacketDecoder(user,
-            new FallbackVerificationHandler(user, gameProfile.getName(), gameProfile.getId())));
+          // Take control over the channel
+          user.hijack(gameProfile.getName(), gameProfile.getId(), MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT);
         }));
       } catch (Throwable throwable) {
         throw new ReflectiveOperationException(throwable);

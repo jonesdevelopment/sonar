@@ -54,7 +54,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   // General
   private final SystemTimer login = new SystemTimer();
-  private final @NotNull FallbackUser<?> user;
+  private final @NotNull FallbackUser user;
   private final String username;
   private final UUID playerUuid;
   private @NotNull State state = State.LOGIN_ACK; // 1.20.2
@@ -88,7 +88,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     SUCCESS
   }
 
-  public FallbackVerificationHandler(final @NotNull FallbackUser<?> user,
+  public FallbackVerificationHandler(final @NotNull FallbackUser user,
                                      final @NotNull String username,
                                      final @NotNull UUID playerUuid) {
     this.user = user;
@@ -224,14 +224,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
-  private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser<?> user,
+  private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser user,
                                               final String locale) {
     // Check the client locale by performing a simple regex check on it
     final Pattern pattern = Sonar.get().getConfig().getVerification().getValidLocaleRegex();
     return pattern.matcher(locale).matches(); // Disallow non-ascii characters (by default)
   }
 
-  private static boolean validateClientBrand(final @NotNull FallbackUser<?> user, final ByteBuf content) {
+  private static boolean validateClientBrand(final @NotNull FallbackUser user, final ByteBuf content) {
     // We have to catch every DecoderException, so we can fail and punish
     // the player instead of only disconnecting them due to an exception.
     try {
