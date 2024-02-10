@@ -63,7 +63,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private short expectedTransactionId;
   private int expectedKeepAliveId, expectedTeleportId = -1;
   private int tick, totalReceivedPackets, ignoredMovementTicks;
-  private double posX, posY, posZ, lastY;
+  private double posX, posY, posZ, lastY, spawnYPosition;
   private boolean resolvedClientBrand, resolvedClientSettings;
   private boolean listenForMovements;
 
@@ -179,9 +179,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
     // Generate the current teleport ID
     expectedTeleportId = RANDOM.nextInt();
+    // Add a little randomization to the spawn y coordinate
+    spawnYPosition = dynamicSpawnYPosition + RANDOM.nextDouble(0.4);
     // Teleport the player to the spawn position
     user.delayedWrite(new PositionLook(
-      SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
+      SPAWN_X_POSITION, spawnYPosition, SPAWN_Z_POSITION,
       0f, -90f, expectedTeleportId, false));
     // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
@@ -459,7 +461,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0
       && expectedTeleportId != -1 // Check if the teleport ID is currently unset
       // Then, check if the position is equal to the spawn position
-      && x == SPAWN_X_POSITION && y == dynamicSpawnYPosition && z == SPAWN_Z_POSITION) {
+      && x == SPAWN_X_POSITION && y == spawnYPosition && z == SPAWN_Z_POSITION) {
       // Reset all values to ensure safety on teleport
       tick = 1;
       posY = -1;
@@ -483,7 +485,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         listenForMovements = true;
       }
 
-      lastY = dynamicSpawnYPosition;
+      lastY = spawnYPosition;
       return;
     }
 
