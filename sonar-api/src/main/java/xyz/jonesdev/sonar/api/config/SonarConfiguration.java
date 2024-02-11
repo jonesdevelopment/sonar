@@ -63,23 +63,32 @@ public final class SonarConfiguration {
 
   public void load() {
     // Try using the system language to determine the language file
-    final String systemLanguage = System.getProperty("user.language", "en").toLowerCase();
-
-    // Make sure the user knows that we're using the system language for translations
-    LOGGER.info("Using system language ({}) for translations.", systemLanguage);
-    LOGGER.info("Check out the GitHub repository for more translations.");
+    Language preferredLanguage = Language.EN; // Default language is English
+    try {
+      final String property = System.getProperty("user.language", "en");
+      preferredLanguage = Language.valueOf(property.toUpperCase());
+      // Make sure the user knows that we're using the system language for translations
+      LOGGER.info("Using system language ({}) for translations.", preferredLanguage);
+    } catch (Exception exception) {
+      LOGGER.warn("Could not use system language for translations.");
+      LOGGER.warn("Using default language ({}) for translations.", preferredLanguage);
+    }
 
     // Load all configurations
     try {
-      generalConfig.load(getAsset("config", systemLanguage));
-      messagesConfig.load(getAsset("messages", systemLanguage));
-      webhookConfig.load(getAsset("webhook", systemLanguage));
+      generalConfig.load(getAsset("config", preferredLanguage));
+      messagesConfig.load(getAsset("messages", preferredLanguage));
+      webhookConfig.load(getAsset("webhook", preferredLanguage));
     } catch (Exception exception) {
       throw new IllegalStateException("Error loading configuration", exception);
     }
 
+    // Load all values
+    loadValues();
+  }
+
+  public void loadValues() {
     // Since we are loading from a file, we don't need to provide default values
-    // except if the value is new (not everyone might have it in their config yet)
 
     // General settings
     logPlayerAddresses = generalConfig.getBoolean("general.log-player-addresses");
@@ -260,8 +269,8 @@ public final class SonarConfiguration {
     notifications.notificationChat = formatString(fromList(messagesConfig.getStringList("notifications.chat")));
   }
 
-  private @NotNull URL getAsset(final String url, final String languageCode) {
-    final String resourceName = url + "/" + languageCode + ".yml";
+  private @NotNull URL getAsset(final String url, final @NotNull Language language) {
+    final String resourceName = url + "/" + language.getCode() + ".yml";
     URL result = Sonar.class.getResource("/assets/" + resourceName);
     if (result == null) {
       LOGGER.warn("Could not find " + resourceName + "! Using en.yml!");
@@ -309,6 +318,8 @@ public final class SonarConfiguration {
   @Getter
   private final Notifications notifications = new Notifications();
 
+  @Getter
+  private String language = "system";
   @Getter
   private String prefix;
   private String supportUrl;
