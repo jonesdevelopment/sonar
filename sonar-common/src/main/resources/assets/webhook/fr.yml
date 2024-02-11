@@ -1,0 +1,60 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Need help or have questions? https://jonesdev.xyz/discord
+# Source code: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# Les notifications d'attaque de bot peuvent également être envoyées à votre serveur Discord en utilisant des webhooks
+webhook:
+  # URL du webhook Discord (Définissez ceci sur '' pour désactiver les webhooks)
+  url: ''
+  # Nom d'utilisateur de l'expéditeur du webhook Discord
+  username: Sonar
+  # URL vers l'avatar de l'expéditeur du webhook Discord (Définissez ceci sur '' pour désactiver)
+  avatar-url: ''
+  # Contenu du message webhook Discord (Définissez ceci sur '' pour désactiver)
+  # Vous pouvez utiliser ceci pour par exemple mentionner des membres du personnel en utilisant <@userId>
+  # Si vous voulez mentionner des rôles, vous devrez utiliser <@&roleId>
+  content: ''
+  # Intégration du message webhook Discord qui est envoyé lorsqu'une attaque a cessé
+  embed:
+    # Petit message de pied de page de l'intégration du webhook Discord
+    footer:
+      # Contenu du message de pied de page de l'intégration du webhook Discord
+      text: © Jones Development and Sonar Contributors
+      # URL de l'icône du message de pied de page de l'intégration du webhook Discord
+      icon-url: ''
+    # Titre de l'intégration du webhook Discord
+    title: ':white_check_mark: Attaque atténuée'
+    # URL cliquable du titre de l'intégration du webhook Discord
+    title-url: ''
+    # Description (contenu) de l'intégration du webhook Discord
+    description:
+      - L'attaque sur votre serveur a été atténuée.
+      - ''
+      - 'Début de l''attaque: <t:%start-timestamp%:T>'
+      - 'Fin de l''attaque: <t:%end-timestamp%:T>'
+      - 'Durée de l''attaque: %duration%'
+      - ''
+      - 'Utilisation maximale du processeur pendant l''attaque: %peak-cpu%%'
+      - 'Utilisation maximale de la mémoire pendant l''attaque: %peak-memory%'
+      - 'Bots maximum par seconde pendant l''attaque: %peak-bps%'
+      - ''
+      - 'Adresses IP sur liste noire pendant l''attaque: %total-blacklisted%'
+      - 'Vérifications échouées pendant l''attaque: %total-failed%'
+      - 'Vérifications réussies pendant l''attaque: %total-success%'
+    # Couleurs RGB de l'intégration du webhook Discord
+    # Sélecteur de couleur : https://www.rapidtables.com/web/color/RGB_Color.html
+    color:
+      red: 0
+      green: 255
+      blue: 0
