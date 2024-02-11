@@ -75,8 +75,7 @@ public final class SonarConfiguration {
       messagesConfig.load(getAsset("messages", systemLanguage));
       webhookConfig.load(getAsset("webhook", systemLanguage));
     } catch (Exception exception) {
-      LOGGER.error("Error while loading configuration: {}", exception);
-      return;
+      throw new IllegalStateException("Error loading configuration", exception);
     }
 
     // Since we are loading from a file, we don't need to provide default values
