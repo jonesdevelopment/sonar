@@ -55,12 +55,6 @@ class LibraryLoader {
         .artifactId("ormlite-jdbc")
         .version("6.1")
         .relocate("com{}j256{}ormlite", "xyz{}jonesdev{}sonar{}libs{}ormlite")
-        .build(),
-      // MySQL
-      Library.builder()
-        .groupId("com{}mysql")
-        .artifactId("mysql-connector-j")
-        .version("8.3.0")
         .build()
     );
   }
