@@ -28,14 +28,20 @@ import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public final class SonarConfiguration {
   @Getter
   private final SimpleYamlConfig generalConfig, messagesConfig, webhookConfig;
+  private final File languageFile;
 
   private static final LoggerWrapper LOGGER = new LoggerWrapper() {
 
@@ -59,19 +65,61 @@ public final class SonarConfiguration {
     this.messagesConfig = new SimpleYamlConfig(new File(pluginFolder, "messages.yml"));
     this.generalConfig = new SimpleYamlConfig(new File(pluginFolder, "config.yml"));
     this.webhookConfig = new SimpleYamlConfig(new File(pluginFolder, "webhook.yml"));
+    this.languageFile = new File(pluginFolder, "language.properties");
+  }
+
+  private static final Language DEFAULT_FALLBACK_LANGUAGE = Language.EN;
+
+  private Language getPreferredLanguage() {
+    if (!languageFile.exists()) {
+      final URL defaultLanguageFile = Sonar.class.getResource("/assets/language.properties");
+      // Make sure the file actually exists before trying to copy it
+      if (defaultLanguageFile == null) {
+        LOGGER.error("Cannot check for custom language (is the file missing?)");
+        return DEFAULT_FALLBACK_LANGUAGE;
+      }
+      // Copy the file to the plugin data directory
+      try (final InputStream inputStream = defaultLanguageFile.openStream()) {
+        Files.copy(inputStream, languageFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      } catch (IOException exception) {
+        LOGGER.error("Error copying file: {}", exception);
+        return DEFAULT_FALLBACK_LANGUAGE;
+      }
+    }
+
+    // Try to read the property from the file
+    try (final InputStream input = new FileInputStream(languageFile)) {
+      final Properties properties = new Properties();
+      properties.load(input);
+      final String property = properties.getProperty("language");
+      try {
+        // Try parsing the property as a language
+        return Language.fromCode(property);
+      } catch (Throwable throwable) {
+        LOGGER.error("Could not find requested language: {}", throwable);
+      }
+    } catch (Exception exception) {
+      LOGGER.error("Error reading language file: {}", exception);
+    }
+    return DEFAULT_FALLBACK_LANGUAGE;
   }
 
   public void load() {
-    // Try using the system language to determine the language file
-    Language preferredLanguage = Language.EN; // Default language is English
-    try {
-      final String property = System.getProperty("user.language", "en");
-      preferredLanguage = Language.valueOf(property.toUpperCase());
-      // Make sure the user knows that we're using the system language for translations
-      LOGGER.info("Using system language ({}) for translations.", preferredLanguage);
-    } catch (Exception exception) {
-      LOGGER.warn("Could not use system language for translations.");
-      LOGGER.warn("Using default language ({}) for translations.", preferredLanguage);
+    // Generate the language file and check what it's set to
+    Language preferredLanguage = getPreferredLanguage();
+    if (preferredLanguage == Language.SYSTEM) {
+      try {
+        // Try using the system language to determine the language file
+        final String property = System.getProperty("user.language", "en");
+        preferredLanguage = Language.fromCode(property);
+        // Make sure the user knows that we're using the system language for translations
+        LOGGER.info("Using system language ({}) for translations.", preferredLanguage);
+      } catch (Exception exception) {
+        LOGGER.warn("Could not use system language for translations.");
+        LOGGER.warn("Using default language ({}) for translations.", preferredLanguage);
+      }
+    } else {
+      LOGGER.info("Using custom language ({}) for translations.", preferredLanguage);
     }
 
     // Load all configurations

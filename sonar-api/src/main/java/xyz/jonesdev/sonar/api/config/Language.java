@@ -18,10 +18,11 @@
 package xyz.jonesdev.sonar.api.config;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
-@SuppressWarnings("unused")
 enum Language {
+  SYSTEM("system"),
   AB("Abkhazian"),
   AA("Afar"),
   AF("Afrikaans"),
@@ -200,5 +201,9 @@ enum Language {
   Language(final String name) {
     this.name = name;
     this.code = name().toLowerCase();
+  }
+
+  public static Language fromCode(final @NotNull String code) {
+    return Language.valueOf(code.toUpperCase());
   }
 }
