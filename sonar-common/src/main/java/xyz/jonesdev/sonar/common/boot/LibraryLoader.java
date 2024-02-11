@@ -29,7 +29,6 @@ class LibraryLoader {
     libraryManager.addJitPack();
     libraryManager.loadLibraries(
       // Simple-YAML
-      // TODO: use a different library for config management?
       Library.builder()
         .groupId("com{}github{}Carleslc{}Simple-YAML")
         .artifactId("Simple-Yaml")

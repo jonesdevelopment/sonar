@@ -1,0 +1,174 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Need help or have questions? https://jonesdev.xyz/discord
+# Source code: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# General settings for Sonar
+general:
+  # Should Sonar log players' IP addresses in console?
+  log-player-addresses: true
+  # Maximum number of players online with the same IP address
+  max-online-per-ip: 3
+
+# Sensitivity settings for the attack tracker
+# Only edit this if you know what you're doing
+attack-tracker:
+  # Minimum number of new players in order for an attack to be detected
+  min-players-for-attack: 8
+  # Amount of time that has to pass in order for an attack to be over
+  # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+  min-attack-duration: 30000
+  # Number of times an incident has to be reported in order to be acknowledged as an attack
+  # This number acts as a buffer to filter out false attack notifications
+  min-attack-threshold: 2
+  # Amount of time that has to pass in order for a new attack to be detected
+  # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+  attack-cooldown-delay: 3000
+
+# You can connect Sonar to a database to keep verified players even after restarting your server
+# Note: IP addresses are saved in plain text. You are responsible for keeping your database safe!
+# However, IP addresses cannot be traced back to players as Sonar uses UUIDs instead of usernames
+database:
+  # Type of database Sonar uses to store verified players
+  # Possible types: NONE, MYSQL
+  type: NONE
+  # URL for authenticating with the SQL database
+  url: localhost
+  # Port for authenticating with the SQL database
+  port: 3306
+  # Name of the SQL database
+  name: sonar
+  # Username for authenticating with the SQL database
+  username: ''
+  # Password for authenticating with the SQL database
+  password: ''
+  # How many days should Sonar keep verified players in the database?
+  maximum-age: 5
+
+# Every new login request will be queued to avoid spam join attacks
+# The queue is updated every 500 milliseconds (10 ticks)
+queue:
+  # Maximum number of concurrent queue polls per 500 milliseconds
+  max-polls: 30
+
+# Every new player that joins for the first time will be sent to
+# a lightweight limbo server where advanced bot checks are performed
+verification:
+  # When should Sonar verify new players?
+  # Possible types: ALWAYS, DURING_ATTACK, NEVER
+  # - ALWAYS: New players will always be checked (Recommended)
+  # - DURING_ATTACK: New players will only be checked during an attack
+  # - NEVER: New players will never be checked
+  timing: ALWAYS
+  checks:
+    # Checks if the players' falling motion is following Minecraft's gravity formula
+    # All predicted motions are precalculated in order to save performance
+    gravity:
+      # Should Sonar check for valid client gravity? (Recommended)
+      enabled: true
+      # Should Sonar check if the player collides with blocks? (Recommended)
+      check-collisions: true
+      # Maximum number of ticks the player has to fall in order to be allowed to hit the platform
+      max-movement-ticks: 8
+      # Maximum number of ignored Y movement changes before a player fails verification
+      max-ignored-ticks: 5
+      # The gamemode of the player during verification
+      # Possible types: SURVIVAL, CREATIVE, ADVENTURE
+      # - SURVIVAL: all UI components are visible
+      # - CREATIVE: health and hunger are hidden
+      # - ADVENTURE: all UI components are visible
+      gamemode: ADVENTURE
+
+    # Make the player type a code from a virtual map in chat
+    map-captcha:
+      # When should Sonar make the player solve a CAPTCHA?
+      # Possible types: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: New players will always receive a CAPTCHA
+      # - DURING_ATTACK: New players will only receive a CAPTCHA during an attack
+      # - NEVER: New players will never receive a CAPTCHA (Recommended)
+      timing: NEVER
+      # Should Sonar randomize the X and Y position of the CAPTCHA?
+      random-position: true
+      # How much should Sonar distort characters (factor for randomization)?
+      distortions-factor-x: 50
+      # How much should Sonar distort characters (factor for randomization)?
+      distortions-factor-y: 50
+      # How many random lines behind the CAPTCHA should Sonar draw?
+      random-lines: 4
+      # How many random ovals behind the CAPTCHA should Sonar draw?
+      random-ovals: 1
+      # Should Sonar randomize the size of the font used for rendering the CAPTCHA?
+      random-font-size: true
+      # How many answers should Sonar prepare?
+      # This task happens asynchronously in the background;
+      # Players are able to join once one CAPTCHA has been prepared
+      precompute: 1000
+      # How long should Sonar wait until the player fails the CAPTCHA?
+      # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+      max-duration: 45000
+      # How many times must a player fail the CAPTCHA before failing the verification?
+      max-tries: 3
+      # Characters (letters and numbers) that are allowed to appear in the answer to the CAPTCHA
+      dictionary: '123456789'
+      # Which font types should Sonar use for the map CAPTCHA codes?
+      fonts:
+        - Dialog
+        - DialogInput
+        - Serif
+        - SansSerif
+
+    # Checks if the players is sending a valid client brand to the server
+    client-brand:
+      # Should Sonar check for valid client brands? (Recommended)
+      enabled: true
+      # Regex for validating client brands during verification
+      valid-regex: ^[!-~ ]+$
+      # Maximum client brand length during verification
+      max-length: 64
+
+    # Regex for validating usernames during verification
+    valid-name-regex: ^[a-zA-Z0-9_]+$
+    # Regex for validating client locale during verification
+    valid-locale-regex: ^[a-zA-Z_]+$
+    # Ping a player has to have in order to timeout
+    # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+    max-ping: 10000
+    # Maximum number of login packets the player has to send in order to be kicked
+    max-login-packets: 256
+
+  # Should Sonar log new verification attempts?
+  log-connections: true
+  # Should Sonar log new verification attempts during attacks?
+  log-during-attack: false
+  # Should Sonar log every single movement/position change during verification?
+  # This is not recommended for production servers but can be helpful for spotting errors.
+  debug-xyz-positions: false
+  # Amount of time that has to pass before a player times out
+  # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+  read-timeout: 3500
+  # How long should a player wait before reconnecting during verification
+  # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+  rejoin-delay: 8000
+  # How long should an IP address be denied from logging in when failing the verification too often?
+  # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+  blacklist-time: 600000
+  # How often does a player have to fail the verification in order to be blacklisted?
+  # (Set this value to 0 to disable the blacklist entirely)
+  blacklist-threshold: 2
+  # List of protocol IDs which are not checked by Sonar (verification bypass)
+  # You can find the full list of all protocol IDs here:
+  # https://wiki.vg/Protocol_version_numbers
+  # For example, Minecraft 1.20 has the ID 763.
+  whitelisted-protocols: []
+  # List of protocol IDs which are unable to join the server at all
+  blacklisted-protocols: []

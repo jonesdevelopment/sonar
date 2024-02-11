@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
 import java.lang.reflect.Method;
@@ -45,6 +46,24 @@ public final class VerifiedPlayerController {
   private static final Map<String, Collection<UUID>> MAP = new ConcurrentHashMap<>();
   private static final ExecutorService DB_UPDATE_SERVICE = Executors.newSingleThreadExecutor();
 
+  private static final LoggerWrapper LOGGER = new LoggerWrapper() {
+
+    @Override
+    public void info(final String message, final Object... args) {
+      Sonar.get().getLogger().info("[database] " + message, args);
+    }
+
+    @Override
+    public void warn(final String message, final Object... args) {
+      Sonar.get().getLogger().warn("[database] " + message, args);
+    }
+
+    @Override
+    public void error(final String message, final Object... args) {
+      Sonar.get().getLogger().error("[database] " + message, args);
+    }
+  };
+
   private @Nullable ConnectionSource connectionSource;
   private Dao<VerifiedPlayer, Integer> dao;
   private QueryBuilder<VerifiedPlayer, Integer> queryBuilder;
@@ -57,7 +76,7 @@ public final class VerifiedPlayerController {
 
     // Don't establish a database connection if the type is NONE
     if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
-      Sonar.get().getLogger().warn("Make sure to configure a database to save verified players.");
+      LOGGER.warn("Configure a database to save verified players.");
       return;
     }
 
@@ -85,11 +104,11 @@ public final class VerifiedPlayerController {
         try {
           dao.queryForAll().forEach(this::_add);
         } catch (SQLException exception) {
-          Sonar.get().getLogger().error("Could not cache entries: {}", exception);
+          LOGGER.error("Could not cache entries: {}", exception);
         }
       });
     } catch (Throwable throwable) {
-      Sonar.get().getLogger().error("Error setting up database: {}", throwable);
+      LOGGER.error("Error setting up database: {}", throwable);
       throwable.printStackTrace(System.err);
     }
   }
@@ -151,11 +170,11 @@ public final class VerifiedPlayerController {
         for (final VerifiedPlayer player : oldEntries) {
           dao.delete(player);
         }
-        Sonar.get().getLogger().info("Removed {} database entries older than {} days.",
+        LOGGER.info("Removed {} database entries older than {} days.",
           oldEntries.size(), maximumAge);
       }
     } catch (SQLException exception) {
-      Sonar.get().getLogger().error("Error trying to clear old entries: {}", exception);
+      LOGGER.error("Error trying to clear old entries: {}", exception);
     }
   }
 
@@ -191,7 +210,7 @@ public final class VerifiedPlayerController {
           }
         }
       } catch (SQLException exception) {
-        Sonar.get().getLogger().error("Error trying to remove entry: {}", exception);
+        LOGGER.error("Error trying to remove entry: {}", exception);
       }
     });
   }
@@ -229,7 +248,7 @@ public final class VerifiedPlayerController {
       try {
         dao.create(player);
       } catch (SQLException exception) {
-        Sonar.get().getLogger().error("Error trying to add entry: {}", exception);
+        LOGGER.error("Error trying to add entry: {}", exception);
       }
     });
   }
@@ -273,7 +292,7 @@ public final class VerifiedPlayerController {
         dao.deleteBuilder().delete();
       }
     } catch (SQLException exception) {
-      Sonar.get().getLogger().error("Error trying to clear entries: {}", exception);
+      LOGGER.error("Error trying to clear entries: {}", exception);
     }
   }
 
