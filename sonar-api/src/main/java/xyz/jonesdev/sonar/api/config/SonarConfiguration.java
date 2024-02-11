@@ -43,7 +43,7 @@ public final class SonarConfiguration {
   private final SimpleYamlConfig generalConfig, messagesConfig, webhookConfig;
   private final File languageFile;
 
-  private static final LoggerWrapper LOGGER = new LoggerWrapper() {
+  static final LoggerWrapper LOGGER = new LoggerWrapper() {
 
     @Override
     public void info(final String message, final Object... args) {
@@ -366,8 +366,6 @@ public final class SonarConfiguration {
   @Getter
   private final Notifications notifications = new Notifications();
 
-  @Getter
-  private String language = "system";
   @Getter
   private String prefix;
   private String supportUrl;

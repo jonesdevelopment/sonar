@@ -21,7 +21,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.simpleyaml.configuration.MemorySection;
 import org.simpleyaml.configuration.file.YamlFile;
-import xyz.jonesdev.sonar.api.Sonar;
 
 import java.io.File;
 import java.io.InputStream;
@@ -31,6 +30,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static xyz.jonesdev.sonar.api.config.SonarConfiguration.LOGGER;
 
 @Getter
 public final class SimpleYamlConfig {
@@ -94,7 +95,7 @@ public final class SimpleYamlConfig {
 
   public int getInt(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      LOGGER.warn("Could not find {} in {}.", path, file.getName());
       return 0;
     }
     return yaml.getInt(path);
@@ -107,7 +108,7 @@ public final class SimpleYamlConfig {
 
   public boolean getBoolean(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      LOGGER.warn("Could not find {} in {}.", path, file.getName());
       return false;
     }
     return yaml.getBoolean(path);
@@ -118,14 +119,14 @@ public final class SimpleYamlConfig {
     if (object instanceof String) {
       return (String) object;
     }
-    Sonar.get().getLogger().info("[config] Migrated {} to {}", path, def);
+    LOGGER.info("[config] Migrated {} to {}", path, def);
     set(path, def);
     return def;
   }
 
   public @NotNull String getString(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      LOGGER.warn("Could not find {} in {}.", path, file.getName());
       return "";
     }
     final Object object = getObject(path);
@@ -151,7 +152,7 @@ public final class SimpleYamlConfig {
 
   public List<String> getStringList(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      LOGGER.warn("Could not find {} in {}.", path, file.getName());
       return new ArrayList<>(0);
     }
     return yaml.getStringList(path);
@@ -164,7 +165,7 @@ public final class SimpleYamlConfig {
 
   public List<Integer> getIntList(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      LOGGER.warn("Could not find {} in {}.", path, file.getName());
       return new ArrayList<>(0);
     }
     return yaml.getIntegerList(path);
