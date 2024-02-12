@@ -112,7 +112,7 @@ verification:
       # მოთამაშეებს შეუძლიათ შესვლა, როდესაც ერთი CAPTCHA მზად არის
       precompute: 1000
       # რამდენ ხანს უნდა დაელოდოს Sonar-ი, სანამ მოთამაშე ვერ გააკეთებს წარმატებულად CAPTCHA-ს?
-      # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+      # (ეს არის ნაჩვენები მილიწამებში: 1 წამი = 1000 მილიწამი)
       max-duration: 45000
       # რამდენჯერ ვერ უდნა გაიაროს CAPTCHA მოთამაშემ სანამ ვერიფიკაციას ვერ გაივლის?
       max-tries: 3
