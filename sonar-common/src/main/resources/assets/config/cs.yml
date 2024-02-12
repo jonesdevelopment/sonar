@@ -1,0 +1,173 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Potřebujete pomoc nebo máte otázky? https://jonesdev.xyz/discord
+# Zdrojový kód: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development a Sonar Contributors, licencováno pod GPL-3.0
+#
+
+# Obecné nastavení pro Sonar
+general:
+  # Měl by Sonar vypisovat IP adresy hráču do konzole?
+  log-player-addresses: true
+  # Maximum hráču online se stejnou IP adresou
+  max-online-per-ip: 3
+
+# Nastavení citlivosti pro sledovač útoku
+# Změnte jenom pokud víte co děláte!
+attack-tracker:
+  # Minimum nových hráču aby sledovač zaregistroval útok
+  min-players-for-attack: 8
+  # Čas, který musí uběhnout aby byl útok zaregistrovan jako ukončený
+  # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
+  min-attack-duration: 30000
+  # Počet, kolikrát musí být incident reportován, aby byl označen jako útok
+  # Toto číslo figuruje jako buffer (tlumič) na filtrovaní chybných notifikací
+  min-attack-threshold: 2
+  # Čas, který musí uběhnout aby byl další útok detekován
+  # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
+  attack-cooldown-delay: 3000
+
+# Můžete se připojit Sonar k databázi aby uložil ověřené hráče ponechal i po restartu serveru
+# Pozn.: IP adresy nejsou jakkoliv šifrovány, naopak jsou ponechány jako čistý text! Je vaše zodpovědnost ponechat tuto databázi bezpečnou!
+# Nicméně, IP adresy nemůžou být vystopovány zpátky k hráči, protože Sonar používá UUID na ukládní místo jmeno hráčů
+database:
+  # Typy datábázi se kterýma Sonar bude pracovat
+  # Typy: NONE, MYSQL (Žádný, MYSQL)
+  type: NONE
+  # Host adresa pro verifikování hráčů s SQL databází
+  host: localhost
+  # Port pro verifikaci s databází
+  port: 3306
+  # Jméno SQL databáze
+  name: sonar
+  # Jméno pro verifikaci přes SQL databázi
+  username: ''
+  # Heslo pro verifikaci přes SQL databázi
+  password: ''
+  # Kolik dní by měl Sonar ponechat hráče v databázi?
+  maximum-age: 5
+
+# Každý nový login bude přidán do řady kvuli prevenci spam útoků
+# Řada je aktulizována každých 500 milisekund (10 ticků)
+queue:
+  # Maximum součastných aktualizací řady za 500 milisekund
+  max-polls: 30
+
+# Každý připojený hráč bude přepojen do
+# Jednoduchého limbo serveru kde proběhnou zkoušky proti botům
+verification:
+  # Kdy by měl Sonar verifikovat nové hráče?
+  # TYPY: ALWAYS, DURING_ATTACK, NEVER (Vždy, Pouze při útoku, Nikdy)
+  # - ALWAYS: Noví hráči budou vždy verifikováni (Doporučeno)
+  # - DURING_ATTACK: New players will only be checked during an attack Noví hráči budou verifikováni pouze při útoku
+  # - NEVER: Noví hráči nebudou nikdy vyžkoušeni
+  timing: ALWAYS
+  checks:
+    # Kontroluje, zda pohyb hráčů je roven gravitační formuli Minecraftu
+    # Všechny předpokládané pohyby jsou předpočítány, kvůli ušetření výkonu
+    gravity:
+      # Měl by Sonar zkoušet pro gravitaci hráče (Doporučováno)
+      enabled: true
+      # Měl by Sonar zkoušet jestli se hráč dotýka bloku? (Doporučováno)
+      check-collisions: true
+      # Maximální počet ticků, který má hráč padat aby byl puštěn na verifikační platformu
+      max-movement-ticks: 8
+      # Maximum ignorovaných změn Y-nové souřadnice hráče, aby neprošel verifikací
+      max-ignored-ticks: 5
+      # Gamemode hráče při verifikaci
+      # Typy: SURVIVAL, CREATIVE, ADVENTURE
+      # - SURVIVAL: všechny komponenty UI jsou zobrazeny
+      # - CREATIVE: životy a hunger neni zobrazen
+      # - ADVENTURE: všechny komponenty UI jsou zobrazeny
+      gamemode: ADVENTURE
+
+    # Nechá hráče verifikovat pomocí kódu na mapě ve hře
+    map-captcha:
+      # Kdy by měl Sonar nechat hráče verifikovat pomocí mapy?
+      # Typy: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: Noví hráči budou vždy verifikováni pomocí CAPTCHY?
+      # - DURING_ATTACK: Noví hráči dostanou map captchu jenom při útoku
+      # - NEVER: Noví hráči nikdy nedostanou map CAPTCHU (Doporučeno)
+      timing: NEVER
+      # Měl by Sonar randomizovat pozici X a Y na CAPTCHE?
+      random-position: true
+      # Jak moc by měl Sonar znehodnotit charaktery (faktor pro randomizaci)
+      distortions-factor-x: 50
+      distortions-factor-y: 50
+      # Kolik náhodných čar by měl Sonar vykreslit za CAPTCHOU
+      random-lines: 4
+      # Kolik náhodných oválů by měl Sonar vykreslit za CAPTCHOU
+      random-ovals: 1
+      # Měl by Sonar randomizovat font pro vykreslování textu v CAPTCHE?
+      random-font-size: true
+      # Kolik odpovědí by měl Sonar předgenerovat?
+      # Tento úkol běží souběžně v pozadí;
+      # Hráči jsou schopni se připojit pokud je CAPTCHA připravena
+      precompute: 1000
+      # Jak dlouho by měl Sonar čekat než hráč selže CAPTCHU?
+      # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
+      max-duration: 45000
+      # Kolikrát musí hráč selhat CAPTCHU před celkovém selhání verifikace?
+      max-tries: 3
+      # Znaky (čísla a písmena), které jsou povoleny k zobrazování v CAPTCHE
+      dictionary: '123456789'
+      # Jaké typy fontů by měl Sonar používat pro map CAPTCHU?
+      fonts:
+        - Dialog
+        - DialogInput
+        - Serif
+        - SansSerif
+
+    # Zkouší pokuď hráč posílá správný "client brand packet" serveru
+    client-brand:
+      # Měl by Sonar zkoušet pro validitu "client brandu"? (Doporučeno)
+      enabled: true
+      # Regex pro validitaci "client brand"
+      valid-regex: ^[!-~ ]+$
+      # Maximální délka "client brand" při verifikaci
+      max-length: 64
+
+    # Regex for validování jmen při verifikaci
+    valid-name-regex: ^[a-zA-Z0-9_]+$
+    # Regex for validaci "client locale" při verifikaci
+    valid-locale-regex: ^[a-zA-Z_]+$
+    # Maximální odezva hráče aby byl odpojen
+    # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
+    max-ping: 10000
+    # Maximální počet login packetů, který musí hřáč poslat aby byl vyhozen
+    max-login-packets: 256
+
+  # Měl by Sonar posílat nové verifikace?
+  log-connections: true
+  # Měl by Sonar posílat nové verifikace při útoku?
+  log-during-attack: false
+  # Měl by Sonar posílat každý jeden pohyb při verifikaci?
+  # Toto nastavení není doporučeno pro servry v produkci, ale může být nápomocné při vyhledávaní chyb
+  debug-xyz-positions: false
+  # Množství času který musí uběhnout aby hráč byl odpojen
+  # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
+  read-timeout: 3500
+  # How long should a player wait before reconnecting during verification Jak dlouho by měl hráč
+  # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
+  rejoin-delay: 8000
+  # Jak dlouho by měla být IP adresa zakázána k připojení po selhání verifikace mockrát?
+  # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
+  blacklist-time: 600000
+  # Kolikrát musí hráč selhat verifikaci aby byl přídán do černé listiny
+  # (Pokuď černou listinu nechcete dejte tuto hodnotu na 0)
+  blacklist-threshold: 2
+  # List ID protokolů (verzí), které nebudou kontrolovány Sonarem (bypass verifikace)
+  # Celý list ID protokolů můžete najít zde
+  # https://wiki.vg/Protocol_version_numbers
+  # Například, Minecraft 1.20 má ID 763.
+  whitelisted-protocols: []
+  # List ID protokolů které se nebudou moct připojit vůbec
+  blacklisted-protocols: []
