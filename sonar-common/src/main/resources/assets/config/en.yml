@@ -37,13 +37,12 @@ attack-tracker:
 
 # You can connect Sonar to a database to keep verified players even after restarting your server
 # Note: IP addresses are saved in plain text. You are responsible for keeping your database safe!
-# However, IP addresses cannot be traced back to players as Sonar uses UUIDs instead of usernames
 database:
   # Type of database Sonar uses to store verified players
   # Possible types: NONE, MYSQL
   type: NONE
-  # URL for authenticating with the SQL database
-  url: localhost
+  # Host address for authenticating with the SQL database
+  host: localhost
   # Port for authenticating with the SQL database
   port: 3306
   # Name of the SQL database
@@ -101,7 +100,6 @@ verification:
       random-position: true
       # How much should Sonar distort characters (factor for randomization)?
       distortions-factor-x: 50
-      # How much should Sonar distort characters (factor for randomization)?
       distortions-factor-y: 50
       # How many random lines behind the CAPTCHA should Sonar draw?
       random-lines: 4

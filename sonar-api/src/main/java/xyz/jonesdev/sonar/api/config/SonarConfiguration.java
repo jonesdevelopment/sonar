@@ -150,7 +150,7 @@ public final class SonarConfiguration {
 
     // Database
     database.type = Database.Type.valueOf(generalConfig.getString("database.type").toUpperCase());
-    database.url = generalConfig.getString("database.url");
+    database.host = generalConfig.getString("database.host");
     database.port = generalConfig.getInt("database.port");
     database.name = generalConfig.getString("database.name");
     database.username = generalConfig.getString("database.username");
@@ -564,7 +564,7 @@ public final class SonarConfiguration {
     }
 
     private Type type;
-    private String url;
+    private String host;
     private int port;
     private String name;
     private String username;

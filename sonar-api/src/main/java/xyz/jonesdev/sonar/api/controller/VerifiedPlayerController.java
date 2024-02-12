@@ -122,7 +122,7 @@ public final class VerifiedPlayerController {
     // Prepare the JDBC connection string
     // TODO: automatically build best connection string for database type
     final String jdbcURL = String.format("jdbc:%s://%s:%d/%s",
-      database.getType().name().toLowerCase(), database.getUrl(), database.getPort(), database.getName());
+      database.getType().name().toLowerCase(), database.getHost(), database.getPort(), database.getName());
 
     // Use reflection to uncover the driver class
     final Class<?> driverClass = Class.forName(database.getType().getDriverClassName());
