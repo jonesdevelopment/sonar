@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.velocity.fallback;
 
 import com.velocitypowered.api.util.GameProfile;
+import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.protocol.packet.DisconnectPacket;
 import com.velocitypowered.proxy.protocol.packet.HandshakePacket;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginPacket;
@@ -49,7 +50,7 @@ import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
   private final Channel channel;
   private @Nullable String username;
-  private InetSocketAddress socketAddress;
+  private InetAddress inetAddress;
   private ProtocolVersion protocolVersion;
   private HandshakePacket handshakePacket;
 
@@ -59,8 +60,6 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
   public void channelActive(final @NotNull ChannelHandlerContext ctx) {
     // Increase connections per second for the action bar verbose
     Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime(), (byte) 0);
-    // Store the IP address (raw)
-    this.socketAddress = (InetSocketAddress) channel.remoteAddress();
     // Make sure to let the server handle the rest
     ctx.fireChannelActive();
   }
@@ -72,8 +71,11 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       // Remove the username from the connected players
       FALLBACK.getConnected().remove(username);
     }
-    // Remove the IP address from the queue
-    FALLBACK.getQueue().remove(socketAddress.getAddress());
+    // The player cannot be in the queue if the IP address is invalid
+    if (inetAddress != null) {
+      // Remove the IP address from the queue
+      FALLBACK.getQueue().remove(inetAddress);
+    }
     // Make sure to let the server handle the rest
     ctx.fireChannelInactive();
   }
@@ -123,8 +125,10 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     Statistics.TOTAL_TRAFFIC.increment();
     // Store the username
     username = serverLogin.getUsername();
-    // We only need an InetAddress for the next bit
-    final InetAddress inetAddress = socketAddress.getAddress();
+    // Make sure to use the potentially modified, original IP
+    final MinecraftConnection minecraftConnection = (MinecraftConnection) channel.pipeline().get(HANDLER);
+    final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
+    inetAddress = socketAddress.getAddress();
 
     try {
       // Check the blacklist here since we cannot let the player "ghost join"

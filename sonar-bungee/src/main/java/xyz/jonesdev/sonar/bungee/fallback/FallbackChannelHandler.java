@@ -28,6 +28,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import net.md_5.bungee.netty.ChannelWrapper;
+import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Handshake;
@@ -46,6 +48,7 @@ import xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper;
 import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 import xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil;
 
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -58,11 +61,22 @@ import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
   private final Channel channel;
   private @Nullable String username;
-  private InetSocketAddress socketAddress;
   private ProtocolVersion protocolVersion;
+  private InetAddress inetAddress;
 
   private static final Fallback FALLBACK = Sonar.get().getFallback();
   private static final Cache<Component, Kick> CACHED_KICK_PACKETS = Caffeine.newBuilder().build();
+
+  private static final Field CHANNEL_WRAPPER_FIELD;
+
+  static {
+    try {
+      CHANNEL_WRAPPER_FIELD = HandlerBoss.class.getDeclaredField("channel");
+      CHANNEL_WRAPPER_FIELD.setAccessible(true);
+    } catch (Exception exception) {
+      throw new ReflectiveOperationException(exception);
+    }
+  }
 
   public static @NotNull Kick getCachedKickPacket(final Component component) {
     Kick packet = CACHED_KICK_PACKETS.asMap().get(component);
@@ -76,24 +90,25 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelActive(final @NotNull ChannelHandlerContext ctx) {
+  public void channelActive(final @NotNull ChannelHandlerContext ctx) throws Exception {
     // Increase connections per second for the action bar verbose
     Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime(), (byte) 0);
-    // Store the IP address (raw)
-    this.socketAddress = (InetSocketAddress) channel.remoteAddress();
     // Make sure to let the server handle the rest
     ctx.fireChannelActive();
   }
 
   @Override
-  public void channelInactive(final @NotNull ChannelHandlerContext ctx) {
+  public void channelInactive(final @NotNull ChannelHandlerContext ctx) throws Exception {
     // The player can disconnect without sending the login packet first
     if (username != null) {
       // Remove the username from the connected players
       FALLBACK.getConnected().remove(username);
     }
-    // Remove the IP address from the queue
-    FALLBACK.getQueue().remove(socketAddress.getAddress());
+    // The player cannot be in the queue if the IP address is invalid
+    if (inetAddress != null) {
+      // Remove the IP address from the queue
+      FALLBACK.getQueue().remove(inetAddress);
+    }
     // Make sure to let the server handle the rest
     ctx.fireChannelInactive();
   }
@@ -105,15 +120,16 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       final PacketWrapper packetWrapper = (PacketWrapper) msg;
       final DefinedPacket wrappedPacket = packetWrapper.packet;
       // Don't handle any invalid packets
-      if (wrappedPacket == null) return;
-      // Intercept any handshake packet by the client
-      if (wrappedPacket instanceof Handshake) {
-        handleHandshake((Handshake) wrappedPacket);
-      }
-      // Intercept any server login packet by the client
-      if (wrappedPacket instanceof LoginRequest) {
-        handleLogin(ctx, (LoginRequest) wrappedPacket, msg);
-        return;
+      if (wrappedPacket != null) {
+        // Intercept any handshake packet by the client
+        if (wrappedPacket instanceof Handshake) {
+          handleHandshake((Handshake) wrappedPacket);
+        }
+        // Intercept any server login packet by the client
+        if (wrappedPacket instanceof LoginRequest) {
+          handleLogin(ctx, (LoginRequest) wrappedPacket, msg);
+          return;
+        }
       }
     }
     // Make sure to let the server handle the rest
@@ -149,8 +165,11 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     Statistics.TOTAL_TRAFFIC.increment();
     // Store the username
     username = loginRequest.getData();
-    // We only need an InetAddress for the next bit
-    final InetAddress inetAddress = socketAddress.getAddress();
+    // Make sure to use the potentially modified, real IP
+    final HandlerBoss handlerBoss = channel.pipeline().get(HandlerBoss.class);
+    final ChannelWrapper channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER_FIELD.get(handlerBoss);
+    final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
+    inetAddress = socketAddress.getAddress();
 
     try {
       // Check the blacklist here since we cannot let the player "ghost join"
