@@ -1,0 +1,60 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Potřebujete pomoc nebo máte otázky? https://jonesdev.xyz/discord
+# Zdrojový kód: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development a Sonar Contributors, licencováno pod GPL-3.0
+#
+
+# Notifikace útoků můžou být poslány na discord server pomocí webhooků
+webhook:
+  # URL Discord webhooku (Ponechejte '' pro žádné webhooky)
+  url: ''
+  # Jméno discord webhooku
+  username: Sonar
+  # URL pro avatara discord webhooku (Ponechejte na '' pro žádného)
+  avatar-url: ''
+  # Obsah zprávy webhooku (Ponechte na '' pro žadnou)
+  # Můžete to použít k např. upozorvování členů staff týmu pomocí <@userId>
+  # Pokuď budete chtít upozornit role, budete muset použít <@&roleId>
+  content: ''
+  # Přidejte zprávu pro webhook, kterou ma poslat když skončil útok
+  embed:
+    # Malé zápatí pro poslanou zprávu webhookem
+    footer:
+      # Obsah zápatí kterou discord webhooku
+      text: © Jones Development and Sonar Contributors
+      # URL ikony zápatí zprávy
+      icon-url: ''
+    # Nadpis discord webhook zprávy
+    title: ':white_check_mark: Útok zahájen'
+    # URL, na kterou se bude moct na webhook zprávě kliknout
+    title-url: ''
+    # Popisek (kontext) discord webhook zprávy
+    description:
+      - Útok na váš server byl ukončen!.
+      - ''
+      - 'Začátek útoku: <t:%start-timestamp%:T>'
+      - 'Konec útoku: <t:%end-timestamp%:T>'
+      - 'Délka útoku: %duration%'
+      - ''
+      - 'Nejvyšší využití CPU při útoku: %peak-cpu%%'
+      - 'Nejvyšší využití paměti při útoku: %peak-memory%'
+      - 'Nejvyšší počet botů za sekundu při útoku: %peak-bps%'
+      - ''
+      - 'IP přidány na černou listinu: %total-blacklisted%'
+      - 'Nepovedené verifikace při útoku: %total-failed%'
+      - 'Povedené verifikace při útoku: %total-success%'
+    # RGB barvy discord webhook zprávy
+    # Barvy: https://www.rapidtables.com/web/color/RGB_Color.html
+    color:
+      red: 0
+      green: 255
+      blue: 0

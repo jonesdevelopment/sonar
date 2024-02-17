@@ -1,0 +1,60 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Need help or have questions? https://jonesdev.xyz/discord
+# Source code: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# Bot attack notifications can also be sent to your Discord server using webhooks
+webhook:
+  # URL of the Discord webhook (Set this to '' to disable webhooks)
+  url: ''
+  # Username of the Discord webhook sender
+  username: Sonar
+  # URL to the avatar of the Discord webhook sender (Set this to '' to disable)
+  avatar-url: ''
+  # Content of the Discord webhook message (Set this to '' to disable)
+  # You can use this to e.g. ping staff members using <@userId>
+  # If you want to ping roles, you will need to use <@&roleId>
+  content: ''
+  # Embed Discord webhook message that is sent when an attack has stopped
+  embed:
+    # Small footer message of the Discord webhook embed
+    footer:
+      # Content of the footer message of the Discord webhook embed
+      text: © Jones Development and Sonar Contributors
+      # URL of the footer message icon of the Discord webhook embed
+      icon-url: ''
+    # Title of the Discord webhook embed
+    title: ':white_check_mark: Attack mitigated'
+    # Clickable URL of the title of the Discord webhook embed
+    title-url: ''
+    # Description (content) of the Discord webhook embed
+    description:
+      - The attack on your server has been mitigated.
+      - ''
+      - 'Attack start: <t:%start-timestamp%:T>'
+      - 'Attack end: <t:%end-timestamp%:T>'
+      - 'Attack duration: %duration%'
+      - ''
+      - 'Peak process CPU usage during the attack: %peak-cpu%%'
+      - 'Peak process memory usage during the attack: %peak-memory%'
+      - 'Peak bots per second during the attack: %peak-bps%'
+      - ''
+      - 'Blacklisted IP addresses during the attack: %total-blacklisted%'
+      - 'Failed verifications during the attack: %total-failed%'
+      - 'Successful verifications during the attack: %total-success%'
+    # RGB colors of the Discord webhook embed
+    # Color picker: https://www.rapidtables.com/web/color/RGB_Color.html
+    color:
+      red: 0
+      green: 255
+      blue: 0

@@ -121,22 +121,23 @@ public final class AttackTracker implements JVMProfiler {
           final long failed = Math.max(totalFailed - currentAttack.failedVerifications, 0);
 
           // Post webhook to Discord
-          Optional.ofNullable(Sonar.get().getConfig().getDiscordWebhook()).ifPresent(webhook -> webhook.post(() -> {
-            final SonarConfiguration.Webhook.Embed config = Sonar.get().getConfig().getWebhook().getEmbed();
-            final String description = config.getDescription()
-              .replace("%start-timestamp%", startTimestamp)
-              .replace("%end-timestamp%", endTimestamp)
-              .replace("%duration%", formattedDuration)
-              .replace("%peak-cpu%", peakCPU)
-              .replace("%peak-memory%", peakMem)
-              .replace("%peak-bps%", peakBPS)
-              .replace("%peak-cps%", peakCPS)
-              .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(blacklisted))
-              .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(failed))
-              .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(verified));
-            return new SonarConfiguration.Webhook.Embed(
-              config.getTitle(), config.getTitleUrl(), description, config.getR(), config.getG(), config.getB());
-          }));
+          Optional.ofNullable(Sonar.get().getConfig().getWebhook().getDiscordWebhook())
+            .ifPresent(webhook -> webhook.post(() -> {
+              final SonarConfiguration.Webhook.Embed config = Sonar.get().getConfig().getWebhook().getEmbed();
+              final String description = config.getDescription()
+                .replace("%start-timestamp%", startTimestamp)
+                .replace("%end-timestamp%", endTimestamp)
+                .replace("%duration%", formattedDuration)
+                .replace("%peak-cpu%", peakCPU)
+                .replace("%peak-memory%", peakMem)
+                .replace("%peak-bps%", peakBPS)
+                .replace("%peak-cps%", peakCPS)
+                .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(blacklisted))
+                .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(failed))
+                .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(verified));
+              return new SonarConfiguration.Webhook.Embed(
+                config.getTitle(), config.getTitleUrl(), description, config.getR(), config.getG(), config.getB());
+            }));
         }
 
         // Reset the attack status

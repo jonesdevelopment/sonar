@@ -29,7 +29,6 @@ class LibraryLoader {
     libraryManager.addJitPack();
     libraryManager.loadLibraries(
       // Simple-YAML
-      // TODO: use a different library for config management?
       Library.builder()
         .groupId("com{}github{}Carleslc{}Simple-YAML")
         .artifactId("Simple-Yaml")
@@ -57,7 +56,7 @@ class LibraryLoader {
         .version("6.1")
         .relocate("com{}j256{}ormlite", "xyz{}jonesdev{}sonar{}libs{}ormlite")
         .build(),
-      // MySQL
+      // MySQL driver
       Library.builder()
         .groupId("com{}mysql")
         .artifactId("mysql-connector-j")

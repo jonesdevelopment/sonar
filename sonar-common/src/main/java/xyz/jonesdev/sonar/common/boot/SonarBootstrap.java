@@ -116,8 +116,8 @@ public abstract class SonarBootstrap<T> implements Sonar {
     getConfig().load();
 
     // Warn player if they reloaded and changed the database type
-    if (getVerifiedPlayerController() != null
-      && getVerifiedPlayerController().getCachedDatabaseType() != getConfig().getDatabase().getType()) {
+    if (verifiedPlayerController != null
+      && verifiedPlayerController.getCachedDatabaseType() != getConfig().getDatabase().getType()) {
       getLogger().warn("Reloading the server after changing the database type"
         + " is generally not recommended as it can sometimes cause data loss.");
     }
