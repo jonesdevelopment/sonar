@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.api.fallback;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -37,11 +36,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public interface FallbackUser {
-  @NotNull Fallback getFallback();
-
   @NotNull Channel getChannel();
-
-  @NotNull ChannelPipeline getPipeline();
 
   @NotNull InetAddress getInetAddress();
 
@@ -63,10 +58,11 @@ public interface FallbackUser {
    * @param encoder  Name of the encoder pipeline
    * @param decoder  Name of the decoder pipeline
    * @param timeout  Name of the read timeout pipeline
+   * @param boss     Name of the main pipeline
    */
   void hijack(final @NotNull String username, final @NotNull UUID uuid,
               final @NotNull String encoder, final @NotNull String decoder,
-              final @NotNull String timeout);
+              final @NotNull String timeout, final @NotNull String boss);
 
   /**
    * Sends a packet/message to the player
@@ -144,7 +140,7 @@ public interface FallbackUser {
         // We let the user override this through the configuration.
         if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
           || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-          getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
+          Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
             .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
             .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
             .replace("%reason%", reason));
@@ -171,8 +167,8 @@ public interface FallbackUser {
         // Call the BotBlacklistedEvent for external API usage
         Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
 
-        getFallback().getBlacklist().put(getInetAddress(), (byte) 0);
-        getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
+        Sonar.get().getFallback().getBlacklist().put(getInetAddress(), (byte) 0);
+        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
           .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
           .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
 

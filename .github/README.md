@@ -41,12 +41,8 @@
 
 - [Fallback](https://github.com/jonesdevelopment/sonar#fallback) is Sonar's main anti-bot component
 - Sonar queues new player logins to prevent spam login attacks
-- Protective components only on BungeeCord:
-  - Sonar checks the handshake packets for legitimacy
-  - Sonar validates the login/server ping packets
-  - Sonar handles all server pings asynchronously
-  - The Varint decoder is updated to Velocity's
-    improved [MinecraftVarintFrameDecoder](https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java).
+- Sonar checks the handshake packets for legitimacy
+- Sonar makes sure some packets cannot be duplicated illegitimately
 
 ### Fallback
 

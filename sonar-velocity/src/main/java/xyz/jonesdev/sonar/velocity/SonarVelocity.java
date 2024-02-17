@@ -27,7 +27,8 @@ import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.velocity.audience.AudienceListener;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackListener;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackInjectionHelper;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackLoginListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -76,7 +77,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
 
     // Register Fallback listener
-    getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackListener());
+    getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackLoginListener());
 
     // Register audience register listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
@@ -95,5 +96,8 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), Sonar.get().getVerboseHandler()::update)
       .repeat(200L, TimeUnit.MILLISECONDS)
       .schedule();
+
+    // Make sure to inject into the server's connection handler
+    FallbackInjectionHelper.inject(getPlugin().getServer());
   }
 }

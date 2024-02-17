@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.fallback.injection;
+package xyz.jonesdev.sonar.bungee.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -27,20 +27,27 @@ import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import java.lang.reflect.Field;
 
 @UtilityClass
-public class BaseInjectionHelper {
-  public void inject(final ChannelInitializer<Channel> childHandler) {
+public class FallbackInjectionHelper {
+  public void inject() {
     try {
       final Field childField = PipelineUtils.class.getField("SERVER_CHILD");
       childField.setAccessible(true);
+
+      // Make sure to store the original channel initializer
+      final ChannelInitializer<Channel> originalInitializer = PipelineUtils.SERVER_CHILD;
+      final ChannelInitializer<Channel> fallbackInitializer = new FallbackChannelInitializer(originalInitializer);
 
       final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
       unsafeField.setAccessible(true);
       final Unsafe unsafe = (Unsafe) unsafeField.get(null);
 
+      // Get the base object (the object containing the field)
       final Object base = unsafe.staticFieldBase(childField);
+      // Get the offset of the static field within its class
       final long offset = unsafe.staticFieldOffset(childField);
 
-      unsafe.putObject(base, offset, childHandler);
+      // Replace the original channel initializer
+      unsafe.putObject(base, offset, fallbackInitializer);
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }

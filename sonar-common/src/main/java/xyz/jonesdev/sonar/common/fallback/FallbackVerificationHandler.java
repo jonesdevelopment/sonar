@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
+import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
@@ -51,6 +52,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener {
   private static final Random RANDOM = new Random();
+  private static final Fallback FALLBACK = Sonar.get().getFallback();
 
   // General
   private final SystemTimer login = new SystemTimer();
@@ -122,7 +124,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       encoder.updateRegistry(registry);
     } else {
       // Something went wrong - the decoder should not be null
-      user.getFallback().getLogger().warn("Necessary pipelines for {} not found", username);
+      FALLBACK.getLogger().warn("Necessary pipelines for {} not found", username);
       // Close the channel to prevent bypasses or other potential exploits
       user.getChannel().close();
     }
@@ -194,7 +196,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void sendChunkData() {
     // If we don't have gravity and captcha enabled, simply finish verification
     if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
-      && !user.getFallback().shouldDoMapCaptcha()) {
+      && !FALLBACK.shouldDoMapCaptcha()) {
       // Save some work by finishing before sending even more packets
       finish();
       return;
@@ -520,7 +522,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (tick > maxMovementTick) {
       // Log/debug position if enabled in the configuration
       if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-        user.getFallback().getLogger().info("{}: {}/{}/{} - deltaY: {} - ground: {} - collision: {}",
+        FALLBACK.getLogger().info("{}: {}/{}/{} - deltaY: {} - ground: {} - collision: {}",
           username, x, y, z, deltaY, ground, collisionOffsetY);
       }
 
@@ -555,7 +557,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Log/debug position if enabled in the configuration
       if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-        user.getFallback().getLogger().info("{}: {}/{}/{} - deltaY: {} - prediction: {} - offset: {}",
+        FALLBACK.getLogger().info("{}: {}/{}/{} - deltaY: {} - prediction: {} - offset: {}",
           username, x, y, z, deltaY, predictedY, offsetY);
       }
 
@@ -567,7 +569,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void captchaOrFinish() {
-    if (user.getFallback().shouldDoMapCaptcha()) {
+    if (FALLBACK.shouldDoMapCaptcha()) {
       if (MapInfoPreparer.getPreparedCAPTCHAs() == 0) {
         // This should not happen, but we have to return if there is no captcha prepared
         user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
@@ -611,7 +613,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void finish() {
     state = State.SUCCESS;
 
-    user.getFallback().getConnected().remove(username);
+    FALLBACK.getConnected().remove(username);
 
     // Add verified player to the database
     final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(user.getInetAddress().toString(), playerUuid,
@@ -624,7 +626,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Disconnect player with the verification success message
     user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());
 
-    user.getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getSuccessLog()
+    FALLBACK.getLogger().info(Sonar.get().getConfig().getVerification().getSuccessLog()
       .replace("%name%", username)
       .replace("%time%", login.toString()));
   }

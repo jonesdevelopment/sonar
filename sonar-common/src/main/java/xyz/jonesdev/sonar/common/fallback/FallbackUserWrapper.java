@@ -21,17 +21,14 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
-import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
@@ -46,14 +43,21 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 
 @Getter
-@RequiredArgsConstructor
 @ToString(of = {"protocolVersion", "inetAddress"})
 public final class FallbackUserWrapper implements FallbackUser {
-  private final Fallback fallback;
   private final Channel channel;
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
+
+  public FallbackUserWrapper(final @NotNull Channel channel,
+                             final @NotNull InetAddress inetAddress,
+                             final @NotNull ProtocolVersion protocolVersion) {
+    this.channel = channel;
+    this.pipeline = channel.pipeline();
+    this.inetAddress = inetAddress;
+    this.protocolVersion = protocolVersion;
+  }
 
   /**
    * Disconnect the player during/after verification
@@ -63,18 +67,28 @@ public final class FallbackUserWrapper implements FallbackUser {
    */
   @Override
   public void disconnect(final @NotNull Component reason) {
-    if (getChannel().isActive()) {
-      final FallbackPacket packet = Disconnect.create(reason);
-      if (getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
-        && getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0) {
-        getChannel().eventLoop().execute(() -> {
-          getChannel().config().setAutoRead(false);
-          getChannel().eventLoop().schedule(() -> {
-            getChannel().writeAndFlush(packet).addListener(ChannelFutureListener.CLOSE);
+    closeWith(channel, protocolVersion, Disconnect.create(reason));
+  }
+
+  /**
+   * @param channel         Channel to close
+   * @param protocolVersion Protocol version
+   * @param msg             Packet to close the channel with
+   */
+  public static void closeWith(final @NotNull Channel channel,
+                               final @NotNull ProtocolVersion protocolVersion,
+                               final @NotNull Object msg) {
+    if (channel.isActive()) {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
+        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0) {
+        channel.eventLoop().execute(() -> {
+          channel.config().setAutoRead(false);
+          channel.eventLoop().schedule(() -> {
+            channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
           }, 250L, TimeUnit.MILLISECONDS);
         });
       } else {
-        getChannel().writeAndFlush(packet).addListener(ChannelFutureListener.CLOSE);
+        channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
       }
     }
   }
@@ -91,10 +105,7 @@ public final class FallbackUserWrapper implements FallbackUser {
   @Override
   public void hijack(final @NotNull String username, final @NotNull UUID uuid,
                      final @NotNull String encoder, final @NotNull String decoder,
-                     final @NotNull String timeout) {
-    // The player has joined the verification
-    Statistics.REAL_TRAFFIC.increment();
-
+                     final @NotNull String timeout, final @NotNull String boss) {
     // This rarely happens when the channel hangs, but the player is still connecting
     // This also fixes a unique issue with TCPShield and other reverse proxies
     if (pipeline.get(encoder) == null || pipeline.get(decoder) == null) {
@@ -102,12 +113,20 @@ public final class FallbackUserWrapper implements FallbackUser {
       return;
     }
 
+    // Remove main pipeline to completely take over the channel
+    if (pipeline.get(boss) != null) {
+      pipeline.remove(boss);
+    }
+
+    // The player has joined the verification
+    Statistics.REAL_TRAFFIC.increment();
+
     if (Sonar.get().getConfig().getVerification().isLogConnections()) {
       // Only log the processing message if the server isn't under attack.
       // We let the user override this through the configuration.
       if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
         || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-        fallback.getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
+        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
           .replace("%name%", username)
           .replace("%ip%", Sonar.get().getConfig().formatAddress(inetAddress))
           .replace("%protocol%", String.valueOf(protocolVersion.getProtocol())));
@@ -118,7 +137,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(username, this));
 
     // Mark the player as connected → verifying players
-    fallback.getConnected().put(username, inetAddress);
+    Sonar.get().getFallback().getConnected().put(username, inetAddress);
 
     // Add better timeout handler to avoid known exploits or issues
     // We also want to timeout bots quickly to avoid flooding

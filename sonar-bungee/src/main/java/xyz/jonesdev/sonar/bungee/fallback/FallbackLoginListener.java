@@ -36,8 +36,11 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.util.Objects;
 
+import static xyz.jonesdev.sonar.bungee.fallback.FallbackChannelHandler.getCachedKickPacket;
+import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
+
 @RequiredArgsConstructor
-public final class FallbackListener implements Listener {
+public final class FallbackLoginListener implements Listener {
 
   private static final Field CHANNEL_FIELD;
 
@@ -53,25 +56,25 @@ public final class FallbackListener implements Listener {
   @SuppressWarnings("deprecation")
   @EventHandler(priority = EventPriority.LOWEST)
   public void handle(final @NotNull LoginEvent event) throws IllegalAccessException {
-    final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
-
     // Check if the number of online players using the same IP address as
     // the connecting player is greater than the configured amount
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
+    // Don't do anything if the setting is disabled
+    if (maxOnlinePerIp <= 0) return;
 
-    if (maxOnlinePerIp > 0) {
-      final long onlinePerIp = SonarBungee.INSTANCE.getPlugin().getServer().getPlayers().stream()
-        .filter(player -> Objects.equals(player.getAddress().getAddress(), inetAddress))
-        .count()
-        + 1 /* add 1 because the player hasn't been added to the list of online players yet */;
+    final InetAddress inetAddress = event.getConnection().getAddress().getAddress();
 
-      // We use '>=' because the player connecting to the server hasn't joined yet
-      if (onlinePerIp >= maxOnlinePerIp) {
-        final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
-        final PendingConnection connection = event.getConnection();
-        FallbackHandlerBoss.closeWith((ChannelWrapper) CHANNEL_FIELD.get(connection),
-          ProtocolVersion.fromId(connection.getVersion()), FallbackHandlerBoss.getKickPacket(component));
-      }
+    final long onlinePerIp = SonarBungee.INSTANCE.getPlugin().getServer().getPlayers().stream()
+      .filter(player -> Objects.equals(player.getAddress().getAddress(), inetAddress))
+      .count()
+      + 1 /* add 1 because the player hasn't been added to the list of online players yet */;
+
+    // We use '>=' because the player connecting to the server hasn't joined yet
+    if (onlinePerIp >= maxOnlinePerIp) {
+      final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
+      final PendingConnection connection = event.getConnection();
+      closeWith(((ChannelWrapper) CHANNEL_FIELD.get(connection)).getHandle(),
+        ProtocolVersion.fromId(connection.getVersion()), getCachedKickPacket(component));
     }
   }
 }
