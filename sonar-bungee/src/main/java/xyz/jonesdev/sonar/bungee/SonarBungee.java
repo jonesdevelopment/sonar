@@ -28,9 +28,8 @@ import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bungee.audience.AudienceListener;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
-import xyz.jonesdev.sonar.bungee.fallback.FallbackListener;
-import xyz.jonesdev.sonar.bungee.fallback.injection.BaseInjectionHelper;
-import xyz.jonesdev.sonar.bungee.fallback.injection.ChildChannelInitializer;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackInjectionHelper;
+import xyz.jonesdev.sonar.bungee.fallback.FallbackLoginListener;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.concurrent.TimeUnit;
@@ -83,13 +82,10 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());
 
     // Register Fallback listener
-    getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new FallbackListener());
+    getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new FallbackLoginListener());
 
     // Register audience register listener
     getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new AudienceListener());
-
-    // Inject base into ProtocolUtils
-    BaseInjectionHelper.inject(ChildChannelInitializer.INSTANCE);
 
     // Register traffic service
     getPlugin().getServer().getScheduler().schedule(getPlugin(), TrafficCounter::reset,
@@ -102,5 +98,8 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     // Register verbose service
     getPlugin().getServer().getScheduler().schedule(getPlugin(), Sonar.get().getVerboseHandler()::update,
       200L, 200L, TimeUnit.MILLISECONDS);
+
+    // Make sure to inject into the server's connection handler
+    FallbackInjectionHelper.inject();
   }
 }
