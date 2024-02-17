@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.common.boot;
 
-import com.alessiodp.libby.Library;
 import com.alessiodp.libby.LibraryManager;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Getter;
@@ -121,19 +120,6 @@ public abstract class SonarBootstrap<T> implements Sonar {
       && verifiedPlayerController.getCachedDatabaseType() != getConfig().getDatabase().getType()) {
       getLogger().warn("Reloading the server after changing the database type"
         + " is generally not recommended as it can sometimes cause data loss.");
-    }
-
-    // Only load database driver libraries if needed
-    if (verifiedPlayerController == null
-      && getConfig().getDatabase().getType() != SonarConfiguration.Database.Type.NONE) {
-      libraryManager.loadLibraries(
-        // MySQL
-        Library.builder()
-          .groupId("com{}mysql")
-          .artifactId("mysql-connector-j")
-          .version("8.3.0")
-          .build()
-      );
     }
 
     // Prepare cached packets
