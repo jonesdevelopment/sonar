@@ -30,7 +30,6 @@ import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
@@ -132,92 +131,91 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
     inetAddress = socketAddress.getAddress();
 
-    try {
-      // Check the blacklist here since we cannot let the player "ghost join"
-      if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
-        closeWith(channel, protocolVersion, DisconnectPacket.create(
-          Sonar.get().getConfig().getVerification().getBlacklisted(),
-          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
-        return;
-      }
-
-      // Don't continue the verification process if the verification is disabled
-      if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) return;
-
-      // Completely skip Geyser connections
-      if (GeyserUtil.isGeyserConnection(channel, socketAddress)) {
-        ctx.fireChannelRead(serverLogin);
-        return;
-      }
-
-      // Check if the player is already queued since we don't want bots to flood the queue
-      if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-        closeWith(channel, protocolVersion, DisconnectPacket.create(
-          Sonar.get().getConfig().getVerification().getAlreadyQueued(),
-          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
-        return;
-      }
-
-      // Check if Fallback is already verifying a player
-      // → is another player with the same IP address connected to Fallback?
-      if (FALLBACK.getConnected().containsKey(serverLogin.getUsername())
-        || FALLBACK.getConnected().containsValue(inetAddress)) {
-        closeWith(channel, protocolVersion, DisconnectPacket.create(
-          Sonar.get().getConfig().getVerification().getAlreadyVerifying(),
-          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
-        return;
-      }
-
-      // Check if the protocol ID of the player is not allowed to enter the server
-      if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
-        .contains(protocolVersion.getProtocol())) {
-        closeWith(channel, protocolVersion, DisconnectPacket.create(
-          Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
-          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
-        return;
-      }
-
-      // Make sure we actually have to verify the player
-      final GameProfile gameProfile = GameProfile.forOfflinePlayer(serverLogin.getUsername());
-      if (Sonar.get().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) {
-        ctx.fireChannelRead(serverLogin);
-        return;
-      }
-
-      // Check if the IP address is currently being rate-limited
-      if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
-        closeWith(channel, protocolVersion, DisconnectPacket.create(
-          Sonar.get().getConfig().getVerification().getTooFastReconnect(),
-          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
-        return;
-      }
-
-      // Check if the protocol ID of the player is allowed to bypass verification
-      if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols()
-        .contains(protocolVersion.getProtocol())) {
-        ctx.fireChannelRead(serverLogin);
-        return;
-      }
-
-      // Queue the connection for further processing
-      FALLBACK.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
-        // Check if the username matches the valid name regex to prevent
-        // UTF-16 names or other types of exploits
-        if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
-          .matcher(gameProfile.getName()).matches()) {
-          closeWith(channel, protocolVersion, DisconnectPacket.create(
-            Sonar.get().getConfig().getVerification().getInvalidUsername(),
-            handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
-          return;
-        }
-
-        // Create an instance for the Fallback connection
-        final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
-        // Let the verification handler take over the channel
-        user.hijack(gameProfile.getName(), gameProfile.getId(), MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
-      }));
-    } catch (Throwable throwable) {
-      throw new ReflectiveOperationException(throwable);
+    // Check the blacklist here since we cannot let the player "ghost join"
+    if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
+      closeWith(channel, protocolVersion, DisconnectPacket.create(
+        Sonar.get().getConfig().getVerification().getBlacklisted(),
+        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      return;
     }
+
+    // Don't continue the verification process if the verification is disabled
+    if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
+      ctx.fireChannelRead(serverLogin);
+      return;
+    }
+
+    // Completely skip Geyser connections
+    if (GeyserUtil.isGeyserConnection(channel, socketAddress)) {
+      ctx.fireChannelRead(serverLogin);
+      return;
+    }
+
+    // Check if the player is already queued since we don't want bots to flood the queue
+    if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
+      closeWith(channel, protocolVersion, DisconnectPacket.create(
+        Sonar.get().getConfig().getVerification().getAlreadyQueued(),
+        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      return;
+    }
+
+    // Check if Fallback is already verifying a player
+    // → is another player with the same IP address connected to Fallback?
+    if (FALLBACK.getConnected().containsKey(serverLogin.getUsername())
+      || FALLBACK.getConnected().containsValue(inetAddress)) {
+      closeWith(channel, protocolVersion, DisconnectPacket.create(
+        Sonar.get().getConfig().getVerification().getAlreadyVerifying(),
+        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      return;
+    }
+
+    // Check if the protocol ID of the player is not allowed to enter the server
+    if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
+      .contains(protocolVersion.getProtocol())) {
+      closeWith(channel, protocolVersion, DisconnectPacket.create(
+        Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
+        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      return;
+    }
+
+    // Make sure we actually have to verify the player
+    final GameProfile gameProfile = GameProfile.forOfflinePlayer(serverLogin.getUsername());
+    if (Sonar.get().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) {
+      ctx.fireChannelRead(serverLogin);
+      return;
+    }
+
+    // Check if the IP address is currently being rate-limited
+    if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
+      closeWith(channel, protocolVersion, DisconnectPacket.create(
+        Sonar.get().getConfig().getVerification().getTooFastReconnect(),
+        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      return;
+    }
+
+    // Check if the protocol ID of the player is allowed to bypass verification
+    if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols()
+      .contains(protocolVersion.getProtocol())) {
+      ctx.fireChannelRead(serverLogin);
+      return;
+    }
+
+    // Queue the connection for further processing
+    FALLBACK.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
+      // Check if the username matches the valid name regex to prevent
+      // UTF-16 names or other types of exploits
+      if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
+        .matcher(gameProfile.getName()).matches()) {
+        closeWith(channel, protocolVersion, DisconnectPacket.create(
+          Sonar.get().getConfig().getVerification().getInvalidUsername(),
+          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+        return;
+      }
+
+      // Create an instance for the Fallback connection
+      final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
+      // Let the verification handler take over the channel
+      user.hijack(gameProfile.getName(), gameProfile.getId(), MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
+    }));
   }
 }

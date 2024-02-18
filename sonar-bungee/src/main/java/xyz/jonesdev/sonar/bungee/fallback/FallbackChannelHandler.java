@@ -172,87 +172,86 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
     inetAddress = socketAddress.getAddress();
 
-    try {
-      // Check the blacklist here since we cannot let the player "ghost join"
-      if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
-        closeWith(channel, protocolVersion,
-          getCachedKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
-        return;
-      }
-
-      // Don't continue the verification process if the verification is disabled
-      if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) return;
-
-      // Completely skip Geyser connections
-      if (GeyserUtil.isGeyserConnection(channel, socketAddress)) {
-        ctx.fireChannelRead(wrappedMessage);
-        return;
-      }
-
-      // Check if the player is already queued since we don't want bots to flood the queue
-      if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-        closeWith(channel, protocolVersion,
-          getCachedKickPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued()));
-        return;
-      }
-
-      // Check if Fallback is already verifying a player
-      // → is another player with the same IP address connected to Fallback?
-      if (FALLBACK.getConnected().containsKey(loginRequest.getData())
-        || FALLBACK.getConnected().containsValue(inetAddress)) {
-        closeWith(channel, protocolVersion,
-          getCachedKickPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying()));
-        return;
-      }
-
-      // Check if the protocol ID of the player is not allowed to enter the server
-      if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
-        .contains(protocolVersion.getProtocol())) {
-        closeWith(channel, protocolVersion,
-          getCachedKickPacket(Sonar.get().getConfig().getVerification().getProtocolBlacklisted()));
-        return;
-      }
-
-      // Make sure we actually have to verify the player
-      final String offlineUUIDString = "OfflinePlayer:" + loginRequest.getData();
-      final UUID offlineUUID = UUID.nameUUIDFromBytes(offlineUUIDString.getBytes(StandardCharsets.UTF_8));
-      if (Sonar.get().getVerifiedPlayerController().has(inetAddress, offlineUUID)) {
-        ctx.fireChannelRead(wrappedMessage);
-        return;
-      }
-
-      // Check if the IP address is currently being rate-limited
-      if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
-        closeWith(channel, protocolVersion,
-          getCachedKickPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect()));
-        return;
-      }
-
-      // Check if the protocol ID of the player is allowed to bypass verification
-      if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols()
-        .contains(protocolVersion.getProtocol())) {
-        ctx.fireChannelRead(wrappedMessage);
-        return;
-      }
-
-      // Queue the connection for further processing
-      FALLBACK.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
-        // Check if the username matches the valid name regex to prevent
-        // UTF-16 names or other types of exploits
-        if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
-          .matcher(loginRequest.getData()).matches()) {
-          closeWith(channel, protocolVersion,
-            Sonar.get().getConfig().getVerification().getInvalidUsername());
-          return;
-        }
-
-        // Create an instance for the Fallback connection
-        final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
-        // Let the verification handler take over the channel
-        user.hijack(loginRequest.getData(), offlineUUID, PACKET_ENCODER, PACKET_DECODER, TIMEOUT_HANDLER, BOSS_HANDLER);
-      }));
-    } catch (Throwable throwable) {
-      throw new ReflectiveOperationException(throwable);
+    // Check the blacklist here since we cannot let the player "ghost join"
+    if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
+      closeWith(channel, protocolVersion,
+        getCachedKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
+      return;
     }
+
+    // Don't continue the verification process if the verification is disabled
+    if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
+      ctx.fireChannelRead(wrappedMessage);
+      return;
+    }
+
+    // Completely skip Geyser connections
+    if (GeyserUtil.isGeyserConnection(channel, socketAddress)) {
+      ctx.fireChannelRead(wrappedMessage);
+      return;
+    }
+
+    // Check if the player is already queued since we don't want bots to flood the queue
+    if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
+      closeWith(channel, protocolVersion,
+        getCachedKickPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued()));
+      return;
+    }
+
+    // Check if Fallback is already verifying a player
+    // → is another player with the same IP address connected to Fallback?
+    if (FALLBACK.getConnected().containsKey(loginRequest.getData())
+      || FALLBACK.getConnected().containsValue(inetAddress)) {
+      closeWith(channel, protocolVersion,
+        getCachedKickPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying()));
+      return;
+    }
+
+    // Check if the protocol ID of the player is not allowed to enter the server
+    if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
+      .contains(protocolVersion.getProtocol())) {
+      closeWith(channel, protocolVersion,
+        getCachedKickPacket(Sonar.get().getConfig().getVerification().getProtocolBlacklisted()));
+      return;
+    }
+
+    // Make sure we actually have to verify the player
+    final String offlineUUIDString = "OfflinePlayer:" + loginRequest.getData();
+    final UUID offlineUUID = UUID.nameUUIDFromBytes(offlineUUIDString.getBytes(StandardCharsets.UTF_8));
+    if (Sonar.get().getVerifiedPlayerController().has(inetAddress, offlineUUID)) {
+      ctx.fireChannelRead(wrappedMessage);
+      return;
+    }
+
+    // Check if the IP address is currently being rate-limited
+    if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
+      closeWith(channel, protocolVersion,
+        getCachedKickPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect()));
+      return;
+    }
+
+    // Check if the protocol ID of the player is allowed to bypass verification
+    if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols()
+      .contains(protocolVersion.getProtocol())) {
+      ctx.fireChannelRead(wrappedMessage);
+      return;
+    }
+
+    // Queue the connection for further processing
+    FALLBACK.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
+      // Check if the username matches the valid name regex to prevent
+      // UTF-16 names or other types of exploits
+      if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
+        .matcher(loginRequest.getData()).matches()) {
+        closeWith(channel, protocolVersion,
+          Sonar.get().getConfig().getVerification().getInvalidUsername());
+        return;
+      }
+
+      // Create an instance for the Fallback connection
+      final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
+      // Let the verification handler take over the channel
+      user.hijack(loginRequest.getData(), offlineUUID, PACKET_ENCODER, PACKET_DECODER, TIMEOUT_HANDLER, BOSS_HANDLER);
+    }));
   }
 }
