@@ -96,6 +96,18 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     ctx.fireChannelRead(msg);
   }
 
+  // We can override the default exceptionCaught method since this handler
+  // will run before the MinecraftConnection knows that there has been an error.
+  // Additionally, this will also run after our custom decoder.
+  @Override
+  public void exceptionCaught(final @NotNull ChannelHandlerContext ctx,
+                              final @NotNull Throwable cause) throws Exception {
+    // Sonar sometimes uses exceptions to quickly close
+    // the channel and interrupt any other ongoing process.
+    // Simply close the channel if we encounter any errors.
+    ctx.close();
+  }
+
   private void handleHandshake(final @NotNull HandshakePacket handshake) throws Exception {
     // Check if the player has already sent a handshake packet
     if (handshakePacket != null) {
@@ -215,7 +227,8 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       // Create an instance for the Fallback connection
       final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
       // Let the verification handler take over the channel
-      user.hijack(gameProfile.getName(), gameProfile.getId(), MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
+      user.hijack(
+        gameProfile.getName(), gameProfile.getId(), MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
     }));
   }
 }

@@ -137,6 +137,18 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     ctx.fireChannelRead(msg);
   }
 
+  // We can override the default exceptionCaught method since this handler
+  // will run before the MinecraftConnection knows that there has been an error.
+  // Additionally, this will also run after our custom decoder.
+  @Override
+  public void exceptionCaught(final @NotNull ChannelHandlerContext ctx,
+                              final @NotNull Throwable cause) throws Exception {
+    // Sonar sometimes uses exceptions to quickly close
+    // the channel and interrupt any other ongoing process.
+    // Simply close the channel if we encounter any errors.
+    ctx.close();
+  }
+
   private void handleHandshake(final @NotNull Handshake handshake) throws Exception {
     // Check if the player has already sent a handshake packet
     if (protocolVersion != null) {
