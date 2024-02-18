@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback.traffic;
+package xyz.jonesdev.sonar.api.statistics;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +25,7 @@ import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
  * This counts all incoming and outgoing traffic.
  */
 @Getter
-public enum TrafficCounter implements JVMProfiler {
+public enum Bandwidth implements JVMProfiler {
   INCOMING,
   OUTGOING;
 
@@ -48,7 +48,7 @@ public enum TrafficCounter implements JVMProfiler {
    * This method is called every second.
    */
   public static synchronized void reset() {
-    for (final TrafficCounter value : values()) {
+    for (final Bandwidth value : values()) {
       value.cacheAndReset();
     }
   }

@@ -31,8 +31,8 @@ import java.util.Collection;
 import java.util.Vector;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.INCOMING;
-import static xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter.OUTGOING;
+import static xyz.jonesdev.sonar.api.statistics.Bandwidth.INCOMING;
+import static xyz.jonesdev.sonar.api.statistics.Bandwidth.OUTGOING;
 
 @Getter
 public final class Notification implements Observable, Counters {

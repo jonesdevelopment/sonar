@@ -44,8 +44,8 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Counters;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.common.fallback.FallbackBandwidthHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper;
-import xyz.jonesdev.sonar.common.fallback.traffic.TrafficChannelHooker;
 import xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil;
 
 import java.lang.reflect.Field;
@@ -55,6 +55,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 
 @RequiredArgsConstructor
@@ -149,7 +150,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     protocolVersion = ProtocolVersion.fromId(handshake.getProtocolVersion());
     // Hook the traffic listener
     // TODO: Can we implement this in channelActive?
-    TrafficChannelHooker.hook(channel.pipeline());
+    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
   }
 
   private void handleLogin(final @NotNull ChannelHandlerContext ctx,

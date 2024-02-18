@@ -15,30 +15,47 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.traffic;
+package xyz.jonesdev.sonar.common.fallback;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
+
+import static xyz.jonesdev.sonar.api.statistics.Bandwidth.INCOMING;
+import static xyz.jonesdev.sonar.api.statistics.Bandwidth.OUTGOING;
 
 @ChannelHandler.Sharable
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class OutgoingBandwidthEncoder extends ChannelOutboundHandlerAdapter {
-  public static final OutgoingBandwidthEncoder INSTANCE = new OutgoingBandwidthEncoder();
+public final class FallbackBandwidthHandler extends ChannelDuplexHandler {
+  public static final ChannelHandler INSTANCE = new FallbackBandwidthHandler();
+
+  @Override
+  public void channelRead(final @NotNull ChannelHandlerContext ctx,
+                          final @NotNull Object msg) throws Exception {
+    // We can only get the size of a message if it's a ByteBuf
+    if (msg instanceof ByteBuf) {
+      // Increment the incoming traffic by the amount of readable bytes
+      INCOMING.increment(((ByteBuf) msg).readableBytes());
+    }
+    // Make sure to let the server handle the rest
+    ctx.fireChannelRead(msg);
+  }
 
   @Override
   public void write(final @NotNull ChannelHandlerContext ctx,
                     final @NotNull Object msg,
-                    final @NotNull ChannelPromise promise) throws Exception {
+                    final ChannelPromise promise) throws Exception {
+    // We can only get the size of a message if it's a ByteBuf
     if (msg instanceof ByteBuf) {
-      TrafficCounter.OUTGOING.increment(((ByteBuf) msg).readableBytes());
+      // Increment the outgoing traffic by the amount of readable bytes
+      OUTGOING.increment(((ByteBuf) msg).readableBytes());
     }
+    // Make sure to let the server handle the rest
     ctx.write(msg, promise);
   }
 }

@@ -23,8 +23,8 @@ import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
-import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
+import xyz.jonesdev.sonar.api.statistics.Bandwidth;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
@@ -105,10 +105,10 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
 
       case NETWORK: {
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNetworkStatistics()
-          .replace("%incoming%", TrafficCounter.INCOMING.getCachedSecond())
-          .replace("%outgoing%", TrafficCounter.OUTGOING.getCachedSecond())
-          .replace("%ttl_incoming%", TrafficCounter.INCOMING.getCachedTtl())
-          .replace("%ttl_outgoing%", TrafficCounter.OUTGOING.getCachedTtl()));
+          .replace("%incoming%", Bandwidth.INCOMING.getCachedSecond())
+          .replace("%outgoing%", Bandwidth.OUTGOING.getCachedSecond())
+          .replace("%ttl_incoming%", Bandwidth.INCOMING.getCachedTtl())
+          .replace("%ttl_outgoing%", Bandwidth.OUTGOING.getCachedTtl()));
         break;
       }
     }

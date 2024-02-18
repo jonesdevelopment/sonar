@@ -24,8 +24,8 @@ import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.api.statistics.Bandwidth;
 import xyz.jonesdev.sonar.bungee.audience.AudienceListener;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackInjectionHelper;
@@ -88,7 +88,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new AudienceListener());
 
     // Register traffic service
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), TrafficCounter::reset,
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), Bandwidth::reset,
       1L, 1L, TimeUnit.SECONDS);
 
     // Register queue service
