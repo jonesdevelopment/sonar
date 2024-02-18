@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.velocity.fallback;
 
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
+import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.DisconnectPacket;
 import com.velocitypowered.proxy.protocol.packet.HandshakePacket;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginPacket;
@@ -135,7 +136,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
         closeWith(channel, protocolVersion, DisconnectPacket.create(
           Sonar.get().getConfig().getVerification().getBlacklisted(),
-          handshakePacket.getProtocolVersion(), true));
+          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
         return;
       }
 
@@ -152,7 +153,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
         closeWith(channel, protocolVersion, DisconnectPacket.create(
           Sonar.get().getConfig().getVerification().getAlreadyQueued(),
-          handshakePacket.getProtocolVersion(), true));
+          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
         return;
       }
 
@@ -162,7 +163,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
         || FALLBACK.getConnected().containsValue(inetAddress)) {
         closeWith(channel, protocolVersion, DisconnectPacket.create(
           Sonar.get().getConfig().getVerification().getAlreadyVerifying(),
-          handshakePacket.getProtocolVersion(), true));
+          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
         return;
       }
 
@@ -171,7 +172,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
         .contains(protocolVersion.getProtocol())) {
         closeWith(channel, protocolVersion, DisconnectPacket.create(
           Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
-          handshakePacket.getProtocolVersion(), true));
+          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
         return;
       }
 
@@ -186,7 +187,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
         closeWith(channel, protocolVersion, DisconnectPacket.create(
           Sonar.get().getConfig().getVerification().getTooFastReconnect(),
-          handshakePacket.getProtocolVersion(), true));
+          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
         return;
       }
 
@@ -205,7 +206,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
           .matcher(gameProfile.getName()).matches()) {
           closeWith(channel, protocolVersion, DisconnectPacket.create(
             Sonar.get().getConfig().getVerification().getInvalidUsername(),
-            handshakePacket.getProtocolVersion(), true));
+            handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
           return;
         }
 
