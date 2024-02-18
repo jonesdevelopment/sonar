@@ -21,6 +21,7 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
+import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.DisconnectPacket;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -37,7 +38,6 @@ public final class FallbackLoginListener {
     // Don't do anything if the setting is disabled
     if (maxOnlinePerIp <= 0) return;
 
-    final ConnectedPlayer connectedPlayer = (ConnectedPlayer) event.getPlayer();
     final InetAddress inetAddress = event.getPlayer().getRemoteAddress().getAddress();
 
     // Check if the number of online players using the same IP address as
@@ -48,9 +48,10 @@ public final class FallbackLoginListener {
 
     // We use '>=' because the player connecting to the server hasn't joined yet
     if (onlinePerIp >= maxOnlinePerIp) {
+      final ConnectedPlayer connectedPlayer = (ConnectedPlayer) event.getPlayer();
       connectedPlayer.getConnection().closeWith(DisconnectPacket.create(
         Sonar.get().getConfig().getTooManyOnlinePerIp(),
-        connectedPlayer.getProtocolVersion(), true));
+        connectedPlayer.getProtocolVersion(), StateRegistry.LOGIN));
     }
   }
 }
