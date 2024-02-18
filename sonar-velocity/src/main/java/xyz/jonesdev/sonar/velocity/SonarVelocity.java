@@ -22,8 +22,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.api.statistics.Bandwidth;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.velocity.audience.AudienceListener;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
@@ -83,7 +83,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
 
     // Register traffic service
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), TrafficCounter::reset)
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), Bandwidth::reset)
       .repeat(1L, TimeUnit.SECONDS)
       .schedule();
 

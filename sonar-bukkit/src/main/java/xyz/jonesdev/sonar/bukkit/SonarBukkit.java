@@ -24,8 +24,8 @@ import org.bstats.bukkit.Metrics;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.fallback.traffic.TrafficCounter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.api.statistics.Bandwidth;
 import xyz.jonesdev.sonar.bukkit.audience.AudienceListener;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
@@ -86,7 +86,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
     // Register traffic service
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
-      TrafficCounter::reset, 20L, 20L);
+      Bandwidth::reset, 20L, 20L);
 
     // Register queue service
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
