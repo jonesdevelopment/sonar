@@ -270,7 +270,7 @@ verification:
 # Перевод для action bar (verbose)
 verbose:
   layout:
-    # Макет перевода статистики в режиме реального времени (verbose)
+    # Макет для панели действий Sonar verbose
     # Placeholders:
     # - '%queued%' Количество игроков в очереди
     # - '%verifying%' Количество проверяемых игроков
