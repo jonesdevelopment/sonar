@@ -17,23 +17,16 @@
 
 package xyz.jonesdev.sonar.bungee.fallback;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Handshake;
-import net.md_5.bungee.protocol.packet.Kick;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +49,8 @@ import java.util.UUID;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
-import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
+import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 @RequiredArgsConstructor
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
@@ -66,7 +60,6 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
   private InetAddress inetAddress;
 
   private static final Fallback FALLBACK = Sonar.get().getFallback();
-  private static final Cache<Component, Kick> CACHED_KICK_PACKETS = Caffeine.newBuilder().build();
 
   private static final Field CHANNEL_WRAPPER_FIELD;
 
@@ -77,17 +70,6 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }
-  }
-
-  public static @NotNull Kick getCachedKickPacket(final Component component) {
-    Kick packet = CACHED_KICK_PACKETS.asMap().get(component);
-    if (packet == null) {
-      final String serialized = JSONComponentSerializer.json().serialize(component);
-      final BaseComponent baseComponent = ComponentSerializer.deserialize(serialized);
-      packet = new Kick(baseComponent);
-      CACHED_KICK_PACKETS.put(component, packet);
-    }
-    return packet;
   }
 
   @Override
@@ -186,8 +168,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
 
     // Check the blacklist here since we cannot let the player "ghost join"
     if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
-      closeWith(channel, protocolVersion,
-        getCachedKickPacket(Sonar.get().getConfig().getVerification().getBlacklisted()));
+      customDisconnect(channel, protocolVersion, blacklisted, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
@@ -205,8 +186,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
 
     // Check if the player is already queued since we don't want bots to flood the queue
     if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-      closeWith(channel, protocolVersion,
-        getCachedKickPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued()));
+      customDisconnect(channel, protocolVersion, alreadyQueued, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
@@ -214,16 +194,14 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     // → is another player with the same IP address connected to Fallback?
     if (FALLBACK.getConnected().containsKey(loginRequest.getData())
       || FALLBACK.getConnected().containsValue(inetAddress)) {
-      closeWith(channel, protocolVersion,
-        getCachedKickPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying()));
+      customDisconnect(channel, protocolVersion, alreadyVerifying, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
     // Check if the protocol ID of the player is not allowed to enter the server
     if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
       .contains(protocolVersion.getProtocol())) {
-      closeWith(channel, protocolVersion,
-        getCachedKickPacket(Sonar.get().getConfig().getVerification().getProtocolBlacklisted()));
+      customDisconnect(channel, protocolVersion, protocolBlacklisted, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
@@ -237,8 +215,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
 
     // Check if the IP address is currently being rate-limited
     if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
-      closeWith(channel, protocolVersion,
-        getCachedKickPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect()));
+      customDisconnect(channel, protocolVersion, reconnectedTooFast, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
@@ -255,8 +232,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       // UTF-16 names or other types of exploits
       if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
         .matcher(loginRequest.getData()).matches()) {
-        closeWith(channel, protocolVersion,
-          Sonar.get().getConfig().getVerification().getInvalidUsername());
+        customDisconnect(channel, protocolVersion, invalidUsername, PACKET_ENCODER, BOSS_HANDLER);
         return;
       }
 

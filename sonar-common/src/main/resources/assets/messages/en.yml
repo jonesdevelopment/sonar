@@ -182,9 +182,6 @@ verification:
     # Message that is logged to console whenever a player is verified
     successful: '%name% has been verified successfully (%time%s!).'
 
-  # Message that is shown to the player when they are being checked for valid gravity
-  welcome: '%prefix%<gray>Please wait a moment for the verification to finish...'
-
   # Messages that are shown to the player when they are supposed to enter the CAPTCHA
   captcha:
     # Message that is shown to the player when they have to enter the answer to the captcha

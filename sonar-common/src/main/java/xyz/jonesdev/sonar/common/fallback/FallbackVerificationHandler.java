@@ -211,19 +211,17 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
     // Teleport player into the fake lobby by sending an empty chunk
     user.delayedWrite(EMPTY_CHUNK_DATA);
-    // Send an UpdateSectionBlocks packet with a platform of blocks
-    // to check if the player collides with the solid platform.
-    user.delayedWrite(updateSectionBlocks);
     // Checking gravity is disabled, just finish verification
     if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
       // Switch to captcha state if needed
       captchaOrFinish();
-    } else {
-      // Make sure the player knows we are checking them
-      user.delayedWrite(youAreBeingChecked);
-      // Send all packets in one flush
-      user.getChannel().flush();
+      return;
     }
+    // Send an UpdateSectionBlocks packet with a platform of blocks
+    // to check if the player collides with the solid platform.
+    user.delayedWrite(updateSectionBlocks);
+    // Send all packets in one flush
+    user.getChannel().flush();
   }
 
   private static boolean validateClientLocale(final @SuppressWarnings("unused") @NotNull FallbackUser user,
@@ -291,8 +289,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // Every 10 seconds
     if (keepAlive.elapsed(10_000L)) {
-      // Send the message again to remind the player
-      user.delayedWrite(enterCodeMessage);
       // Send a KeepAlive packet to prevent timeout
       user.delayedWrite(CAPTCHA_KEEP_ALIVE);
       // Send both packets in one flush

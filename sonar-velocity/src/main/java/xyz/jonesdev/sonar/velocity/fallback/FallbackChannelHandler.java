@@ -17,10 +17,7 @@
 
 package xyz.jonesdev.sonar.velocity.fallback;
 
-import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.protocol.StateRegistry;
-import com.velocitypowered.proxy.protocol.packet.DisconnectPacket;
 import com.velocitypowered.proxy.protocol.packet.HandshakePacket;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginPacket;
 import io.netty.channel.Channel;
@@ -42,10 +39,13 @@ import xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import static com.velocitypowered.proxy.network.Connections.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
-import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
+import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 @RequiredArgsConstructor
 public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
@@ -145,9 +145,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
 
     // Check the blacklist here since we cannot let the player "ghost join"
     if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
-      closeWith(channel, protocolVersion, DisconnectPacket.create(
-        Sonar.get().getConfig().getVerification().getBlacklisted(),
-        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      customDisconnect(channel, protocolVersion, blacklisted, MINECRAFT_DECODER, HANDLER);
       return;
     }
 
@@ -165,9 +163,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
 
     // Check if the player is already queued since we don't want bots to flood the queue
     if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
-      closeWith(channel, protocolVersion, DisconnectPacket.create(
-        Sonar.get().getConfig().getVerification().getAlreadyQueued(),
-        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      customDisconnect(channel, protocolVersion, alreadyQueued, MINECRAFT_DECODER, HANDLER);
       return;
     }
 
@@ -175,33 +171,28 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     // → is another player with the same IP address connected to Fallback?
     if (FALLBACK.getConnected().containsKey(serverLogin.getUsername())
       || FALLBACK.getConnected().containsValue(inetAddress)) {
-      closeWith(channel, protocolVersion, DisconnectPacket.create(
-        Sonar.get().getConfig().getVerification().getAlreadyVerifying(),
-        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      customDisconnect(channel, protocolVersion, alreadyVerifying, MINECRAFT_DECODER, HANDLER);
       return;
     }
 
     // Check if the protocol ID of the player is not allowed to enter the server
     if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
       .contains(protocolVersion.getProtocol())) {
-      closeWith(channel, protocolVersion, DisconnectPacket.create(
-        Sonar.get().getConfig().getVerification().getProtocolBlacklisted(),
-        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      customDisconnect(channel, protocolVersion, protocolBlacklisted, MINECRAFT_DECODER, HANDLER);
       return;
     }
 
     // Make sure we actually have to verify the player
-    final GameProfile gameProfile = GameProfile.forOfflinePlayer(serverLogin.getUsername());
-    if (Sonar.get().getVerifiedPlayerController().has(inetAddress, gameProfile.getId())) {
+    final String offlineUUIDString = "OfflinePlayer:" + serverLogin.getUsername();
+    final UUID offlineUUID = UUID.nameUUIDFromBytes(offlineUUIDString.getBytes(StandardCharsets.UTF_8));
+    if (Sonar.get().getVerifiedPlayerController().has(inetAddress, offlineUUID)) {
       ctx.fireChannelRead(serverLogin);
       return;
     }
 
     // Check if the IP address is currently being rate-limited
     if (!FALLBACK.getRatelimiter().attempt(inetAddress)) {
-      closeWith(channel, protocolVersion, DisconnectPacket.create(
-        Sonar.get().getConfig().getVerification().getTooFastReconnect(),
-        handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+      customDisconnect(channel, protocolVersion, reconnectedTooFast, MINECRAFT_DECODER, HANDLER);
       return;
     }
 
@@ -217,18 +208,15 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       // Check if the username matches the valid name regex to prevent
       // UTF-16 names or other types of exploits
       if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
-        .matcher(gameProfile.getName()).matches()) {
-        closeWith(channel, protocolVersion, DisconnectPacket.create(
-          Sonar.get().getConfig().getVerification().getInvalidUsername(),
-          handshakePacket.getProtocolVersion(), StateRegistry.LOGIN));
+        .matcher(serverLogin.getUsername()).matches()) {
+        customDisconnect(channel, protocolVersion, invalidUsername, MINECRAFT_DECODER, HANDLER);
         return;
       }
 
       // Create an instance for the Fallback connection
       final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
       // Let the verification handler take over the channel
-      user.hijack(
-        gameProfile.getName(), gameProfile.getId(), MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
+      user.hijack(serverLogin.getUsername(), offlineUUID, MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
     }));
   }
 }

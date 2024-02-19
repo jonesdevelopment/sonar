@@ -43,8 +43,8 @@ public interface FallbackUser {
   @NotNull ProtocolVersion getProtocolVersion();
 
   /**
-   * Kicks the player from the server with
-   * the given disconnect message.
+   * Disconnect the player during/after verification
+   * using our custom Disconnect packet.
    *
    * @param reason Disconnect message component
    */

@@ -35,13 +35,10 @@ allprojects {
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    val adventureVersion = "4.15.0"
-
     // adventure
-    implementation("net.kyori:adventure-text-minimessage:$adventureVersion")
-    implementation("net.kyori:adventure-text-serializer-gson:$adventureVersion")
-    // adventure nbt
-    implementation("net.kyori:adventure-nbt:$adventureVersion")
+    implementation("net.kyori:adventure-text-minimessage:4.15.0")
+    implementation("net.kyori:adventure-text-serializer-gson:4.15.0")
+    implementation("net.kyori:adventure-nbt:4.15.0")
 
     compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.8") // caching
@@ -76,32 +73,26 @@ tasks {
     // Remove file timestamps
     isPreserveFileTimestamps = false
 
-    // bStats has to be relocated to the Sonar package otherwise it throws an exception
-    // https://github.com/Bastian/bstats-metrics/blob/master/base/src/main/java/org/bstats/MetricsBase.java#L251
+    // Relocate libraries
     relocate("org.bstats", "xyz.jonesdev.sonar.libs.bstats")
-
-    // https://github.com/jonesdevelopment/sonar/issues/46
-    // Relocate some packages, so we don't run into issues where we accidentally use Velocity's classes
     relocate("com.alessiodp.libby", "xyz.jonesdev.sonar.libs.libby")
-    relocate("xyz.jonesdev.cappuccino", "xyz.jonesdev.sonar.libs.cappuccino")
+    relocate("com.simpleyaml", "xyz.jonesdev.sonar.libs.yaml")
+    relocate("com.google.gson", "xyz.jonesdev.sonar.libs.gson")
+    relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
+    relocate("com.github.benmanes.caffeine", "xyz.jonesdev.sonar.libs.caffeine")
+
+    // TODO: actually fix this :/
     // We have to be careful here, so we don't accidentally break adventure
-    relocate("net.kyori.adventure", "xyz.jonesdev.sonar.libs.adventure") {
+    relocate("net.kyori", "xyz.jonesdev.sonar.libs.kyori") {
       exclude("net.kyori.adventure.text.**")
       exclude("net.kyori.adventure.audience.Audience")
       exclude("net.kyori.adventure.title.*")
     }
-    relocate("net.kyori.examination", "xyz.jonesdev.sonar.libs.examination")
-    relocate("net.kyori.option", "xyz.jonesdev.sonar.libs.option")
-    // Relocate dynamically loaded libraries
-    relocate("com.simpleyaml", "xyz.jonesdev.sonar.libs.yaml")
-    relocate("com.google.code.gson", "xyz.jonesdev.sonar.libs.gson")
-    relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
-    relocate("com.github.benmanes.caffeine", "xyz.jonesdev.sonar.libs.caffeine")
-    // We want to load our own Gson dynamically
-    exclude("com/google/gson/**")
 
     // Exclude unnecessary metadata information
-    exclude("META-INF/versions/**")
+    exclude("META-INF/*/**")
+    // We want to load our own Gson dynamically
+    exclude("com/google/gson/**")
   }
 
   compileJava {

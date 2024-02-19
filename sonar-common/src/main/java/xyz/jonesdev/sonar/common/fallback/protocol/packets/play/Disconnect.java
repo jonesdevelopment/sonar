@@ -17,39 +17,28 @@
 
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
-import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.utility.component.ComponentSerializer.serialize;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
+import xyz.jonesdev.sonar.common.utility.component.ComponentHolder;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class Disconnect implements FallbackPacket {
-  private @Nullable String reason;
-  private BinaryTag binaryTag;
+  private @NotNull ComponentHolder componentHolder;
+  private boolean login;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_3) >= 0) {
-      writeNamelessCompoundTag(byteBuf, binaryTag);
-    } else {
-      writeString(byteBuf, reason);
-    }
+    componentHolder.write(byteBuf, login ? ProtocolVersion.MINECRAFT_1_20_2 : protocolVersion);
   }
 
   @Override
@@ -57,9 +46,8 @@ public final class Disconnect implements FallbackPacket {
     throw new UnsupportedOperationException();
   }
 
-  public static @NotNull Disconnect create(final Component component) {
-    final String serialized = JSONComponentSerializer.json().serialize(component);
-    final BinaryTag binaryTag = serialize(new JsonParser().parse(serialized));
-    return new Disconnect(serialized, binaryTag);
+  public static @NotNull Disconnect create(final @NotNull Component component,
+                                           final boolean login) {
+    return new Disconnect(new ComponentHolder(component), login);
   }
 }

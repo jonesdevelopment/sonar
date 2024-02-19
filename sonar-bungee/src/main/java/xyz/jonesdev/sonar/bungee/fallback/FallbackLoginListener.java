@@ -19,13 +19,16 @@ package xyz.jonesdev.sonar.bungee.fallback;
 
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.connection.PendingConnection;
-import net.md_5.bungee.api.event.LoginEvent;
+import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import net.md_5.bungee.netty.ChannelWrapper;
+import net.md_5.bungee.protocol.packet.Kick;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -36,7 +39,6 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.util.Objects;
 
-import static xyz.jonesdev.sonar.bungee.fallback.FallbackChannelHandler.getCachedKickPacket;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 
 @RequiredArgsConstructor
@@ -55,7 +57,7 @@ public final class FallbackLoginListener implements Listener {
 
   @SuppressWarnings("deprecation")
   @EventHandler(priority = EventPriority.LOWEST)
-  public void handle(final @NotNull LoginEvent event) throws IllegalAccessException {
+  public void handle(final @NotNull PreLoginEvent event) throws IllegalAccessException {
     // Check if the number of online players using the same IP address as
     // the connecting player is greater than the configured amount
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
@@ -72,9 +74,11 @@ public final class FallbackLoginListener implements Listener {
     // We use '>=' because the player connecting to the server hasn't joined yet
     if (onlinePerIp >= maxOnlinePerIp) {
       final Component component = Sonar.get().getConfig().getTooManyOnlinePerIp();
+      final String serialized = GsonComponentSerializer.gson().serialize(component);
       final PendingConnection connection = event.getConnection();
       closeWith(((ChannelWrapper) CHANNEL_FIELD.get(connection)).getHandle(),
-        ProtocolVersion.fromId(connection.getVersion()), getCachedKickPacket(component));
+        ProtocolVersion.fromId(connection.getVersion()),
+        new Kick(ComponentSerializer.deserialize(serialized)));
     }
   }
 }

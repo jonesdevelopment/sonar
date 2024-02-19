@@ -43,6 +43,9 @@ public enum FallbackPacketRegistry {
 
       clientbound.register(LoginSuccess.class, LoginSuccess::new,
         map(0x02, MINECRAFT_1_7_2, false));
+
+      clientbound.register(Disconnect.class, Disconnect::new,
+        map(0x00, MINECRAFT_1_7_2, true));
     }
   },
   CONFIG {

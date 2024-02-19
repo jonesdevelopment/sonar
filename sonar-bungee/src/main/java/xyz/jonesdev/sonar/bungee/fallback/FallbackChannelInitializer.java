@@ -51,6 +51,8 @@ public final class FallbackChannelInitializer extends ChannelInitializer<Channel
       throw new ReflectiveOperationException(throwable);
     }
 
-    channel.pipeline().addAfter(PACKET_DECODER, FALLBACK_HANDLER, new FallbackChannelHandler(channel));
+    if (channel.pipeline().get(PACKET_DECODER) != null) {
+      channel.pipeline().addAfter(PACKET_DECODER, FALLBACK_HANDLER, new FallbackChannelHandler(channel));
+    }
   }
 }

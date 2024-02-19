@@ -17,6 +17,8 @@
 
 package xyz.jonesdev.sonar.api.webhook;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -35,6 +37,8 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public final class DiscordWebhook {
   private final String url;
+
+  private static final Gson GSON = new GsonBuilder().disableInnerClassSerialization().create();
 
   private static final ExecutorService HTTP_REQUEST_SERVICE = Executors.newSingleThreadExecutor();
 
@@ -73,7 +77,7 @@ public final class DiscordWebhook {
     final List<Webhook.EmbedMessage> embeds = Collections.singletonList(embedMessage);
 
     final Webhook webhook = new Webhook(content, username, avatarUrl, false, embeds);
-    return Sonar.GENERAL_GSON.toJson(webhook);
+    return GSON.toJson(webhook);
   }
 
   private @NotNull HttpsURLConnection prepareConnection(final @NotNull URL url,
