@@ -186,12 +186,6 @@ verification:
     - <yellow>Anti-bot verileriniz henüz hazır değil.
     - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
     - '%footer%'
-  # Aynı anda çok fazla oyuncu doğrulama yaptığında gösterilen bağlantıyı kesme mesajı
-  too-many-players:
-    - '%header%'
-    - <gold>Too many players are currently trying to log in, try again later.
-    - <gray>Please wait a few seconds before trying to join again.
-    - '%footer%'
   # Doğrulama sırasında birisi çok hızlı bir şekilde yeniden katıldığında gösterilen bağlantıyı kesme mesajı
   too-fast-reconnect:
     - '%header%'
@@ -227,13 +221,6 @@ verification:
     - '%header%'
     - <red>Sunucumuzda izin verilmeyen bir sürüm ile giriş yapmaya çalışıyorsun.
     - <gold>Giriş yapma hakkında yardıma mı ihtiyacın var? <gray>%support-url%
-    - '%footer%'
-  # Birisi çevrimiçi olan bir hesapla doğrulama yapmaya çalıştığında gösterilen bağlantıyı kesme mesajı
-  already-online:
-    - '%header%'
-    - <red>Hesabınızla zaten çevrimiçi olan biri var.
-    - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
-    - <gray>Bu durum devam ederse, oyununuzu yeniden başlatmayı deneyin veya destek ekibiyle iletişime geçin.
     - '%footer%'
   # Birisi başarıyla doğrulama yaptığında gösterilen bağlantıyı kesme mesajı
   success:

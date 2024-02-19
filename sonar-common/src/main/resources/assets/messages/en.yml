@@ -200,12 +200,6 @@ verification:
     - <yellow>Your anti-bot data has not been prepared yet.
     - <gray>Please wait a few seconds before trying to verify again.
     - '%footer%'
-  # Disconnect message that is shown when too many players are verifying at the same time
-  too-many-players:
-    - '%header%'
-    - <gold>Too many players are currently trying to log in, try again later.
-    - <gray>Please wait a few seconds before trying to join again.
-    - '%footer%'
   # Disconnect message that is shown when someone rejoins too fast during verification
   too-fast-reconnect:
     - '%header%'
@@ -241,13 +235,6 @@ verification:
     - '%header%'
     - <red>You are using a version that is not allowed on our server.
     - <gold>Need help logging in? <gray>%support-url%
-    - '%footer%'
-  # Disconnect message that is shown when someone tries verifying with an account that is online
-  already-online:
-    - '%header%'
-    - <red>There is someone already online with your account.
-    - <gray>Please wait a few seconds before trying to verify again.
-    - <gray>If this keeps occurring, try restarting your game or contact support.
     - '%footer%'
   # Disconnect message that is shown when someone verifies successfully
   success:

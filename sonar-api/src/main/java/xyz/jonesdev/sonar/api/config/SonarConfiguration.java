@@ -295,14 +295,12 @@ public final class SonarConfiguration {
     verification.map.enterCodeActionBar = formatString(messagesConfig.getString("verification.captcha.action-bar"));
     verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect")));
     verification.currentlyPreparing = deserialize(fromList(messagesConfig.getStringList("verification.currently-preparing")));
-    verification.tooManyPlayers = deserialize(fromList(messagesConfig.getStringList("verification.too-many-players")));
     verification.tooFastReconnect = deserialize(fromList(messagesConfig.getStringList("verification.too-fast-reconnect")));
     verification.alreadyVerifying = deserialize(fromList(messagesConfig.getStringList("verification.already-verifying")));
     verification.alreadyQueued = deserialize(fromList(messagesConfig.getStringList("verification.already-queued")));
     verification.blacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted")));
     verification.invalidUsername = deserialize(fromList(messagesConfig.getStringList("verification.invalid-username")));
     verification.protocolBlacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted-protocol")));
-    verification.alreadyConnected = deserialize(fromList(messagesConfig.getStringList("verification.already-online")));
     verification.verificationSuccess = deserialize(fromList(messagesConfig.getStringList("verification.success")));
     verification.verificationFailed = deserialize(fromList(messagesConfig.getStringList("verification.failed")));
 
@@ -486,7 +484,6 @@ public final class SonarConfiguration {
     private final Collection<Integer> whitelistedProtocols = new HashSet<>(0);
     private final Collection<Integer> blacklistedProtocols = new HashSet<>(0);
 
-    private Component tooManyPlayers;
     private Component tooFastReconnect;
     private Component invalidUsername;
     private Component alreadyConnected;
