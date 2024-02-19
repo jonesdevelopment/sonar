@@ -295,7 +295,7 @@ verbose:
     normal: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Logins/s
       <white>%logins-per-second% <dark_aqua>╺ <gray>На проверке <white>%verifying%
       <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
-    # Шаблон action bar, отображающей информацию во время атаки
+    # Макет action bar, отображающей информацию во время атаки
     attack: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Logins/s
       <white>%logins-per-second% <dark_aqua>╺ <gray>В очереди <white>%queued% <dark_aqua>╺
       <gray>На проверке <white>%verifying% <dark_aqua>╺ <gray>Продолжительность <white>%attack-duration%
@@ -312,11 +312,11 @@ verbose:
 
 # Перевод сообщений об атаках
 notifications:
-  # Шаблон для заголовка уведомления об атаке
+  # Макет для заголовка уведомления об атаке
   title: <yellow><b>Sonar<reset>
-  # Шаблон для подзаголовка уведомления об атаке
+  # Макет для подзаголовка уведомления об атаке
   subtitle: <gray>Обнаружена бот-атака
-  # Шаблон для уведомления об атаке в чате
+  # Макет для уведомления об атаке в чате
   chat:
     - ''
     - <yellow><b>Sonar<reset>
