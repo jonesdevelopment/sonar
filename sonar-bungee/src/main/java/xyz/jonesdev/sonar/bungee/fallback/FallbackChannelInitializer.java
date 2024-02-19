@@ -53,9 +53,6 @@ public final class FallbackChannelInitializer extends ChannelInitializer<Channel
 
     if (channel.pipeline().get(PACKET_DECODER) != null) {
       channel.pipeline().addAfter(PACKET_DECODER, FALLBACK_HANDLER, new FallbackChannelHandler(channel));
-    } else {
-      // Make sure to close the channel if an error occurs
-      channel.close();
     }
   }
 }
