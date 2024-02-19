@@ -17,29 +17,45 @@
 
 package xyz.jonesdev.sonar.api.statistics;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.time.Duration;
+public interface SonarStatistics {
+  long getConnectionsPerSecond();
 
-@SuppressWarnings("unused")
-public interface Counters {
+  long getLoginsPerSecond();
+
+  long getCurrentIncomingBandwidth();
+
+  long getCurrentOutgoingBandwidth();
+
+  long getTotalIncomingBandwidth();
+
+  long getTotalOutgoingBandwidth();
+
+  String getCurrentIncomingBandwidthFormatted();
+
+  String getCurrentOutgoingBandwidthFormatted();
+
+  String getTotalIncomingBandwidthFormatted();
+
+  String getTotalOutgoingBandwidthFormatted();
+
+  int getTotalPlayersJoined();
+
+  int getTotalPlayersVerified();
+
+  int getTotalSuccessfulVerifications();
+
+  int getTotalFailedVerifications();
+
+  long getCurrentAttemptedVerifications();
+
+  int getTotalAttemptedVerifications();
+
+  long getCurrentBlacklistSize();
+
+  long getTotalBlacklistSize();
+
   @ApiStatus.Internal
-  Cache<Long, Byte> LOGINS_PER_SECOND = Caffeine.newBuilder()
-    .expireAfterWrite(Duration.ofSeconds(1))
-    .build();
-
-  @ApiStatus.Internal
-  Cache<Long, Byte> CONNECTIONS_PER_SECOND = Caffeine.newBuilder()
-    .expireAfterWrite(Duration.ofSeconds(1))
-    .build();
-
-  static long getConnectionsPerSecond() {
-    return CONNECTIONS_PER_SECOND.estimatedSize();
-  }
-
-  static long getLoginsPerSecond() {
-    return LOGINS_PER_SECOND.estimatedSize();
-  }
+  void cleanUpCache();
 }

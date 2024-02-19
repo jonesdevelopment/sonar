@@ -15,20 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.profiler;
+package xyz.jonesdev.sonar.api.jvm;
 
 import com.sun.management.OperatingSystemMXBean;
+import lombok.experimental.UtilityClass;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 
-public interface JVMProfiler {
-  Runtime RUNTIME = Runtime.getRuntime();
-  OperatingSystemMXBean OPERATING_SYSTEM_MX_BEAN = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-  RuntimeMXBean RUNTIME_MX_BEAN = ManagementFactory.getRuntimeMXBean();
-  char[] MEMORY_UNITS = {'k', 'M', 'G', 'T', 'P', 'E'};
+@UtilityClass
+public class JVMProcessInformation {
+  private final Runtime RUNTIME = Runtime.getRuntime();
+  private final OperatingSystemMXBean MX = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+  private final char[] MEMORY_UNITS = {'k', 'M', 'G', 'T', 'P', 'E'};
 
-  default String formatMemory(final long size) {
+  public String formatMemory(final long size) {
     if (size < 1024L) {
       return size + " B";
     }
@@ -38,43 +38,43 @@ public interface JVMProfiler {
     return String.format("%.1f %sB", formattedSize, unit);
   }
 
-  default int getVirtualCores() {
+  public int getVirtualCores() {
     return RUNTIME.availableProcessors();
   }
 
-  default double getProcessCPUUsage() {
-    return OPERATING_SYSTEM_MX_BEAN.getProcessCpuLoad() * 100;
+  public double getProcessCPUUsage() {
+    return MX.getProcessCpuLoad() * 100;
   }
 
-  default double getAverageProcessCPUUsage() {
+  public double getAverageProcessCPUUsage() {
     return getProcessCPUUsage() / getVirtualCores();
   }
 
-  default double getSystemCPUUsage() {
-    return OPERATING_SYSTEM_MX_BEAN.getSystemCpuLoad() * 100;
+  public double getSystemCPUUsage() {
+    return MX.getSystemCpuLoad() * 100;
   }
 
-  default double getAverageSystemCPUUsage() {
+  public double getAverageSystemCPUUsage() {
     return getSystemCPUUsage() / getVirtualCores();
   }
 
-  default double getSystemLoadAverage() {
-    return OPERATING_SYSTEM_MX_BEAN.getSystemLoadAverage() * 100;
+  public double getSystemLoadAverage() {
+    return MX.getSystemLoadAverage() * 100;
   }
 
-  default long getMaxMemory() {
+  public long getMaxMemory() {
     return RUNTIME.maxMemory();
   }
 
-  default long getTotalMemory() {
+  public long getTotalMemory() {
     return RUNTIME.totalMemory();
   }
 
-  default long getFreeMemory() {
+  public long getFreeMemory() {
     return RUNTIME.freeMemory();
   }
 
-  default long getUsedMemory() {
+  public long getUsedMemory() {
     return getTotalMemory() - getFreeMemory();
   }
 }

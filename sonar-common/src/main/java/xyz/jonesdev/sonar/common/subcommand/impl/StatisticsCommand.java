@@ -23,11 +23,10 @@ import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
-import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
-import xyz.jonesdev.sonar.api.statistics.Bandwidth;
-import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
+import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
 
 @SubcommandInfo(
   name = "statistics",
@@ -40,7 +39,7 @@ import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
   },
   argumentsRequired = false
 )
-public final class StatisticsCommand extends Subcommand implements JVMProfiler {
+public final class StatisticsCommand extends Subcommand {
   private enum StatisticType {
     GENERAL,
     NETWORK,
@@ -77,9 +76,9 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
           .replace("%blacklisted%", DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklist().estimatedSize()))
           .replace("%queued%", DECIMAL_FORMAT.format(SONAR.getFallback().getQueue().getQueuedPlayers().size()))
           .replace("%uptime%", String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L))
-          .replace("%total_joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
-          .replace("%total_attempts%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
-          .replace("%total_failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get())));
+          .replace("%total_joins%", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined()))
+          .replace("%total_attempts%", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications()))
+          .replace("%total_failed%", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications())));
         break;
       }
 
@@ -105,10 +104,10 @@ public final class StatisticsCommand extends Subcommand implements JVMProfiler {
 
       case NETWORK: {
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNetworkStatistics()
-          .replace("%incoming%", Bandwidth.INCOMING.getCachedSecond())
-          .replace("%outgoing%", Bandwidth.OUTGOING.getCachedSecond())
-          .replace("%ttl_incoming%", Bandwidth.INCOMING.getCachedTtl())
-          .replace("%ttl_outgoing%", Bandwidth.OUTGOING.getCachedTtl()));
+          .replace("%incoming%", CachedBandwidthStatistics.INCOMING.getCachedSecond())
+          .replace("%outgoing%", CachedBandwidthStatistics.OUTGOING.getCachedSecond())
+          .replace("%ttl_incoming%", CachedBandwidthStatistics.INCOMING.getCachedTtl())
+          .replace("%ttl_outgoing%", CachedBandwidthStatistics.OUTGOING.getCachedTtl()));
         break;
       }
     }

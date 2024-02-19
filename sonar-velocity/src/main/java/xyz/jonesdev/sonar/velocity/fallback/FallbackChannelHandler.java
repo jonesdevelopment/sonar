@@ -31,10 +31,9 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.api.statistics.Counters;
-import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.common.fallback.FallbackBandwidthHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper;
+import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil;
 
 import java.net.InetAddress;
@@ -60,7 +59,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelActive(final @NotNull ChannelHandlerContext ctx) {
     // Increase connections per second for the action bar verbose
-    Counters.CONNECTIONS_PER_SECOND.put(System.nanoTime(), (byte) 0);
+    GlobalSonarStatistics.countConnection();
     // Make sure to let the server handle the rest
     ctx.fireChannelActive();
   }
@@ -133,9 +132,7 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
       throw new CorruptedFrameException("Already logged on");
     }
     // Increase joins per second for the action bar verbose
-    Counters.LOGINS_PER_SECOND.put(System.nanoTime(), (byte) 0);
-    // Increase total traffic statistic
-    Statistics.TOTAL_TRAFFIC.increment();
+    GlobalSonarStatistics.countLogin();
     // Store the username
     username = serverLogin.getUsername();
     // Make sure to use the potentially modified, original IP

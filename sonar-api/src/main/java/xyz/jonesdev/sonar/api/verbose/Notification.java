@@ -24,25 +24,21 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.statistics.Counters;
-import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 
 import java.util.Collection;
 import java.util.Vector;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.statistics.Bandwidth.INCOMING;
-import static xyz.jonesdev.sonar.api.statistics.Bandwidth.OUTGOING;
 
 @Getter
-public final class Notification implements Observable, Counters {
+public final class Notification implements Observable {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
 
   public void sendAttackNotification() {
     // No need to do anything if we have no subscribers
-    if (subscribers.isEmpty()) {
-      return;
-    }
+    if (subscribers.isEmpty()) return;
+    final SonarStatistics statistics = Sonar.get().getStatistics();
     // Prepare the title
     // TODO: Why do custom title times not work?
     //  Title.Times.times(Ticks.duration(5L), Ticks.duration(60L), Ticks.duration(10L));
@@ -57,17 +53,17 @@ public final class Notification implements Observable, Counters {
       .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize()))
-      .replace("%total-joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
-      .replace("%logins-per-second%", DECIMAL_FORMAT.format(LOGINS_PER_SECOND.estimatedSize()))
-      .replace("%connections-per-second%", DECIMAL_FORMAT.format(CONNECTIONS_PER_SECOND.estimatedSize()))
-      .replace("%verify-total%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
+      .replace("%total-joins%", DECIMAL_FORMAT.format(statistics.getTotalPlayersJoined()))
+      .replace("%logins-per-second%", DECIMAL_FORMAT.format(statistics.getLoginsPerSecond()))
+      .replace("%connections-per-second%", DECIMAL_FORMAT.format(statistics.getConnectionsPerSecond()))
+      .replace("%verify-total%", DECIMAL_FORMAT.format(statistics.getTotalAttemptedVerifications()))
       .replace("%verify-success%",
         DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
-      .replace("%verify-failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
-      .replace("%incoming-traffic%", INCOMING.getCachedSecond())
-      .replace("%outgoing-traffic%", OUTGOING.getCachedSecond())
-      .replace("%incoming-traffic-ttl%", INCOMING.getCachedTtl())
-      .replace("%outgoing-traffic-ttl%", OUTGOING.getCachedTtl()));
+      .replace("%verify-failed%", DECIMAL_FORMAT.format(statistics.getTotalFailedVerifications()))
+      .replace("%incoming-traffic%", statistics.getCurrentIncomingBandwidthFormatted())
+      .replace("%outgoing-traffic%", statistics.getCurrentOutgoingBandwidthFormatted())
+      .replace("%incoming-traffic-ttl%", statistics.getTotalIncomingBandwidthFormatted())
+      .replace("%outgoing-traffic-ttl%", statistics.getTotalOutgoingBandwidthFormatted()));
     // Send the title and chat messages to all online players
     for (final String subscriber : Sonar.get().getNotificationHandler().getSubscribers()) {
       final Audience audience = Sonar.AUDIENCES.get(subscriber);

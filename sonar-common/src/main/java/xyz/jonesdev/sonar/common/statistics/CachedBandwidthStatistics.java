@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.statistics;
+package xyz.jonesdev.sonar.common.statistics;
 
 import lombok.Getter;
 import lombok.Setter;
-import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
+import xyz.jonesdev.sonar.api.jvm.JVMProcessInformation;
 
 /**
  * This counts all incoming and outgoing traffic.
  */
 @Getter
-public enum Bandwidth implements JVMProfiler {
+public enum CachedBandwidthStatistics {
   INCOMING,
   OUTGOING;
 
@@ -48,15 +48,15 @@ public enum Bandwidth implements JVMProfiler {
    * This method is called every second.
    */
   public static synchronized void reset() {
-    for (final Bandwidth value : values()) {
+    for (final CachedBandwidthStatistics value : values()) {
       value.cacheAndReset();
     }
   }
 
   private void cacheAndReset() {
     ttl += curr; // increment total
-    cachedSecond = formatMemory(curr);
-    cachedTtl = formatMemory(ttl);
+    cachedSecond = JVMProcessInformation.formatMemory(curr);
+    cachedTtl = JVMProcessInformation.formatMemory(ttl);
     curr = 0L; // reset current
   }
 }
