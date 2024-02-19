@@ -100,7 +100,7 @@ commands:
     cleared: '%prefix%Вы успешно удалили %удалено% IP-адресов из черного списка.'
     # Сообщение, которое показывается, когда кто-то проверяет размер черного списка
     size: '%prefix%В настоящее время черный список содержит %amount% IP-адрес(ов).'
-    # Message that is shown when someone adds an IP address to the blacklist
+    # Сообщение, которое показывается, когда кто-то добавляет IP-адрес в черный список
     added: '%prefix%Успешно добавлен %ip% в черный список.'
     # Сообщение, которое отображается, когда кто-то добавляет IP-адрес в черный список, который находится в белом списке
     added-warning: '%prefix%<red>Предупреждение: <white>%ip% находится в белом списке.
@@ -270,7 +270,7 @@ verification:
 # Перевод для action bar (verbose)
 verbose:
   layout:
-    # Макет для панели действий Sonar verbose
+    # Перевод статистики в режиме реального времени (verbose)
     # Placeholders:
     # - '%queued%' Количество игроков в очереди
     # - '%verifying%' Количество проверяемых игроков
@@ -295,12 +295,12 @@ verbose:
     normal: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Logins/s
       <white>%logins-per-second% <dark_aqua>╺ <gray>На проверке <white>%verifying%
       <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
-    # Макет action bar, отображающей информацию во время атаки
+    # Шаблон action bar, отображающей информацию во время атаки
     attack: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Logins/s
       <white>%logins-per-second% <dark_aqua>╺ <gray>В очереди <white>%queued% <dark_aqua>╺
       <gray>На проверке <white>%verifying% <dark_aqua>╺ <gray>Продолжительность <white>%attack-duration%
       <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
-  # Анимация для action bar (текст с названием предмета)
+  # Анимация для action bar 
   # Альтернативы:
   # - ▙, ▛, ▜, ▟
   # - ⬈, ⬊, ⬋, ⬉
@@ -312,11 +312,11 @@ verbose:
 
 # Перевод сообщений об атаках
 notifications:
-  # Layout for Sonar's attack notification title
+  # Шаблон для заголовка уведомления об атаке
   title: <yellow><b>Sonar<reset>
-  # Макет для подзаголовка уведомления об атаке
+  # Шаблон для подзаголовка уведомления об атаке
   subtitle: <gray>Обнаружена бот-атака
-  # Макет для уведомления об атаке в чате
+  # Шаблон для уведомления об атаке в чате
   chat:
     - ''
     - <yellow><b>Sonar<reset>
