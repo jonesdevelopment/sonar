@@ -23,16 +23,15 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.event.impl.AttackDetectedEvent;
 import xyz.jonesdev.sonar.api.event.impl.AttackMitigatedEvent;
-import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
-import xyz.jonesdev.sonar.api.statistics.Counters;
-import xyz.jonesdev.sonar.api.statistics.Statistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Optional;
 
+import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AttackTracker implements JVMProfiler {
+public final class AttackTracker {
   public static final AttackTracker INSTANCE = new AttackTracker();
   private @Nullable AttackStatistics currentAttack;
   private int attackThreshold;
@@ -52,7 +51,7 @@ public final class AttackTracker implements JVMProfiler {
   }
 
   public void checkIfUnderAttack() {
-    final long joinsPerSecond = Counters.LOGINS_PER_SECOND.estimatedSize();
+    final long joinsPerSecond = Sonar.get().getStatistics().getLoginsPerSecond();
     final int verifyingPlayers = Sonar.get().getFallback().getConnected().size();
     final int queuedPlayers = Sonar.get().getFallback().getQueue().getQueuedPlayers().size();
     final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();
@@ -67,7 +66,7 @@ public final class AttackTracker implements JVMProfiler {
       if (currentAttack == null) {
         currentAttack = new AttackStatistics();
         currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().estimatedSize();
-        currentAttack.failedVerifications = Statistics.FAILED_VERIFICATIONS.get();
+        currentAttack.failedVerifications = Sonar.get().getStatistics().getTotalFailedVerifications();
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
         Sonar.get().getNotificationHandler().sendAttackNotification();
       } else {
@@ -80,7 +79,7 @@ public final class AttackTracker implements JVMProfiler {
         // Update joins per second peak if necessary
         currentAttack.peakJoinsPerSecond = joinsPerSecond;
       }
-      final long connectionsPerSecond = Counters.CONNECTIONS_PER_SECOND.estimatedSize();
+      final long connectionsPerSecond = Sonar.get().getStatistics().getConnectionsPerSecond();
       if (connectionsPerSecond > currentAttack.peakConnectionsPerSecond) {
         // Update connections per second peak if necessary
         currentAttack.peakConnectionsPerSecond = connectionsPerSecond;
@@ -117,7 +116,7 @@ public final class AttackTracker implements JVMProfiler {
           // Calculate during-attack-statistics using their deltas
           final long totalVerified = Sonar.get().getVerifiedPlayerController().estimatedSize();
           final long verified = Math.max(totalVerified - currentAttack.successfulVerifications, 0);
-          final long totalFailed = Statistics.FAILED_VERIFICATIONS.get();
+          final long totalFailed = Sonar.get().getStatistics().getTotalFailedVerifications();
           final long failed = Math.max(totalFailed - currentAttack.failedVerifications, 0);
 
           // Post webhook to Discord

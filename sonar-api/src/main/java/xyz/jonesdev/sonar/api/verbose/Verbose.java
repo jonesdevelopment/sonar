@@ -25,31 +25,24 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
-import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
-import xyz.jonesdev.sonar.api.statistics.Counters;
-import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
 import java.util.Vector;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.statistics.Bandwidth.INCOMING;
-import static xyz.jonesdev.sonar.api.statistics.Bandwidth.OUTGOING;
+import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
 
 @Getter
-public final class Verbose implements Observable, JVMProfiler, Counters {
+public final class Verbose implements Observable {
   private final @NotNull Collection<String> subscribers = new Vector<>(0);
   private int animationIndex;
 
   // Run action bar verbose
   public void update() {
-    // Clean up all blacklisted IPs
-    Sonar.get().getFallback().getBlacklist().cleanUp();
-    // Clean up all counters
-    LOGINS_PER_SECOND.cleanUp();
-    CONNECTIONS_PER_SECOND.cleanUp();
-
+    // Make sure to clean up the cached statistics
+    Sonar.get().getStatistics().cleanUpCache();
     // Don't prepare component if there are no subscribers
     if (subscribers.isEmpty()) return;
     // Prepare the action bar format component
@@ -63,6 +56,7 @@ public final class Verbose implements Observable, JVMProfiler, Counters {
   }
 
   public @NotNull Component prepareActionBarFormat() {
+    final SonarStatistics statistics = Sonar.get().getStatistics();
     final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
     final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
     return MiniMessage.miniMessage().deserialize((attackDuration != null
@@ -73,18 +67,19 @@ public final class Verbose implements Observable, JVMProfiler, Counters {
       .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
       .replace("%blacklisted%",
         DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize()))
-      .replace("%total-joins%", DECIMAL_FORMAT.format(Statistics.TOTAL_TRAFFIC.get()))
-      .replace("%logins-per-second%", DECIMAL_FORMAT.format(LOGINS_PER_SECOND.estimatedSize()))
-      .replace("%connections-per-second%", DECIMAL_FORMAT.format(CONNECTIONS_PER_SECOND.estimatedSize()))
-      .replace("%verify-total%", DECIMAL_FORMAT.format(Statistics.REAL_TRAFFIC.get()))
+      .replace("%blacklisted%", DECIMAL_FORMAT.format(statistics.getCurrentBlacklistSize()))
+      .replace("%total-joins%", DECIMAL_FORMAT.format(statistics.getTotalPlayersJoined()))
+      .replace("%logins-per-second%", DECIMAL_FORMAT.format(statistics.getLoginsPerSecond()))
+      .replace("%connections-per-second%", DECIMAL_FORMAT.format(statistics.getConnectionsPerSecond()))
+      .replace("%verify-total%", DECIMAL_FORMAT.format(statistics.getTotalAttemptedVerifications()))
       .replace("%verify-success%",
         DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
-      .replace("%verify-failed%", DECIMAL_FORMAT.format(Statistics.FAILED_VERIFICATIONS.get()))
+      .replace("%verify-failed%", DECIMAL_FORMAT.format(statistics.getTotalFailedVerifications()))
       .replace("%attack-duration%", attackDuration == null ? "00:00" : attackDuration.formattedDelay())
-      .replace("%incoming-traffic%", INCOMING.getCachedSecond())
-      .replace("%outgoing-traffic%", OUTGOING.getCachedSecond())
-      .replace("%incoming-traffic-ttl%", INCOMING.getCachedTtl())
-      .replace("%outgoing-traffic-ttl%", OUTGOING.getCachedTtl())
+      .replace("%incoming-traffic%", statistics.getCurrentIncomingBandwidthFormatted())
+      .replace("%outgoing-traffic%", statistics.getCurrentOutgoingBandwidthFormatted())
+      .replace("%incoming-traffic-ttl%", statistics.getTotalIncomingBandwidthFormatted())
+      .replace("%outgoing-traffic-ttl%", statistics.getTotalOutgoingBandwidthFormatted())
       .replace("%used-memory%", formatMemory(getUsedMemory()))
       .replace("%free-memory%", formatMemory(getFreeMemory()))
       .replace("%total-memory%", formatMemory(getTotalMemory()))

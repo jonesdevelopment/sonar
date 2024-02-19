@@ -27,11 +27,14 @@ import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.api.profiler.JVMProfiler;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+
+import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
 
 // This command is only used to display helpful information to help
 // the Sonar contributors to fix issues more quickly
@@ -40,8 +43,9 @@ import java.util.WeakHashMap;
   description = "Print developer information",
   onlyConsole = true
 )
-public final class DumpCommand extends Subcommand implements JVMProfiler {
+public final class DumpCommand extends Subcommand {
 
+  private static final RuntimeMXBean RUNTIME_MX_BEAN = ManagementFactory.getRuntimeMXBean();
   private static final Gson GSON = new GsonBuilder().create();
 
   @Override

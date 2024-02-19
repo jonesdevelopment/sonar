@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.api;
 
-import com.alessiodp.libby.LibraryManager;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
@@ -27,6 +26,7 @@ import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.event.SonarEventManager;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
@@ -69,7 +69,7 @@ public interface Sonar {
 
   @NotNull SystemTimer getLaunchTimer();
 
-  @NotNull LibraryManager getLibraryManager();
+  @NotNull SonarStatistics getStatistics();
 
   /**
    * Set a custom verbose handler

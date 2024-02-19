@@ -37,6 +37,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.map.PreparedMapInfo;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
+import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
 
 import java.util.Objects;
@@ -609,7 +610,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void finish() {
     state = State.SUCCESS;
 
-    FALLBACK.getConnected().remove(username);
+    // Increment amount of total successful verifications
+    GlobalSonarStatistics.totalSuccessfulVerifications++;
 
     // Add verified player to the database
     final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(user.getInetAddress().toString(), playerUuid,
