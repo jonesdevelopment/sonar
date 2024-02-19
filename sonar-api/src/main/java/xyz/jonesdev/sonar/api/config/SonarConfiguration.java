@@ -291,8 +291,6 @@ public final class SonarConfiguration {
     verification.blacklistLog = formatString(messagesConfig.getString("verification.logs.blacklisted"));
     verification.successLog = formatString(messagesConfig.getString("verification.logs.successful"));
 
-    verification.gravity.youAreBeingChecked = deserialize(formatString(messagesConfig.getString("verification.welcome")));
-
     verification.map.enterCode = deserialize(formatString(messagesConfig.getString("verification.captcha.enter-code")));
     verification.map.enterCodeActionBar = formatString(messagesConfig.getString("verification.captcha.action-bar"));
     verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect")));
@@ -448,7 +446,6 @@ public final class SonarConfiguration {
       private Gamemode gamemode;
       private int maxMovementTicks;
       private int maxIgnoredTicks;
-      private Component youAreBeingChecked;
 
       @Getter
       @RequiredArgsConstructor

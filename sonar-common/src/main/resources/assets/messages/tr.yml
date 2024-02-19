@@ -170,9 +170,6 @@ verification:
     # Bir oyuncu doğrulandığında konsola kaydedilen mesaj
     successful: '%name% başarıyla doğrulandı! (%time%s).'
 
-  # Yerçekimi için kontrol edildiklerinde oyuncuya gösterilen mesaj
-  welcome: '%prefix%<gray>Lütfen doğrulamanın bitmesini bekleyin...'
-
   # CAPTCHA'yı girmeleri gerektiğinde oyuncuya gösterilen mesajlar
   captcha:
     # Captcha'nın cevabını girmeleri gerektiğinde oyuncuya gösterilen mesaj

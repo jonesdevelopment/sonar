@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
 import lombok.ToString;
@@ -29,6 +30,7 @@ import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.statistics.Statistics;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
@@ -59,49 +61,11 @@ public final class FallbackUserWrapper implements FallbackUser {
     this.protocolVersion = protocolVersion;
   }
 
-  /**
-   * Disconnect the player during/after verification
-   * using our custom {@link Disconnect} packet.
-   *
-   * @param reason Disconnect message component
-   */
   @Override
   public void disconnect(final @NotNull Component reason) {
-    closeWith(channel, protocolVersion, Disconnect.create(reason));
+    closeWith(channel, protocolVersion, Disconnect.create(reason, false));
   }
 
-  /**
-   * @param channel         Channel to close
-   * @param protocolVersion Protocol version
-   * @param msg             Packet to close the channel with
-   */
-  public static void closeWith(final @NotNull Channel channel,
-                               final @NotNull ProtocolVersion protocolVersion,
-                               final @NotNull Object msg) {
-    if (channel.isActive()) {
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
-        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0) {
-        channel.eventLoop().execute(() -> {
-          channel.config().setAutoRead(false);
-          channel.eventLoop().schedule(() -> {
-            channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
-          }, 250L, TimeUnit.MILLISECONDS);
-        });
-      } else {
-        channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
-      }
-    }
-  }
-
-  /**
-   * Takes over the channel and begins the verification process
-   *
-   * @param username Username of the player
-   * @param uuid     UUID of the player
-   * @param encoder  Name of the encoder pipeline
-   * @param decoder  Name of the decoder pipeline
-   * @param timeout  Name of the read timeout pipeline
-   */
   @Override
   public void hijack(final @NotNull String username, final @NotNull UUID uuid,
                      final @NotNull String encoder, final @NotNull String decoder,
@@ -158,5 +122,61 @@ public final class FallbackUserWrapper implements FallbackUser {
     // Replace normal decoder to allow custom packets
     pipeline.replace(decoder, FALLBACK_PACKET_DECODER,
       new FallbackPacketDecoder(this, new FallbackVerificationHandler(this, username, uuid)));
+  }
+
+  /**
+   * @param channel         Channel to close
+   * @param protocolVersion Protocol version
+   * @param msg             Packet to close the channel with
+   */
+  public static void closeWith(final @NotNull Channel channel,
+                               final @NotNull ProtocolVersion protocolVersion,
+                               final @NotNull Object msg) {
+    if (channel.isActive()) {
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
+        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0) {
+        channel.eventLoop().execute(() -> {
+          channel.config().setAutoRead(false);
+          channel.eventLoop().schedule(() -> {
+            channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+          }, 250L, TimeUnit.MILLISECONDS);
+        });
+      } else {
+        channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+      }
+    }
+  }
+
+  /**
+   * Disconnect the player before verification (during login)
+   * by replacing the encoder before running the method.
+   *
+   * @param packet          Disconnect packet
+   * @param encoder         Encoder to replace
+   * @param boss            Main pipeline to remove
+   * @param channel         Channel of the player
+   * @param protocolVersion Protocol version of the player
+   */
+  public static void customDisconnect(final @NotNull Channel channel,
+                                      final @NotNull ProtocolVersion protocolVersion,
+                                      final @NotNull FallbackPacket packet,
+                                      final @NotNull String encoder,
+                                      final @NotNull String boss) {
+    // Remove main pipeline to completely take over the channel
+    if (channel.pipeline().get(boss) != null) {
+      channel.pipeline().remove(boss);
+    }
+    final ChannelHandler currentEncoder = channel.pipeline().get(encoder);
+    // Simply close the channel if no decoder exists
+    if (currentEncoder != null) {
+      // We don't need to update the encoder if it's already present
+      if (!(currentEncoder instanceof FallbackPacketEncoder)) {
+        final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
+        channel.pipeline().replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
+      }
+      closeWith(channel, protocolVersion, packet);
+    } else {
+      channel.close();
+    }
   }
 }

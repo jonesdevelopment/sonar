@@ -46,7 +46,6 @@ public class FallbackPreparer {
   public final FallbackPacket START_WRITING_CHUNKS = new GameEvent(13, 0);
   // Chat
   public FallbackPacket enterCodeMessage;
-  public FallbackPacket youAreBeingChecked;
   public FallbackPacket incorrectCaptcha;
   // JoinGame
   public FallbackPacket joinGame;
@@ -54,6 +53,14 @@ public class FallbackPreparer {
   public FallbackPacket updateSectionBlocks;
   // Default Spawn Position
   public FallbackPacket dynamicSpawnPosition;
+
+  // Disconnect messages
+  public FallbackPacket blacklisted;
+  public FallbackPacket alreadyQueued;
+  public FallbackPacket alreadyVerifying;
+  public FallbackPacket reconnectedTooFast;
+  public FallbackPacket protocolBlacklisted;
+  public FallbackPacket invalidUsername;
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
@@ -117,16 +124,20 @@ public class FallbackPreparer {
     // Prepare UpdateSectionBlocks packet
     updateSectionBlocks = new UpdateSectionBlocks(0, 0, CHANGED_BLOCKS);
 
-    // "You are being checked" message
-    if (Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
-      youAreBeingChecked = new Chat(Sonar.get().getConfig().getVerification().getGravity().getYouAreBeingChecked());
-    }
+    // Prepare disconnect packets during login
+    blacklisted = Disconnect.create(Sonar.get().getConfig().getVerification().getBlacklisted(), true);
+    alreadyVerifying = Disconnect.create(Sonar.get().getConfig().getVerification().getAlreadyVerifying(), true);
+    alreadyQueued = Disconnect.create(Sonar.get().getConfig().getVerification().getAlreadyQueued(), true);
+    protocolBlacklisted = Disconnect.create(Sonar.get().getConfig().getVerification().getProtocolBlacklisted(), true);
+    reconnectedTooFast = Disconnect.create(Sonar.get().getConfig().getVerification().getTooFastReconnect(), true);
+    invalidUsername = Disconnect.create(Sonar.get().getConfig().getVerification().getInvalidUsername(), true);
 
+    // Precompute captcha answers
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER) {
-      enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCode());
-      incorrectCaptcha = new Chat(Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha());
+      enterCodeMessage = new Chat(Sonar.get().getConfig().getVerification().getMap().getEnterCode(), Chat.SYSTEM_TYPE);
+      incorrectCaptcha = new Chat(
+        Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha(), Chat.SYSTEM_TYPE);
 
-      // Precompute captcha answers
       MapInfoPreparer.prepare();
     }
   }

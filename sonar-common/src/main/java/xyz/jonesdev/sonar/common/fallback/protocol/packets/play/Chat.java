@@ -17,24 +17,21 @@
 
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
-import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.utility.component.ComponentHolder;
 
 import java.time.Instant;
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.component.ComponentSerializer.serialize;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
@@ -50,7 +47,7 @@ public final class Chat implements FallbackPacket {
   public static final byte SYSTEM_TYPE = (byte) 1;
   public static final byte GAME_INFO_TYPE = (byte) 2;
 
-  private Component component;
+  private ComponentHolder componentHolder;
   private String message;
   private byte type;
   private boolean signedPreview;
@@ -61,33 +58,20 @@ public final class Chat implements FallbackPacket {
   private boolean signed;
   private byte[] signature;
 
-  // 1.20.3
-  private BinaryTag nbtMessage;
-
-  // Clientbound LegacyChat
-  public Chat(final Component component) {
-    this(component, SYSTEM_TYPE);
+  public Chat(final @NotNull Component component,
+              final byte type) {
+    this(new ComponentHolder(component), type);
   }
 
-  // Clientbound LegacyChat
-  public Chat(final Component component, final byte type) {
-    this(component, JSONComponentSerializer.json().serialize(component), type);
-  }
-
-  public Chat(final Component component, final String message, final byte type) {
-    this(component, message, type,
-      false, false, null, null,
-      0L, false, null, serialize(new JsonParser().parse(message)));
+  public Chat(final ComponentHolder componentHolder, final byte type) {
+    this.componentHolder = componentHolder;
+    this.type = type;
   }
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     // Serialized message
-    if (protocolVersion.compareTo(MINECRAFT_1_20_3) >= 0) {
-      writeNamelessCompoundTag(byteBuf, nbtMessage);
-    } else {
-      writeString(byteBuf, message);
-    }
+    componentHolder.write(byteBuf, protocolVersion);
 
     // Type
     if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {

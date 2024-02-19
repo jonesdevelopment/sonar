@@ -19,10 +19,7 @@ package xyz.jonesdev.sonar.velocity.fallback;
 
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.LoginEvent;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.protocol.StateRegistry;
-import com.velocitypowered.proxy.protocol.packet.DisconnectPacket;
+import com.velocitypowered.api.event.connection.PreLoginEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.velocity.SonarVelocity;
@@ -33,12 +30,12 @@ import java.util.Objects;
 public final class FallbackLoginListener {
 
   @Subscribe(order = PostOrder.LAST)
-  public void handle(final @NotNull LoginEvent event) {
+  public void handle(final @NotNull PreLoginEvent event) {
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
     // Don't do anything if the setting is disabled
     if (maxOnlinePerIp <= 0) return;
 
-    final InetAddress inetAddress = event.getPlayer().getRemoteAddress().getAddress();
+    final InetAddress inetAddress = event.getConnection().getRemoteAddress().getAddress();
 
     // Check if the number of online players using the same IP address as
     // the connecting player is greater than the configured amount
@@ -48,10 +45,7 @@ public final class FallbackLoginListener {
 
     // We use '>=' because the player connecting to the server hasn't joined yet
     if (onlinePerIp >= maxOnlinePerIp) {
-      final ConnectedPlayer connectedPlayer = (ConnectedPlayer) event.getPlayer();
-      connectedPlayer.getConnection().closeWith(DisconnectPacket.create(
-        Sonar.get().getConfig().getTooManyOnlinePerIp(),
-        connectedPlayer.getProtocolVersion(), StateRegistry.LOGIN));
+      event.setResult(PreLoginEvent.PreLoginComponentResult.denied(Sonar.get().getConfig().getTooManyOnlinePerIp()));
     }
   }
 }

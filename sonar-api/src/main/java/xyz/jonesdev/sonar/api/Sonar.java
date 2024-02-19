@@ -18,8 +18,6 @@
 package xyz.jonesdev.sonar.api;
 
 import com.alessiodp.libby.LibraryManager;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
@@ -40,11 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public interface Sonar {
   DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
-  String LINE_SEPARATOR = "\n"; // Using System.lineSeparator is broken, for some reason...
-
-  Gson GENERAL_GSON = new GsonBuilder()
-    .disableInnerClassSerialization()
-    .create();
 
   /**
    * Since we want to use Adventure on every server platform,

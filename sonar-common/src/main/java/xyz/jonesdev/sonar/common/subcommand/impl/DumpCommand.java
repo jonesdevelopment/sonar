@@ -17,11 +17,12 @@
 
 package xyz.jonesdev.sonar.common.subcommand.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
@@ -41,9 +42,11 @@ import java.util.WeakHashMap;
 )
 public final class DumpCommand extends Subcommand implements JVMProfiler {
 
+  private static final Gson GSON = new GsonBuilder().create();
+
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    final String json = Sonar.GENERAL_GSON.toJson(collectMappedInformation());
+    final String json = GSON.toJson(collectMappedInformation());
     SONAR.getLogger().info("Generated dump: {}", json);
   }
 
