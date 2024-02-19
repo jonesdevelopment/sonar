@@ -19,9 +19,7 @@ package xyz.jonesdev.sonar.bungee.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
-import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.protocol.DefinedPacket;
@@ -29,19 +27,17 @@ import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackBandwidthHandler;
+import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandlerAdapter;
 import xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil;
 
 import java.lang.reflect.Field;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -51,14 +47,11 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWID
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
-@RequiredArgsConstructor
-public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
-  private final Channel channel;
-  private @Nullable String username;
-  private ProtocolVersion protocolVersion;
-  private InetAddress inetAddress;
+public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter {
 
-  private static final Fallback FALLBACK = Sonar.get().getFallback();
+  public FallbackChannelHandler(final @NotNull Channel channel) {
+    super(channel);
+  }
 
   private static final Field CHANNEL_WRAPPER_FIELD;
 
@@ -69,30 +62,6 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }
-  }
-
-  @Override
-  public void channelActive(final @NotNull ChannelHandlerContext ctx) throws Exception {
-    // Increase connections per second for the action bar verbose
-    GlobalSonarStatistics.countConnection();
-    // Make sure to let the server handle the rest
-    ctx.fireChannelActive();
-  }
-
-  @Override
-  public void channelInactive(final @NotNull ChannelHandlerContext ctx) throws Exception {
-    // The player can disconnect without sending the login packet first
-    if (username != null) {
-      // Remove the username from the connected players
-      FALLBACK.getConnected().remove(username);
-    }
-    // The player cannot be in the queue if the IP address is invalid
-    if (inetAddress != null) {
-      // Remove the IP address from the queue
-      FALLBACK.getQueue().remove(inetAddress);
-    }
-    // Make sure to let the server handle the rest
-    ctx.fireChannelInactive();
   }
 
   @Override
@@ -116,18 +85,6 @@ public final class FallbackChannelHandler extends ChannelInboundHandlerAdapter {
     }
     // Make sure to let the server handle the rest
     ctx.fireChannelRead(msg);
-  }
-
-  // We can override the default exceptionCaught method since this handler
-  // will run before the MinecraftConnection knows that there has been an error.
-  // Additionally, this will also run after our custom decoder.
-  @Override
-  public void exceptionCaught(final @NotNull ChannelHandlerContext ctx,
-                              final @NotNull Throwable cause) throws Exception {
-    // Sonar sometimes uses exceptions to quickly close
-    // the channel and interrupt any other ongoing process.
-    // Simply close the channel if we encounter any errors.
-    ctx.close();
   }
 
   private void handleHandshake(final @NotNull Handshake handshake) throws Exception {
