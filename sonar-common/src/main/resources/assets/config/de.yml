@@ -1,0 +1,171 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Brauchst du Hilfe? https://jonesdev.xyz/discord
+# Source code: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# Generelle Einstellungen für Sonar
+general:
+  # Soll Sonar die IP Adressen von Spielern in der Konsole anzeigen?
+  log-player-addresses: true
+  # Maximale Anzahl an Spielern mit der selben IP Adresse
+  max-online-per-ip: 3
+
+# Sensitivitätseinstellungen für Angriffstracker
+# Bearbeite diese Einstellungen nur wenn du weißt was du tust!
+attack-tracker:
+  # Minimale Anzahl an neuen Spielern damit ein Angriff als solcher erkannt wird
+  min-players-for-attack: 8
+  # Anzahl an Millisekunden bis ein Angriff vorbei ist
+  min-attack-duration: 30000
+  # Anzahl an gemeldenten Vorfällen damit ein Angriff als solcher erkannt wird
+  # Diese Zahl repräsentiert einen Puffer um falsche Angriffsbenachrichtigungen zu filtern
+  min-attack-threshold: 2
+  # Anzahl an Millisekunden die vergehen muss damit eine neue Attacke erkannt wird
+  attack-cooldown-delay: 3000
+
+# Du kannst Sonar mit einer Datenbank verbinden um verifizierte Spieler zu speichern
+# Beachte: IP adressen werden im Klartext gespeichert. Du bist für die Sicherheit der Datenbank verantwortlich
+database:
+  # Typ von Datenbank die Sonar verwenden soll um verifizierte Spielerdaten zu speichern
+  # Mögliche Typen: NONE, MYSQL
+  type: NONE
+  # HOST für die Authentifizierung mit der SQL Datenbank
+  host: localhost
+  # Port für die Authentifizierung mit der SQL Datenbank
+  port: 3306
+  # Name der SQL Datenbank
+  name: sonar
+  # Username für die Authentifizierung mit der SQL Datenbank
+  username: ''
+  # Password für die Authentifizierung mit der SQL Datenbank
+  password: ''
+  # Wie viele Tage soll Sonar verifizierte Spielerdaten in der Datenbank behalten?
+  maximum-age: 5
+
+# Jede neue Login-Anfrage wird in eine Warteschlange eingereiht, um Spam-Beitrittsangriffe zu vermeiden
+# Die Warteschlange wird alle 500 Millisekunden (10 Ticks) aktualisiert
+queue:
+  # Maximale Anzahl an gleichzeitigen Abfragen der Warteschlange pro 500 Millisekunden
+  max-polls: 30
+
+# Jeder neue Spieler, der das erste Mal beitritt, wird zu
+# einem leichtgewichtigen Limbo-Server gesendet, wo fortgeschrittene Bot-Überprüfungen durchgeführt werden
+verification:
+  # Wann sollte Sonar neue Spieler überprüfen?
+  # Mögliche Typen: ALWAYS, DURING_ATTACK, NEVER
+  # - ALWAYS: Neue Spieler werden immer überprüft (Empfohlen)
+  # - DURING_ATTACK: Neue Spieler werden nur während eines Angriffs überprüft
+  # - NEVER: Neue Spieler werden nie überprüft
+  timing: ALWAYS
+  checks:
+    # Überprüft, ob die Fallbewegung der Spieler der Gravitationsformel von Minecraft folgt
+    # Alle vorhergesagten Bewegungen werden vorausberechnet, um die Leistung zu sparen
+    gravity:
+      # Soll Sonar auf gültige Client-Gravitation prüfen? (Empfohlen)
+      enabled: true
+      # Soll Sonar prüfen, ob der Spieler mit Blöcken kollidiert? (Empfohlen)
+      check-collisions: true
+      # Maximale Anzahl an Ticks, die der Spieler fallen muss, um die Plattform erreichen zu dürfen
+      max-movement-ticks: 8
+      # Maximale Anzahl an ignorierten Y-Bewegungsänderungen, bevor ein Spieler die Überprüfung nicht besteht
+      max-ignored-ticks: 5
+      # Der Spielmodus des Spielers während der Überprüfung
+      # Mögliche Typen: SURVIVAL, CREATIVE, ADVENTURE
+      # - SURVIVAL: alle UI-Komponenten sind sichtbar
+      # - CREATIVE: Gesundheit und Hunger sind versteckt
+      # - ADVENTURE: alle UI-Komponenten sind sichtbar
+      gamemode: ADVENTURE
+
+    # Lässt den Spieler einen Code von einer virtuellen Karte im Chat eingeben
+    map-captcha:
+      # Wann sollte Sonar den Spieler ein CAPTCHA lösen lassen?
+      # Mögliche Typen: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: Neue Spieler erhalten immer ein CAPTCHA
+      # - DURING_ATTACK: Neue Spieler erhalten nur während eines Angriffs ein CAPTCHA
+      # - NEVER: Neue Spieler erhalten nie ein CAPTCHA (Empfohlen)
+      timing: NEVER
+      # Soll Sonar die X- und Y-Position des CAPTCHAs zufällig wählen?
+      random-position: true
+      # Wie stark sollen Zeichen verzerrt werden (Faktor für Zufälligkeit)?
+      distortions-factor-x: 50
+      # Wie stark sollen Zeichen verzerrt werden (Faktor für Zufälligkeit)?
+      distortions-factor-y: 50
+      # Wie viele zufällige Linien hinter dem CAPTCHA soll Sonar zeichnen?
+      random-lines: 4
+      # Wie viele zufällige Ovale hinter dem CAPTCHA soll Sonar zeichnen?
+      random-ovals: 1
+      # Soll Sonar die Schriftgröße für das Rendern des CAPTCHAs zufällig wählen?
+      random-font-size: true
+      # Wie viele Antworten soll Sonar vorbereiten?
+      # Dieser Vorgang erfolgt asynchron im Hintergrund;
+      # Spieler können beitreten, sobald ein CAPTCHA vorbereitet wurde
+      precompute: 1000
+      # Wie lange soll Sonar warten, bis der Spieler das CAPTCHA nicht besteht?
+      # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
+      max-duration: 45000
+      # Wie oft muss ein Spieler das CAPTCHA nicht bestehen, bevor er die Überprüfung nicht besteht?
+      max-tries: 3
+      # Zeichen (Buchstaben und Zahlen), die im Antwort-CAPTCHA erscheinen dürfen
+      dictionary: '123456789'
+      # Welche Schriftarten soll Sonar für die Map-CAPTCHA-Codes verwenden?
+      fonts:
+        - Dialog
+        - DialogInput
+        - Serif
+        - SansSerif
+    
+    # Überprüft, ob die Spieler eine gültige Client-Marke an den Server senden
+    client-brand:
+      # Soll Sonar auf gültige Client-Marken prüfen? (Empfohlen)
+      enabled: true
+      # Regex zur Validierung von Client-Marken während der Überprüfung
+      valid-regex: ^[!-~ ]+$
+      # Maximale Länge der Client-Marke während der Überprüfung
+      max-length: 64
+
+    # Regex zur Validierung von Benutzernamen während der Überprüfung
+    valid-name-regex: ^[a-zA-Z0-9_]+$
+    # Regex zur Validierung der Client-Spracheinstellung während der Überprüfung
+    valid-locale-regex: ^[a-zA-Z_]+$
+    # Ping, den ein Spieler haben muss, um ein Timeout zu erleiden
+    # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
+    max-ping: 10000
+    # Maximale Anzahl an Login-Paketen, die der Spieler senden muss, um gekickt zu werden
+    max-login-packets: 256
+
+  # Soll Sonar neue Überprüfungsversuche protokollieren?
+  log-connections: true
+  # Soll Sonar neue Überprüfungsversuche während Angriffen protokollieren?
+  log-during-attack: false
+  # Soll Sonar jede einzelne Bewegung/Positionsänderung während der Überprüfung protokollieren?
+  # Dies wird für Produktivserver nicht empfohlen, kann aber beim Auffinden von Fehlern hilfreich sein.
+  debug-xyz-positions: false
+  # Zeit, die verstreichen muss, bevor ein Spieler ein Timeout erleidet
+  # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
+  read-timeout: 3500
+  # Wie lange sollte ein Spieler warten, bevor er während der Überprüfung erneut verbinden kann
+  # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
+  rejoin-delay: 8000
+  # Wie lange sollte eine IP-Adresse vom Einloggen ausgeschlossen werden, wenn die Überprüfung zu oft nicht bestanden wird?
+  # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
+  blacklist-time: 600000
+  # Wie oft muss ein Spieler die Überprüfung nicht bestehen, um auf die Schwarze Liste gesetzt zu werden?
+  # (Setzen Sie diesen Wert auf 0, um die Schwarze Liste vollständig zu deaktivieren)
+  blacklist-threshold: 2
+  # Liste von Protokoll-IDs, die von Sonar nicht überprüft werden (Überprüfungsumgehung)
+  # Die vollständige Liste aller Protokoll-IDs finden Sie hier:
+  # https://wiki.vg/Protocol_version_numbers
+  # Zum Beispiel hat Minecraft 1.20 die ID 763.
+  whitelisted-protocols: []
+  # Liste von Protokoll-IDs, die den Server überhaupt nicht betreten dürfen
+  blacklisted-protocols: []

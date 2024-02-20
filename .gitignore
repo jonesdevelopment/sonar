@@ -30,6 +30,5 @@ gradlew*
 *.jpg
 *.jpeg
 *.log
-*.yml
 *.svg
 *.txt
