@@ -217,7 +217,8 @@ public final class SonarConfiguration {
 
     webhook.embed.title = webhookConfig.getString(embedPath + "title");
     webhook.embed.titleUrl = webhookConfig.getString(embedPath + "title-url");
-    webhook.embed.description = fromList(webhookConfig.getStringList(embedPath + "description"));
+    webhook.embed.description = formatString(String.join("\n",
+      webhookConfig.getStringList(embedPath + "description")));
     webhook.embed.r = webhookConfig.getInt(embedPath + "color.red");
     webhook.embed.g = webhookConfig.getInt(embedPath + "color.green");
     webhook.embed.b = webhookConfig.getInt(embedPath + "color.blue");
@@ -486,7 +487,6 @@ public final class SonarConfiguration {
 
     private Component tooFastReconnect;
     private Component invalidUsername;
-    private Component alreadyConnected;
     private Component verificationSuccess;
     private Component verificationFailed;
     private Component alreadyVerifying;
