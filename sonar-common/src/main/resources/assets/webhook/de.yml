@@ -1,0 +1,60 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Brauchst du Hilfe? https://jonesdev.xyz/discord
+# Source code: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# Bot-Angriffsbenachrichtigungen können auch über Webhooks an deinen Discord-Server gesendet werden
+webhook:
+  # URL des Discord-Webhooks (Setze dies auf '' um Webhooks zu deaktivieren)
+  url: ''
+  # Benutzername des Discord-Webhook-Senders
+  username: Sonar
+  # URL zum Avatar des Discord-Webhook-Senders (Setze dies auf '' um zu deaktivieren)
+  avatar-url: ''
+  # Inhalt der Discord-Webhook-Nachricht (Setze dies auf '' um zu deaktivieren)
+  # Dies kann beispielsweise verwendet werden, um Teammitglieder mit <@userId> anzupingen
+  # Wenn du Rollen anpingen möchtest, musst du <@&roleId> verwenden
+  content: ''
+  # Eingebettete Discord-Webhook-Nachricht, die gesendet wird, wenn ein Angriff gestoppt wurde
+  embed:
+    # Kleine Fußzeile der eingebetteten Discord-Webhook-Nachricht
+    footer:
+      # Inhalt der Fußzeile der eingebetteten Discord-Webhook-Nachricht
+      text: © Jones Development und Sonar Mitwirkende
+      # URL des Icons der Fußzeile der eingebetteten Discord-Webhook-Nachricht
+      icon-url: ''
+    # Titel der eingebetteten Discord-Webhook-Nachricht
+    title: ':white_check_mark: Angriff abgewehrt'
+    # Klickbare URL des Titels der eingebetteten Discord-Webhook-Nachricht
+    title-url: ''
+    # Beschreibung (Inhalt) der eingebetteten Discord-Webhook-Nachricht
+    description:
+      - Der Angriff auf deinen Server wurde abgewehrt.
+      - ''
+      - 'Angriffsbeginn: <t:%start-timestamp%:T>'
+      - 'Angriffsende: <t:%end-timestamp%:T>'
+      - 'Angriffsdauer: %duration%'
+      - ''
+      - 'Spitzenauslastung der CPU des Prozesses während des Angriffs: %peak-cpu%%'
+      - 'Spitzenauslastung des Arbeitsspeichers des Prozesses während des Angriffs: %peak-memory%'
+      - 'Spitzenwert der Bots pro Sekunde während des Angriffs: %peak-bps%'
+      - ''
+      - 'Während des Angriffs auf die Blacklist gesetzte IP-Adressen: %total-blacklisted%'
+      - 'Gescheiterte Verifizierungen während des Angriffs: %total-failed%'
+      - 'Erfolgreiche Verifizierungen während des Angriffs: %total-success%'
+    # RGB-Farben der eingebetteten Discord-Webhook-Nachricht
+    # Color picker: https://www.rapidtables.com/web/color/RGB_Color.html
+    color:
+      red: 0
+      green: 255
+      blue: 0
