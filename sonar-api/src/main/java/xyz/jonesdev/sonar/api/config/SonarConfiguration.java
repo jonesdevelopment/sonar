@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 public final class SonarConfiguration {
   @Getter
   private final SimpleYamlConfig generalConfig, messagesConfig, webhookConfig;
-  private final File languageFile;
+  private final File languageFile, pluginFolder;
 
   static final LoggerWrapper LOGGER = new LoggerWrapper() {
 
@@ -62,6 +62,7 @@ public final class SonarConfiguration {
   };
 
   public SonarConfiguration(final @NotNull File pluginFolder) {
+    this.pluginFolder = pluginFolder;
     this.messagesConfig = new SimpleYamlConfig(new File(pluginFolder, "messages.yml"));
     this.generalConfig = new SimpleYamlConfig(new File(pluginFolder, "config.yml"));
     this.webhookConfig = new SimpleYamlConfig(new File(pluginFolder, "webhook.yml"));
@@ -105,6 +106,11 @@ public final class SonarConfiguration {
   }
 
   public void load() {
+    // Make sure the plugin folder actually exists before trying to copy files into it
+    if (!pluginFolder.exists() && !pluginFolder.mkdirs()) {
+      throw new IllegalStateException("Could not create plugin folder (insufficient permissions?)");
+    }
+
     // Generate the language file and check what it's set to
     Language preferredLanguage = getPreferredLanguage();
     if (preferredLanguage == Language.SYSTEM) {
