@@ -178,9 +178,6 @@ verification:
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler erfolgreich verifiziert wurde
     successful: '%name% wurde erfolgreich verifiziert (%time%s!).'
 
-  # Nachricht, die dem Spieler angezeigt wird, wenn er auf die Überprüfung der gültigen Gravitation wartet
-  welcome: '%prefix%<gray>Bitte warte einen Moment, bis die Überprüfung abgeschlossen ist...'
-
   # Nachrichten, die dem Spieler angezeigt werden, wenn er den CAPTCHA eingeben soll
   captcha:
     # Nachricht, die dem Spieler angezeigt wird, wenn er den CAPTCHA-Code im Chat eingeben muss
@@ -195,12 +192,6 @@ verification:
   currently-preparing:
     - '%header%'
     - <yellow>Deine Anti-Bot-Daten wurden noch nicht vorbereitet.
-    - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - '%footer%'
-  # Trennungs-Nachricht, die angezeigt wird, wenn zu viele Spieler gleichzeitig versuchen, sich einzuloggen
-  too-many-players:
-    - '%header%'
-    - <gold>Zu viele Spieler versuchen derzeit sich einzuloggen, versuche es später noch einmal.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
     - '%footer%'
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand zu schnell während der Verifizierung erneut beitritt
@@ -238,13 +229,6 @@ verification:
     - '%header%'
     - <red>Du verwendest eine Version, die auf unserem Server nicht erlaubt ist.
     - <gold>Brauchst du Hilfe beim Einloggen? <gray>%support-url%
-    - '%footer%'
-  # Nachricht, die angezeigt wird, wenn jemand versucht, sich zu verifizieren, während ein Konto online ist
-  already-online:
-    - '%header%'
-    - <red>Jemand ist bereits online mit deinem Konto.
-    - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - <gray>Wenn dies weiterhin auftritt, versuche dein Spiel neu zu starten oder kontaktiere den Support.
     - '%footer%'
   # Nachricht, die angezeigt wird, wenn jemand die Verifizierung erfolgreich abschließt
   success:
