@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
   id("java")
-  id("com.github.johnrengelman.shadow") version "8.1.1"
+  id("io.github.goooler.shadow") version "8.1.5"
   id("io.toolebox.git-versioner") version "1.6.7"
 }
 
@@ -26,7 +26,7 @@ allprojects {
   }
 
   apply(plugin = "java")
-  apply(plugin = "com.github.johnrengelman.shadow")
+  apply(plugin = "io.github.goooler.shadow")
 
   dependencies {
     compileOnly("org.projectlombok:lombok:1.18.30")
@@ -36,9 +36,9 @@ allprojects {
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 
     // adventure
-    implementation("net.kyori:adventure-text-minimessage:4.15.0")
-    implementation("net.kyori:adventure-text-serializer-gson:4.15.0")
-    implementation("net.kyori:adventure-nbt:4.15.0")
+    implementation("net.kyori:adventure-text-minimessage:4.16.0")
+    implementation("net.kyori:adventure-text-serializer-gson:4.16.0")
+    implementation("net.kyori:adventure-nbt:4.16.0")
 
     compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.8") // caching
