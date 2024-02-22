@@ -39,7 +39,7 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public final class Chat implements FallbackPacket {
+public final class UniversalChatPacket implements FallbackPacket {
   private static final UUID PLACEHOLDER_UUID = new UUID(0L, 0L);
   private static final int DIV_FLOOR = -Math.floorDiv(-20, 8);
 
@@ -58,12 +58,12 @@ public final class Chat implements FallbackPacket {
   private boolean signed;
   private byte[] signature;
 
-  public Chat(final @NotNull Component component,
-              final byte type) {
+  public UniversalChatPacket(final @NotNull Component component,
+                             final byte type) {
     this(new ComponentHolder(component), type);
   }
 
-  public Chat(final ComponentHolder componentHolder, final byte type) {
+  public UniversalChatPacket(final ComponentHolder componentHolder, final byte type) {
     this.componentHolder = componentHolder;
     this.type = type;
   }

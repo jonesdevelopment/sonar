@@ -22,10 +22,10 @@ import io.netty.util.collection.IntObjectMap;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryData;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 import java.util.*;
@@ -38,40 +38,40 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 public enum FallbackPacketRegistry {
   LOGIN {
     {
-      serverbound.register(LoginAcknowledged.class, LoginAcknowledged::new,
+      serverbound.register(LoginAcknowledgedPacket.class, LoginAcknowledgedPacket::new,
         map(0x03, MINECRAFT_1_20_2, false));
 
-      clientbound.register(LoginSuccess.class, LoginSuccess::new,
+      clientbound.register(LoginSuccessPacket.class, LoginSuccessPacket::new,
         map(0x02, MINECRAFT_1_7_2, false));
 
-      clientbound.register(Disconnect.class, Disconnect::new,
+      clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
         map(0x00, MINECRAFT_1_7_2, true));
     }
   },
   CONFIG {
     {
-      clientbound.register(Disconnect.class, Disconnect::new,
+      clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
         map(0x01, MINECRAFT_1_20_2, true));
-      clientbound.register(FinishConfiguration.class, FinishConfiguration::new,
+      clientbound.register(FinishConfigurationPacket.class, FinishConfigurationPacket::new,
         map(0x02, MINECRAFT_1_20_2, false));
-      clientbound.register(KeepAlive.class, KeepAlive::new,
+      clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
         map(0x03, MINECRAFT_1_20_2, false));
-      clientbound.register(RegistryData.class, RegistryData::new,
+      clientbound.register(RegistryDataPacket.class, RegistryDataPacket::new,
         map(0x05, MINECRAFT_1_20_2, true));
 
-      serverbound.register(ClientSettings.class, ClientSettings::new,
+      serverbound.register(ClientSettingsPacket.class, ClientSettingsPacket::new,
         map(0x00, MINECRAFT_1_20_2, false));
-      serverbound.register(PluginMessage.class, PluginMessage::new,
+      serverbound.register(PluginMessagePacket.class, PluginMessagePacket::new,
         map(0x01, MINECRAFT_1_20_2, false));
-      serverbound.register(FinishConfiguration.class, FinishConfiguration::new,
+      serverbound.register(FinishConfigurationPacket.class, FinishConfigurationPacket::new,
         map(0x02, MINECRAFT_1_20_2, false));
-      serverbound.register(KeepAlive.class, KeepAlive::new,
+      serverbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
         map(0x03, MINECRAFT_1_20_2, false));
     }
   },
   GAME {
     {
-      clientbound.register(JoinGame.class, JoinGame::new,
+      clientbound.register(JoinGamePacket.class, JoinGamePacket::new,
         map(0x01, MINECRAFT_1_7_2, true),
         map(0x23, MINECRAFT_1_9, true),
         map(0x25, MINECRAFT_1_13, true),
@@ -85,7 +85,7 @@ public enum FallbackPacketRegistry {
         map(0x24, MINECRAFT_1_19_3, true),
         map(0x28, MINECRAFT_1_19_4, true),
         map(0x29, MINECRAFT_1_20_2, true));
-      clientbound.register(KeepAlive.class, KeepAlive::new,
+      clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
         map(0x00, MINECRAFT_1_7_2, false),
         map(0x1F, MINECRAFT_1_9, false),
         map(0x21, MINECRAFT_1_13, false),
@@ -99,7 +99,7 @@ public enum FallbackPacketRegistry {
         map(0x1F, MINECRAFT_1_19_3, false),
         map(0x23, MINECRAFT_1_19_4, false),
         map(0x24, MINECRAFT_1_20_2, false));
-      clientbound.register(Disconnect.class, Disconnect::new,
+      clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
         map(0x40, MINECRAFT_1_7_2, true),
         map(0x1A, MINECRAFT_1_9, true),
         map(0x1B, MINECRAFT_1_13, true),
@@ -113,7 +113,7 @@ public enum FallbackPacketRegistry {
         map(0x17, MINECRAFT_1_19_3, true),
         map(0x1A, MINECRAFT_1_19_4, true),
         map(0x1B, MINECRAFT_1_20_2, true));
-      clientbound.register(PositionLook.class, PositionLook::new,
+      clientbound.register(PlayerPositionLookPacket.class, PlayerPositionLookPacket::new,
         map(0x08, MINECRAFT_1_7_2, true),
         map(0x2E, MINECRAFT_1_9, true),
         map(0x2F, MINECRAFT_1_12_1, true),
@@ -128,7 +128,7 @@ public enum FallbackPacketRegistry {
         map(0x38, MINECRAFT_1_19_3, true),
         map(0x3C, MINECRAFT_1_19_4, true),
         map(0x3E, MINECRAFT_1_20_2, true));
-      clientbound.register(Abilities.class, Abilities::new,
+      clientbound.register(ClientAbilitiesPacket.class, ClientAbilitiesPacket::new,
         map(0x39, MINECRAFT_1_7_2, true),
         map(0x2B, MINECRAFT_1_9, true),
         map(0x2C, MINECRAFT_1_12_1, true),
@@ -143,7 +143,7 @@ public enum FallbackPacketRegistry {
         map(0x30, MINECRAFT_1_19_3, true),
         map(0x34, MINECRAFT_1_19_4, true),
         map(0x36, MINECRAFT_1_20_2, true));
-      clientbound.register(EmptyChunkData.class, EmptyChunkData::new,
+      clientbound.register(ChunkDataPacket.class, ChunkDataPacket::new,
         map(0x21, MINECRAFT_1_7_2, true),
         map(0x20, MINECRAFT_1_9, true),
         map(0x22, MINECRAFT_1_13, true),
@@ -157,7 +157,7 @@ public enum FallbackPacketRegistry {
         map(0x20, MINECRAFT_1_19_3, true),
         map(0x24, MINECRAFT_1_19_4, true),
         map(0x25, MINECRAFT_1_20_2, true));
-      clientbound.register(UpdateSectionBlocks.class, UpdateSectionBlocks::new,
+      clientbound.register(UpdateSectionBlocksPacket.class, UpdateSectionBlocksPacket::new,
         map(0x22, MINECRAFT_1_7_2, true),
         map(0x10, MINECRAFT_1_9, true),
         map(0x0F, MINECRAFT_1_13, true),
@@ -171,7 +171,7 @@ public enum FallbackPacketRegistry {
         map(0x43, MINECRAFT_1_19_4, true),
         map(0x45, MINECRAFT_1_20_2, true),
         map(0x47, MINECRAFT_1_20_3, true));
-      clientbound.register(Transaction.class, Transaction::new,
+      clientbound.register(TransactionPacket.class, TransactionPacket::new,
         map(0x32, MINECRAFT_1_7_2, true),
         map(0x11, MINECRAFT_1_9, true),
         map(0x12, MINECRAFT_1_13, true),
@@ -184,7 +184,7 @@ public enum FallbackPacketRegistry {
         map(0x2E, MINECRAFT_1_19_3, true),
         map(0x32, MINECRAFT_1_19_4, true),
         map(0x33, MINECRAFT_1_20_2, true));
-      clientbound.register(DefaultSpawnPosition.class, DefaultSpawnPosition::new,
+      clientbound.register(DefaultSpawnPositionPacket.class, DefaultSpawnPositionPacket::new,
         map(0x05, MINECRAFT_1_7_2, true),
         map(0x43, MINECRAFT_1_9, true),
         map(0x45, MINECRAFT_1_12, true),
@@ -200,7 +200,7 @@ public enum FallbackPacketRegistry {
         map(0x50, MINECRAFT_1_19_4, true),
         map(0x52, MINECRAFT_1_20_2, true),
         map(0x54, MINECRAFT_1_20_3, true));
-      clientbound.register(MapData.class, MapData::new,
+      clientbound.register(MapDataPacket.class, MapDataPacket::new,
         map(0x34, MINECRAFT_1_7_2, true),
         map(0x24, MINECRAFT_1_9, true),
         map(0x26, MINECRAFT_1_13, true),
@@ -213,7 +213,7 @@ public enum FallbackPacketRegistry {
         map(0x25, MINECRAFT_1_19_3, true),
         map(0x29, MINECRAFT_1_19_4, true),
         map(0x2A, MINECRAFT_1_20_2, true));
-      clientbound.register(SetSlot.class, SetSlot::new,
+      clientbound.register(SetSlotPacket.class, SetSlotPacket::new,
         map(0x2F, MINECRAFT_1_7_2, true),
         map(0x16, MINECRAFT_1_9, true),
         map(0x17, MINECRAFT_1_13, true),
@@ -226,7 +226,7 @@ public enum FallbackPacketRegistry {
         map(0x12, MINECRAFT_1_19_3, true),
         map(0x14, MINECRAFT_1_19_4, true),
         map(0x15, MINECRAFT_1_20_2, true));
-      clientbound.register(Chat.class, Chat::new,
+      clientbound.register(UniversalChatPacket.class, UniversalChatPacket::new,
         map(0x02, MINECRAFT_1_7_2, false),
         map(0x0F, MINECRAFT_1_9, false),
         map(0x0E, MINECRAFT_1_13, false),
@@ -239,10 +239,10 @@ public enum FallbackPacketRegistry {
         map(0x64, MINECRAFT_1_19_4, false),
         map(0x67, MINECRAFT_1_20_2, false),
         map(0x69, MINECRAFT_1_20_3, false));
-      clientbound.register(GameEvent.class, GameEvent::new,
+      clientbound.register(GameEventPacket.class, GameEventPacket::new,
         map(0x20, MINECRAFT_1_20_3, true));
 
-      serverbound.register(Chat.class, Chat::new,
+      serverbound.register(UniversalChatPacket.class, UniversalChatPacket::new,
         map(0x01, MINECRAFT_1_7_2, false),
         map(0x02, MINECRAFT_1_9, false),
         map(0x03, MINECRAFT_1_12, false),
@@ -251,7 +251,7 @@ public enum FallbackPacketRegistry {
         map(0x04, MINECRAFT_1_19, false),
         map(0x05, MINECRAFT_1_19_1, false),
         map(0x05, MINECRAFT_1_19_3, false));
-      serverbound.register(KeepAlive.class, KeepAlive::new,
+      serverbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
         map(0x00, MINECRAFT_1_7_2, false),
         map(0x0B, MINECRAFT_1_9, false),
         map(0x0C, MINECRAFT_1_12, false),
@@ -266,7 +266,7 @@ public enum FallbackPacketRegistry {
         map(0x12, MINECRAFT_1_19_4, false),
         map(0x14, MINECRAFT_1_20_2, false),
         map(0x15, MINECRAFT_1_20_3, false));
-      serverbound.register(ClientSettings.class, ClientSettings::new,
+      serverbound.register(ClientSettingsPacket.class, ClientSettingsPacket::new,
         map(0x15, MINECRAFT_1_7_2, false),
         map(0x04, MINECRAFT_1_9, false),
         map(0x05, MINECRAFT_1_12, false),
@@ -277,7 +277,7 @@ public enum FallbackPacketRegistry {
         map(0x07, MINECRAFT_1_19_3, false),
         map(0x08, MINECRAFT_1_19_4, false),
         map(0x09, MINECRAFT_1_20_2, false));
-      serverbound.register(PluginMessage.class, PluginMessage::new,
+      serverbound.register(PluginMessagePacket.class, PluginMessagePacket::new,
         map(0x17, MINECRAFT_1_7_2, false),
         map(0x09, MINECRAFT_1_9, false),
         map(0x0A, MINECRAFT_1_12, false),
@@ -290,7 +290,7 @@ public enum FallbackPacketRegistry {
         map(0x0C, MINECRAFT_1_19_3, false),
         map(0x0D, MINECRAFT_1_19_4, false),
         map(0x0F, MINECRAFT_1_20_2, false));
-      serverbound.register(PositionLook.class, PositionLook::new,
+      serverbound.register(PlayerPositionLookPacket.class, PlayerPositionLookPacket::new,
         map(0x06, MINECRAFT_1_7_2, false),
         map(0x0D, MINECRAFT_1_9, false),
         map(0x0F, MINECRAFT_1_12, false),
@@ -305,9 +305,9 @@ public enum FallbackPacketRegistry {
         map(0x15, MINECRAFT_1_19_4, false),
         map(0x17, MINECRAFT_1_20_2, false),
         map(0x18, MINECRAFT_1_20_3, false));
-      serverbound.register(TeleportConfirm.class, TeleportConfirm::new,
+      serverbound.register(TeleportConfirmPacket.class, TeleportConfirmPacket::new,
         map(0x00, MINECRAFT_1_9, false));
-      serverbound.register(Position.class, Position::new,
+      serverbound.register(PlayerPositionPacket.class, PlayerPositionPacket::new,
         map(0x04, MINECRAFT_1_7_2, false),
         map(0x0C, MINECRAFT_1_9, false),
         map(0x0E, MINECRAFT_1_12, false),
@@ -322,7 +322,7 @@ public enum FallbackPacketRegistry {
         map(0x14, MINECRAFT_1_19_4, false),
         map(0x16, MINECRAFT_1_20_2, false),
         map(0x17, MINECRAFT_1_20_3, false));
-      serverbound.register(Player.class, Player::new,
+      serverbound.register(PlayerTickPacket.class, PlayerTickPacket::new,
         map(0x03, MINECRAFT_1_7_2, false),
         map(0x0F, MINECRAFT_1_9, false),
         map(0x0D, MINECRAFT_1_12, false),
@@ -337,7 +337,7 @@ public enum FallbackPacketRegistry {
         map(0x17, MINECRAFT_1_19_4, false),
         map(0x19, MINECRAFT_1_20_2, false),
         map(0x1A, MINECRAFT_1_20_3, false));
-      serverbound.register(Transaction.class, Transaction::new,
+      serverbound.register(TransactionPacket.class, TransactionPacket::new,
         map(0x0F, MINECRAFT_1_7_2, false),
         map(0x05, MINECRAFT_1_9, false),
         map(0x06, MINECRAFT_1_12, false),

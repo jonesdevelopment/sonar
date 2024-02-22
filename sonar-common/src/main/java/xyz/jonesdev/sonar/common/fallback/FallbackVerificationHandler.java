@@ -34,8 +34,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.*;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.ItemMapType;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfoPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.PreparedMapInfo;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfiguration;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledged;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
@@ -141,7 +141,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Generate a random KeepAlive ID for the pre-join check
       expectedKeepAliveId = RANDOM.nextInt();
       // Send first KeepAlive to check if the connection is somewhat responsive
-      user.write(new KeepAlive(expectedKeepAliveId));
+      user.write(new KeepAlivePacket(expectedKeepAliveId));
     }
   }
 
@@ -152,7 +152,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Generate a random transaction ID
     expectedTransactionId = (short) RANDOM.nextInt();
     // Send a transaction with the given ID
-    user.write(new Transaction(0, expectedTransactionId, false));
+    user.write(new TransactionPacket(0, expectedTransactionId, false));
   }
 
   private void sendJoinGamePacket() {
@@ -185,7 +185,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Add a little randomization to the spawn y coordinate
     spawnYPosition = dynamicSpawnYPosition + RANDOM.nextDouble(0.4);
     // Teleport the player to the spawn position
-    user.delayedWrite(new PositionLook(
+    user.delayedWrite(new PlayerPositionLookPacket(
       SPAWN_X_POSITION, spawnYPosition, SPAWN_Z_POSITION,
       0f, -90f, expectedTeleportId, false));
     // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
@@ -261,8 +261,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     checkFrame(!login.elapsed(maxDuration), "took too long to enter captcha");
 
     // Handle incoming chat messages
-    if (packet instanceof Chat) {
-      final Chat chat = (Chat) packet;
+    if (packet instanceof UniversalChatPacket) {
+      final UniversalChatPacket chat = (UniversalChatPacket) packet;
       Objects.requireNonNull(captcha);
       if (!chat.getMessage().equals(captcha.getInfo().getAnswer())) {
         // Captcha is incorrect
@@ -281,8 +281,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Only send action bar if the message is actually supposed to be sent
       if (!actionBarMessage.isEmpty()) {
         final String timeLeft = String.format("%.0f", (maxDuration - login.delay()) / 1000D);
-        user.write(new Chat(MiniMessage.miniMessage().deserialize(
-          actionBarMessage.replace("%time-left%", timeLeft)), Chat.GAME_INFO_TYPE));
+        user.write(new UniversalChatPacket(MiniMessage.miniMessage().deserialize(
+          actionBarMessage.replace("%time-left%", timeLeft)), UniversalChatPacket.GAME_INFO_TYPE));
         // Make sure to reset the timer
         actionBar.reset();
       }
@@ -318,7 +318,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
     checkFrame(!login.elapsed(timeout), "time limit exceeded");
 
-    if (packet instanceof LoginAcknowledged) {
+    if (packet instanceof LoginAcknowledgedPacket) {
       // Check if we are currently expecting a LoginAcknowledged packet
       assertState(State.LOGIN_ACK);
 
@@ -326,7 +326,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       configure();
     }
 
-    if (packet instanceof FinishConfiguration) {
+    if (packet instanceof FinishConfigurationPacket) {
       // Check if we are currently expecting a FinishConfiguration packet
       assertState(State.CONFIGURE);
 
@@ -339,8 +339,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       initialJoinProcess();
     }
 
-    if (packet instanceof KeepAlive) {
-      final KeepAlive keepAlive = (KeepAlive) packet;
+    if (packet instanceof KeepAlivePacket) {
+      final KeepAlivePacket keepAlive = (KeepAlivePacket) packet;
 
       // 1.7-1.8.9 are sending a KeepAlive packet with the ID 0 every 20 ticks
       if (keepAlive.getId() == 0 && user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) return;
@@ -354,8 +354,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       sendJoinGamePacket();
     }
 
-    if (packet instanceof ClientSettings) {
-      final ClientSettings clientSettings = (ClientSettings) packet;
+    if (packet instanceof ClientSettingsPacket) {
+      final ClientSettingsPacket clientSettings = (ClientSettingsPacket) packet;
 
       // Validate the locale using a regex to filter unwanted characters.
       checkFrame(validateClientLocale(user, clientSettings.getLocale()), "invalid locale");
@@ -369,8 +369,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       resolvedClientSettings = true;
     }
 
-    if (packet instanceof PluginMessage) {
-      final PluginMessage pluginMessage = (PluginMessage) packet;
+    if (packet instanceof PluginMessagePacket) {
+      final PluginMessagePacket pluginMessage = (PluginMessagePacket) packet;
 
       // Only the brand channel is important, drop the rest
       if (pluginMessage.getChannel().equals("MC|Brand")
@@ -401,11 +401,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
     }
 
-    if (packet instanceof Transaction) {
+    if (packet instanceof TransactionPacket) {
       // Check if we are currently expecting a Transaction packet
       assertState(State.TRANSACTION);
 
-      final Transaction transaction = (Transaction) packet;
+      final TransactionPacket transaction = (TransactionPacket) packet;
 
       // The transaction should always be accepted
       checkFrame(transaction.isAccepted(), "transaction not accepted?!");
@@ -428,12 +428,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       }
     }
 
-    if (packet instanceof TeleportConfirm) {
+    if (packet instanceof TeleportConfirmPacket) {
       // Check if we are currently expecting a TeleportConfirm packet
       assertState(State.TELEPORT);
 
       // Check if the teleport ID is correct
-      final TeleportConfirm teleportConfirm = (TeleportConfirm) packet;
+      final TeleportConfirmPacket teleportConfirm = (TeleportConfirmPacket) packet;
       checkFrame(teleportConfirm.getTeleportId() == expectedTeleportId, "invalid teleport ID");
 
       // Reset all values to ensure safety on teleport
@@ -446,18 +446,18 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (state != State.LOGIN_ACK) {
-      if (packet instanceof Position) {
-        final Position position = (Position) packet;
+      if (packet instanceof PlayerPositionPacket) {
+        final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
       }
 
-      if (packet instanceof PositionLook) {
-        final PositionLook position = (PositionLook) packet;
+      if (packet instanceof PlayerPositionLookPacket) {
+        final PlayerPositionLookPacket position = (PlayerPositionLookPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
       }
 
-      if (packet instanceof Player) {
-        final Player player = (Player) packet;
+      if (packet instanceof PlayerTickPacket) {
+        final PlayerTickPacket player = (PlayerTickPacket) packet;
         handlePositionUpdate(posX, posY, posZ, player.isOnGround());
       }
     }
@@ -592,8 +592,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
     // Set slot to map
-    user.delayedWrite(new SetSlot(0, 36, 1, 0,
-      ItemMapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlot.MAP_NBT));
+    user.delayedWrite(new SetSlotPacket(0, 36, 1, 0,
+      ItemMapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlotPacket.MAP_NBT));
     // Send random captcha to the player
     captcha = MapInfoPreparer.getRandomCaptcha();
     Objects.requireNonNull(captcha).write(user);

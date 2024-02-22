@@ -36,8 +36,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccess;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.Disconnect;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.DisconnectPacket;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.net.InetAddress;
@@ -66,7 +66,7 @@ public final class FallbackUserWrapper implements FallbackUser {
 
   @Override
   public void disconnect(final @NotNull Component reason) {
-    closeWith(channel, protocolVersion, Disconnect.create(reason, false));
+    closeWith(channel, protocolVersion, DisconnectPacket.create(reason, false));
   }
 
   @Override
@@ -116,7 +116,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     pipeline.replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
 
     // Send LoginSuccess packet to make the client think they are joining the server
-    write(new LoginSuccess(username, uuid));
+    write(new LoginSuccessPacket(username, uuid));
 
     // The LoginSuccess packet has been sent, now we can change the registry state
     newEncoder.updateRegistry(protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0

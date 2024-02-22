@@ -15,51 +15,51 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets.login;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.netty.FastUUID;
 
-import java.util.UUID;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
 
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class LoginSuccess implements FallbackPacket {
-  private String username;
-  private UUID uuid;
+public final class TransactionPacket implements FallbackPacket {
+  private int windowId, id;
+  private boolean accepted;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeUUID(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
-      writeUUIDIntArray(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_7_6) >= 0) {
-      writeString(byteBuf, uuid.toString());
+    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
+      byteBuf.writeByte(windowId);
+      byteBuf.writeShort((short) id);
+      // The "accepted" field is actually really unnecessary since
+      // it's never even used in the client.
+      byteBuf.writeBoolean(accepted);
     } else {
-      writeString(byteBuf, FastUUID.toString(uuid));
-    }
-
-    writeString(byteBuf, username);
-
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeVarInt(byteBuf, 0); // properties
+      byteBuf.writeInt(id);
     }
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
+      windowId = byteBuf.readByte();
+      id = byteBuf.readShort();
+      accepted = byteBuf.readBoolean();
+    } else {
+      id = byteBuf.readInt();
+      // Always set accepted to true since 1.17 or higher don't use
+      // transactions for inventory confirmation anymore.
+      accepted = true;
+    }
   }
 }

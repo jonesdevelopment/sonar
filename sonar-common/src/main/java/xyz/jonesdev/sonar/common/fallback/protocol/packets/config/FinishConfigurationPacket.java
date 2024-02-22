@@ -18,26 +18,23 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
 
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
 import lombok.ToString;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
-
-@Getter
 @ToString
-public final class RegistryData implements FallbackPacket {
+public final class FinishConfigurationPacket implements FallbackPacket {
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    writeNamelessCompoundTag(byteBuf, DimensionRegistry.CODEC_1_20);
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 0;
   }
 }

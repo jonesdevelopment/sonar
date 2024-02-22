@@ -33,10 +33,10 @@ import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/PluginMessage.java
 @Getter
 @ToString
-public final class PluginMessage extends DeferredByteBufHolder implements FallbackPacket {
+public final class PluginMessagePacket extends DeferredByteBufHolder implements FallbackPacket {
   private String channel;
 
-  public PluginMessage() {
+  public PluginMessagePacket() {
     super(null);
   }
 
