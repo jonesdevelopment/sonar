@@ -39,6 +39,6 @@ public class GeyserUtil {
   public boolean isGeyserConnection(final @NotNull Channel channel,
                                     final @NotNull InetSocketAddress originalAddress) {
     return originalAddress.getPort() == 0 // check for floodgate on the server
-        || channel.attr(PLAYER_ATTRIBUTE).get() != null; // check for standalone Geyser proxy connection
+      || channel.attr(PLAYER_ATTRIBUTE).get() != null; // check for standalone Geyser proxy connection
   }
 }
