@@ -38,7 +38,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
   public SonarBukkit(final @NotNull SonarBukkitPlugin plugin) {
     super(plugin, new BukkitLibraryManager(
-      plugin, plugin.getDataFolder().getName()),
+        plugin, plugin.getDataFolder().getName()),
       plugin.getDataFolder(), SonarPlatform.BUKKIT);
     INSTANCE = this;
   }

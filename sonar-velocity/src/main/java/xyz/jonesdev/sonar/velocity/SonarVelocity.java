@@ -38,7 +38,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
   public SonarVelocity(final @NotNull SonarVelocityPlugin plugin) {
     super(plugin, new VelocityLibraryManager<>(
-      plugin, plugin.getLogger(), plugin.getDataDirectory(), plugin.getServer().getPluginManager()),
+        plugin, plugin.getLogger(), plugin.getDataDirectory(), plugin.getServer().getPluginManager()),
       plugin.getDataDirectory().toFile(), SonarPlatform.VELOCITY);
     INSTANCE = this;
   }

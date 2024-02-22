@@ -34,13 +34,14 @@ import java.util.Objects;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
 
-// Taken from
+// Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
 public final class ComponentHolder {
-  private final Component component;
+  private final String serializedComponent;
+  private BinaryTag cachedBinaryTag;
 
   public ComponentHolder(final Component component) {
-    this.component = component;
+    this.serializedComponent = GsonComponentSerializer.gson().serialize(component);
   }
 
   private BinaryTag serialize(final JsonElement json) {
@@ -73,15 +74,15 @@ public final class ComponentHolder {
         throw new IllegalArgumentException("Unknown JSON primitive: " + jsonPrimitive);
       }
     } else if (json instanceof JsonObject) {
-      CompoundBinaryTag.Builder compound = CompoundBinaryTag.builder();
+      final CompoundBinaryTag.Builder compound = CompoundBinaryTag.builder();
 
-      for (Map.Entry<String, JsonElement> property : ((JsonObject) json).entrySet()) {
+      for (final Map.Entry<String, JsonElement> property : ((JsonObject) json).entrySet()) {
         compound.put(property.getKey(), serialize(property.getValue()));
       }
 
       return compound.build();
     } else if (json instanceof JsonArray) {
-      JsonArray jsonArray = ((JsonArray) json).getAsJsonArray();
+      final JsonArray jsonArray = json.getAsJsonArray();
 
       if (jsonArray.size() == 0) {
         return ListBinaryTag.empty();
@@ -91,7 +92,7 @@ public final class ComponentHolder {
       BinaryTagType<? extends BinaryTag> listType = null;
 
       for (final JsonElement jsonEl : jsonArray) {
-        BinaryTag tag = serialize(jsonEl);
+        final BinaryTag tag = serialize(jsonEl);
         tagItems.add(tag);
 
         if (listType == null) {
@@ -103,21 +104,21 @@ public final class ComponentHolder {
 
       switch (Objects.requireNonNull(listType).id()) {
         case 1://BinaryTagTypes.BYTE:
-          byte[] bytes = new byte[jsonArray.size()];
+          final byte[] bytes = new byte[jsonArray.size()];
           for (int i = 0; i < bytes.length; i++) {
             bytes[i] = (Byte) jsonArray.get(i).getAsNumber();
           }
 
           return ByteArrayBinaryTag.byteArrayBinaryTag(bytes);
         case 3://BinaryTagTypes.INT:
-          int[] ints = new int[jsonArray.size()];
+          final int[] ints = new int[jsonArray.size()];
           for (int i = 0; i < ints.length; i++) {
             ints[i] = (Integer) jsonArray.get(i).getAsNumber();
           }
 
           return IntArrayBinaryTag.intArrayBinaryTag(ints);
         case 4://BinaryTagTypes.LONG:
-          long[] longs = new long[jsonArray.size()];
+          final long[] longs = new long[jsonArray.size()];
           for (int i = 0; i < longs.length; i++) {
             longs[i] = (Long) jsonArray.get(i).getAsNumber();
           }
@@ -142,12 +143,13 @@ public final class ComponentHolder {
 
   public void write(final @NotNull ByteBuf byteBuf,
                     final @NotNull ProtocolVersion protocolVersion) {
-    final String serialized = GsonComponentSerializer.gson().serialize(component);
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_3) >= 0) {
-      final BinaryTag binaryTag = serialize(new JsonParser().parse(serialized));
-      writeNamelessCompoundTag(byteBuf, binaryTag);
+      if (cachedBinaryTag == null) {
+        cachedBinaryTag = serialize(new JsonParser().parse(serializedComponent));
+      }
+      writeNamelessCompoundTag(byteBuf, cachedBinaryTag);
     } else {
-      writeString(byteBuf, serialized);
+      writeString(byteBuf, serializedComponent);
     }
   }
 }

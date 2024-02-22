@@ -48,22 +48,22 @@ public final class Notification implements Observable {
     // Prepare the chat message
     final Component chat = MiniMessage.miniMessage().deserialize(
       Sonar.get().getConfig().getNotifications().getNotificationChat()
-      .replace("%queued%",
-        DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-      .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
-      .replace("%blacklisted%",
-        DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize()))
-      .replace("%total-joins%", DECIMAL_FORMAT.format(statistics.getTotalPlayersJoined()))
-      .replace("%logins-per-second%", DECIMAL_FORMAT.format(statistics.getLoginsPerSecond()))
-      .replace("%connections-per-second%", DECIMAL_FORMAT.format(statistics.getConnectionsPerSecond()))
-      .replace("%verify-total%", DECIMAL_FORMAT.format(statistics.getTotalAttemptedVerifications()))
-      .replace("%verify-success%",
-        DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
-      .replace("%verify-failed%", DECIMAL_FORMAT.format(statistics.getTotalFailedVerifications()))
-      .replace("%incoming-traffic%", statistics.getCurrentIncomingBandwidthFormatted())
-      .replace("%outgoing-traffic%", statistics.getCurrentOutgoingBandwidthFormatted())
-      .replace("%incoming-traffic-ttl%", statistics.getTotalIncomingBandwidthFormatted())
-      .replace("%outgoing-traffic-ttl%", statistics.getTotalOutgoingBandwidthFormatted()));
+        .replace("%queued%",
+          DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
+        .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
+        .replace("%blacklisted%",
+          DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize()))
+        .replace("%total-joins%", DECIMAL_FORMAT.format(statistics.getTotalPlayersJoined()))
+        .replace("%logins-per-second%", DECIMAL_FORMAT.format(statistics.getLoginsPerSecond()))
+        .replace("%connections-per-second%", DECIMAL_FORMAT.format(statistics.getConnectionsPerSecond()))
+        .replace("%verify-total%", DECIMAL_FORMAT.format(statistics.getTotalAttemptedVerifications()))
+        .replace("%verify-success%",
+          DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
+        .replace("%verify-failed%", DECIMAL_FORMAT.format(statistics.getTotalFailedVerifications()))
+        .replace("%incoming-traffic%", statistics.getCurrentIncomingBandwidthFormatted())
+        .replace("%outgoing-traffic%", statistics.getCurrentOutgoingBandwidthFormatted())
+        .replace("%incoming-traffic-ttl%", statistics.getTotalIncomingBandwidthFormatted())
+        .replace("%outgoing-traffic-ttl%", statistics.getTotalOutgoingBandwidthFormatted()));
     // Send the title and chat messages to all online players
     for (final String subscriber : Sonar.get().getNotificationHandler().getSubscribers()) {
       final Audience audience = Sonar.AUDIENCES.get(subscriber);
