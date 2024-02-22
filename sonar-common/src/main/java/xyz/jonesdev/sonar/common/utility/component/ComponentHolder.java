@@ -34,13 +34,14 @@ import java.util.Objects;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
 
-// Taken from
+// Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
 public final class ComponentHolder {
-  private final Component component;
+  private final String serializedComponent;
+  private BinaryTag cachedBinaryTag;
 
   public ComponentHolder(final Component component) {
-    this.component = component;
+    this.serializedComponent = GsonComponentSerializer.gson().serialize(component);
   }
 
   private BinaryTag serialize(final JsonElement json) {
@@ -142,12 +143,13 @@ public final class ComponentHolder {
 
   public void write(final @NotNull ByteBuf byteBuf,
                     final @NotNull ProtocolVersion protocolVersion) {
-    final String serialized = GsonComponentSerializer.gson().serialize(component);
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_3) >= 0) {
-      final BinaryTag binaryTag = serialize(new JsonParser().parse(serialized));
-      writeNamelessCompoundTag(byteBuf, binaryTag);
+      if (cachedBinaryTag == null) {
+        cachedBinaryTag = serialize(new JsonParser().parse(serializedComponent));
+      }
+      writeNamelessCompoundTag(byteBuf, cachedBinaryTag);
     } else {
-      writeString(byteBuf, serialized);
+      writeString(byteBuf, serializedComponent);
     }
   }
 }
