@@ -34,7 +34,7 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class ClientSettings implements FallbackPacket {
+public final class ClientSettingsPacket implements FallbackPacket {
   private String locale;
   private byte viewDistance;
   private int chatVisibility;

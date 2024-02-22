@@ -26,40 +26,37 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_12_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class Transaction implements FallbackPacket {
-  private int windowId, id;
-  private boolean accepted;
+public final class KeepAlivePacket implements FallbackPacket {
+  private long id;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      byteBuf.writeByte(windowId);
-      byteBuf.writeShort((short) id);
-      // The "accepted" field is actually really unnecessary since
-      // it's never even used in the client.
-      byteBuf.writeBoolean(accepted);
+    if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
+      byteBuf.writeLong(id);
+    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+      writeVarInt(byteBuf, (int) id);
     } else {
-      byteBuf.writeInt(id);
+      byteBuf.writeInt((int) id);
     }
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      windowId = byteBuf.readByte();
-      id = byteBuf.readShort();
-      accepted = byteBuf.readBoolean();
+    if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
+      id = byteBuf.readLong();
+    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+      id = readVarInt(byteBuf);
     } else {
       id = byteBuf.readInt();
-      // Always set accepted to true since 1.17 or higher don't use
-      // transactions for inventory confirmation anymore.
-      accepted = true;
     }
   }
 }

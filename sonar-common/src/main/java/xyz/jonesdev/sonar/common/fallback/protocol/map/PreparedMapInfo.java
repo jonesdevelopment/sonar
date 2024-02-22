@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol.map;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.MapData;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.MapDataPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
@@ -30,8 +30,8 @@ public final class PreparedMapInfo {
   public static final int SCALE = DIMENSIONS * DIMENSIONS;
 
   private final MapInfo info;
-  private final MapData[] legacy;
-  private final MapData modern;
+  private final MapDataPacket[] legacy;
+  private final MapDataPacket modern;
 
   public PreparedMapInfo(final String answer,
                          final int columns, final int rows,
@@ -44,18 +44,18 @@ public final class PreparedMapInfo {
       final byte buf = buffer[i];
       grid[i & Byte.MAX_VALUE][i >> 7] = buf;
     }
-    this.legacy = new MapData[grid.length];
+    this.legacy = new MapDataPacket[grid.length];
     for (int i = 0; i < grid.length; i++) {
-      this.legacy[i] = new MapData(new MapInfo(answer, DIMENSIONS, DIMENSIONS, i, 0, grid[i]));
+      this.legacy[i] = new MapDataPacket(new MapInfo(answer, DIMENSIONS, DIMENSIONS, i, 0, grid[i]));
     }
 
     // Prepare 1.8+ map data
-    this.modern = new MapData(info);
+    this.modern = new MapDataPacket(info);
   }
 
   public void write(final @NotNull FallbackUser user) {
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-      for (final MapData data : legacy) {
+      for (final MapDataPacket data : legacy) {
         user.delayedWrite(data);
       }
     } else {

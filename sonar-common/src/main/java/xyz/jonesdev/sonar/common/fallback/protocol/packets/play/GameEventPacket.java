@@ -19,32 +19,27 @@ package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-@Getter
-@ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Abilities implements FallbackPacket {
-  private int encodedFlags;
-  private float flySpeed, walkSpeed;
+public final class GameEventPacket implements FallbackPacket {
+  private int type;
+  private float value;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    byteBuf.writeByte(encodedFlags);
-    byteBuf.writeFloat(flySpeed);
-    byteBuf.writeFloat(walkSpeed);
+    byteBuf.writeByte(type);
+    byteBuf.writeFloat(value);
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    encodedFlags = byteBuf.readByte();
-    flySpeed = byteBuf.readFloat();
-    walkSpeed = byteBuf.readFloat();
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 }

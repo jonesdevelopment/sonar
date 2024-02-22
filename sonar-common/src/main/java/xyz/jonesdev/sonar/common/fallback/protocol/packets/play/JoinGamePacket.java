@@ -35,7 +35,7 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public final class JoinGame implements FallbackPacket {
+public final class JoinGamePacket implements FallbackPacket {
   private int entityId;
   private int gamemode;
   private long partialHashedSeed;

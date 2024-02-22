@@ -35,7 +35,7 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarLong
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"changedBlocks"})
-public final class UpdateSectionBlocks implements FallbackPacket {
+public final class UpdateSectionBlocksPacket implements FallbackPacket {
   private int sectionX, sectionZ;
   private ChangedBlock[] changedBlocks;
 

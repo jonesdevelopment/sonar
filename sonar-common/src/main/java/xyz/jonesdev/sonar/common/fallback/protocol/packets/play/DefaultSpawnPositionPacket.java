@@ -26,37 +26,37 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_12_2;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_14;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class KeepAlive implements FallbackPacket {
-  private long id;
+public final class DefaultSpawnPositionPacket implements FallbackPacket {
+  private int x, y, z;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
-      byteBuf.writeLong(id);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-      writeVarInt(byteBuf, (int) id);
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.writeInt(x);
+      byteBuf.writeInt(y);
+      byteBuf.writeInt(z);
     } else {
-      byteBuf.writeInt((int) id);
+      final long encoded = protocolVersion.compareTo(MINECRAFT_1_14) < 0
+        ? ((x & 0x3FFFFFFL) << 38) | ((y & 0xFFFL) << 26) | (z & 0x3FFFFFFL)
+        : ((x & 0x3FFFFFFL) << 38) | ((y & 0x3FFFFFFL) << 12) | (z & 0xFFFL);
+
+      byteBuf.writeLong(encoded);
+
+      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
+        byteBuf.writeFloat(0f);
+      }
     }
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
-      id = byteBuf.readLong();
-    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-      id = readVarInt(byteBuf);
-    } else {
-      id = byteBuf.readInt();
-    }
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 }

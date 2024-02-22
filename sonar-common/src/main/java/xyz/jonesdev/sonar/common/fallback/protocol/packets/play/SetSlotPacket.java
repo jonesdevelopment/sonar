@@ -37,7 +37,7 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class SetSlot implements FallbackPacket {
+public final class SetSlotPacket implements FallbackPacket {
   private int windowId;
   private int slot;
   private int count;

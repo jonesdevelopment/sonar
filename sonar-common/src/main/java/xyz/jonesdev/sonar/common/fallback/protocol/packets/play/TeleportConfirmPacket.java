@@ -15,19 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets.login;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-public final class LoginAcknowledged implements FallbackPacket {
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
+
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public final class TeleportConfirmPacket implements FallbackPacket {
+  private int teleportId;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    teleportId = readVarInt(byteBuf);
   }
 }

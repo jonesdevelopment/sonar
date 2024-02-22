@@ -22,25 +22,32 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
+import xyz.jonesdev.sonar.common.utility.component.ComponentHolder;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class TeleportConfirm implements FallbackPacket {
-  private int teleportId;
+public final class DisconnectPacket implements FallbackPacket {
+  private @NotNull ComponentHolder componentHolder;
+  private boolean login;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    componentHolder.write(byteBuf, login ? ProtocolVersion.MINECRAFT_1_20_2 : protocolVersion);
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    teleportId = readVarInt(byteBuf);
+    throw new UnsupportedOperationException();
+  }
+
+  public static @NotNull DisconnectPacket create(final @NotNull Component component,
+                                                 final boolean login) {
+    return new DisconnectPacket(new ComponentHolder(component), login);
   }
 }

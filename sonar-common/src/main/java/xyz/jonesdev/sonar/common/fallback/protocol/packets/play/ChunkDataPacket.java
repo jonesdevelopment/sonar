@@ -36,7 +36,7 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class EmptyChunkData implements FallbackPacket {
+public final class ChunkDataPacket implements FallbackPacket {
   private int x, z;
 
   private static final byte[] SECTION_BYTES = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};

@@ -15,39 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.login;
 
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.utility.component.ComponentHolder;
 
-@Getter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public final class Disconnect implements FallbackPacket {
-  private @NotNull ComponentHolder componentHolder;
-  private boolean login;
+public final class LoginAcknowledgedPacket implements FallbackPacket {
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    componentHolder.write(byteBuf, login ? ProtocolVersion.MINECRAFT_1_20_2 : protocolVersion);
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
-  }
-
-  public static @NotNull Disconnect create(final @NotNull Component component,
-                                           final boolean login) {
-    return new Disconnect(new ComponentHolder(component), login);
   }
 }
