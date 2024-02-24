@@ -27,13 +27,14 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.Vector;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 
 @Getter
 public final class Notification implements Observable {
-  private final @NotNull Collection<String> subscribers = new Vector<>(0);
+  private final @NotNull Collection<UUID> subscribers = new Vector<>(0);
 
   public void sendAttackNotification() {
     // No need to do anything if we have no subscribers
@@ -65,8 +66,8 @@ public final class Notification implements Observable {
         .replace("%incoming-traffic-ttl%", statistics.getTotalIncomingBandwidthFormatted())
         .replace("%outgoing-traffic-ttl%", statistics.getTotalOutgoingBandwidthFormatted()));
     // Send the title and chat messages to all online players
-    for (final String subscriber : Sonar.get().getNotificationHandler().getSubscribers()) {
-      final Audience audience = Sonar.AUDIENCES.get(subscriber);
+    for (final UUID subscriber : Sonar.get().getNotificationHandler().getSubscribers()) {
+      final Audience audience = Sonar.get().audience(subscriber);
       if (audience == null) continue;
       audience.showTitle(title);
       audience.sendMessage(chat);

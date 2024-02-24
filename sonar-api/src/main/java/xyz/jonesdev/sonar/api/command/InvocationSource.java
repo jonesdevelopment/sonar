@@ -23,12 +23,13 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
+import java.util.UUID;
 import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
 public abstract class InvocationSource {
-  private final String name;
+  private final UUID uuid;
   private final Audience audience;
   private final boolean player;
   private final Predicate<String> permissionFunction;

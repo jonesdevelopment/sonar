@@ -25,7 +25,7 @@ import xyz.jonesdev.sonar.bungee.SonarBungee;
 
 public final class BungeeInvocationSource extends InvocationSource {
   public BungeeInvocationSource(final @NotNull CommandSender sender) {
-    super(sender.getName(),
+    super(sender instanceof ProxiedPlayer ? ((ProxiedPlayer) sender).getUniqueId() : null,
       SonarBungee.INSTANCE.getBungeeAudiences().sender(sender),
       sender instanceof ProxiedPlayer,
       sender::hasPermission);

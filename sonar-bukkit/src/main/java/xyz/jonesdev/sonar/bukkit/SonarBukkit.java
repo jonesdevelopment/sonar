@@ -19,18 +19,20 @@ package xyz.jonesdev.sonar.bukkit;
 
 import com.alessiodp.libby.BukkitLibraryManager;
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
-import xyz.jonesdev.sonar.bukkit.audience.AudienceListener;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
@@ -47,6 +49,14 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
    * Wrapper for Bukkit audiences
    */
   private final BukkitAudiences bukkitAudiences = BukkitAudiences.create(getPlugin());
+
+  @Override
+  public @NotNull Audience audience(final @Nullable UUID uniqueId) {
+    if (uniqueId == null) {
+      return bukkitAudiences.console();
+    }
+    return bukkitAudiences.player(uniqueId);
+  }
 
   /**
    * Create a wrapper for the plugin logger, so we can use it outside
@@ -80,9 +90,6 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
-
-    // Register audience register listener
-    getPlugin().getServer().getPluginManager().registerEvents(new AudienceListener(), getPlugin());
 
     // Register traffic service
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),

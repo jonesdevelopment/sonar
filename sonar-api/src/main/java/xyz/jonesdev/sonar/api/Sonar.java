@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api;
 
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
@@ -33,8 +34,7 @@ import xyz.jonesdev.sonar.api.verbose.Verbose;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 
 public interface Sonar {
   DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
@@ -43,7 +43,7 @@ public interface Sonar {
    * Since we want to use Adventure on every server platform,
    * we have to use their platform module to support BungeeCord and Bukkit
    */
-  Map<String, Audience> AUDIENCES = new ConcurrentHashMap<>();
+  @Nullable Audience audience(final @Nullable UUID uniqueId);
 
   /**
    * @return The platform the plugin is being run on

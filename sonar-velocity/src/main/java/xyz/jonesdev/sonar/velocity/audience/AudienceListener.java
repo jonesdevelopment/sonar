@@ -22,17 +22,17 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.velocity.SonarVelocity;
 
 public final class AudienceListener {
 
   @Subscribe(order = PostOrder.LAST)
   public void handle(final @NotNull PostLoginEvent event) {
-    Sonar.AUDIENCES.put(event.getPlayer().getUsername(), event.getPlayer());
+    SonarVelocity.AUDIENCES.put(event.getPlayer().getUniqueId(), event.getPlayer());
   }
 
   @Subscribe(order = PostOrder.LAST)
   public void handle(final @NotNull DisconnectEvent event) {
-    Sonar.AUDIENCES.remove(event.getPlayer().getUsername());
+    SonarVelocity.AUDIENCES.remove(event.getPlayer().getUniqueId());
   }
 }

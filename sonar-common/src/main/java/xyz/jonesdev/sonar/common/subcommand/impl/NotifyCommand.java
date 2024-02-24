@@ -31,13 +31,13 @@ public final class NotifyCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    if (SONAR.getNotificationHandler().isSubscribed(invocation.getSender().getName())) {
-      SONAR.getNotificationHandler().unsubscribe(invocation.getSender().getName());
+    if (SONAR.getNotificationHandler().isSubscribed(invocation.getSender().getUuid())) {
+      SONAR.getNotificationHandler().unsubscribe(invocation.getSender().getUuid());
       invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNotificationsUnsubscribed());
       return;
     }
 
     invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNotificationsSubscribed());
-    SONAR.getNotificationHandler().subscribe(invocation.getSender().getName());
+    SONAR.getNotificationHandler().subscribe(invocation.getSender().getUuid());
   }
 }

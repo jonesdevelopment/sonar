@@ -19,19 +19,21 @@ package xyz.jonesdev.sonar.bungee;
 
 import com.alessiodp.libby.BungeeLibraryManager;
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
-import xyz.jonesdev.sonar.bungee.audience.AudienceListener;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackInjectionHelper;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackLoginListener;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -47,6 +49,14 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
    * Wrapper for BungeeCord audiences
    */
   private final BungeeAudiences bungeeAudiences = BungeeAudiences.create(getPlugin());
+
+  @Override
+  public @NotNull Audience audience(final @Nullable UUID uniqueId) {
+    if (uniqueId == null) {
+      return bungeeAudiences.console();
+    }
+    return bungeeAudiences.player(uniqueId);
+  }
 
   /**
    * Create a wrapper for the plugin logger, so we can use it outside
@@ -83,9 +93,6 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     // Register Fallback listener
     getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new FallbackLoginListener());
-
-    // Register audience register listener
-    getPlugin().getServer().getPluginManager().registerListener(getPlugin(), new AudienceListener());
 
     // Register traffic service
     getPlugin().getServer().getScheduler().schedule(getPlugin(), CachedBandwidthStatistics::reset,

@@ -29,6 +29,7 @@ import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.Vector;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
@@ -36,7 +37,7 @@ import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
 
 @Getter
 public final class Verbose implements Observable {
-  private final @NotNull Collection<String> subscribers = new Vector<>(0);
+  private final @NotNull Collection<UUID> subscribers = new Vector<>(0);
   private int animationIndex;
 
   // Run action bar verbose
@@ -48,8 +49,8 @@ public final class Verbose implements Observable {
     // Prepare the action bar format component
     final Component component = prepareActionBarFormat();
     // Send the action bar to all online players
-    for (final String subscriber : subscribers) {
-      final Audience audience = Sonar.AUDIENCES.get(subscriber);
+    for (final UUID subscriber : subscribers) {
+      final Audience audience = Sonar.get().audience(subscriber);
       if (audience == null) continue;
       audience.sendActionBar(component);
     }

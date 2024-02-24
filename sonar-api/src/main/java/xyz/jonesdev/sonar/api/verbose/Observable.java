@@ -20,29 +20,30 @@ package xyz.jonesdev.sonar.api.verbose;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public interface Observable {
-  Collection<String> getSubscribers();
+  Collection<UUID> getSubscribers();
 
   /**
-   * @param name Name of the audience
+   * @param uuid UUID of the player
    * @return Whether the audience is subscribed or not
    */
-  default boolean isSubscribed(final @NotNull String name) {
-    return getSubscribers().contains(name);
+  default boolean isSubscribed(final @NotNull UUID uuid) {
+    return getSubscribers().contains(uuid);
   }
 
   /**
-   * @param name Name of the audience to subscribe
+   * @param uuid UUID of the player
    */
-  default void subscribe(final String name) {
-    getSubscribers().add(name);
+  default void subscribe(final UUID uuid) {
+    getSubscribers().add(uuid);
   }
 
   /**
-   * @param name Name of the audience to unsubscribe
+   * @param uuid UUID of the player
    */
-  default void unsubscribe(final String name) {
-    getSubscribers().remove(name);
+  default void unsubscribe(final UUID uuid) {
+    getSubscribers().remove(uuid);
   }
 }
