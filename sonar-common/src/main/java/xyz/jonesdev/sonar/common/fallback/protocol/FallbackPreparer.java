@@ -83,16 +83,11 @@ public class FallbackPreparer {
   public double maxFallDistance;
 
   public void prepare() {
-    joinGame = new JoinGamePacket(0,
+    joinGame = new JoinGamePacket(1,
       Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
-      0,
-      false,
-      0,
-      true,
-      true,
-      false,
-      new String[]{"minecraft:overworld"},
-      "minecraft:overworld");
+      0, false, 0,
+      true, false, false,
+      new String[]{"minecraft:overworld"}, "minecraft:overworld");
 
     maxFallDistance = 0;
     maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
