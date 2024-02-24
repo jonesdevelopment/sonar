@@ -19,7 +19,9 @@ package xyz.jonesdev.sonar.velocity;
 
 import com.alessiodp.libby.VelocityLibraryManager;
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
@@ -30,6 +32,9 @@ import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackInjectionHelper;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackLoginListener;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -41,6 +46,19 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
         plugin, plugin.getLogger(), plugin.getDataDirectory(), plugin.getServer().getPluginManager()),
       plugin.getDataDirectory().toFile(), SonarPlatform.VELOCITY);
     INSTANCE = this;
+  }
+
+  /**
+   * Custom wrapper for Velocity audiences
+   */
+  public static final Map<UUID, Audience> AUDIENCES = new ConcurrentHashMap<>();
+
+  @Override
+  public @Nullable Audience audience(final @Nullable UUID uniqueId) {
+    if (uniqueId == null) {
+      return getPlugin().getServer().getConsoleCommandSource();
+    }
+    return AUDIENCES.get(uniqueId);
   }
 
   /**
@@ -79,6 +97,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     // Register Fallback listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackLoginListener());
 
+    // TODO: find a proper way of handling Audiences on Velocity
     // Register audience register listener
     getPlugin().getServer().getEventManager().register(getPlugin(), new AudienceListener());
 

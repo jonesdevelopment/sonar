@@ -32,8 +32,8 @@ public final class VerboseCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    if (SONAR.getVerboseHandler().isSubscribed(invocation.getSender().getName())) {
-      SONAR.getVerboseHandler().unsubscribe(invocation.getSender().getName());
+    if (SONAR.getVerboseHandler().isSubscribed(invocation.getSender().getUuid())) {
+      SONAR.getVerboseHandler().unsubscribe(invocation.getSender().getUuid());
       invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerboseUnsubscribed());
       // Reset ActionBar component when unsubscribing
       invocation.getSender().getAudience().sendActionBar(Component.empty());
@@ -41,6 +41,6 @@ public final class VerboseCommand extends Subcommand {
     }
 
     invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerboseSubscribed());
-    SONAR.getVerboseHandler().subscribe(invocation.getSender().getName());
+    SONAR.getVerboseHandler().subscribe(invocation.getSender().getUuid());
   }
 }
