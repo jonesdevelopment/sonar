@@ -57,6 +57,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(0); // difficulty
       byteBuf.writeByte(0); // max players
       writeString(byteBuf, "flat"); // level type
+      return;
     }
 
     if (protocolVersion.inBetween(MINECRAFT_1_8, MINECRAFT_1_9)) {
@@ -66,6 +67,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(0); // max players
       writeString(byteBuf, "flat"); // level type
       byteBuf.writeBoolean(reducedDebugInfo);
+      return;
     }
 
     if (protocolVersion.inBetween(MINECRAFT_1_9_1, MINECRAFT_1_13_2)) {
@@ -75,6 +77,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(0); // max players
       writeString(byteBuf, "flat"); // level type
       byteBuf.writeBoolean(reducedDebugInfo);
+      return;
     }
 
     if (protocolVersion.inBetween(MINECRAFT_1_14, MINECRAFT_1_14_4)) {
@@ -84,6 +87,7 @@ public final class JoinGamePacket implements FallbackPacket {
       writeString(byteBuf, "flat"); // level type
       writeVarInt(byteBuf, viewDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
+      return;
     }
 
     if (protocolVersion.inBetween(MINECRAFT_1_15, MINECRAFT_1_15_2)) {
@@ -95,6 +99,7 @@ public final class JoinGamePacket implements FallbackPacket {
       writeVarInt(byteBuf, viewDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
+      return;
     }
 
     if (protocolVersion.inBetween(MINECRAFT_1_16, MINECRAFT_1_16_1)) {
@@ -111,6 +116,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(showRespawnScreen);
       byteBuf.writeBoolean(false); // debug type
       byteBuf.writeBoolean(false); // flat
+      return;
     }
 
     if (protocolVersion.inBetween(MINECRAFT_1_16_2, MINECRAFT_1_17_1)) {
@@ -128,6 +134,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(showRespawnScreen);
       byteBuf.writeBoolean(false); // debug type
       byteBuf.writeBoolean(false); // flat
+      return;
     }
 
     if (protocolVersion.inBetween(MINECRAFT_1_18, MINECRAFT_1_18_2)) {
@@ -151,6 +158,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(showRespawnScreen);
       byteBuf.writeBoolean(false); // debug type
       byteBuf.writeBoolean(false); // flat
+      return;
     }
 
     if (protocolVersion.inBetween(MINECRAFT_1_19, MINECRAFT_1_19_4)) {
@@ -178,6 +186,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(false); // debug type
       byteBuf.writeBoolean(false); // flat
       byteBuf.writeBoolean(false); // no last death location
+      return;
     }
 
     if (protocolVersion.equals(MINECRAFT_1_20)) {
@@ -198,6 +207,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(false); // flat
       byteBuf.writeBoolean(false); // no last death location
       writeVarInt(byteBuf, 0);
+      return;
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0) {
