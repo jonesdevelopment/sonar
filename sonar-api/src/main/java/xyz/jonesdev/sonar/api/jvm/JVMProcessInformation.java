@@ -26,7 +26,7 @@ import java.lang.management.ManagementFactory;
 public class JVMProcessInformation {
   private final Runtime RUNTIME = Runtime.getRuntime();
   private final OperatingSystemMXBean MX = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-  private final char[] MEMORY_UNITS = {'k', 'M', 'G', 'T', 'P', 'E'};
+  private final char[] MEMORY_UNITS = {'K', 'M', 'G', 'T', 'P', 'E'};
 
   public String formatMemory(final long size) {
     if (size < 1024L) {
@@ -35,7 +35,8 @@ public class JVMProcessInformation {
     final int group = (63 - Long.numberOfLeadingZeros(size)) / 10;
     final double formattedSize = (double) size / (1L << (group * 10));
     final char unit = MEMORY_UNITS[group - 1];
-    return String.format("%.1f %sB", formattedSize, unit);
+    // https://en.wikipedia.org/wiki/Byte#Multiple-byte_units
+    return String.format("%.1f %siB", formattedSize, unit);
   }
 
   public int getVirtualCores() {
