@@ -19,6 +19,8 @@ package xyz.jonesdev.sonar.common.boot;
 
 import com.alessiodp.libby.LibraryManager;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.j256.ormlite.logger.Level;
+import com.j256.ormlite.logger.Logger;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -77,6 +79,8 @@ public abstract class SonarBootstrap<T> implements Sonar {
     this.notificationHandler = new Notification();
     this.config = new SonarConfiguration(dataDirectory);
     this.subcommandRegistry = new SubcommandRegistryHolder();
+    // Hide unnecessary debug information
+    Logger.setGlobalLogLevel(Level.WARNING);
   }
 
   public final void initialize() {
@@ -122,8 +126,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Warn player if they reloaded and changed the database type
     if (verifiedPlayerController != null
       && verifiedPlayerController.getCachedDatabaseType() != getConfig().getDatabase().getType()) {
-      getLogger().warn("Reloading the server after changing the database type"
-        + " is generally not recommended as it can sometimes cause data loss.");
+      getLogger().warn("Reloading after changing the database type is not recommended as it may cause data loss.");
     }
 
     // Prepare cached packets
