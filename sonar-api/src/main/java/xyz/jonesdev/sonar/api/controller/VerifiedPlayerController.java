@@ -20,6 +20,8 @@ package xyz.jonesdev.sonar.api.controller;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcSingleConnectionSource;
+import com.j256.ormlite.logger.Level;
+import com.j256.ormlite.logger.Logger;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -79,6 +81,9 @@ public final class VerifiedPlayerController {
       LOGGER.warn("Configure a database to save verified players.");
       return;
     }
+
+    // Hide unnecessary debug information
+    Logger.setGlobalLogLevel(Level.WARNING);
 
     try (final ConnectionSource connectionSource = setupDriverAndConnect()) {
       this.connectionSource = connectionSource;
