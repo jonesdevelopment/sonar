@@ -39,7 +39,7 @@ attack-tracker:
 # Note: IP addresses are saved in plain text. You are responsible for keeping your database safe!
 database:
   # Type of database Sonar uses to store verified players
-  # Possible types: NONE, MYSQL
+  # Possible types: NONE, MYSQL, MARIADB
   type: NONE
   # Host address for authenticating with the SQL database
   host: localhost

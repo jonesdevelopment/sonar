@@ -37,7 +37,7 @@ attack-tracker:
 # Beachte: IP adressen werden im Klartext gespeichert. Du bist für die Sicherheit der Datenbank verantwortlich
 database:
   # Typ von Datenbank die Sonar verwenden soll um verifizierte Spielerdaten zu speichern
-  # Mögliche Typen: NONE, MYSQL
+  # Mögliche Typen: NONE, MYSQL, MARIADB
   type: NONE
   # HOST für die Authentifizierung mit der SQL Datenbank
   host: localhost
