@@ -17,6 +17,9 @@
 
 package xyz.jonesdev.sonar.api.config;
 
+import com.j256.ormlite.db.DatabaseType;
+import com.j256.ormlite.jdbc.db.MariaDbDatabaseType;
+import com.j256.ormlite.jdbc.db.MysqlDatabaseType;
 import lombok.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -557,10 +560,15 @@ public final class SonarConfiguration {
     @Getter
     @RequiredArgsConstructor
     public enum Type {
-      MYSQL("com.mysql.cj.jdbc.NonRegisteringDriver"),
-      NONE(null);
+      MYSQL("com.mysql.cj.jdbc.NonRegisteringDriver",
+        "jdbc:mysql://%s:%d/%s", new MysqlDatabaseType()),
+      MARIADB("org.mariadb.jdbc.Driver",
+        "jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseType()),
+      NONE(null, null, null);
 
       private final String driverClassName;
+      private final String connectionString;
+      private final DatabaseType databaseType;
     }
 
     private Type type;

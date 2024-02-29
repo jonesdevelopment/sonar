@@ -120,9 +120,8 @@ public final class VerifiedPlayerController {
     final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
 
     // Prepare the JDBC connection string
-    // TODO: automatically build best connection string for database type
-    final String jdbcURL = String.format("jdbc:%s://%s:%d/%s",
-      database.getType().name().toLowerCase(), database.getHost(), database.getPort(), database.getName());
+    final String jdbcURL = String.format(database.getType().getConnectionString(),
+      database.getHost(), database.getPort(), database.getName());
 
     // Use reflection to uncover the driver class
     final Class<?> driverClass = Class.forName(database.getType().getDriverClassName());
@@ -133,7 +132,8 @@ public final class VerifiedPlayerController {
     credentials.put("password", database.getPassword());
 
     // Return new JDBC connection instance for our controller to handle
-    return new JdbcSingleConnectionSource(jdbcURL, invoke(jdbcURL, driverClass, credentials));
+    return new JdbcSingleConnectionSource(
+      jdbcURL, database.getType().getDatabaseType(), invoke(jdbcURL, driverClass, credentials));
   }
 
   /**
