@@ -40,7 +40,7 @@ attack-tracker:
 # Nicméně, IP adresy nemůžou být vystopovány zpátky k hráči, protože Sonar používá UUID na ukládní místo jmeno hráčů
 database:
   # Typy datábázi se kterýma Sonar bude pracovat
-  # Typy: NONE, MYSQL (Žádný, MYSQL)
+  # Typy: NONE, MYSQL, MARIADB
   type: NONE
   # Host adresa pro verifikování hráčů s SQL databází
   host: localhost

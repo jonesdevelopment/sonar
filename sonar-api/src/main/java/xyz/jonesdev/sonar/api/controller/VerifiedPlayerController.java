@@ -19,7 +19,7 @@ package xyz.jonesdev.sonar.api.controller;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.jdbc.JdbcSingleConnectionSource;
+import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -32,9 +32,9 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
-import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.sql.*;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -71,8 +71,9 @@ public final class VerifiedPlayerController {
   private final @NotNull SonarConfiguration.Database.Type cachedDatabaseType;
 
   public VerifiedPlayerController() {
+    final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
     // Cache selected database type, so we don't need to call Sonar.get() every time
-    cachedDatabaseType = Sonar.get().getConfig().getDatabase().getType();
+    cachedDatabaseType = database.getType();
 
     // Don't establish a database connection if the type is NONE
     if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
@@ -80,8 +81,11 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    try (final ConnectionSource connectionSource = setupDriverAndConnect()) {
-      this.connectionSource = connectionSource;
+    try {
+      connectionSource = new JdbcPooledConnectionSource(
+        String.format(database.getType().getConnectionString(),
+          database.getHost(), database.getPort(), database.getName()),
+        database.getUsername(), database.getPassword(), database.getType().getDatabaseType());
 
       // Create table
       try {
@@ -98,83 +102,38 @@ public final class VerifiedPlayerController {
       // Make sure to run the clean task and the caching task in the same thread
       // https://github.com/jonesdevelopment/sonar/issues/150
       DB_UPDATE_SERVICE.execute(() -> {
-        // Make sure to clear all outdated entries first
-        clearOld(Sonar.get().getConfig().getDatabase().getMaximumAge());
-        // Add all entries from the database to the cache
         try {
+          // Make sure to clear all outdated entries first
+          clearOld(database.getMaximumAge());
+          // Add all entries from the database to the cache
           dao.queryForAll().forEach(this::_add);
         } catch (SQLException exception) {
-          LOGGER.error("Could not cache entries: {}", exception);
+          LOGGER.error("Error initializing database: {}", exception);
         }
       });
-    } catch (Throwable throwable) {
-      LOGGER.error("Error setting up database: {}", throwable);
-      throwable.printStackTrace(System.err);
+    } catch (SQLException exception) {
+      LOGGER.error("Error setting up database: {}", exception);
     }
-  }
-
-  /**
-   * Automatically sets up the database connection using the configured credentials
-   */
-  private static @NotNull ConnectionSource setupDriverAndConnect() throws Throwable {
-    final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
-
-    // Prepare the JDBC connection string
-    // TODO: automatically build best connection string for database type
-    final String jdbcURL = String.format("jdbc:%s://%s:%d/%s",
-      database.getType().name().toLowerCase(), database.getHost(), database.getPort(), database.getName());
-
-    // Use reflection to uncover the driver class
-    final Class<?> driverClass = Class.forName(database.getType().getDriverClassName());
-
-    // Make sure we send the username and password
-    final Properties credentials = new Properties();
-    credentials.put("user", database.getUsername());
-    credentials.put("password", database.getPassword());
-
-    // Return new JDBC connection instance for our controller to handle
-    return new JdbcSingleConnectionSource(jdbcURL, invoke(jdbcURL, driverClass, credentials));
-  }
-
-  /**
-   * Uses reflection to load the database driver from the injected library
-   *
-   * @param connectionString URL of the database
-   * @param driverClass      Class of the database driver
-   * @param credentials      Credentials for the database
-   */
-  private static Connection invoke(final @NotNull String connectionString,
-                                   final @NotNull Class<?> driverClass,
-                                   final @NotNull Properties credentials) throws Throwable {
-    final Object driver = driverClass.getDeclaredConstructor().newInstance();
-    DriverManager.registerDriver((Driver) driver);
-    final Method connect = driverClass.getDeclaredMethod("connect", String.class, Properties.class);
-    connect.setAccessible(true);
-    return (Connection) connect.invoke(driver, connectionString, credentials);
   }
 
   /**
    * Clear all old entries using the given timestamp.
    */
-  private void clearOld(final @Range(from = 1, to = 365) int maximumAge) {
-    try {
-      final long timestamp = Instant.now()
-        .minus(maximumAge, ChronoUnit.DAYS)
-        .getEpochSecond() * 1000L; // convert to ms
+  private void clearOld(final @Range(from = 1, to = 365) int maximumAge) throws SQLException {
+    final long timestamp = Instant.now()
+      .minus(maximumAge, ChronoUnit.DAYS)
+      .getEpochSecond() * 1000L; // convert to ms
 
-      final List<VerifiedPlayer> oldEntries = queryBuilder.where()
-        .lt("timestamp", new Timestamp(timestamp))
-        .query();
+    final List<VerifiedPlayer> oldEntries = queryBuilder.where()
+      .lt("timestamp", new Timestamp(timestamp))
+      .query();
 
-      if (oldEntries != null) {
-        for (final VerifiedPlayer player : oldEntries) {
-          dao.delete(player);
-        }
-        LOGGER.info("Removed {} database entries older than {} days.",
-          oldEntries.size(), maximumAge);
+    if (oldEntries != null) {
+      for (final VerifiedPlayer player : oldEntries) {
+        dao.delete(player);
       }
-    } catch (SQLException exception) {
-      LOGGER.error("Error trying to clear old entries: {}", exception);
+      LOGGER.info("Removed {} database entries older than {} days.",
+        oldEntries.size(), maximumAge);
     }
   }
 
