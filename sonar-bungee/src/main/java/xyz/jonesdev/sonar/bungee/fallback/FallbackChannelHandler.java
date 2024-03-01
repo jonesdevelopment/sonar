@@ -96,6 +96,13 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     if (handshake.getHost().isEmpty()) {
       throw new CorruptedFrameException("Hostname is empty");
     }
+    // Connections from unknown protocol versions will be discarded
+    // as this is the safest way of handling unwanted connections
+    if (protocolVersion.isUnknown()) {
+      // Sonar does NOT support snapshots or unknown versions;
+      // I'll try my best to stay up-to-date!
+      throw new CorruptedFrameException("Unknown protocol");
+    }
     // Store the protocol version
     protocolVersion = ProtocolVersion.fromId(handshake.getProtocolVersion());
     // Hook the traffic listener
