@@ -373,7 +373,7 @@ public enum FallbackPacketRegistry {
     PacketRegistry() {
       final Map<ProtocolVersion, ProtocolRegistry> mutableVersions = new EnumMap<>(ProtocolVersion.class);
       for (final ProtocolVersion version : ProtocolVersion.values()) {
-        if (!version.isLegacy() && !version.isUnknown()) {
+        if (!version.isUnknown()) {
           mutableVersions.put(version, new ProtocolRegistry(version));
         }
       }

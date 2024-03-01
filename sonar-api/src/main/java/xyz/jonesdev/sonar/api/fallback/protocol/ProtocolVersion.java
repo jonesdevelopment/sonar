@@ -20,13 +20,15 @@ package xyz.jonesdev.sonar.api.fallback.protocol;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
 public enum ProtocolVersion {
   UNKNOWN(-1),
-  LEGACY(-2),
   MINECRAFT_1_7_2(4),
   MINECRAFT_1_7_6(5),
   MINECRAFT_1_8(47),
@@ -70,10 +72,8 @@ public enum ProtocolVersion {
 
   private final int protocol;
 
-  public static final ProtocolVersion MINIMUM_VERSION = MINECRAFT_1_7_2;
   public static final ProtocolVersion LATEST_VERSION;
   public static final Map<Integer, ProtocolVersion> ID_TO_PROTOCOL_CONSTANT;
-  public static final Set<ProtocolVersion> SUPPORTED_VERSIONS;
 
   static {
     {
@@ -90,12 +90,11 @@ public enum ProtocolVersion {
       final Set<ProtocolVersion> versions = EnumSet.noneOf(ProtocolVersion.class);
 
       for (final ProtocolVersion value : values()) {
-        if (!value.isUnknown() && !value.isLegacy()) {
+        if (!value.isUnknown()) {
           versions.add(value);
         }
       }
 
-      SUPPORTED_VERSIONS = Collections.unmodifiableSet(versions);
       LATEST_VERSION = (ProtocolVersion) versions.toArray()[versions.size() - 1];
     }
   }
@@ -110,10 +109,5 @@ public enum ProtocolVersion {
 
   public boolean isUnknown() {
     return this == UNKNOWN;
-  }
-
-  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  public boolean isLegacy() {
-    return this == LEGACY;
   }
 }
