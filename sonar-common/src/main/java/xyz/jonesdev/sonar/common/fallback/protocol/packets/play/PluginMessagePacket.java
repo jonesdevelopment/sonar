@@ -42,17 +42,17 @@ public final class PluginMessagePacket extends DeferredByteBufHolder implements 
 
   @Override
   public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 8;
+    return 4;
   }
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 0xfff + 1; // limit packet size to 4096
+    return 0xFFF; // strict size limit
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    channel = readString(byteBuf);
+    channel = readString(byteBuf, 512);
 
     if (protocolVersion.compareTo(MINECRAFT_1_13) >= 0) {
       channel = transformLegacyToModernChannel(channel);
