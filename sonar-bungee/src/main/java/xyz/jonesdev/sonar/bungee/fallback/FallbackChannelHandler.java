@@ -97,6 +97,8 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     if (handshake.getHost().isEmpty()) {
       throw new CorruptedFrameException("Hostname is empty");
     }
+    // Store the protocol version
+    protocolVersion = ProtocolVersion.fromId(handshake.getProtocolVersion());
     // Connections from unknown protocol versions will be discarded
     // as this is the safest way of handling unwanted connections
     if (protocolVersion.isUnknown()) {
@@ -104,8 +106,6 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
       // I'll try my best to stay up-to-date!
       throw new CorruptedFrameException("Unknown protocol");
     }
-    // Store the protocol version
-    protocolVersion = ProtocolVersion.fromId(handshake.getProtocolVersion());
     // Hook the traffic listener
     // TODO: Can we implement this in channelActive?
     channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
