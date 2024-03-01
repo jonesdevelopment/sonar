@@ -77,6 +77,13 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     }
     // Store the protocol version
     protocolVersion = ProtocolVersion.fromId(handshake.getProtocolVersion().getProtocol());
+    // Connections from unknown protocol versions will be discarded
+    // as this is the safest way of handling unwanted connections
+    if (protocolVersion.isUnknown()) {
+      // Sonar does NOT support snapshots or unknown versions;
+      // I'll try my best to stay up-to-date!
+      throw new CorruptedFrameException("Unknown protocol");
+    }
     // Store the handshake packet
     handshakePacket = handshake;
     // Hook the traffic listener
