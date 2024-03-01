@@ -24,15 +24,18 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class GlobalSonarStatistics implements SonarStatistics {
-  private static final Cache<Long, Byte> LOGINS_PER_SECOND = Caffeine.newBuilder()
+  private static final Cache<Integer, Byte> LOGINS_PER_SECOND = Caffeine.newBuilder()
     .expireAfterWrite(Duration.ofSeconds(1))
     .build();
 
-  private static final Cache<Long, Byte> CONNECTIONS_PER_SECOND = Caffeine.newBuilder()
+  private static final Cache<Integer, Byte> CONNECTIONS_PER_SECOND = Caffeine.newBuilder()
     .expireAfterWrite(Duration.ofSeconds(1))
     .build();
+
+  private static final AtomicInteger ACTION_COUNTER = new AtomicInteger(Integer.MIN_VALUE);
 
   /**
    * Helper methods that make it easier to count new statistics
@@ -40,12 +43,12 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @ApiStatus.Internal
   public static void countConnection() {
-    CONNECTIONS_PER_SECOND.put(System.nanoTime(), (byte) 0);
+    CONNECTIONS_PER_SECOND.put(ACTION_COUNTER.getAndIncrement(), (byte) 0);
   }
 
   @ApiStatus.Internal
   public static void countLogin() {
-    LOGINS_PER_SECOND.put(System.nanoTime(), (byte) 0);
+    LOGINS_PER_SECOND.put(ACTION_COUNTER.getAndIncrement(), (byte) 0);
     totalJoinedPlayers++;
   }
 
