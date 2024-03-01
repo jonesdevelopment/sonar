@@ -101,42 +101,44 @@ public final class AttackTracker {
         Sonar.get().getEventManager().publish(new AttackMitigatedEvent(currentAttack));
 
         if (++attackThreshold > Sonar.get().getConfig().getMinAttackThreshold()) {
-          // Save attack statistics
-          final long deltaInMillis = currentAttack.duration.delay();
-          final String peakCPU = Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage);
-          final String peakMem = formatMemory(currentAttack.peakProcessMemoryUsage);
-          final String peakBPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond);
-          final String peakCPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakConnectionsPerSecond);
-          final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
-          final double seconds = (deltaInMillis % (60 * 1000)) / 1000D; // Convert remaining milliseconds to seconds
-          final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
-          final String startTimestamp = String.valueOf(currentAttack.duration.getStart() / 1000L);
-          final String endTimestamp = String.valueOf(System.currentTimeMillis() / 1000L);
-          final long blacklisted = Sonar.get().getFallback().getBlacklist().estimatedSize();
-          // Calculate during-attack-statistics using their deltas
-          final long totalVerified = Sonar.get().getVerifiedPlayerController().estimatedSize();
-          final long verified = Math.max(totalVerified - currentAttack.successfulVerifications, 0);
-          final long totalFailed = Sonar.get().getStatistics().getTotalFailedVerifications();
-          final long failed = Math.max(totalFailed - currentAttack.failedVerifications, 0);
-
           // Post webhook to Discord
           Optional.ofNullable(Sonar.get().getConfig().getWebhook().getDiscordWebhook())
-            .ifPresent(webhook -> webhook.post(() -> {
-              final SonarConfiguration.Webhook.Embed config = Sonar.get().getConfig().getWebhook().getEmbed();
-              final String description = config.getDescription()
-                .replace("%start-timestamp%", startTimestamp)
-                .replace("%end-timestamp%", endTimestamp)
-                .replace("%duration%", formattedDuration)
-                .replace("%peak-cpu%", peakCPU)
-                .replace("%peak-memory%", peakMem)
-                .replace("%peak-bps%", peakBPS)
-                .replace("%peak-cps%", peakCPS)
-                .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(blacklisted))
-                .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(failed))
-                .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(verified));
-              return new SonarConfiguration.Webhook.Embed(
-                config.getTitle(), config.getTitleUrl(), description, config.getR(), config.getG(), config.getB());
-            }));
+            .ifPresent(webhook -> {
+              // Save attack statistics
+              final long deltaInMillis = currentAttack.duration.delay();
+              final String peakCPU = Sonar.DECIMAL_FORMAT.format(currentAttack.peakProcessCPUUsage);
+              final String peakMem = formatMemory(currentAttack.peakProcessMemoryUsage);
+              final String peakBPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakJoinsPerSecond);
+              final String peakCPS = Sonar.DECIMAL_FORMAT.format(currentAttack.peakConnectionsPerSecond);
+              final long minutes = deltaInMillis / (60 * 1000); // Convert milliseconds to minutes
+              final double seconds = (deltaInMillis % (60 * 1000)) / 1000D; // Convert remaining milliseconds to seconds
+              final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
+              final String startTimestamp = String.valueOf(currentAttack.duration.getStart() / 1000L);
+              final String endTimestamp = String.valueOf(System.currentTimeMillis() / 1000L);
+              final long blacklisted = Sonar.get().getFallback().getBlacklist().estimatedSize();
+              // Calculate during-attack-statistics using their deltas
+              final long totalVerified = Sonar.get().getVerifiedPlayerController().estimatedSize();
+              final long verified = Math.max(totalVerified - currentAttack.successfulVerifications, 0);
+              final long totalFailed = Sonar.get().getStatistics().getTotalFailedVerifications();
+              final long failed = Math.max(totalFailed - currentAttack.failedVerifications, 0);
+
+              webhook.post(() -> {
+                final SonarConfiguration.Webhook.Embed config = Sonar.get().getConfig().getWebhook().getEmbed();
+                final String description = config.getDescription()
+                  .replace("%start-timestamp%", startTimestamp)
+                  .replace("%end-timestamp%", endTimestamp)
+                  .replace("%duration%", formattedDuration)
+                  .replace("%peak-cpu%", peakCPU)
+                  .replace("%peak-memory%", peakMem)
+                  .replace("%peak-bps%", peakBPS)
+                  .replace("%peak-cps%", peakCPS)
+                  .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(blacklisted))
+                  .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(failed))
+                  .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(verified));
+                return new SonarConfiguration.Webhook.Embed(
+                  config.getTitle(), config.getTitleUrl(), description, config.getR(), config.getG(), config.getB());
+              });
+            });
         }
 
         // Reset the attack status
