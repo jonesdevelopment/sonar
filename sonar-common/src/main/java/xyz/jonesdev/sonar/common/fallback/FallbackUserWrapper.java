@@ -44,8 +44,7 @@ import java.net.InetAddress;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 
 @Getter
 @ToString(of = {"protocolVersion", "inetAddress"})
@@ -128,7 +127,7 @@ public final class FallbackUserWrapper implements FallbackUser {
   }
 
   @Override
-  public void fail(@Nullable String reason) {
+  public void fail(final @Nullable String reason) {
     if (channel.isActive()) {
       disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
 
@@ -236,6 +235,19 @@ public final class FallbackUserWrapper implements FallbackUser {
       closeWith(channel, protocolVersion, packet);
     } else {
       channel.close();
+    }
+  }
+
+  /**
+   * Removes Sonar's pipelines from a channel to save
+   * unnecessary RAM and CPU usage
+   *
+   * @param pipeline Pipeline object of the channel
+   */
+  public static void deject(final @NotNull ChannelPipeline pipeline) {
+    // Remove Sonar's pipelines if they exist
+    if (pipeline.get(FALLBACK_HANDLER) != null) {
+      pipeline.remove(FALLBACK_HANDLER);
     }
   }
 }

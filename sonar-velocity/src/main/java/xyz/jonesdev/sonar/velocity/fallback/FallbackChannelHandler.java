@@ -41,6 +41,7 @@ import java.util.UUID;
 import static com.velocitypowered.proxy.network.Connections.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
+import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.deject;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter {
@@ -115,12 +116,14 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     // Don't continue the verification process if the verification is disabled
     if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
       ctx.fireChannelRead(serverLogin);
+      deject(channel.pipeline());
       return;
     }
 
     // Completely skip Geyser connections
     if (GeyserUtil.isGeyserConnection(channel, socketAddress)) {
       ctx.fireChannelRead(serverLogin);
+      deject(channel.pipeline());
       return;
     }
 
@@ -150,6 +153,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     final UUID offlineUUID = UUID.nameUUIDFromBytes(offlineUUIDString.getBytes(StandardCharsets.UTF_8));
     if (Sonar.get().getVerifiedPlayerController().has(inetAddress, offlineUUID)) {
       ctx.fireChannelRead(serverLogin);
+      deject(channel.pipeline());
       return;
     }
 
@@ -163,6 +167,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols()
       .contains(protocolVersion.getProtocol())) {
       ctx.fireChannelRead(serverLogin);
+      deject(channel.pipeline());
       return;
     }
 
