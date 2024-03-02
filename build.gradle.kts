@@ -80,6 +80,8 @@ tasks {
     relocate("com.google.gson", "xyz.jonesdev.sonar.libs.gson")
     relocate("com.j256.ormlite", "xyz.jonesdev.sonar.libs.ormlite")
     relocate("com.github.benmanes.caffeine", "xyz.jonesdev.sonar.libs.caffeine")
+    relocate("com.mysql", "xyz.jonesdev.sonar.libs.mysql")
+    relocate("org.mariadb", "xyz.jonesdev.sonar.libs.mariadb")
 
     // TODO: actually fix this :/
     // We have to be careful here, so we don't accidentally break adventure
