@@ -81,6 +81,9 @@ public final class VerifiedPlayerController {
       return;
     }
 
+    // Initialize MySQL/MariaDB driver
+    database.getType().getDatabaseType().loadDriver();
+
     try {
       connectionSource = new JdbcPooledConnectionSource(
         String.format(database.getType().getConnectionString(),

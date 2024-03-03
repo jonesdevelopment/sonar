@@ -18,8 +18,6 @@
 package xyz.jonesdev.sonar.api.config;
 
 import com.j256.ormlite.db.DatabaseType;
-import com.j256.ormlite.jdbc.db.MariaDbDatabaseType;
-import com.j256.ormlite.jdbc.db.MysqlDatabaseType;
 import lombok.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -28,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.api.ormlite.MariaDbDatabaseTypeAdapter;
+import xyz.jonesdev.sonar.api.ormlite.MysqlDatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.io.File;
@@ -560,13 +560,10 @@ public final class SonarConfiguration {
     @Getter
     @RequiredArgsConstructor
     public enum Type {
-      MYSQL("com.mysql.cj.jdbc.NonRegisteringDriver",
-        "jdbc:mysql://%s:%d/%s", new MysqlDatabaseType()),
-      MARIADB("org.mariadb.jdbc.Driver",
-        "jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseType()),
-      NONE(null, null, null);
+      MYSQL("jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter()),
+      MARIADB("jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter()),
+      NONE(null, null);
 
-      private final String driverClassName;
       private final String connectionString;
       private final DatabaseType databaseType;
     }

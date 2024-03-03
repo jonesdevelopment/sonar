@@ -61,12 +61,14 @@ class LibraryLoader {
         .groupId("com{}mysql")
         .artifactId("mysql-connector-j")
         .version("8.3.0")
+        .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
         .build(),
       // MariaDB driver
       Library.builder()
         .groupId("org{}mariadb{}jdbc")
         .artifactId("mariadb-java-client")
         .version("3.3.3")
+        .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
         .build()
     );
   }
