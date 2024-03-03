@@ -20,6 +20,8 @@ package xyz.jonesdev.sonar.velocity;
 import com.alessiodp.libby.VelocityLibraryManager;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
+import org.bstats.charts.SimplePie;
+import org.bstats.velocity.Metrics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -89,7 +91,13 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
   public void enable() {
 
     // Initialize bStats.org metrics
-    getPlugin().getMetricsFactory().make(getPlugin(), getPlatform().getMetricsId());
+    final Metrics metrics = getPlugin().getMetricsFactory().make(getPlugin(), getPlatform().getMetricsId());
+
+    // Add charts for some configuration options
+    metrics.addCustomChart(new SimplePie("Verification timing",
+      () -> getConfig().getVerification().getTiming().getDisplayName()));
+    metrics.addCustomChart(new SimplePie("Map CAPTCHA timing",
+      () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
 
     // Register Sonar command
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
