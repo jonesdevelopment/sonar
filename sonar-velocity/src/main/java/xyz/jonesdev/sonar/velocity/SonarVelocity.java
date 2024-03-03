@@ -91,7 +91,6 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
   @Override
   public void enable() {
-
     // Initialize bStats.org metrics
     metrics = getPlugin().getMetricsFactory().make(getPlugin(), getPlatform().getMetricsId());
 

@@ -87,7 +87,6 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
   @Override
   public void enable() {
-
     // Initialize bStats.org metrics
     metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
 
@@ -115,7 +114,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
   @Override
   public void disable() {
-    // Shutdown metrics
+    // Make sure to properly shutdown bStats metrics
     metrics.shutdown();
   }
 }

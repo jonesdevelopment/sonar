@@ -87,7 +87,6 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
   @Override
   public void enable() {
-
     // Initialize bStats.org metrics
     metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
 
@@ -121,7 +120,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
   @Override
   public void disable() {
-    // Shutdown metrics
+    // Make sure to properly shutdown bStats metrics
     metrics.shutdown();
   }
 }
