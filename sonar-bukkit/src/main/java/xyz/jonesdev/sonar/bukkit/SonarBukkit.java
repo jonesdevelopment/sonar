@@ -22,6 +22,7 @@ import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -82,11 +83,18 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     }
   };
 
+  private Metrics metrics;
+
   @Override
   public void enable() {
-
     // Initialize bStats.org metrics
-    new Metrics(getPlugin(), getPlatform().getMetricsId());
+    metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
+
+    // Add charts for some configuration options
+    metrics.addCustomChart(new SimplePie("verification",
+      () -> getConfig().getVerification().getTiming().getDisplayName()));
+    metrics.addCustomChart(new SimplePie("captcha",
+      () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
 
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
@@ -102,5 +110,11 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     // Register verbose service
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
       Sonar.get().getVerboseHandler()::update, 4L, 4L);
+  }
+
+  @Override
+  public void disable() {
+    // Make sure to properly shutdown bStats metrics
+    metrics.shutdown();
   }
 }

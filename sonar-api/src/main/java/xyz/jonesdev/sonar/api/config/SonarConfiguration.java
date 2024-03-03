@@ -420,8 +420,13 @@ public final class SonarConfiguration {
     private Timing timing;
 
     @Getter
+    @RequiredArgsConstructor
     public enum Timing {
-      ALWAYS, DURING_ATTACK, NEVER
+      ALWAYS("Always"),
+      DURING_ATTACK("During Attack"),
+      NEVER("Never");
+
+      private final String displayName;
     }
 
     private final Map map = new Map();

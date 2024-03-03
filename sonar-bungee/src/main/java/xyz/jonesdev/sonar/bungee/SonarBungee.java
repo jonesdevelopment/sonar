@@ -22,6 +22,7 @@ import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import org.bstats.bungeecord.Metrics;
+import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -82,11 +83,18 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     }
   };
 
+  private Metrics metrics;
+
   @Override
   public void enable() {
-
     // Initialize bStats.org metrics
-    new Metrics(getPlugin(), getPlatform().getMetricsId());
+    metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
+
+    // Add charts for some configuration options
+    metrics.addCustomChart(new SimplePie("verification",
+      () -> getConfig().getVerification().getTiming().getDisplayName()));
+    metrics.addCustomChart(new SimplePie("captcha",
+      () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
 
     // Register Sonar command
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());
@@ -108,5 +116,11 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     // Make sure to inject into the server's connection handler
     FallbackInjectionHelper.inject();
+  }
+
+  @Override
+  public void disable() {
+    // Make sure to properly shutdown bStats metrics
+    metrics.shutdown();
   }
 }
