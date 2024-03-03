@@ -83,11 +83,13 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     }
   };
 
+  private Metrics metrics;
+
   @Override
   public void enable() {
 
     // Initialize bStats.org metrics
-    final Metrics metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
+    metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
 
     // Add charts for some configuration options
     metrics.addCustomChart(new SimplePie("verification",
@@ -109,5 +111,11 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     // Register verbose service
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
       Sonar.get().getVerboseHandler()::update, 4L, 4L);
+  }
+
+  @Override
+  public void disable() {
+    // Shutdown metrics
+    metrics.shutdown();
   }
 }

@@ -83,11 +83,13 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     }
   };
 
+  private Metrics metrics;
+
   @Override
   public void enable() {
 
     // Initialize bStats.org metrics
-    final Metrics metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
+    metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
 
     // Add charts for some configuration options
     metrics.addCustomChart(new SimplePie("verification",
@@ -115,5 +117,11 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     // Make sure to inject into the server's connection handler
     FallbackInjectionHelper.inject();
+  }
+
+  @Override
+  public void disable() {
+    // Shutdown metrics
+    metrics.shutdown();
   }
 }

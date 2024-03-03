@@ -120,6 +120,21 @@ public final class VerifiedPlayerController {
   }
 
   /**
+   * Closes the connection if instantiated
+   */
+  public void close() {
+    // The connection source will always be null if the database type is NONE.
+    if (connectionSource != null) {
+      try {
+        // Properly close the connection
+        connectionSource.close();
+      } catch (Exception exception) {
+        LOGGER.error("Error closing database: {}", exception);
+      }
+    }
+  }
+
+  /**
    * Clear all old entries using the given timestamp.
    */
   private void clearOld(final @Range(from = 1, to = 365) int maximumAge) throws SQLException {

@@ -87,11 +87,13 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     }
   };
 
+  private Metrics metrics;
+
   @Override
   public void enable() {
 
     // Initialize bStats.org metrics
-    final Metrics metrics = getPlugin().getMetricsFactory().make(getPlugin(), getPlatform().getMetricsId());
+    metrics = getPlugin().getMetricsFactory().make(getPlugin(), getPlatform().getMetricsId());
 
     // Add charts for some configuration options
     metrics.addCustomChart(new SimplePie("verification",
@@ -126,5 +128,11 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
     // Make sure to inject into the server's connection handler
     FallbackInjectionHelper.inject(getPlugin().getServer());
+  }
+
+  @Override
+  public void disable() {
+    // Make sure to properly shutdown bStats metrics
+    metrics.shutdown();
   }
 }

@@ -159,11 +159,16 @@ public abstract class SonarBootstrap<T> implements Sonar {
     verifiedPlayerController = new VerifiedPlayerController();
   }
 
-  public void shutdown() {
+  public final void shutdown() {
+    // Initialize shutdown process
     getLogger().info("Starting shutdown process...");
-
-    // ...
-
+    // Close database connection
+    verifiedPlayerController.close();
+    // Run the per-platform disable method
+    disable();
+    // Thank the user for using Sonar
     getLogger().info("Successfully shut down. Goodbye!");
   }
+
+  public abstract void disable();
 }
