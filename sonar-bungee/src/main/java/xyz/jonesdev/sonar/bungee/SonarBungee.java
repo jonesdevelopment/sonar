@@ -90,9 +90,9 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     final Metrics metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
 
     // Add charts for some configuration options
-    metrics.addCustomChart(new SimplePie("Verification timing",
+    metrics.addCustomChart(new SimplePie("verification",
       () -> getConfig().getVerification().getTiming().getDisplayName()));
-    metrics.addCustomChart(new SimplePie("Map CAPTCHA timing",
+    metrics.addCustomChart(new SimplePie("captcha",
       () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
 
     // Register Sonar command
