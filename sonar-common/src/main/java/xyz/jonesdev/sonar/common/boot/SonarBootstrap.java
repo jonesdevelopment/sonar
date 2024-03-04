@@ -156,6 +156,10 @@ public abstract class SonarBootstrap<T> implements Sonar {
     }
 
     // Reinitialize database controller
+    if (verifiedPlayerController != null) {
+      // Close the old connection first
+      verifiedPlayerController.close();
+    }
     verifiedPlayerController = new VerifiedPlayerController();
   }
 
