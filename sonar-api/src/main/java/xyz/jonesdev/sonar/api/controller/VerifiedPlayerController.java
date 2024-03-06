@@ -27,6 +27,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Unmodifiable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
@@ -43,7 +44,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class VerifiedPlayerController {
-  private static final Map<String, Collection<UUID>> MAP = new ConcurrentHashMap<>();
   private static final ExecutorService DB_UPDATE_SERVICE = Executors.newSingleThreadExecutor();
 
   private static final LoggerWrapper LOGGER = new LoggerWrapper() {
@@ -64,6 +64,7 @@ public final class VerifiedPlayerController {
     }
   };
 
+  private final Map<String, Collection<UUID>> cache = new ConcurrentHashMap<>(128);
   private @Nullable ConnectionSource connectionSource;
   private Dao<VerifiedPlayer, Integer> dao;
   private QueryBuilder<VerifiedPlayer, Integer> queryBuilder;
@@ -198,7 +199,7 @@ public final class VerifiedPlayerController {
    * @param inetAddress IP address of the player
    */
   private void _remove(final @NotNull String inetAddress) {
-    MAP.remove(inetAddress);
+    cache.remove(inetAddress);
   }
 
   /**
@@ -236,24 +237,30 @@ public final class VerifiedPlayerController {
    * @param player VerifiedPlayer model
    */
   private void _add(final @NotNull VerifiedPlayer player) {
-    MAP.computeIfAbsent(player.getInetAddress(), v -> new Vector<>())
+    cache.computeIfAbsent(player.getInetAddress(), v -> new ArrayList<>())
       .add(player.getPlayerUUID());
   }
 
   /**
+   * Returns the amount of verified IP addresses
+   *
    * @return Estimated size of the local cache
    */
   public synchronized int estimatedSize() {
-    return MAP.values().stream()
-      .mapToInt(Collection::size)
-      .sum();
+    /*
+     * TODO: Work on this
+     * return MAP.values().stream()
+     *   .mapToInt(Collection::size)
+     *   .sum();
+     */
+    return cache.size();
   }
 
   /**
    * @return List of UUIDs associated with one IP address
    */
-  public Collection<UUID> getUUIDs(final @NotNull String inetAddress) {
-    return MAP.getOrDefault(inetAddress, Collections.emptyList());
+  public @Unmodifiable Collection<UUID> getUUIDs(final @NotNull String inetAddress) {
+    return cache.getOrDefault(inetAddress, Collections.emptyList());
   }
 
   /**
@@ -262,7 +269,7 @@ public final class VerifiedPlayerController {
    */
   public void clearAll() {
     try {
-      MAP.clear();
+      cache.clear();
 
       // Only update the column if the database type is not NONE
       if (cachedDatabaseType != SonarConfiguration.Database.Type.NONE) {
@@ -279,7 +286,7 @@ public final class VerifiedPlayerController {
    * @return Whether the local cache contains the IP and UUID
    */
   public boolean has(final @NotNull String inetAddress, final @NotNull UUID uuid) {
-    final Collection<UUID> got = MAP.get(inetAddress);
+    final Collection<UUID> got = cache.get(inetAddress);
     if (got != null) {
       return got.contains(uuid);
     }
@@ -301,7 +308,7 @@ public final class VerifiedPlayerController {
    * @return Whether the local cache contains the IP
    */
   public boolean has(final @NotNull String inetAddress) {
-    return MAP.containsKey(inetAddress);
+    return cache.containsKey(inetAddress);
   }
 
   /**
