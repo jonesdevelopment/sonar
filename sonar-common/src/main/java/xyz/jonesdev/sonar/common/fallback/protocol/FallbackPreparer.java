@@ -128,7 +128,8 @@ public class FallbackPreparer {
     invalidUsername = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidUsername(), true);
 
     // Precompute captcha answers
-    if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER) {
+    if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
+      || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
       enterCodeMessage = new UniversalChatPacket(Sonar.get().getConfig().getVerification().getMap().getEnterCode(), UniversalChatPacket.SYSTEM_TYPE);
       incorrectCaptcha = new UniversalChatPacket(
         Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha(), UniversalChatPacket.SYSTEM_TYPE);

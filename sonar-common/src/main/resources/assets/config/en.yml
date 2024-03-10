@@ -77,6 +77,8 @@ verification:
       enabled: true
       # Should Sonar check if the player collides with blocks? (Recommended)
       check-collisions: true
+      # Should Sonar make the player solve a CAPTCHA if they fail the gravity check?
+      captcha-on-fail: false
       # Maximum number of ticks the player has to fall in order to be allowed to hit the platform
       max-movement-ticks: 8
       # Maximum number of ignored Y movement changes before a player fails verification
