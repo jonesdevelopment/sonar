@@ -173,6 +173,7 @@ public final class SonarConfiguration {
     verification.timing = Verification.Timing.valueOf(generalConfig.getString("verification.timing"));
     verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled");
     verification.gravity.checkCollisions = generalConfig.getBoolean("verification.checks.gravity.check-collisions");
+    verification.gravity.captchaOnFail = generalConfig.getBoolean("verification.checks.gravity.captcha-on-fail");
     verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks"), 2, 100);
     verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks"), 1, 128);
     verification.gravity.gamemode = Verification.Gravity.Gamemode.valueOf(generalConfig.getString("verification.checks.gravity.gamemode"));
@@ -456,6 +457,7 @@ public final class SonarConfiguration {
     public static final class Gravity {
       private boolean enabled;
       private boolean checkCollisions;
+      private boolean captchaOnFail;
       private Gamemode gamemode;
       private int maxMovementTicks;
       private int maxIgnoredTicks;

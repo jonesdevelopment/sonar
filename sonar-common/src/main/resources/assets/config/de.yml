@@ -75,6 +75,8 @@ verification:
       enabled: true
       # Soll Sonar prüfen, ob der Spieler mit Blöcken kollidiert? (Empfohlen)
       check-collisions: true
+      # Soll Sonar den Spieler dazu bringen, ein CAPTCHA zu lösen, wenn er die Schwerkraftprüfung nicht besteht?
+      captcha-on-fail: false
       # Maximale Anzahl an Ticks, die der Spieler fallen muss, um die Plattform erreichen zu dürfen
       max-movement-ticks: 8
       # Maximale Anzahl an ignorierten Y-Bewegungsänderungen, bevor ein Spieler die Überprüfung nicht besteht

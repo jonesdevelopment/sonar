@@ -446,6 +446,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (state != State.LOGIN_ACK) {
+      System.out.println(state);
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
@@ -473,6 +474,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       tick = 1;
       posY = -1;
       expectedTeleportId = -1;
+      // Check for ground state in the first packet
+      checkFrame(!ground, "invalid ground state");
     }
 
     posX = x;
@@ -533,8 +536,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (ground) {
         // Make sure the player is actually colliding with the blocks and not only spoofing ground
         checkFrame(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
-        // The player is colliding to blocks, finish verification
-        captchaOrFinish();
+        // Check if the player is not spoofing ground
+        // We cannot use checkFrame as it interferes with the CAPTCHA
+        if (collisionOffsetY > -1) {
+          // The player is colliding to blocks, finish verification
+          captchaOrFinish();
+        }
         return;
       } else {
         // Make sure the player is colliding with blocks but is sending an invalid ground state
@@ -567,27 +574,27 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private void captchaOrFinish() {
     if (FALLBACK.shouldDoMapCaptcha()) {
-      if (MapInfoPreparer.getPreparedCAPTCHAs() == 0) {
-        // This should not happen, but we have to return if there is no captcha prepared
-        user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
-        return;
-      }
-      // Set the state to MAP_CAPTCHA, so we don't handle any unnecessary packets
-      state = State.MAP_CAPTCHA;
-      if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
-        && user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
-        // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
-        user.delayedWrite(CAPTCHA_SPAWN_POSITION);
-      }
       // Initialize the map captcha
-      handleMapCaptcha();
-    } else {
-      // Finish the verification
-      finish();
+      handleCAPTCHA();
+      return;
     }
+    // Finish the verification
+    finish();
   }
 
-  private void handleMapCaptcha() {
+  private void handleCAPTCHA() {
+    if (MapInfoPreparer.getPreparedCAPTCHAs() == 0) {
+      // This should not happen, but we have to return if there is no captcha prepared
+      user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
+      return;
+    }
+    // Set the state to MAP_CAPTCHA, so we don't handle any unnecessary packets
+    state = State.MAP_CAPTCHA;
+    if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
+      && user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
+      // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
+      user.delayedWrite(CAPTCHA_SPAWN_POSITION);
+    }
     // Reset max tries
     captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
@@ -608,6 +615,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void finish() {
+    // Something must've gone horribly wrong...
+    if (state == State.SUCCESS) return;
+
     state = State.SUCCESS;
 
     // Increment amount of total successful verifications
@@ -646,6 +656,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
    */
   private void checkFrame(final boolean condition, final String message) {
     if (!condition) {
+      if (state == State.POSITION // Gravity check
+        && Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+        handleCAPTCHA();
+        return;
+      }
       user.fail(message);
       throw new CorruptedFrameException(message);
     }
