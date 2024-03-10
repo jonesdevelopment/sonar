@@ -446,7 +446,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (state != State.LOGIN_ACK) {
-      System.out.println(state);
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
