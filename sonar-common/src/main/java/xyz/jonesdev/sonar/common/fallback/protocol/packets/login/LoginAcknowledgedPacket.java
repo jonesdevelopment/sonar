@@ -30,4 +30,10 @@ public final class LoginAcknowledgedPacket implements FallbackPacket {
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
   }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/LoginAcknowledgedPacket.java#L41
+    return 0;
+  }
 }
