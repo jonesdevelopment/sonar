@@ -111,7 +111,7 @@ verification:
         # Adds a bit of blurriness/distortion to the image
         pinch: true
         # Applies color correction (color saturation)
-        saturation: 0.3
+        saturation: 0.15
         # Applies a horizontal triangular ripple filter
         distortion: 2
       # Сколько капч должен подготовить Sonar?
@@ -124,7 +124,7 @@ verification:
       max-tries: 3
       # Символы (буквы и цифры), которые разрешено использовать в ответе на капчу
       # It is not recommended to add numbers or letters that might look like one another
-      dictionary: '0123569'
+      dictionary: '1235689'
       # Какие типы шрифтов следует использовать в Sonar для текста в капче?
       font-names:
         - Dialog

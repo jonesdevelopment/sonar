@@ -35,14 +35,16 @@ public final class CaptchaPreparer {
   private static final Random RANDOM = new Random();
 
   private MapCaptchaInfo[] cached;
-  private volatile boolean finishedPreparing;
+  private int preparedAmount;
 
   public void prepare() {
     // Make sure we're not preparing when Sonar is already preparing answers
-    if (cached != null && !finishedPreparing) return;
+    if (cached != null && preparedAmount != cached.length) return;
+    preparedAmount = 0;
 
     final SystemTimer timer = new SystemTimer();
     Sonar.get().getLogger().info("Asynchronously preparing CAPTCHA answers...");
+    Sonar.get().getLogger().info("Players will be able to join even if the preparation isn't finished");
 
     // Prepare cache
     final SonarConfiguration.Verification.Map config = Sonar.get().getConfig().getVerification().getMap();
@@ -65,10 +67,12 @@ public final class CaptchaPreparer {
       for (int i = 0; i < config.getPrecomputeAmount(); i++) {
         final CaptchaGenerator captchaGenerator = new CaptchaGenerator(configuration);
         final CaptchaHolder captchaHolder = captchaGenerator.generate();
+        final byte[] buffer = MapColorPalette.getBufferFromImage(captchaHolder.getImage());
+        cached[i] = new MapCaptchaInfo(captchaHolder.getAnswer(), buffer);
+        preparedAmount++;
       }
 
-      finishedPreparing = true;
-      Sonar.get().getLogger().info("Finished preparing CAPTCHA answers ({}s)!", timer);
+      Sonar.get().getLogger().info("Finished preparing {} CAPTCHA answers ({}s)!", preparedAmount, timer);
     });
   }
 
@@ -77,6 +81,7 @@ public final class CaptchaPreparer {
   }
 
   public MapCaptchaInfo getRandomCaptcha() {
-    return cached[RANDOM.nextInt(cached.length)];
+    // Give the player a random CAPTCHA out of the ones that we've already prepared
+    return cached[RANDOM.nextInt(preparedAmount)];
   }
 }

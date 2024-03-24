@@ -109,7 +109,7 @@ verification:
         # Adds a bit of blurriness/distortion to the image
         pinch: true
         # Applies color correction (color saturation)
-        saturation: 0.3
+        saturation: 0.15
         # Applies a horizontal triangular ripple filter
         distortion: 2
       # Wie viele Antworten soll Sonar vorbereiten?
@@ -122,7 +122,7 @@ verification:
       max-tries: 3
       # Zeichen (Buchstaben und Zahlen), die im Antwort-CAPTCHA erscheinen dürfen
       # It is not recommended to add numbers or letters that might look like one another
-      dictionary: '0123569'
+      dictionary: '1235689'
       # Welche Schriftarten soll Sonar für die Map-CAPTCHA-Codes verwenden?
       font-names:
         - Dialog

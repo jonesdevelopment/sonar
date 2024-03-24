@@ -111,7 +111,7 @@ verification:
         # Adds a bit of blurriness/distortion to the image
         pinch: true
         # Applies color correction (color saturation)
-        saturation: 0.3
+        saturation: 0.15
         # Applies a horizontal triangular ripple filter
         distortion: 2
       # რამდენი პასუხი უნდა მოამზადოს Sonar-მა?
@@ -124,7 +124,7 @@ verification:
       max-tries: 3
       # სიმბოლოები (ასოები და რიცხვები), რომლებიც დაშვებულია გამოჩნდეს CAPTCHA-ს პასუხში
       # It is not recommended to add numbers or letters that might look like one another
-      dictionary: '0123569'
+      dictionary: '1235689'
       # Which fonts should Sonar use for the map CAPTCHA codes?
       font-names:
         - Dialog
