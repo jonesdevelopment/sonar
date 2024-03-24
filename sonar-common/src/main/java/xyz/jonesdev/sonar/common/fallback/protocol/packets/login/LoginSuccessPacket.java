@@ -24,8 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.fallback.netty.FastUUID;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.netty.FastUUID;
 
 import java.util.UUID;
 

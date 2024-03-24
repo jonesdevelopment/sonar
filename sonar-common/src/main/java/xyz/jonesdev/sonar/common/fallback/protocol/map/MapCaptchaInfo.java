@@ -25,41 +25,41 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.MapDataPacket;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 @Getter
-public final class PreparedMapInfo {
-  public static final int DIMENSIONS = (int) Math.pow(2, 7);
-  public static final int SCALE = DIMENSIONS * DIMENSIONS;
+public final class MapCaptchaInfo {
+  private final String answer;
+  private final byte[] buffer;
 
-  private final MapInfo info;
   private final MapDataPacket[] legacy;
   private final MapDataPacket modern;
 
-  public PreparedMapInfo(final String answer,
-                         final int columns, final int rows,
-                         final byte @NotNull [] buffer) {
-    this.info = new MapInfo(answer, columns, rows, 0, 0, buffer);
+  public MapCaptchaInfo(final @NotNull String answer, final byte @NotNull [] buffer) {
+    this.answer = answer;
+    this.buffer = buffer;
 
     // Prepare 1.7 map data using a grid
-    final byte[][] grid = new byte[DIMENSIONS][DIMENSIONS];
+    final byte[][] grid = new byte[128][128];
     for (int i = 0; i < buffer.length; i++) {
       final byte buf = buffer[i];
       grid[i & Byte.MAX_VALUE][i >> 7] = buf;
     }
     this.legacy = new MapDataPacket[grid.length];
     for (int i = 0; i < grid.length; i++) {
-      this.legacy[i] = new MapDataPacket(new MapInfo(answer, DIMENSIONS, DIMENSIONS, i, 0, grid[i]));
+      this.legacy[i] = new MapDataPacket(grid[i], i, 0);
     }
 
     // Prepare 1.8+ map data
-    this.modern = new MapDataPacket(info);
+    this.modern = new MapDataPacket(buffer, 0, 0);
   }
 
-  public void write(final @NotNull FallbackUser user) {
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-      for (final MapDataPacket data : legacy) {
-        user.delayedWrite(data);
-      }
-    } else {
+  public void delayedWrite(final @NotNull FallbackUser user) {
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
       user.delayedWrite(modern);
+      return;
+    }
+
+    // 1.7.2-1.7.10
+    for (final MapDataPacket legacyPacket : legacy) {
+      user.delayedWrite(legacyPacket);
     }
   }
 }

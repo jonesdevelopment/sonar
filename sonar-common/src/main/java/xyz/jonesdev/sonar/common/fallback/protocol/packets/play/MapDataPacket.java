@@ -25,7 +25,6 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfo;
 
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
@@ -34,19 +33,20 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class MapDataPacket implements FallbackPacket {
-  private MapInfo mapInfo;
+  private byte[] buffer;
+  private int x, y;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     writeVarInt(byteBuf, 0);
 
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
-      byteBuf.writeShort(mapInfo.getBuffer().length + 3);
+      byteBuf.writeShort(buffer.length + 3);
       byteBuf.writeByte(0); // scaling
-      byteBuf.writeByte(mapInfo.getX());
-      byteBuf.writeByte(mapInfo.getY());
+      byteBuf.writeByte(x);
+      byteBuf.writeByte(y);
 
-      byteBuf.writeBytes(mapInfo.getBuffer());
+      byteBuf.writeBytes(buffer);
     } else {
       byteBuf.writeByte(0); // scaling
 
@@ -65,13 +65,13 @@ public final class MapDataPacket implements FallbackPacket {
         writeVarInt(byteBuf, 0);
       }
 
-      byteBuf.writeByte(mapInfo.getColumns());
-      byteBuf.writeByte(mapInfo.getRows());
-      byteBuf.writeByte(mapInfo.getX());
-      byteBuf.writeByte(mapInfo.getY());
+      byteBuf.writeByte(128); // rows
+      byteBuf.writeByte(128); // columns
+      byteBuf.writeByte(x);
+      byteBuf.writeByte(y);
 
-      writeVarInt(byteBuf, mapInfo.getBuffer().length);
-      byteBuf.writeBytes(mapInfo.getBuffer());
+      writeVarInt(byteBuf, buffer.length);
+      byteBuf.writeBytes(buffer);
     }
   }
 
