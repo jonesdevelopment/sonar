@@ -96,36 +96,40 @@ verification:
       # - DURING_ATTACK: Neue Spieler erhalten nur während eines Angriffs ein CAPTCHA
       # - NEVER: Neue Spieler erhalten nie ein CAPTCHA (Empfohlen)
       timing: NEVER
-      # Soll Sonar die X- und Y-Position des CAPTCHAs zufällig wählen?
-      random-position: true
-      # Wie stark sollen Zeichen verzerrt werden (Faktor für Zufälligkeit)?
-      distortions-factor-x: 50
-      # Wie stark sollen Zeichen verzerrt werden (Faktor für Zufälligkeit)?
-      distortions-factor-y: 50
-      # Wie viele zufällige Linien hinter dem CAPTCHA soll Sonar zeichnen?
-      random-lines: 4
-      # Wie viele zufällige Ovale hinter dem CAPTCHA soll Sonar zeichnen?
-      random-ovals: 1
-      # Soll Sonar die Schriftgröße für das Rendern des CAPTCHAs zufällig wählen?
-      random-font-size: true
+      # Options for the effects on the image shown to the player
+      effects:
+        # Adds a glow effect to the image
+        flare: true
+        # Adds random lines to the image
+        scratches: true
+        # Applies a ripple (sine) distortion filter
+        ripple: true
+        # Applies a horizontal distortion filter
+        smear: true
+        # Adds a bit of blurriness/distortion to the image
+        pinch: true
+        # Applies color correction (color saturation)
+        saturation: 0.3
+        # Applies a horizontal triangular ripple filter
+        distortion: 2
       # Wie viele Antworten soll Sonar vorbereiten?
-      # Dieser Vorgang erfolgt asynchron im Hintergrund;
-      # Spieler können beitreten, sobald ein CAPTCHA vorbereitet wurde
-      precompute: 1000
+      # Dieser Vorgang erfolgt asynchron im Hintergrund
+      precompute: 500
       # Wie lange soll Sonar warten, bis der Spieler das CAPTCHA nicht besteht?
       # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
       max-duration: 45000
       # Wie oft muss ein Spieler das CAPTCHA nicht bestehen, bevor er die Überprüfung nicht besteht?
       max-tries: 3
       # Zeichen (Buchstaben und Zahlen), die im Antwort-CAPTCHA erscheinen dürfen
-      dictionary: '123456789'
+      # It is not recommended to add numbers or letters that might look like one another
+      dictionary: '0123569'
       # Welche Schriftarten soll Sonar für die Map-CAPTCHA-Codes verwenden?
-      fonts:
+      font-names:
         - Dialog
         - DialogInput
-        - Serif
         - SansSerif
-    
+        - Monospaced
+
     # Überprüft, ob die Spieler eine gültige Client-Marke an den Server senden
     client-brand:
       # Soll Sonar auf gültige Client-Marken prüfen? (Empfohlen)

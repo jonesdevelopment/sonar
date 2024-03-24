@@ -99,34 +99,39 @@ verification:
       # - DURING_ATTACK: Noví hráči dostanou map captchu jenom při útoku
       # - NEVER: Noví hráči nikdy nedostanou map CAPTCHU (Doporučeno)
       timing: NEVER
-      # Měl by Sonar randomizovat pozici X a Y na CAPTCHE?
-      random-position: true
-      # Jak moc by měl Sonar znehodnotit charaktery (faktor pro randomizaci)
-      distortions-factor-x: 50
-      distortions-factor-y: 50
-      # Kolik náhodných čar by měl Sonar vykreslit za CAPTCHOU
-      random-lines: 4
-      # Kolik náhodných oválů by měl Sonar vykreslit za CAPTCHOU
-      random-ovals: 1
-      # Měl by Sonar randomizovat font pro vykreslování textu v CAPTCHE?
-      random-font-size: true
+      # Options for the effects on the image shown to the player
+      effects:
+        # Adds a glow effect to the image
+        flare: true
+        # Adds random lines to the image
+        scratches: true
+        # Applies a ripple (sine) distortion filter
+        ripple: true
+        # Applies a horizontal distortion filter
+        smear: true
+        # Adds a bit of blurriness/distortion to the image
+        pinch: true
+        # Applies color correction (color saturation)
+        saturation: 0.3
+        # Applies a horizontal triangular ripple filter
+        distortion: 2
       # Kolik odpovědí by měl Sonar předgenerovat?
-      # Tento úkol běží souběžně v pozadí;
-      # Hráči jsou schopni se připojit pokud je CAPTCHA připravena
-      precompute: 1000
+      # Tento úkol běží souběžně v pozadí
+      precompute: 500
       # Jak dlouho by měl Sonar čekat než hráč selže CAPTCHU?
       # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
       max-duration: 45000
       # Kolikrát musí hráč selhat CAPTCHU před celkovém selhání verifikace?
       max-tries: 3
       # Znaky (čísla a písmena), které jsou povoleny k zobrazování v CAPTCHE
-      dictionary: '123456789'
+      # It is not recommended to add numbers or letters that might look like one another
+      dictionary: '0123569'
       # Jaké typy fontů by měl Sonar používat pro map CAPTCHU?
-      fonts:
+      font-names:
         - Dialog
         - DialogInput
-        - Serif
         - SansSerif
+        - Monospaced
 
     # Zkouší pokuď hráč posílá správný "client brand packet" serveru
     client-brand:

@@ -179,19 +179,22 @@ public final class SonarConfiguration {
     verification.gravity.gamemode = Verification.Gravity.Gamemode.valueOf(generalConfig.getString("verification.checks.gravity.gamemode"));
 
     verification.map.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.map-captcha.timing"));
-    verification.map.randomizePositions = generalConfig.getBoolean("verification.checks.map-captcha.random-position");
-    verification.map.distortionsFactorX = clamp(generalConfig.getInt(
-      "verification.checks.map-captcha.distortions-factor-x"), 0, 100) / 100D;
-    verification.map.distortionsFactorY = clamp(generalConfig.getInt(
-      "verification.checks.map-captcha.distortions-factor-y"), 0, 100) / 100D;
-    verification.map.randomLinesAmount = generalConfig.getInt("verification.checks.map-captcha.random-lines");
-    verification.map.randomOvalsAmount = generalConfig.getInt("verification.checks.map-captcha.random-ovals");
-    verification.map.randomizeFontSize = generalConfig.getBoolean("verification.checks.map-captcha.random-font-size");
+
+    verification.map.flare = generalConfig.getBoolean("verification.checks.map-captcha.effects.flare");
+    verification.map.scratches = generalConfig.getBoolean("verification.checks.map-captcha.effects.scratches");
+    verification.map.ripple = generalConfig.getBoolean("verification.checks.map-captcha.effects.ripple");
+    verification.map.smear = generalConfig.getBoolean("verification.checks.map-captcha.effects.smear");
+    verification.map.pinch = generalConfig.getBoolean("verification.checks.map-captcha.effects.pinch");
+    verification.map.saturation = (float) generalConfig.getYaml().getDouble(
+      "verification.checks.map-captcha.effects.saturation", 0.3);
+    verification.map.distortion = (float) generalConfig.getYaml().getDouble(
+      "verification.checks.map-captcha.effects.distortion", 2);
+
     verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute");
     verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration");
     verification.map.maxTries = generalConfig.getInt("verification.checks.map-captcha.max-tries");
     verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary");
-    verification.map.fonts = generalConfig.getStringList("verification.checks.map-captcha.fonts");
+    verification.map.fonts = generalConfig.getStringList("verification.checks.map-captcha.font-names");
 
     verification.brand.enabled = generalConfig.getBoolean("verification.checks.client-brand.enabled");
     verification.brand.validRegex = Pattern.compile(generalConfig.getString("verification.checks.client-brand.valid-regex"));
@@ -437,12 +440,13 @@ public final class SonarConfiguration {
     @Getter
     public static final class Map {
       private Timing timing;
-      private boolean randomizePositions;
-      private boolean randomizeFontSize;
-      private double distortionsFactorX;
-      private double distortionsFactorY;
-      private int randomLinesAmount;
-      private int randomOvalsAmount;
+      private boolean flare;
+      private boolean scratches;
+      private boolean ripple;
+      private boolean smear;
+      private boolean pinch;
+      private float saturation;
+      private float distortion;
       private int precomputeAmount;
       private int maxDuration;
       private int maxTries;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.netty;
+package xyz.jonesdev.sonar.common.fallback.netty;
 
 import org.jetbrains.annotations.NotNull;
 

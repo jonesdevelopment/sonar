@@ -32,8 +32,7 @@ import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.*;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.ItemMapType;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfoPreparer;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.PreparedMapInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapCaptchaInfo;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
@@ -73,7 +72,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   // Map captcha
   private final SystemTimer keepAlive = new SystemTimer();
   private final SystemTimer actionBar = new SystemTimer();
-  private @Nullable PreparedMapInfo captcha;
+  private @Nullable MapCaptchaInfo captcha;
   private int captchaTriesLeft;
 
   public enum State {
@@ -264,7 +263,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (packet instanceof UniversalChatPacket) {
       final UniversalChatPacket chat = (UniversalChatPacket) packet;
       Objects.requireNonNull(captcha);
-      if (!chat.getMessage().equals(captcha.getInfo().getAnswer())) {
+      if (!chat.getMessage().equals(captcha.getAnswer())) {
         // Captcha is incorrect
         checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
         user.write(incorrectCaptcha);
@@ -582,7 +581,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void handleCAPTCHA() {
-    if (MapInfoPreparer.getPreparedCAPTCHAs() == 0) {
+    if (!MAP_INFO_PREPARER.isCaptchaAvailable()) {
       // This should not happen, but we have to return if there is no captcha prepared
       user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
       return;
@@ -601,8 +600,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.delayedWrite(new SetSlotPacket(0, 36, 1, 0,
       ItemMapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlotPacket.MAP_NBT));
     // Send random captcha to the player
-    captcha = MapInfoPreparer.getRandomCaptcha();
-    Objects.requireNonNull(captcha).write(user);
+    captcha = MAP_INFO_PREPARER.getRandomCaptcha();
+    Objects.requireNonNull(captcha).delayedWrite(user);
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
