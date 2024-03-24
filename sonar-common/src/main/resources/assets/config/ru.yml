@@ -98,7 +98,7 @@ verification:
       # - DURING_ATTACK: Новые игроки будут получать капчу только во время атаки
       # - NEVER: Новые игроки никогда не получат капчу (Рекомендуется)
       timing: NEVER
-      # Options for the effects on the image shown to the player
+      # Кастомизация эффектов на картинке, которые показываются игроку
       effects:
         # Добавляет свечение к изображению
         flare: true
