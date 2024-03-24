@@ -100,19 +100,19 @@ verification:
       timing: NEVER
       # Options for the effects on the image shown to the player
       effects:
-        # Adds a glow effect to the image
+        # Добавляет свечение к изображению
         flare: true
-        # Adds random lines to the image
+        # Добавляет случайные линии к изображению
         scratches: true
-        # Applies a ripple (sine) distortion filter
+        # Применяет искажение ряби (синусоидальное)
         ripple: true
-        # Applies a horizontal distortion filter
+        # Применяет горизонтальное искажение
         smear: true
-        # Adds a bit of blurriness/distortion to the image
+        # Добавляет немного размытости/искажения к изображению
         pinch: true
-        # Applies color correction (color saturation)
+        # Применяет цветокоррекцию (насыщенность цвета)
         saturation: 0.15
-        # Applies a horizontal triangular ripple filter
+        # Применяет горизонтальное треугольное искажение
         distortion: 2
       # Сколько капч должен подготовить Sonar?
       # Эта задача выполняется асинхронно в фоновом режиме
