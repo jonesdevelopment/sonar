@@ -98,34 +98,39 @@ verification:
       # - DURING_ATTACK: ახალი მოთამაშებს მოუწევთ CAPTCHA-ს გაკეთება მხოლოდ შეტევის დროს
       # - NEVER: ახალ მოთამაშეებს არასდროს მოუწევთ CAPTCHA-ს გაკეთება (Recommended)
       timing: NEVER
-      # მოახდინოს თუ არა Sonar-მა CAPTCHA-ს X და Y პოზიციების რანდომიზაცია?
-      random-position: true
-      # რამდენად უნდა დაამახინჯოს Sonar-მა სიმბოლოები (რანდომიზაციის ფაქტორი)?
-      distortions-factor-x: 50
-      distortions-factor-y: 50
-      # რამდენი რანდომული ხაზი უნდა დახატოს Sonar-მა CAPTCHA-ს უკან?
-      random-lines: 4
-      # რამდენი რანდომული ოვალი უნდა დახატოს სონარმა CAPTCHA-ს უკან?
-      random-ovals: 1
-      # დაარანდომაიზოს Sonar-მა თუ არა შერჩევისას შრიფტის ზომა, რომელიც გამოიყენება CAPTCHA-ზე?
-      random-font-size: true
+      # Options for the effects on the image shown to the player
+      effects:
+        # Adds a glow effect to the image
+        flare: true
+        # Adds random lines to the image
+        scratches: true
+        # Applies a ripple (sine) distortion filter
+        ripple: true
+        # Applies a horizontal distortion filter
+        smear: true
+        # Adds a bit of blurriness/distortion to the image
+        pinch: true
+        # Applies color correction (color saturation)
+        saturation: 0.15
+        # Applies a horizontal triangular ripple filter
+        distortion: 2
       # რამდენი პასუხი უნდა მოამზადოს Sonar-მა?
-      # ეს ხდება ასინქრონულად უკანა ფონზე;
-      # მოთამაშეებს შეუძლიათ შესვლა, როდესაც ერთი CAPTCHA მზად არის
-      precompute: 1000
+      # ეს ხდება ასინქრონულად უკანა ფონზე
+      precompute: 500
       # რამდენ ხანს უნდა დაელოდოს Sonar-ი, სანამ მოთამაშე ვერ გააკეთებს წარმატებულად CAPTCHA-ს?
       # (ეს არის ნაჩვენები მილიწამებში: 1 წამი = 1000 მილიწამი)
       max-duration: 45000
       # რამდენჯერ ვერ უდნა გაიაროს CAPTCHA მოთამაშემ სანამ ვერიფიკაციას ვერ გაივლის?
       max-tries: 3
       # სიმბოლოები (ასოები და რიცხვები), რომლებიც დაშვებულია გამოჩნდეს CAPTCHA-ს პასუხში
-      dictionary: '123456789'
-      # რომელი შრიფტის ტიპები უნდა გამოიყენოს Sonar-მა რუკის CAPTCHA კოდებისთვის?
-      fonts:
+      # It is not recommended to add numbers or letters that might look like one another
+      dictionary: '1235689'
+      # Which fonts should Sonar use for the map CAPTCHA codes?
+      font-names:
         - Dialog
         - DialogInput
-        - Serif
         - SansSerif
+        - Monospaced
 
     #ამოწმებს, აგზავნიან თუ არა მოთამაშეები სერვერზე რეალურ კლიენტის სახელს
     client-brand:

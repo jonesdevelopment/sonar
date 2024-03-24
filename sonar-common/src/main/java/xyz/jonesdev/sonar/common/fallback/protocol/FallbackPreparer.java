@@ -23,7 +23,7 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapInfoPreparer;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
@@ -82,6 +82,9 @@ public class FallbackPreparer {
   public double[] preparedCachedYMotions;
   public double maxFallDistance;
 
+  // CAPTCHA
+  public final CaptchaPreparer MAP_INFO_PREPARER = new CaptchaPreparer();
+
   public void prepare() {
     joinGame = new JoinGamePacket(1,
       Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
@@ -134,7 +137,7 @@ public class FallbackPreparer {
       incorrectCaptcha = new UniversalChatPacket(
         Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha(), UniversalChatPacket.SYSTEM_TYPE);
 
-      MapInfoPreparer.prepare();
+      MAP_INFO_PREPARER.prepare();
     }
   }
 }

@@ -98,10 +98,6 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
         // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
       }
-    } else {
-      // Packets are always ByteBufs - if we detect an unknown object, fail verification
-      user.fail("packet is not a ByteBuf");
-      throw new CorruptedFrameException("Packet is not a ByteBuf?!");
     }
   }
 
