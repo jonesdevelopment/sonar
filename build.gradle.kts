@@ -42,7 +42,7 @@ allprojects {
 
     compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.8") // caching
-    compileOnly("io.netty:netty-all:4.1.107.Final") // netty
+    compileOnly("io.netty:netty-all:4.1.108.Final") // netty
 
     // Library/dependency loading
     compileOnly("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
