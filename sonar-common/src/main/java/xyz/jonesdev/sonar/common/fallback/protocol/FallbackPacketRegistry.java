@@ -157,11 +157,17 @@ public enum FallbackPacketRegistry {
         map(0x20, MINECRAFT_1_19_3, true),
         map(0x24, MINECRAFT_1_19_4, true),
         map(0x25, MINECRAFT_1_20_2, true));
+      clientbound.register(RemoveEntitiesPacket.class, RemoveEntitiesPacket::new,
+        map(0x13, MINECRAFT_1_7_2, true),
+        map(-1, MINECRAFT_1_9, true),
+        map(0x40, MINECRAFT_1_20_3, true));
       clientbound.register(SetPassengersPacket.class, SetPassengersPacket::new,
-        map(0x5D, MINECRAFT_1_7_2, true));
+        map(0x1B, MINECRAFT_1_7_2, true),
+        map(-1, MINECRAFT_1_9, true),
+        map(0x5D, MINECRAFT_1_20_3, true));
       clientbound.register(SpawnEntityPacket.class, SpawnEntityPacket::new,
-        map(0x2C, MINECRAFT_1_7_2, true),
-        map(0x2C, MINECRAFT_1_8, true),
+        map(0x0E, MINECRAFT_1_7_2, true),
+        map(-1, MINECRAFT_1_9, true),
         map(0x01, MINECRAFT_1_20_3, true));
       clientbound.register(UpdateSectionBlocksPacket.class, UpdateSectionBlocksPacket::new,
         map(0x22, MINECRAFT_1_7_2, true),

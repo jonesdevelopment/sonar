@@ -65,6 +65,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       final int packetId = readVarInt(byteBuf);
       final FallbackPacket packet = registry.createPacket(packetId);
 
+      System.out.println(packetId + " | " + packet);
       // If the packet isn't found, skip it
       if (packet == null) {
         byteBuf.readerIndex(originalReaderIndex);

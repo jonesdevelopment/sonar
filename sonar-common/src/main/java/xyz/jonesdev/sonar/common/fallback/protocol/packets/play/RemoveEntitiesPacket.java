@@ -32,24 +32,15 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class SetPassengersPacket implements FallbackPacket {
-  private int entityId;
-  private int passengerId;
+public final class RemoveEntitiesPacket implements FallbackPacket {
+  private int[] entityIds;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    // You can find this in the EntityAttach packet,
-    // which was later replaced by SetPassengers in 1.9+
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_9) < 0) {
-      byteBuf.writeInt(passengerId);
-      byteBuf.writeInt(entityId);
-      byteBuf.writeByte(0); // leash
-      return;
+    writeVarInt(byteBuf, entityIds.length);
+    for (final int entityId : entityIds) {
+      writeVarInt(byteBuf, entityId);
     }
-
-    writeVarInt(byteBuf, entityId);
-    writeVarInt(byteBuf, 1); // passenger count
-    writeVarInt(byteBuf, passengerId);
   }
 
   @Override

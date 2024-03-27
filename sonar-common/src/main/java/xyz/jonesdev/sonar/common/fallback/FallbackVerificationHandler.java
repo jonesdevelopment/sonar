@@ -36,6 +36,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.map.MapCaptchaInfo;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.vehicle.EntityType;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
 
@@ -635,11 +636,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void handleVehicleCheck() {
     // Set the state to VEHICLE, so we don't handle any unnecessary packets
     state = State.VEHICLE;
-    // Generate a random entityId for the vehicle (boat)
-    final int vehicleId = PLAYER_ENTITY_ID + RANDOM.nextInt(2, 9);
     // Send the necessary packets to mount the player on the vehicle
-    user.delayedWrite(new SpawnEntityPacket(vehicleId, 9, posX, posY, posZ));
-    user.delayedWrite(new SetPassengersPacket(vehicleId, PLAYER_ENTITY_ID));
+    final int vehicleType = EntityType.BOAT.getId(user.getProtocolVersion());
+    user.delayedWrite(new SpawnEntityPacket(vehicleEntityId, vehicleType, posX, posY, posZ));
+    user.delayedWrite(setPassengers);
     user.getChannel().flush();
   }
 
@@ -655,6 +655,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       && user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
       // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
       user.delayedWrite(CAPTCHA_SPAWN_POSITION);
+    }
+    if (performVehicle) {
+      // Make sure the player exits the vehicle before sending the CAPTCHA
+      user.delayedWrite(removeEntities);
     }
     // Reset max tries
     captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
