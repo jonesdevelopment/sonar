@@ -31,7 +31,7 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.*;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.ItemMapType;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.MapCaptchaInfo;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
@@ -75,6 +75,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private @Nullable MapCaptchaInfo captcha;
   private int captchaTriesLeft;
 
+  // Cached options to make sure the original values don't change throughout the verification
+  private final boolean performVehicle, performCaptcha, performGravity, performCollisions;
+
   public enum State {
     // 1.20.2 configuration state
     LOGIN_ACK, CONFIGURE,
@@ -84,8 +87,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     CLIENT_SETTINGS, PLUGIN_MESSAGE, TRANSACTION,
     // PLAY checks
     TELEPORT, POSITION,
-    // Captcha
-    MAP_CAPTCHA,
+    // Vehicle check
+    VEHICLE,
+    // CAPTCHA
+    CAPTCHA,
     // Done
     SUCCESS
   }
@@ -96,6 +101,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.user = user;
     this.username = username;
     this.playerUuid = playerUuid;
+    this.performGravity = Sonar.get().getConfig().getVerification().getGravity().isEnabled();
+    this.performCollisions = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
+    this.performCaptcha = FALLBACK.shouldPerformCaptcha();
+    this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
 
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
       // Start initializing the actual join process
@@ -194,9 +203,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void sendChunkData() {
-    // If we don't have gravity and captcha enabled, simply finish verification
-    if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
-      && !FALLBACK.shouldDoMapCaptcha()) {
+    // If we don't have any checks, simply finish verification
+    // This is *hopefully* a very rare case though...
+    if (!performGravity && !performCaptcha && !performVehicle) {
       // Save some work by finishing before sending even more packets
       finish();
       return;
@@ -212,9 +221,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Teleport player into the fake lobby by sending an empty chunk
     user.delayedWrite(EMPTY_CHUNK_DATA);
     // Checking gravity is disabled, just finish verification
-    if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()) {
+    if (!performGravity) {
       // Switch to captcha state if needed
-      captchaOrFinish();
+      vehicleCheckOrNext();
       return;
     }
     // Send an UpdateSectionBlocks packet with a platform of blocks
@@ -254,7 +263,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
-  private void handlePacketDuringCaptcha(final @NotNull FallbackPacket packet) {
+  private void handlePacketsCAPTCHA(final @NotNull FallbackPacket packet) {
     // Check if the player took too long to enter the captcha
     final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
     checkFrame(!login.elapsed(maxDuration), "took too long to enter captcha");
@@ -298,20 +307,42 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
+  private void handlePacketsVehicle(final @NotNull FallbackPacket packet) {
+    if (packet instanceof PlayerInputPacket) {
+      final PlayerInputPacket inputPacket = (PlayerInputPacket) packet;
+
+      // Make sure the values sent by the client are legitimate
+      checkFrame(inputPacket.getForward() <= 0.98f, "invalid vehicle speed (f)");
+      checkFrame(inputPacket.getSideways() <= 0.98f, "invalid vehicle speed (s)");
+
+      // Continue checking or verify the player
+      captchaOrNext();
+    }
+  }
+
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    // The player has already been verified, drop all other packets
+    // The player has already been verified, drop all (other) packets
     if (state == State.SUCCESS) return;
 
-    // We are expecting a captcha code in chat, drop all other packets
-    if (state == State.MAP_CAPTCHA) {
-      handlePacketDuringCaptcha(packet);
+    // Calculate maximum amount of packets sent by the client to the server
+    final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets()
+      + maxMovementTick // Account for positions/fall check
+      + Sonar.get().getConfig().getVerification().getMap().getMaxDuration()
+      + Sonar.get().getConfig().getVerification().getMap().getMaxTries();
+    checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
+
+    // We are expecting a code in chat, drop all other packets
+    if (state == State.CAPTCHA) {
+      handlePacketsCAPTCHA(packet);
       return;
     }
 
-    // Check if the player is not sending a ton of packets to the server
-    final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxMovementTick;
-    checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
+    // We are expecting vehicle packets, drop all other packets
+    if (state == State.VEHICLE) {
+      handlePacketsVehicle(packet);
+      return;
+    }
 
     if (packet instanceof LoginAcknowledgedPacket) {
       // Check if we are currently expecting a LoginAcknowledged packet
@@ -319,6 +350,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Start the configuration process for 1.20.2 clients
       configure();
+      return;
     }
 
     if (packet instanceof FinishConfigurationPacket) {
@@ -332,6 +364,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Start initializing the actual join process
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);
       initialJoinProcess();
+      return;
     }
 
     if (packet instanceof KeepAlivePacket) {
@@ -347,6 +380,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // The correct KeepAlive packet has been received
       sendJoinGamePacket();
+      return;
     }
 
     if (packet instanceof ClientSettingsPacket) {
@@ -362,6 +396,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Make sure we mark the ClientSettings as valid
       resolvedClientSettings = true;
+      return;
     }
 
     if (packet instanceof PluginMessagePacket) {
@@ -394,6 +429,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // Make sure we mark the PluginMessage as valid
         resolvedClientBrand = true;
       }
+      return;
     }
 
     if (packet instanceof TransactionPacket) {
@@ -421,6 +457,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // the channel earlier when we teleported the player.
         user.getChannel().flush();
       }
+      return;
     }
 
     if (packet instanceof TeleportConfirmPacket) {
@@ -438,17 +475,20 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Now we can send the chunk data
       sendChunkData();
+      return;
     }
 
     if (state != State.LOGIN_ACK) {
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
+        return;
       }
 
       if (packet instanceof PlayerPositionLookPacket) {
         final PlayerPositionLookPacket position = (PlayerPositionLookPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
+        return;
       }
 
       if (packet instanceof PlayerTickPacket) {
@@ -522,8 +562,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         }
 
         // If the collision check is disabled, finish verification
-        if (!Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions()) {
-          captchaOrFinish();
+        if (!performCollisions) {
+          vehicleCheckOrNext();
           return;
         }
 
@@ -532,7 +572,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           // Make sure the player is actually colliding with the blocks and not only spoofing ground
           checkFrame(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
           // The player is colliding to blocks, finish verification
-          captchaOrFinish();
+          vehicleCheckOrNext();
           return;
         } else {
           // Make sure the player is colliding with blocks but is sending an invalid ground state
@@ -572,14 +612,35 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
-  private void captchaOrFinish() {
-    if (FALLBACK.shouldDoMapCaptcha()) {
+  // TODO: Maybe recode the flow with a better state system?
+  private void vehicleCheckOrNext() {
+    if (performVehicle) {
+      // Initialize the vehicle check
+      handleVehicleCheck();
+      return;
+    }
+    captchaOrNext();
+  }
+
+  private void captchaOrNext() {
+    if (performCaptcha) {
       // Initialize the map captcha
       handleCAPTCHA();
       return;
     }
     // Finish the verification
     finish();
+  }
+
+  private void handleVehicleCheck() {
+    // Set the state to VEHICLE, so we don't handle any unnecessary packets
+    state = State.VEHICLE;
+    // Generate a random entityId for the vehicle (boat)
+    final int vehicleId = PLAYER_ENTITY_ID + RANDOM.nextInt(2, 9);
+    // Send the necessary packets to mount the player on the vehicle
+    user.delayedWrite(new SpawnEntityPacket(vehicleId, 9, posX, posY, posZ));
+    user.delayedWrite(new SetPassengersPacket(vehicleId, PLAYER_ENTITY_ID));
+    user.getChannel().flush();
   }
 
   private void handleCAPTCHA() {
@@ -589,8 +650,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
     // Set the state to MAP_CAPTCHA, so we don't handle any unnecessary packets
-    state = State.MAP_CAPTCHA;
-    if (!Sonar.get().getConfig().getVerification().getGravity().isEnabled()
+    state = State.CAPTCHA;
+    if (!performGravity
       && user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
       // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
       user.delayedWrite(CAPTCHA_SPAWN_POSITION);
@@ -600,7 +661,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // Set slot to map
     user.delayedWrite(new SetSlotPacket(0, 36, 1, 0,
-      ItemMapType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlotPacket.MAP_NBT));
+      ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlotPacket.MAP_NBT));
     // Send random captcha to the player
     captcha = MAP_INFO_PREPARER.getRandomCaptcha();
     Objects.requireNonNull(captcha).delayedWrite(user);
@@ -615,9 +676,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void finish() {
-    // Something must've gone horribly wrong...
-    if (state == State.SUCCESS) return;
-
     state = State.SUCCESS;
 
     // Increment amount of total successful verifications

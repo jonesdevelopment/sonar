@@ -69,14 +69,18 @@ public final class Fallback {
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean shouldVerifyNewPlayers() {
-    return performTimingCheck(Sonar.get().getConfig().getVerification().getTiming());
+    return shouldPerform(Sonar.get().getConfig().getVerification().getTiming());
   }
 
-  public boolean shouldDoMapCaptcha() {
-    return performTimingCheck(Sonar.get().getConfig().getVerification().getMap().getTiming());
+  public boolean shouldPerformCaptcha() {
+    return shouldPerform(Sonar.get().getConfig().getVerification().getMap().getTiming());
   }
 
-  private boolean performTimingCheck(final SonarConfiguration.Verification.Timing timing) {
+  public boolean shouldPerformVehicleCheck() {
+    return shouldPerform(Sonar.get().getConfig().getVerification().getVehicle().getTiming());
+  }
+
+  private static boolean shouldPerform(final SonarConfiguration.Verification.Timing timing) {
     return timing == SonarConfiguration.Verification.Timing.ALWAYS
       || (timing == SonarConfiguration.Verification.Timing.DURING_ATTACK
       && Sonar.get().getAttackTracker().isCurrentlyUnderAttack());

@@ -26,40 +26,23 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
-
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class TransactionPacket implements FallbackPacket {
-  private int windowId, id;
-  private boolean accepted;
+public class PlayerInputPacket implements FallbackPacket {
+  private float sideways, forward;
+  private int encodedFlags;
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      windowId = byteBuf.readByte();
-      id = byteBuf.readShort();
-      accepted = byteBuf.readBoolean();
-    } else {
-      id = byteBuf.readInt();
-      // Always set accepted to true since 1.17 or higher don't use
-      // transactions for inventory confirmation anymore.
-      accepted = true;
-    }
+  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      byteBuf.writeByte(windowId);
-      byteBuf.writeShort((short) id);
-      // The "accepted" field is actually really unnecessary since
-      // it's never even used in the client.
-      byteBuf.writeBoolean(accepted);
-    } else {
-      byteBuf.writeInt(id);
-    }
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    sideways = byteBuf.readFloat();
+    forward = byteBuf.readFloat();
+    encodedFlags = byteBuf.readByte();
   }
 }

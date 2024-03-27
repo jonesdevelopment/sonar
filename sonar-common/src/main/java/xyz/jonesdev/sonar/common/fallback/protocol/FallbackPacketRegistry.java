@@ -157,6 +157,12 @@ public enum FallbackPacketRegistry {
         map(0x20, MINECRAFT_1_19_3, true),
         map(0x24, MINECRAFT_1_19_4, true),
         map(0x25, MINECRAFT_1_20_2, true));
+      clientbound.register(SetPassengersPacket.class, SetPassengersPacket::new,
+        map(0x5D, MINECRAFT_1_7_2, true));
+      clientbound.register(SpawnEntityPacket.class, SpawnEntityPacket::new,
+        map(0x2C, MINECRAFT_1_7_2, true),
+        map(0x2C, MINECRAFT_1_8, true),
+        map(0x01, MINECRAFT_1_20_3, true));
       clientbound.register(UpdateSectionBlocksPacket.class, UpdateSectionBlocksPacket::new,
         map(0x22, MINECRAFT_1_7_2, true),
         map(0x10, MINECRAFT_1_9, true),
@@ -242,6 +248,9 @@ public enum FallbackPacketRegistry {
       clientbound.register(GameEventPacket.class, GameEventPacket::new,
         map(0x20, MINECRAFT_1_20_3, true));
 
+      serverbound.register(PlayerInputPacket.class, PlayerInputPacket::new,
+        //map(0x0C, MINECRAFT_1_8, false),
+        map(0x23, MINECRAFT_1_20_3, false));
       serverbound.register(UniversalChatPacket.class, UniversalChatPacket::new,
         map(0x01, MINECRAFT_1_7_2, false),
         map(0x02, MINECRAFT_1_9, false),

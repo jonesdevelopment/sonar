@@ -48,6 +48,7 @@ public class FallbackPreparer {
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
   // JoinGame
+  public final int PLAYER_ENTITY_ID = 1;
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
@@ -86,7 +87,7 @@ public class FallbackPreparer {
   public final CaptchaPreparer MAP_INFO_PREPARER = new CaptchaPreparer();
 
   public void prepare() {
-    joinGame = new JoinGamePacket(1,
+    joinGame = new JoinGamePacket(PLAYER_ENTITY_ID,
       Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
       0, false, 0,
       true, false, false,
