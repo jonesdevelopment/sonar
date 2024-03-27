@@ -463,111 +463,117 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void handlePositionUpdate(final double x, final double y, final double z, final boolean ground) {
-    // 1.8 does not have a TeleportConfirm packet, so we need to handle the spawning differently
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0
-      && expectedTeleportId != -1 // Check if the teleport ID is currently unset
-      // Then, check if the position is equal to the spawn position
-      && x == SPAWN_X_POSITION && y == spawnYPosition && z == SPAWN_Z_POSITION) {
-      // Reset all values to ensure safety on teleport
-      tick = 1;
-      posY = -1;
-      expectedTeleportId = -1;
-      // Check for ground state in the first packet
-      checkFrame(!ground, "invalid ground state");
-    }
-
-    posX = x;
-    lastY = posY;
-    posY = y;
-    posZ = z;
-
-    // The player is not allowed to move away from the collision platform.
-    // This should not happen unless the max movement tick is configured to a high number.
-    checkFrame(Math.abs(x - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (x)");
-    checkFrame(Math.abs(z - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (z)");
-
-    // Check if the client hasn't moved before sending the first movement packet
-    if (!listenForMovements) {
-      if (posX == SPAWN_X_POSITION && posZ == SPAWN_Z_POSITION) {
-        // Now, once we verified the X and Z position, we can safely check for gravity
-        listenForMovements = true;
+    try {
+      // 1.8 does not have a TeleportConfirm packet, so we need to handle the spawning differently
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0
+        && expectedTeleportId != -1 // Check if the teleport ID is currently unset
+        // Then, check if the position is equal to the spawn position
+        && x == SPAWN_X_POSITION && y == spawnYPosition && z == SPAWN_Z_POSITION) {
+        // Reset all values to ensure safety on teleport
+        tick = 1;
+        posY = -1;
+        expectedTeleportId = -1;
+        // Check for ground state in the first packet
+        checkFrame(!ground, "invalid ground state");
       }
 
-      lastY = spawnYPosition;
-      return;
-    }
+      posX = x;
+      lastY = posY;
+      posY = y;
+      posZ = z;
 
-    final double deltaY = lastY - y;
-    // The deltaY is 0 whenever the player sends their first position packet.
-    // We have to account for this or the player will fail the verification.
-    if (deltaY == 0) {
-      // Check for too many ignored Y ticks
-      final int maxIgnoredTicks = Sonar.get().getConfig().getVerification().getGravity().getMaxIgnoredTicks();
-      checkFrame(++ignoredMovementTicks < maxIgnoredTicks, "too many ignored ticks");
-      return;
-    }
+      // The player is not allowed to move away from the collision platform.
+      // This should not happen unless the max movement tick is configured to a high number.
+      checkFrame(Math.abs(x - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (x)");
+      checkFrame(Math.abs(z - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (z)");
 
-    // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-    double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockType.getBlockHeight()) - y;
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-      collisionOffsetY += 1.62f; // 1.7 is weird and sends the head position instead of the AABB minY
-    }
+      // Check if the client hasn't moved before sending the first movement packet
+      if (!listenForMovements) {
+        if (posX == SPAWN_X_POSITION && posZ == SPAWN_Z_POSITION) {
+          // Now, once we verified the X and Z position, we can safely check for gravity
+          listenForMovements = true;
+        }
 
-    // Check if the player is colliding by performing a basic Y offset check.
-    // The offset cannot be greater than 0 since the blocks will not let the player fall through them.
-    checkFrame(collisionOffsetY <= 0, "fell through blocks: " + collisionOffsetY);
-
-    if (tick > maxMovementTick) {
-      // Log/debug position if enabled in the configuration
-      if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-        FALLBACK.getLogger().info("{}: {}/{}/{} - deltaY: {} - ground: {} - collision: {}",
-          username, x, y, z, deltaY, ground, collisionOffsetY);
-      }
-
-      // If the collision check is disabled, finish verification
-      if (!Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions()) {
-        captchaOrFinish();
+        lastY = spawnYPosition;
         return;
       }
 
-      // Perform the collision check
-      if (ground) {
-        // Make sure the player is actually colliding with the blocks and not only spoofing ground
-        checkFrame(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
-        // Check if the player is not spoofing ground
-        // We cannot use checkFrame as it interferes with the CAPTCHA
-        if (collisionOffsetY > -1) {
+      final double deltaY = lastY - y;
+      // The deltaY is 0 whenever the player sends their first position packet.
+      // We have to account for this or the player will fail the verification.
+      if (deltaY == 0) {
+        // Check for too many ignored Y ticks
+        final int maxIgnoredTicks = Sonar.get().getConfig().getVerification().getGravity().getMaxIgnoredTicks();
+        checkFrame(++ignoredMovementTicks < maxIgnoredTicks, "too many ignored ticks");
+        return;
+      }
+
+      // Calculate the difference between the player's Y coordinate and the expected Y coordinate
+      double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockType.getBlockHeight()) - y;
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+        collisionOffsetY += 1.62f; // 1.7 is weird and sends the head position instead of the AABB minY
+      }
+
+      // Check if the player is colliding by performing a basic Y offset check.
+      // The offset cannot be greater than 0 since the blocks will not let the player fall through them.
+      checkFrame(collisionOffsetY <= 0, "fell through blocks: " + collisionOffsetY);
+
+      if (tick > maxMovementTick) {
+        // Log/debug position if enabled in the configuration
+        if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
+          FALLBACK.getLogger().info("{}: {}/{}/{} - deltaY: {} - ground: {} - collision: {}",
+            username, x, y, z, deltaY, ground, collisionOffsetY);
+        }
+
+        // If the collision check is disabled, finish verification
+        if (!Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions()) {
+          captchaOrFinish();
+          return;
+        }
+
+        // Perform the collision check
+        if (ground) {
+          // Make sure the player is actually colliding with the blocks and not only spoofing ground
+          checkFrame(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
           // The player is colliding to blocks, finish verification
           captchaOrFinish();
+          return;
+        } else {
+          // Make sure the player is colliding with blocks but is sending an invalid ground state
+          checkFrame(collisionOffsetY != 0, "no ground: " + collisionOffsetY);
         }
-        return;
       } else {
-        // Make sure the player is colliding with blocks but is sending an invalid ground state
-        checkFrame(collisionOffsetY != 0, "no ground: " + collisionOffsetY);
-      }
-    } else {
-      // Check if the player is spoofing the ground state
-      checkFrame(!ground, "spoofed ground state");
-    }
-
-    // Make sure we don't run out of predicted Y motions
-    checkFrame(tick < preparedCachedYMotions.length, "too many movements");
-
-    if (!ground) {
-      final double predictedY = preparedCachedYMotions[tick];
-      final double offsetY = Math.abs(deltaY - predictedY);
-
-      // Log/debug position if enabled in the configuration
-      if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-        FALLBACK.getLogger().info("{}: {}/{}/{} - deltaY: {} - prediction: {} - offset: {}",
-          username, x, y, z, deltaY, predictedY, offsetY);
+        // Check if the player is spoofing the ground state
+        checkFrame(!ground, "spoofed ground state");
       }
 
-      // Check if the y motion is roughly equal to the predicted value
-      checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
-        tick, y, offsetY, deltaY, predictedY));
+      // Make sure we don't run out of predicted Y motions
+      checkFrame(tick < preparedCachedYMotions.length, "too many movements");
+
+      if (!ground) {
+        final double predictedY = preparedCachedYMotions[tick];
+        final double offsetY = Math.abs(deltaY - predictedY);
+
+        // Log/debug position if enabled in the configuration
+        if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
+          FALLBACK.getLogger().info("{}: {}/{}/{} - deltaY: {} - prediction: {} - offset: {}",
+            username, x, y, z, deltaY, predictedY, offsetY);
+        }
+
+        // Check if the y motion is roughly equal to the predicted value
+        checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
+          tick, y, offsetY, deltaY, predictedY));
+      }
+      tick++;
+    } catch (CorruptedFrameException exception) {
+      // Do not throw the exception if the user configured to display the CAPTCHA instead
+      if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+        handleCAPTCHA();
+        return;
+      }
+      // Interrupt the netty eventLoop to immediately stop further processing
+      throw new DecoderException(exception);
     }
-    tick++;
   }
 
   private void captchaOrFinish() {
@@ -654,12 +660,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
    */
   private void checkFrame(final boolean condition, final String message) {
     if (!condition) {
-      if (state == State.POSITION // Gravity check
-        && Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-        handleCAPTCHA();
-        return;
+      // Only fail the player if we are either not in the POSITION state,
+      // or if the user configured Sonar to display a CAPTCHA instead of failing.
+      if (state != State.POSITION
+        || !Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+        user.fail(message);
       }
-      user.fail(message);
       throw new CorruptedFrameException(message);
     }
   }
