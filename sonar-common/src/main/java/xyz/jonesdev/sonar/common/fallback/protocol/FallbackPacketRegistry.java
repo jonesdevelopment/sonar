@@ -255,7 +255,8 @@ public enum FallbackPacketRegistry {
         map(0x20, MINECRAFT_1_20_3, true));
 
       serverbound.register(PlayerInputPacket.class, PlayerInputPacket::new,
-        //map(0x0C, MINECRAFT_1_8, false),
+        map(0x0C, MINECRAFT_1_7_2, false),
+        map(-1, MINECRAFT_1_8, false),
         map(0x23, MINECRAFT_1_20_3, false));
       serverbound.register(UniversalChatPacket.class, UniversalChatPacket::new,
         map(0x01, MINECRAFT_1_7_2, false),

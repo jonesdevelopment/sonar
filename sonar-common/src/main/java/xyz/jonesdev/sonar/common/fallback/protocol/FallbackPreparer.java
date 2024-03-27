@@ -150,7 +150,7 @@ public class FallbackPreparer {
 
     // Prepare packets for the vehicle check
     vehicleEntityId = PLAYER_ENTITY_ID + ThreadLocalRandom.current().nextInt(1, 10);
-    removeEntities = new RemoveEntitiesPacket(new int[]{vehicleEntityId});
+    removeEntities = new RemoveEntitiesPacket(vehicleEntityId);
     setPassengers = new SetPassengersPacket(vehicleEntityId, PLAYER_ENTITY_ID);
   }
 }

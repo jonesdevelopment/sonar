@@ -33,12 +33,14 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class RemoveEntitiesPacket implements FallbackPacket {
-  private int[] entityIds;
+  private int entityId; // We only need one entityId
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    writeVarInt(byteBuf, entityIds.length);
-    for (final int entityId : entityIds) {
+    writeVarInt(byteBuf, 1); // size
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.writeInt(entityId);
+    } else {
       writeVarInt(byteBuf, entityId);
     }
   }
