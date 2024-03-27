@@ -32,7 +32,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 @AllArgsConstructor
 public class PlayerInputPacket implements FallbackPacket {
   private float sideways, forward;
-  private int encodedFlags;
+  private boolean jump, unmount;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -40,9 +40,16 @@ public class PlayerInputPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     sideways = byteBuf.readFloat();
     forward = byteBuf.readFloat();
-    encodedFlags = byteBuf.readByte();
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      jump = byteBuf.readBoolean();
+      unmount = byteBuf.readBoolean();
+    } else {
+      final byte flags = byteBuf.readByte();
+      jump = (flags & 0x01) != 0;
+      unmount = (flags & 0x02) != 0;
+    }
   }
 }
