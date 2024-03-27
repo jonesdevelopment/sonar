@@ -316,6 +316,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(inputPacket.getForward() <= 0.98f, "invalid vehicle speed (f)");
       checkFrame(inputPacket.getSideways() <= 0.98f, "invalid vehicle speed (s)");
 
+      // Don't verify if the player tries unmounting or jumping
+      // We can't fail since the player is able to jump or sneak
+      if (inputPacket.isJump() || inputPacket.isUnmount()) return;
+
       // Continue checking or verify the player
       captchaOrNext();
     }
