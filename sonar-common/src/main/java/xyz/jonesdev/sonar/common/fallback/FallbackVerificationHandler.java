@@ -313,10 +313,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets() + maxMovementTick;
     checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
 
-    // Check for timeout since the player could be sending packets but not important ones
-    final long timeout = Sonar.get().getConfig().getVerification().getMaxPing();
-    checkFrame(!login.elapsed(timeout), "time limit exceeded");
-
     if (packet instanceof LoginAcknowledgedPacket) {
       // Check if we are currently expecting a LoginAcknowledged packet
       assertState(State.LOGIN_ACK);

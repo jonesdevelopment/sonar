@@ -202,7 +202,6 @@ public final class SonarConfiguration {
 
     verification.validNameRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-name-regex"));
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
-    verification.maxPing = clamp(generalConfig.getInt("verification.checks.max-ping"), 500, 30000);
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets"), 128, 8192);
 
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
@@ -497,7 +496,6 @@ public final class SonarConfiguration {
     private String blacklistLog;
 
     private int maxLoginPackets;
-    private int maxPing;
     private int readTimeout;
     private int reconnectDelay;
     private int blacklistTime;
