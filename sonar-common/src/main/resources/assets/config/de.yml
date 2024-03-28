@@ -86,6 +86,14 @@ verification:
       # - ADVENTURE: alle UI-Komponenten sind sichtbar
       gamemode: ADVENTURE
 
+    # Checks if the client sends proper packets when mounting a vehicle
+    vehicle:
+      # Possible types: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: New players will always be mounted on a vehicle
+      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
+      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      timing: ALWAYS
+
     # Lässt den Spieler einen Code von einer virtuellen Karte im Chat eingeben
     map-captcha:
       # Wann sollte Sonar den Spieler ein CAPTCHA lösen lassen?

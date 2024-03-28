@@ -89,6 +89,14 @@ verification:
       # - ADVENTURE: všechny komponenty UI jsou zobrazeny
       gamemode: ADVENTURE
 
+    # Checks if the client sends proper packets when mounting a vehicle
+    vehicle:
+      # Possible types: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: New players will always be mounted on a vehicle
+      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
+      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      timing: ALWAYS
+
     # Nechá hráče verifikovat pomocí kódu na mapě ve hře
     map-captcha:
       # Kdy by měl Sonar nechat hráče verifikovat pomocí mapy?

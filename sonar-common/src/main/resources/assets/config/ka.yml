@@ -88,6 +88,14 @@ verification:
       # - ADVENTURE: ყველა UI კომპონენტი ჩანს
       gamemode: ADVENTURE
 
+    # Checks if the client sends proper packets when mounting a vehicle
+    vehicle:
+      # Possible types: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: New players will always be mounted on a vehicle
+      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
+      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      timing: ALWAYS
+
     # დააწერინეთ მოთამაშეს კოდი ჩატში, რომელიც იქნება ნაჩვენები ვირტუალურ მაპზე, რომელიც ხელში ეჭირებად
     map-captcha:
       # როდის უნდა გააკეთებინოს Sonar-მა მოთამაშეს CAPTCHA?

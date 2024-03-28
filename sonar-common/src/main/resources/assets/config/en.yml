@@ -90,11 +90,10 @@ verification:
 
     # Checks if the client sends proper packets when mounting a vehicle
     vehicle:
-      # When should Sonar make the player mount a vehicle?
       # Possible types: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: New players will always receive a CAPTCHA
-      # - DURING_ATTACK: New players will only receive a CAPTCHA during an attack
-      # - NEVER: New players will never receive a CAPTCHA (Recommended)
+      # - ALWAYS: New players will always be mounted on a vehicle
+      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
+      # - NEVER: New players will never be mounted on a vehicle (Recommended)
       timing: ALWAYS
 
     # Make the player type a code from a virtual map in chat
