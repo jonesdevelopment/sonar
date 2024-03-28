@@ -24,6 +24,7 @@ import java.util.UUID;
 // Taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/api/src/main/java/com/velocitypowered/api/util/FastUuidSansHyphens.java
 public final class FastUUID {
+  public static final UUID EMPTY_UUID = new UUID(0L, 0L);
   private static final int MOJANG_BROKEN_UUID_LENGTH = 32;
 
   private static final char[] HEX_DIGITS =

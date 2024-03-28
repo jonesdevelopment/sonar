@@ -26,40 +26,31 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
+import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class TransactionPacket implements FallbackPacket {
-  private int windowId, id;
-  private boolean accepted;
+public final class RemoveEntitiesPacket implements FallbackPacket {
+  private int entityId; // We only need one entityId
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      windowId = byteBuf.readByte();
-      id = byteBuf.readShort();
-      accepted = byteBuf.readBoolean();
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    // No idea why Mojang decided that this is a good idea, but whatever
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) != 0) {
+      writeVarInt(byteBuf, 1); // size
+    }
+
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      byteBuf.writeInt(entityId);
     } else {
-      id = byteBuf.readInt();
-      // Always set accepted to true since 1.17 or higher don't use
-      // transactions for inventory confirmation anymore.
-      accepted = true;
+      writeVarInt(byteBuf, entityId);
     }
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      byteBuf.writeByte(windowId);
-      byteBuf.writeShort((short) id);
-      // The "accepted" field is actually really unnecessary since
-      // it's never even used in the client.
-      byteBuf.writeBoolean(accepted);
-    } else {
-      byteBuf.writeInt(id);
-    }
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 }

@@ -81,14 +81,20 @@ verification:
       captcha-on-fail: false
       # Максимальное количество тиков, на которое должен упасть игрок, чтобы ему было разрешено упасть на платформу
       max-movement-ticks: 8
-      # Максимальное количество проигнорированных изменений движения Y, прежде чем игрок не пройдет проверку
-      max-ignored-ticks: 5
       # Режим игрока во время проверки
       # Возможные типы: SURVIVAL, CREATIVE, ADVENTURE
       # - SURVIVAL: все компоненты пользовательского интерфейса видны
       # - CREATIVE: здоровье и голод скрыты
       # - ADVENTURE: все компоненты пользовательского интерфейса видны
       gamemode: ADVENTURE
+
+    # Checks if the client sends proper packets when mounting a vehicle
+    vehicle:
+      # Possible types: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: New players will always be mounted on a vehicle
+      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
+      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      timing: ALWAYS
 
     # Заставить игрока ввести код с картинки в чат
     map-captcha:

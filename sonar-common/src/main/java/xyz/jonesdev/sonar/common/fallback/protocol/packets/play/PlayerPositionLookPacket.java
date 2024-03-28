@@ -40,19 +40,6 @@ public final class PlayerPositionLookPacket implements FallbackPacket {
   private boolean onGround;
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    x = byteBuf.readDouble();
-    y = byteBuf.readDouble();
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
-      y = byteBuf.readDouble(); // Account for weird y positions on 1.7
-    }
-    z = byteBuf.readDouble();
-    yaw = byteBuf.readFloat();
-    pitch = byteBuf.readFloat();
-    onGround = byteBuf.readBoolean();
-  }
-
-  @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     byteBuf.writeDouble(x);
     byteBuf.writeDouble(y);
@@ -77,7 +64,20 @@ public final class PlayerPositionLookPacket implements FallbackPacket {
   }
 
   @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    x = byteBuf.readDouble();
+    y = byteBuf.readDouble();
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      y = byteBuf.readDouble(); // Account for weird y positions on 1.7
+    }
+    z = byteBuf.readDouble();
+    yaw = byteBuf.readFloat();
+    pitch = byteBuf.readFloat();
+    onGround = byteBuf.readBoolean();
+  }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 41 : 33;
   }
 

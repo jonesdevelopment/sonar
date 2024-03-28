@@ -50,11 +50,6 @@ public final class SetSlotPacket implements FallbackPacket {
     .build();
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     byteBuf.writeByte(windowId);
 
@@ -91,5 +86,10 @@ public final class SetSlotPacket implements FallbackPacket {
         writeCompoundTag(byteBuf, compoundBinaryTag);
       }
     }
+  }
+
+  @Override
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 }

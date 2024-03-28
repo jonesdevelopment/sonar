@@ -46,13 +46,8 @@ public final class ClientSettingsPacket implements FallbackPacket {
   private boolean clientListingAllowed; // Added in 1.18, overwrites server-list "anonymous" mode
 
   @Override
-  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 2;
-  }
-
-  @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 0xff + 1; // 256 as a hard-limit
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -82,7 +77,12 @@ public final class ClientSettingsPacket implements FallbackPacket {
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 2;
+  }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 0xff + 1; // 256 as a hard-limit
   }
 }

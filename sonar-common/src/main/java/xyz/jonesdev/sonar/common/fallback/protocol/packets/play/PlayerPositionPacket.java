@@ -35,6 +35,11 @@ public final class PlayerPositionPacket implements FallbackPacket {
   private boolean onGround;
 
   @Override
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
@@ -43,11 +48,6 @@ public final class PlayerPositionPacket implements FallbackPacket {
     }
     z = byteBuf.readDouble();
     onGround = byteBuf.readBoolean();
-  }
-
-  @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
   }
 
   @Override

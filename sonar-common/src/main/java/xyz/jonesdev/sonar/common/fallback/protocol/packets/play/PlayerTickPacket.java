@@ -34,12 +34,12 @@ public final class PlayerTickPacket implements FallbackPacket {
   private boolean onGround;
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    onGround = byteBuf.readBoolean();
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    onGround = byteBuf.readBoolean();
   }
 }
