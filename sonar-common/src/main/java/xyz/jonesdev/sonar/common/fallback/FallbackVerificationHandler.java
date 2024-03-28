@@ -305,23 +305,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
-  private void handlePacketsVehicle(final @NotNull FallbackPacket packet) {
-    if (packet instanceof PlayerInputPacket) {
-      final PlayerInputPacket inputPacket = (PlayerInputPacket) packet;
-
-      // Make sure the values sent by the client are legitimate
-      checkFrame(inputPacket.getForward() <= 0.98f, "invalid vehicle speed (f)");
-      checkFrame(inputPacket.getSideways() <= 0.98f, "invalid vehicle speed (s)");
-
-      // Don't verify if the player tries unmounting or jumping
-      // We can't fail since the player is able to jump or sneak
-      if (inputPacket.isJump() || inputPacket.isUnmount()) return;
-
-      // Continue checking or verify the player
-      captchaOrNext();
-    }
-  }
-
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     // The player has already been verified, drop all (other) packets
@@ -340,9 +323,22 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
-    // We are expecting vehicle packets, drop all other packets
-    if (state == State.VEHICLE) {
-      handlePacketsVehicle(packet);
+    if (packet instanceof PlayerInputPacket) {
+      // Check if we are currently expecting a PlayerInputPacket packet
+      assertState(State.VEHICLE);
+
+      final PlayerInputPacket inputPacket = (PlayerInputPacket) packet;
+
+      // Make sure the values sent by the client are legitimate
+      checkFrame(inputPacket.getForward() <= 0.98f, "invalid vehicle speed (f)");
+      checkFrame(inputPacket.getSideways() <= 0.98f, "invalid vehicle speed (s)");
+
+      // Don't verify if the player tries unmounting or jumping
+      // We can't fail since the player is able to jump or sneak
+      if (inputPacket.isJump() || inputPacket.isUnmount()) return;
+
+      // Continue checking or verify the player
+      captchaOrNext();
       return;
     }
 
@@ -640,13 +636,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void handleCAPTCHA() {
+    // Set the state to MAP_CAPTCHA, so we don't handle any unnecessary packets
+    state = State.CAPTCHA;
     if (!MAP_INFO_PREPARER.isCaptchaAvailable()) {
       // This should not happen, but we have to return if there is no captcha prepared
       user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
       return;
     }
-    // Set the state to MAP_CAPTCHA, so we don't handle any unnecessary packets
-    state = State.CAPTCHA;
     if (!performGravity
       && user.getProtocolVersion().compareTo(MINECRAFT_1_18_2) >= 0) {
       // Make sure the player escapes the 1.18.2+ "Loading terrain" screen
