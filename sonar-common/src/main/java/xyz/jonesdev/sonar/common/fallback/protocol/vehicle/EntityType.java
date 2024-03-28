@@ -44,8 +44,8 @@ public enum EntityType {
       case MINECRAFT_1_12:
       case MINECRAFT_1_12_1:
       case MINECRAFT_1_12_2:
-      case MINECRAFT_1_13:
         return 1;
+      case MINECRAFT_1_13:
       case MINECRAFT_1_13_1:
       case MINECRAFT_1_13_2:
       case MINECRAFT_1_14:
