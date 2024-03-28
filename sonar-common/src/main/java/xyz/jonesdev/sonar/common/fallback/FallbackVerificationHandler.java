@@ -299,9 +299,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Every 10 seconds
     if (keepAlive.elapsed(10_000L)) {
       // Send a KeepAlive packet to prevent timeout
-      user.delayedWrite(CAPTCHA_KEEP_ALIVE);
-      // Send both packets in one flush
-      user.getChannel().flush();
+      user.write(CAPTCHA_KEEP_ALIVE);
       // Make sure to reset the timer
       keepAlive.reset();
     }
