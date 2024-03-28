@@ -37,7 +37,11 @@ public final class RemoveEntitiesPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    writeVarInt(byteBuf, 1); // size
+    // No idea why Mojang decided that this is a good idea, but whatever
+    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) != 0) {
+      writeVarInt(byteBuf, 1); // size
+    }
+
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
       byteBuf.writeInt(entityId);
     } else {
