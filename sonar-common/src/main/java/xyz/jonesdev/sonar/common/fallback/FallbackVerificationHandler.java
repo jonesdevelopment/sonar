@@ -55,7 +55,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private static final Random RANDOM = new Random();
   private static final Fallback FALLBACK = Sonar.get().getFallback();
 
-  // General
   private final SystemTimer login = new SystemTimer();
   private final @NotNull FallbackUser user;
   private final String username;
@@ -65,12 +64,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   // Checks
   private short expectedTransactionId;
   private int expectedKeepAliveId, expectedTeleportId = -1;
-  private int tick, totalReceivedPackets, ignoredMovementTicks;
+  private int tick, totalReceivedPackets;
   private double posX, posY, posZ, lastY, spawnYPosition;
   private boolean resolvedClientBrand, resolvedClientSettings;
   private boolean listenForMovements;
 
-  // Map captcha
+  // CAPTCHA
   private final SystemTimer keepAlive = new SystemTimer();
   private final SystemTimer actionBar = new SystemTimer();
   private @Nullable MapCaptchaInfo captcha;
@@ -285,7 +284,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     // Every second
-    if (actionBar.elapsed(1000L)) {
+    if (actionBar.elapsed(user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0 ? 10_000L : 1_000L)) {
       final String actionBarMessage = Sonar.get().getConfig().getVerification().getMap().getEnterCodeActionBar();
       // Only send action bar if the message is actually supposed to be sent
       if (!actionBarMessage.isEmpty()) {
