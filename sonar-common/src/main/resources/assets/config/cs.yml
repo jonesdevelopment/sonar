@@ -82,8 +82,6 @@ verification:
       captcha-on-fail: false
       # Maximální počet ticků, který má hráč padat aby byl puštěn na verifikační platformu
       max-movement-ticks: 8
-      # Maximum ignorovaných změn Y-nové souřadnice hráče, aby neprošel verifikací
-      max-ignored-ticks: 5
       # Gamemode hráče při verifikaci
       # Typy: SURVIVAL, CREATIVE, ADVENTURE
       # - SURVIVAL: všechny komponenty UI jsou zobrazeny

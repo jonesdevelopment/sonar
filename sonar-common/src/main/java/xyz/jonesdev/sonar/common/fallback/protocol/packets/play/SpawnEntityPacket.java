@@ -36,15 +36,14 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SpawnEntityPacket implements FallbackPacket {
-  private int entityId = 2;
-  private int entityType = 9;
+  private int entityId, entityType;
   private double x, y, z;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     writeVarInt(byteBuf, entityId);
 
-    final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_9) >= 0;
+    final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_8) > 0;
 
     if (v1_9orHigher) {
       writeUUID(byteBuf, EMPTY_UUID);
@@ -77,9 +76,9 @@ public final class SpawnEntityPacket implements FallbackPacket {
     }
 
     if (v1_9orHigher) {
-      byteBuf.writeShort(0); // velocityX
-      byteBuf.writeShort(0); // velocityY
-      byteBuf.writeShort(0); // velocityZ
+      byteBuf.writeShort(0); // velocity X
+      byteBuf.writeShort(0); // velocity Y
+      byteBuf.writeShort(0); // velocity Z
     }
   }
 

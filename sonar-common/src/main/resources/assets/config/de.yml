@@ -79,8 +79,6 @@ verification:
       captcha-on-fail: false
       # Maximale Anzahl an Ticks, die der Spieler fallen muss, um die Plattform erreichen zu dürfen
       max-movement-ticks: 8
-      # Maximale Anzahl an ignorierten Y-Bewegungsänderungen, bevor ein Spieler die Überprüfung nicht besteht
-      max-ignored-ticks: 5
       # Der Spielmodus des Spielers während der Überprüfung
       # Mögliche Typen: SURVIVAL, CREATIVE, ADVENTURE
       # - SURVIVAL: alle UI-Komponenten sind sichtbar

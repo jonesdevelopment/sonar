@@ -637,7 +637,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     state = State.VEHICLE;
     // Send the necessary packets to mount the player on the vehicle
     final int vehicleType = EntityType.BOAT.getId(user.getProtocolVersion());
-    user.delayedWrite(new SpawnEntityPacket(vehicleEntityId, vehicleType, posX, posY, posZ));
+    user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, vehicleType, posX, posY, posZ));
     user.delayedWrite(setPassengers);
     user.getChannel().flush();
   }

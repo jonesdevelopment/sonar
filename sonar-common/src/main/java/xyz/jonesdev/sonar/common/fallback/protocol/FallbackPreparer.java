@@ -68,7 +68,7 @@ public class FallbackPreparer {
   // Vehicle
   public FallbackPacket removeEntities;
   public FallbackPacket setPassengers;
-  public int vehicleEntityId;
+  public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1;
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
@@ -149,8 +149,7 @@ public class FallbackPreparer {
     }
 
     // Prepare packets for the vehicle check
-    vehicleEntityId = PLAYER_ENTITY_ID + ThreadLocalRandom.current().nextInt(1, 10);
-    removeEntities = new RemoveEntitiesPacket(vehicleEntityId);
-    setPassengers = new SetPassengersPacket(vehicleEntityId, PLAYER_ENTITY_ID);
+    removeEntities = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
+    setPassengers = new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID);
   }
 }
