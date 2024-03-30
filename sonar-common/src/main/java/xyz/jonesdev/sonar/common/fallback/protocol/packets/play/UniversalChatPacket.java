@@ -29,9 +29,9 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.utility.component.ComponentHolder;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
+import static xyz.jonesdev.sonar.common.fallback.netty.FastUUID.EMPTY_UUID;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
@@ -40,7 +40,6 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class UniversalChatPacket implements FallbackPacket {
-  private static final UUID PLACEHOLDER_UUID = new UUID(0L, 0L);
   private static final int DIV_FLOOR = -Math.floorDiv(-20, 8);
 
   public static final byte CHAT_TYPE = (byte) 0;
@@ -85,7 +84,7 @@ public final class UniversalChatPacket implements FallbackPacket {
     // Sender
     if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
       && protocolVersion.compareTo(MINECRAFT_1_19) < 0) {
-      writeUUID(byteBuf, PLACEHOLDER_UUID);
+      writeUUID(byteBuf, EMPTY_UUID);
     }
   }
 

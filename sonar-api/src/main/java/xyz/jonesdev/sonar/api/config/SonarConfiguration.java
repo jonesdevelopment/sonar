@@ -171,15 +171,16 @@ public final class SonarConfiguration {
 
     // Verification
     verification.timing = Verification.Timing.valueOf(generalConfig.getString("verification.timing"));
+
     verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled");
     verification.gravity.checkCollisions = generalConfig.getBoolean("verification.checks.gravity.check-collisions");
     verification.gravity.captchaOnFail = generalConfig.getBoolean("verification.checks.gravity.captcha-on-fail");
     verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks"), 2, 100);
-    verification.gravity.maxIgnoredTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-ignored-ticks"), 1, 128);
     verification.gravity.gamemode = Verification.Gravity.Gamemode.valueOf(generalConfig.getString("verification.checks.gravity.gamemode"));
 
-    verification.map.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.map-captcha.timing"));
+    verification.vehicle.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.vehicle.timing"));
 
+    verification.map.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.map-captcha.timing"));
     verification.map.flare = generalConfig.getBoolean("verification.checks.map-captcha.effects.flare");
     verification.map.scratches = generalConfig.getBoolean("verification.checks.map-captcha.effects.scratches");
     verification.map.ripple = generalConfig.getBoolean("verification.checks.map-captcha.effects.ripple");
@@ -189,7 +190,6 @@ public final class SonarConfiguration {
       "verification.checks.map-captcha.effects.saturation", 0.3);
     verification.map.distortion = (float) generalConfig.getYaml().getDouble(
       "verification.checks.map-captcha.effects.distortion", 2);
-
     verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute");
     verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration");
     verification.map.maxTries = generalConfig.getInt("verification.checks.map-captcha.max-tries");
@@ -202,7 +202,6 @@ public final class SonarConfiguration {
 
     verification.validNameRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-name-regex"));
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
-    verification.maxPing = clamp(generalConfig.getInt("verification.checks.max-ping"), 500, 30000);
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets"), 128, 8192);
 
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
@@ -435,6 +434,7 @@ public final class SonarConfiguration {
 
     private final Map map = new Map();
     private final Gravity gravity = new Gravity();
+    private final Vehicle vehicle = new Vehicle();
     private final Brand brand = new Brand();
 
     @Getter
@@ -464,7 +464,6 @@ public final class SonarConfiguration {
       private boolean captchaOnFail;
       private Gamemode gamemode;
       private int maxMovementTicks;
-      private int maxIgnoredTicks;
 
       @Getter
       @RequiredArgsConstructor
@@ -477,6 +476,11 @@ public final class SonarConfiguration {
 
         private final int id;
       }
+    }
+
+    @Getter
+    public static final class Vehicle {
+      private Timing timing;
     }
 
     @Getter
@@ -497,7 +501,6 @@ public final class SonarConfiguration {
     private String blacklistLog;
 
     private int maxLoginPackets;
-    private int maxPing;
     private int readTimeout;
     private int reconnectDelay;
     private int blacklistTime;

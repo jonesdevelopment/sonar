@@ -41,13 +41,8 @@ public final class PluginMessagePacket extends DeferredByteBufHolder implements 
   }
 
   @Override
-  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 4;
-  }
-
-  @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    return 0xFFF; // strict size limit
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -66,7 +61,12 @@ public final class PluginMessagePacket extends DeferredByteBufHolder implements 
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 4;
+  }
+
+  @Override
+  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    return 0xFFF; // strict size limit
   }
 }

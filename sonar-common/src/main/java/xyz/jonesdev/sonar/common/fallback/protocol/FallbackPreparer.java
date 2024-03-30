@@ -28,6 +28,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigur
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 @UtilityClass
 public class FallbackPreparer {
 
@@ -48,6 +50,7 @@ public class FallbackPreparer {
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
   // JoinGame
+  public final int PLAYER_ENTITY_ID = ThreadLocalRandom.current().nextInt(10);
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
@@ -61,6 +64,11 @@ public class FallbackPreparer {
   public FallbackPacket reconnectedTooFast;
   public FallbackPacket protocolBlacklisted;
   public FallbackPacket invalidUsername;
+
+  // Vehicle
+  public FallbackPacket removeEntities;
+  public FallbackPacket setPassengers;
+  public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1;
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
@@ -86,7 +94,7 @@ public class FallbackPreparer {
   public final CaptchaPreparer MAP_INFO_PREPARER = new CaptchaPreparer();
 
   public void prepare() {
-    joinGame = new JoinGamePacket(1,
+    joinGame = new JoinGamePacket(PLAYER_ENTITY_ID,
       Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
       0, false, 0,
       true, false, false,
@@ -139,5 +147,9 @@ public class FallbackPreparer {
 
       MAP_INFO_PREPARER.prepare();
     }
+
+    // Prepare packets for the vehicle check
+    removeEntities = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
+    setPassengers = new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID);
   }
 }

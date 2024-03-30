@@ -43,8 +43,6 @@ public class ClientAbilitiesPacket implements FallbackPacket {
 
   @Override
   public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    encodedFlags = byteBuf.readByte();
-    flySpeed = byteBuf.readFloat();
-    walkSpeed = byteBuf.readFloat();
+    throw new UnsupportedOperationException();
   }
 }

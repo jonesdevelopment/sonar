@@ -81,14 +81,20 @@ verification:
       captcha-on-fail: false
       # Maximum number of ticks the player has to fall in order to be allowed to hit the platform
       max-movement-ticks: 8
-      # Maximum number of ignored Y movement changes before a player fails verification
-      max-ignored-ticks: 5
       # The gamemode of the player during verification
       # Possible types: SURVIVAL, CREATIVE, ADVENTURE
       # - SURVIVAL: all UI components are visible
       # - CREATIVE: health and hunger are hidden
       # - ADVENTURE: all UI components are visible
       gamemode: ADVENTURE
+
+    # Checks if the client sends proper packets when mounting a vehicle
+    vehicle:
+      # Possible types: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: New players will always be mounted on a vehicle
+      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
+      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      timing: ALWAYS
 
     # Make the player type a code from a virtual map in chat
     map-captcha:

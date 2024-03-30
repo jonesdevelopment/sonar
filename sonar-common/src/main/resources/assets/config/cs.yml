@@ -82,14 +82,20 @@ verification:
       captcha-on-fail: false
       # Maximální počet ticků, který má hráč padat aby byl puštěn na verifikační platformu
       max-movement-ticks: 8
-      # Maximum ignorovaných změn Y-nové souřadnice hráče, aby neprošel verifikací
-      max-ignored-ticks: 5
       # Gamemode hráče při verifikaci
       # Typy: SURVIVAL, CREATIVE, ADVENTURE
       # - SURVIVAL: všechny komponenty UI jsou zobrazeny
       # - CREATIVE: životy a hunger neni zobrazen
       # - ADVENTURE: všechny komponenty UI jsou zobrazeny
       gamemode: ADVENTURE
+
+    # Checks if the client sends proper packets when mounting a vehicle
+    vehicle:
+      # Possible types: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: New players will always be mounted on a vehicle
+      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
+      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      timing: ALWAYS
 
     # Nechá hráče verifikovat pomocí kódu na mapě ve hře
     map-captcha:
