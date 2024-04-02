@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.FallbackUserState;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.*;
@@ -48,6 +49,7 @@ import java.util.regex.Pattern;
 import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Gravity.Gamemode.CREATIVE;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackUserState.*;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -59,7 +61,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private final @NotNull FallbackUser user;
   private final String username;
   private final UUID playerUuid;
-  private @NotNull State state = State.LOGIN_ACK; // 1.20.2
 
   // Checks
   private short expectedTransactionId;
@@ -77,23 +78,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   // Cached options to make sure the original values don't change throughout the verification
   private final boolean performVehicle, performCaptcha, performGravity, performCollisions;
-
-  public enum State {
-    // 1.20.2 configuration state
-    LOGIN_ACK, CONFIGURE,
-    // pre-JOIN ping check
-    KEEP_ALIVE,
-    // post-JOIN checks
-    CLIENT_SETTINGS, PLUGIN_MESSAGE, TRANSACTION,
-    // PLAY checks
-    TELEPORT, POSITION,
-    // Vehicle check
-    VEHICLE,
-    // CAPTCHA
-    CAPTCHA,
-    // Done
-    SUCCESS
-  }
 
   public FallbackVerificationHandler(final @NotNull FallbackUser user,
                                      final @NotNull String username,
@@ -114,7 +98,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private void configure() {
     // Set the state to CONFIGURE to avoid false positives
-    state = State.CONFIGURE;
+    user.setState(CONFIGURE);
     // Send the necessary configuration packets to the client
     user.delayedWrite(REGISTRY_SYNC);
     user.delayedWrite(FINISH_CONFIGURATION);
@@ -145,7 +129,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       sendJoinGamePacket();
     } else {
       // Set the state to KEEP_ALIVE to avoid false positives
-      state = State.KEEP_ALIVE;
+      user.setState(KEEP_ALIVE);
       // Generate a random KeepAlive ID for the pre-join check
       expectedKeepAliveId = RANDOM.nextInt();
       // Send first KeepAlive to check if the connection is somewhat responsive
@@ -156,7 +140,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void sendTransaction() {
     // Set the state to TRANSACTION to avoid false positives
     // and go on with the flow of the verification.
-    state = State.TRANSACTION;
+    user.setState(TRANSACTION);
     // Generate a random transaction ID
     expectedTransactionId = (short) RANDOM.nextInt();
     // Send a transaction with the given ID
@@ -169,7 +153,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Set the state to CLIENT_SETTINGS to avoid false positives
       // (1.20.2 needs the LOGIN_ACK state) and go on with
       // the flow of the verification.
-      state = State.CLIENT_SETTINGS;
+      user.setState(CLIENT_SETTINGS);
     }
     // Send the JoinGame packet so we can continue the verification
     user.write(joinGame);
@@ -183,7 +167,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private void sendAbilitiesAndTeleport() {
     // Set the state to TELEPORT to avoid false positives
     // and go on with the flow of the verification.
-    state = State.TELEPORT;
+    user.setState(TELEPORT);
     // Make sure the player is unable to fly (e.g. if the player is in creative mode)
     if (Sonar.get().getConfig().getVerification().getGravity().getGamemode() == CREATIVE) {
       user.delayedWrite(DEFAULT_ABILITIES);
@@ -212,7 +196,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
     // Set the state to POSITION to avoid false positives
     // and go on with the flow of the verification.
-    state = State.POSITION;
+    user.setState(POSITION);
     // 1.20.3 packets introduced game events
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_3) >= 0) {
       // Make sure the client knows that we're sending chunks next
@@ -307,8 +291,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    // The player has already been verified, drop all (other) packets
-    if (state == State.SUCCESS) return;
+    // The player has already been verified or failed the verification -> drop packet
+    if (!user.getState().canReceivePackets()) return;
 
     // Calculate maximum amount of packets sent by the client to the server
     final int maxPackets = Sonar.get().getConfig().getVerification().getMaxLoginPackets()
@@ -318,14 +302,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     checkFrame(++totalReceivedPackets < maxPackets, "too many packets");
 
     // We are expecting a code in chat, drop all other packets
-    if (state == State.CAPTCHA) {
+    if (user.getState() == CAPTCHA) {
       handlePacketsCAPTCHA(packet);
       return;
     }
 
     if (packet instanceof PlayerInputPacket) {
       // Check if we are currently expecting a PlayerInputPacket packet
-      assertState(State.VEHICLE);
+      assertState(VEHICLE);
 
       final PlayerInputPacket inputPacket = (PlayerInputPacket) packet;
 
@@ -344,7 +328,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     if (packet instanceof LoginAcknowledgedPacket) {
       // Check if we are currently expecting a LoginAcknowledged packet
-      assertState(State.LOGIN_ACK);
+      assertState(LOGIN_ACK);
 
       // Start the configuration process for 1.20.2 clients
       configure();
@@ -353,7 +337,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     if (packet instanceof FinishConfigurationPacket) {
       // Check if we are currently expecting a FinishConfiguration packet
-      assertState(State.CONFIGURE);
+      assertState(CONFIGURE);
 
       // Check if the client has already sent valid ClientSettings and PluginMessage packets
       checkFrame(resolvedClientBrand, "did not resolve client brand");
@@ -372,7 +356,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       if (keepAlive.getId() == 0 && user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0) return;
 
       // Check if we are currently expecting a KeepAlive packet
-      assertState(State.KEEP_ALIVE);
+      assertState(KEEP_ALIVE);
 
       checkFrame(keepAlive.getId() == expectedKeepAliveId, "invalid KeepAlive ID");
 
@@ -388,8 +372,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(validateClientLocale(user, clientSettings.getLocale()), "invalid locale");
 
       // Clients sometimes mess up the ClientSettings or PluginMessage packet.
-      if (state == State.CLIENT_SETTINGS) {
-        state = State.PLUGIN_MESSAGE;
+      // Probably caused by some weird race condition in Minecraft 1.13+
+      if (user.getState() == CLIENT_SETTINGS) {
+        user.setState(PLUGIN_MESSAGE);
       }
 
       // Make sure we mark the ClientSettings as valid
@@ -419,7 +404,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         }
 
         // Clients sometimes mess up the ClientSettings or PluginMessage packet.
-        if (state == State.PLUGIN_MESSAGE) {
+        if (user.getState() == PLUGIN_MESSAGE) {
           // Send the transaction packet
           sendTransaction();
         }
@@ -432,7 +417,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     if (packet instanceof TransactionPacket) {
       // Check if we are currently expecting a Transaction packet
-      assertState(State.TRANSACTION);
+      assertState(TRANSACTION);
 
       final TransactionPacket transaction = (TransactionPacket) packet;
 
@@ -460,7 +445,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     if (packet instanceof TeleportConfirmPacket) {
       // Check if we are currently expecting a TeleportConfirm packet
-      assertState(State.TELEPORT);
+      assertState(TELEPORT);
 
       // Check if the teleport ID is correct
       final TeleportConfirmPacket teleportConfirm = (TeleportConfirmPacket) packet;
@@ -476,7 +461,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
-    if (state != State.LOGIN_ACK) {
+    if (user.getState() != LOGIN_ACK) {
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
@@ -627,7 +612,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private void handleVehicleCheck() {
     // Set the state to VEHICLE, so we don't handle any unnecessary packets
-    state = State.VEHICLE;
+    user.setState(VEHICLE);
     // Send the necessary packets to mount the player on the vehicle
     final int vehicleType = EntityType.BOAT.getId(user.getProtocolVersion());
     user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, vehicleType, posX, posY, posZ));
@@ -636,8 +621,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void handleCAPTCHA() {
-    // Set the state to MAP_CAPTCHA, so we don't handle any unnecessary packets
-    state = State.CAPTCHA;
+    // Set the state to CAPTCHA, so we don't handle any unnecessary packets
+    user.setState(CAPTCHA);
     if (!MAP_INFO_PREPARER.isCaptchaAvailable()) {
       // This should not happen, but we have to return if there is no captcha prepared
       user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
@@ -673,10 +658,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   private void finish() {
     // Make sure we drop all further packets
-    state = State.SUCCESS;
-
-    // Make sure we don't accidentally fail the verification
-    user.setVerified(true);
+    user.setState(SUCCESS);
 
     // Increment amount of total successful verifications
     GlobalSonarStatistics.totalSuccessfulVerifications++;
@@ -702,7 +684,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
    *
    * @param expectedState Expected state
    */
-  private void assertState(final @NotNull State expectedState) {
+  private void assertState(final @NotNull FallbackUserState expectedState) {
+    final FallbackUserState state = user.getState();
     checkFrame(state == expectedState, "expected " + expectedState + ", got " + state);
   }
 
@@ -716,7 +699,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (!condition) {
       // Only fail the player if we are either not in the POSITION state,
       // or if the user configured Sonar to display a CAPTCHA instead of failing.
-      if (state != State.POSITION
+      if (user.getState() != POSITION
         || !Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
         user.fail(message);
       }

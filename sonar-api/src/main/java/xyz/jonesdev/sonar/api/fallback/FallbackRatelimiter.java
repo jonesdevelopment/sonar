@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api.fallback;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +30,10 @@ import java.net.InetAddress;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FallbackRatelimiter {
   static final FallbackRatelimiter INSTANCE = new FallbackRatelimiter();
-  private Cache<InetAddress, Byte> expiringCache;
+
+  private Cache<InetAddress, Byte> attemptCache;
+  @Getter
+  private Cache<InetAddress, Integer> failCountCache;
 
   /**
    * We don't want to clean up the cache in the
@@ -37,7 +41,8 @@ public final class FallbackRatelimiter {
    * it would take up too many resources.
    */
   public void cleanUpCache() {
-    expiringCache.cleanUp();
+    attemptCache.cleanUp();
+    failCountCache.cleanUp();
   }
 
   /**
@@ -49,12 +54,27 @@ public final class FallbackRatelimiter {
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean attempt(final @NotNull InetAddress inetAddress) {
     // Cache the IP address if it's not already cached
-    if (!expiringCache.asMap().containsKey(inetAddress)) {
+    if (!attemptCache.asMap().containsKey(inetAddress)) {
       // Cache the IP address
-      expiringCache.put(inetAddress, (byte) 0);
+      attemptCache.put(inetAddress, (byte) 0);
       return true;
     }
     // Deny the connection attempt
     return false;
+  }
+
+  /**
+   * Checks if the player is failing verifications too often
+   * Increments the number of times this user has failed the verification
+   *
+   * @param inetAddress IP address of the player
+   * @param count       Count of previously failed verifications
+   */
+  public void incrementFails(final @NotNull InetAddress inetAddress, final int count) {
+    // Make sure to remove the old values from the cache
+    if (count > 0) {
+      failCountCache.invalidate(inetAddress);
+    }
+    failCountCache.put(inetAddress, count + 1);
   }
 }

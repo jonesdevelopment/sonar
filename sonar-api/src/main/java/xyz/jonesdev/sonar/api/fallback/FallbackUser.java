@@ -17,8 +17,6 @@
 
 package xyz.jonesdev.sonar.api.fallback;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
@@ -26,8 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.net.InetAddress;
-import java.time.Duration;
-import java.util.Objects;
 import java.util.UUID;
 
 public interface FallbackUser {
@@ -37,12 +33,9 @@ public interface FallbackUser {
 
   @NotNull ProtocolVersion getProtocolVersion();
 
-  /**
-   * @return Temporary variable to see if the user passed the verification
-   */
-  boolean isVerified();
+  @NotNull FallbackUserState getState();
 
-  void setVerified(final boolean verified);
+  void setState(final FallbackUserState state);
 
   /**
    * Disconnect the player during/after verification
@@ -89,40 +82,6 @@ public interface FallbackUser {
     } else {
       ReferenceCountUtil.release(msg);
     }
-  }
-
-  Cache<InetAddress, Integer> GLOBAL_FAIL_COUNT = Caffeine.newBuilder()
-    .expireAfterWrite(Duration.ofMinutes(5)) // expire after 5 minutes
-    .build();
-
-  /**
-   * Increments the number of times this user (by IP address) has failed the verification
-   */
-  default void incrementFails() {
-    final InetAddress inetAddress = Objects.requireNonNull(getInetAddress());
-    final int failCount = getFailedCount();
-    // Make sure to remove the old values from the cache
-    if (failCount > 0) {
-      GLOBAL_FAIL_COUNT.invalidate(inetAddress);
-    }
-    GLOBAL_FAIL_COUNT.put(inetAddress, failCount + 1);
-  }
-
-  /**
-   * @return The number of times this user (by IP address) has failed the verification
-   * @apiNote Returns 0 if no key/value is present in the cache
-   */
-  default int getFailedCount() {
-    // Make sure to clean up the cache before we try to get cached values
-    GLOBAL_FAIL_COUNT.cleanUp();
-    return GLOBAL_FAIL_COUNT.asMap().getOrDefault(Objects.requireNonNull(getInetAddress()), 0);
-  }
-
-  /**
-   * Removes all previously failed verifications
-   */
-  default void invalidateFails() {
-    GLOBAL_FAIL_COUNT.invalidate(Objects.requireNonNull(getInetAddress()));
   }
 
   /**
