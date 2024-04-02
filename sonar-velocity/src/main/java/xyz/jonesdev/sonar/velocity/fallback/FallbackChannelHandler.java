@@ -26,7 +26,6 @@ import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackBandwidthHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandlerAdapter;
@@ -182,7 +181,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
       }
 
       // Create an instance for the Fallback connection
-      final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
+      user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
       // Let the verification handler take over the channel
       user.hijack(serverLogin.getUsername(), offlineUUID, MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
     }));

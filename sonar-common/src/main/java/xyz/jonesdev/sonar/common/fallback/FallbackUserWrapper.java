@@ -22,10 +22,10 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserBlacklistedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
@@ -53,6 +53,8 @@ public final class FallbackUserWrapper implements FallbackUser {
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
+  @Setter
+  private boolean verified;
 
   public FallbackUserWrapper(final @NotNull Channel channel,
                              final @NotNull InetAddress inetAddress,
@@ -127,20 +129,19 @@ public final class FallbackUserWrapper implements FallbackUser {
   }
 
   @Override
-  public void fail(final @Nullable String reason) {
+  public void fail(final @NotNull String reason) {
     if (channel.isActive()) {
+      // Disconnect the player if the channel is open
       disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
 
-      if (reason != null) {
-        // Only log the failed message if the server isn't under attack.
-        // We let the user override this through the configuration.
-        if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
-          || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-          Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
-            .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-            .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
-            .replace("%reason%", reason));
-        }
+      // Only log the failed message if the server isn't under attack.
+      // We let the user override this through the configuration.
+      if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
+        || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
+          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
+          .replace("%reason%", reason));
       }
     }
 

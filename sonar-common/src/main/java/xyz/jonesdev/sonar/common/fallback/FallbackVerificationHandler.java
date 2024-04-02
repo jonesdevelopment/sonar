@@ -672,7 +672,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   }
 
   private void finish() {
+    // Make sure we drop all further packets
     state = State.SUCCESS;
+
+    // Make sure we don't accidentally fail the verification
+    user.setVerified(true);
 
     // Increment amount of total successful verifications
     GlobalSonarStatistics.totalSuccessfulVerifications++;
@@ -708,7 +712,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
    * @param condition Condition to fail if it's false
    * @param message   Messages displayed in the stacktrace
    */
-  private void checkFrame(final boolean condition, final String message) {
+  private void checkFrame(final boolean condition, final @NotNull String message) {
     if (!condition) {
       // Only fail the player if we are either not in the POSITION state,
       // or if the user configured Sonar to display a CAPTCHA instead of failing.

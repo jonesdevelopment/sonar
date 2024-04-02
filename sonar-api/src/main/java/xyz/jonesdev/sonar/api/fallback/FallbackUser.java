@@ -23,7 +23,6 @@ import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.net.InetAddress;
@@ -37,6 +36,13 @@ public interface FallbackUser {
   @NotNull InetAddress getInetAddress();
 
   @NotNull ProtocolVersion getProtocolVersion();
+
+  /**
+   * @return Temporary variable to see if the user passed the verification
+   */
+  boolean isVerified();
+
+  void setVerified(final boolean verified);
 
   /**
    * Disconnect the player during/after verification
@@ -126,6 +132,8 @@ public interface FallbackUser {
    * the player will be temporarily denied from verifying.
    *
    * @param reason Reason for failing the verification
+   * @apiNote The {@link xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent}
+   * will not be thrown if no reason is given
    */
-  void fail(final @Nullable String reason);
+  void fail(final @NotNull String reason);
 }
