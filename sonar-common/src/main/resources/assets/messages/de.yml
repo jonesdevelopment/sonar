@@ -238,7 +238,7 @@ verification:
   # Nachricht, die angezeigt wird, wenn jemand die Verifizierung nicht besteht
   failed:
     - '%header%'
-    - <red>Du hast die Verifizierung nicht bestanden.
+    - <red>Du hast die Bot-Verifizierung nicht bestanden.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
     - <gold>Brauchst du Hilfe? <gray>%support-url%
     - '%footer%'
