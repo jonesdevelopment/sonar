@@ -170,6 +170,9 @@ verification:
   # How long should a player wait before reconnecting during verification
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   rejoin-delay: 8000
+  # How long should Sonar remember the amount of failed verifications for a player?
+  # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+  remember-time: 120000
   # How long should an IP address be denied from logging in when failing the verification too often?
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   blacklist-time: 600000

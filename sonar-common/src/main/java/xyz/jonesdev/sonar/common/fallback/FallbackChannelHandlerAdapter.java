@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
@@ -36,6 +37,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   protected @Nullable String username;
   protected InetAddress inetAddress;
   protected ProtocolVersion protocolVersion;
+  protected @Nullable FallbackUser user;
 
   protected static final Fallback FALLBACK = Sonar.get().getFallback();
 
@@ -58,6 +60,12 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     if (inetAddress != null) {
       // Remove the IP address from the queue
       FALLBACK.getQueue().remove(inetAddress);
+    }
+    // The player cannot be in the verification if the user object doesn't exist,
+    // or if the user failed/succeeded the bot verification process.
+    if (user != null && user.getState().canReceivePackets()) {
+      // Mark the verification attempt as failed
+      user.fail("disconnected during verification");
     }
     // Make sure to let the server handle the rest
     ctx.fireChannelInactive();

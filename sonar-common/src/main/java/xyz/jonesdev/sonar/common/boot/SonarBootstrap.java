@@ -132,9 +132,12 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Prepare cached packets
     FallbackPreparer.prepare();
 
-    // Update ratelimiter cache
-    getFallback().getRatelimiter().setExpiringCache(Caffeine.newBuilder()
+    // Update ratelimiter caches
+    getFallback().getRatelimiter().setAttemptCache(Caffeine.newBuilder()
       .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getReconnectDelay()))
+      .build());
+    getFallback().getRatelimiter().setFailCountCache(Caffeine.newBuilder()
+      .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getRememberTime()))
       .build());
 
     // Update blacklist cache

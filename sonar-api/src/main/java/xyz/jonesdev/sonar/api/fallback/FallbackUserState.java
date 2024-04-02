@@ -15,21 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.event.impl;
+package xyz.jonesdev.sonar.api.fallback;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+public enum FallbackUserState {
+  // 1.20.2 configuration state
+  LOGIN_ACK, CONFIGURE,
+  // pre-JOIN ping check
+  KEEP_ALIVE,
+  // post-JOIN checks
+  CLIENT_SETTINGS, PLUGIN_MESSAGE, TRANSACTION,
+  // PLAY checks
+  TELEPORT, POSITION,
+  // Vehicle check
+  VEHICLE,
+  // CAPTCHA
+  CAPTCHA,
+  // Done
+  SUCCESS,
+  // Placeholder
+  FAILED;
 
-@Getter
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor
-public final class UserVerifyFailedEvent implements SonarEvent {
-  private final @NotNull FallbackUser user;
-  private final @NotNull String reason;
+  public boolean canReceivePackets() {
+    return this != FAILED && this != SUCCESS;
+  }
 }

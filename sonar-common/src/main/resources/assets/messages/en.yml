@@ -244,7 +244,7 @@ verification:
   # Disconnect message that is shown when someone fails verification
   failed:
     - '%header%'
-    - <red>You have failed the verification.
+    - <red>You have failed the bot verification.
     - <gray>Please wait a few seconds before trying to verify again.
     - <gold>Need help? <gray>%support-url%
     - '%footer%'

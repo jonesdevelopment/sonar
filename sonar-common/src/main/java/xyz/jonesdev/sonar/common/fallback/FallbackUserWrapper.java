@@ -22,15 +22,16 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserBlacklistedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.FallbackUserState;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
@@ -53,6 +54,8 @@ public final class FallbackUserWrapper implements FallbackUser {
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
+  @Setter
+  private FallbackUserState state = FallbackUserState.LOGIN_ACK; // 1.20.2+
 
   public FallbackUserWrapper(final @NotNull Channel channel,
                              final @NotNull InetAddress inetAddress,
@@ -127,21 +130,21 @@ public final class FallbackUserWrapper implements FallbackUser {
   }
 
   @Override
-  public void fail(final @Nullable String reason) {
-    if (channel.isActive()) {
-      disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
+  public void fail(final @NotNull String reason) {
+    // Make sure to set the state to failed to drop all handlers
+    setState(FallbackUserState.FAILED);
 
-      if (reason != null) {
-        // Only log the failed message if the server isn't under attack.
-        // We let the user override this through the configuration.
-        if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
-          || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-          Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
-            .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-            .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
-            .replace("%reason%", reason));
-        }
-      }
+    // Disconnect the player if the channel is open
+    disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
+
+    // Only log the failed message if the server isn't under attack.
+    // We let the user override this through the configuration.
+    if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
+      || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+      Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
+        .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
+        .replace("%reason%", reason));
     }
 
     // Increment amount of total failed verifications
@@ -150,35 +153,37 @@ public final class FallbackUserWrapper implements FallbackUser {
     // Call the VerifyFailedEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifyFailedEvent(this, reason));
 
-    // Use a label, so we can easily add more code beneath this method
+    // Use a label, so we can easily add more code beneath this method in the future
     blacklist: {
       // Check if the player has too many failed attempts
       final int blacklistThreshold = Sonar.get().getConfig().getVerification().getBlacklistThreshold();
       // The user is allowed to disable the blacklist entirely by setting the threshold to 0
       if (blacklistThreshold <= 0) break blacklist;
 
-      // Add 1 to the amount of fails since we haven't updated the cached entries yet (for performance)
-      final int failCount = getFailedCount() + 1;
+      // Use 1 as the default amount of fails since we haven't cached anything yet
+      final int failCount = Sonar.get().getFallback().getRatelimiter().getFailCountCache()
+        .asMap().getOrDefault(inetAddress, 1);
+
       // Now we simply need to check if the threshold is reached
-      if (failCount >= blacklistThreshold) {
-        // Call the BotBlacklistedEvent for external API usage
-        Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
-
-        // Increment amount of total blacklisted players
-        GlobalSonarStatistics.totalBlacklistedPlayers++;
-
-        Sonar.get().getFallback().getBlacklist().put(getInetAddress(), (byte) 0);
-        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
-          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
-
-        // Invalidate the cached entry to ensure memory safety
-        invalidateFails();
+      if (failCount < blacklistThreshold) {
+        // Make sure we increment the number of fails
+        Sonar.get().getFallback().getRatelimiter().incrementFails(inetAddress, failCount);
         break blacklist;
       }
 
-      // Make sure we increment the number of fails
-      incrementFails();
+      // Call the BotBlacklistedEvent for external API usage
+      Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
+
+      // Increment amount of total blacklisted players
+      GlobalSonarStatistics.totalBlacklistedPlayers++;
+
+      Sonar.get().getFallback().getBlacklist().put(getInetAddress(), (byte) 0);
+      Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
+        .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
+
+      // Invalidate the cached entry to ensure memory safety
+      Sonar.get().getFallback().getRatelimiter().getFailCountCache().invalidate(inetAddress);
     }
   }
 

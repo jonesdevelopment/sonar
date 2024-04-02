@@ -29,7 +29,6 @@ import net.md_5.bungee.protocol.packet.LoginRequest;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackBandwidthHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandlerAdapter;
@@ -203,7 +202,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
       }
 
       // Create an instance for the Fallback connection
-      final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
+      user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
       // Let the verification handler take over the channel
       user.hijack(loginRequest.getData(), offlineUUID, PACKET_ENCODER, PACKET_DECODER, TIMEOUT_HANDLER, BOSS_HANDLER);
     }));
