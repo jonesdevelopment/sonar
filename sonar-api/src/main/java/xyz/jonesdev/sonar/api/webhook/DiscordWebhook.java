@@ -34,14 +34,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
+
 @RequiredArgsConstructor
 public final class DiscordWebhook {
   private final String url;
 
-  private static final Gson GSON = new GsonBuilder().disableInnerClassSerialization().create();
-
+  private static final Gson GSON = new GsonBuilder().create();
   private static final ExecutorService HTTP_REQUEST_SERVICE = Executors.newSingleThreadExecutor();
 
+  /**
+   * Asynchronously posts a Discord webhook via HTTPS
+   */
   public void post(final Supplier<SonarConfiguration.Webhook.Embed> embed) {
     HTTP_REQUEST_SERVICE.execute(() -> {
       try {
@@ -51,9 +55,12 @@ public final class DiscordWebhook {
         try (final OutputStream outputStream = urlConnection.getOutputStream()) {
           outputStream.write(serializedContent.getBytes(StandardCharsets.UTF_8));
         }
-        // Check if the connection was a success
-        if (urlConnection.getResponseCode() != 204) {
-          throw new IllegalStateException("Unexpected response code " + urlConnection.getResponseCode());
+
+        // Warn the user if the connection might've not been successful
+        // I don't know why Discord doesn't respond with OK, but I guess this should be fine
+        final int code = urlConnection.getResponseCode();
+        if (code != HTTP_NO_CONTENT) {
+          Sonar.get().getLogger().warn("Unexpected Discord webhook response code {}", code);
         }
       } catch (Exception exception) {
         Sonar.get().getLogger().error("Could not send webhook: {}", exception);
@@ -61,7 +68,7 @@ public final class DiscordWebhook {
     });
   }
 
-  private String prepareSerializedContent(final SonarConfiguration.Webhook.@NotNull Embed embed) {
+  private static String prepareSerializedContent(final SonarConfiguration.Webhook.@NotNull Embed embed) {
     final String content = Sonar.get().getConfig().getWebhook().getContent();
     final String username = Sonar.get().getConfig().getWebhook().getUsername();
     final String avatarUrl = Sonar.get().getConfig().getWebhook().getAvatarUrl();

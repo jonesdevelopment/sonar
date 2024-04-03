@@ -22,6 +22,11 @@ import org.jetbrains.annotations.NotNull;
 
 public final class MysqlDatabaseTypeAdapter extends MysqlDatabaseType {
 
+  /**
+   * We need to override the default driver class name
+   * in order to use the custom relocated MySQL driver
+   * Read more: {@link MariaDbDatabaseTypeAdapter}
+   */
   @Override
   protected String @NotNull [] getDriverClassNames() {
     return new String[]{"xyz.jonesdev.sonar.libs.mysql.cj.jdbc.Driver"};

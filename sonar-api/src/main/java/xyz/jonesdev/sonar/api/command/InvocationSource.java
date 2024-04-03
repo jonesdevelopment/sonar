@@ -35,13 +35,6 @@ public abstract class InvocationSource {
   private final Predicate<String> permissionFunction;
 
   /**
-   * Sends an empty chat message to the command executor
-   */
-  public final void sendMessage() {
-    sendMessage(Component.empty());
-  }
-
-  /**
    * Sends a message to the command executor
    */
   public final void sendMessage(final String legacy) {

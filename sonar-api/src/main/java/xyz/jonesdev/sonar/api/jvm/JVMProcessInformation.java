@@ -32,6 +32,7 @@ public class JVMProcessInformation {
     if (size < 1024L) {
       return size + " B";
     }
+    // https://stackoverflow.com/questions/3758606/how-can-i-convert-byte-size-into-a-human-readable-format-in-java
     final int group = (63 - Long.numberOfLeadingZeros(size)) / 10;
     final double formattedSize = (double) size / (1L << (group * 10));
     final char unit = MEMORY_UNITS[group - 1];
@@ -39,42 +40,73 @@ public class JVMProcessInformation {
     return String.format("%.1f %siB", formattedSize, unit);
   }
 
+  /**
+   * @return Number of available processors for the JVM
+   */
   public int getVirtualCores() {
     return RUNTIME.availableProcessors();
   }
 
+  /**
+   * @return Current process CPU usage in percent
+   */
   public double getProcessCPUUsage() {
     return MX.getProcessCpuLoad() * 100;
   }
 
+  /**
+   * @return Current per-core process CPU usage in percent
+   */
   public double getAverageProcessCPUUsage() {
     return getProcessCPUUsage() / getVirtualCores();
   }
 
+  /**
+   * @return Current system CPU usage in percent
+   */
   public double getSystemCPUUsage() {
     return MX.getSystemCpuLoad() * 100;
   }
 
+  /**
+   * @return Current per-core system CPU usage in percent
+   */
   public double getAverageSystemCPUUsage() {
     return getSystemCPUUsage() / getVirtualCores();
   }
 
+  /**
+   * @return Current system load average in percent
+   * @apiNote This returns the global process load, not the CPU usage
+   */
   public double getSystemLoadAverage() {
     return MX.getSystemLoadAverage() * 100;
   }
 
+  /**
+   * @return Memory (in bytes) the JVM will attempt to use
+   */
   public long getMaxMemory() {
     return RUNTIME.maxMemory();
   }
 
+  /**
+   * @return Memory (in bytes) available to the host machine
+   */
   public long getTotalMemory() {
     return RUNTIME.totalMemory();
   }
 
+  /**
+   * @return Memory (in bytes) the JVM can allocate
+   */
   public long getFreeMemory() {
     return RUNTIME.freeMemory();
   }
 
+  /**
+   * @return Memory (in bytes) the JVM is using
+   */
   public long getUsedMemory() {
     return getTotalMemory() - getFreeMemory();
   }

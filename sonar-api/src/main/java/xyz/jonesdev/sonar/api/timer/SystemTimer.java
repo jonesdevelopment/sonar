@@ -32,14 +32,23 @@ public final class SystemTimer {
     start = System.currentTimeMillis();
   }
 
+  /**
+   * @return Time between the current timestamp and the start timestamp
+   */
   public long delay() {
     return System.currentTimeMillis() - start;
   }
 
+  /**
+   * @apiNote Read more: {@link SystemTimer#delay}, {@link SystemTimer#formattedDelay}
+   */
   public boolean elapsed(final long amount) {
     return delay() >= amount;
   }
 
+  /**
+   * @apiNote Read more: {@link SystemTimer#delay}
+   */
   public @NotNull String formattedDelay() {
     return FORMATTER.format(delay());
   }
