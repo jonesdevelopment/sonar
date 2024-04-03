@@ -134,17 +134,21 @@ public final class FallbackUserWrapper implements FallbackUser {
     // Make sure to set the state to failed to drop all handlers
     setState(FallbackUserState.FAILED);
 
-    // Disconnect the player if the channel is open
-    disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
+    // Only log the failed message if the server isn't currently under attack.
+    // However, we let the user override this through the configuration.
+    final boolean shouldLog = !Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
+      || Sonar.get().getConfig().getVerification().isLogDuringAttack();
 
-    // Only log the failed message if the server isn't under attack.
-    // We let the user override this through the configuration.
-    if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
-      || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-      Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
-        .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
-        .replace("%reason%", reason));
+    // Only disconnect the player and log if the channel is active
+    if (channel.isActive()) {
+      disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
+
+      if (shouldLog) {
+        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
+          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
+          .replace("%reason%", reason));
+      }
     }
 
     // Increment amount of total failed verifications
@@ -178,9 +182,12 @@ public final class FallbackUserWrapper implements FallbackUser {
       GlobalSonarStatistics.totalBlacklistedPlayers++;
 
       Sonar.get().getFallback().getBlacklist().put(getInetAddress(), (byte) 0);
-      Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
-        .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
+
+      if (shouldLog) {
+        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
+          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
+      }
 
       // Invalidate the cached entry to ensure memory safety
       Sonar.get().getFallback().getRatelimiter().getFailCountCache().invalidate(inetAddress);
