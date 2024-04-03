@@ -32,6 +32,7 @@ public class JVMProcessInformation {
     if (size < 1024L) {
       return size + " B";
     }
+    // https://stackoverflow.com/questions/3758606/how-can-i-convert-byte-size-into-a-human-readable-format-in-java
     final int group = (63 - Long.numberOfLeadingZeros(size)) / 10;
     final double formattedSize = (double) size / (1L << (group * 10));
     final char unit = MEMORY_UNITS[group - 1];
