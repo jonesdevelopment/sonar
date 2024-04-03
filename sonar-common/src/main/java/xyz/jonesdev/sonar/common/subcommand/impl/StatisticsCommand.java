@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.subcommand.impl;
 
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
@@ -62,7 +63,7 @@ public final class StatisticsCommand extends Subcommand {
 
     invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getStatisticsHeader()
       .replace("%type%", type.name().toLowerCase()));
-    invocation.getSender().sendMessage();
+    invocation.getSender().sendMessage(Component.empty());
 
     switch (type) {
       case GENERAL: {
