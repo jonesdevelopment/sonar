@@ -20,9 +20,9 @@ dependencies {
   testCompileOnly("net.md_5:bungeecord-proxy:master-SNAPSHOT")
 
   // adventure platform support
-  implementation("net.kyori:adventure-platform-bungeecord:4.3.3-SNAPSHOT")
-  implementation("net.kyori:adventure-platform-api:4.3.3-SNAPSHOT")
-  implementation("net.kyori:adventure-platform-facet:4.3.3-SNAPSHOT")
+  implementation("net.kyori:adventure-platform-bungeecord:4.3.2")
+  implementation("net.kyori:adventure-platform-api:4.3.2")
+  implementation("net.kyori:adventure-platform-facet:4.3.2")
   // adventure
   implementation("net.kyori:adventure-text-minimessage:4.16.0")
   implementation("net.kyori:adventure-text-serializer-gson:4.16.0")

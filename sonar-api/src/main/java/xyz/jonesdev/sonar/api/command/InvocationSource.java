@@ -35,7 +35,7 @@ public final class InvocationSource {
 
   /**
    * @return True, if {@link InvocationSource#uuid} is not null
-   * @apiNote This indicated a player as a player will always have a UUID
+   * @apiNote This indicates a player as a player will always have a UUID
    */
   public boolean isPlayer() {
     return uuid != null;
@@ -43,6 +43,9 @@ public final class InvocationSource {
 
   /**
    * Sends a message to the command executor
+   *
+   * @apiNote We should probably use cached components...
+   * (See {@link InvocationSource#sendMessage(Component)})
    */
   public void sendMessage(final String legacy) {
     sendMessage(MiniMessage.miniMessage().deserialize(legacy));
