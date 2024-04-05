@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class InvocationSource {
+public final class InvocationSource {
   private final UUID uuid;
   private final Audience audience;
   private final boolean player;
@@ -37,14 +37,14 @@ public abstract class InvocationSource {
   /**
    * Sends a message to the command executor
    */
-  public final void sendMessage(final String legacy) {
+  public void sendMessage(final String legacy) {
     sendMessage(MiniMessage.miniMessage().deserialize(legacy));
   }
 
   /**
    * Sends a message to the command executor
    */
-  public final void sendMessage(final Component component) {
+  public void sendMessage(final Component component) {
     audience.sendMessage(component);
   }
 }

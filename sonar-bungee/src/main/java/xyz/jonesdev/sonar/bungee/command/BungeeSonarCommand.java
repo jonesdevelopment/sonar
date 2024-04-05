@@ -18,11 +18,13 @@
 package xyz.jonesdev.sonar.bungee.command;
 
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
+import xyz.jonesdev.sonar.bungee.SonarBungee;
 
 import static java.util.Collections.emptyList;
 
@@ -34,7 +36,11 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
   @Override
   public void execute(final @NotNull CommandSender sender, final String[] args) {
     // Create our own invocation source wrapper to handle messages properly
-    final InvocationSource invocationSource = new BungeeInvocationSource(sender);
+    final InvocationSource invocationSource = new InvocationSource(
+      sender instanceof ProxiedPlayer ? ((ProxiedPlayer) sender).getUniqueId() : null,
+      SonarBungee.INSTANCE.getBungeeAudiences().sender(sender),
+      sender instanceof ProxiedPlayer,
+      sender::hasPermission);
     // Pass the invocation source and command arguments to our command handler
     handle(invocationSource, args);
   }
