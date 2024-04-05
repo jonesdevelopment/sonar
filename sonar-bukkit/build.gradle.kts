@@ -14,6 +14,7 @@ bukkit {
   website = "https://jonesdev.xyz/discord/"
   load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
   softDepend = listOf("Geyser-Spigot", "floodgate", "Protocolize", "packetevents", "ProtocolLib", "ViaVersion")
+  foliaSupported = true
 
   commands {
     register("sonar") {
