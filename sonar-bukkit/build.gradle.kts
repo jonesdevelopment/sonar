@@ -28,11 +28,17 @@ repositories {
 }
 
 dependencies {
-  compileOnly(project(":api"))
-  compileOnly(project(":common"))
+  implementation(project(":api"))
+  implementation(project(":common"))
 
-  // MiniMessage platform support
-  implementation("net.kyori:adventure-platform-bukkit:4.3.2")
+  // adventure platform support
+  implementation("net.kyori:adventure-platform-bukkit:4.3.3-SNAPSHOT")
+  implementation("net.kyori:adventure-platform-api:4.3.3-SNAPSHOT")
+  implementation("net.kyori:adventure-platform-facet:4.3.3-SNAPSHOT")
+  // adventure
+  implementation("net.kyori:adventure-text-minimessage:4.16.0")
+  implementation("net.kyori:adventure-text-serializer-gson:4.16.0")
+  implementation("net.kyori:adventure-nbt:4.16.0")
 
   // We have to use 1.8 for backwards compatibility
   compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
@@ -42,6 +48,15 @@ dependencies {
 
   // Library/dependency loading
   implementation("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")
+}
+
+tasks {
+  shadowJar {
+    relocate("net.kyori", "xyz.jonesdev.sonar.libs.kyori")
+
+    // Make sure to exclude Gson, as we are already injecting it
+    exclude("com/google/gson/**")
+  }
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11

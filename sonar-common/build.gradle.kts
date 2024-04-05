@@ -1,6 +1,10 @@
 dependencies {
   compileOnly(project(":api"))
 
+  // adventure nbt for packets
+  compileOnly("net.kyori:adventure-nbt:4.16.0")
+
+  // CAPTCHA image generation
   implementation("xyz.jonesdev.capja:capja:0.1.2")
 }
 

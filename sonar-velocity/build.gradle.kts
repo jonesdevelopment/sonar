@@ -1,8 +1,8 @@
 val velocityVersion = "3.3.0-SNAPSHOT"
 
 dependencies {
-  compileOnly(project(":api"))
-  compileOnly(project(":common"))
+  implementation(project(":api"))
+  implementation(project(":common"))
 
   compileOnly("com.velocitypowered:velocity-proxy:$velocityVersion")
   testCompileOnly("com.velocitypowered:velocity-proxy:$velocityVersion")
