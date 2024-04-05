@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.api;
 
 import net.kyori.adventure.audience.Audience;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
@@ -43,6 +44,7 @@ public interface Sonar {
    * Since we want to use Adventure on every server platform,
    * we have to use their platform module to support BungeeCord and Bukkit
    */
+  @ApiStatus.Internal
   @Nullable Audience audience(final @Nullable UUID uniqueId);
 
   /**
