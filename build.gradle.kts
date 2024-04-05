@@ -49,11 +49,6 @@ allprojects {
 
   tasks {
     shadowJar {
-      // Minimize JAR
-      minimize {
-        exclude(project(":api"))
-      }
-
       // Set the file name of the shadowed jar
       archiveFileName.set("${rootProject.name}-${project.name.replaceFirstChar { it.uppercase() }}.jar")
 
