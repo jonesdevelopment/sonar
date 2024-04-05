@@ -31,8 +31,15 @@ import java.util.function.Predicate;
 public final class InvocationSource {
   private final UUID uuid;
   private final Audience audience;
-  private final boolean player;
   private final Predicate<String> permissionFunction;
+
+  /**
+   * @return True, if {@link InvocationSource#uuid} is not null
+   * @apiNote This indicated a player as a player will always have a UUID
+   */
+  public boolean isPlayer() {
+    return uuid != null;
+  }
 
   /**
    * Sends a message to the command executor

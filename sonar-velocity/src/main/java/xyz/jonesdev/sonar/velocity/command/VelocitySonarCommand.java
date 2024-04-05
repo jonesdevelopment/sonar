@@ -35,7 +35,6 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
     final InvocationSource invocationSource = new InvocationSource(
       invocation.source() instanceof Player ? ((Player) invocation.source()).getUniqueId() : null,
       invocation.source(),
-      invocation.source() instanceof Player,
       invocation.source()::hasPermission);
     // Pass the invocation source and command arguments to our command handler
     handle(invocationSource, invocation.arguments());

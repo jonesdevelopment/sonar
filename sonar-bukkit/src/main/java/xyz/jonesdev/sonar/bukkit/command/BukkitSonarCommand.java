@@ -42,7 +42,6 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
     final InvocationSource invocationSource = new InvocationSource(
       sender instanceof Player ? ((Player) sender).getUniqueId() : null,
       SonarBukkit.INSTANCE.getBukkitAudiences().sender(sender),
-      sender instanceof Player,
       sender::hasPermission);
     // Pass the invocation source and command arguments to our command handler
     handle(invocationSource, args);
