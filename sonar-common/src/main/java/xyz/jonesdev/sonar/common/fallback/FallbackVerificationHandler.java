@@ -400,7 +400,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
         // Validate the client branding using a regex to filter unwanted characters.
         if (Sonar.get().getConfig().getVerification().getBrand().isEnabled()) {
-          checkFrame(validateClientBrand(user, pluginMessage.content()), "invalid client brand");
+          checkFrame(validateClientBrand(user, pluginMessage.getSlicedBuffer()), "invalid client brand");
         }
 
         // Clients sometimes mess up the ClientSettings or PluginMessage packet.

@@ -22,23 +22,17 @@ import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.netty.DeferredByteBufHolder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 
-// Mostly taken from
-// https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/PluginMessage.java
 @Getter
 @ToString
-public final class PluginMessagePacket extends DeferredByteBufHolder implements FallbackPacket {
+public final class PluginMessagePacket implements FallbackPacket {
   private String channel;
-
-  public PluginMessagePacket() {
-    super(null);
-  }
+  private ByteBuf slicedBuffer;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -54,9 +48,9 @@ public final class PluginMessagePacket extends DeferredByteBufHolder implements 
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-      replace(byteBuf.readRetainedSlice(byteBuf.readableBytes()));
+      slicedBuffer = byteBuf.readRetainedSlice(byteBuf.readableBytes());
     } else {
-      replace(readRetainedByteBufSlice17(byteBuf));
+      slicedBuffer = readRetainedByteBufSlice17(byteBuf);
     }
   }
 
