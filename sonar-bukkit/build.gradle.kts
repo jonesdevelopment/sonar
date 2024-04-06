@@ -36,9 +36,11 @@ dependencies {
   implementation("net.kyori:adventure-platform-bukkit:4.3.2")
   implementation("net.kyori:adventure-platform-api:4.3.2")
   implementation("net.kyori:adventure-platform-facet:4.3.2")
-  // adventure
-  implementation("net.kyori:adventure-text-minimessage:4.16.0")
-  implementation("net.kyori:adventure-text-serializer-gson:4.16.0")
+
+  // adventure minimessage
+  compileOnly("net.kyori:adventure-text-minimessage:4.16.0")
+  compileOnly("net.kyori:adventure-text-serializer-gson:4.16.0")
+  // adventure nbt
   implementation("net.kyori:adventure-nbt:4.16.0")
 
   // We have to use 1.8 for backwards compatibility
@@ -54,9 +56,6 @@ dependencies {
 tasks {
   shadowJar {
     relocate("net.kyori", "xyz.jonesdev.sonar.libs.kyori")
-
-    // Make sure to exclude Gson, as we are already injecting it
-    exclude("com/google/gson/**")
   }
 }
 

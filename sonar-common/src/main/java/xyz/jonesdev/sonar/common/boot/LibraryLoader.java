@@ -21,6 +21,8 @@ import com.alessiodp.libby.Library;
 import com.alessiodp.libby.LibraryManager;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.SonarPlatform;
 
 @UtilityClass
 class LibraryLoader {
@@ -71,5 +73,23 @@ class LibraryLoader {
         .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
         .build()
     );
+
+    // Only load adventure dependencies if needed
+    if (Sonar.get().getPlatform() != SonarPlatform.VELOCITY) {
+      libraryManager.loadLibraries(
+        Library.builder()
+          .groupId("net{}kyori")
+          .artifactId("adventure-text-minimessage")
+          .version("4.16.0")
+          .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
+          .build(),
+        Library.builder()
+          .groupId("net{}kyori")
+          .artifactId("adventure-text-serializer-gson")
+          .version("4.16.0")
+          .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
+          .build()
+      );
+    }
   }
 }

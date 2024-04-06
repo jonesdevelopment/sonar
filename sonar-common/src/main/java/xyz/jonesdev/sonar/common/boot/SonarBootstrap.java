@@ -68,12 +68,13 @@ public abstract class SonarBootstrap<T> implements Sonar {
     SonarSupplier.set(this);
     // Store our library manager for the API
     this.libraryManager = libraryManager;
-    // Load all libraries before anything else
-    LibraryLoader.loadLibraries(libraryManager);
     // Set the plugin instance
     this.plugin = plugin;
     this.dataDirectory = dataDirectory;
     this.platform = platform;
+    // Load all libraries before anything else
+    LibraryLoader.loadLibraries(libraryManager);
+    // Load the rest of the components
     this.statistics = new GlobalSonarStatistics();
     this.verboseHandler = new Verbose();
     this.notificationHandler = new Notification();
