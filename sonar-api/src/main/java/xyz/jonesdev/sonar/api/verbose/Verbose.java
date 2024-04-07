@@ -22,6 +22,7 @@ import lombok.val;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
@@ -56,6 +57,7 @@ public final class Verbose implements Observable {
     }
   }
 
+  @ApiStatus.Internal
   public @NotNull Component prepareActionBarFormat() {
     final SonarStatistics statistics = Sonar.get().getStatistics();
     final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();

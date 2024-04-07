@@ -52,9 +52,9 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
   private final BukkitAudiences bukkitAudiences = BukkitAudiences.create(getPlugin());
 
   @Override
-  public @NotNull Audience audience(final @Nullable UUID uniqueId) {
+  public @Nullable Audience audience(final @Nullable UUID uniqueId) {
     if (uniqueId == null) {
-      return bukkitAudiences.console();
+      return null;
     }
     return bukkitAudiences.player(uniqueId);
   }

@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.api.fallback;
 import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
@@ -43,6 +44,7 @@ public interface FallbackUser {
    *
    * @param reason Disconnect message component
    */
+  @ApiStatus.Internal
   void disconnect(final @NotNull Component reason);
 
   /**

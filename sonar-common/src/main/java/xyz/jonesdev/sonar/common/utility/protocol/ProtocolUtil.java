@@ -176,7 +176,7 @@ public class ProtocolUtil {
     }
   }
 
-  private static int readExtendedForgeShort(@NotNull final ByteBuf byteBuf) {
+  private static int readExtendedForgeShort(final @NotNull ByteBuf byteBuf) {
     int low = byteBuf.readUnsignedShort();
     int high = 0;
     if ((low & 0x8000) != 0) {

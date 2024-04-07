@@ -52,9 +52,9 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   private final BungeeAudiences bungeeAudiences = BungeeAudiences.create(getPlugin());
 
   @Override
-  public @NotNull Audience audience(final @Nullable UUID uniqueId) {
+  public @Nullable Audience audience(final @Nullable UUID uniqueId) {
     if (uniqueId == null) {
-      return bungeeAudiences.console();
+      return null;
     }
     return bungeeAudiences.player(uniqueId);
   }

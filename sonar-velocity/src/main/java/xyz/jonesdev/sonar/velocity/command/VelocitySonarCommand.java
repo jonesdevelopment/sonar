@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.proxy.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
@@ -31,7 +32,10 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
   @Override
   public void execute(final @NotNull Invocation invocation) {
     // Create our own invocation source wrapper to handle messages properly
-    final InvocationSource invocationSource = new VelocityInvocationSource(invocation.source());
+    final InvocationSource invocationSource = new InvocationSource(
+      invocation.source() instanceof Player ? ((Player) invocation.source()).getUniqueId() : null,
+      invocation.source(),
+      invocation.source()::hasPermission);
     // Pass the invocation source and command arguments to our command handler
     handle(invocationSource, invocation.arguments());
   }

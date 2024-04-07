@@ -8,7 +8,6 @@ joining the [Discord](https://jonesdev.xyz/discord).
 2. Follow the coding guidelines for your code.
 3. Test your code before committing and pushing it.
 4. Use [semantic](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716) commit messages for your commits.
-5. Create a feature branch or push to the `dev` branch.
 
 ## Coding Guidelines:
 

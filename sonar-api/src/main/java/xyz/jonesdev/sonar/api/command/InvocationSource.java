@@ -28,23 +28,33 @@ import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class InvocationSource {
+public final class InvocationSource {
   private final UUID uuid;
   private final Audience audience;
-  private final boolean player;
   private final Predicate<String> permissionFunction;
 
   /**
-   * Sends a message to the command executor
+   * @return True, if {@link InvocationSource#uuid} is not null
+   * @apiNote This indicates a player as a player will always have a UUID
    */
-  public final void sendMessage(final String legacy) {
+  public boolean isPlayer() {
+    return uuid != null;
+  }
+
+  /**
+   * Sends a message to the command executor
+   *
+   * @apiNote We should probably use cached components...
+   * (See {@link InvocationSource#sendMessage(Component)})
+   */
+  public void sendMessage(final String legacy) {
     sendMessage(MiniMessage.miniMessage().deserialize(legacy));
   }
 
   /**
    * Sends a message to the command executor
    */
-  public final void sendMessage(final Component component) {
+  public void sendMessage(final Component component) {
     audience.sendMessage(component);
   }
 }
