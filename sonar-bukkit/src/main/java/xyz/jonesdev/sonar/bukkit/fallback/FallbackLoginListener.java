@@ -46,7 +46,6 @@ public final class FallbackLoginListener implements Listener {
     final long onlinePerIp = SonarBukkit.INSTANCE.getPlugin().getServer().getOnlinePlayers().stream()
       .filter(player -> Objects.equals(player.getAddress().getAddress(), event.getAddress()))
       .count();
-    System.out.println(onlinePerIp);
 
     // We use '>=' because the player connecting to the server hasn't joined yet
     if (onlinePerIp >= maxOnlinePerIp) {
