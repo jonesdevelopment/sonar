@@ -44,7 +44,6 @@ import java.util.UUID;
 import static net.md_5.bungee.netty.PipelineUtils.*;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
-import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.deject;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter {
@@ -135,15 +134,13 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
 
     // Don't continue the verification process if the verification is disabled
     if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
-      ctx.fireChannelRead(wrappedMessage);
-      deject(channel.pipeline());
+      initialLogin(ctx, wrappedMessage, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
     // Completely skip Geyser connections
     if (GeyserUtil.isGeyserConnection(channel, socketAddress)) {
-      ctx.fireChannelRead(wrappedMessage);
-      deject(channel.pipeline());
+      initialLogin(ctx, wrappedMessage, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
@@ -172,8 +169,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     final String offlineUUIDString = "OfflinePlayer:" + loginRequest.getData();
     final UUID offlineUUID = UUID.nameUUIDFromBytes(offlineUUIDString.getBytes(StandardCharsets.UTF_8));
     if (Sonar.get().getVerifiedPlayerController().has(inetAddress, offlineUUID)) {
-      ctx.fireChannelRead(wrappedMessage);
-      deject(channel.pipeline());
+      initialLogin(ctx, wrappedMessage, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
@@ -186,8 +182,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     // Check if the protocol ID of the player is allowed to bypass verification
     if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols()
       .contains(protocolVersion.getProtocol())) {
-      ctx.fireChannelRead(wrappedMessage);
-      deject(channel.pipeline());
+      initialLogin(ctx, wrappedMessage, PACKET_ENCODER, BOSS_HANDLER);
       return;
     }
 
