@@ -39,8 +39,6 @@ commands:
   incorrect-usage: '%prefix%<red>Benutzung: /sonar %usage%'
   # Nachricht, die angezeigt wird, wenn jemand eine ungültige IP-Adresse angibt (Ungültiges Format)
   invalid-ip-address: '%prefix%Die angegebene IP-Adresse scheint ungültig zu sein.'
-  # Nachricht, die angezeigt wird, wenn jemand eine illegale IP-Adresse angibt (Lokale IP)
-  illegal-ip-address: '%prefix%Die angegebene IP-Adresse scheint entweder eine lokale oder eine Schleifenrückführungs-IP zu sein.'
   # Nachricht, die angezeigt wird, wenn die Konsole einen Befehl ausführt, der nur für Spieler ist
   player-only: '%prefix%<red>Diesen Befehl kannst du nur als Spieler ausführen.'
   # Nachricht, die angezeigt wird, wenn ein Spieler einen Befehl ausführt, der nur für die Konsole ist

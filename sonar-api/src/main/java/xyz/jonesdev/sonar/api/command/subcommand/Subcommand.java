@@ -53,13 +53,8 @@ public abstract class Subcommand {
     final InetAddress inetAddress;
     try {
       inetAddress = InetAddress.getByName(rawIP);
-
-      if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress()) {
-        source.sendMessage(SONAR.getConfig().getCommands().getIllegalIpAddress());
-        return null;
-      }
     } catch (UnknownHostException exception) {
-      source.sendMessage(SONAR.getConfig().getCommands().getIncorrectIpAddress());
+      source.sendMessage(SONAR.getConfig().getCommands().getInvalidIpAddress());
       return null;
     }
     return inetAddress;

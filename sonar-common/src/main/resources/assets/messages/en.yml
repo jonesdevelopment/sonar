@@ -38,9 +38,6 @@ commands:
   incorrect-usage: '%prefix%<red>Usage: /sonar %usage%'
   # Message that is shown when someone provides an invalid IP address (Invalid format)
   invalid-ip-address: '%prefix%The IP address you provided seems to be invalid.'
-  # Message that is shown when someone provides an illegal IP address (Local IP)
-  illegal-ip-address: '%prefix%The IP address you provided seems to be either a local
-    or loopback IP.'
   # Message that is shown when the console runs a command that is player-only
   player-only: '%prefix%<red>You can only execute this command as a player.'
   # Message that is shown when a player runs a command that is console-only

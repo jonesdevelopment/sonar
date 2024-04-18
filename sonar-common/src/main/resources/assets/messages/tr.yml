@@ -38,8 +38,6 @@ commands:
   incorrect-usage: '%prefix%<red>Kullanım: /sonar %usage%'
   # Birisi geçersiz bir IP adresi sağladığında gösterilen mesaj (Geçersiz format)
   invalid-ip-address: '%prefix%Sağladığınız IP adresi geçersiz görünüyor.'
-  # Birisi yasal olmayan bir IP adresi sağladığında gösterilen mesaj (Yerel IP)
-  illegal-ip-address: '%prefix%Sağladığınız IP adresi yerel veya döngüsel bir IP gibi görünüyor.'
   # Konsol, sadece oyuncunun çalıştırabileceği bir komut çalıştırdığında gösterilen mesaj
   player-only: '%prefix%<red>Bu komutu sadece bir oyuncu olarak çalıştırabilirsiniz.'
   # Bir oyuncu, sadece konsolun çalıştırabileceği bir komutu çalıştırdığında gösterilen mesaj
