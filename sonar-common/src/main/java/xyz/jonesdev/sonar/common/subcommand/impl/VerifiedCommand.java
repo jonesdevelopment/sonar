@@ -148,7 +148,7 @@ public final class VerifiedCommand extends Subcommand {
         final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(inetAddress.toString(), uuid, timestamp);
         Sonar.get().getVerifiedPlayerController().add(verifiedPlayer);
 
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedRemove()
+        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedAdd()
           .replace("%ip%", rawInetAddress));
         // Unlock the IP address
         LOCK.remove(rawInetAddress);

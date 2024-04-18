@@ -121,6 +121,8 @@ commands:
     size: '%prefix%Es sind derzeit %amount% einzigartige Spieler verifiziert.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse unverifiziert macht
     removed: '%prefix%Erfolgreich %ip% unverifiziert.'
+    # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse verifiziert macht
+    added: '%prefix%Erfolgreich %ip% verifiziert.'
     # Message that is shown when someone tries to verify an IP address/UUID that are already verified
     already: '%prefix%The IP address and UUID you provided are already verified.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse unverifiziert macht, die nicht verifiziert ist
