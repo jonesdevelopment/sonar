@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.velocity;
 
 import com.alessiodp.libby.VelocityLibraryManager;
+import com.velocitypowered.api.proxy.Player;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import org.bstats.charts.SimplePie;
@@ -31,8 +32,9 @@ import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackInjectionHelper;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackLoginListener;
 
+import java.net.InetAddress;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -56,6 +58,18 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
       return null;
     }
     return getPlugin().getServer().getPlayer(uniqueId).orElse(null);
+  }
+
+  @Override
+  public boolean hasTooManyAccounts(final @NotNull InetAddress inetAddress, final int limit) {
+    int count = 1;
+    for (final Player player : getPlugin().getServer().getAllPlayers()) {
+      // Check if the IP address of the player is equal to the IP trying to connect
+      if (!Objects.equals(player.getRemoteAddress().getAddress(), inetAddress)) continue;
+      // Increment count of duplicated accounts
+      if (++count >= limit) return true;
+    }
+    return false;
   }
 
   /**
@@ -97,9 +111,6 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
     // Register Sonar command
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
-
-    // Register Fallback listener
-    getPlugin().getServer().getEventManager().register(getPlugin(), new FallbackLoginListener());
 
     // Register traffic service
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), CachedBandwidthStatistics::reset)

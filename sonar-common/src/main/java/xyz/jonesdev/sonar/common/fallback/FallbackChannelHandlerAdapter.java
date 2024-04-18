@@ -27,9 +27,13 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.net.InetAddress;
+
+import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
+import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.deject;
 
 @RequiredArgsConstructor
 public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
@@ -79,5 +83,31 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
                                     final @NotNull Throwable cause) throws Exception {
     // Simply close the channel if we encounter any errors.
     ctx.close();
+  }
+
+  /**
+   * Executes the maximum accounts per IP limit check before letting the player join
+   *
+   * @param ctx    Forwarded channel handler context
+   * @param packet Login packet sent by the client
+   */
+  protected void initialLogin(final @NotNull ChannelHandlerContext ctx,
+                              final @NotNull Object packet,
+                              final @NotNull String encoder,
+                              final @NotNull String boss) {
+    final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
+    // Skip the maximum online per IP check if it's disabled in the configuration
+    if (maxOnlinePerIp > 0) {
+      // Check if the number of online players using the same IP address as
+      // the connecting player is greater than the configured amount
+      if (Sonar.get().hasTooManyAccounts(inetAddress, maxOnlinePerIp)) {
+        customDisconnect(channel, protocolVersion, FallbackPreparer.tooManyOnlinePerIP, encoder, boss);
+        return;
+      }
+    }
+
+    ctx.fireChannelRead(packet);
+    // Deject the channel since we don't need it anymore
+    deject(channel.pipeline());
   }
 }

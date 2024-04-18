@@ -64,6 +64,7 @@ public class FallbackPreparer {
   public FallbackPacket reconnectedTooFast;
   public FallbackPacket protocolBlacklisted;
   public FallbackPacket invalidUsername;
+  public FallbackPacket tooManyOnlinePerIP;
 
   // Vehicle
   public FallbackPacket removeEntities;
@@ -137,6 +138,7 @@ public class FallbackPreparer {
     protocolBlacklisted = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getProtocolBlacklisted(), true);
     reconnectedTooFast = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getTooFastReconnect(), true);
     invalidUsername = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidUsername(), true);
+    tooManyOnlinePerIP = DisconnectPacket.create(Sonar.get().getConfig().getTooManyOnlinePerIp(), true);
 
     // Precompute captcha answers
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
