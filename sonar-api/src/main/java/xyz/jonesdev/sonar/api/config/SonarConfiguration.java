@@ -256,8 +256,7 @@ public final class SonarConfiguration {
 
     noPermission = formatString(messagesConfig.getString("commands.no-permission"));
     commands.incorrectCommandUsage = formatString(messagesConfig.getString("commands.incorrect-usage"));
-    commands.incorrectIpAddress = formatString(messagesConfig.getString("commands.invalid-ip-address"));
-    commands.illegalIpAddress = formatString(messagesConfig.getString("commands.illegal-ip-address"));
+    commands.invalidIpAddress = formatString(messagesConfig.getString("commands.invalid-ip-address"));
     commands.playersOnly = formatString(messagesConfig.getString("commands.player-only"));
     commands.consoleOnly = formatString(messagesConfig.getString("commands.console-only"));
     commands.commandCoolDown = formatString(messagesConfig.getString("commands.cool-down"));
@@ -290,6 +289,8 @@ public final class SonarConfiguration {
     commands.verifiedCleared = formatString(messagesConfig.getString("commands.verified.cleared"));
     commands.verifiedSize = formatString(messagesConfig.getString("commands.verified.size"));
     commands.verifiedRemove = formatString(messagesConfig.getString("commands.verified.removed"));
+    commands.verifiedAdd = formatString(messagesConfig.getString("commands.verified.added"));
+    commands.verifiedAlready = formatString(messagesConfig.getString("commands.verified.already"));
     commands.verifiedNotFound = formatString(messagesConfig.getString("commands.verified.ip-not-found"));
     commands.verifiedBlocked = formatString(messagesConfig.getString("commands.verified.blocked"));
 
@@ -525,8 +526,7 @@ public final class SonarConfiguration {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Commands {
     private String incorrectCommandUsage;
-    private String incorrectIpAddress;
-    private String illegalIpAddress;
+    private String invalidIpAddress;
     private String subCommandNoPerm;
     private String playersOnly;
     private String consoleOnly;
@@ -543,6 +543,8 @@ public final class SonarConfiguration {
     private String blacklistSize;
 
     private String verifiedRemove;
+    private String verifiedAdd;
+    private String verifiedAlready;
     private String verifiedNotFound;
     private String verifiedCleared;
     private String verifiedSize;

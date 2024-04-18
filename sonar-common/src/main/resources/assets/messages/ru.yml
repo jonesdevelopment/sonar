@@ -38,8 +38,6 @@ commands:
   incorrect-usage: '%prefix%<red>Применение: /sonar %usage%'
   # Сообщение, которое отображается, когда кто-то предоставляет неверный формат IP-адреса
   invalid-ip-address: '%prefix%Указанный вами IP-адрес недействителен'
-  # Сообщение, которое отображается, когда кто-то предоставляет локальный IP-адрес
-  illegal-ip-address: '%prefix%IP-адрес который вы указали является локальным.'
   # Сообщение, которое отображается, когда консоль выполняет команду, предназначенную только для игроков
   player-only: '%prefix%<red>Эта команда может быть выполнена только игроком.'
   # Сообщение, которое отображается, когда игрок выполняет команду, доступную только для консоли
@@ -124,6 +122,10 @@ commands:
     size: '%prefix%В настоящее время проверено %amount% уникальных игроков.'
     # Сообщение, которое отображается при удалении IP-адреса из списка проверенных игроков
     removed: '%prefix%Успешно удален %ip%.'
+    # Message that is shown when someone verifies an IP address
+    added: '%prefix%Successfully verified %ip%.'
+    # Message that is shown when someone tries to verify an IP address/UUID that are already verified
+    already: '%prefix%The IP address and UUID you provided are already verified.'
     # Сообщение, которое показывается когда кто-то удаляет IP из списка но его небыло в списке
     ip-not-found: '%prefix%Указанный вами IP-адрес не в списке.'
     # Сообщение, которое показывается когда выполняю сразу две операции (двойная операция)

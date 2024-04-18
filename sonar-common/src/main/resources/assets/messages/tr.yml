@@ -38,8 +38,6 @@ commands:
   incorrect-usage: '%prefix%<red>Kullanım: /sonar %usage%'
   # Birisi geçersiz bir IP adresi sağladığında gösterilen mesaj (Geçersiz format)
   invalid-ip-address: '%prefix%Sağladığınız IP adresi geçersiz görünüyor.'
-  # Birisi yasal olmayan bir IP adresi sağladığında gösterilen mesaj (Yerel IP)
-  illegal-ip-address: '%prefix%Sağladığınız IP adresi yerel veya döngüsel bir IP gibi görünüyor.'
   # Konsol, sadece oyuncunun çalıştırabileceği bir komut çalıştırdığında gösterilen mesaj
   player-only: '%prefix%<red>Bu komutu sadece bir oyuncu olarak çalıştırabilirsiniz.'
   # Bir oyuncu, sadece konsolun çalıştırabileceği bir komutu çalıştırdığında gösterilen mesaj
@@ -115,6 +113,10 @@ commands:
     size: '%prefix%Şu anda %amount% benzersiz oyuncu doğrulanmış.'
     # Birisi bir IP adresini doğrulanmamış olarak işaretlediğinde gösterilen mesaj
     removed: '%prefix%Başarıyla %ip% doğrulanmamış olarak işaretlendi.'
+    # Message that is shown when someone verifies an IP address
+    added: '%prefix%Successfully verified %ip%.'
+    # Message that is shown when someone tries to verify an IP address/UUID that are already verified
+    already: '%prefix%The IP address and UUID you provided are already verified.'
     # Birisi bir IP adresini doğrulanmamış olarak işaretlemeye çalıştığında ama doğrulanmamış olduğunda gösterilen mesaj
     ip-not-found: '%prefix%Sağladığınız IP adresi doğrulanmış olarak işaretlenmemiş.'
     # Birisi aynı IP adresini iki kez (çift işlem) doğrulanmamış olarak işaretlemeye çalıştığında gösterilen mesaj
