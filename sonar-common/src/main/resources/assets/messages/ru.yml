@@ -124,6 +124,8 @@ commands:
     size: '%prefix%В настоящее время проверено %amount% уникальных игроков.'
     # Сообщение, которое отображается при удалении IP-адреса из списка проверенных игроков
     removed: '%prefix%Успешно удален %ip%.'
+    # Message that is shown when someone tries to verify an IP address/UUID that are already verified
+    already: '%prefix%The IP address and UUID you provided are already verified.'
     # Сообщение, которое показывается когда кто-то удаляет IP из списка но его небыло в списке
     ip-not-found: '%prefix%Указанный вами IP-адрес не в списке.'
     # Сообщение, которое показывается когда выполняю сразу две операции (двойная операция)

@@ -60,7 +60,7 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         // Display a warning if the IP is verified but being added to the blacklist
-        if (SONAR.getVerifiedPlayerController().has(inetAddress)) {
+        if (SONAR.getVerifiedPlayerController().has(inetAddress.toString())) {
           invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistAddWarning()
             .replace("%ip%", rawInetAddress));
         }

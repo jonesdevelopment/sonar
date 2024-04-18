@@ -127,6 +127,8 @@ commands:
     size: '%prefix%There are currently %amount% unique player(s) verified.'
     # Message that is shown when someone un-verifies an IP address
     removed: '%prefix%Successfully unverified %ip%.'
+    # Message that is shown when someone tries to verify an IP address/UUID that are already verified
+    already: '%prefix%The IP address and UUID you provided are already verified.'
     # Message that is shown when someone un-verifies an IP address, but it is not verified
     ip-not-found: '%prefix%The IP address you provided is not verified.'
     # Message that is shown when someone tries un-verifying the same IP address twice (double operation)

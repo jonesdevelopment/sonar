@@ -290,6 +290,7 @@ public final class SonarConfiguration {
     commands.verifiedCleared = formatString(messagesConfig.getString("commands.verified.cleared"));
     commands.verifiedSize = formatString(messagesConfig.getString("commands.verified.size"));
     commands.verifiedRemove = formatString(messagesConfig.getString("commands.verified.removed"));
+    commands.verifiedAlready = formatString(messagesConfig.getString("commands.verified.already"));
     commands.verifiedNotFound = formatString(messagesConfig.getString("commands.verified.ip-not-found"));
     commands.verifiedBlocked = formatString(messagesConfig.getString("commands.verified.blocked"));
 
@@ -543,6 +544,7 @@ public final class SonarConfiguration {
     private String blacklistSize;
 
     private String verifiedRemove;
+    private String verifiedAlready;
     private String verifiedNotFound;
     private String verifiedCleared;
     private String verifiedSize;

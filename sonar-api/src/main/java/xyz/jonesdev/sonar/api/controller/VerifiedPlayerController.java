@@ -310,13 +310,4 @@ public final class VerifiedPlayerController {
   public boolean has(final @NotNull String inetAddress) {
     return cache.containsKey(inetAddress);
   }
-
-  /**
-   * @param inetAddress IP address
-   * @return Whether the local cache contains the IP
-   * @see #has(String)
-   */
-  public boolean has(final @NotNull InetAddress inetAddress) {
-    return has(inetAddress.toString());
-  }
 }
