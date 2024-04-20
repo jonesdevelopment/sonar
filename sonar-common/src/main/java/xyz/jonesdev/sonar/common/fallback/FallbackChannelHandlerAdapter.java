@@ -139,7 +139,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
                                    final @NotNull String handler) throws Exception {
     // Check if the player has already sent a login packet
     if (this.username != null) {
-      throw new CorruptedFrameException("Already logged on");
+      throw new CorruptedFrameException("Already sent login");
     }
     // Increase joins per second for the action bar verbose
     GlobalSonarStatistics.countLogin();

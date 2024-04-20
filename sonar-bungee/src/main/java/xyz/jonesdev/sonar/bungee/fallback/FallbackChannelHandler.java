@@ -71,7 +71,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
           final HandlerBoss handlerBoss = channel.pipeline().get(HandlerBoss.class);
           final ChannelWrapper channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER_FIELD.get(handlerBoss);
           final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
-          handleLogin(ctx, wrappedPacket, loginRequest.getData(), socketAddress,
+          handleLogin(ctx, msg, loginRequest.getData(), socketAddress,
             PACKET_ENCODER, PACKET_DECODER, TIMEOUT_HANDLER, BOSS_HANDLER);
           return;
         }
