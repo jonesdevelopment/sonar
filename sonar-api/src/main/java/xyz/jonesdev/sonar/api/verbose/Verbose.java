@@ -40,9 +40,6 @@ public final class Verbose implements Observable {
 
   // Run action bar verbose
   public void update() {
-    // Make sure to clean up the cached statistics
-    Sonar.get().getStatistics().cleanUpCache();
-
     // Don't prepare component if there are no subscribers
     Component component = null;
     for (final UUID subscriber : subscribers) {

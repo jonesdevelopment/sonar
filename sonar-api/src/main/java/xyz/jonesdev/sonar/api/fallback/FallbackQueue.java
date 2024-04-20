@@ -56,26 +56,5 @@ public final class FallbackQueue {
       // Remove runnable from iterator
       iterator.remove();
     }
-
-    // Run the attack check task
-    Sonar.get().getAttackTracker().checkIfUnderAttack();
-    // Clean up the cache of rate-limited IPs
-    Sonar.get().getFallback().getRatelimiter().cleanUpCache();
-  }
-
-  /**
-   * @param inetAddress IP address of the player
-   * @param runnable    Queued action on the netty thread
-   * @see #remove
-   */
-  public void queue(final InetAddress inetAddress, final Runnable runnable) {
-    queuedPlayers.put(inetAddress, runnable);
-  }
-
-  /**
-   * @param inetAddress IP address of the player
-   */
-  public void remove(final InetAddress inetAddress) {
-    queuedPlayers.remove(inetAddress);
   }
 }

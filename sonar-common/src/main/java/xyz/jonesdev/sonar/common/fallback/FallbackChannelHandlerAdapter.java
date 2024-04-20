@@ -70,7 +70,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     // The player cannot be in the queue if the IP address is invalid
     if (inetAddress != null) {
       // Remove the IP address from the queue
-      FALLBACK.getQueue().remove(inetAddress);
+      FALLBACK.getQueue().getQueuedPlayers().remove(inetAddress);
     }
     // The player cannot be in the verification if the user object doesn't exist,
     // or if the user failed/succeeded the bot verification process.
@@ -208,7 +208,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
 
     // Queue the connection for further processing
-    FALLBACK.getQueue().queue(inetAddress, () -> {
+    FALLBACK.getQueue().getQueuedPlayers().put(inetAddress, () -> {
       // Check if the username matches the valid name regex to prevent
       // UTF-16 names or other types of exploits
       if (!Sonar.get().getConfig().getVerification().getValidNameRegex()

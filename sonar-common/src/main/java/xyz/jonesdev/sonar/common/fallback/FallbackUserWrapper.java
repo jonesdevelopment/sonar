@@ -82,7 +82,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     if (Sonar.get().getConfig().getVerification().isLogConnections()) {
       // Only log the processing message if the server isn't under attack.
       // We let the user override this through the configuration.
-      if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
+      if (Sonar.get().getAttackTracker().getCurrentAttack() == null
         || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
         Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
           .replace("%name%", username)
@@ -145,7 +145,7 @@ public final class FallbackUserWrapper implements FallbackUser {
 
     // Only log the failed message if the server isn't currently under attack.
     // However, we let the user override this through the configuration.
-    final boolean shouldLog = !Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
+    final boolean shouldLog = Sonar.get().getAttackTracker().getCurrentAttack() == null
       || Sonar.get().getConfig().getVerification().isLogDuringAttack();
 
     // Only disconnect the player and log if the channel is active
