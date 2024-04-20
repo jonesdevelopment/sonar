@@ -55,9 +55,9 @@ database:
   maximum-age: 5
 
 # Every new login request will be queued to avoid spam join attacks
-# The queue is updated every 500 milliseconds (10 ticks)
+# The queue is updated every 1 second (20 ticks)
 queue:
-  # Maximum number of concurrent queue polls per 500 milliseconds
+  # Maximum number of concurrent queue polls per 1 second
   max-polls: 30
 
 # Every new player that joins for the first time will be sent to

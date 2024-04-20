@@ -114,17 +114,16 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     // Register Sonar command
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());
 
-    // Register traffic service
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), CachedBandwidthStatistics::reset,
+    // Register queue and traffic service
+    getPlugin().getServer().getScheduler().schedule(getPlugin(), () -> {
+        CachedBandwidthStatistics.reset();
+        getFallback().getQueue().poll();
+      },
       1L, 1L, TimeUnit.SECONDS);
-
-    // Register queue service
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), getFallback().getQueue().getPollTask(),
-      500L, 500L, TimeUnit.MILLISECONDS);
 
     // Register verbose service
     getPlugin().getServer().getScheduler().schedule(getPlugin(), Sonar.get().getVerboseHandler()::update,
-      200L, 200L, TimeUnit.MILLISECONDS);
+      250L, 250L, TimeUnit.MILLISECONDS);
 
     // Make sure to inject into the server's connection handler
     FallbackInjectionHelper.inject();

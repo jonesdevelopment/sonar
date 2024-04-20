@@ -34,7 +34,7 @@ public final class FallbackQueue {
   private final Map<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(64);
 
   // Runnable task executed for polling the queue
-  private final Runnable pollTask = () -> {
+  public void poll() {
     final int maxQueuePolls = Sonar.get().getConfig().getQueue().getMaxQueuePolls();
     int index = 0;
 

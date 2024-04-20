@@ -56,9 +56,9 @@ database:
   maximum-age: 5
 
 # Každý nový login bude přidán do řady kvuli prevenci spam útoků
-# Řada je aktulizována každých 500 milisekund (10 ticků)
+# Řada je aktulizována každých 1 sekund (20 ticků)
 queue:
-  # Maximum součastných aktualizací řady za 500 milisekund
+  # Maximum součastných aktualizací řady za 1 sekund
   max-polls: 30
 
 # Každý připojený hráč bude přepojen do

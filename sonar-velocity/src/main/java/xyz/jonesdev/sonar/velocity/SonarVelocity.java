@@ -112,19 +112,17 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     // Register Sonar command
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
 
-    // Register traffic service
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), CachedBandwidthStatistics::reset)
+    // Register queue and traffic service
+    getPlugin().getServer().getScheduler().buildTask(getPlugin(), () -> {
+        CachedBandwidthStatistics.reset();
+        getFallback().getQueue().poll();
+      })
       .repeat(1L, TimeUnit.SECONDS)
-      .schedule();
-
-    // Register queue service
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), getFallback().getQueue().getPollTask())
-      .repeat(500L, TimeUnit.MILLISECONDS)
       .schedule();
 
     // Register verbose service
     getPlugin().getServer().getScheduler().buildTask(getPlugin(), Sonar.get().getVerboseHandler()::update)
-      .repeat(200L, TimeUnit.MILLISECONDS)
+      .repeat(250L, TimeUnit.MILLISECONDS)
       .schedule();
 
     // Make sure to inject into the server's connection handler

@@ -115,17 +115,16 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
 
-    // Register traffic service
-    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
-      CachedBandwidthStatistics::reset, 20L, 20L);
-
-    // Register queue service
-    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
-      getFallback().getQueue().getPollTask(), 10L, 10L);
+    // Register queue and traffic service
+    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(), () -> {
+        CachedBandwidthStatistics.reset();
+        getFallback().getQueue().poll();
+      },
+      20L, 20L);
 
     // Register verbose service
     getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
-      Sonar.get().getVerboseHandler()::update, 4L, 4L);
+      Sonar.get().getVerboseHandler()::update, 5L, 5L);
   }
 
   @Override
