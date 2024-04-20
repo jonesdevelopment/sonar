@@ -22,19 +22,15 @@ import lombok.val;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
-import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
 import java.util.UUID;
 import java.util.Vector;
 
-import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
 import static xyz.jonesdev.sonar.api.timer.SystemTimer.DATE_FORMATTER;
 
 @Getter
@@ -55,79 +51,21 @@ public final class Verbose implements Observable {
 
       // Only prepare component if there are subscribers
       if (component == null) {
-        component = prepareActionBarFormat();
+        final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
+        final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
+        component = replaceStatistic(attackDuration != null
+          ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
+          : Sonar.get().getConfig().getVerbose().getActionBarLayout())
+          .replaceText(TextReplacementConfig.builder().once().matchLiteral("%attack-duration%")
+            .replacement(attackDuration == null ? "00:00" : DATE_FORMATTER.format(attackDuration.delay()))
+            .build())
+          .replaceText(TextReplacementConfig.builder().once().matchLiteral("%animation%")
+            .replacement(nextAnimation())
+            .build());
       }
       // Send the action bar to all online subscribers
       audience.sendActionBar(component);
     }
-  }
-
-  @ApiStatus.Internal
-  public @NotNull Component prepareActionBarFormat() {
-    final SonarStatistics statistics = Sonar.get().getStatistics();
-    final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
-    final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
-    return (attackDuration != null
-      ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
-      : Sonar.get().getConfig().getVerbose().getActionBarLayout())
-      // TODO: Make this a bit prettier and better for performance
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%queued%")
-        .replacement(DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%verifying%")
-        .replacement(DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%blacklisted%")
-        .replacement(DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%total-joins%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getTotalPlayersJoined()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%logins-per-second%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getLoginsPerSecond()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%connections-per-second%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getConnectionsPerSecond()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%verify-total%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getTotalAttemptedVerifications()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%verify-success%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getTotalSuccessfulVerifications()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%verify-failed%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getTotalFailedVerifications()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%incoming-traffic%")
-        .replacement(statistics.getCurrentIncomingBandwidthFormatted())
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%outgoing-traffic%")
-        .replacement(statistics.getCurrentOutgoingBandwidthFormatted())
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%incoming-traffic-ttl%")
-        .replacement(statistics.getTotalIncomingBandwidthFormatted())
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%outgoing-traffic-ttl%")
-        .replacement(statistics.getTotalOutgoingBandwidthFormatted())
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%used-memory%")
-        .replacement(formatMemory(getUsedMemory()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%free-memory%")
-        .replacement(formatMemory(getFreeMemory()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%total-memory%")
-        .replacement(formatMemory(getTotalMemory()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%max-memory%")
-        .replacement(formatMemory(getMaxMemory()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%attack-duration%")
-        .replacement(attackDuration == null ? "00:00" : DATE_FORMATTER.format(attackDuration.delay()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%animation%")
-        .replacement(nextAnimation())
-        .build());
   }
 
   public String nextAnimation() {

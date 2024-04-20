@@ -21,6 +21,7 @@ import com.j256.ormlite.db.DatabaseType;
 import lombok.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -325,7 +326,10 @@ public final class SonarConfiguration {
 
     notifications.notificationTitle = deserialize(formatString(messagesConfig.getString("notifications.title")));
     notifications.notificationSubtitle = deserialize(formatString(messagesConfig.getString("notifications.subtitle")));
-    notifications.notificationChat = formatString(fromList(messagesConfig.getStringList("notifications.chat")));
+    notifications.title = Title.title(
+      Sonar.get().getConfig().getNotifications().getNotificationTitle(),
+      Sonar.get().getConfig().getNotifications().getNotificationSubtitle());
+    notifications.notificationChat = deserialize(formatString(fromList(messagesConfig.getStringList("notifications.chat"))));
   }
 
   private @NotNull URL getAsset(final String url, final @NotNull Language language) {
@@ -408,9 +412,10 @@ public final class SonarConfiguration {
   @Getter
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Notifications {
+    private Title title;
     private Component notificationTitle;
     private Component notificationSubtitle;
-    private String notificationChat;
+    private Component notificationChat;
   }
 
   @Getter

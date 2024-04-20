@@ -47,10 +47,9 @@ public enum CachedBandwidthStatistics {
    * (per-second) value and resets the current value.
    * This method is called every second.
    */
-  public static synchronized void reset() {
-    for (final CachedBandwidthStatistics value : values()) {
-      value.cacheAndReset();
-    }
+  public static void reset() {
+    INCOMING.cacheAndReset();
+    OUTGOING.cacheAndReset();
   }
 
   private void cacheAndReset() {
