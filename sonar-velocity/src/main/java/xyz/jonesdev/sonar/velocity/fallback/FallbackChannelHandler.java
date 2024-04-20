@@ -25,8 +25,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.FallbackBandwidthHandler;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandlerAdapter;
 import xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
@@ -37,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static com.velocitypowered.proxy.network.Connections.*;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -51,7 +48,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
     // Intercept any handshake packet by the client
     if (msg instanceof HandshakePacket handshake) {
-      handleHandshake(handshake);
+      handleHandshake(handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
     }
     // Intercept any server login packet by the client
     if (msg instanceof ServerLoginPacket serverLogin) {
@@ -60,29 +57,6 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     }
     // Make sure to let the server handle the rest
     ctx.fireChannelRead(msg);
-  }
-
-  private void handleHandshake(final @NotNull HandshakePacket handshake) throws Exception {
-    // Check if the player has already sent a handshake packet
-    if (protocolVersion != null) {
-      throw new CorruptedFrameException("Already sent handshake");
-    }
-    // Check if the hostname is invalid
-    if (handshake.getServerAddress().isEmpty()) {
-      throw new CorruptedFrameException("Hostname is empty");
-    }
-    // Store the protocol version
-    protocolVersion = ProtocolVersion.fromId(handshake.getProtocolVersion().getProtocol());
-    // Connections from unknown protocol versions will be discarded
-    // as this is the safest way of handling unwanted connections
-    if (protocolVersion.isUnknown()) {
-      // Sonar does NOT support snapshots or unknown versions;
-      // I'll try my best to stay up-to-date!
-      throw new CorruptedFrameException("Unknown protocol");
-    }
-    // Hook the traffic listener
-    // TODO: Can we implement this in channelActive?
-    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
   }
 
   private void handleLogin(final @NotNull ChannelHandlerContext ctx,

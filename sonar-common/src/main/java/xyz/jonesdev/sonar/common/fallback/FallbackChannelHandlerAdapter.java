@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.fallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +33,7 @@ import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.net.InetAddress;
 
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.deject;
 
@@ -86,6 +88,35 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   }
 
   /**
+   * Validates and handles incoming handshake packets
+   *
+   * @param hostname Hostname (server address) sent by the client
+   * @param protocol Protocol version number sent by the client
+   */
+  protected final void handleHandshake(final @NotNull String hostname, final int protocol) throws Exception {
+    // Check if the player has already sent a handshake packet
+    if (protocolVersion != null) {
+      throw new CorruptedFrameException("Already sent handshake");
+    }
+    // Check if the hostname is invalid
+    if (hostname.isEmpty()) {
+      throw new CorruptedFrameException("Hostname is empty");
+    }
+    // Store the protocol version
+    protocolVersion = ProtocolVersion.fromId(protocol);
+    // Connections from unknown protocol versions will be discarded
+    // as this is the safest way of handling unwanted connections
+    if (protocolVersion.isUnknown()) {
+      // Sonar does NOT support snapshots or unknown versions;
+      // I'll try my best to stay up-to-date!
+      throw new CorruptedFrameException("Unknown protocol");
+    }
+    // Hook the traffic listener
+    // TODO: Can we implement this in channelActive?
+    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
+  }
+
+  /**
    * Executes the maximum accounts per IP limit check before letting the player join
    *
    * @param ctx    Forwarded channel handler context
@@ -94,7 +125,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   protected void initialLogin(final @NotNull ChannelHandlerContext ctx,
                               final @NotNull Object packet,
                               final @NotNull String encoder,
-                              final @NotNull String boss) {
+                              final @NotNull String boss) throws Exception {
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
     // Skip the maximum online per IP check if it's disabled in the configuration
     if (maxOnlinePerIp > 0) {
