@@ -100,14 +100,14 @@ public abstract class SonarBootstrap<T> implements Sonar {
     reload();
 
     getLogger().info("Successfully initialized components in {}s!", launchTimer);
-    getLogger().info("Enabling all tasks and features..");
+    getLogger().info("Enabling all tasks and features...");
 
     try {
       // Run the per-platform initialization method
       enable();
 
       // Start threads
-      getLogger().info("Starting all service threads..");
+      getLogger().info("Starting all managed threads...");
       SonarServiceThreadManager.start();
 
       // Done
