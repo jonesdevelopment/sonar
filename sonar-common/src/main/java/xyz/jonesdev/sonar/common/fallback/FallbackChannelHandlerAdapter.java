@@ -230,10 +230,10 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
    * @param ctx         Forwarded channel handler context
    * @param loginPacket Login packet sent by the client
    */
-  protected void initialLogin(final @NotNull ChannelHandlerContext ctx,
-                              final @NotNull Object loginPacket,
-                              final @NotNull String encoder,
-                              final @NotNull String handler) throws Exception {
+  protected final void initialLogin(final @NotNull ChannelHandlerContext ctx,
+                                    final @NotNull Object loginPacket,
+                                    final @NotNull String encoder,
+                                    final @NotNull String handler) throws Exception {
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
     // Skip the maximum online per IP check if it's disabled in the configuration
     if (maxOnlinePerIp > 0) {
