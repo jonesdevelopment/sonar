@@ -64,7 +64,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
 
   private void handleHandshake(final @NotNull HandshakePacket handshake) throws Exception {
     // Check if the player has already sent a handshake packet
-    if (protocolVersion == null) {
+    if (protocolVersion != null) {
       throw new CorruptedFrameException("Already sent handshake");
     }
     // Check if the hostname is invalid
