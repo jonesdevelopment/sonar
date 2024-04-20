@@ -166,7 +166,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     }
 
     // Queue the connection for further processing
-    FALLBACK.getQueue().queue(inetAddress, () -> channel.eventLoop().execute(() -> {
+    FALLBACK.getQueue().queue(inetAddress, () -> {
       // Check if the username matches the valid name regex to prevent
       // UTF-16 names or other types of exploits
       if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
@@ -179,6 +179,6 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
       user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
       // Let the verification handler take over the channel
       user.hijack(serverLogin.getUsername(), offlineUUID, MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
-    }));
+    });
   }
 }

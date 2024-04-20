@@ -25,18 +25,15 @@ import org.bstats.charts.SimplePie;
 import org.bstats.velocity.Metrics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
-import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
 import xyz.jonesdev.sonar.velocity.fallback.FallbackInjectionHelper;
 
 import java.net.InetAddress;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Getter
 public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
@@ -111,19 +108,6 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
     // Register Sonar command
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
-
-    // Register queue and traffic service
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), () -> {
-        CachedBandwidthStatistics.reset();
-        getFallback().getQueue().poll();
-      })
-      .repeat(1L, TimeUnit.SECONDS)
-      .schedule();
-
-    // Register verbose service
-    getPlugin().getServer().getScheduler().buildTask(getPlugin(), Sonar.get().getVerboseHandler()::update)
-      .repeat(250L, TimeUnit.MILLISECONDS)
-      .schedule();
 
     // Make sure to inject into the server's connection handler
     FallbackInjectionHelper.inject(getPlugin().getServer());

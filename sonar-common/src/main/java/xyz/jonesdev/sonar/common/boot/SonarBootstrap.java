@@ -36,6 +36,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
+import xyz.jonesdev.sonar.common.service.SonarServiceThreadManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.subcommand.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.update.UpdateChecker;
@@ -99,11 +100,15 @@ public abstract class SonarBootstrap<T> implements Sonar {
     reload();
 
     getLogger().info("Successfully initialized components in {}s!", launchTimer);
-    getLogger().info("Enabling all tasks and features...");
+    getLogger().info("Enabling all tasks and features..");
 
     try {
       // Run the per-platform initialization method
       enable();
+
+      // Start threads
+      getLogger().info("Starting all service threads..");
+      SonarServiceThreadManager.start();
 
       // Done
       getLogger().info("Done ({}s)!", launchTimer);
@@ -170,6 +175,8 @@ public abstract class SonarBootstrap<T> implements Sonar {
   public final void shutdown() {
     // Initialize shutdown process
     getLogger().info("Starting shutdown process...");
+    // Interrupt threads
+    SonarServiceThreadManager.stop();
     // Close database connection
     verifiedPlayerController.close();
     // Run the per-platform disable method
