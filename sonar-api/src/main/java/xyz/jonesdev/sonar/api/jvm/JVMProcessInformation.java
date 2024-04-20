@@ -39,7 +39,7 @@ public class JVMProcessInformation {
     final double formattedSize = (double) size / (1L << (group * 10));
     final char unit = MEMORY_UNITS[group - 1];
     // https://en.wikipedia.org/wiki/Byte#Multiple-byte_units
-    return DECIMAL_FORMAT.format(formattedSize) + unit + "iB";
+    return DECIMAL_FORMAT.format(formattedSize) + " " + unit + "iB";
   }
 
   /**
