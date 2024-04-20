@@ -319,8 +319,8 @@ public final class SonarConfiguration {
     verification.verificationSuccess = deserialize(fromList(messagesConfig.getStringList("verification.success")));
     verification.verificationFailed = deserialize(fromList(messagesConfig.getStringList("verification.failed")));
 
-    verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout.normal"));
-    verbose.actionBarLayoutDuringAttack = formatString(messagesConfig.getString("verbose.layout.attack"));
+    verbose.actionBarLayout = deserialize(formatString(messagesConfig.getString("verbose.layout.normal")));
+    verbose.actionBarLayoutDuringAttack = deserialize(formatString(messagesConfig.getString("verbose.layout.attack")));
     verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation"));
 
     notifications.notificationTitle = deserialize(formatString(messagesConfig.getString("notifications.title")));
@@ -400,8 +400,8 @@ public final class SonarConfiguration {
   @Getter
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Verbose {
-    private String actionBarLayout;
-    private String actionBarLayoutDuringAttack;
+    private Component actionBarLayout;
+    private Component actionBarLayoutDuringAttack;
     private List<String> animation;
   }
 

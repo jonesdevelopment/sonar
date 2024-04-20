@@ -18,13 +18,12 @@
 package xyz.jonesdev.sonar.api.timer;
 
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 
 @Getter
 public final class SystemTimer {
-  private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("mm:ss");
+  public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("mm:ss");
 
   private long start = System.currentTimeMillis();
 
@@ -40,17 +39,10 @@ public final class SystemTimer {
   }
 
   /**
-   * @apiNote Read more: {@link SystemTimer#delay}, {@link SystemTimer#formattedDelay}
+   * @apiNote Read more: {@link SystemTimer#delay}
    */
   public boolean elapsed(final long amount) {
     return delay() >= amount;
-  }
-
-  /**
-   * @apiNote Read more: {@link SystemTimer#delay}
-   */
-  public @NotNull String formattedDelay() {
-    return FORMATTER.format(delay());
   }
 
   @Override
