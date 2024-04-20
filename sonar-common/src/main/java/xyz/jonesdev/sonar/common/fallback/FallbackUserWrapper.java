@@ -75,7 +75,7 @@ public final class FallbackUserWrapper implements FallbackUser {
   @Override
   public void hijack(final @NotNull String username, final @NotNull UUID uuid,
                      final @NotNull String encoder, final @NotNull String decoder,
-                     final @NotNull String timeout, final @NotNull String boss) {
+                     final @NotNull String timeout, final @NotNull String handler) {
     // The player has joined the verification
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
@@ -108,8 +108,8 @@ public final class FallbackUserWrapper implements FallbackUser {
 
     channel.eventLoop().execute(() -> {
       // Remove main pipeline to completely take over the channel
-      if (pipeline.get(boss) != null) {
-        pipeline.remove(boss);
+      if (pipeline.get(handler) != null) {
+        pipeline.remove(handler);
       }
 
       // Send LoginSuccess packet to make the client think they are joining the server
@@ -232,7 +232,7 @@ public final class FallbackUserWrapper implements FallbackUser {
    *
    * @param packet          Disconnect packet
    * @param encoder         Encoder to replace
-   * @param boss            Main pipeline to remove
+   * @param handler         Main pipeline to remove
    * @param channel         Channel of the player
    * @param protocolVersion Protocol version of the player
    */
@@ -240,11 +240,11 @@ public final class FallbackUserWrapper implements FallbackUser {
                                       final @NotNull ProtocolVersion protocolVersion,
                                       final @NotNull FallbackPacket packet,
                                       final @NotNull String encoder,
-                                      final @NotNull String boss) {
+                                      final @NotNull String handler) {
     if (channel.eventLoop().inEventLoop()) {
-      _customDisconnect(channel, protocolVersion, packet, encoder, boss);
+      _customDisconnect(channel, protocolVersion, packet, encoder, handler);
     } else {
-      channel.eventLoop().execute(() -> _customDisconnect(channel, protocolVersion, packet, encoder, boss));
+      channel.eventLoop().execute(() -> _customDisconnect(channel, protocolVersion, packet, encoder, handler));
     }
   }
 
