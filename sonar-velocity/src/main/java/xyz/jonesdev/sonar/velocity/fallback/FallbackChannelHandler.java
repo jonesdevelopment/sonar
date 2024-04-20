@@ -23,7 +23,6 @@ import com.velocitypowered.proxy.protocol.packet.ServerLoginPacket;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
@@ -48,8 +47,6 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     super(channel);
   }
 
-  private @ApiStatus.Internal HandshakePacket handshakePacket;
-
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
     // Intercept any handshake packet by the client
@@ -67,7 +64,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
 
   private void handleHandshake(final @NotNull HandshakePacket handshake) throws Exception {
     // Check if the player has already sent a handshake packet
-    if (handshakePacket != null) {
+    if (protocolVersion == null) {
       throw new CorruptedFrameException("Already sent handshake");
     }
     // Check if the hostname is invalid
@@ -83,8 +80,6 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
       // I'll try my best to stay up-to-date!
       throw new CorruptedFrameException("Unknown protocol");
     }
-    // Store the handshake packet
-    handshakePacket = handshake;
     // Hook the traffic listener
     // TODO: Can we implement this in channelActive?
     channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
