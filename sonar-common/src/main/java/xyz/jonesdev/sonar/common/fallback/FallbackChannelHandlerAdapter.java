@@ -114,7 +114,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     if (protocolVersion.isUnknown()) {
       // Sonar does NOT support snapshots or unknown versions;
       // I'll try my best to stay up-to-date!
-      throw new CorruptedFrameException("Unknown protocol");
+      throw new CorruptedFrameException("Unknown protocol version " + protocol);
     }
     // Hook the traffic listener
     // TODO: Can we implement this in channelActive?
