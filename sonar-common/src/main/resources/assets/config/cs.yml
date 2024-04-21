@@ -167,7 +167,7 @@ verification:
   debug-xyz-positions: false
   # Množství času který musí uběhnout aby hráč byl odpojen
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
-  read-timeout: 3500
+  read-timeout: 8000
   # How long should a player wait before reconnecting during verification Jak dlouho by měl hráč
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
   rejoin-delay: 8000

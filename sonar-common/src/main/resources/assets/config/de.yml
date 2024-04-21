@@ -164,7 +164,7 @@ verification:
   debug-xyz-positions: false
   # Zeit, die verstreichen muss, bevor ein Spieler ein Timeout erleidet
   # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
-  read-timeout: 3500
+  read-timeout: 8000
   # Wie lange sollte ein Spieler warten, bevor er während der Überprüfung erneut verbinden kann
   # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
   rejoin-delay: 8000
