@@ -109,13 +109,6 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
     // Store the protocol version
     protocolVersion = ProtocolVersion.fromId(protocol);
-    // Connections from unknown protocol versions will be discarded
-    // as this is the safest way of handling unwanted connections
-    if (protocolVersion.isUnknown()) {
-      // Sonar does NOT support snapshots or unknown versions;
-      // I'll try my best to stay up-to-date!
-      throw new CorruptedFrameException("Unknown protocol version " + protocol);
-    }
     // Hook the traffic listener
     // TODO: Can we implement this in channelActive?
     channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
@@ -140,6 +133,13 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     // Check if the player has already sent a login packet
     if (this.username != null) {
       throw new CorruptedFrameException("Already sent login");
+    }
+    // Connections from unknown protocol versions will be discarded
+    // as this is the safest way of handling unwanted connections
+    if (protocolVersion.isUnknown()) {
+      // Sonar does NOT support snapshots or unknown versions;
+      // I'll try my best to stay up-to-date!
+      throw new CorruptedFrameException("Unknown protocol version");
     }
     // Increase joins per second for the action bar verbose
     GlobalSonarStatistics.countLogin();
