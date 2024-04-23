@@ -89,11 +89,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.performCollisions = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
     this.performCaptcha = FALLBACK.shouldPerformCaptcha();
     this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
-
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
-      // Start initializing the actual join process
-      initialJoinProcess();
-    }
   }
 
   private void configure() {
@@ -123,7 +118,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
   }
 
-  private void initialJoinProcess() {
+  public void initialJoinProcess() {
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       // 1.7 players don't have KeepAlive packets in the login process
       sendJoinGamePacket();

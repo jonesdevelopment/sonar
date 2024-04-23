@@ -46,6 +46,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
 
 @Getter
 @ToString(of = {"protocolVersion", "inetAddress"})
@@ -74,26 +75,14 @@ public final class FallbackUserWrapper implements FallbackUser {
   @Override
   public void hijack(final @NotNull String username, final @NotNull UUID uuid,
                      final @NotNull String encoder, final @NotNull String decoder,
-                     final @NotNull String timeout, final @NotNull String boss) {
-    // This rarely happens when the channel hangs, but the player is still connecting
-    // This also fixes a unique issue with TCPShield and other reverse proxies
-    if (pipeline.get(encoder) == null || pipeline.get(decoder) == null) {
-      channel.close();
-      return;
-    }
-
-    // Remove main pipeline to completely take over the channel
-    if (pipeline.get(boss) != null) {
-      pipeline.remove(boss);
-    }
-
+                     final @NotNull String timeout, final @NotNull String handler) {
     // The player has joined the verification
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
     if (Sonar.get().getConfig().getVerification().isLogConnections()) {
       // Only log the processing message if the server isn't under attack.
       // We let the user override this through the configuration.
-      if (!Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
+      if (Sonar.get().getAttackTracker().getCurrentAttack() == null
         || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
         Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
           .replace("%name%", username)
@@ -117,16 +106,36 @@ public final class FallbackUserWrapper implements FallbackUser {
     final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
     pipeline.replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
 
-    // Send LoginSuccess packet to make the client think they are joining the server
-    write(new LoginSuccessPacket(username, uuid));
+    channel.eventLoop().execute(() -> {
+      // Remove main pipeline to completely take over the channel
+      if (pipeline.get(handler) != null) {
+        pipeline.remove(handler);
+      }
 
-    // The LoginSuccess packet has been sent, now we can change the registry state
-    newEncoder.updateRegistry(protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
-      ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
+      // Send LoginSuccess packet to make the client think they are joining the server
+      write(new LoginSuccessPacket(username, uuid));
 
-    // Replace normal decoder to allow custom packets
-    pipeline.replace(decoder, FALLBACK_PACKET_DECODER,
-      new FallbackPacketDecoder(this, new FallbackVerificationHandler(this, username, uuid)));
+      // The LoginSuccess packet has been sent, now we can change the registry state
+      newEncoder.updateRegistry(protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
+        ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
+
+      try {
+        // Prepare custom packet decoder and verification handler
+        final FallbackVerificationHandler verification = new FallbackVerificationHandler(this, username, uuid);
+        final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(this, verification);
+        // Replace normal decoder to allow custom packets
+        pipeline.replace(decoder, FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
+
+        if (protocolVersion.compareTo(MINECRAFT_1_20_2) < 0) {
+          // Start initializing the actual join process for pre-1.20.2 clients
+          verification.initialJoinProcess();
+        }
+      } catch (Throwable throwable) {
+        // This rarely happens when the channel hangs and the player is still connecting
+        // I honestly have no idea how else I'm supposed to fix this
+        channel.close();
+      }
+    });
   }
 
   @Override
@@ -136,7 +145,7 @@ public final class FallbackUserWrapper implements FallbackUser {
 
     // Only log the failed message if the server isn't currently under attack.
     // However, we let the user override this through the configuration.
-    final boolean shouldLog = !Sonar.get().getAttackTracker().isCurrentlyUnderAttack()
+    final boolean shouldLog = Sonar.get().getAttackTracker().getCurrentAttack() == null
       || Sonar.get().getConfig().getVerification().isLogDuringAttack();
 
     // Only disconnect the player and log if the channel is active
@@ -223,7 +232,7 @@ public final class FallbackUserWrapper implements FallbackUser {
    *
    * @param packet          Disconnect packet
    * @param encoder         Encoder to replace
-   * @param boss            Main pipeline to remove
+   * @param handler         Main pipeline to remove
    * @param channel         Channel of the player
    * @param protocolVersion Protocol version of the player
    */
@@ -231,7 +240,19 @@ public final class FallbackUserWrapper implements FallbackUser {
                                       final @NotNull ProtocolVersion protocolVersion,
                                       final @NotNull FallbackPacket packet,
                                       final @NotNull String encoder,
-                                      final @NotNull String boss) {
+                                      final @NotNull String handler) {
+    if (channel.eventLoop().inEventLoop()) {
+      _customDisconnect(channel, protocolVersion, packet, encoder, handler);
+    } else {
+      channel.eventLoop().execute(() -> _customDisconnect(channel, protocolVersion, packet, encoder, handler));
+    }
+  }
+
+  private static void _customDisconnect(final @NotNull Channel channel,
+                                        final @NotNull ProtocolVersion protocolVersion,
+                                        final @NotNull FallbackPacket packet,
+                                        final @NotNull String encoder,
+                                        final @NotNull String boss) {
     // Remove main pipeline to completely take over the channel
     if (channel.pipeline().get(boss) != null) {
       channel.pipeline().remove(boss);

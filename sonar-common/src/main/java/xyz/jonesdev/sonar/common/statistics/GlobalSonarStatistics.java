@@ -63,7 +63,7 @@ public final class GlobalSonarStatistics implements SonarStatistics {
    * Called every time the action bar updates to ensure fresh values
    */
   @Override
-  public synchronized void cleanUpCache() {
+  public void cleanUpCache() {
     LOGINS_PER_SECOND.cleanUp();
     CONNECTIONS_PER_SECOND.cleanUp();
     // Also clean up the blacklist

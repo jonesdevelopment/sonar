@@ -21,20 +21,17 @@ import lombok.Getter;
 import lombok.val;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.jetbrains.annotations.ApiStatus;
+import net.kyori.adventure.text.TextReplacementConfig;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
-import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Collection;
 import java.util.UUID;
 import java.util.Vector;
 
-import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
+import static xyz.jonesdev.sonar.api.timer.SystemTimer.DATE_FORMATTER;
 
 @Getter
 public final class Verbose implements Observable {
@@ -43,51 +40,29 @@ public final class Verbose implements Observable {
 
   // Run action bar verbose
   public void update() {
-    // Make sure to clean up the cached statistics
-    Sonar.get().getStatistics().cleanUpCache();
     // Don't prepare component if there are no subscribers
-    if (subscribers.isEmpty()) return;
-    // Prepare the action bar format component
-    final Component component = prepareActionBarFormat();
-    // Send the action bar to all online players
+    Component component = null;
     for (final UUID subscriber : subscribers) {
       final Audience audience = Sonar.get().audience(subscriber);
       if (audience == null) continue;
+
+      // Only prepare component if there are subscribers
+      if (component == null) {
+        final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
+        final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
+        component = replaceStatistic(attackDuration != null
+          ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
+          : Sonar.get().getConfig().getVerbose().getActionBarLayout())
+          .replaceText(TextReplacementConfig.builder().once().matchLiteral("%attack-duration%")
+            .replacement(attackDuration == null ? "00:00" : DATE_FORMATTER.format(attackDuration.delay()))
+            .build())
+          .replaceText(TextReplacementConfig.builder().once().matchLiteral("%animation%")
+            .replacement(nextAnimation())
+            .build());
+      }
+      // Send the action bar to all online subscribers
       audience.sendActionBar(component);
     }
-  }
-
-  @ApiStatus.Internal
-  public @NotNull Component prepareActionBarFormat() {
-    final SonarStatistics statistics = Sonar.get().getStatistics();
-    final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
-    final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
-    return MiniMessage.miniMessage().deserialize((attackDuration != null
-      ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
-      : Sonar.get().getConfig().getVerbose().getActionBarLayout())
-      .replace("%queued%",
-        DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-      .replace("%verifying%", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
-      .replace("%blacklisted%",
-        DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize()))
-      .replace("%blacklisted%", DECIMAL_FORMAT.format(statistics.getCurrentBlacklistSize()))
-      .replace("%total-joins%", DECIMAL_FORMAT.format(statistics.getTotalPlayersJoined()))
-      .replace("%logins-per-second%", DECIMAL_FORMAT.format(statistics.getLoginsPerSecond()))
-      .replace("%connections-per-second%", DECIMAL_FORMAT.format(statistics.getConnectionsPerSecond()))
-      .replace("%verify-total%", DECIMAL_FORMAT.format(statistics.getTotalAttemptedVerifications()))
-      .replace("%verify-success%",
-        DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize()))
-      .replace("%verify-failed%", DECIMAL_FORMAT.format(statistics.getTotalFailedVerifications()))
-      .replace("%attack-duration%", attackDuration == null ? "00:00" : attackDuration.formattedDelay())
-      .replace("%incoming-traffic%", statistics.getCurrentIncomingBandwidthFormatted())
-      .replace("%outgoing-traffic%", statistics.getCurrentOutgoingBandwidthFormatted())
-      .replace("%incoming-traffic-ttl%", statistics.getTotalIncomingBandwidthFormatted())
-      .replace("%outgoing-traffic-ttl%", statistics.getTotalOutgoingBandwidthFormatted())
-      .replace("%used-memory%", formatMemory(getUsedMemory()))
-      .replace("%free-memory%", formatMemory(getFreeMemory()))
-      .replace("%total-memory%", formatMemory(getTotalMemory()))
-      .replace("%max-memory%", formatMemory(getMaxMemory()))
-      .replace("%animation%", nextAnimation()));
   }
 
   public String nextAnimation() {

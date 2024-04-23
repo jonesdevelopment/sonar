@@ -55,11 +55,11 @@ public interface FallbackUser {
    * @param encoder  Name of the encoder pipeline
    * @param decoder  Name of the decoder pipeline
    * @param timeout  Name of the read timeout pipeline
-   * @param boss     Name of the main pipeline
+   * @param handler  Name of the main pipeline
    */
   void hijack(final @NotNull String username, final @NotNull UUID uuid,
               final @NotNull String encoder, final @NotNull String decoder,
-              final @NotNull String timeout, final @NotNull String boss);
+              final @NotNull String timeout, final @NotNull String handler);
 
   /**
    * Sends a packet/message to the player

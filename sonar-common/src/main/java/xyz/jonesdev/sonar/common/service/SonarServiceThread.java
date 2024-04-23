@@ -15,38 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.timer;
+package xyz.jonesdev.sonar.common.service;
 
-import lombok.Getter;
+public final class SonarServiceThread extends Thread {
+  private final long delay;
+  private final Runnable runnable;
 
-import java.text.SimpleDateFormat;
-
-@Getter
-public final class SystemTimer {
-  public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("mm:ss");
-
-  private long start = System.currentTimeMillis();
-
-  public void reset() {
-    start = System.currentTimeMillis();
-  }
-
-  /**
-   * @return Time between the current timestamp and the start timestamp
-   */
-  public long delay() {
-    return System.currentTimeMillis() - start;
-  }
-
-  /**
-   * @apiNote Read more: {@link SystemTimer#delay}
-   */
-  public boolean elapsed(final long amount) {
-    return delay() >= amount;
+  public SonarServiceThread(final String name, final long delay, final Runnable runnable) {
+    setName(name);
+    this.delay = delay;
+    this.runnable = runnable;
   }
 
   @Override
-  public String toString() {
-    return String.format("%.3f", delay() / 1000D);
+  public void run() {
+    try {
+      while (!isInterrupted()) {
+        runnable.run();
+        // Sleep thread by specified delay
+        Thread.sleep(delay);
+      }
+    } catch (InterruptedException interruptedException) {
+      //
+    }
   }
 }

@@ -151,10 +151,4 @@ public final class AttackTracker {
       attackThreshold = 0;
     }
   }
-
-  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  public boolean isCurrentlyUnderAttack() {
-    final int minDelay = Sonar.get().getConfig().getAttackCooldownDelay();
-    return currentAttack != null && currentAttack.timer.delay() < minDelay;
-  }
 }

@@ -26,12 +26,10 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
-import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 
 import java.net.InetAddress;
 import java.util.Objects;
@@ -114,18 +112,6 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
-
-    // Register traffic service
-    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
-      CachedBandwidthStatistics::reset, 20L, 20L);
-
-    // Register queue service
-    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
-      getFallback().getQueue().getPollTask(), 10L, 10L);
-
-    // Register verbose service
-    getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(getPlugin(),
-      Sonar.get().getVerboseHandler()::update, 4L, 4L);
   }
 
   @Override

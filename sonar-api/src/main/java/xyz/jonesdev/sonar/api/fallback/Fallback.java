@@ -83,6 +83,6 @@ public final class Fallback {
   private static boolean shouldPerform(final SonarConfiguration.Verification.Timing timing) {
     return timing == SonarConfiguration.Verification.Timing.ALWAYS
       || (timing == SonarConfiguration.Verification.Timing.DURING_ATTACK
-      && Sonar.get().getAttackTracker().isCurrentlyUnderAttack());
+      && Sonar.get().getAttackTracker().getCurrentAttack() != null);
   }
 }

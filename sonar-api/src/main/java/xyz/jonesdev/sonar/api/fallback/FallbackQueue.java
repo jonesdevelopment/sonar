@@ -26,15 +26,20 @@ import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FallbackQueue {
   static final FallbackQueue INSTANCE = new FallbackQueue();
   private final Map<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(64);
+  // Async executor for all new verifications
+  public static final ExecutorService QUEUE_EXECUTOR = new ForkJoinPool(
+    Math.min(0x7fff, Runtime.getRuntime().availableProcessors()),
+    ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true);
 
-  // Runnable task executed for polling the queue
-  private final Runnable pollTask = () -> {
+  public void poll() {
     final int maxQueuePolls = Sonar.get().getConfig().getQueue().getMaxQueuePolls();
     int index = 0;
 
@@ -47,30 +52,9 @@ public final class FallbackQueue {
       }
       // Run the cached runnable
       final Map.Entry<InetAddress, Runnable> entry = iterator.next();
-      entry.getValue().run();
+      QUEUE_EXECUTOR.execute(entry.getValue());
       // Remove runnable from iterator
       iterator.remove();
     }
-
-    // Run the attack check task
-    Sonar.get().getAttackTracker().checkIfUnderAttack();
-    // Clean up the cache of rate-limited IPs
-    Sonar.get().getFallback().getRatelimiter().cleanUpCache();
-  };
-
-  /**
-   * @param inetAddress IP address of the player
-   * @param runnable    Queued action on the netty thread
-   * @see #remove
-   */
-  public void queue(final InetAddress inetAddress, final Runnable runnable) {
-    queuedPlayers.put(inetAddress, runnable);
-  }
-
-  /**
-   * @param inetAddress IP address of the player
-   */
-  public void remove(final InetAddress inetAddress) {
-    queuedPlayers.remove(inetAddress);
   }
 }

@@ -26,18 +26,15 @@ import org.bstats.bungeecord.Metrics;
 import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackInjectionHelper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
-import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 
 import java.net.InetAddress;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Getter
 public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
@@ -113,18 +110,6 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
     // Register Sonar command
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());
-
-    // Register traffic service
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), CachedBandwidthStatistics::reset,
-      1L, 1L, TimeUnit.SECONDS);
-
-    // Register queue service
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), getFallback().getQueue().getPollTask(),
-      500L, 500L, TimeUnit.MILLISECONDS);
-
-    // Register verbose service
-    getPlugin().getServer().getScheduler().schedule(getPlugin(), Sonar.get().getVerboseHandler()::update,
-      200L, 200L, TimeUnit.MILLISECONDS);
 
     // Make sure to inject into the server's connection handler
     FallbackInjectionHelper.inject();

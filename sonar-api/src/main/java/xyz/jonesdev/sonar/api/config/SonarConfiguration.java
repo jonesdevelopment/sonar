@@ -21,6 +21,7 @@ import com.j256.ormlite.db.DatabaseType;
 import lombok.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -319,13 +320,16 @@ public final class SonarConfiguration {
     verification.verificationSuccess = deserialize(fromList(messagesConfig.getStringList("verification.success")));
     verification.verificationFailed = deserialize(fromList(messagesConfig.getStringList("verification.failed")));
 
-    verbose.actionBarLayout = formatString(messagesConfig.getString("verbose.layout.normal"));
-    verbose.actionBarLayoutDuringAttack = formatString(messagesConfig.getString("verbose.layout.attack"));
+    verbose.actionBarLayout = deserialize(formatString(messagesConfig.getString("verbose.layout.normal")));
+    verbose.actionBarLayoutDuringAttack = deserialize(formatString(messagesConfig.getString("verbose.layout.attack")));
     verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation"));
 
     notifications.notificationTitle = deserialize(formatString(messagesConfig.getString("notifications.title")));
     notifications.notificationSubtitle = deserialize(formatString(messagesConfig.getString("notifications.subtitle")));
-    notifications.notificationChat = formatString(fromList(messagesConfig.getStringList("notifications.chat")));
+    notifications.title = Title.title(
+      Sonar.get().getConfig().getNotifications().getNotificationTitle(),
+      Sonar.get().getConfig().getNotifications().getNotificationSubtitle());
+    notifications.notificationChat = deserialize(formatString(fromList(messagesConfig.getStringList("notifications.chat"))));
   }
 
   private @NotNull URL getAsset(final String url, final @NotNull Language language) {
@@ -400,17 +404,18 @@ public final class SonarConfiguration {
   @Getter
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Verbose {
-    private String actionBarLayout;
-    private String actionBarLayoutDuringAttack;
+    private Component actionBarLayout;
+    private Component actionBarLayoutDuringAttack;
     private List<String> animation;
   }
 
   @Getter
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Notifications {
+    private Title title;
     private Component notificationTitle;
     private Component notificationSubtitle;
-    private String notificationChat;
+    private Component notificationChat;
   }
 
   @Getter

@@ -21,12 +21,14 @@ import com.sun.management.OperatingSystemMXBean;
 import lombok.experimental.UtilityClass;
 
 import java.lang.management.ManagementFactory;
+import java.text.DecimalFormat;
 
 @UtilityClass
 public class JVMProcessInformation {
   private final Runtime RUNTIME = Runtime.getRuntime();
   private final OperatingSystemMXBean MX = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
   private final char[] MEMORY_UNITS = {'K', 'M', 'G', 'T', 'P', 'E'};
+  private final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.#");
 
   public String formatMemory(final long size) {
     if (size < 1024L) {
@@ -37,7 +39,7 @@ public class JVMProcessInformation {
     final double formattedSize = (double) size / (1L << (group * 10));
     final char unit = MEMORY_UNITS[group - 1];
     // https://en.wikipedia.org/wiki/Byte#Multiple-byte_units
-    return String.format("%.1f %siB", formattedSize, unit);
+    return DECIMAL_FORMAT.format(formattedSize) + " " + unit + "iB";
   }
 
   /**
