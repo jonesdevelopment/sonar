@@ -72,12 +72,6 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       // Remove the IP address from the queue
       FALLBACK.getQueue().getQueuedPlayers().remove(inetAddress);
     }
-    // The player cannot be in the verification if the user object doesn't exist,
-    // or if the user failed/succeeded the bot verification process.
-    if (user != null && user.getState().canReceivePackets()) {
-      // Mark the verification attempt as failed
-      user.fail("disconnected during verification");
-    }
     // Make sure to let the server handle the rest
     ctx.fireChannelInactive();
   }
