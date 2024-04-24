@@ -69,6 +69,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private double posX, posY, posZ, lastY, spawnYPosition;
   private boolean resolvedClientBrand, resolvedClientSettings;
   private boolean listenForMovements;
+  private boolean receivedSteerBoat, receivedPlayerInput;
 
   // CAPTCHA
   private final SystemTimer keepAlive = new SystemTimer();
@@ -302,6 +303,19 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
+    if (packet instanceof PaddleBoatPacket) {
+      // Check if we are currently expecting a PaddleBoatPacket packet
+      assertState(VEHICLE);
+
+      // Only pass the player if both checks are passed
+      if (receivedPlayerInput && receivedSteerBoat) {
+        captchaOrNext();
+      }
+
+      // Mark paddle boat check as passed
+      receivedSteerBoat = true;
+    }
+
     if (packet instanceof PlayerInputPacket) {
       // Check if we are currently expecting a PlayerInputPacket packet
       assertState(VEHICLE);
@@ -313,11 +327,23 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(inputPacket.getSideways() <= 0.98f, "invalid vehicle speed (s)");
 
       // Don't verify if the player tries unmounting or jumping
-      // We can't fail since the player is able to jump or sneak
-      if (inputPacket.isJump() || inputPacket.isUnmount()) return;
+      checkFrame(!inputPacket.isJump(), "tried to jump in vehicle");
+      checkFrame(!inputPacket.isUnmount(), "tried to escape the vehicle");
 
-      // Continue checking or verify the player
-      captchaOrNext();
+      // Only pass the player if both checks are passed
+      if (receivedPlayerInput && receivedSteerBoat) {
+        captchaOrNext();
+      }
+
+      // pre-1.9 clients do not have a PaddleBoat packet
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
+        receivedSteerBoat = true;
+      } else {
+        // PaddleBoat → PlayerInput → PaddleBoat
+        checkFrame(receivedSteerBoat, "invalid vehicle steering order");
+      }
+      // Mark player input check as passed
+      receivedPlayerInput = true;
       return;
     }
 
