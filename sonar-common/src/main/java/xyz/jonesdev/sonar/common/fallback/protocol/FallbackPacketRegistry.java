@@ -277,6 +277,20 @@ public enum FallbackPacketRegistry {
       clientbound.register(GameEventPacket.class, GameEventPacket::new,
         map(0x20, MINECRAFT_1_20_3, true));
 
+      serverbound.register(PaddleBoatPacket.class, PaddleBoatPacket::new,
+        map(0x11, MINECRAFT_1_9, false),
+        map(0x12, MINECRAFT_1_12, false),
+        map(0x11, MINECRAFT_1_12_1, false),
+        map(0x14, MINECRAFT_1_13, false),
+        map(0x16, MINECRAFT_1_14, false),
+        map(0x17, MINECRAFT_1_16, false),
+        map(0x16, MINECRAFT_1_17, false),
+        map(0x18, MINECRAFT_1_19, false),
+        map(0x19, MINECRAFT_1_19_1, false),
+        map(0x18, MINECRAFT_1_19_3, false),
+        map(0x19, MINECRAFT_1_19_4, false),
+        map(0x1B, MINECRAFT_1_20_2, false),
+        map(0x1C, MINECRAFT_1_20_3, false));
       serverbound.register(PlayerInputPacket.class, PlayerInputPacket::new,
         map(0x0C, MINECRAFT_1_7_2, false),
         map(0x15, MINECRAFT_1_9, false),
