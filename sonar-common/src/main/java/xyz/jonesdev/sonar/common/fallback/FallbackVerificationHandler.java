@@ -304,7 +304,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof PaddleBoatPacket) {
-      System.out.println("PaddleBoatPacket " + packet);
       // Check if we are currently expecting a PaddleBoatPacket packet
       assertState(VEHICLE);
 
@@ -318,7 +317,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     if (packet instanceof PlayerInputPacket) {
-      System.out.println("PlayerInputPacket " + packet);
       // Check if we are currently expecting a PlayerInputPacket packet
       assertState(VEHICLE);
 
