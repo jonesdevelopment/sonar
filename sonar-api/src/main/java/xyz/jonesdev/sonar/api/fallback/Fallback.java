@@ -80,10 +80,6 @@ public final class Fallback {
     return shouldPerform(Sonar.get().getConfig().getVerification().getVehicle().getTiming());
   }
 
-  public boolean shouldPerformTransfer() {
-    return shouldPerform(Sonar.get().getConfig().getVerification().getTransfer().getTiming());
-  }
-
   private static boolean shouldPerform(final SonarConfiguration.Verification.Timing timing) {
     return timing == SonarConfiguration.Verification.Timing.ALWAYS
       || (timing == SonarConfiguration.Verification.Timing.DURING_ATTACK

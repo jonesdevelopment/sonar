@@ -158,19 +158,13 @@ verification:
   # If enabled, the player will be transferred back to the origin server
   # after successfully passing the bot verification.
   # This feature was introduced by Mojang in Minecraft version 1.20.5
-  #
-  # For this to work, you must enable the feature in your server's configuration
-  # Additionally, you might want to reduce the amount of login rate-limiting
-  # performed by Velocity or other proxies/plugins, as this might prevent the
-  # player from being transferred correctly.
   transfer:
-    # When should Sonar transfer the player?
-    # Note: This will not work with any version older than 1.20.5
-    # Possible types: ALWAYS, DURING_ATTACK, NEVER
-    # - ALWAYS: New players will always receive a CAPTCHA
-    # - DURING_ATTACK: New players will only receive a CAPTCHA during an attack
-    # - NEVER: New players will never receive a CAPTCHA (Recommended)
-    timing: ALWAYS
+    # Should Sonar transfer the player to the origin server (instead of kicking them)?
+    # For this to work, you must enable the feature in your server's configuration
+    # Additionally, you might want to reduce the amount of login rate-limiting
+    # performed by Velocity or other proxies/plugins, as this might prevent the
+    # player from being transferred correctly.
+    enabled: false
     # Which server should Sonar transfer the player to when the verification is passed?
     # Please enter the server IP that is used by players to normally connect to your server.
     # For example, you can put "mc.hypixel.net" or a direct IP like "1.1.1.1"

@@ -205,11 +205,11 @@ public final class SonarConfiguration {
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets"), 128, 8192);
 
-    verification.transfer.timing = Verification.Timing.valueOf(generalConfig.getString("verification.transfer.timing"));
+    verification.transfer.enabled = generalConfig.getBoolean("verification.transfer.enabled");
     verification.transfer.host = generalConfig.getString("verification.transfer.destination-host");
     verification.transfer.port = clamp(generalConfig.getInt("verification.transfer.destination-port"), 0, 0xffff);
 
-    if (verification.transfer.timing != Verification.Timing.NEVER) {
+    if (verification.transfer.enabled) {
       Sonar.get().getLogger().info("Transferring 1.20.5+ clients is enabled. Please make sure to follow the instructions in order for this to work properly.");
     }
 
@@ -508,7 +508,7 @@ public final class SonarConfiguration {
 
     @Getter
     public static final class Transfer {
-      private Timing timing;
+      private boolean enabled;
       private String host;
       private int port;
     }

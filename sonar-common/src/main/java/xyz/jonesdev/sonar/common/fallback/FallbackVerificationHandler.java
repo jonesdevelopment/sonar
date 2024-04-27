@@ -90,7 +90,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.performCollisions = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
     this.performCaptcha = FALLBACK.shouldPerformCaptcha();
     this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
-    this.transfer = user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0 && FALLBACK.shouldPerformTransfer();
+    this.transfer = Sonar.get().getConfig().getVerification().getTransfer().isEnabled()
+      && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0;
   }
 
   private void configure() {
