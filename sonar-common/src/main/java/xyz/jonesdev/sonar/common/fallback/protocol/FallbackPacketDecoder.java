@@ -22,7 +22,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
@@ -72,7 +71,6 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
         return;
       }
 
-      Sonar.get().getLogger().info("Decode {} packet with {} bytes.", packet.getClass().getSimpleName(), byteBuf.readableBytes());
 
       try {
         // Ensure that the packet isn't too large or too small
