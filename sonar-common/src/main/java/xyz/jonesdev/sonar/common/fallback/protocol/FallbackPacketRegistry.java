@@ -23,7 +23,6 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryBundleDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
@@ -61,11 +60,8 @@ public enum FallbackPacketRegistry {
         map(0x03, MINECRAFT_1_20_2, false),
         map(0x04, MINECRAFT_1_20_5, false));
 
-      // TODO: Merge RegistryBundlePacket into RegistryDataPacket
       clientbound.register(RegistryDataPacket.class, RegistryDataPacket::new,
         map(0x05, MINECRAFT_1_20_2, true),
-        map(-1, MINECRAFT_1_20_5, true));
-      clientbound.register(RegistryBundleDataPacket.class, RegistryBundleDataPacket::new,
         map(0x07, MINECRAFT_1_20_5, true));
 
       serverbound.register(ClientSettingsPacket.class, ClientSettingsPacket::new,

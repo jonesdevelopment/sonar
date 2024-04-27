@@ -97,11 +97,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     user.setState(CONFIGURE);
     // Send the necessary configuration packets to the client
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
-      for (final FallbackPacket packet : REGISTRY_SYNC_BUNDLE) {
+      for (final FallbackPacket packet : REGISTRY_SYNC_1_20_5) {
         user.delayedWrite(packet);
       }
     } else {
-      user.delayedWrite(REGISTRY_SYNC);
+      user.delayedWrite(REGISTRY_SYNC_LEGACY);
     }
     user.delayedWrite(FINISH_CONFIGURATION);
     // Send all packets in one flush
@@ -668,7 +668,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
     // Set slot to map
-    user.delayedWrite(new SetSlotPacket(0, 36, 1, 0,
+    user.delayedWrite(new SetSlotPacket(36, 1,
       ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlotPacket.MAP_NBT));
     // Send random captcha to the player
     captcha = MAP_INFO_PREPARER.getRandomCaptcha();

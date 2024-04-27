@@ -38,10 +38,8 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SetSlotPacket implements FallbackPacket {
-  private int windowId;
   private int slot;
   private int count;
-  private int data;
   private int itemId;
   private CompoundBinaryTag compoundBinaryTag;
 
@@ -51,7 +49,7 @@ public final class SetSlotPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    byteBuf.writeByte(windowId);
+    byteBuf.writeByte(0); // windowId
 
     if (protocolVersion.compareTo(MINECRAFT_1_17_1) >= 0) {
       writeVarInt(byteBuf, 0);
@@ -68,13 +66,15 @@ public final class SetSlotPacket implements FallbackPacket {
     } else {
       writeVarInt(byteBuf, itemId);
     }
+
     byteBuf.writeByte(count);
+
     if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
-      byteBuf.writeShort(data);
+      byteBuf.writeShort(0); // data
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
         byteBuf.writeShort(-1);
       } else {
         byteBuf.writeByte(0);
