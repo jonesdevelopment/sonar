@@ -78,7 +78,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private int captchaTriesLeft;
 
   // Cached options to make sure the original values don't change throughout the verification
-  private final boolean performVehicle, performCaptcha, performGravity, performCollisions;
+  private final boolean performVehicle, performCaptcha, performGravity, performCollisions, transfer;
 
   public FallbackVerificationHandler(final @NotNull FallbackUser user,
                                      final @NotNull String username,
@@ -90,6 +90,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.performCollisions = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
     this.performCaptcha = FALLBACK.shouldPerformCaptcha();
     this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
+    this.transfer = user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0 && FALLBACK.shouldPerformTransfer();
   }
 
   private void configure() {
@@ -697,6 +698,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // Call the VerifySuccessEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, playerUuid, user, login.delay()));
+
+    // If enabled, transfer the player back to the origin server
+    // This feature was introduced by Mojang in Minecraft version 1.20.5
+    // Thanks a lot to @Kadeluxe for helping me out with this!
+    if (transfer) {
+      user.write(transferToOrigin);
+    }
 
     // Disconnect player with the verification success message
     user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());

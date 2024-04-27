@@ -205,6 +205,14 @@ public final class SonarConfiguration {
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets"), 128, 8192);
 
+    verification.transfer.timing = Verification.Timing.valueOf(generalConfig.getString("verification.transfer.timing"));
+    verification.transfer.host = generalConfig.getString("verification.transfer.destination-host");
+    verification.transfer.port = clamp(generalConfig.getInt("verification.transfer.destination-port"), 0, 0xffff);
+
+    if (verification.transfer.timing != Verification.Timing.NEVER) {
+      Sonar.get().getLogger().info("Transferring 1.20.5+ clients is enabled. Please make sure to follow the instructions in order for this to work properly.");
+    }
+
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
     verification.logDuringAttack = generalConfig.getBoolean("verification.log-during-attack");
     verification.debugXYZPositions = generalConfig.getBoolean("verification.debug-xyz-positions");
@@ -443,6 +451,7 @@ public final class SonarConfiguration {
     private final Gravity gravity = new Gravity();
     private final Vehicle vehicle = new Vehicle();
     private final Brand brand = new Brand();
+    private final Transfer transfer = new Transfer();
 
     @Getter
     public static final class Map {
@@ -495,6 +504,13 @@ public final class SonarConfiguration {
       private boolean enabled;
       private int maxLength;
       private Pattern validRegex;
+    }
+
+    @Getter
+    public static final class Transfer {
+      private Timing timing;
+      private String host;
+      private int port;
     }
 
     private boolean logConnections;

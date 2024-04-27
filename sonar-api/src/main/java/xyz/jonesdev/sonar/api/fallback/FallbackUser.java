@@ -28,13 +28,17 @@ import java.net.InetAddress;
 import java.util.UUID;
 
 public interface FallbackUser {
-  @NotNull Channel getChannel();
+  @NotNull
+  Channel getChannel();
 
-  @NotNull InetAddress getInetAddress();
+  @NotNull
+  InetAddress getInetAddress();
 
-  @NotNull ProtocolVersion getProtocolVersion();
+  @NotNull
+  ProtocolVersion getProtocolVersion();
 
-  @NotNull FallbackUserState getState();
+  @NotNull
+  FallbackUserState getState();
 
   void setState(final FallbackUserState state);
 

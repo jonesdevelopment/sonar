@@ -59,6 +59,8 @@ public class FallbackPreparer {
   public FallbackPacket updateSectionBlocks;
   // Default Spawn Position
   public FallbackPacket dynamicSpawnPosition;
+  // Transfer packet
+  public FallbackPacket transferToOrigin;
 
   // Disconnect messages
   public FallbackPacket blacklisted;
@@ -152,6 +154,10 @@ public class FallbackPreparer {
 
       MAP_INFO_PREPARER.prepare();
     }
+
+    transferToOrigin = new TransferPacket(
+      Sonar.get().getConfig().getVerification().getTransfer().getHost(),
+      Sonar.get().getConfig().getVerification().getTransfer().getPort());
 
     // Prepare packets for the vehicle check
     removeEntities = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
