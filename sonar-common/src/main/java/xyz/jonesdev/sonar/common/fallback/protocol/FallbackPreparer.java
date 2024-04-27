@@ -43,7 +43,7 @@ public class FallbackPreparer {
   // Finish Configuration
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket();
   // Synchronize Registry
-  public final FallbackPacket REGISTRY_SYNC_LEGACY = new RegistryDataPacket();
+  public final FallbackPacket REGISTRY_SYNC_LEGACY = new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null);
   public final List<FallbackPacket> REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
   // Keep Alive
   public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlivePacket(0L);

@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,24 +35,15 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public final class RegistryDataPacket implements FallbackPacket {
-  private final CompoundBinaryTag tag;
-  private final List<RegistryDataPacket.Bundle> bundles;
-  private final String type;
-
-  public RegistryDataPacket() {
-    this(null, null);
-  }
-
-  public RegistryDataPacket(final String type, final List<Bundle> bundles) {
-    this.tag = DimensionRegistry.CODEC_1_20;
-    this.type = type;
-    this.bundles = bundles;
-  }
+  private CompoundBinaryTag tag;
+  private String type;
+  private List<RegistryDataPacket.Bundle> bundles;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_5) < 0) {
       writeNamelessCompoundTag(byteBuf, tag);
     } else {
@@ -87,7 +77,7 @@ public final class RegistryDataPacket implements FallbackPacket {
         final CompoundBinaryTag tag = (CompoundBinaryTag) binaryTag;
         bundles.add(new Bundle(tag.getString("name"), tag.getCompound("element")));
       }
-      packets.add(new RegistryDataPacket(type, bundles));
+      packets.add(new RegistryDataPacket(rootTag, type, bundles));
     }
     return packets;
   }
