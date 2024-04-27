@@ -57,8 +57,12 @@ public final class SetSlotPacket implements FallbackPacket {
 
     byteBuf.writeShort(slot);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_13_2) >= 0) {
+    if (protocolVersion.inBetween(MINECRAFT_1_13_2, MINECRAFT_1_20_3)) {
       byteBuf.writeBoolean(true);
+    }
+
+    if (protocolVersion.compareTo(MINECRAFT_1_20_5) >= 0) {
+      writeVarInt(byteBuf, count);
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_13_2) < 0) {
@@ -67,7 +71,9 @@ public final class SetSlotPacket implements FallbackPacket {
       writeVarInt(byteBuf, itemId);
     }
 
-    byteBuf.writeByte(count);
+    if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
+      byteBuf.writeByte(count);
+    }
 
     if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
       byteBuf.writeShort(0); // data
@@ -80,10 +86,17 @@ public final class SetSlotPacket implements FallbackPacket {
         byteBuf.writeByte(0);
       }
     } else {
-      if (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0) {
-        writeNamelessCompoundTag(byteBuf, compoundBinaryTag);
-      } else {
+      if (protocolVersion.compareTo(MINECRAFT_1_20_2) < 0) {
         writeCompoundTag(byteBuf, compoundBinaryTag);
+      } else if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
+        writeNamelessCompoundTag(byteBuf, compoundBinaryTag);
+      } else { // 1.20.5
+        // component
+        writeVarInt(byteBuf, 1); // component count to add
+        writeVarInt(byteBuf, 0); // component count to remove
+        // single VarInt component
+        writeVarInt(byteBuf, 26); // map component
+        writeVarInt(byteBuf, 0); // map id
       }
     }
   }
