@@ -93,13 +93,13 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
    * @param protocol Protocol version number sent by the client
    */
   protected final void handleHandshake(final @NotNull String hostname, final int protocol) throws Exception {
-    // Check if the player has already sent a handshake packet
-    if (protocolVersion != null) {
-      throw new CorruptedFrameException("Already sent handshake");
-    }
     // Check if the hostname is invalid
     if (hostname.isEmpty()) {
       throw new CorruptedFrameException("Hostname is empty");
+    }
+    // Check if the player has already sent a handshake packet
+    if (protocolVersion != null) {
+      throw new CorruptedFrameException("Already sent handshake");
     }
     // Store the protocol version
     protocolVersion = ProtocolVersion.fromId(protocol);
