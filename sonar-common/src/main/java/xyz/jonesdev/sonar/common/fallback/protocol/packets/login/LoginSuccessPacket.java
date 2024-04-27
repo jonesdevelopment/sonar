@@ -58,6 +58,9 @@ public final class LoginSuccessPacket implements FallbackPacket {
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       writeVarInt(byteBuf, 0); // properties
     }
+    if (protocolVersion.compareTo(MINECRAFT_1_20_5) >= 0) {
+      byteBuf.writeBoolean(false); // should authenticate
+    }
   }
 
   @Override

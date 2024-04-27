@@ -96,7 +96,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Set the state to CONFIGURE to avoid false positives
     user.setState(CONFIGURE);
     // Send the necessary configuration packets to the client
-    user.delayedWrite(REGISTRY_SYNC);
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
+      for (final FallbackPacket packet : REGISTRY_SYNC_BUNDLE) {
+        user.delayedWrite(packet);
+      }
+    } else {
+      user.delayedWrite(REGISTRY_SYNC);
+    }
     user.delayedWrite(FINISH_CONFIGURATION);
     // Send all packets in one flush
     user.getChannel().flush();

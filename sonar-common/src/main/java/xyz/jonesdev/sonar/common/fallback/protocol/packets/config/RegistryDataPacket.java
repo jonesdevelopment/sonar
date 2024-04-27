@@ -19,7 +19,9 @@ package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
 
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -29,15 +31,24 @@ import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamel
 
 @Getter
 @ToString
+@RequiredArgsConstructor
 public final class RegistryDataPacket implements FallbackPacket {
+
+  final CompoundBinaryTag tag;
+
+  public RegistryDataPacket() {
+    this(DimensionRegistry.CODEC_1_20);
+  }
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    writeNamelessCompoundTag(byteBuf, DimensionRegistry.CODEC_1_20);
+    writeNamelessCompoundTag(byteBuf, tag);
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
   }
+
+
 }

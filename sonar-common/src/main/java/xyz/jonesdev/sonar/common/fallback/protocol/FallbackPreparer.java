@@ -23,11 +23,14 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
+import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryBundleDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
@@ -42,6 +45,7 @@ public class FallbackPreparer {
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket();
   // Synchronize Registry
   public final FallbackPacket REGISTRY_SYNC = new RegistryDataPacket();
+  public final List<FallbackPacket> REGISTRY_SYNC_BUNDLE = RegistryBundleDataPacket.of(DimensionRegistry.CODEC_1_20);
   // Keep Alive
   public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlivePacket(0L);
   // Game Event (1.20.3+)

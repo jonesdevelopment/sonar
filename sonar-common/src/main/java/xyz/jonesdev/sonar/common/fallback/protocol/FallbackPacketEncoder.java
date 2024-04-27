@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.CLIENTBOUND;
@@ -47,5 +48,6 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
     final int packetId = registry.getPacketId(msg);
     writeVarInt(out, packetId);
     msg.encode(out, protocolVersion);
+    Sonar.get().getLogger().info("Encode {} packet with {} bytes.", msg.getClass().getSimpleName(), out.readableBytes());
   }
 }
