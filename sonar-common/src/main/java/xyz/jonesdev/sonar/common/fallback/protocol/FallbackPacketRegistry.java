@@ -158,7 +158,8 @@ public enum FallbackPacketRegistry {
         map(0x31, MINECRAFT_1_19_1, true),
         map(0x30, MINECRAFT_1_19_3, true),
         map(0x34, MINECRAFT_1_19_4, true),
-        map(0x36, MINECRAFT_1_20_2, true));
+        map(0x36, MINECRAFT_1_20_2, true),
+        map(0x38, MINECRAFT_1_20_5, true));
       clientbound.register(ChunkDataPacket.class, ChunkDataPacket::new,
         map(0x21, MINECRAFT_1_7_2, true),
         map(0x20, MINECRAFT_1_9, true),
@@ -190,7 +191,8 @@ public enum FallbackPacketRegistry {
         map(0x3A, MINECRAFT_1_19_3, true),
         map(0x3E, MINECRAFT_1_19_4, true),
         map(0x3E, MINECRAFT_1_19_4, true),
-        map(0x40, MINECRAFT_1_20_2, true));
+        map(0x40, MINECRAFT_1_20_2, true),
+        map(0x42, MINECRAFT_1_20_5, true));
       clientbound.register(SetPassengersPacket.class, SetPassengersPacket::new,
         map(0x1B, MINECRAFT_1_7_2, true),
         map(0x40, MINECRAFT_1_9, true),
