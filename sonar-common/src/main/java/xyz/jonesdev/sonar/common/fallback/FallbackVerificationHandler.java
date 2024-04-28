@@ -78,7 +78,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private int captchaTriesLeft;
 
   // Cached options to make sure the original values don't change throughout the verification
-  private final boolean performVehicle, performCaptcha, performGravity, performCollisions;
+  private final boolean performVehicle, performCaptcha, performGravity, performCollisions, transfer;
 
   public FallbackVerificationHandler(final @NotNull FallbackUser user,
                                      final @NotNull String username,
@@ -90,13 +90,21 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.performCollisions = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
     this.performCaptcha = FALLBACK.shouldPerformCaptcha();
     this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
+    this.transfer = Sonar.get().getConfig().getVerification().getTransfer().isEnabled()
+      && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0;
   }
 
   private void configure() {
     // Set the state to CONFIGURE to avoid false positives
     user.setState(CONFIGURE);
     // Send the necessary configuration packets to the client
-    user.delayedWrite(REGISTRY_SYNC);
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
+      for (final FallbackPacket packet : REGISTRY_SYNC_1_20_5) {
+        user.delayedWrite(packet);
+      }
+    } else {
+      user.delayedWrite(REGISTRY_SYNC_LEGACY);
+    }
     user.delayedWrite(FINISH_CONFIGURATION);
     // Send all packets in one flush
     user.getChannel().flush();
@@ -662,7 +670,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     captchaTriesLeft = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
     // Set slot to map
-    user.delayedWrite(new SetSlotPacket(0, 36, 1, 0,
+    user.delayedWrite(new SetSlotPacket(36, 1,
       ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlotPacket.MAP_NBT));
     // Send random captcha to the player
     captcha = MAP_INFO_PREPARER.getRandomCaptcha();
@@ -691,6 +699,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // Call the VerifySuccessEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, playerUuid, user, login.delay()));
+
+    // If enabled, transfer the player back to the origin server
+    // This feature was introduced by Mojang in Minecraft version 1.20.5
+    // Thanks a lot to @Kadeluxe for helping me out with this!
+    if (transfer) {
+      user.write(transferToOrigin);
+    }
 
     // Disconnect player with the verification success message
     user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());

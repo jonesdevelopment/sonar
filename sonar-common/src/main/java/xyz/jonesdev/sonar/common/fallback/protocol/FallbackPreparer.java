@@ -23,11 +23,13 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
+import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
@@ -41,7 +43,8 @@ public class FallbackPreparer {
   // Finish Configuration
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket();
   // Synchronize Registry
-  public final FallbackPacket REGISTRY_SYNC = new RegistryDataPacket();
+  public final FallbackPacket REGISTRY_SYNC_LEGACY = new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null);
+  public final List<FallbackPacket> REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
   // Keep Alive
   public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlivePacket(0L);
   // Game Event (1.20.3+)
@@ -56,6 +59,8 @@ public class FallbackPreparer {
   public FallbackPacket updateSectionBlocks;
   // Default Spawn Position
   public FallbackPacket dynamicSpawnPosition;
+  // Transfer packet
+  public FallbackPacket transferToOrigin;
 
   // Disconnect messages
   public FallbackPacket blacklisted;
@@ -149,6 +154,10 @@ public class FallbackPreparer {
 
       MAP_INFO_PREPARER.prepare();
     }
+
+    transferToOrigin = new TransferPacket(
+      Sonar.get().getConfig().getVerification().getTransfer().getHost(),
+      Sonar.get().getConfig().getVerification().getTransfer().getPort());
 
     // Prepare packets for the vehicle check
     removeEntities = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);

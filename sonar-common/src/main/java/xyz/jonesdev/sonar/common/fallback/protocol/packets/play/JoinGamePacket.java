@@ -210,7 +210,7 @@ public final class JoinGamePacket implements FallbackPacket {
       return;
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0) {
+    if (protocolVersion.inBetween(MINECRAFT_1_20_2, MINECRAFT_1_20_3)) {
       byteBuf.writeBoolean(isHardcore);
       writeStringArray(byteBuf, levelNames);
       writeVarInt(byteBuf, 0); // max players
@@ -228,6 +228,29 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(false); // flat
       byteBuf.writeBoolean(false); // no last death location
       writeVarInt(byteBuf, 0);
+      return;
+    }
+
+    if (protocolVersion.compareTo(MINECRAFT_1_20_5) >= 0) {
+      byteBuf.writeBoolean(isHardcore);
+      writeStringArray(byteBuf, levelNames);
+      writeVarInt(byteBuf, 0); // max players
+      writeVarInt(byteBuf, viewDistance);
+      writeVarInt(byteBuf, viewDistance); // simulation distance
+      byteBuf.writeBoolean(reducedDebugInfo);
+      byteBuf.writeBoolean(showRespawnScreen);
+      byteBuf.writeBoolean(false); // limited crafting
+      // It depends on the dimension data we send in RegistryData. If we only send one dimension. It should be 0.
+      writeVarInt(byteBuf, 0);
+      writeString(byteBuf, levelName);
+      byteBuf.writeLong(partialHashedSeed);
+      byteBuf.writeByte(gamemode);
+      byteBuf.writeByte(-1); // previous gamemode
+      byteBuf.writeBoolean(false); // debug type
+      byteBuf.writeBoolean(false); // flat
+      byteBuf.writeBoolean(false); // no last death location
+      writeVarInt(byteBuf, 0); // pearl cooldown
+      byteBuf.writeBoolean(false); // secure profile
     }
   }
 

@@ -78,6 +78,7 @@ public enum BlockType {
         return 10225;
       case MINECRAFT_1_20_2:
       case MINECRAFT_1_20_3:
+      case MINECRAFT_1_20_5:
         return 10366;
     }
   }, 1D);

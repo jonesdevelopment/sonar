@@ -98,7 +98,7 @@ public class ProtocolUtil {
     return str;
   }
 
-  public static void writeString(final ByteBuf byteBuf, final CharSequence str) {
+  public static void writeString(final ByteBuf byteBuf, final @NotNull CharSequence str) {
     final int size = ByteBufUtil.utf8Bytes(str);
     VarIntUtil.writeVarInt(byteBuf, size);
     byteBuf.writeCharSequence(str, StandardCharsets.UTF_8);

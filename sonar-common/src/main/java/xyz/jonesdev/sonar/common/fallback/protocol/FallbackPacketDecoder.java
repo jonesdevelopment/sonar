@@ -101,7 +101,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     }
   }
 
-  private void doLengthSanityChecks(final ByteBuf byteBuf,
+  private void doLengthSanityChecks(final @NotNull ByteBuf byteBuf,
                                     final @NotNull FallbackPacket packet) throws Exception {
     final int expectedMaxLen = packet.expectedMaxLength(byteBuf, user.getProtocolVersion());
     if (expectedMaxLen != -1 && byteBuf.readableBytes() > expectedMaxLen) {
