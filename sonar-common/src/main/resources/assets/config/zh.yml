@@ -1,0 +1,197 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# 有问题或需要帮助? https://jonesdev.xyz/discord
+# 源代码: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# 未归类的设置
+general:
+  # Sonar 应该在控制台中打印玩家的 IP 地址吗?
+  log-player-addresses: true
+  # 具有相同 IP 地址的在线玩家的最大数量
+  max-online-per-ip: 3
+
+# 攻击检测器的敏感度设置
+# 只有当您知道自己在做什么的时候才编辑它
+attack-tracker:
+  # 在一段时间内至少需要 x 个新玩家加入才满足触发条件.
+  min-players-for-attack: 8
+  # 至少经过多少毫秒后才可以解除遭受攻击模式
+  # (该值为毫秒. 1秒等于1000毫秒.)
+  min-attack-duration: 30000
+  # 攻击检测器要重复检测到多少次攻击 才能确认服务器正在遭受攻击?
+  # 该值作为缓冲区 以避免可能的误判
+  min-attack-threshold: 2
+  # 当从遭受攻击标记为解除攻击时 应该需要等待多久才能再次被标记为正在遭受攻击?
+  # (该值为毫秒. 1秒等于1000毫秒.)
+  attack-cooldown-delay: 3000
+
+# 您可以让 Sonar 连接到数据库 以便从数据库中保存和读取已经过验证的 IP 和玩家.
+# 提示: IP 地址将以纯文本形式保存 请确保您的数据库安全!
+database:
+  # 要连接到的数据库类型
+  # 可用类型: NONE (不使用数据库), MYSQL, MARIADB
+  type: NONE
+  # 数据库的地址
+  host: localhost
+  # 数据库的端口
+  port: 3306
+  # 数据库名称
+  name: sonar
+  # 用于登录数据库的用户名
+  username: ''
+  # 用于登录数据库的密码
+  password: ''
+  # Sonar 应该在数据库中保留在白名单中的玩家最多多少天?
+  maximum-age: 5
+
+# 在遭到攻击时 每个新玩家的登录请求将排队 以避免大量连接同时进行验证
+# 队列将每1秒刷新一次
+queue:
+  # 每秒最多处理多少个登录请求?
+  max-polls: 30
+
+# 每个需要验证的玩家都将被发送到一个轻量级的虚拟服务器来检查高级机器人
+verification:
+  # Sonar 应该在什么时候验证玩家?
+  # 可用类型: ALWAYS, DURING_ATTACK, NEVER
+  # - ALWAYS: 玩家始终需要验证 直到他们通过验证为止
+  # - DURING_ATTACK: 玩家仅在服务器疑似遭到攻击时验证
+  # - NEVER: 玩家不会被验证
+  timing: ALWAYS
+  checks:
+    # 检查玩家的下落移动是否遵循原版客户端.
+    gravity:
+      # Sonar 是否应该检查玩家的下落移动? (推荐启用)
+      enabled: true
+      # Sonar 是否应该生成方块平台以检查玩家下落与方块之间的碰撞? (推荐启用)
+      check-collisions: true
+      # 当玩家验证失败时 是否向他们发送验证码?
+      captcha-on-fail: false
+      # 玩家跌落在平台上多少tick后才能被算作站在平台上?
+      max-movement-ticks: 8
+      # 玩家在虚拟服务器中的游戏模式
+      # 可用类型: SURVIVAL, CREATIVE, ADVENTURE
+      # - SURVIVAL: 生存模式, 所有UI可见
+      # - CREATIVE: 创造模式, 隐藏血量和饱食度
+      # - ADVENTURE: 冒险模式, 所有UI可见
+      gamemode: ADVENTURE
+
+    # 检查客户端坐在实体上时是否发送了正确的数据包
+    vehicle:
+      # 可用类型: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: 始终应用该检查
+      # - DURING_ATTACK: 仅在疑似遭受攻击时应用该检查
+      # - NEVER: 永远不应用该检查
+      timing: ALWAYS
+
+    # 地图验证码
+    map-captcha:
+      # Sonar 应该在什么时候向玩家发送验证码?
+      # 可用类型: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: 始终应用该检查
+      # - DURING_ATTACK: 仅在疑似遭受攻击时应用该检查
+      # - NEVER: 永远不应用该检查
+      timing: NEVER
+      # 图像效果选项 (用于混淆自动图像识别)
+      effects:
+        # 是否添加局部发光效果
+        flare: true
+        # 是否添加随机的线条
+        scratches: true
+        # 是否应用波纹失真效果
+        ripple: true
+        # 是否应用纵向畸变滤镜
+        smear: true
+        # 是否添加一些失真
+        pinch: true
+        # 图像的色彩饱和度
+        saturation: 0.15
+        # 水平三角形纹波滤镜
+        distortion: 2
+      # Sonar 应该一次准备多少个验证码?
+      precompute: 500
+      # Sonar 应该给玩家多少时间完成验证码? (该值为毫秒. 1秒等于1000毫秒.)
+      max-duration: 45000
+      # 玩家最多能输入多少次错误的验证码?
+      max-tries: 3
+      # 允许出现在验证码答案中的字符
+      # 不建议添加可能看起来彼此相似的数字或字母
+      dictionary: '1235689'
+      # Sonar 应该为验证码使用哪些字体?
+      font-names:
+        - Dialog
+        - DialogInput
+        - SansSerif
+        - Monospaced
+
+    # 检查玩家是否正在向服务器发送有效的客户端标识符
+    client-brand:
+      # 是否启用此检查? (建议启用)
+      enabled: true
+      # 用于检查客户端标识符的正则表达式
+      valid-regex: ^[!-~ ]+$
+      # 客户端标识符的最长长度限制
+      max-length: 64
+
+    # 用于检查用户名是否有效的正则表达式
+    valid-name-regex: ^[a-zA-Z0-9_]+$
+    # 用于检查客户端语言(例如 zh_CN)的正则表达式
+    valid-locale-regex: ^[a-zA-Z_]+$
+    # 玩家必须在多少毫秒内回复Ping?
+    max-ping: 10000
+    # 玩家最多能发送多少个数据包用于登录?
+    max-login-packets: 256
+
+  # 开启后 玩家将在验证成功后被重定向到指定的服务器
+  # 该功能由 Mojang 在 Minecraft 1.20.5 版本中引入
+  transfer:
+    # Sonar 是否应该将玩家重定向到指定的服务器而不是踢出玩家?
+    # 为此您必须在服务器软件的配置文件中允许接受来自transfer的连接.
+    # 此外 您可能希望减少 Velocity 或其它服务器软件/插件的登录速率限制
+    # 因为这可能会阻止玩家快速地重新连接到服务器
+    enabled: false
+    # 当玩家通过验证后, Sonar 应该将玩家转移到哪个服务器
+    # 请输入玩家正常连接服务器时使用的服务器IP或域名
+    # 例如使用域名("mc.hypixel.net") 或使用 IP 地址("1.1.1.1").
+    destination-host: "play.my-server.com"
+    # Sonar 应该告诉玩家通过以上域名的什么端口来连接到服务器?
+    # 如果服务器地址不包含端口 请保留25565.
+    destination-port: 25565
+
+  # 当 Sonar 尝试验证玩家时 是否在控制台中打印它?
+  log-connections: true
+  # Sonar 是否应该记录在攻击期间内的验证会话?
+  log-during-attack: false
+  # Sonar 是否应该记录验证过程中玩家的移动位置的变化?
+  # 有助于发现错误 但不建议在非调试环境下的服务器启用该选项.
+  debug-xyz-positions: false
+  # 要在客户端未响应多少毫秒后因超时而被踢出服务器?
+  # (该值为毫秒. 1秒等于1000毫秒.)
+  read-timeout: 8000
+  # 当玩家在需要验证时(即还未通过检查的情况下)需要等待多少毫秒才可以重新连接?
+  # (该值为毫秒. 1秒等于1000毫秒.)
+  rejoin-delay: 8000
+  # 当玩家验证失败后, Sonar 应该记住他多久?
+  # (该值为毫秒. 1秒等于1000毫秒.)
+  remember-time: 120000
+  # 黑名单应在多少秒后过期? (可能由于频繁验证失败. 在黑名单中将会被拒绝进入服务器.)
+  # (该值为毫秒. 1秒等于1000毫秒.)
+  blacklist-time: 600000
+  # 玩家必须验证失败多少次才会被列入黑名单? (设置为0以完全禁用)
+  blacklist-threshold: 2
+  # Sonar 不应该检查哪些协议? (即 跳过检查)
+  # 您可以在 https://wiki.vg/Protocol_version_numbers 找到所有协议号
+  # 例如 Minecraft 1.20 对应的协议号为763.
+  whitelisted-protocols: []
+  # 黑名单中的协议将阻止所有使用该协议的客户端.
+  blacklisted-protocols: []
