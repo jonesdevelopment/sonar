@@ -610,13 +610,14 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         }
 
         // Check if the y motion is roughly equal to the predicted value
-        if (isGeyser && !bedrockSpawned) {
-          bedrockSpawned=true;
+        final boolean isSuccess = (offsetY < 0.005);
+        if (!isSuccess && isGeyser && !bedrockSpawned) {
           tick=0;
         } else {
           checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
             tick, y, offsetY, deltaY, predictedY));
         }
+        bedrockSpawned=true;
       }
       tick++;
     } catch (CorruptedFrameException exception) {
