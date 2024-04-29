@@ -689,7 +689,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
-    user.delayedWrite(CAPTCHA_ABILITIES);
+    user.delayedWrite(isGeyser ? CAPTCHA_ABILITIES_BEDROCK : CAPTCHA_ABILITIES);
     // Make sure the player knows what to do
     user.delayedWrite(enterCodeMessage);
     // Send all packets in one flush
