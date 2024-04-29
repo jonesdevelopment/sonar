@@ -610,14 +610,37 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         }
 
         // Check if the y motion is roughly equal to the predicted value
-        final boolean isSuccess = (offsetY < 0.005);
+        boolean isSuccess = (offsetY < 0.005);
         if (!isSuccess && isGeyser && !bedrockSpawned) {
-          tick=0;
-        } else {
-          checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
-            tick, y, offsetY, deltaY, predictedY));
+          final boolean debug = Sonar.get().getConfig().getVerification().isDebugXYZPositions();
+          if (Math.abs(deltaY) < 0.0001) {
+            tick=0; // spawn with wrong position. reset tick.
+            isSuccess=true;
+            if (debug) { FALLBACK.getLogger().info("Ignoring caused by first position is wrong. (deltaY: {})", deltaY); }
+          } else {
+            final int oldTick = tick;
+            // This may result in an instant bypass of the gravity check.
+            // Perhaps ignorable ticks should be restricted.
+            final long maxIgnoreTick = (System.currentTimeMillis() - login.getStart() + 100L) / 50L;
+            for (int i = (tick + 1); (i < preparedCachedYMotions.length && (tick - 1) <= maxIgnoreTick); i++) {
+              final double newPredictedY = preparedCachedYMotions[i];
+              if ((deltaY - newPredictedY) < 0.005) {
+                tick=i;
+                break;
+              }
+            }
+            //checkFrame(oldTick != tick, "too many movements");
+            isSuccess = (tick > oldTick);
+            if (isSuccess && debug)
+            { FALLBACK.getLogger().info(
+              "Skipping {} tick(s) for bedrock client. (deltaY: {} - prediction: {})",
+              tick - oldTick, deltaY, preparedCachedYMotions[tick]);
+            }
+          }
         }
         bedrockSpawned=true;
+        checkFrame(isSuccess, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
+          tick, y, offsetY, deltaY, predictedY));
       }
       tick++;
     } catch (CorruptedFrameException exception) {
