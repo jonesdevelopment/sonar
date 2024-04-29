@@ -154,10 +154,12 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
 
     // Completely skip Geyser connections
+    /*
     if (GeyserUtil.isGeyserConnection(channel, socketAddress)) {
       initialLogin(ctx, loginPacket, encoder, handler);
       return;
     }
+     */
 
     // Check if the player is already queued since we don't want bots to flood the queue
     if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
@@ -212,7 +214,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       }
 
       // Create an instance for the Fallback connection
-      user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
+      user = new FallbackUserWrapper(channel, inetAddress, protocolVersion, GeyserUtil.isGeyserConnection(channel, socketAddress));
       // Let the verification handler take over the channel
       user.hijack(username, offlineUUID, encoder, decoder, timeout, handler);
     });

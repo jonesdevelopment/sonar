@@ -61,6 +61,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private final @NotNull FallbackUser user;
   private final String username;
   private final UUID playerUuid;
+  private final boolean isGeyser;
 
   // Checks
   private short expectedTransactionId;
@@ -70,6 +71,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private boolean resolvedClientBrand, resolvedClientSettings;
   private boolean listenForMovements;
   private boolean receivedSteerBoat, receivedPlayerInput;
+  private boolean bedrockSpawned;
 
   // CAPTCHA
   private final SystemTimer keepAlive = new SystemTimer();
@@ -82,7 +84,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   public FallbackVerificationHandler(final @NotNull FallbackUser user,
                                      final @NotNull String username,
-                                     final @NotNull UUID playerUuid) {
+                                     final @NotNull UUID playerUuid,
+                                     final boolean isGeyser) {
     this.user = user;
     this.username = username;
     this.playerUuid = playerUuid;
@@ -92,6 +95,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
     this.transfer = Sonar.get().getConfig().getVerification().getTransfer().isEnabled()
       && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0;
+    this.isGeyser = isGeyser;
   }
 
   private void configure() {
@@ -369,8 +373,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       assertState(CONFIGURE);
 
       // Check if the client has already sent valid ClientSettings and PluginMessage packets
-      checkFrame(resolvedClientBrand, "did not resolve client brand");
-      checkFrame(resolvedClientSettings, "did not resolve client settings");
+      if (!isGeyser) {
+        checkFrame(resolvedClientBrand, "did not resolve client brand");
+        checkFrame(resolvedClientSettings, "did not resolve client settings");
+      }
 
       // Start initializing the actual join process
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);
@@ -593,7 +599,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Make sure we don't run out of predicted Y motions
       checkFrame(tick < preparedCachedYMotions.length, "too many movements");
 
-      if (!ground) {
+      if (!ground && performGravity) {
         final double predictedY = preparedCachedYMotions[tick];
         final double offsetY = Math.abs(deltaY - predictedY);
 
@@ -604,8 +610,13 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         }
 
         // Check if the y motion is roughly equal to the predicted value
-        checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
-          tick, y, offsetY, deltaY, predictedY));
+        if (isGeyser && !bedrockSpawned) {
+          bedrockSpawned=true;
+          tick=0;
+        } else {
+          checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
+            tick, y, offsetY, deltaY, predictedY));
+        }
       }
       tick++;
     } catch (CorruptedFrameException exception) {
