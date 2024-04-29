@@ -622,7 +622,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             // This may result in an instant bypass of the gravity check.
             // Perhaps ignorable ticks should be restricted.
             final long maxIgnoreTick = (System.currentTimeMillis() - login.getStart() + 100L) / 50L;
-            for (int i = (tick + 1); (i < preparedCachedYMotions.length && (tick - 1) <= maxIgnoreTick); i++) {
+            for (int i = (tick + 1); (i < preparedCachedYMotions.length && (i - tick) <= maxIgnoreTick); i++) {
               final double newPredictedY = preparedCachedYMotions[i];
               if ((deltaY - newPredictedY) < 0.005) {
                 tick=i;
@@ -638,9 +638,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             }
           }
         }
-        bedrockSpawned=true;
         checkFrame(isSuccess, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
           tick, y, offsetY, deltaY, predictedY));
+        if (isGeyser) {
+          bedrockSpawned=true;
+        }
       }
       tick++;
     } catch (CorruptedFrameException exception) {
