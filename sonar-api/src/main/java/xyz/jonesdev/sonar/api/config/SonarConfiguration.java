@@ -213,6 +213,7 @@ public final class SonarConfiguration {
       Sonar.get().getLogger().info("Transferring 1.20.5+ clients is enabled. Please make sure to follow the instructions in order for this to work properly.");
     }
 
+    verification.checkGeyser = generalConfig.getBoolean("verification.check-geyser-players");
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
     verification.logDuringAttack = generalConfig.getBoolean("verification.log-during-attack");
     verification.debugXYZPositions = generalConfig.getBoolean("verification.debug-xyz-positions");
@@ -513,6 +514,7 @@ public final class SonarConfiguration {
       private int port;
     }
 
+    private boolean checkGeyser;
     private boolean logConnections;
     private boolean logDuringAttack;
     private boolean debugXYZPositions;

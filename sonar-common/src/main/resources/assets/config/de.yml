@@ -180,6 +180,10 @@ verification:
   # Soll Sonar jede einzelne Bewegung/Positionsänderung während der Überprüfung protokollieren?
   # Dies wird für Produktivserver nicht empfohlen, kann aber beim Auffinden von Fehlern hilfreich sein.
   debug-xyz-positions: false
+  # Should Sonar also check Geyser (Bedrock) players?
+  # This feature is experimental and might cause issues
+  # If this is disabled, Bedrock players will be skipped
+  check-geyser-players: true
   # Zeit, die verstreichen muss, bevor ein Spieler ein Timeout erleidet
   # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
   read-timeout: 8000

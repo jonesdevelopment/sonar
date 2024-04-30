@@ -61,7 +61,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private final @NotNull FallbackUser user;
   private final String username;
   private final UUID playerUuid;
-  private final boolean isGeyser;
 
   // Checks
   private short expectedTransactionId;
@@ -84,8 +83,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   public FallbackVerificationHandler(final @NotNull FallbackUser user,
                                      final @NotNull String username,
-                                     final @NotNull UUID playerUuid,
-                                     final boolean isGeyser) {
+                                     final @NotNull UUID playerUuid) {
     this.user = user;
     this.username = username;
     this.playerUuid = playerUuid;
@@ -95,7 +93,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
     this.transfer = Sonar.get().getConfig().getVerification().getTransfer().isEnabled()
       && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0;
-    this.isGeyser = isGeyser;
   }
 
   private void configure() {
@@ -373,7 +370,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       assertState(CONFIGURE);
 
       // Check if the client has already sent valid ClientSettings and PluginMessage packets
-      if (!isGeyser) {
+      if (!user.isGeyser()) {
         checkFrame(resolvedClientBrand, "did not resolve client brand");
         checkFrame(resolvedClientSettings, "did not resolve client settings");
       }
@@ -611,7 +608,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
         // Check if the y motion is roughly equal to the predicted value
         boolean isSuccess = (offsetY < 0.005);
-        if (!isSuccess && isGeyser && !bedrockSpawned) {
+        if (!isSuccess && user.isGeyser() && !bedrockSpawned) {
           final boolean debug = Sonar.get().getConfig().getVerification().isDebugXYZPositions();
           if (Math.abs(deltaY) < 0.0001) {
             tick=0; // spawn with wrong position. reset tick.
@@ -640,7 +637,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         }
         checkFrame(isSuccess, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
           tick, y, offsetY, deltaY, predictedY));
-        if (isGeyser) {
+        if (user.isGeyser()) {
           bedrockSpawned=true;
         }
       }
@@ -715,7 +712,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
-    user.delayedWrite(isGeyser ? CAPTCHA_ABILITIES_BEDROCK : CAPTCHA_ABILITIES);
+    user.delayedWrite(user.isGeyser() ? CAPTCHA_ABILITIES_BEDROCK : CAPTCHA_ABILITIES);
     // Make sure the player knows what to do
     user.delayedWrite(enterCodeMessage);
     // Send all packets in one flush

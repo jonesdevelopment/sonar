@@ -175,6 +175,10 @@ verification:
   # Sonar 是否应该记录验证过程中玩家的移动位置的变化?
   # 有助于发现错误 但不建议在非调试环境下的服务器启用该选项.
   debug-xyz-positions: false
+  # Should Sonar also check Geyser (Bedrock) players?
+  # This feature is experimental and might cause issues
+  # If this is disabled, Bedrock players will be skipped
+  check-geyser-players: true
   # 要在客户端未响应多少毫秒后因超时而被踢出服务器?
   # (该值为毫秒. 1秒等于1000毫秒.)
   read-timeout: 8000

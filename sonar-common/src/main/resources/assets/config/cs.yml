@@ -183,6 +183,10 @@ verification:
   # Měl by Sonar posílat každý jeden pohyb při verifikaci?
   # Toto nastavení není doporučeno pro servry v produkci, ale může být nápomocné při vyhledávaní chyb
   debug-xyz-positions: false
+  # Should Sonar also check Geyser (Bedrock) players?
+  # This feature is experimental and might cause issues
+  # If this is disabled, Bedrock players will be skipped
+  check-geyser-players: true
   # Množství času který musí uběhnout aby hráč byl odpojen
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
   read-timeout: 8000

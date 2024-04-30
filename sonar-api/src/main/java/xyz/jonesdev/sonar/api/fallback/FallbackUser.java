@@ -40,6 +40,8 @@ public interface FallbackUser {
   @NotNull
   FallbackUserState getState();
 
+  boolean isGeyser();
+
   void setState(final FallbackUserState state);
 
   /**

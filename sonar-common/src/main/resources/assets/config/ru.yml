@@ -182,6 +182,10 @@ verification:
   # Должен ли Sonar регистрировать каждое движение/изменение положения во время проверки?
   # Это не рекомендуется для рабочих серверов, но может быть полезно для выявления ошибок.
   debug-xyz-positions: false
+  # Should Sonar also check Geyser (Bedrock) players?
+  # This feature is experimental and might cause issues
+  # If this is disabled, Bedrock players will be skipped
+  check-geyser-players: true
   # Количество времени, которое должно пройти, прежде чем игрока кикнет.
   # (Это значение представляет время в миллисекундах: 1 секунда = 1000 миллисекунд)
   read-timeout: 8000

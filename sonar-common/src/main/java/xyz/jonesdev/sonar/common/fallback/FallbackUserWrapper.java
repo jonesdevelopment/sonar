@@ -55,19 +55,19 @@ public final class FallbackUserWrapper implements FallbackUser {
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
-  private final boolean isGeyser;
+  private final boolean geyser;
   @Setter
   private FallbackUserState state = FallbackUserState.LOGIN_ACK; // 1.20.2+
 
   public FallbackUserWrapper(final @NotNull Channel channel,
                              final @NotNull InetAddress inetAddress,
                              final @NotNull ProtocolVersion protocolVersion,
-                             final boolean isGeyser) {
+                             final boolean geyser) {
     this.channel = channel;
     this.pipeline = channel.pipeline();
     this.inetAddress = inetAddress;
     this.protocolVersion = protocolVersion;
-    this.isGeyser = isGeyser;
+    this.geyser = geyser;
   }
 
   @Override
@@ -124,7 +124,7 @@ public final class FallbackUserWrapper implements FallbackUser {
 
       try {
         // Prepare custom packet decoder and verification handler
-        final FallbackVerificationHandler verification = new FallbackVerificationHandler(this, username, uuid, isGeyser);
+        final FallbackVerificationHandler verification = new FallbackVerificationHandler(this, username, uuid);
         final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(this, verification);
         // Replace normal decoder to allow custom packets
         pipeline.replace(decoder, FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
