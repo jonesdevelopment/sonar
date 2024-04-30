@@ -648,7 +648,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
           tick, y, offsetY, deltaY, predictedY));
 
         // First correct gravity tick → Geyser player has spawned
-        if (user.isGeyser()) {
+        if (!bedrockSpawned && user.isGeyser()) {
           bedrockSpawned = true;
         }
       }
