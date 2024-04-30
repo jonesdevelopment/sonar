@@ -606,18 +606,22 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             username, x, y, z, deltaY, predictedY, offsetY);
         }
 
+        boolean correctMotion = offsetY < 5e-3; // 0.005
+
         // TODO: make this actually somewhat readable
-        boolean isSuccess = offsetY < 0.005;
-        if (!isSuccess && user.isGeyser() && !bedrockSpawned) {
-          final boolean debug = Sonar.get().getConfig().getVerification().isDebugXYZPositions();
-          if (Math.abs(deltaY) < 0.0001) {
-            tick = 0; // spawn with wrong position; reset tick
-            isSuccess = true;
-            if (debug) {
-              FALLBACK.getLogger().info("Ignoring caused by first position is wrong. (deltaY: {})", deltaY);
+        if (!correctMotion && user.isGeyser() && !bedrockSpawned) {
+          // Use 0.0001 as some sort of threshold to check
+          // if the player spawned with the wrong position.
+          if (Math.abs(deltaY) < 1e-4) {
+            // Reset ticks
+            tick = 0;
+            correctMotion = true;
+
+            if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
+              FALLBACK.getLogger().info("[geyser] Ignoring first position (deltaY: {})", deltaY);
             }
           } else {
-            final int oldTick = tick;
+            final int previousTick = tick;
             // This may result in an instant bypass of the gravity check.
             // Perhaps ignorable ticks should be restricted.
             final long maxIgnoreTick = (System.currentTimeMillis() - login.getStart() + 100L) / 50L;
@@ -629,18 +633,18 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
               }
             }
 
-            //checkFrame(oldTick != tick, "too many movements");
-            isSuccess = tick > oldTick;
+            // checkFrame(oldTick != tick, "too many movements");
+            correctMotion = tick > previousTick;
 
-            if (isSuccess && debug) { FALLBACK.getLogger().info(
-              "Skipping {} tick(s) for bedrock client. (deltaY: {} - prediction: {})",
-              tick - oldTick, deltaY, preparedCachedYMotions[tick]);
+            if (correctMotion && Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
+              FALLBACK.getLogger().info("[geyser] Skipping {} ticks (deltaY: {} - predicted: {})",
+                tick - previousTick, deltaY, preparedCachedYMotions[tick]);
             }
           }
         }
 
         // Check if the y motion is roughly equal to the predicted value
-        checkFrame(isSuccess, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
+        checkFrame(correctMotion, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
           tick, y, offsetY, deltaY, predictedY));
 
         // First correct gravity tick → Geyser player has spawned
