@@ -493,8 +493,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     // Only handle position packets if we aren't in the configuration phase (1.20.2+)
-    // Additionally, we don't want top check Geyser players for gravity, as this
-    // might cause issues because of the protocol differences.
+    // Additionally, we don't want to check Geyser players for valid gravity, as this
+    // might cause issues because of the different protocol → Bedrock is UDP
+    // TODO: Find a suitable solution for this, or simply remove this comment :)
     if (user.getState() != LOGIN_ACK && !user.isGeyser()) {
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
