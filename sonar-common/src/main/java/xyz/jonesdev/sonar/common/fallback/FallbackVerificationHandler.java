@@ -493,7 +493,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     }
 
     // Only handle position packets if we aren't in certain phases
-    if (user.getState().shouldExpectMovement()) {
+    if (user.getState() != LOGIN_ACK && user.getState() != VEHICLE) {
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
