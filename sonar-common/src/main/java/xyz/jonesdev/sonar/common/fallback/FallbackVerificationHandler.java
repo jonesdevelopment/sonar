@@ -70,7 +70,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private boolean resolvedClientBrand, resolvedClientSettings;
   private boolean listenForMovements;
   private boolean receivedSteerBoat, receivedPlayerInput;
-  private boolean bedrockSpawned;
 
   // CAPTCHA
   private final SystemTimer keepAlive = new SystemTimer();
@@ -493,7 +492,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
-    if (user.getState() != LOGIN_ACK) {
+    // Only handle position packets if we aren't in the configuration phase (1.20.2+)
+    // Additionally, we don't want top check Geyser players for gravity, as this
+    // might cause issues because of the protocol differences.
+    if (user.getState() != LOGIN_ACK && !user.isGeyser()) {
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
@@ -606,51 +608,9 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
             username, x, y, z, deltaY, predictedY, offsetY);
         }
 
-        boolean correctMotion = offsetY < 5e-3; // 0.005
-
-        // TODO: make this actually somewhat readable
-        if (!correctMotion && user.isGeyser() && !bedrockSpawned) {
-          // Use 0.0001 as some sort of threshold to check
-          // if the player spawned with the wrong position.
-          if (Math.abs(deltaY) < 1e-4) {
-            // Reset ticks
-            tick = 0;
-            correctMotion = true;
-
-            if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-              FALLBACK.getLogger().info("[geyser] Ignoring first position (deltaY: {})", deltaY);
-            }
-          } else {
-            final int previousTick = tick;
-            // This may result in an instant bypass of the gravity check.
-            // Perhaps ignorable ticks should be restricted.
-            final long maxIgnoreTick = (System.currentTimeMillis() - login.getStart() + 100L) / 50L;
-            for (int i = (tick + 1); (i < preparedCachedYMotions.length && (i - tick) <= maxIgnoreTick); i++) {
-              final double newPredictedY = preparedCachedYMotions[i];
-              if ((deltaY - newPredictedY) < 0.005) {
-                tick = i;
-                break;
-              }
-            }
-
-            // checkFrame(oldTick != tick, "too many movements");
-            correctMotion = tick > previousTick;
-
-            if (correctMotion && Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-              FALLBACK.getLogger().info("[geyser] Skipping {} ticks (deltaY: {} - predicted: {})",
-                tick - previousTick, deltaY, preparedCachedYMotions[tick]);
-            }
-          }
-        }
-
         // Check if the y motion is roughly equal to the predicted value
-        checkFrame(correctMotion, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
+        checkFrame(offsetY < 5e-3, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
           tick, y, offsetY, deltaY, predictedY));
-
-        // First correct gravity tick → Geyser player has spawned
-        if (!bedrockSpawned && user.isGeyser()) {
-          bedrockSpawned = true;
-        }
       }
       tick++;
     } catch (CorruptedFrameException exception) {
