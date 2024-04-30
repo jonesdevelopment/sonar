@@ -492,11 +492,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
-    // Only handle position packets if we aren't in the configuration phase (1.20.2+)
-    // Additionally, we don't want to check Geyser players for valid gravity, as this
-    // might cause issues because of the different protocol → Bedrock is UDP
-    // TODO: Find a suitable solution for this, or simply remove this comment :)
-    if (user.getState() != LOGIN_ACK && !user.isGeyser()) {
+    // Only handle position packets if we aren't in certain phases
+    if (user.getState().shouldExpectMovement()) {
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
@@ -544,6 +541,12 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Check if the client hasn't moved before sending the first movement packet
       if (!listenForMovements) {
         if (posX == SPAWN_X_POSITION && posZ == SPAWN_Z_POSITION) {
+          // We don't want to check Geyser players for valid gravity, as this might
+          // cause issues because of the different protocol → Bedrock is UDP
+          if (user.isGeyser()) {
+            vehicleCheckOrNext();
+            return;
+          }
           // Now, once we verified the X and Z position, we can safely check for gravity
           listenForMovements = true;
         }

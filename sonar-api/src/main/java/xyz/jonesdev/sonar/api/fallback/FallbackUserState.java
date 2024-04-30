@@ -38,4 +38,8 @@ public enum FallbackUserState {
   public boolean canReceivePackets() {
     return this != FAILED && this != SUCCESS;
   }
+
+  public boolean shouldExpectMovement() {
+    return this != LOGIN_ACK && this != VEHICLE && this != CAPTCHA;
+  }
 }
