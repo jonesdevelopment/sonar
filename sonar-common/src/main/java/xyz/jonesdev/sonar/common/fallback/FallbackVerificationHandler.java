@@ -484,8 +484,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Reset all values to ensure safety on teleport
       tick = 1;
-      posY = lastY = -1;
-      expectedTeleportId = -1;
+      posY = lastY = expectedTeleportId = -1;
 
       // Now we can send the chunk data
       sendChunkData();
@@ -522,8 +521,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         && x == SPAWN_X_POSITION && y == spawnYPosition && z == SPAWN_Z_POSITION) {
         // Reset all values to ensure safety on teleport
         tick = 1;
-        posY = -1;
-        expectedTeleportId = -1;
+        posY = expectedTeleportId = -1;
         // Check for ground state in the first packet
         checkFrame(!ground, "invalid ground state");
       }
