@@ -86,12 +86,12 @@ verification:
       # - ADVENTURE: alle UI-Komponenten sind sichtbar
       gamemode: ADVENTURE
 
-    # Checks if the client sends proper packets when mounting a vehicle
+    # Überprüft, ob der Spieler beim Einsteigen in ein Boot die richtigen Pakete sendet
     vehicle:
-      # Possible types: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: New players will always be mounted on a vehicle
-      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
-      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      # Mögliche Typen: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: Neue Spieler werden immer auf einem Fahrzeug montiert (Empfohlen)
+      # - DURING_ATTACK: Neue Spieler werden nur während eines Angriffs auf ein Fahrzeug gesetzt
+      # - NEVER: Neue Spieler werden niemals in ein Fahrzeug eingebaut
       timing: ALWAYS
 
     # Lässt den Spieler einen Code von einer virtuellen Karte im Chat eingeben
@@ -102,21 +102,21 @@ verification:
       # - DURING_ATTACK: Neue Spieler erhalten nur während eines Angriffs ein CAPTCHA
       # - NEVER: Neue Spieler erhalten nie ein CAPTCHA (Empfohlen)
       timing: NEVER
-      # Options for the effects on the image shown to the player
+      # Optionen für die Effekte auf das dem Player angezeigte Bild
       effects:
-        # Adds a glow effect to the image
+        # Fügt dem Bild einen Leuchteffekt hinzu
         flare: true
-        # Adds random lines to the image
+        # Fügt dem Bild zufällige Linien hinzu
         scratches: true
-        # Applies a ripple (sine) distortion filter
+        # Wendet einen Sinus-Verzerrungsfilter an
         ripple: true
-        # Applies a horizontal distortion filter
+        # Wendet einen horizontalen Verzerrungsfilter an
         smear: true
-        # Adds a bit of blurriness/distortion to the image
+        # Fügt dem Bild etwas Unschärfe/Verzerrung hinzu
         pinch: true
-        # Applies color correction (color saturation)
+        # Wendet eine Farbkorrektur an (Farbsättigung)
         saturation: 0.15
-        # Applies a horizontal triangular ripple filter
+        # Wendet einen horizontalen dreieckigen Wellenfilter an
         distortion: 2
       # Wie viele Antworten soll Sonar vorbereiten?
       # Dieser Vorgang erfolgt asynchron im Hintergrund
@@ -155,22 +155,22 @@ verification:
     # Maximale Anzahl an Login-Paketen, die der Spieler senden muss, um gekickt zu werden
     max-login-packets: 256
 
-  # If enabled, the player will be transferred back to the origin server
-  # after successfully passing the bot verification.
-  # This feature was introduced by Mojang in Minecraft version 1.20.5
+  # Wenn aktiviert, wird der Player zurück zum Ursprungsserver gesendet
+  # falls dieser die der Bot-Verifizierung erfolgreich besteht.
+  # Diese Funktion wurde von Mojang in Minecraft Version 1.20.5 eingeführt
   transfer:
-    # Should Sonar transfer the player to the origin server (instead of kicking them)?
-    # For this to work, you must enable the feature in your server's configuration
-    # Additionally, you might want to reduce the amount of login rate-limiting
-    # performed by Velocity or other proxies/plugins, as this might prevent the
-    # player from being transferred correctly.
+    # Sollte Sonar den Spieler auf den Ursprungsserver senden (anstatt ihn zu kicken)?
+    # Damit dies funktioniert, müssen Sie die Funktion in der Konfiguration Ihres Servers aktivieren
+    # Darüber hinaus möchten Sie möglicherweise die Begrenzung der Anmelderate reduzieren
+    # wird von Velocity oder anderen Proxys/Plugins durchgeführt, da dies das verhindern könnte
+    # Spieler konnte nicht korrekt übertragen werden.
     enabled: false
-    # Which server should Sonar transfer the player to when the verification is passed?
-    # Please enter the server IP that is used by players to normally connect to your server.
-    # For example, you can put "mc.hypixel.net" or a direct IP like "1.1.1.1"
+    # Auf welchen Server soll Sonar den Spieler übertragen, wenn die Verifizierung bestanden wurde?
+    # Bitte geben Sie die Server-IP ein, die von Spielern verwendet wird, um sich zu verbinden.
+    # Sie können beispielsweise "mc.hypixel.net" oder eine direkte IP wie "1.1.1.1" verwenden.
     destination-host: "play.my-server.com"
-    # Which port should Sonar use when transferring the player to the origin server?
-    # If your server does not need a port to connect to, you can leave this as 25565.
+    # Welchen Port sollte Sonar verwenden, wenn der Spieler auf den Ursprungsserver gesendet wird?
+    # Wenn Ihr Server keinen Port zum Herstellen einer Verbindung benötigt, können Sie diesen auf 25565 belassen.
     destination-port: 25565
 
   # Soll Sonar neue Überprüfungsversuche protokollieren?
@@ -180,9 +180,9 @@ verification:
   # Soll Sonar jede einzelne Bewegung/Positionsänderung während der Überprüfung protokollieren?
   # Dies wird für Produktivserver nicht empfohlen, kann aber beim Auffinden von Fehlern hilfreich sein.
   debug-xyz-positions: false
-  # Should Sonar also check Geyser (Bedrock) players?
-  # This feature is experimental and might cause issues
-  # If this is disabled, Bedrock players will be skipped
+  # Sollte Sonar auch Geyser (Bedrock)-Spieler überprüfen?
+  # Diese Funktion ist experimentell und kann Probleme verursachen
+  # Wenn dies deaktiviert ist, werden Bedrock-Spieler übersprungen
   check-geyser-players: true
   # Zeit, die verstreichen muss, bevor ein Spieler ein Timeout erleidet
   # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
