@@ -86,7 +86,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.user = user;
     this.username = username;
     this.playerUuid = playerUuid;
-    this.performGravity = Sonar.get().getConfig().getVerification().getGravity().isEnabled();
+    // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
+    this.performGravity = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isEnabled();
     this.performCollisions = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
     this.performCaptcha = FALLBACK.shouldPerformCaptcha();
     this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
@@ -539,12 +540,6 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Check if the client hasn't moved before sending the first movement packet
       if (!listenForMovements) {
         if (posX == SPAWN_X_POSITION && posZ == SPAWN_Z_POSITION) {
-          // We don't want to check Geyser players for valid gravity, as this might
-          // cause issues because of the different protocol → Bedrock is UDP
-          if (user.isGeyser()) {
-            vehicleCheckOrNext();
-            return;
-          }
           // Now, once we verified the X and Z position, we can safely check for gravity
           listenForMovements = true;
         }
