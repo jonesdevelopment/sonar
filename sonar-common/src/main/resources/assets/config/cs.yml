@@ -130,7 +130,7 @@ verification:
       # Kolikrát musí hráč selhat CAPTCHU před celkovém selhání verifikace?
       max-tries: 3
       # Znaky (čísla a písmena), které jsou povoleny k zobrazování v CAPTCHE
-      # It is not recommended to add numbers or letters that might look like one another
+      # Nedoporučuje se přidávat čísla nebo písmena, která by se mohla navzájem podobat
       dictionary: '1235689'
       # Jaké typy fontů by měl Sonar používat pro map CAPTCHU?
       font-names:

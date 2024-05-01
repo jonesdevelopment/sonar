@@ -127,7 +127,7 @@ verification:
       # Wie oft muss ein Spieler das CAPTCHA nicht bestehen, bevor er die Überprüfung nicht besteht?
       max-tries: 3
       # Zeichen (Buchstaben und Zahlen), die im Antwort-CAPTCHA erscheinen dürfen
-      # It is not recommended to add numbers or letters that might look like one another
+      # Es wird nicht empfohlen, Zahlen oder Buchstaben hinzuzufügen, die einander ähneln könnten
       dictionary: '1235689'
       # Welche Schriftarten soll Sonar für die Map-CAPTCHA-Codes verwenden?
       font-names:
