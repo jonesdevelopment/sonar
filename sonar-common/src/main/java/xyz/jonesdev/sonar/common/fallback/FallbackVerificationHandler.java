@@ -347,7 +347,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // pre-1.9 clients do not have a PaddleBoat packet
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
         receivedSteerBoat = true;
-      } else {
+      } else if (!user.isGeyser()) {
         // PaddleBoat → PlayerInput → PaddleBoat
         checkFrame(receivedSteerBoat, "invalid vehicle steering order");
       }
