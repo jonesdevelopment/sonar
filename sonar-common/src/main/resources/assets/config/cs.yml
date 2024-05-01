@@ -89,12 +89,12 @@ verification:
       # - ADVENTURE: všechny komponenty UI jsou zobrazeny
       gamemode: ADVENTURE
 
-    # Checks if the client sends proper packets when mounting a vehicle
+    # Kontroluje, zda klient odesílá správné pakety při montáži vozidla
     vehicle:
-      # Possible types: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: New players will always be mounted on a vehicle
-      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
-      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      # Typy: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: Noví hráči budou vždy namontováni na vozidle (Doporučeno)
+      # - DURING_ATTACK: Noví hráči budou namontováni na vozidlo pouze během útoku
+      # - NEVER: Noví hráči nebudou nikdy namontováni na vozidlo
       timing: ALWAYS
 
     # Nechá hráče verifikovat pomocí kódu na mapě ve hře
@@ -105,21 +105,21 @@ verification:
       # - DURING_ATTACK: Noví hráči dostanou map captchu jenom při útoku
       # - NEVER: Noví hráči nikdy nedostanou map CAPTCHU (Doporučeno)
       timing: NEVER
-      # Options for the effects on the image shown to the player
+      # Možnosti efektů na obrázek zobrazený přehrávači
       effects:
-        # Adds a glow effect to the image
+        # Přidá do obrázku efekt záře
         flare: true
-        # Adds random lines to the image
+        # Přidá do obrázku náhodné čáry
         scratches: true
-        # Applies a ripple (sine) distortion filter
+        # Přidá filtr zvlnění (sinus) zkreslení
         ripple: true
-        # Applies a horizontal distortion filter
+        # Přidá horizontální filtr zkreslení
         smear: true
-        # Adds a bit of blurriness/distortion to the image
+        # Dodává obrazu trochu rozmazání/zkreslení
         pinch: true
-        # Applies color correction (color saturation)
+        # Použije korekci barev (sytost barev)
         saturation: 0.15
-        # Applies a horizontal triangular ripple filter
+        # Přidá horizontální trojúhelníkový filtr zvlnění
         distortion: 2
       # Kolik odpovědí by měl Sonar předgenerovat?
       # Tento úkol běží souběžně v pozadí
@@ -148,9 +148,9 @@ verification:
       # Maximální délka "client brand" při verifikaci
       max-length: 64
 
-    # Regex for validování jmen při verifikaci
+    # Regex pro validování jmen při verifikaci
     valid-name-regex: ^[a-zA-Z0-9_]+$
-    # Regex for validaci "client locale" při verifikaci
+    # Regex pro validaci "client locale" při verifikaci
     valid-locale-regex: ^[a-zA-Z_]+$
     # Maximální odezva hráče aby byl odpojen
     # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
@@ -158,22 +158,22 @@ verification:
     # Maximální počet login packetů, který musí hřáč poslat aby byl vyhozen
     max-login-packets: 256
 
-  # If enabled, the player will be transferred back to the origin server
-  # after successfully passing the bot verification.
-  # This feature was introduced by Mojang in Minecraft version 1.20.5
+  # Je-li povoleno, přehrávač bude přenesen zpět na původní server
+  # po úspěšném absolvování ověření robota.
+  # Tuto funkci představil Mojang ve verzi Minecraft 1.20.5
   transfer:
-    # Should Sonar transfer the player to the origin server (instead of kicking them)?
-    # For this to work, you must enable the feature in your server's configuration
-    # Additionally, you might want to reduce the amount of login rate-limiting
-    # performed by Velocity or other proxies/plugins, as this might prevent the
-    # player from being transferred correctly.
+    # Měl by Sonar přenést hráče na původní server (místo toho, aby je kopl)?
+    # Aby to fungovalo, musíte tuto funkci povolit v konfiguraci vašeho serveru
+    # Kromě toho možná budete chtít snížit množství omezení rychlosti přihlášení
+    # provádí Velocity nebo jiné proxy/pluginy, protože to může zabránit
+    # hráč nebyl převeden správně.
     enabled: false
-    # Which server should Sonar transfer the player to when the verification is passed?
-    # Please enter the server IP that is used by players to normally connect to your server.
-    # For example, you can put "mc.hypixel.net" or a direct IP like "1.1.1.1"
+    # Na který server by měl Sonar přenést přehrávač, když projde ověřením?
+    # Zadejte IP serveru, který hráči používají k běžnému připojení k vašemu serveru.
+    # Například můžete zadat "mc.hypixel.net" nebo přímou IP jako "1.1.1.1"
     destination-host: "play.my-server.com"
-    # Which port should Sonar use when transferring the player to the origin server?
-    # If your server does not need a port to connect to, you can leave this as 25565.
+    # Jaký port by měl Sonar použít při přenosu přehrávače na původní server?
+    # Pokud váš server nepotřebuje port pro připojení, můžete toto ponechat jako 25565.
     destination-port: 25565
 
   # Měl by Sonar posílat nové verifikace?
@@ -183,17 +183,17 @@ verification:
   # Měl by Sonar posílat každý jeden pohyb při verifikaci?
   # Toto nastavení není doporučeno pro servry v produkci, ale může být nápomocné při vyhledávaní chyb
   debug-xyz-positions: false
-  # Should Sonar also check Geyser (Bedrock) players?
-  # This feature is experimental and might cause issues
-  # If this is disabled, Bedrock players will be skipped
+  # Měl by Sonar také kontrolovat hráče Geyser (Bedrock)?
+  # Tato funkce je experimentální a může způsobit problémy
+  # Pokud je toto zakázáno, hráči Bedrock budou přeskočeni
   check-geyser-players: true
   # Množství času který musí uběhnout aby hráč byl odpojen
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
   read-timeout: 8000
-  # How long should a player wait before reconnecting during verification Jak dlouho by měl hráč
+  # Jak dlouho by měl hráč čekat, než se při ověřování znovu připojí
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
   rejoin-delay: 8000
-  # How long should Sonar remember the amount of failed verifications for a player?
+  # Jak dlouho by si měl Sonar pamatovat počet neúspěšných ověření hráče?
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
   remember-time: 120000
   # Jak dlouho by měla být IP adresa zakázána k připojení po selhání verifikace mockrát?
