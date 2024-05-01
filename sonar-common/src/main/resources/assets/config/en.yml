@@ -91,9 +91,9 @@ verification:
     # Checks if the client sends proper packets when mounting a vehicle
     vehicle:
       # Possible types: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: New players will always be mounted on a vehicle
+      # - ALWAYS: New players will always be mounted on a vehicle (Recommended)
       # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
-      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      # - NEVER: New players will never be mounted on a vehicle
       timing: ALWAYS
 
     # Make the player type a code from a virtual map in chat
