@@ -38,6 +38,7 @@ public class FallbackPreparer {
   // Abilities
   public final FallbackPacket DEFAULT_ABILITIES = new ClientAbilitiesPacket(0x00, 0f, 0f);
   public final FallbackPacket CAPTCHA_ABILITIES = new ClientAbilitiesPacket(0x02, 0f, 0f);
+  public final FallbackPacket CAPTCHA_ABILITIES_BEDROCK = new ClientAbilitiesPacket(0x06, 0f, 0f);
   // Chunks
   public final FallbackPacket EMPTY_CHUNK_DATA = new ChunkDataPacket(0, 0);
   // Finish Configuration

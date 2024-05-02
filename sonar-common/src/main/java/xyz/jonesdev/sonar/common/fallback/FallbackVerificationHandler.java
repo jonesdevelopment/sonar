@@ -86,7 +86,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     this.user = user;
     this.username = username;
     this.playerUuid = playerUuid;
-    this.performGravity = Sonar.get().getConfig().getVerification().getGravity().isEnabled();
+    // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
+    this.performGravity = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isEnabled();
     this.performCollisions = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
     this.performCaptcha = FALLBACK.shouldPerformCaptcha();
     this.performVehicle = FALLBACK.shouldPerformVehicleCheck();
@@ -346,7 +347,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // pre-1.9 clients do not have a PaddleBoat packet
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
         receivedSteerBoat = true;
-      } else {
+      } else if (!user.isGeyser()) {
         // PaddleBoat → PlayerInput → PaddleBoat
         checkFrame(receivedSteerBoat, "invalid vehicle steering order");
       }
@@ -369,8 +370,10 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       assertState(CONFIGURE);
 
       // Check if the client has already sent valid ClientSettings and PluginMessage packets
-      checkFrame(resolvedClientBrand, "did not resolve client brand");
-      checkFrame(resolvedClientSettings, "did not resolve client settings");
+      if (!user.isGeyser()) {
+        checkFrame(resolvedClientBrand, "did not resolve client brand");
+        checkFrame(resolvedClientSettings, "did not resolve client settings");
+      }
 
       // Start initializing the actual join process
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);
@@ -482,15 +485,15 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
       // Reset all values to ensure safety on teleport
       tick = 1;
-      posY = lastY = -1;
-      expectedTeleportId = -1;
+      posY = lastY = expectedTeleportId = -1;
 
       // Now we can send the chunk data
       sendChunkData();
       return;
     }
 
-    if (user.getState() != LOGIN_ACK) {
+    // Only handle position packets if we aren't in certain phases
+    if (user.getState() != LOGIN_ACK && user.getState() != VEHICLE) {
       if (packet instanceof PlayerPositionPacket) {
         final PlayerPositionPacket position = (PlayerPositionPacket) packet;
         handlePositionUpdate(position.getX(), position.getY(), position.getZ(), position.isOnGround());
@@ -519,8 +522,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         && x == SPAWN_X_POSITION && y == spawnYPosition && z == SPAWN_Z_POSITION) {
         // Reset all values to ensure safety on teleport
         tick = 1;
-        posY = -1;
-        expectedTeleportId = -1;
+        posY = expectedTeleportId = -1;
         // Check for ground state in the first packet
         checkFrame(!ground, "invalid ground state");
       }
@@ -593,7 +595,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // Make sure we don't run out of predicted Y motions
       checkFrame(tick < preparedCachedYMotions.length, "too many movements");
 
-      if (!ground) {
+      if (!ground && performGravity) {
         final double predictedY = preparedCachedYMotions[tick];
         final double offsetY = Math.abs(deltaY - predictedY);
 
@@ -604,7 +606,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         }
 
         // Check if the y motion is roughly equal to the predicted value
-        checkFrame(offsetY < 0.005, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
+        checkFrame(offsetY < 5e-3, String.format("invalid gravity: %d, %.7f, %.10f, %.10f != %.10f",
           tick, y, offsetY, deltaY, predictedY));
       }
       tick++;
@@ -678,7 +680,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
-    user.delayedWrite(CAPTCHA_ABILITIES);
+    user.delayedWrite(user.isGeyser() ? CAPTCHA_ABILITIES_BEDROCK : CAPTCHA_ABILITIES);
     // Make sure the player knows what to do
     user.delayedWrite(enterCodeMessage);
     // Send all packets in one flush

@@ -153,8 +153,9 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       return;
     }
 
-    // Completely skip Geyser connections
-    if (GeyserUtil.isGeyserConnection(channel, socketAddress)) {
+    // Completely skip Geyser connections if configured
+    final boolean geyser = GeyserUtil.isGeyserConnection(channel, socketAddress);
+    if (geyser && !Sonar.get().getConfig().getVerification().isCheckGeyser()) {
       initialLogin(ctx, loginPacket, encoder, handler);
       return;
     }
@@ -212,7 +213,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       }
 
       // Create an instance for the Fallback connection
-      user = new FallbackUserWrapper(channel, inetAddress, protocolVersion);
+      user = new FallbackUserWrapper(channel, inetAddress, protocolVersion, geyser);
       // Let the verification handler take over the channel
       user.hijack(username, offlineUUID, encoder, decoder, timeout, handler);
     });

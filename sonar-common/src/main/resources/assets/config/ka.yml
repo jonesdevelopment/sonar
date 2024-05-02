@@ -91,9 +91,9 @@ verification:
     # Checks if the client sends proper packets when mounting a vehicle
     vehicle:
       # Possible types: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: New players will always be mounted on a vehicle
+      # - ALWAYS: New players will always be mounted on a vehicle (Recommended)
       # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
-      # - NEVER: New players will never be mounted on a vehicle (Recommended)
+      # - NEVER: New players will never be mounted on a vehicle
       timing: ALWAYS
 
     # დააწერინეთ მოთამაშეს კოდი ჩატში, რომელიც იქნება ნაჩვენები ვირტუალურ მაპზე, რომელიც ხელში ეჭირებად
@@ -182,6 +182,10 @@ verification:
   # ჩაიწეროს თუ არა Sonar-მა ყოველი მოძრაობა/პოზიცია ვერიფიკაციის დროს?
   # ეს არ არის რეკომენდირებული აქტიურ სერვერებისთვის, მაგრამ შეიძლება გამოსადეგი იყოს ცრუ პოსიტივების გამოსასწორებლად.
   debug-xyz-positions: false
+  # Should Sonar also check Geyser (Bedrock) players?
+  # This feature is experimental and might cause issues
+  # If this is disabled, Bedrock players will be skipped
+  check-geyser-players: true
   # დროის ოდენობა, რომელიც უნდა გავიდეს, სანამ მოთამაშე ტაიმაუტდება სერვერიდან.
   # (ეს არის ნაჩვენები მილიწამებში: 1 წამი = 1000 მილიწამი)
   read-timeout: 8000
