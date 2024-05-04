@@ -136,6 +136,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     }
 
     // Prepare cached packets
+    getLogger().info("Taking cached snapshots of all packets...");
     FallbackPreparer.prepare();
 
     // Update ratelimiter caches

@@ -33,7 +33,10 @@ import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.FallbackUserState;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.DisconnectPacket;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
@@ -43,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.CONFIG;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 
 @Getter
 @ToString(of = {"protocolVersion", "inetAddress"})
@@ -115,8 +120,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       write(FallbackPreparer.LOGIN_SUCCESS);
 
       // The LoginSuccess packet has been sent, now we can change the registry state
-      newEncoder.updateRegistry(protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0
-        ? FallbackPacketRegistry.CONFIG : FallbackPacketRegistry.GAME);
+      newEncoder.updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME);
 
       try {
         // Prepare custom packet decoder and verification handler
