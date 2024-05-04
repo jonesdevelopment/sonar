@@ -25,34 +25,34 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.CaptchaPreparer;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.CachedFallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class FallbackPreparer {
 
   // LoginSuccess
-  public final FallbackPacket LOGIN_SUCCESS = new LoginSuccessPacket();
+  public final FallbackPacket LOGIN_SUCCESS = new CachedFallbackPacket(new LoginSuccessPacket());
   // Abilities
-  public final FallbackPacket DEFAULT_ABILITIES = new ClientAbilitiesPacket(0x00, 0f, 0f);
-  public final FallbackPacket CAPTCHA_ABILITIES = new ClientAbilitiesPacket(0x02, 0f, 0f);
-  public final FallbackPacket CAPTCHA_ABILITIES_BEDROCK = new ClientAbilitiesPacket(0x06, 0f, 0f);
+  public final FallbackPacket DEFAULT_ABILITIES = new CachedFallbackPacket(new ClientAbilitiesPacket(0x00, 0f, 0f));
+  public final FallbackPacket CAPTCHA_ABILITIES = new CachedFallbackPacket(new ClientAbilitiesPacket(0x02, 0f, 0f));
+  public final FallbackPacket CAPTCHA_ABILITIES_BEDROCK = new CachedFallbackPacket(new ClientAbilitiesPacket(0x06, 0f, 0f));
   // Chunks
-  public final FallbackPacket EMPTY_CHUNK_DATA = new ChunkDataPacket(0, 0);
+  public final FallbackPacket EMPTY_CHUNK_DATA = new CachedFallbackPacket(new ChunkDataPacket(0, 0));
   // Finish Configuration
-  public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket();
+  public final FallbackPacket FINISH_CONFIGURATION = new CachedFallbackPacket(new FinishConfigurationPacket());
   // Synchronize Registry
-  public final FallbackPacket REGISTRY_SYNC_LEGACY = new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null);
-  public final List<FallbackPacket> REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
+  public final FallbackPacket REGISTRY_SYNC_LEGACY = new CachedFallbackPacket(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null));
+  public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
   // Keep Alive
-  public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlivePacket(0L);
+  public final FallbackPacket CAPTCHA_KEEP_ALIVE = new CachedFallbackPacket(new KeepAlivePacket(-1337L));
   // Game Event (1.20.3+)
-  public final FallbackPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
+  public final FallbackPacket START_WRITING_CHUNKS = new CachedFallbackPacket(new GameEventPacket(13, 0));
   // Chat
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
@@ -87,10 +87,10 @@ public class FallbackPreparer {
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
 
   // Captcha position
-  public final FallbackPacket CAPTCHA_POSITION = new PlayerPositionLookPacket(
-    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false);
-  public final FallbackPacket CAPTCHA_SPAWN_POSITION = new DefaultSpawnPositionPacket(
-    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION);
+  public final FallbackPacket CAPTCHA_POSITION = new CachedFallbackPacket(new PlayerPositionLookPacket(
+    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false));
+  public final FallbackPacket CAPTCHA_SPAWN_POSITION = new CachedFallbackPacket(new DefaultSpawnPositionPacket(
+    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION));
 
   // Blocks
   private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
@@ -127,7 +127,8 @@ public class FallbackPreparer {
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
     dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + (int) Math.ceil(maxFallDistance);
-    dynamicSpawnPosition = new DefaultSpawnPositionPacket(SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION);
+    dynamicSpawnPosition = new CachedFallbackPacket(new DefaultSpawnPositionPacket(
+      SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION));
 
     // Prepare collision platform positions
     int index = 0;
@@ -143,38 +144,40 @@ public class FallbackPreparer {
     }
 
     // Prepare UpdateSectionBlocks packet
-    updateSectionBlocks = new UpdateSectionBlocksPacket(0, 0, CHANGED_BLOCKS);
+    updateSectionBlocks = new CachedFallbackPacket(new UpdateSectionBlocksPacket(0, 0, CHANGED_BLOCKS));
 
     // Prepare disconnect packets during login
-    blacklisted = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getBlacklisted(), true);
-    alreadyVerifying = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getAlreadyVerifying(), true);
-    alreadyQueued = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getAlreadyQueued(), true);
-    protocolBlacklisted = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getProtocolBlacklisted(), true);
-    reconnectedTooFast = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getTooFastReconnect(), true);
-    invalidUsername = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidUsername(), true);
-    tooManyOnlinePerIP = DisconnectPacket.create(Sonar.get().getConfig().getTooManyOnlinePerIp(), true);
+    blacklisted = new CachedFallbackPacket(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getBlacklisted(), true));
+    alreadyVerifying = new CachedFallbackPacket(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getAlreadyVerifying(), true));
+    alreadyQueued = new CachedFallbackPacket(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getAlreadyQueued(), true));
+    protocolBlacklisted = new CachedFallbackPacket(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getProtocolBlacklisted(), true));
+    reconnectedTooFast = new CachedFallbackPacket(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getTooFastReconnect(), true));
+    invalidUsername = new CachedFallbackPacket(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidUsername(), true));
+    tooManyOnlinePerIP = new CachedFallbackPacket(DisconnectPacket.create(Sonar.get().getConfig().getTooManyOnlinePerIp(), true));
 
     // Prepare transfer packet
-    transferToOrigin = new TransferPacket(
+    transferToOrigin = new CachedFallbackPacket(new TransferPacket(
       Sonar.get().getConfig().getVerification().getTransfer().getHost(),
-      Sonar.get().getConfig().getVerification().getTransfer().getPort());
+      Sonar.get().getConfig().getVerification().getTransfer().getPort()));
 
     // Prepare packets for the vehicle check
-    removeEntities = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
-    setPassengers = new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID);
+    removeEntities = new CachedFallbackPacket(new RemoveEntitiesPacket(VEHICLE_ENTITY_ID));
+    setPassengers = new CachedFallbackPacket(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
       || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
       // Prepare CAPTCHA messages
-      enterCodeMessage = new UniversalChatPacket(Sonar.get().getConfig().getVerification().getMap().getEnterCode(), UniversalChatPacket.SYSTEM_TYPE);
-      incorrectCaptcha = new UniversalChatPacket(
-        Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha(), UniversalChatPacket.SYSTEM_TYPE);
+      enterCodeMessage = new CachedFallbackPacket(new UniversalChatPacket(
+        Sonar.get().getConfig().getVerification().getMap().getEnterCode(), UniversalChatPacket.SYSTEM_TYPE));
+      incorrectCaptcha = new CachedFallbackPacket(new UniversalChatPacket(
+        Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha(), UniversalChatPacket.SYSTEM_TYPE));
 
       // Prepare countdown
-      xpCountdown = new SetExperiencePacket[Sonar.get().getConfig().getVerification().getMap().getMaxDuration() / 1000];
+      xpCountdown = new FallbackPacket[Sonar.get().getConfig().getVerification().getMap().getMaxDuration() / 1000];
 
       for (int i = 0; i < xpCountdown.length; i++) {
-        xpCountdown[i] = new SetExperiencePacket((float) i / xpCountdown.length, i, i);
+        final float bar = (float) i / xpCountdown.length;
+        xpCountdown[i] = new CachedFallbackPacket(new SetExperiencePacket(bar, i, i));
       }
 
       // Prepare CAPTCHA answers

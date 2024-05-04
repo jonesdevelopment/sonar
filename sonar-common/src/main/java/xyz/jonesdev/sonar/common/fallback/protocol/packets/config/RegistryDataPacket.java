@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.CachedFallbackPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,6 @@ import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeStrin
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class RegistryDataPacket implements FallbackPacket {
@@ -46,7 +46,7 @@ public final class RegistryDataPacket implements FallbackPacket {
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_5) < 0) {
       writeNamelessCompoundTag(byteBuf, tag);
-    } else {
+    } else if (type != null) {
       writeString(byteBuf, type);
       writeVarInt(byteBuf, bundles.size());
 
@@ -69,15 +69,16 @@ public final class RegistryDataPacket implements FallbackPacket {
     throw new UnsupportedOperationException();
   }
 
-  public static @NotNull List<FallbackPacket> of(final @NotNull CompoundBinaryTag rootTag) {
-    final List<FallbackPacket> packets = new ArrayList<>();
+  public static FallbackPacket @NotNull [] of(final @NotNull CompoundBinaryTag rootTag) {
+    final FallbackPacket[] packets = new FallbackPacket[rootTag.size()];
+    int index = 0;
     for (final String type : rootTag.keySet()) {
       final ArrayList<RegistryDataPacket.Bundle> bundles = new ArrayList<>();
       for (final BinaryTag binaryTag : rootTag.getCompound(type).getList("value")) {
         final CompoundBinaryTag tag = (CompoundBinaryTag) binaryTag;
         bundles.add(new Bundle(tag.getString("name"), tag.getCompound("element")));
       }
-      packets.add(new RegistryDataPacket(rootTag, type, bundles));
+      packets[index++] = new CachedFallbackPacket(new RegistryDataPacket(rootTag, type, bundles));
     }
     return packets;
   }
