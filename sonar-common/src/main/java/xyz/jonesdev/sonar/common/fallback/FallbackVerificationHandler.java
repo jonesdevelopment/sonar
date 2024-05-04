@@ -71,10 +71,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
   private boolean receivedSteerBoat, receivedPlayerInput;
 
   // CAPTCHA
-  private final SystemTimer keepAlive = new SystemTimer();
-  private final SystemTimer countdown = new SystemTimer();
   private @Nullable MapCaptchaInfo captcha;
-  private int captchaTriesLeft;
+  private int captchaTriesLeft, lastCountdownIndex;
 
   // Cached options to make sure the original values don't change throughout the verification
   private final boolean performVehicle, performCaptcha, performGravity, performCollisions, transfer;
@@ -258,40 +256,35 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // Handle incoming chat messages
     if (packet instanceof UniversalChatPacket) {
-      checkFrame(captcha != null, "Captcha not sent yet");
       final UniversalChatPacket chat = (UniversalChatPacket) packet;
-      if (!chat.getMessage().equals(captcha.getAnswer())) {
-        // Captcha is incorrect
-        checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
-        user.write(incorrectCaptcha);
+      final String answer = Objects.requireNonNull(captcha).getAnswer();
+
+      if (chat.getMessage().equals(answer)) {
+        // Captcha is correct
+        finish();
         return;
       }
-      // Captcha is correct
-      finish();
+
+      // Captcha is incorrect
+      checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
+      user.write(incorrectCaptcha);
       return;
     }
 
     // Only expect idle (position) packets
     if (packet instanceof PlayerPositionPacket
       || packet instanceof PlayerPositionLookPacket) {
-      // Limit to every 500 milliseconds to avoid spam
-      if (countdown.elapsed(500L)) {
-        final long difference = maxDuration - login.delay();
-        final int timeLeft = (int) (difference / 1000D);
-        if (timeLeft >= 0 && xpCountdown.length > timeLeft) {
-          user.write(xpCountdown[timeLeft]);
-        }
-        // Make sure to reset the timer
-        countdown.reset();
-      }
-
-      // Make sure the player does not time out
-      if (keepAlive.elapsed(2_000L)) {
+      // A position packet is sent every second
+      final long difference = maxDuration - login.delay();
+      final int index = (int) (difference / 1000D);
+      // Make sure we can actually safely get and send the packet
+      if (lastCountdownIndex != index && index >= 0 && xpCountdown.length > index) {
+        // Send the countdown using the experience bar
+        user.write(xpCountdown[index]);
         // Send a KeepAlive packet to prevent timeout
         user.write(CAPTCHA_KEEP_ALIVE);
-        // Make sure to reset the timer
-        keepAlive.reset();
       }
+      lastCountdownIndex = index;
     }
   }
 

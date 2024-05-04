@@ -33,11 +33,7 @@ import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.FallbackUserState;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.*;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.DisconnectPacket;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
@@ -116,7 +112,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       }
 
       // Send LoginSuccess packet to make the client think they are joining the server
-      write(new LoginSuccessPacket(username, uuid));
+      write(FallbackPreparer.LOGIN_SUCCESS);
 
       // The LoginSuccess packet has been sent, now we can change the registry state
       newEncoder.updateRegistry(protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0

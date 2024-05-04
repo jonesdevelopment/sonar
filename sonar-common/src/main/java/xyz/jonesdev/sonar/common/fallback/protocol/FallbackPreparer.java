@@ -27,6 +27,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.map.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 import java.util.List;
@@ -35,6 +36,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @UtilityClass
 public class FallbackPreparer {
 
+  // LoginSuccess
+  public final FallbackPacket LOGIN_SUCCESS = new LoginSuccessPacket();
   // Abilities
   public final FallbackPacket DEFAULT_ABILITIES = new ClientAbilitiesPacket(0x00, 0f, 0f);
   public final FallbackPacket CAPTCHA_ABILITIES = new ClientAbilitiesPacket(0x02, 0f, 0f);
