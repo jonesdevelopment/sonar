@@ -256,16 +256,18 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
     // Handle incoming chat messages
     if (packet instanceof UniversalChatPacket) {
-      checkFrame(captcha != null, "Captcha not sent yet");
       final UniversalChatPacket chat = (UniversalChatPacket) packet;
-      if (!chat.getMessage().equals(captcha.getAnswer())) {
-        // Captcha is incorrect
-        checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
-        user.write(incorrectCaptcha);
+      final String answer = Objects.requireNonNull(captcha).getAnswer();
+
+      if (chat.getMessage().equals(answer)) {
+        // Captcha is correct
+        finish();
         return;
       }
-      // Captcha is correct
-      finish();
+
+      // Captcha is incorrect
+      checkFrame(captchaTriesLeft-- > 0, "failed captcha too often");
+      user.write(incorrectCaptcha);
       return;
     }
 
