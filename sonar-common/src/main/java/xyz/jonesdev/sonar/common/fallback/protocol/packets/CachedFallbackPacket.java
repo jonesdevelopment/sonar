@@ -28,13 +28,20 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import java.util.HashMap;
 import java.util.Map;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.ID_TO_PROTOCOL_CONSTANT;
+
+// Mostly taken from
+// https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/PacketSnapshot.java
 @Getter
 public class CachedFallbackPacket implements FallbackPacket {
-  private final Map<Integer, byte[]> mappings = new HashMap<>(ProtocolVersion.ID_TO_PROTOCOL_CONSTANT.size());
+  private final Map<Integer, Integer> mappings = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
+  private final Map<Integer, byte[]> cachedBytes = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
   private final FallbackPacket originalPacket;
 
   public CachedFallbackPacket(final @NotNull FallbackPacket originalPacket) {
-    for (final ProtocolVersion protocolVersion : ProtocolVersion.ID_TO_PROTOCOL_CONSTANT.values()) {
+    final Map<Integer, Integer> hashes = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
+
+    for (final ProtocolVersion protocolVersion : ID_TO_PROTOCOL_CONSTANT.values()) {
       // Allocate a buffer for each protocol version
       final ByteBuf byteBuf = Unpooled.buffer();
       try {
@@ -44,10 +51,21 @@ public class CachedFallbackPacket implements FallbackPacket {
           originalPacket.toString(), protocolVersion, exception);
         break;
       }
-      // Cache the raw bytes of the encoded packet
-      final byte[] bytes = new byte[byteBuf.readableBytes()];
-      byteBuf.readBytes(bytes);
-      mappings.put(protocolVersion.getProtocol(), bytes);
+
+      // Make sure we don't unnecessarily fill the RAM
+      final int protocol = protocolVersion.getProtocol();
+      final int hash = byteBuf.hashCode();
+      final int hashed = hashes.getOrDefault(hash, -1);
+      if (hashed != -1) {
+        mappings.put(protocol, hashed);
+      } else {
+        hashes.put(hash, protocol);
+        mappings.put(protocol, protocol);
+        // Cache the raw bytes of the encoded packet
+        final byte[] bytes = new byte[byteBuf.readableBytes()];
+        byteBuf.readBytes(bytes);
+        cachedBytes.put(protocol, bytes);
+      }
       // Make sure to release the buffer to avoid memory leaks
       byteBuf.release();
     }
@@ -57,10 +75,11 @@ public class CachedFallbackPacket implements FallbackPacket {
   @Override
   public void encode(final @NotNull ByteBuf byteBuf,
                      final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    final byte[] message = mappings.get(protocolVersion.getProtocol());
+    final int hash = mappings.get(protocolVersion.getProtocol());
+    final byte[] bytes = cachedBytes.get(hash);
 
-    if (message != null) {
-      byteBuf.writeBytes(message);
+    if (bytes != null) {
+      byteBuf.writeBytes(bytes);
     } else {
       Sonar.get().getLogger().error("Could not find cached packet {} for version {}",
         toString(), protocolVersion);
