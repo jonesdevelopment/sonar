@@ -184,9 +184,6 @@ verification:
   captcha:
     # Nachricht, die dem Spieler angezeigt wird, wenn er den CAPTCHA-Code im Chat eingeben muss
     enter-code: '%prefix%<green>Bitte gib den Code im Chat ein, der auf der Karte angezeigt wird.'
-    # Timer, der dem Spieler angezeigt wird, wenn er den CAPTCHA-Code im Chat eingeben muss
-    # (Setze dies auf '' um die Aktionsleisten-Nachricht zu deaktivieren)
-    action-bar: '%prefix%<green>Du hast %time-left% Sekunden Zeit, um den Code im Chat einzugeben'
     # Nachricht, die dem Spieler angezeigt wird, wenn er den falschen Code im Chat eingibt
     incorrect: '%prefix%<red>Du hast den falschen Code eingegeben. Bitte versuche es erneut.'
 

@@ -21,7 +21,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
 import lombok.val;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -73,7 +72,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
 
   // CAPTCHA
   private final SystemTimer keepAlive = new SystemTimer();
-  private final SystemTimer actionBar = new SystemTimer();
+  private final SystemTimer countdown = new SystemTimer();
   private @Nullable MapCaptchaInfo captcha;
   private int captchaTriesLeft;
 
@@ -272,25 +271,27 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       return;
     }
 
-    // Every second
-    if (actionBar.elapsed(user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0 ? 10_000L : 1_000L)) {
-      final String actionBarMessage = Sonar.get().getConfig().getVerification().getMap().getEnterCodeActionBar();
-      // Only send action bar if the message is actually supposed to be sent
-      if (!actionBarMessage.isEmpty()) {
-        final String timeLeft = String.format("%.0f", (maxDuration - login.delay()) / 1000D);
-        user.write(new UniversalChatPacket(MiniMessage.miniMessage().deserialize(
-          actionBarMessage.replace("%time-left%", timeLeft)), UniversalChatPacket.GAME_INFO_TYPE));
+    // Only expect idle (position) packets
+    if (packet instanceof PlayerPositionPacket
+      || packet instanceof PlayerPositionLookPacket) {
+      // Limit to every 500 milliseconds to avoid spam
+      if (countdown.elapsed(500L)) {
+        final long difference = maxDuration - login.delay();
+        final int timeLeft = (int) (difference / 1000D);
+        if (timeLeft >= 0 && xpCountdown.length > timeLeft) {
+          user.write(xpCountdown[timeLeft]);
+        }
         // Make sure to reset the timer
-        actionBar.reset();
+        countdown.reset();
       }
-    }
 
-    // Every 10 seconds
-    if (keepAlive.elapsed(10_000L)) {
-      // Send a KeepAlive packet to prevent timeout
-      user.write(CAPTCHA_KEEP_ALIVE);
-      // Make sure to reset the timer
-      keepAlive.reset();
+      // Make sure the player does not time out
+      if (keepAlive.elapsed(2_000L)) {
+        // Send a KeepAlive packet to prevent timeout
+        user.write(CAPTCHA_KEEP_ALIVE);
+        // Make sure to reset the timer
+        keepAlive.reset();
+      }
     }
   }
 

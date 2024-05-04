@@ -123,7 +123,7 @@ verification:
       precompute: 500
       # Wie lange soll Sonar warten, bis der Spieler das CAPTCHA nicht besteht?
       # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
-      max-duration: 45000
+      max-duration: 30000
       # Wie oft muss ein Spieler das CAPTCHA nicht bestehen, bevor er die Überprüfung nicht besteht?
       max-tries: 3
       # Zeichen (Buchstaben und Zahlen), die im Antwort-CAPTCHA erscheinen dürfen

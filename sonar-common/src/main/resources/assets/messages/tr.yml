@@ -176,9 +176,6 @@ verification:
   captcha:
     # Captcha'nın cevabını girmeleri gerektiğinde oyuncuya gösterilen mesaj
     enter-code: '%prefix%<green>Haritada gösterilen kodu lütfen sohbete girin.'
-    # Timer that is shown to the player when they have to enter the answer to the captcha
-    # (Set this to '' to disable the action bar message)
-    action-bar: '%prefix%<green>Kodu girmek için %time-left% saniyeniz kaldı'
     # Message that is shown to the player when they enter the wrong answer in chat
     incorrect: '%prefix%<red>Yanlış kodu girdiniz. Lütfen tekrar deneyin.'
 

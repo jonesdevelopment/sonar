@@ -125,7 +125,7 @@ verification:
       precompute: 500
       # How long should Sonar wait until the player fails the CAPTCHA?
       # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
-      max-duration: 45000
+      max-duration: 30000
       # How many times must a player fail the CAPTCHA before failing the verification?
       max-tries: 3
       # Characters (letters and numbers) that are allowed to appear in the answer to the CAPTCHA
