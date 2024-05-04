@@ -20,6 +20,8 @@ package xyz.jonesdev.sonar.common.fallback.protocol.map;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.CachedFallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.MapDataPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
@@ -29,8 +31,8 @@ public final class MapCaptchaInfo {
   private final String answer;
   private final byte[] buffer;
 
-  private final MapDataPacket[] legacy;
-  private final MapDataPacket modern;
+  private final FallbackPacket[] legacy;
+  private final FallbackPacket modern;
 
   public MapCaptchaInfo(final @NotNull String answer, final byte @NotNull [] buffer) {
     this.answer = answer;
@@ -42,24 +44,23 @@ public final class MapCaptchaInfo {
       final byte buf = buffer[i];
       grid[i & Byte.MAX_VALUE][i >> 7] = buf;
     }
-    this.legacy = new MapDataPacket[grid.length];
+    this.legacy = new FallbackPacket[grid.length];
     for (int i = 0; i < grid.length; i++) {
-      this.legacy[i] = new MapDataPacket(grid[i], i, 0);
+      this.legacy[i] = new CachedFallbackPacket(new MapDataPacket(grid[i], i, 0));
     }
 
     // Prepare 1.8+ map data
-    this.modern = new MapDataPacket(buffer, 0, 0);
+    this.modern = new CachedFallbackPacket(new MapDataPacket(buffer, 0, 0));
   }
 
   public void delayedWrite(final @NotNull FallbackUser user) {
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
       user.delayedWrite(modern);
-      return;
-    }
-
-    // 1.7.2-1.7.10
-    for (final MapDataPacket legacyPacket : legacy) {
-      user.delayedWrite(legacyPacket);
+    } else {
+      // 1.7.2-1.7.10
+      for (final FallbackPacket legacyPacket : legacy) {
+        user.delayedWrite(legacyPacket);
+      }
     }
   }
 }
