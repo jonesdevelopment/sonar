@@ -180,8 +180,6 @@ verification:
   captcha:
     # 玩家需要输入验证码答案时显示的消息
     enter-code: '%prefix%<green>请在聊天框中发送地图上的验证码.'
-    # 显示还有多少秒来解决验证码. (设置为空即禁用)
-    action-bar: '%prefix%<green>您还有 %time-left% 秒来解决该验证码.'
     # 当玩家输入错误的验证码时显示的消息
     incorrect: '%prefix%<red>您输入了错误的验证码. 请再试一次'
 

@@ -121,7 +121,7 @@ verification:
       # Sonar 应该一次准备多少个验证码?
       precompute: 500
       # Sonar 应该给玩家多少时间完成验证码? (该值为毫秒. 1秒等于1000毫秒.)
-      max-duration: 45000
+      max-duration: 30000
       # 玩家最多能输入多少次错误的验证码?
       max-tries: 3
       # 允许出现在验证码答案中的字符

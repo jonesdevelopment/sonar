@@ -188,10 +188,6 @@ verification:
     # Message that is shown to the player when they have to enter the answer to the captcha
     enter-code: '%prefix%<green>Please enter the code in chat that is displayed on
       the map.'
-    # Timer that is shown to the player when they have to enter the answer to the captcha
-    # (Set this to '' to disable the action bar message)
-    action-bar: '%prefix%<green>You have %time-left% seconds left to enter the code
-      in chat'
     # Message that is shown to the player when they enter the wrong answer in chat
     incorrect: '%prefix%<red>You have entered the wrong code. Please try again.'
 

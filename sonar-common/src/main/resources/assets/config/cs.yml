@@ -126,7 +126,7 @@ verification:
       precompute: 500
       # Jak dlouho by měl Sonar čekat než hráč selže CAPTCHU?
       # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
-      max-duration: 45000
+      max-duration: 30000
       # Kolikrát musí hráč selhat CAPTCHU před celkovém selhání verifikace?
       max-tries: 3
       # Znaky (čísla a písmena), které jsou povoleny k zobrazování v CAPTCHE

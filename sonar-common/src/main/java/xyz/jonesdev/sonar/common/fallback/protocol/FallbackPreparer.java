@@ -100,13 +100,18 @@ public class FallbackPreparer {
   // CAPTCHA
   public final CaptchaPreparer MAP_INFO_PREPARER = new CaptchaPreparer();
 
+  // XP packets
+  public FallbackPacket[] xpCountdown;
+
   public void prepare() {
+    // Prepare JoinGame packet
     joinGame = new JoinGamePacket(PLAYER_ENTITY_ID,
       Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
       0, false, 0,
       true, false, false,
       new String[]{"minecraft:overworld"}, "minecraft:overworld");
 
+    // Prepare cached motions for the gravity check
     maxFallDistance = 0;
     maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
     preparedCachedYMotions = new double[maxMovementTick + 8];
@@ -146,16 +151,7 @@ public class FallbackPreparer {
     invalidUsername = DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidUsername(), true);
     tooManyOnlinePerIP = DisconnectPacket.create(Sonar.get().getConfig().getTooManyOnlinePerIp(), true);
 
-    // Precompute captcha answers
-    if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
-      || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-      enterCodeMessage = new UniversalChatPacket(Sonar.get().getConfig().getVerification().getMap().getEnterCode(), UniversalChatPacket.SYSTEM_TYPE);
-      incorrectCaptcha = new UniversalChatPacket(
-        Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha(), UniversalChatPacket.SYSTEM_TYPE);
-
-      MAP_INFO_PREPARER.prepare();
-    }
-
+    // Prepare transfer packet
     transferToOrigin = new TransferPacket(
       Sonar.get().getConfig().getVerification().getTransfer().getHost(),
       Sonar.get().getConfig().getVerification().getTransfer().getPort());
@@ -163,5 +159,23 @@ public class FallbackPreparer {
     // Prepare packets for the vehicle check
     removeEntities = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
     setPassengers = new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID);
+
+    if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
+      || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+      // Prepare CAPTCHA messages
+      enterCodeMessage = new UniversalChatPacket(Sonar.get().getConfig().getVerification().getMap().getEnterCode(), UniversalChatPacket.SYSTEM_TYPE);
+      incorrectCaptcha = new UniversalChatPacket(
+        Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha(), UniversalChatPacket.SYSTEM_TYPE);
+
+      // Prepare countdown
+      xpCountdown = new SetExperiencePacket[Sonar.get().getConfig().getVerification().getMap().getMaxDuration() / 1000];
+
+      for (int i = 0; i < xpCountdown.length; i++) {
+        xpCountdown[i] = new SetExperiencePacket((float) i / xpCountdown.length, i, i);
+      }
+
+      // Prepare CAPTCHA answers
+      MAP_INFO_PREPARER.prepare();
+    }
   }
 }

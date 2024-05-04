@@ -191,8 +191,8 @@ public final class SonarConfiguration {
       "verification.checks.map-captcha.effects.saturation", 0.3);
     verification.map.distortion = (float) generalConfig.getYaml().getDouble(
       "verification.checks.map-captcha.effects.distortion", 2);
-    verification.map.precomputeAmount = generalConfig.getInt("verification.checks.map-captcha.precompute");
-    verification.map.maxDuration = generalConfig.getInt("verification.checks.map-captcha.max-duration");
+    verification.map.precomputeAmount = clamp(generalConfig.getInt("verification.checks.map-captcha.precompute"), 1, 1000);
+    verification.map.maxDuration = clamp(generalConfig.getInt("verification.checks.map-captcha.max-duration"), 5000, 360000);
     verification.map.maxTries = generalConfig.getInt("verification.checks.map-captcha.max-tries");
     verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary");
     verification.map.fonts = generalConfig.getStringList("verification.checks.map-captcha.font-names");
@@ -317,7 +317,6 @@ public final class SonarConfiguration {
     verification.successLog = formatString(messagesConfig.getString("verification.logs.successful"));
 
     verification.map.enterCode = deserialize(formatString(messagesConfig.getString("verification.captcha.enter-code")));
-    verification.map.enterCodeActionBar = formatString(messagesConfig.getString("verification.captcha.action-bar"));
     verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect")));
     verification.currentlyPreparing = deserialize(fromList(messagesConfig.getStringList("verification.currently-preparing")));
     verification.tooFastReconnect = deserialize(fromList(messagesConfig.getStringList("verification.too-fast-reconnect")));
@@ -352,7 +351,11 @@ public final class SonarConfiguration {
   }
 
   private static int clamp(final int v, final int max, final int min) {
-    return Math.max(Math.min(v, min), max);
+    final int output = Math.max(Math.min(v, min), max);
+    if (output != v) {
+      Sonar.get().getLogger().warn("Clamped configuration value {} to {}", v, output);
+    }
+    return output;
   }
 
   public String formatAddress(final InetAddress inetAddress) {
@@ -470,7 +473,6 @@ public final class SonarConfiguration {
       private String dictionary;
       private Component enterCode;
       private Component failedCaptcha;
-      private String enterCodeActionBar;
       private List<String> fonts;
     }
 
