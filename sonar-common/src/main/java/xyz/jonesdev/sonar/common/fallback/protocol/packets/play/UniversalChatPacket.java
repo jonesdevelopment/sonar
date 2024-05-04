@@ -31,7 +31,6 @@ import xyz.jonesdev.sonar.common.utility.component.ComponentHolder;
 import java.time.Instant;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.fallback.netty.FastUUID.EMPTY_UUID;
 import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;

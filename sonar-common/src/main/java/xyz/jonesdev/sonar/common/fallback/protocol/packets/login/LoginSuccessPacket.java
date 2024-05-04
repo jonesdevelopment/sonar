@@ -18,13 +18,10 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.login;
 
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.netty.FastUUID;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import java.util.UUID;
@@ -35,25 +32,28 @@ import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
 
 @Getter
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
 public final class LoginSuccessPacket implements FallbackPacket {
-  private String username;
-  private UUID uuid;
+  // Use a cached UUID because the client actually does nothing with it...
+  public static final UUID PLACEHOLDER_UUID = new UUID(1L, 1L);
+  private static final String PLACEHOLDER_UUID_STRING = PLACEHOLDER_UUID.toString();
+  private static final String PLACEHOLDER_UUID_LEGACY = "00000000000000010000000000000001";
+
+  // Use a cached username because the client actually does nothing with it...
+  private static final String PLACEHOLDER_USERNAME = "Sonar";
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeUUID(byteBuf, uuid);
+      writeUUID(byteBuf, PLACEHOLDER_UUID);
     } else if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
-      writeUUIDIntArray(byteBuf, uuid);
+      writeUUIDIntArray(byteBuf, PLACEHOLDER_UUID);
     } else if (protocolVersion.compareTo(MINECRAFT_1_7_6) >= 0) {
-      writeString(byteBuf, uuid.toString());
+      writeString(byteBuf, PLACEHOLDER_UUID_STRING);
     } else {
-      writeString(byteBuf, FastUUID.toString(uuid));
+      writeString(byteBuf, PLACEHOLDER_UUID_LEGACY);
     }
 
-    writeString(byteBuf, username);
+    writeString(byteBuf, PLACEHOLDER_USERNAME);
 
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       writeVarInt(byteBuf, 0); // properties

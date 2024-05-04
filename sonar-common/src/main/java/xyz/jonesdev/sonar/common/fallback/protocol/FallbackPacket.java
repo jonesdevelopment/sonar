@@ -20,7 +20,10 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.buffer.ByteBuf;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
+import java.util.UUID;
+
 public interface FallbackPacket {
+  UUID EMPTY_UUID = new UUID(0L, 0L);
 
   /**
    * Encodes the packet sent by the server
