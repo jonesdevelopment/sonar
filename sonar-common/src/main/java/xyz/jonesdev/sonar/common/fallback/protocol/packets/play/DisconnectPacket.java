@@ -26,7 +26,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.utility.component.ComponentHolder;
+import xyz.jonesdev.sonar.common.utility.ComponentHolder;
 
 @Getter
 @ToString

@@ -38,7 +38,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigur
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
-import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
+import xyz.jonesdev.sonar.common.utility.ProtocolUtil;
 
 import java.util.Objects;
 import java.util.Random;

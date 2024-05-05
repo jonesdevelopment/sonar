@@ -26,14 +26,12 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.utility.component.ComponentHolder;
+import xyz.jonesdev.sonar.common.utility.ComponentHolder;
 
 import java.time.Instant;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.*;
 
 @Data
 @NoArgsConstructor

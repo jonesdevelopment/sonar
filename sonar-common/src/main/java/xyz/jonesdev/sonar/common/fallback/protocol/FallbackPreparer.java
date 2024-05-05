@@ -30,13 +30,14 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPa
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class FallbackPreparer {
 
   // LoginSuccess
-  public final FallbackPacket LOGIN_SUCCESS = new FallbackPacketSnapshot(new LoginSuccessPacket());
+  public final FallbackPacket LOGIN_SUCCESS = new FallbackPacketSnapshot(new LoginSuccessPacket(new UUID(1L, 1L), "Sonar"));
   // Abilities
   public final FallbackPacket DEFAULT_ABILITIES = new FallbackPacketSnapshot(new ClientAbilitiesPacket(0x00, 0f, 0f));
   public final FallbackPacket CAPTCHA_ABILITIES = new FallbackPacketSnapshot(new ClientAbilitiesPacket(0x02, 0f, 0f));

@@ -28,7 +28,7 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
+import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.readVarInt;
 
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final FallbackUser user;

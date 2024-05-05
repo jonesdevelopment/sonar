@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.utility.component;
+package xyz.jonesdev.sonar.common.utility;
 
 import com.google.gson.*;
 import com.google.gson.internal.LazilyParsedNumber;
@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
+import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.writeNamelessCompoundTag;
+import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.writeString;
 
 // Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
