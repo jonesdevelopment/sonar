@@ -28,8 +28,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_12_2;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.readVarInt;
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @ToString

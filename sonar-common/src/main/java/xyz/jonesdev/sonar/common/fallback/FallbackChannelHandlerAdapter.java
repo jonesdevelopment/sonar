@@ -30,7 +30,7 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
-import xyz.jonesdev.sonar.common.utility.GeyserDetection;
+import xyz.jonesdev.sonar.common.util.GeyserDetection;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

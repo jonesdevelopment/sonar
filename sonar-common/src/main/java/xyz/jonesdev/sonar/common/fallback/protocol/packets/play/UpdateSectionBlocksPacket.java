@@ -28,8 +28,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.writeVarInt;
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.writeVarLong;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarLong;
 
 @Getter
 @NoArgsConstructor

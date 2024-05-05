@@ -30,7 +30,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Getter
 @NoArgsConstructor

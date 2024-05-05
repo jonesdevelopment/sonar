@@ -25,7 +25,7 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.CLIENTBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPacket> {
   private final ProtocolVersion protocolVersion;

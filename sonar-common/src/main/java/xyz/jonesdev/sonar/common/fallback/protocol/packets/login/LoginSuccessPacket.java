@@ -25,12 +25,12 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.utility.FastUuidSansHyphens;
+import xyz.jonesdev.sonar.common.util.FastUuidSansHyphens;
 
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Getter
 @ToString

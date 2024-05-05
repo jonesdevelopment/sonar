@@ -27,8 +27,8 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.readString;
-import static xyz.jonesdev.sonar.common.utility.ProtocolUtil.readVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readString;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 @Getter
 @ToString
