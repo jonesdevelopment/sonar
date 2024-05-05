@@ -500,8 +500,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         return;
       }
 
-      if (packet instanceof PlayerTickPacket) {
-        final PlayerTickPacket player = (PlayerTickPacket) packet;
+      if (packet instanceof PlayerPositionIdlePacket) {
+        final PlayerPositionIdlePacket player = (PlayerPositionIdlePacket) packet;
         handlePositionUpdate(posX, posY, posZ, player.isOnGround());
       }
     }
