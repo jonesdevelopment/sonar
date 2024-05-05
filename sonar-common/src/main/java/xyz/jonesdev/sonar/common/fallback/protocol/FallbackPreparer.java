@@ -45,7 +45,7 @@ public class FallbackPreparer {
   // Chunks
   public final FallbackPacket EMPTY_CHUNK_DATA = new FallbackPacketSnapshot(new ChunkDataPacket(0, 0));
   // Finish Configuration
-  public final FallbackPacket FINISH_CONFIGURATION = new FallbackPacketSnapshot(new FinishConfigurationPacket());
+  public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket(); // No snapshot needed because it's empty either way
   // Synchronize Registry
   public final FallbackPacket REGISTRY_SYNC_LEGACY = new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null));
   public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
