@@ -20,9 +20,8 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockPosition;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
-import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
+import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
@@ -93,7 +92,7 @@ public class FallbackPreparer {
     SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION));
 
   // Blocks
-  private final ChangedBlock[] CHANGED_BLOCKS = new ChangedBlock[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
+  private final BlockUpdate[] CHANGED_BLOCKS = new BlockUpdate[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
   public BlockType blockType = BlockType.BARRIER;
 
   public int maxMovementTick, dynamicSpawnYPosition;
@@ -134,12 +133,12 @@ public class FallbackPreparer {
     int index = 0;
     for (int x = 0; x < BLOCKS_PER_ROW; x++) {
       for (int z = 0; z < BLOCKS_PER_ROW; z++) {
-        final BlockPosition position = new BlockPosition(
+        final BlockUpdate.BlockPosition position = new BlockUpdate.BlockPosition(
           x + (BLOCKS_PER_ROW / 2),
           DEFAULT_Y_COLLIDE_POSITION,
           z + (BLOCKS_PER_ROW / 2),
           0, 0);
-        CHANGED_BLOCKS[index++] = new ChangedBlock(position, blockType);
+        CHANGED_BLOCKS[index++] = new BlockUpdate(position, blockType);
       }
     }
 

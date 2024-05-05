@@ -25,7 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.block.ChangedBlock;
+import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
@@ -34,10 +34,10 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarLong;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"changedBlocks"})
+@ToString(exclude = {"blockUpdates"})
 public final class UpdateSectionBlocksPacket implements FallbackPacket {
   private int sectionX, sectionZ;
-  private ChangedBlock[] changedBlocks;
+  private BlockUpdate[] blockUpdates;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
@@ -46,13 +46,13 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
       byteBuf.writeInt(sectionZ);
 
       if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-        byteBuf.writeShort(changedBlocks.length);
-        byteBuf.writeInt(4 * changedBlocks.length);
+        byteBuf.writeShort(blockUpdates.length);
+        byteBuf.writeInt(4 * blockUpdates.length);
       } else {
-        writeVarInt(byteBuf, changedBlocks.length);
+        writeVarInt(byteBuf, blockUpdates.length);
       }
 
-      for (final ChangedBlock block : changedBlocks) {
+      for (final BlockUpdate block : blockUpdates) {
         byteBuf.writeShort(block.getLegacyBlockState());
         final int blockId = block.getType().getId(protocolVersion);
         if (protocolVersion.compareTo(MINECRAFT_1_13) >= 0) {
@@ -68,7 +68,7 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
       }
     } else {
       // We only need one Y position
-      final int sectionY = changedBlocks[0].getPosition().getY() >> 4;
+      final int sectionY = blockUpdates[0].getPosition().getY() >> 4;
 
       // https://wiki.vg/Protocol#Update_Section_Blocks
       byteBuf.writeLong(((sectionX & 0x3FFFFFL) << 42) | (sectionY & 0xFFFFF) | ((sectionZ & 0x3FFFFFL) << 20));
@@ -78,9 +78,9 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
         byteBuf.writeBoolean(true); // suppress light updates
       }
 
-      writeVarInt(byteBuf, changedBlocks.length);
+      writeVarInt(byteBuf, blockUpdates.length);
 
-      for (final ChangedBlock block : changedBlocks) {
+      for (final BlockUpdate block : blockUpdates) {
         // https://wiki.vg/Protocol#Update_Section_Blocks
         final int shiftedBlockId = block.getType().getId(protocolVersion) << 12;
         final long positionIdValue = shiftedBlockId | block.getBlockState();
