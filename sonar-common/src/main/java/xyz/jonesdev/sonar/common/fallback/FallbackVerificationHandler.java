@@ -31,12 +31,12 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUserState;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.*;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.ItemType;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapCaptchaInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
+import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
-import xyz.jonesdev.sonar.common.fallback.protocol.vehicle.EntityType;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
 

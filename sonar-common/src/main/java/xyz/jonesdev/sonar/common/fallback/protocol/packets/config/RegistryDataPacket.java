@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.CachedFallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +78,7 @@ public final class RegistryDataPacket implements FallbackPacket {
         final CompoundBinaryTag tag = (CompoundBinaryTag) binaryTag;
         bundles.add(new Bundle(tag.getString("name"), tag.getCompound("element")));
       }
-      packets[index++] = new CachedFallbackPacket(new RegistryDataPacket(rootTag, type, bundles));
+      packets[index++] = new FallbackPacketSnapshot(new RegistryDataPacket(rootTag, type, bundles));
     }
     return packets;
   }
