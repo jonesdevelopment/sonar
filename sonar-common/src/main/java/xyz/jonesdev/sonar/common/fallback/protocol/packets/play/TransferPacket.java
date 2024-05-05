@@ -34,13 +34,13 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class TransferPacket implements FallbackPacket {
-  private String host;
-  private int port;
+  private String destinationHost;
+  private int destinationPort;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    writeString(byteBuf, host);
-    writeVarInt(byteBuf, port);
+    writeString(byteBuf, destinationHost);
+    writeVarInt(byteBuf, destinationPort);
   }
 
   @Override

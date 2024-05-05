@@ -33,17 +33,18 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 @NoArgsConstructor
 @AllArgsConstructor
 public final class TransactionPacket implements FallbackPacket {
-  private int windowId, id;
+  private int windowId;
+  private int transactionId;
   private boolean accepted;
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
       windowId = byteBuf.readByte();
-      id = byteBuf.readShort();
+      transactionId = byteBuf.readShort();
       accepted = byteBuf.readBoolean();
     } else {
-      id = byteBuf.readInt();
+      transactionId = byteBuf.readInt();
       // Always set accepted to true since 1.17 or higher don't use
       // transactions for inventory confirmation anymore.
       accepted = true;
@@ -54,12 +55,12 @@ public final class TransactionPacket implements FallbackPacket {
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
       byteBuf.writeByte(windowId);
-      byteBuf.writeShort((short) id);
+      byteBuf.writeShort((short) transactionId);
       // The "accepted" field is actually really unnecessary since
       // it's never even used in the client.
       byteBuf.writeBoolean(accepted);
     } else {
-      byteBuf.writeInt(id);
+      byteBuf.writeInt(transactionId);
     }
   }
 }

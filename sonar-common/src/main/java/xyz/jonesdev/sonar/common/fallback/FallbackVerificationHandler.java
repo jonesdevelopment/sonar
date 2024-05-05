@@ -450,7 +450,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // The transaction should always be accepted
       checkFrame(transaction.isAccepted(), "transaction not accepted?!");
       // Check if the transaction ID is valid
-      checkFrame(transaction.getId() == expectedTransactionId, "invalid transaction id");
+      checkFrame(transaction.getTransactionId() == expectedTransactionId, "invalid transaction id");
 
       // First, send an Abilities packet to the client to make
       // sure the player falls even in spectator mode.

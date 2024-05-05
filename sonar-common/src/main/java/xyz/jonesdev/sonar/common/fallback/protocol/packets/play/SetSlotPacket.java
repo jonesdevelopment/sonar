@@ -89,6 +89,7 @@ public final class SetSlotPacket implements FallbackPacket {
       } else if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
         writeNamelessCompoundTag(byteBuf, compoundBinaryTag);
       } else { // 1.20.5
+        // TODO: find a way to improve this
         // component
         writeVarInt(byteBuf, 1); // component count to add
         writeVarInt(byteBuf, 0); // component count to remove
