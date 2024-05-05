@@ -28,8 +28,6 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
 
-import java.time.Instant;
-
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
@@ -46,16 +44,9 @@ public final class UniversalChatPacket implements FallbackPacket {
   private ComponentHolder componentHolder;
   private String message;
   private byte type;
-  private boolean signedPreview;
-  private boolean unsigned = false;
-  private Instant timestamp;
-  private Instant expiry;
-  private long salt;
-  private boolean signed;
   private byte[] signature;
 
-  public UniversalChatPacket(final @NotNull Component component,
-                             final byte type) {
+  public UniversalChatPacket(final @NotNull Component component, final byte type) {
     this(new ComponentHolder(component), type);
   }
 
@@ -89,28 +80,28 @@ public final class UniversalChatPacket implements FallbackPacket {
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     message = readString(byteBuf, 256);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0) {
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) <= 0) {
-        final long expiresAt = byteBuf.readLong();
+    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_19_1) <= 0) {
+        byteBuf.readLong(); // expiresAt
         final long saltLong = byteBuf.readLong();
         final byte[] signatureBytes = readByteArray(byteBuf);
+        boolean unsigned = false;
 
         if (saltLong != 0L && signatureBytes.length > 0) {
           signature = signatureBytes;
-          expiry = Instant.ofEpochMilli(expiresAt);
-        } else if ((protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0
+        } else if ((protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0
           || saltLong == 0L) && signatureBytes.length == 0) {
           unsigned = true;
         } else {
           throw new CorruptedFrameException("Invalid signature");
         }
 
-        signedPreview = byteBuf.readBoolean();
+        final boolean signedPreview = byteBuf.readBoolean();
         if (signedPreview && unsigned) {
           throw new CorruptedFrameException("Signature missing");
         }
 
-        if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
+        if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
           final int size = readVarInt(byteBuf);
           if (size < 0 || size > 5) {
             throw new CorruptedFrameException("Invalid previous messages");
@@ -127,11 +118,12 @@ public final class UniversalChatPacket implements FallbackPacket {
           }
         }
       } else {
-        timestamp = Instant.ofEpochMilli(byteBuf.readLong());
-        salt = byteBuf.readLong();
-        signed = byteBuf.readBoolean();
+        byteBuf.readLong(); // timestamp
+        byteBuf.readLong(); // salt
+        final boolean signed = byteBuf.readBoolean();
+
         if (signed) {
-          byte[] sign = new byte[256];
+          final byte[] sign = new byte[256];
           byteBuf.readBytes(sign);
           signature = sign;
         } else {
@@ -139,7 +131,7 @@ public final class UniversalChatPacket implements FallbackPacket {
         }
 
         readVarInt(byteBuf);
-        byte[] bytes = new byte[DIV_FLOOR];
+        final byte[] bytes = new byte[DIV_FLOOR];
         byteBuf.readBytes(bytes);
       }
     }
