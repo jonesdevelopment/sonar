@@ -33,8 +33,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SetPassengersPacket implements FallbackPacket {
-  private int entityId;
-  private int passengerId;
+  private int entityId, passengerId;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {

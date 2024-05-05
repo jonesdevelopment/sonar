@@ -39,7 +39,7 @@ public final class ClientSettingsPacket implements FallbackPacket {
   private byte viewDistance;
   private int chatVisibility;
   private boolean chatColors;
-  private byte difficulty; // 1.7 Protocol
+  private byte difficulty; // 1.7
   private short skinParts;
   private int mainHand;
   private boolean chatFilteringEnabled; // Added in 1.17

@@ -36,9 +36,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SetSlotPacket implements FallbackPacket {
-  private int slot;
-  private int count;
-  private int itemId;
+  private int slot, count, itemId;
   private CompoundBinaryTag compoundBinaryTag;
 
   public static final CompoundBinaryTag MAP_NBT = CompoundBinaryTag.builder()
