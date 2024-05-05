@@ -26,21 +26,21 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeString;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeString;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class TransferPacket implements FallbackPacket {
-  private String host;
-  private int port;
+  private String destinationHost;
+  private int destinationPort;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    writeString(byteBuf, host);
-    writeVarInt(byteBuf, port);
+    writeString(byteBuf, destinationHost);
+    writeVarInt(byteBuf, destinationPort);
   }
 
   @Override

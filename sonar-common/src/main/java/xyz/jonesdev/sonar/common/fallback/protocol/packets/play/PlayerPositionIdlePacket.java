@@ -30,7 +30,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class PlayerTickPacket implements FallbackPacket {
+public final class PlayerPositionIdlePacket implements FallbackPacket {
   private boolean onGround;
 
   @Override

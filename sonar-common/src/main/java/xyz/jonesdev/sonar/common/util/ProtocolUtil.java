@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.utility.protocol;
+package xyz.jonesdev.sonar.common.util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -33,8 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.readVarInt;
-
 // Taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
@@ -49,8 +47,128 @@ public class ProtocolUtil {
   private static final String UNREGISTER_CHANNEL = "minecraft:unregister";
   private static final Pattern INVALID_IDENTIFIER_REGEX = Pattern.compile("[^a-z0-9\\-_]*");
 
-  public static @NotNull UUID readUUID(final @NotNull ByteBuf byteBuf) {
-    return new UUID(byteBuf.readLong(), byteBuf.readLong());
+  public static int readVarInt(final ByteBuf byteBuf) {
+    int read = readVarIntSafely(byteBuf);
+    if (read == Integer.MIN_VALUE) {
+      throw new CorruptedFrameException("Corrupt VarInt");
+    }
+    return read;
+  }
+
+  public static int readVarIntSafely(final @NotNull ByteBuf byteBuf) {
+    int i = 0;
+    int maxRead = Math.min(5, byteBuf.readableBytes());
+    for (int j = 0; j < maxRead; j++) {
+      int k = byteBuf.readByte();
+      i |= (k & 0x7F) << j * 7;
+      if ((k & 0x80) != 128) {
+        return i;
+      }
+    }
+    return Integer.MIN_VALUE;
+  }
+
+  public static void writeVarInt(final ByteBuf byteBuf, final int value) {
+    // Peel the one and two byte count cases explicitly as they are the most common VarInt sizes
+    // that the proxy will write, to improve inlining.
+    if ((value & (0xFFFFFFFF << 7)) == 0) {
+      byteBuf.writeByte(value);
+    } else if ((value & (0xFFFFFFFF << 14)) == 0) {
+      int w = (value & 0x7F | 0x80) << 8 | (value >>> 7);
+      byteBuf.writeShort(w);
+    } else {
+      writeVarIntFull(byteBuf, value);
+    }
+  }
+
+  private void writeVarIntFull(final ByteBuf byteBuf, final int value) {
+    // See https://steinborn.me/posts/performance/how-fast-can-you-write-a-varint/
+    if ((value & (0xFFFFFFFF << 7)) == 0) {
+      byteBuf.writeByte(value);
+    } else if ((value & (0xFFFFFFFF << 14)) == 0) {
+      int w = (value & 0x7F | 0x80) << 8 | (value >>> 7);
+      byteBuf.writeShort(w);
+    } else if ((value & (0xFFFFFFFF << 21)) == 0) {
+      int w = (value & 0x7F | 0x80) << 16 | ((value >>> 7) & 0x7F | 0x80) << 8 | (value >>> 14);
+      byteBuf.writeMedium(w);
+    } else if ((value & (0xFFFFFFFF << 28)) == 0) {
+      int w = (value & 0x7F | 0x80) << 24 | (((value >>> 7) & 0x7F | 0x80) << 16)
+        | ((value >>> 14) & 0x7F | 0x80) << 8 | (value >>> 21);
+      byteBuf.writeInt(w);
+    } else {
+      int w = (value & 0x7F | 0x80) << 24 | ((value >>> 7) & 0x7F | 0x80) << 16
+        | ((value >>> 14) & 0x7F | 0x80) << 8 | ((value >>> 21) & 0x7F | 0x80);
+      byteBuf.writeInt(w);
+      byteBuf.writeByte(value >>> 28);
+    }
+  }
+
+  public static void writeVarLong(final ByteBuf byteBuf, final long value) {
+    // Peel the one and two byte count cases explicitly as they are the most common VarLong sizes
+    // that the proxy will write, to improve inlining.
+    if ((value & 0xFFFFFFFFFFFFFF80L) == 0L) {
+      byteBuf.writeByte((byte) value);
+    } else if ((value & 0xFFFFFFFFFFFFC000L) == 0L) {
+      int w = (int) ((value & 0x7FL | 0x80L) << 8 | value >>> 7);
+      byteBuf.writeShort(w);
+    } else {
+      writeVarLongFull(byteBuf, value);
+    }
+  }
+
+  private void writeVarLongFull(final ByteBuf byteBuf, final long value) {
+    if ((value & 0xFFFFFFFFFFFFFF80L) == 0L) {
+      byteBuf.writeByte((byte) value);
+    } else if ((value & 0xFFFFFFFFFFFFC000L) == 0L) {
+      int w = (int) ((value & 0x7FL | 0x80L) << 8 | value >>> 7);
+      byteBuf.writeShort(w);
+    } else if ((value & 0xFFFFFFFFFFE00000L) == 0L) {
+      int w = (int) ((value & 0x7FL | 0x80L) << 16 | (value >>> 7 & 0x7FL | 0x80L) << 8 | value >>> 14);
+      byteBuf.writeMedium(w);
+    } else if ((value & 0xFFFFFFFFF0000000L) == 0L) {
+      int w =
+        (int) ((value & 0x7FL | 0x80L) << 24 | (value >>> 7 & 0x7FL | 0x80L) << 16 | (value >>> 14 & 0x7FL | 0x80L) << 8 | value >>> 21);
+      byteBuf.writeInt(w);
+    } else {
+      long l =
+        (value & 0x7FL | 0x80L) << 24 | (value >>> 7 & 0x7FL | 0x80L) << 16 | (value >>> 14 & 0x7FL | 0x80L) << 8 | (value >>> 21 & 0x7FL | 0x80L);
+      if ((value & 0xFFFFFFF800000000L) == 0L) {
+        int w =
+          (int) l;
+        byteBuf.writeInt(w);
+        byteBuf.writeByte((int) (value >>> 28));
+      } else if ((value & 0xFFFFFC0000000000L) == 0L) {
+        int w =
+          (int) l;
+        int w2 = (int) ((value >>> 28 & 0x7FL | 0x80L) << 8 | value >>> 35);
+        byteBuf.writeInt(w);
+        byteBuf.writeShort(w2);
+      } else if ((value & 0xFFFE000000000000L) == 0L) {
+        int w =
+          (int) l;
+        int w2 = (int) ((value >>> 28 & 0x7FL | 0x80L) << 16 | (value >>> 35 & 0x7FL | 0x80L) << 8 | value >>> 42);
+        byteBuf.writeInt(w);
+        byteBuf.writeMedium(w2);
+      } else {
+        long w =
+          (value & 0x7FL | 0x80L) << 56 | (value >>> 7 & 0x7FL | 0x80L) << 48 | (value >>> 14 & 0x7FL | 0x80L) << 40 | (value >>> 21 & 0x7FL | 0x80L) << 32 | (value >>> 28 & 0x7FL | 0x80L) << 24 | (value >>> 35 & 0x7FL | 0x80L) << 16 | (value >>> 42 & 0x7FL | 0x80L) << 8 | value >>> 49;
+        if ((value & 0xFF00000000000000L) == 0L) {
+          byteBuf.writeLong(w);
+        } else if ((value & Long.MIN_VALUE) == 0L) {
+          byteBuf.writeLong(w);
+          byteBuf.writeByte((byte) (value >>> 56));
+        } else {
+          int w2 = (int) ((value >>> 56 & 0x7FL | 0x80L) << 8 | value >>> 63);
+          byteBuf.writeLong(w);
+          byteBuf.writeShort(w2);
+        }
+      }
+    }
+  }
+
+  public static void readUUID(final @NotNull ByteBuf byteBuf) {
+    byteBuf.readLong(); // least
+    byteBuf.readLong(); // most
   }
 
   public static byte @NotNull [] readByteArray(final ByteBuf byteBuf) {
@@ -82,7 +200,7 @@ public class ProtocolUtil {
 
   public static @NotNull String readString(final ByteBuf byteBuf,
                                            final int cap) throws CorruptedFrameException {
-    final int length = VarIntUtil.readVarInt(byteBuf);
+    final int length = readVarInt(byteBuf);
     return readString(byteBuf, cap, length);
   }
 
@@ -100,7 +218,7 @@ public class ProtocolUtil {
 
   public static void writeString(final ByteBuf byteBuf, final @NotNull CharSequence str) {
     final int size = ByteBufUtil.utf8Bytes(str);
-    VarIntUtil.writeVarInt(byteBuf, size);
+    writeVarInt(byteBuf, size);
     byteBuf.writeCharSequence(str, StandardCharsets.UTF_8);
   }
 
@@ -118,12 +236,12 @@ public class ProtocolUtil {
 
   public static void writeArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
     checkFrame(bytes.length < Short.MAX_VALUE, "Too long array");
-    VarIntUtil.writeVarInt(byteBuf, bytes.length);
+    writeVarInt(byteBuf, bytes.length);
     byteBuf.writeBytes(bytes);
   }
 
   public static void writeStringArray(final ByteBuf byteBuf, final String @NotNull [] stringArray) {
-    VarIntUtil.writeVarInt(byteBuf, stringArray.length);
+    writeVarInt(byteBuf, stringArray.length);
     for (final String s : stringArray) {
       writeString(byteBuf, s);
     }

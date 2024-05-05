@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.map;
+package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
 
 import xyz.jonesdev.capja.CaptchaGenerator;
 import xyz.jonesdev.capja.CaptchaHolder;

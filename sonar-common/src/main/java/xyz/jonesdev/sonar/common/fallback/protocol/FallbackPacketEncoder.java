@@ -22,11 +22,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.CachedFallbackPacket;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.CLIENTBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPacket> {
   private final ProtocolVersion protocolVersion;
@@ -45,8 +44,8 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
   protected void encode(final ChannelHandlerContext ctx,
                         final @NotNull FallbackPacket packet,
                         final ByteBuf out) throws Exception {
-    final FallbackPacket originalPacket = packet instanceof CachedFallbackPacket
-      ? ((CachedFallbackPacket) packet).getOriginalPacket() : packet;
+    final FallbackPacket originalPacket = packet instanceof FallbackPacketSnapshot
+      ? ((FallbackPacketSnapshot) packet).getOriginalPacket() : packet;
     final int packetId = registry.getPacketId(originalPacket);
     writeVarInt(out, packetId);
     packet.encode(out, protocolVersion);

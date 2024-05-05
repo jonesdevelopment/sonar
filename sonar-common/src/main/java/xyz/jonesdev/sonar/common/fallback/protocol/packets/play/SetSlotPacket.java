@@ -29,18 +29,14 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeCompoundTag;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.writeNamelessCompoundTag;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SetSlotPacket implements FallbackPacket {
-  private int slot;
-  private int count;
-  private int itemId;
+  private int slot, count, itemId;
   private CompoundBinaryTag compoundBinaryTag;
 
   public static final CompoundBinaryTag MAP_NBT = CompoundBinaryTag.builder()
@@ -91,6 +87,7 @@ public final class SetSlotPacket implements FallbackPacket {
       } else if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
         writeNamelessCompoundTag(byteBuf, compoundBinaryTag);
       } else { // 1.20.5
+        // TODO: find a way to improve this
         // component
         writeVarInt(byteBuf, 1); // component count to add
         writeVarInt(byteBuf, 0); // component count to remove

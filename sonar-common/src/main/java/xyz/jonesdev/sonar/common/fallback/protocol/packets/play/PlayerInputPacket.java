@@ -30,7 +30,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlayerInputPacket implements FallbackPacket {
+public final class PlayerInputPacket implements FallbackPacket {
   private float sideways, forward;
   private boolean jump, unmount;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets;
+package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -23,7 +23,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +32,12 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.ID_TO_PRO
 // Mostly taken from
 // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/PacketSnapshot.java
 @Getter
-public class CachedFallbackPacket implements FallbackPacket {
+public final class FallbackPacketSnapshot implements FallbackPacket {
   private final Map<Integer, Integer> mappings = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
   private final Map<Integer, byte[]> cachedBytes = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
   private final FallbackPacket originalPacket;
 
-  public CachedFallbackPacket(final @NotNull FallbackPacket originalPacket) {
+  public FallbackPacketSnapshot(final @NotNull FallbackPacket originalPacket) {
     final Map<Integer, Integer> hashes = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
 
     for (final ProtocolVersion protocolVersion : ID_TO_PROTOCOL_CONSTANT.values()) {

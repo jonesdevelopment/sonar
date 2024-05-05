@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.utility.geyser;
+package xyz.jonesdev.sonar.common.util;
 
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
@@ -28,7 +28,7 @@ import java.net.InetSocketAddress;
  * Simple utility to determine if someone joins using GeyserMC
  */
 @UtilityClass
-public class GeyserUtil {
+public class GeyserDetection {
   // https://github.com/GeyserMC/Floodgate/blob/master/core/src/main/java/org/geysermc/floodgate/module/CommonModule.java#L206
   private final AttributeKey<Object> PLAYER_ATTRIBUTE = AttributeKey.valueOf("floodgate-player");
 

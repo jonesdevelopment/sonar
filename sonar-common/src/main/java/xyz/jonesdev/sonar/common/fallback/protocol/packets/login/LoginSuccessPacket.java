@@ -18,42 +18,41 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.login;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.util.FastUuidSansHyphens;
 
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil.*;
-import static xyz.jonesdev.sonar.common.utility.protocol.VarIntUtil.writeVarInt;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Getter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public final class LoginSuccessPacket implements FallbackPacket {
-  // Use a cached UUID because the client actually does nothing with it...
-  public static final UUID PLACEHOLDER_UUID = new UUID(1L, 1L);
-  private static final String PLACEHOLDER_UUID_STRING = PLACEHOLDER_UUID.toString();
-  private static final String PLACEHOLDER_UUID_LEGACY = "00000000000000010000000000000001";
-
-  // Use a cached username because the client actually does nothing with it...
-  private static final String PLACEHOLDER_USERNAME = "Sonar";
+  private UUID uuid;
+  private String username;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeUUID(byteBuf, PLACEHOLDER_UUID);
+      writeUUID(byteBuf, uuid);
     } else if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
-      writeUUIDIntArray(byteBuf, PLACEHOLDER_UUID);
+      writeUUIDIntArray(byteBuf, uuid);
     } else if (protocolVersion.compareTo(MINECRAFT_1_7_6) >= 0) {
-      writeString(byteBuf, PLACEHOLDER_UUID_STRING);
+      writeString(byteBuf, uuid.toString());
     } else {
-      writeString(byteBuf, PLACEHOLDER_UUID_LEGACY);
+      writeString(byteBuf, FastUuidSansHyphens.toString(uuid));
     }
 
-    writeString(byteBuf, PLACEHOLDER_USERNAME);
+    writeString(byteBuf, username);
 
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       writeVarInt(byteBuf, 0); // properties

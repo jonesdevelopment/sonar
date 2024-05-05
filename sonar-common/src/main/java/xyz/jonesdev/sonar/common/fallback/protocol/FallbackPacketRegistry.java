@@ -431,7 +431,7 @@ public enum FallbackPacketRegistry {
         map(0x16, MINECRAFT_1_20_2, false),
         map(0x17, MINECRAFT_1_20_3, false),
         map(0x1A, MINECRAFT_1_20_5, false));
-      serverbound.register(PlayerTickPacket.class, PlayerTickPacket::new,
+      serverbound.register(PlayerPositionIdlePacket.class, PlayerPositionIdlePacket::new,
         map(0x03, MINECRAFT_1_7_2, false),
         map(0x0F, MINECRAFT_1_9, false),
         map(0x0D, MINECRAFT_1_12, false),

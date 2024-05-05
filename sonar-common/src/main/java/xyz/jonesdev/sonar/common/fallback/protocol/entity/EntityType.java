@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.map;
+package xyz.jonesdev.sonar.common.fallback.protocol.entity;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -23,57 +23,62 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.util.function.Function;
 
-@SuppressWarnings("unused")
 @RequiredArgsConstructor
-public enum ItemType {
-  FILLED_MAP(protocolVersion -> {
+public enum EntityType {
+  BOAT(protocolVersion -> {
     // Useful resources:
     // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
     // - https://pokechu22.github.io/Burger/1.20.4.html
-    // - https://github.com/ViaVersion/Mappings/tree/main/mappings
     switch (protocolVersion) {
       default:
-        // 1.7-1.12.2
-        return 358;
+      case MINECRAFT_1_7_2:
+      case MINECRAFT_1_7_6:
+      case MINECRAFT_1_8:
+      case MINECRAFT_1_9:
+      case MINECRAFT_1_9_1:
+      case MINECRAFT_1_9_2:
+      case MINECRAFT_1_9_4:
+      case MINECRAFT_1_10:
+      case MINECRAFT_1_11:
+      case MINECRAFT_1_11_1:
+      case MINECRAFT_1_12:
+      case MINECRAFT_1_12_1:
+      case MINECRAFT_1_12_2:
       case MINECRAFT_1_13:
       case MINECRAFT_1_13_1:
-        return 608;
       case MINECRAFT_1_13_2:
-        return 613;
+        return 1;
       case MINECRAFT_1_14:
       case MINECRAFT_1_14_1:
       case MINECRAFT_1_14_2:
       case MINECRAFT_1_14_3:
       case MINECRAFT_1_14_4:
+        return 5;
       case MINECRAFT_1_15:
       case MINECRAFT_1_15_1:
       case MINECRAFT_1_15_2:
-        return 671;
       case MINECRAFT_1_16:
       case MINECRAFT_1_16_1:
       case MINECRAFT_1_16_2:
       case MINECRAFT_1_16_3:
       case MINECRAFT_1_16_4:
-        return 733;
+        return 6;
       case MINECRAFT_1_17:
       case MINECRAFT_1_17_1:
       case MINECRAFT_1_18:
       case MINECRAFT_1_18_2:
-        return 847;
+        return 7;
       case MINECRAFT_1_19:
       case MINECRAFT_1_19_1:
-        return 886;
       case MINECRAFT_1_19_3:
-        return 914;
+        return 8;
       case MINECRAFT_1_19_4:
-        return 937;
       case MINECRAFT_1_20:
       case MINECRAFT_1_20_2:
-        return 941;
       case MINECRAFT_1_20_3:
-        return 979;
+        return 9;
       case MINECRAFT_1_20_5:
-        return 982;
+        return 10;
     }
   });
 

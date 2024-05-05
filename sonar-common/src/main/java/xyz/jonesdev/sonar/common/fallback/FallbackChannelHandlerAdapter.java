@@ -30,7 +30,7 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
-import xyz.jonesdev.sonar.common.utility.geyser.GeyserUtil;
+import xyz.jonesdev.sonar.common.util.GeyserDetection;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -154,7 +154,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
 
     // Completely skip Geyser connections if configured
-    final boolean geyser = GeyserUtil.isGeyserConnection(channel, socketAddress);
+    final boolean geyser = GeyserDetection.isGeyserConnection(channel, socketAddress);
     if (geyser && !Sonar.get().getConfig().getVerification().isCheckGeyser()) {
       initialLogin(ctx, loginPacket, encoder, handler);
       return;

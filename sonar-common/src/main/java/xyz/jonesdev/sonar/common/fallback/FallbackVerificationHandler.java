@@ -31,14 +31,14 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUserState;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.*;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.ItemType;
-import xyz.jonesdev.sonar.common.fallback.protocol.map.MapCaptchaInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
+import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
-import xyz.jonesdev.sonar.common.fallback.protocol.vehicle.EntityType;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
-import xyz.jonesdev.sonar.common.utility.protocol.ProtocolUtil;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.util.Objects;
 import java.util.Random;
@@ -450,7 +450,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       // The transaction should always be accepted
       checkFrame(transaction.isAccepted(), "transaction not accepted?!");
       // Check if the transaction ID is valid
-      checkFrame(transaction.getId() == expectedTransactionId, "invalid transaction id");
+      checkFrame(transaction.getTransactionId() == expectedTransactionId, "invalid transaction id");
 
       // First, send an Abilities packet to the client to make
       // sure the player falls even in spectator mode.
@@ -500,8 +500,8 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         return;
       }
 
-      if (packet instanceof PlayerTickPacket) {
-        final PlayerTickPacket player = (PlayerTickPacket) packet;
+      if (packet instanceof PlayerPositionIdlePacket) {
+        final PlayerPositionIdlePacket player = (PlayerPositionIdlePacket) packet;
         handlePositionUpdate(posX, posY, posZ, player.isOnGround());
       }
     }
