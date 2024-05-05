@@ -25,6 +25,7 @@ public final class LoginAcknowledgedPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
