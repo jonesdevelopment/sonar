@@ -103,21 +103,38 @@ verification:
       # - NEVER: 永远不应用该检查
       timing: NEVER
       # 图像效果选项 (用于混淆自动图像识别)
+      # You should only edit this if you know what you're doing
       effects:
-        # 是否添加局部发光效果
-        flare: true
-        # 是否添加随机的线条
+        # Adds random lines to the image
         scratches: true
-        # 是否应用波纹失真效果
+        # Applies a ripple filter (wavy effect)
         ripple: true
-        # 是否应用纵向畸变滤镜
-        smear: true
-        # 是否添加一些失真
-        pinch: true
-        # 图像的色彩饱和度
-        saturation: 0.15
-        # 水平三角形纹波滤镜
-        distortion: 2
+        # Applies a bump filter (sharpened text)
+        bump: true
+        # Distortion filter
+        distortion:
+          # Should Sonar apply a distortion filter?
+          enabled: true
+          # What shape should Sonar use for the distortion filter?
+          # Possible types: 0, 1, 2, 3
+          # - 0: Crosses
+          # - 1: Lines
+          # - 2: Circles
+          # - 3: Squares
+          shape: 2
+          # Distance between distorted pixels/objects
+          distance: 5
+          # Density of the distorted pixels/objects
+          density: 0.1
+          # Amount of blending between the colors of objects
+          mix: 0.15
+      # Path to the background image Sonar uses for the CAPTCHA
+      # If the image isn't found, a noise will be used as the default background
+      background: ''
+      # Should Sonar automatically detect the background color?
+      # This is done to create a contrast between the background image and the text
+      # If this is disabled, Sonar will use a random gradient for the colors
+      auto-color: false
       # Sonar 应该一次准备多少个验证码?
       precompute: 500
       # Sonar 应该给玩家多少时间完成验证码? (该值为毫秒. 1秒等于1000毫秒.)
@@ -127,12 +144,6 @@ verification:
       # 允许出现在验证码答案中的字符
       # 不建议添加可能看起来彼此相似的数字或字母
       dictionary: '1235689'
-      # Sonar 应该为验证码使用哪些字体?
-      font-names:
-        - Dialog
-        - DialogInput
-        - SansSerif
-        - Monospaced
 
     # 检查玩家是否正在向服务器发送有效的客户端标识符
     client-brand:
