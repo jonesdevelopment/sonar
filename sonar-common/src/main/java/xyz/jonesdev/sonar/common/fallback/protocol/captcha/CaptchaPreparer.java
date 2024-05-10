@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
 
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.capja.SimpleCaptchaGenerator;
 import xyz.jonesdev.capja.filter.SimpleRippleFilter;
 import xyz.jonesdev.capja.filter.SimpleScratchFilter;
@@ -29,6 +30,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -59,7 +61,8 @@ public final class CaptchaPreparer {
     // Prepare everything asynchronously
     PREPARATION_SERVICE.execute(() -> {
       // Create the images using capja
-      final SimpleCaptchaGenerator generator = new SimpleCaptchaGenerator(128, 128, null);
+      final @Nullable File backgroundImage = Sonar.get().getConfig().getVerification().getMap().getBackgroundImage();
+      final SimpleCaptchaGenerator generator = new SimpleCaptchaGenerator(128, 128, backgroundImage);
       final char[] dictionary = config.getDictionary().toCharArray();
 
       final SimpleScratchFilter scratchFilter = new SimpleScratchFilter(5);

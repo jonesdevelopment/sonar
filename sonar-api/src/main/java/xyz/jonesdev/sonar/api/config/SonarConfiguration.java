@@ -192,7 +192,16 @@ public final class SonarConfiguration {
     verification.map.distortion.density = (float) generalConfig.getYaml().getDouble("verification.checks.map-captcha.effects.distortion.density");
     verification.map.distortion.mix = (float) generalConfig.getYaml().getDouble("verification.checks.map-captcha.effects.distortion.mix");
 
-    verification.map.backgroundImage = generalConfig.getString("verification.checks.map-captcha.background");
+    final String backgroundImagePath = generalConfig.getString("verification.checks.map-captcha.background");
+    if (!backgroundImagePath.isEmpty()) {
+      verification.map.backgroundImage = new File(pluginFolder, backgroundImagePath);
+      if (!verification.map.backgroundImage.exists()) {
+        Sonar.get().getLogger().error("The background image does not exist! Please check the configuration.");
+      }
+    } else {
+      verification.map.backgroundImage = null;
+    }
+
     verification.map.autoColor = generalConfig.getBoolean("verification.checks.map-captcha.auto-color");
     verification.map.precomputeAmount = clamp(generalConfig.getInt("verification.checks.map-captcha.precompute"), 1, 1000);
     verification.map.maxDuration = clamp(generalConfig.getInt("verification.checks.map-captcha.max-duration"), 5000, 360000);
@@ -465,7 +474,7 @@ public final class SonarConfiguration {
       private boolean scratches;
       private boolean ripple;
       private boolean bump;
-      private String backgroundImage;
+      private File backgroundImage;
       private boolean autoColor;
       private int precomputeAmount;
       private int maxDuration;

@@ -130,6 +130,7 @@ verification:
           mix: 0.15
       # Path to the background image Sonar uses for the CAPTCHA
       # If the image isn't found, a noise will be used as the default background
+      # You can simply put the name of the file here if file is in the plugin directory
       background: ''
       # Should Sonar automatically detect the background color?
       # This is done to create a contrast between the background image and the text

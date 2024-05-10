@@ -133,7 +133,7 @@ verification:
       background: ''
       # Should Sonar automatically detect the background color?
       # This is done to create a contrast between the background image and the text
-      # If this is disabled, Sonar will use a random gradient for the colors
+      # You can simply put the name of the file here if file is in the plugin directory
       auto-color: false
       # Sonar 应该一次准备多少个验证码?
       precompute: 500
