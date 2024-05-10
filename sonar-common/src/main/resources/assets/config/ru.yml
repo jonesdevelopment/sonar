@@ -88,12 +88,12 @@ verification:
       # - ADVENTURE: все компоненты пользовательского интерфейса видны
       gamemode: ADVENTURE
 
-    # Checks if the client sends proper packets when mounting a vehicle
+    # Проверяет, отправляет ли клиент правильные пакеты при садке на транспортное средство
     vehicle:
-      # Possible types: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: New players will always be mounted on a vehicle (Recommended)
-      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
-      # - NEVER: New players will never be mounted on a vehicle
+      # Возможные типы: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: Новые игроки всегда будут садиться на транспортное средство (Рекомендуется)
+      # - DURING_ATTACK: Новые игроки будут садиться на транспортное средство только во время атаки
+      # - NEVER: Новые игроки никогда не будут садиться на транспортное средство
       timing: ALWAYS
 
     # Заставить игрока ввести код с картинки в чат
@@ -105,37 +105,37 @@ verification:
       # - NEVER: Новые игроки никогда не получат капчу (Рекомендуется)
       timing: NEVER
       # Кастомизация эффектов на картинке, которые показываются игроку
-      # You should only edit this if you know what you're doing
+      # Рекомендуется редактировать только если вы знаете, что делаете
       effects:
-        # Adds random lines to the image
+        # Добавляет случайные линии на изображение
         scratches: true
-        # Applies a ripple filter (wavy effect)
+        # Применяет эффект волны (ripple)
         ripple: true
-        # Applies a bump filter (sharpened text)
+        # Применяет фильтр bump (увеличивает резкость текста)
         bump: true
-        # Distortion filter
+        # Фильтр искажения
         distortion:
-          # Should Sonar apply a distortion filter?
+          # Следует ли применять фильтр искажения?
           enabled: true
-          # What shape should Sonar use for the distortion filter?
-          # Possible types: 0, 1, 2, 3
-          # - 0: Crosses
-          # - 1: Lines
-          # - 2: Circles
-          # - 3: Squares
+          # Какую форму следует использовать Sonar для фильтра искажения?
+          # Возможные типы: 0, 1, 2, 3
+          # - 0: Кресты
+          # - 1: Линии
+          # - 2: Круги
+          # - 3: Квадраты
           shape: 2
-          # Distance between distorted pixels/objects
+          # Расстояние между искаженными пикселями/объектами
           distance: 5
-          # Density of the distorted pixels/objects
+          # Плотность искаженных пикселей/объектов
           density: 0.1
-          # Amount of blending between the colors of objects
+          # Степень смешивания между цветами объектов
           mix: 0.15
-      # Path to the background image Sonar uses for the CAPTCHA
-      # If the image isn't found, a noise will be used as the default background
+      # Путь к фоновому изображению, которое использует Sonar для CAPTCHA
+      # Если изображение не найдено, будет использован шум как фон по умолчанию
       background: ''
-      # Should Sonar automatically detect the background color?
-      # This is done to create a contrast between the background image and the text
-      # You can simply put the name of the file here if file is in the plugin directory
+      # Следует ли Sonar автоматически определять цвет фона?
+      # Это делается для создания контраста между фоновым изображением и текстом
+      # Просто укажите имя файла здесь, если файл находится в каталоге плагина
       auto-color: false
       # Сколько капч должен подготовить Sonar?
       # Эта задача выполняется асинхронно в фоновом режиме
@@ -146,7 +146,7 @@ verification:
       # Сколько раз игрок должен завалить капчу, чтобы не пройти проверку?
       max-tries: 3
       # Символы (буквы и цифры), которые разрешено использовать в ответе на капчу
-      # It is not recommended to add numbers or letters that might look like one another
+      # Не рекомендуется добавлять цифры или буквы, которые могут быть похожи друг на друга
       dictionary: '1235689'
 
     # Проверяет, отправляет ли игрок на сервер действительный клиентский бренд.
@@ -168,22 +168,22 @@ verification:
     # Максимальное количество пакетов для входа на сервер, которое игрок должен отправить, чтобы быть выгнанным
     max-login-packets: 256
 
-  # If enabled, the player will be transferred back to the origin server
-  # after successfully passing the bot verification.
-  # This feature was introduced by Mojang in Minecraft version 1.20.5
+  # Если включено, игрок будет возвращен на исходный сервер
+  # после успешного прохождения проверки на бота.
+  # Эта функция была введена Mojang в версии Minecraft 1.20.5
   transfer:
-    # Should Sonar transfer the player to the origin server (instead of kicking them)?
-    # For this to work, you must enable the feature in your server's configuration
-    # Additionally, you might want to reduce the amount of login rate-limiting
-    # performed by Velocity or other proxies/plugins, as this might prevent the
-    # player from being transferred correctly.
+    # Должен ли Sonar переместить игрока на исходный сервер (вместо выкидывания его)?
+    # Для этого необходимо включить функцию в конфигурации вашего сервера
+    # Кроме того, вы можете пожелать снизить количество ограничений на скорость входа
+    # выполняемых Velocity или другими прокси/плагинами, так как это может помешать
+    # корректному перемещению игрока.
     enabled: false
-    # Which server should Sonar transfer the player to when the verification is passed?
-    # Please enter the server IP that is used by players to normally connect to your server.
-    # For example, you can put "mc.hypixel.net" or a direct IP like "1.1.1.1"
+    # На какой сервер должен Sonar переместить игрока после прохождения проверки?
+    # Введите IP-адрес сервера, который обычно используется игроками для подключения к вашему серверу.
+    # Например, вы можете указать "mc.hypixel.net" или прямой IP-адрес, например "1.1.1.1"
     destination-host: "play.my-server.com"
-    # Which port should Sonar use when transferring the player to the origin server?
-    # If your server does not need a port to connect to, you can leave this as 25565.
+    # Какой порт должен использовать Sonar при перемещении игрока на исходный сервер?
+    # Если ваш сервер не требует порта для подключения, вы можете оставить это как 25565.
     destination-port: 25565
 
   # Должен ли Sonar регистрировать новые попытки проверки?
@@ -193,9 +193,9 @@ verification:
   # Должен ли Sonar регистрировать каждое движение/изменение положения во время проверки?
   # Это не рекомендуется для рабочих серверов, но может быть полезно для выявления ошибок.
   debug-xyz-positions: false
-  # Should Sonar also check Geyser (Bedrock) players?
-  # This feature is experimental and might cause issues
-  # If this is disabled, Bedrock players will be skipped
+  # Следует ли Sonar также проверять игроков Geyser (Bedrock)?
+  # Эта функция экспериментальна и может вызывать проблемы
+  # Если это отключено, игроки Bedrock будут пропущены
   check-geyser-players: true
   # Количество времени, которое должно пройти, прежде чем игрока кикнет.
   # (Это значение представляет время в миллисекундах: 1 секунда = 1000 миллисекунд)
