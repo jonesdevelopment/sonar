@@ -26,10 +26,10 @@ import java.awt.image.BufferedImage;
 public class MapColorPalette {
   // https://minecraft.wiki/w/Map_item_format#Full_color_tables
   public static final int[] COLOR_MAP = {
-    0,
-    0,
-    0,
-    0,
+    -16777216,
+    -16777216,
+    -16777216,
+    -16777216,
     -10912473,
     -9594576,
     -8408520,
@@ -38,10 +38,10 @@ public class MapColorPalette {
     -2766452,
     -530013,
     -8225962,
-    -7697782,
-    -5658199,
-    -3815995,
-    -9934744,
+    -7566196,
+    -5526613,
+    -3684409,
+    -9868951,
     -4980736,
     -2359296,
     -65536,
@@ -66,22 +66,22 @@ public class MapColorPalette {
     -7499618,
     -5986120,
     -11118495,
-    -8304095,
-    -6464728,
-    -4756945,
-    -10471400,
+    -9810890,
+    -8233406,
+    -6853299,
+    -11585240,
     -11579569,
     -10461088,
     -9408400,
     -12895429,
-    -10136525,
-    -8689858,
-    -7375032,
-    -11780314,
     -13816396,
     -13158436,
     -12566273,
     -14605945,
+    -10202062,
+    -8690114,
+    -7375032,
+    -11845850,
     -4935252,
     -2303533,
     -779,
@@ -153,19 +153,34 @@ public class MapColorPalette {
     -12543338,
     -11551561,
     -10691627,
+    -13601936,
+    -13346124,
+    -12620068,
+    -11894529,
+    -14204025,
+    -16738008,
+    -16729294,
+    -16721606,
+    -16748002,
+    -10798046,
+    -9483734,
+    -8301007,
+    -12309223,
+    -11599616,
+    -10485504,
+    -9436672,
+    -12910336,
   };
 
-  public byte[] getBufferFromImage(final @NotNull BufferedImage bufferedImage) {
-    final int width = bufferedImage.getWidth();
-    final int height = bufferedImage.getHeight();
+  public int[] getBufferFromImage(final @NotNull BufferedImage bufferedImage) {
+    final int[] buffer = new int[128 * 128];
 
-    final int[] pixels = new int[128 * 128];
-    final byte[] buffer = new byte[128 * 128];
+    bufferedImage.getRGB(0, 0,
+      bufferedImage.getWidth(), bufferedImage.getHeight(),
+      buffer, 0, bufferedImage.getWidth());
 
-    bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
-
-    for (int i = 0; i < pixels.length; i++) {
-      buffer[i] = mapColorToMinecraft(pixels[i]);
+    for (int i = 0; i < buffer.length; i++) {
+      buffer[i] = mapColorToMinecraft(buffer[i]);
     }
     return buffer;
   }
@@ -173,11 +188,12 @@ public class MapColorPalette {
   private byte mapColorToMinecraft(final int argb) {
     int minDistance = Integer.MAX_VALUE;
     byte closestIndex = 0;
-    for (byte i = 0; i < COLOR_MAP.length; i++) {
+    for (int i = 0; i < COLOR_MAP.length; i++) {
+      final byte index = (byte) (i < 128 ? i : -129 + (i - 127));
       final int distance = calculateColorDistance(argb, COLOR_MAP[i]);
       if (distance < minDistance) {
         minDistance = distance;
-        closestIndex = i;
+        closestIndex = index;
       }
     }
     return closestIndex;

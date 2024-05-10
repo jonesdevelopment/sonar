@@ -182,20 +182,31 @@ public final class SonarConfiguration {
     verification.vehicle.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.vehicle.timing"));
 
     verification.map.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.map-captcha.timing"));
-    verification.map.flare = generalConfig.getBoolean("verification.checks.map-captcha.effects.flare");
     verification.map.scratches = generalConfig.getBoolean("verification.checks.map-captcha.effects.scratches");
     verification.map.ripple = generalConfig.getBoolean("verification.checks.map-captcha.effects.ripple");
-    verification.map.smear = generalConfig.getBoolean("verification.checks.map-captcha.effects.smear");
-    verification.map.pinch = generalConfig.getBoolean("verification.checks.map-captcha.effects.pinch");
-    verification.map.saturation = (float) generalConfig.getYaml().getDouble(
-      "verification.checks.map-captcha.effects.saturation", 0.3);
-    verification.map.distortion = (float) generalConfig.getYaml().getDouble(
-      "verification.checks.map-captcha.effects.distortion", 2);
+    verification.map.bump = generalConfig.getBoolean("verification.checks.map-captcha.effects.bump");
+
+    verification.map.distortion.enabled = generalConfig.getBoolean("verification.checks.map-captcha.effects.distortion.enabled");
+    verification.map.distortion.shape = generalConfig.getInt("verification.checks.map-captcha.effects.distortion.shape");
+    verification.map.distortion.distance = generalConfig.getInt("verification.checks.map-captcha.effects.distortion.distance");
+    verification.map.distortion.density = (float) generalConfig.getYaml().getDouble("verification.checks.map-captcha.effects.distortion.density");
+    verification.map.distortion.mix = (float) generalConfig.getYaml().getDouble("verification.checks.map-captcha.effects.distortion.mix");
+
+    final String backgroundImagePath = generalConfig.getString("verification.checks.map-captcha.background");
+    if (!backgroundImagePath.isEmpty()) {
+      verification.map.backgroundImage = new File(pluginFolder, backgroundImagePath);
+      if (!verification.map.backgroundImage.exists()) {
+        Sonar.get().getLogger().error("The background image does not exist! Please check the configuration.");
+      }
+    } else {
+      verification.map.backgroundImage = null;
+    }
+
+    verification.map.autoColor = generalConfig.getBoolean("verification.checks.map-captcha.auto-color");
     verification.map.precomputeAmount = clamp(generalConfig.getInt("verification.checks.map-captcha.precompute"), 1, 1000);
     verification.map.maxDuration = clamp(generalConfig.getInt("verification.checks.map-captcha.max-duration"), 5000, 360000);
     verification.map.maxTries = generalConfig.getInt("verification.checks.map-captcha.max-tries");
     verification.map.dictionary = generalConfig.getString("verification.checks.map-captcha.dictionary");
-    verification.map.fonts = generalConfig.getStringList("verification.checks.map-captcha.font-names");
 
     verification.brand.enabled = generalConfig.getBoolean("verification.checks.client-brand.enabled");
     verification.brand.validRegex = Pattern.compile(generalConfig.getString("verification.checks.client-brand.valid-regex"));
@@ -460,20 +471,28 @@ public final class SonarConfiguration {
     @Getter
     public static final class Map {
       private Timing timing;
-      private boolean flare;
       private boolean scratches;
       private boolean ripple;
-      private boolean smear;
-      private boolean pinch;
-      private float saturation;
-      private float distortion;
+      private boolean bump;
+      private File backgroundImage;
+      private boolean autoColor;
       private int precomputeAmount;
       private int maxDuration;
       private int maxTries;
       private String dictionary;
       private Component enterCode;
       private Component failedCaptcha;
-      private List<String> fonts;
+
+      private Smear distortion = new Smear();
+
+      @Getter
+      public static final class Smear {
+        private boolean enabled;
+        private int shape;
+        private int distance;
+        private float density;
+        private float mix;
+      }
     }
 
     @Getter

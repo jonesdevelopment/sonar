@@ -105,21 +105,38 @@ verification:
       # - NEVER: Новые игроки никогда не получат капчу (Рекомендуется)
       timing: NEVER
       # Кастомизация эффектов на картинке, которые показываются игроку
+      # You should only edit this if you know what you're doing
       effects:
-        # Добавляет свечение к изображению
-        flare: true
-        # Добавляет случайные линии к изображению
+        # Adds random lines to the image
         scratches: true
-        # Применяет искажение ряби (синусоидальное)
+        # Applies a ripple filter (wavy effect)
         ripple: true
-        # Применяет горизонтальное искажение
-        smear: true
-        # Добавляет немного размытости/искажения к изображению
-        pinch: true
-        # Применяет цветокоррекцию (насыщенность цвета)
-        saturation: 0.15
-        # Применяет горизонтальное треугольное искажение
-        distortion: 2
+        # Applies a bump filter (sharpened text)
+        bump: true
+        # Distortion filter
+        distortion:
+          # Should Sonar apply a distortion filter?
+          enabled: true
+          # What shape should Sonar use for the distortion filter?
+          # Possible types: 0, 1, 2, 3
+          # - 0: Crosses
+          # - 1: Lines
+          # - 2: Circles
+          # - 3: Squares
+          shape: 2
+          # Distance between distorted pixels/objects
+          distance: 5
+          # Density of the distorted pixels/objects
+          density: 0.1
+          # Amount of blending between the colors of objects
+          mix: 0.15
+      # Path to the background image Sonar uses for the CAPTCHA
+      # If the image isn't found, a noise will be used as the default background
+      background: ''
+      # Should Sonar automatically detect the background color?
+      # This is done to create a contrast between the background image and the text
+      # You can simply put the name of the file here if file is in the plugin directory
+      auto-color: false
       # Сколько капч должен подготовить Sonar?
       # Эта задача выполняется асинхронно в фоновом режиме
       precompute: 500
@@ -131,12 +148,6 @@ verification:
       # Символы (буквы и цифры), которые разрешено использовать в ответе на капчу
       # It is not recommended to add numbers or letters that might look like one another
       dictionary: '1235689'
-      # Какие типы шрифтов следует использовать в Sonar для текста в капче?
-      font-names:
-        - Dialog
-        - DialogInput
-        - SansSerif
-        - Monospaced
 
     # Проверяет, отправляет ли игрок на сервер действительный клиентский бренд.
     client-brand:

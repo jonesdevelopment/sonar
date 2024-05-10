@@ -29,19 +29,17 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 @Getter
 public final class MapCaptchaInfo {
   private final String answer;
-  private final byte[] buffer;
 
   private final FallbackPacket[] legacy;
   private final FallbackPacket modern;
 
-  public MapCaptchaInfo(final @NotNull String answer, final byte @NotNull [] buffer) {
+  public MapCaptchaInfo(final @NotNull String answer, final int @NotNull [] buffer) {
     this.answer = answer;
-    this.buffer = buffer;
 
     // Prepare 1.7 map data using a grid
-    final byte[][] grid = new byte[128][128];
+    final int[][] grid = new int[128][128];
     for (int i = 0; i < buffer.length; i++) {
-      final byte buf = buffer[i];
+      final int buf = buffer[i];
       grid[i & Byte.MAX_VALUE][i >> 7] = buf;
     }
     this.legacy = new FallbackPacket[grid.length];
