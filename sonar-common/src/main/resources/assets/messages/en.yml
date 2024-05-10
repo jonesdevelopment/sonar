@@ -92,7 +92,7 @@ commands:
 
   # Translations for '/sonar blacklist'
   blacklist:
-    # Message that is shown when someone tries clearing the blacklist but is is empty
+    # Message that is shown when someone tries clearing the blacklist but is empty
     empty: '%prefix%The blacklist is currently empty. Therefore, no IP addresses were
       removed from the blacklist.'
     # Message that is shown when someone clears the blacklist

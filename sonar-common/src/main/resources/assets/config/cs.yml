@@ -105,39 +105,39 @@ verification:
       # - DURING_ATTACK: Noví hráči dostanou map captchu jenom při útoku
       # - NEVER: Noví hráči nikdy nedostanou map CAPTCHU (Doporučeno)
       timing: NEVER
-      # Možnosti efektů na obrázek zobrazený přehrávači
-      # You should only edit this if you know what you're doing
+      # Možnosti pro efekty na zobrazeném obrázku
+      # Toto byste měli upravovat, pouze pokud víte, co děláte
       effects:
-        # Adds random lines to the image
+        # Přidá do obrázku náhodné čáry
         scratches: true
-        # Applies a ripple filter (wavy effect)
+        # Přidá filtr zvlnění (vlnitý efekt)
         ripple: true
-        # Applies a bump filter (sharpened text)
+        # Přidá nárazový filtr (zaostřený text)
         bump: true
-        # Distortion filter
+        # Filtr zkreslení
         distortion:
-          # Should Sonar apply a distortion filter?
+          # Měl by Sonar použít filtr zkreslení?
           enabled: true
-          # What shape should Sonar use for the distortion filter?
-          # Possible types: 0, 1, 2, 3
-          # - 0: Crosses
-          # - 1: Lines
-          # - 2: Circles
-          # - 3: Squares
+          # Jaký tvar by měl Sonar použít pro filtr zkreslení?
+          # Typy: 0, 1, 2, 3
+          # - 0: Kříže
+          # - 1: Čáry
+          # - 2: Kruhy
+          # - 3: Čtverce
           shape: 2
-          # Distance between distorted pixels/objects
+          # Vzdálenost mezi zkreslenými pixely/objekty
           distance: 5
-          # Density of the distorted pixels/objects
+          # Hustota zkreslených pixelů/objektů
           density: 0.1
-          # Amount of blending between the colors of objects
+          # Míra prolnutí mezi barvami objektů
           mix: 0.15
-      # Path to the background image Sonar uses for the CAPTCHA
-      # If the image isn't found, a noise will be used as the default background
-      # You can simply put the name of the file here if file is in the plugin directory
+      # Cesta k obrázku na pozadí, který Sonar používá pro CAPTCHA
+      # Pokud není obrázek nalezen, bude jako výchozí pozadí použit šum
+      # Zde můžete jednoduše zadat název souboru, pokud je soubor v adresáři pluginu
       background: ''
-      # Should Sonar automatically detect the background color?
-      # This is done to create a contrast between the background image and the text
-      # If this is disabled, Sonar will use a random gradient for the colors
+      # Měl by Sonar automaticky detekovat barvu pozadí?
+      # To se provádí za účelem vytvoření kontrastu mezi obrázkem na pozadí a textem
+      # Pokud je toto zakázáno, Sonar použije pro barvy náhodný přechod
       auto-color: false
       # Kolik odpovědí by měl Sonar předgenerovat?
       # Tento úkol běží souběžně v pozadí

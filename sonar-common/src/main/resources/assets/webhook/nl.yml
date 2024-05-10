@@ -1,0 +1,60 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Hulp nodig of vragen? https://jonesdev.xyz/discord
+# Broncode: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# Bot aanval meldingen kunnen ook met behulp van webhooks naar uw Discord-server worden verzonden
+webhook:
+  # URL van de Discord-webhook (zet dit op '' om webhooks uit te schakelen)
+  url: ''
+  # Gebruikersnaam van de Discord-webhook-afzender
+  username: Sonar
+  # URL naar de avatar van de Discord-webhook-afzender (zet dit op '' om uit te schakelen)
+  avatar-url: ''
+  # Inhoud van het Discord-webhook (zet dit op '' om uit te schakelen)
+  # U kunt dit gebruiken om bv. ping medewerkers met <@userId>
+  # Als u rollen wilt pingen, moet u <@&roleId> gebruiken
+  content: ''
+  # Embed Discord-webhook dat wordt verzonden wanneer een aanval is gestopt
+  embed:
+    # Klein voettekst bericht van de Discord-webhook-insluiting
+    footer:
+      # Inhoud van de voettekst bericht van de Discord-webhook-insluiting
+      text: © Jones Development and Sonar Contributors
+      # URL van de voettekst pictogram van de Discord-webhook-insluiting
+      icon-url: ''
+    # Titel van de Discord-webhook-insluiting
+    title: ':white_check_mark: Aanval verzacht'
+    # Klikbare URL van de titel van de Discord-webhook-insluiting
+    title-url: ''
+    # Beschrijving (inhoud) van de Discord-webhook-insluiting
+    description:
+      - De aanval op uw server is afgezwakt.
+      - ''
+      - 'Aanval beginnen: <t:%start-timestamp%:T>'
+      - 'Einde aanval: <t:%end-timestamp%:T>'
+      - 'Duur van de aanval: %duration%'
+      - ''
+      - 'Maximaal proces CPU-gebruik tijdens de aanval: %peak-cpu%%'
+      - 'Maximaal proces-geheugengebruik tijdens de aanval: %peak-memory%'
+      - 'Maximaal bots per seconde tijdens de aanval: %peak-bps%'
+      - ''
+      - 'IP-adressen op de zwarte lijst gezet tijdens de aanval: %total-blacklisted%'
+      - 'Mislukte verificaties tijdens de aanval: %total-failed%'
+      - 'Succesvolle verificaties tijdens de aanval: %total-success%'
+    # RGB-kleuren van de Discord-webhook-insluiting
+    # Kleur kiezer: https://www.rapidtables.com/web/color/RGB_Color.html
+    color:
+      red: 0
+      green: 255
+      blue: 0

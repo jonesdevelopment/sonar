@@ -1,0 +1,222 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Hulp nodig of vragen? https://jonesdev.xyz/discord
+# Broncode: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# Algemene instellingen voor Sonar
+general:
+  # Moet Sonar de IP-adressen van spelers in de console registreren?
+  log-player-addresses: true
+  # Maximaal aantal spelers online met hetzelfde IP-adres
+  max-online-per-ip: 3
+
+# Gevoeligheidsinstellingen voor de aanvalstracker
+# Bewerk dit alleen als je weet wat je doet
+attack-tracker:
+  # Minimumaantal nieuwe spelers om een aanval te kunnen detecteren
+  min-players-for-attack: 8
+  # De hoeveelheid tijd die moet verstrijken voordat een aanval voorbij is
+  # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
+  min-attack-duration: 30000
+  # Aantal keren dat een incident moet worden gemeld om als aanval te worden erkend
+  # Dit nummer fungeert als buffer om valse aanvalsmeldingen eruit te filteren
+  min-attack-threshold: 2
+  # De hoeveelheid tijd die moet verstrijken voordat een nieuwe aanval wordt gedetecteerd
+  # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
+  attack-cooldown-delay: 3000
+
+# U kunt Sonar verbinden met een database om geverifieerde spelers te behouden, zelfs nadat u uw server opnieuw hebt opgestart
+# Let op: IP-adressen worden opgeslagen in platte tekst. U bent verantwoordelijk voor het veilig houden van uw database!
+database:
+  # Type database dat Sonar gebruikt om geverifieerde spelers op te slaan
+  # Mogelijke typen: NONE, MYSQL, MARIADB
+  type: NONE
+  # Adres voor authenticatie met de SQL-database
+  host: localhost
+  # Poort voor authenticatie met de SQL-database
+  port: 3306
+  # Naam van de SQL-database
+  name: sonar
+  # Gebruikersnaam voor authenticatie met de SQL-database
+  username: ''
+  # Wachtwoord voor authenticatie met de SQL-database
+  password: ''
+  # Hoeveel dagen moet Sonar geverifieerde spelers in de database bewaren?
+  maximum-age: 5
+
+# Elk nieuw inlogverzoek wordt in de wachtrij geplaatst om spam-join-aanvallen te voorkomen
+# De wachtrij wordt elke seconde bijgewerkt (20 ticks)
+queue:
+  # Maximaal aantal gelijktijdige peilingen per seconde
+  max-polls: 30
+
+# Elke nieuwe speler die voor de eerste keer meedoet, wordt naar gestuurd
+# een lichtgewicht limbo-server waar geavanceerde bot-controles worden uitgevoerd
+verification:
+  # Wanneer moet Sonar nieuwe spelers verifiëren?
+  # Mogelijke typen: ALWAYS, DURING_ATTACK, NEVER
+  # - ALWAYS: Nieuwe spelers worden altijd gecontroleerd (Aanbevolen)
+  # - DURING_ATTACK: Nieuwe spelers worden alleen gecontroleerd tijdens een aanval
+  # - NEVER: Nieuwe spelers worden nooit gecontroleerd
+  timing: ALWAYS
+  checks:
+    # Controleert of de valbeweging van de spelers de zwaartekrachtformule van Minecraft volgt
+    # Alle voorspelde bewegingen worden vooraf berekend om prestaties te besparen
+    gravity:
+      # Moet Sonar controleren op geldige zwaartekracht van de cliënt? (Aanbevolen)
+      enabled: true
+      # Moet Sonar controleren of de speler tegen blokken botst? (Aanbevolen)
+      check-collisions: true
+      # Moet Sonar de speler een CAPTCHA laten oplossen als hij niet slaagt voor de zwaartekracht controle?
+      captcha-on-fail: false
+      # Maximaal aantal ticks dat de speler moet laten vallen om het platform te mogen raken
+      max-movement-ticks: 8
+      # De spelmodus van de speler tijdens verificatie
+      # Mogelijke typen: SURVIVAL, CREATIVE, ADVENTURE
+      # - SURVIVAL: alle UI-componenten zijn zichtbaar
+      # - CREATIVE: gezondheid en honger zijn verborgen
+      # - ADVENTURE: alle UI-componenten zijn zichtbaar
+      gamemode: ADVENTURE
+
+    # Controleert of de klant de juiste pakketten verzendt bij het monteren van een voertuig
+    vehicle:
+      # Mogelijke typen: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: Nieuwe spelers worden altijd op een voertuig gemonteerd (Aanbevolen)
+      # - DURING_ATTACK: Nieuwe spelers worden alleen tijdens een aanval op een voertuig gemonteerd
+      # - NEVER: Nieuwe spelers zullen nooit op een voertuig worden gemonteerd
+      timing: ALWAYS
+
+    # Laat de speler een code van een virtuele kaart in de chat typen
+    map-captcha:
+      # Wanneer moet Sonar de speler een CAPTCHA laten oplossen?
+      # Mogelijke typen: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: Nieuwe spelers ontvangen altijd een CAPTCHA
+      # - DURING_ATTACK: Nieuwe spelers ontvangen alleen een CAPTCHA tijdens een aanval
+      # - NEVER: Nieuwe spelers zullen nooit een CAPTCHA ontvangen (Aanbevolen)
+      timing: NEVER
+      # Opties voor de effecten op de afbeelding die aan de speler wordt getoond
+      # Je moet dit alleen bewerken als je weet wat je doet
+      effects:
+        # Voegt willekeurige lijnen toe aan de afbeelding
+        scratches: true
+        # Past een ripple-filter toe (golfeffect)
+        ripple: true
+        # Past een bump-filter toe (verscherpte tekst)
+        bump: true
+        # Vervormingsfilter
+        distortion:
+          # Moet Sonar een vervormingsfilter toepassen?
+          enabled: true
+          # Welke vorm moet Sonar gebruiken voor het vervormingsfilter?
+          # Mogelijke typen: 0, 1, 2, 3
+          # - 0: Kruisen
+          # - 1: Lijnen
+          # - 2: Cirkels
+          # - 3: Vierkantjes
+          shape: 2
+          # Afstand tussen vervormde pixels/objecten
+          distance: 5
+          # Dichtheid van de vervormde pixels/objecten
+          density: 0.1
+          # Hoeveelheid overvloeiing tussen de kleuren van objecten
+          mix: 0.15
+      # Pad naar de achtergrondafbeelding die Sonar gebruikt voor de CAPTCHA
+      # Als de afbeelding niet wordt gevonden, wordt er een ruis gebruikt als standaardachtergrond
+      # U kunt eenvoudig de naam van het bestand hier plaatsen als het bestand zich in de plugin map bevindt
+      background: ''
+      # Moet Sonar automatisch de achtergrondkleur detecteren?
+      # Dit wordt gedaan om een contrast te creëren tussen de achtergrondafbeelding en de tekst
+      # Als dit is uitgeschakeld, gebruikt Sonar een willekeurig verloop voor de kleuren
+      auto-color: false
+      # Hoeveel antwoorden moet Sonar voorbereiden?
+      # Deze taak gebeurt asynchroon op de achtergrond
+      precompute: 500
+      # Hoe lang moet Sonar wachten totdat de speler de CAPTCHA niet haalt?
+      # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
+      max-duration: 30000
+      # Hoe vaak moet een speler de CAPTCHA niet halen voordat de verificatie mislukt?
+      max-tries: 3
+      # Tekens (letters en cijfers) die mogen voorkomen in het antwoord op de CAPTCHA
+      # Het wordt niet aanbevolen om cijfers of letters toe te voegen die op elkaar lijken
+      dictionary: '1235689'
+
+    # Controleert of de speler een geldig Minecraft-klantmerk naar de server verzendt
+    client-brand:
+      # Moet Sonar controleren op geldige Minecraft-klantmerk? (Aanbevolen)
+      enabled: true
+      # Regex voor het valideren van Minecraft-klantmerken tijdens verificatie
+      valid-regex: ^[!-~ ]+$
+      # Maximale lengte van het Minecraft-klantmerk tijdens verificatie
+      max-length: 64
+
+    # Regex voor het valideren van gebruikersnamen tijdens verificatie
+    valid-name-regex: ^[a-zA-Z0-9_]+$
+    # Regex voor het valideren van de landinstelling van de client tijdens verificatie
+    valid-locale-regex: ^[a-zA-Z_]+$
+    # Ping moet een speler hebben om een time-out te krijgen
+    # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
+    max-ping: 10000
+    # Maximaal aantal loginpakketten dat de speler moet verzenden om te worden geschopt
+    max-login-packets: 256
+
+  # Indien ingeschakeld, wordt de speler teruggestuurd naar de oorspronkelijke server
+  # nadat u de bot-verificatie met succes heeft doorstaan.
+  # Deze functie is geïntroduceerd door Mojang in Minecraft versie 1.20.5
+  transfer:
+    # Moet Sonar de speler overbrengen naar de oorspronkelijke server (in plaats van hem te schoppen)?
+    # Om dit te laten werken, moet u de functie inschakelen in de configuratie van uw server
+    # Bovendien wilt u mogelijk de beperking van de inlegsnelheid verminderen
+    # uitgevoerd door Velocity van andere proxy's/plugins, omdat dit de
+    # speler wordt niet correct weergegeven.
+    enabled: false
+    # Naar welke server moet Sonar de speler overbrengen wanneer de verificatie is geslaagd?
+    # Voer het server-IP in dat door spelers wordt gebruikt om normaal verbinding te maken met uw server.
+    # U kunt bijvoorbeeld "mc.hypixel.net" of een direct IP-adres zoals "1.1.1.1" invoeren
+    destination-host: "play.my-server.com"
+    # Welke poort moet Sonar gebruiken bij het overbrengen van de speler naar de oorspronkelijke server?
+    # Als uw server geen poort nodig heeft om verbinding mee te maken, kunt u dit op 25565 laten staan.
+    destination-port: 25565
+
+  # Moet Sonar nieuwe verificatiepogingen registreren?
+  log-connections: true
+  # Moet Sonar nieuwe verificatiepogingen registreren tijdens aanvallen?
+  log-during-attack: false
+  # Moet Sonar elke beweging/positieverandering tijdens de verificatie registreren?
+  # Dit wordt niet aanbevolen voor productieservers, maar kan nuttig zijn bij het opsporen van fouten.
+  debug-xyz-positions: false
+  # Moet Sonar ook Geyser (Bedrock) spelers controleren?
+  # Deze functie is experimenteel en kan problemen veroorzaken
+  # Als dit is uitgeschakeld, worden Bedrock-spelers overgeslagen
+  check-geyser-players: true
+  # De hoeveelheid tijd die moet verstrijken voordat een speler een time-out krijgt
+  # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
+  read-timeout: 8000
+  # Hoe lang moet een speler wachten voordat hij tijdens de verificatie opnieuw verbinding maakt?
+  # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
+  rejoin-delay: 8000
+  # Hoe lang moet Sonar het aantal mislukte verificaties voor een speler onthouden?
+  # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
+  remember-time: 120000
+  # Hoe lang moet een IP-adres worden ontzegd om in te loggen als de verificatie te vaak mislukt?
+  # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
+  blacklist-time: 600000
+  # Hoe vaak moet een speler de verificatie niet doorstaan om op de zwarte lijst te worden geplaatst?
+  # (Stel deze waarde in op 0 om de zwarte lijst volledig uit te schakelen)
+  blacklist-threshold: 2
+  # Lijst met protocol-ID's die niet door Sonar worden gecontroleerd (verificatie-bypass)
+  # De volledige lijst met alle protocol-ID's vindt u hier:
+  # https://wiki.vg/Protocol_version_numbers
+  # Minecraft 1.20 heeft bijvoorbeeld de ID 763.
+  whitelisted-protocols: []
+  # Lijst met protocol-ID's die helemaal geen verbinding kunnen maken met de server
+  blacklisted-protocols: []
