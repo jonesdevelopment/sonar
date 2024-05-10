@@ -110,7 +110,7 @@ public final class CaptchaPreparer {
         }
         final BufferedImage image = generator.createImage(answer, filterArray);
         // Convert and cache converted Minecraft map bytes
-        final byte[] buffer = MapColorPalette.getBufferFromImage(image);
+        final int[] buffer = MapColorPalette.getBufferFromImage(image);
         cached[preparedAmount] = new MapCaptchaInfo(new String(answer), buffer);
       }
 

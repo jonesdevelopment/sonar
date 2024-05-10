@@ -155,17 +155,15 @@ public class MapColorPalette {
     -10691627,
   };
 
-  public byte[] getBufferFromImage(final @NotNull BufferedImage bufferedImage) {
-    final int width = bufferedImage.getWidth();
-    final int height = bufferedImage.getHeight();
+  public int[] getBufferFromImage(final @NotNull BufferedImage bufferedImage) {
+    final int[] buffer = new int[128 * 128];
 
-    final int[] pixels = new int[128 * 128];
-    final byte[] buffer = new byte[128 * 128];
+    bufferedImage.getRGB(0, 0,
+      bufferedImage.getWidth(), bufferedImage.getHeight(),
+      buffer, 0, bufferedImage.getWidth());
 
-    bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
-
-    for (int i = 0; i < pixels.length; i++) {
-      buffer[i] = mapColorToMinecraft(pixels[i]);
+    for (int i = 0; i < buffer.length; i++) {
+      buffer[i] = mapColorToMinecraft(buffer[i]);
     }
     return buffer;
   }
