@@ -102,39 +102,39 @@ verification:
       # - DURING_ATTACK: Neue Spieler erhalten nur während eines Angriffs ein CAPTCHA
       # - NEVER: Neue Spieler erhalten nie ein CAPTCHA (Empfohlen)
       timing: NEVER
-      # Optionen für die Effekte auf das dem Player angezeigte Bild
-      # You should only edit this if you know what you're doing
+      # Optionen für die Effekte auf dem angezeigten Bild
+      # Sie sollten dies nur bearbeiten, wenn Sie wissen, was Sie tun
       effects:
-        # Adds random lines to the image
+        # Fügt dem Bild zufällige Linien hinzu
         scratches: true
-        # Applies a ripple filter (wavy effect)
+        # Wendet einen Ripple-Filter an (Welleneffekt)
         ripple: true
-        # Applies a bump filter (sharpened text)
+        # Wendet einen Bump-Filter an (geschärfter Text)
         bump: true
-        # Distortion filter
+        # Verzerrungsfilter
         distortion:
-          # Should Sonar apply a distortion filter?
+          # Sollte Sonar einen Verzerrungsfilter anwenden?
           enabled: true
-          # What shape should Sonar use for the distortion filter?
-          # Possible types: 0, 1, 2, 3
-          # - 0: Crosses
-          # - 1: Lines
-          # - 2: Circles
-          # - 3: Squares
+          # Welche Form sollte Sonar für den Verzerrungsfilter verwenden?
+          # Mögliche Typen: 0, 1, 2, 3
+          # - 0: Kreuze
+          # - 1: Linien
+          # - 2: Kreise
+          # - 3: Quadrate
           shape: 2
-          # Distance between distorted pixels/objects
+          # Abstand zwischen verzerrten Pixeln/Objekten
           distance: 5
-          # Density of the distorted pixels/objects
+          # Dichte der verzerrten Pixel/Objekte
           density: 0.1
-          # Amount of blending between the colors of objects
+          # Ausmaß der Vermischung zwischen den Farben von Objekten
           mix: 0.15
-      # Path to the background image Sonar uses for the CAPTCHA
-      # If the image isn't found, a noise will be used as the default background
-      # You can simply put the name of the file here if file is in the plugin directory
+      # Pfad zum Hintergrundbild, das Sonar für das CAPTCHA verwendet
+      # Wenn das Bild nicht gefunden wird, wird ein Rauschen als Standardhintergrund verwendet
+      # Sie können hier einfach den Namen der Datei eingeben, wenn sich die Datei im Plugin-Verzeichnis befindet
       background: ''
-      # Should Sonar automatically detect the background color?
-      # This is done to create a contrast between the background image and the text
-      # If this is disabled, Sonar will use a random gradient for the colors
+      # Sollte Sonar die Hintergrundfarbe automatisch erkennen?
+      # Dies geschieht, um einen Kontrast zwischen dem Hintergrundbild und dem Text zu erzeugen
+      # Wenn dies deaktiviert ist, verwendet Sonar einen zufälligen Farbverlauf für die Farben
       auto-color: false
       # Wie viele Antworten soll Sonar vorbereiten?
       # Dieser Vorgang erfolgt asynchron im Hintergrund
