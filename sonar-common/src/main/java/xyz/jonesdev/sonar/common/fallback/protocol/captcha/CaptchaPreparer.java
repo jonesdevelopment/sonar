@@ -65,36 +65,34 @@ public final class CaptchaPreparer {
       final SimpleCaptchaGenerator generator = new SimpleCaptchaGenerator(128, 128, backgroundImage);
       final char[] dictionary = config.getDictionary().toCharArray();
 
-      final SimpleScratchFilter scratchFilter = new SimpleScratchFilter(5);
-      final BumpFilter bumpFilter = new BumpFilter();
+      // Prepare the filters for the CAPTCHA
+      final List<AbstractBufferedImageOp> filters = new ArrayList<>();
+      if (Sonar.get().getConfig().getVerification().getMap().isScratches()) {
+        filters.add(new SimpleScratchFilter(5));
+      }
+      if (Sonar.get().getConfig().getVerification().getMap().isRipple()) {
+        final SimpleRippleFilter rippleFilter = new SimpleRippleFilter();
+        rippleFilter.setXAmplitude(0);
+        float yAmplitude = 10 - ThreadLocalRandom.current().nextInt(20);
+        if (Math.abs(yAmplitude) < 3) {
+          yAmplitude = yAmplitude >= 0 ? 3 : -3;
+        }
+        rippleFilter.setYAmplitude(yAmplitude);
+        filters.add(rippleFilter);
+      }
+      if (Sonar.get().getConfig().getVerification().getMap().getDistortion().isEnabled()) {
+        final SmearFilter smearFilter = new SmearFilter();
+        smearFilter.setShape(Sonar.get().getConfig().getVerification().getMap().getDistortion().getShape());
+        smearFilter.setMix(Sonar.get().getConfig().getVerification().getMap().getDistortion().getMix());
+        smearFilter.setDensity(Sonar.get().getConfig().getVerification().getMap().getDistortion().getDensity());
+        smearFilter.setDistance(Sonar.get().getConfig().getVerification().getMap().getDistortion().getDistance());
+        filters.add(smearFilter);
+      }
+      if (Sonar.get().getConfig().getVerification().getMap().isBump()) {
+        filters.add(new BumpFilter());
+      }
 
       for (preparedAmount = 0; preparedAmount < config.getPrecomputeAmount(); preparedAmount++) {
-        // Prepare the filters per CAPTCHA for some more randomness
-        final List<AbstractBufferedImageOp> filters = new ArrayList<>();
-        if (Sonar.get().getConfig().getVerification().getMap().isScratches()) {
-          filters.add(scratchFilter);
-        }
-        if (Sonar.get().getConfig().getVerification().getMap().isRipple()) {
-          final SimpleRippleFilter rippleFilter = new SimpleRippleFilter();
-          rippleFilter.setXAmplitude(0);
-          float yAmplitude = 10 - ThreadLocalRandom.current().nextInt(20);
-          if (Math.abs(yAmplitude) < 3) {
-            yAmplitude = yAmplitude >= 0 ? 3 : -3;
-          }
-          rippleFilter.setYAmplitude(yAmplitude);
-          filters.add(rippleFilter);
-        }
-        if (Sonar.get().getConfig().getVerification().getMap().getDistortion().isEnabled()) {
-          final SmearFilter smearFilter = new SmearFilter();
-          smearFilter.setShape(Sonar.get().getConfig().getVerification().getMap().getDistortion().getShape());
-          smearFilter.setMix(Sonar.get().getConfig().getVerification().getMap().getDistortion().getMix());
-          smearFilter.setDensity(Sonar.get().getConfig().getVerification().getMap().getDistortion().getDensity());
-          smearFilter.setDistance(Sonar.get().getConfig().getVerification().getMap().getDistortion().getDistance());
-          filters.add(smearFilter);
-        }
-        if (Sonar.get().getConfig().getVerification().getMap().isBump()) {
-          filters.add(bumpFilter);
-        }
         if (!Sonar.get().getConfig().getVerification().getMap().isAutoColor()) {
           // Generate a random gradient color if automatic coloring is disabled
           final Color color0 = Color.getHSBColor((float) Math.random(), 1, 1);
