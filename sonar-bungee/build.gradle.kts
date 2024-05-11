@@ -9,7 +9,7 @@ bungee {
   version = rootProject.version.toString().split("-")[0]
   main = "xyz.jonesdev.sonar.bungee.SonarBungeePlugin"
   author = "Jones Development, Sonar Contributors"
-  softDepends = setOf("Geyser-BungeeCord", "floodgate", "Protocolize", "ViaVersion")
+  softDepends = setOf("Geyser-BungeeCord", "floodgate", "Protocolize", "ViaVersion", "packetevents", "FastLogin")
 }
 
 dependencies {
