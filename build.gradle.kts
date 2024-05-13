@@ -36,7 +36,7 @@ allprojects {
     testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
 
     // adventure
-    compileOnly("net.kyori:adventure-text-minimessage:4.16.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
     compileOnly("net.kyori:adventure-text-serializer-gson:4.16.0")
 
     compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
