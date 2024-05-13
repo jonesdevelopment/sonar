@@ -37,7 +37,7 @@ allprojects {
 
     // adventure
     compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.16.0")
+    compileOnly("net.kyori:adventure-text-serializer-gson:4.17.0")
 
     compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.8") // caching
