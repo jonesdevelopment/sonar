@@ -94,7 +94,7 @@ verification:
       # - ALWAYS : Les nouveaux joueurs seront toujours montés dans un véhicule (Recommandé)
       # - DURING_ATTACK : Les nouveaux joueurs ne seront montés dans un véhicule que pendant une attaque
       # - NEVER : Les nouveaux joueurs ne seront jamais montés dans un véhicule
-      timing: NEVER
+      timing: ALWAYS
 
     # Fait taper au joueur un code à partir d'une carte virtuelle dans le chat
     map-captcha:
