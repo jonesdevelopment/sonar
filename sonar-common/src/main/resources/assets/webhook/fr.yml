@@ -39,7 +39,7 @@ webhook:
     title-url: ''
     # Description (message) de l'embed
     description:
-      - "L'attaque sur votre serveur a été mitigé".
+      - 'L''attaque sur votre serveur a été mitigé'
       - ''
       - 'Démarré à: <t:%start-timestamp%:T>'
       - 'Fini à: <t:%end-timestamp%:T>'
