@@ -1,0 +1,60 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Besoin d'aide ou d'autres questions ? https://jonesdev.xyz/discord
+# Code source : https://github.com/jonesdevelopment/sonar
+# Droit d'auteur Jones Development, un contributeur Sonar, licence sous GPL-3.0
+#
+
+# Les notifications d'attaque bot peuvent être envoyé à discord via un webhook
+webhook:
+  # Lien du webhook discord (Mettez '' pour désactiver les webhooks)
+  url: ''
+  # Nom d'utilisateur du webhook
+  username: Sonar
+  # Lien vers l'avatar du webhook (Mettez '' pour désactiver)
+  avatar-url: ''
+  # Message à envoyer (Mettez '' pour désactiver)
+  # Vous pouvez mentionner des personnes en utilisant <@idUtilisateur>
+  # Si vous voulez mentionner un rôle vous devriez utiliser <@&idRole>
+  content: ''
+  # Embed qui sera envoyé quand il y a une attaque
+  embed:
+    # Petit footer de l'embed
+    footer:
+      # Message du footer
+      text: © Jones Development et Contributeurs Sonar
+      # Lien de l'icône du footer
+      icon-url: ''
+    # Titre du webhook discord
+    title: '✅ Attaque mitigé'
+    # Lien clickable du titre
+    title-url: ''
+    # Description (message) de l'embed
+    description:
+      - "L'attaque sur votre serveur a été mitigé".
+      - ''
+      - 'Démarré à: <t:%start-timestamp%:T>'
+      - 'Fini à: <t:%end-timestamp%:T>'
+      - 'Durée: %duration%'
+      - ''
+      - 'Pique du processeur: %peak-cpu%%'
+      - 'Pique de la mémoire ram: %peak-memory%'
+      - 'Pique du nombre de bots par secondes: %peak-bps%'
+      - ''
+      - "IP Blacklisté durant l'attaque: %total-blacklisted%"
+      - "Vérification échoué durant l'attaque: %total-failed%"
+      - "Vérification réussi durant l'attaque: %total-success%"
+    # Code couleur RGB pour l'embed
+    # Sélectionner la couleur: https://www.rapidtables.com/web/color/RGB_Color.html
+    color:
+      red: 0
+      green: 255
+      blue: 0
