@@ -88,12 +88,12 @@ verification:
       # - ADVENTURE: ყველა UI კომპონენტი ჩანს
       gamemode: ADVENTURE
 
-    # Checks if the client sends proper packets when mounting a vehicle
+    # ამოწმებს, აგზავნის თუ არა კლიენტი შესაბამის პაკეტებს სატრანსპორტო საშუალებაზე დაჯდომის დროს
     vehicle:
-      # Possible types: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: New players will always be mounted on a vehicle (Recommended)
-      # - DURING_ATTACK: New players will only be mounted on a vehicle during an attack
-      # - NEVER: New players will never be mounted on a vehicle
+      # შესაძლო ტიპები: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: ახალი მოთამაშეები ყოველთვის დაჯდებიან სატრანსპორტო საშუალებაზე
+      # - DURING_ATTACK: ახალი მოთამაშეები მხოლოდ ბოტების შემოტევის დროს დაჯდებიან სატრანსპორტო საშუალებაზე
+      # - NEVER: ახალი მოთამაშეები არასოდეს დაჯდებიან სატრანსპორტო საშუალებაზე (რეკომენდებულია)
       timing: ALWAYS
 
     # დააწერინეთ მოთამაშეს კოდი ჩატში, რომელიც იქნება ნაჩვენები ვირტუალურ მაპზე, რომელიც ხელში ეჭირებად
@@ -104,7 +104,7 @@ verification:
       # - DURING_ATTACK: ახალი მოთამაშებს მოუწევთ CAPTCHA-ს გაკეთება მხოლოდ შეტევის დროს
       # - NEVER: ახალ მოთამაშეებს არასდროს მოუწევთ CAPTCHA-ს გაკეთება (Recommended)
       timing: NEVER
-      # Options for the effects on the image shown to the player
+      # ეფექტების პარამეტრები გამოსახულებაზე, რომელიც აჩვენა მოთამაშეს
       # You should only edit this if you know what you're doing
       effects:
         # Adds random lines to the image
@@ -132,10 +132,11 @@ verification:
           mix: 0.15
       # Path to the background image Sonar uses for the CAPTCHA
       # If the image isn't found, a noise will be used as the default background
+      # You can simply put the name of the file here if file is in the plugin directory
       background: ''
       # Should Sonar automatically detect the background color?
       # This is done to create a contrast between the background image and the text
-      # You can simply put the name of the file here if file is in the plugin directory
+      # If this is disabled, Sonar will use a random gradient for the colors
       auto-color: false
       # რამდენი პასუხი უნდა მოამზადოს Sonar-მა?
       # ეს ხდება ასინქრონულად უკანა ფონზე
@@ -146,10 +147,10 @@ verification:
       # რამდენჯერ ვერ უდნა გაიაროს CAPTCHA მოთამაშემ სანამ ვერიფიკაციას ვერ გაივლის?
       max-tries: 3
       # სიმბოლოები (ასოები და რიცხვები), რომლებიც დაშვებულია გამოჩნდეს CAPTCHA-ს პასუხში
-      # It is not recommended to add numbers or letters that might look like one another
+      # არ არის რეკომენდებული რიცხვების ან ასოების დამატება, რომლებიც შეიძლება ერთმანეთს ჰგავდეს
       dictionary: '1235689'
 
-    #ამოწმებს, აგზავნიან თუ არა მოთამაშეები სერვერზე რეალურ კლიენტის სახელს
+    # ამოწმებს, აგზავნიან თუ არა მოთამაშეები სერვერზე რეალურ კლიენტის სახელს
     client-brand:
       # უნდა შეამოწმოს თუ არა Sonar-მა ნამდვილია თუ არა მოთამაშის კლიენტის სახელი? (რეკომენდებულია)
       enabled: true
@@ -168,22 +169,21 @@ verification:
     # მაქსიმალური რაოდენობა ლოგინ პაკეტების, რომელიც მოთამაშემ უნდა გააგზავნოს სანამ გაიკიკება სერვერიდან
     max-login-packets: 256
 
-  # If enabled, the player will be transferred back to the origin server
-  # after successfully passing the bot verification.
-  # This feature was introduced by Mojang in Minecraft version 1.20.5
+  # თუ ჩართულია, მოთამაშე გადავა საწყისი სერვერში ერიფიკაციის წარმატებით გავლის შემდეგ
+  # ეს ფუნქცია დაემატა Mojang-ის მიერ Minecraft-ის 1.20.5 ვერსიაში
   transfer:
-    # Should Sonar transfer the player to the origin server (instead of kicking them)?
-    # For this to work, you must enable the feature in your server's configuration
-    # Additionally, you might want to reduce the amount of login rate-limiting
-    # performed by Velocity or other proxies/plugins, as this might prevent the
-    # player from being transferred correctly.
+    # უნდა გადაიყვანოს თუ არა Sonar-მა მოთამაშე საწყის სერვერზე (მათი გაკიკვის ნაცვლად)?
+    # ამისთვის, თქვენ უნდა ჩართოთ ეს ფუნქცია თქვენი სერვერის კონფიგურაციაში
+    # დამატებით, შეიძლება გინდოდეთ შეამციროთ შესვლის rate-limiting ი
+    # რომელსაც ახორციელებს Velocity ან სხვა პროქსები/პლაგინები, რადგან ეს შეიძლება ხელს უშლიდეს
+    # მოთამაშის სწორად გადაყვანას
     enabled: false
-    # Which server should Sonar transfer the player to when the verification is passed?
-    # Please enter the server IP that is used by players to normally connect to your server.
-    # For example, you can put "mc.hypixel.net" or a direct IP like "1.1.1.1"
+    # რომელ სერვერზე უნდა გადაიყვანოს Sonar-მა მოთამაშე ვერიფიკაციის გავლის შემდეგ?
+    # გთხოვთ, შეიყვანოთ სერვერის IP მისამართი, რომლითაც მოთამაშეები ჩვეულებრივ უერთდებიან თქვენს სერვერს
+    # მაგალითად, შეგიძლიათ ჩაწეროთ "mc.hypixel.net" ან პირდაპირი IP როგორიცაა "1.1.1.1"
     destination-host: "play.my-server.com"
-    # Which port should Sonar use when transferring the player to the origin server?
-    # If your server does not need a port to connect to, you can leave this as 25565.
+    # რომელი პორტი უნდა გამოიყენოს Sonar-მა მოთამაშის საწყის სერვერზე გადაყვანისას?
+    # თუ თქვენს სერვერს არ სჭირდება პორტი შესასვლელად, შეგიძლიათ დატოვოთ ეს 25565-ზე
     destination-port: 25565
 
   # ჩაიწეროს თუ არა Sonar-მა ახალი ვერიფიკაციის მცდელობები?
