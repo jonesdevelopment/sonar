@@ -22,19 +22,21 @@ import io.netty.channel.ChannelInitializer;
 import lombok.RequiredArgsConstructor;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 import static net.md_5.bungee.netty.PipelineUtils.PACKET_DECODER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
 
 @RequiredArgsConstructor
 public final class FallbackChannelInitializer extends ChannelInitializer<Channel> {
-  private static final Method INIT_CHANNEL_METHOD;
+  private static final MethodHandle INIT_CHANNEL_METHOD;
 
   static {
     try {
-      INIT_CHANNEL_METHOD = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
-      INIT_CHANNEL_METHOD.setAccessible(true);
+      INIT_CHANNEL_METHOD = MethodHandles.privateLookupIn(ChannelInitializer.class, MethodHandles.lookup())
+        .findVirtual(ChannelInitializer.class, "initChannel", MethodType.methodType(void.class, Channel.class));
     } catch (Throwable throwable) {
       throw new ReflectiveOperationException(throwable);
     }
@@ -46,7 +48,7 @@ public final class FallbackChannelInitializer extends ChannelInitializer<Channel
   protected void initChannel(final Channel channel) throws Exception {
     // Invoke the original method
     try {
-      INIT_CHANNEL_METHOD.invoke(originalChannelInitializer, channel);
+      INIT_CHANNEL_METHOD.invokeExact(originalChannelInitializer, channel);
     } catch (Throwable throwable) {
       throw new ReflectiveOperationException(throwable);
     }
