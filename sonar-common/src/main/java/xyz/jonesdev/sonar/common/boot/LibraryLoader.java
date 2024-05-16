@@ -21,12 +21,11 @@ import com.alessiodp.libby.Library;
 import com.alessiodp.libby.LibraryManager;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 
 @UtilityClass
 class LibraryLoader {
-  void loadLibraries(final @NotNull LibraryManager libraryManager) {
+  void loadLibraries(final @NotNull LibraryManager libraryManager, final @NotNull SonarPlatform platform) {
     libraryManager.addMavenCentral();
     libraryManager.addJitPack();
     libraryManager.loadLibraries(
@@ -74,19 +73,19 @@ class LibraryLoader {
         .build()
     );
 
-    // Only load adventure dependencies if needed
-    if (Sonar.get().getPlatform() != SonarPlatform.VELOCITY) {
+    // Only load adventure if not on Velocity
+    if (platform != SonarPlatform.VELOCITY) {
       libraryManager.loadLibraries(
         Library.builder()
           .groupId("net{}kyori")
           .artifactId("adventure-text-minimessage")
-          .version("4.16.0")
+          .version("4.17.0")
           .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
           .build(),
         Library.builder()
           .groupId("net{}kyori")
           .artifactId("adventure-text-serializer-gson")
-          .version("4.16.0")
+          .version("4.17.0")
           .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
           .build()
       );

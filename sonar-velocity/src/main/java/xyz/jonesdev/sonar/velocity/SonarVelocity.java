@@ -40,9 +40,9 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
   public static SonarVelocity INSTANCE;
 
   public SonarVelocity(final @NotNull SonarVelocityPlugin plugin) {
-    super(plugin, new VelocityLibraryManager<>(
-        plugin, plugin.getLogger(), plugin.getDataDirectory(), plugin.getServer().getPluginManager()),
-      plugin.getDataDirectory().toFile(), SonarPlatform.VELOCITY);
+    super(plugin, SonarPlatform.VELOCITY, plugin.getDataDirectory().toFile(),
+      new VelocityLibraryManager<>(plugin, plugin.getLogger(),
+        plugin.getDataDirectory(), plugin.getServer().getPluginManager()));
     INSTANCE = this;
   }
 

@@ -41,7 +41,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
   public static SonarBungee INSTANCE;
 
   public SonarBungee(final @NotNull SonarBungeePlugin plugin) {
-    super(plugin, new BungeeLibraryManager(plugin), plugin.getDataFolder(), SonarPlatform.BUNGEE);
+    super(plugin, SonarPlatform.BUNGEE, plugin.getDataFolder(), new BungeeLibraryManager(plugin));
     INSTANCE = this;
   }
 
