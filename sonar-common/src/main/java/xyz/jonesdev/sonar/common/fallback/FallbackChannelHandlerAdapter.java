@@ -28,7 +28,6 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.util.GeyserDetection;
 
@@ -235,7 +234,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       // Check if the number of online players using the same IP address as
       // the connecting player is greater than the configured amount
       if (Sonar.get().hasTooManyAccounts(inetAddress, maxOnlinePerIp)) {
-        customDisconnect(channel, protocolVersion, FallbackPreparer.tooManyOnlinePerIP, encoder, handler);
+        customDisconnect(channel, protocolVersion, tooManyOnlinePerIP, encoder, handler);
         return;
       }
     }
