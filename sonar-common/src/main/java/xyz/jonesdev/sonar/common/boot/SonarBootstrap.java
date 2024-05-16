@@ -54,27 +54,22 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private Notification notificationHandler;
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
-  private File dataDirectory;
-  private final LibraryManager libraryManager;
   private final SonarStatistics statistics;
   private final SonarPlatform platform;
   private final SubcommandRegistry subcommandRegistry;
   private final SystemTimer launchTimer = new SystemTimer();
 
   public SonarBootstrap(final @NotNull T plugin,
-                        final LibraryManager libraryManager,
-                        final File dataDirectory,
-                        final SonarPlatform platform) {
+                        final @NotNull SonarPlatform platform,
+                        final @NotNull File dataDirectory,
+                        final @NotNull LibraryManager libraryManager) {
+    // Load all libraries before anything else
+    LibraryLoader.loadLibraries(libraryManager, platform);
     // Set the Sonar API
     SonarSupplier.set(this);
-    // Store our library manager for the API
-    this.libraryManager = libraryManager;
     // Set the plugin instance
     this.plugin = plugin;
-    this.dataDirectory = dataDirectory;
     this.platform = platform;
-    // Load all libraries before anything else
-    LibraryLoader.loadLibraries(libraryManager);
     // Load the rest of the components
     this.statistics = new GlobalSonarStatistics();
     this.verboseHandler = new Verbose();

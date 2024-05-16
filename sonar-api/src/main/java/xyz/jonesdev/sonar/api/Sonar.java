@@ -33,7 +33,6 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.UUID;
@@ -62,8 +61,6 @@ public interface Sonar {
    * @return A small wrapper for the plugin logger so we can use the logger everywhere
    */
   @NotNull LoggerWrapper getLogger();
-
-  @NotNull File getDataDirectory();
 
   @NotNull SonarConfiguration getConfig();
 
