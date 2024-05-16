@@ -178,8 +178,10 @@ public abstract class SonarBootstrap<T> implements Sonar {
     getLogger().info("Starting shutdown process...");
     // Interrupt threads
     SonarServiceThreadManager.stop();
-    // Close database connection
-    verifiedPlayerController.close();
+    // Close database connection if present
+    if (verifiedPlayerController != null) {
+      verifiedPlayerController.close();
+    }
     // Run the per-platform disable method
     disable();
     // Thank the user for using Sonar

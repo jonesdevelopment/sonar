@@ -117,7 +117,9 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
   @Override
   public void disable() {
-    // Make sure to properly shutdown bStats metrics
-    metrics.shutdown();
+    if (metrics != null) {
+      // Make sure to properly shutdown bStats metrics
+      metrics.shutdown();
+    }
   }
 }
