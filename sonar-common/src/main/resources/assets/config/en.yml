@@ -28,7 +28,7 @@ attack-tracker:
   # Amount of time that has to pass in order for an attack to be over
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   min-attack-duration: 30000
-  # Number of times an incident has to be reported in order to be acknowledged as an attack
+  # Number of times an incident has to be reported to be acknowledged as an attack
   # This number acts as a buffer to filter out false attack notifications
   min-attack-threshold: 2
   # Amount of time that has to pass in order for a new attack to be detected
@@ -71,7 +71,7 @@ verification:
   timing: ALWAYS
   checks:
     # Checks if the players' falling motion is following Minecraft's gravity formula
-    # All predicted motions are precalculated in order to save performance
+    # All predicted motions are precalculated to save performance
     gravity:
       # Should Sonar check for valid client gravity? (Recommended)
       enabled: true
@@ -79,7 +79,7 @@ verification:
       check-collisions: true
       # Should Sonar make the player solve a CAPTCHA if they fail the gravity check?
       captcha-on-fail: false
-      # Maximum number of ticks the player has to fall in order to be allowed to hit the platform
+      # Maximum number of ticks the player has to fall to be allowed to hit the platform
       max-movement-ticks: 8
       # The gamemode of the player during verification
       # Possible types: SURVIVAL, CREATIVE, ADVENTURE
@@ -132,7 +132,7 @@ verification:
           mix: 0.15
       # Path to the background image Sonar uses for the CAPTCHA
       # If the image isn't found, a noise will be used as the default background
-      # You can simply put the name of the file here if file is in the plugin directory
+      # You can put the name of the file here if the file is in the plugin directory
       background: ''
       # Should Sonar automatically detect the background color?
       # This is done to create a contrast between the background image and the text
@@ -150,7 +150,7 @@ verification:
       # It is not recommended to add numbers or letters that might look like one another
       dictionary: '1235689'
 
-    # Checks if the players is sending a valid client brand to the server
+    # Checks if the players are sending a valid client brand to the server
     client-brand:
       # Should Sonar check for valid client brands? (Recommended)
       enabled: true
@@ -163,7 +163,7 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex for validating client locale during verification
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Ping a player has to have in order to timeout
+    # Ping a player has to have to timeout
     # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
     max-ping: 10000
     # Maximum number of login packets the player has to send in order to be kicked
