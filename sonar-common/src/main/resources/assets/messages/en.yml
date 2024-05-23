@@ -24,7 +24,7 @@ header:
 # Placeholder for every '%footer%' in this configuration file
 footer:
   - <gray>If you believe that this is an error, contact an administrator.
-# Disconnect message that is shown when someone joins but there are too many online players with their IP address
+# Disconnect message that is shown when someone joins, but there are too many online players with their IP address
 too-many-online-per-ip:
   - '%header%'
   - <red>There are too many players online with your IP address.
@@ -32,21 +32,21 @@ too-many-online-per-ip:
 
 # Translations for commands
 commands:
-  # Message that is shown when a player tries running /sonar without permission
+  # Message shown when a player tries running /sonar without permission
   no-permission: '%prefix%<red>You do not have permission to execute this command.'
-  # Message that is shown when someone uses a command incorrectly
+  # Message shown when someone uses a command incorrectly
   incorrect-usage: '%prefix%<red>Usage: /sonar %usage%'
-  # Message that is shown when someone provides an invalid IP address (Invalid format)
+  # Message shown when someone provides an invalid IP address (Invalid format)
   invalid-ip-address: '%prefix%The IP address you provided seems to be invalid.'
-  # Message that is shown when the console runs a command that is player-only
+  # Message shown when the console runs a command that is player-only
   player-only: '%prefix%<red>You can only execute this command as a player.'
-  # Message that is shown when a player runs a command that is console-only
+  # Message shown when a player runs a command that is console-only
   console-only: '%prefix%<red>For security reasons, you can only execute this command
     through console.'
-  # Message that is shown when a player executes Sonar commands too quickly
+  # Message shown when a player executes Sonar commands too quickly
   cool-down: '%prefix%<red>You can only execute this command every 0.5 seconds.'
   cool-down-left: '%prefix%<red>Please wait another <bold>%time-left%s<reset><red>.'
-  # Message that is shown when a player does not have permission to execute a certain subcommand
+  # Message shown when a player does not have permission to execute a certain subcommand
   subcommand-no-permission: '%prefix%<red>You do not have permission to execute this
     subcommand. <gray>(%permission%)'
 
@@ -71,73 +71,73 @@ commands:
 
   # Translations for '/sonar reload'
   reload:
-    # Message that is shown when someone starts reloading Sonar
+    # Message shown when someone starts reloading Sonar
     start: '%prefix%Reloading Sonar...'
-    # Message that is shown when Sonar has finished reloading
+    # Message shown when Sonar has finished reloading
     finish: '%prefix%<green>Successfully reloaded <gray>(%taken%ms)'
 
   # Translations for '/sonar verbose'
   verbose:
-    # Message that is shown when a player subscribes to Sonar verbose
+    # Message shown when a player subscribes to Sonar verbose
     subscribed: '%prefix%You are now viewing Sonar verbose.'
-    # Message that is shown when a player unsubscribes from Sonar verbose
+    # Message shown when a player unsubscribes from Sonar verbose
     unsubscribed: '%prefix%You are no longer viewing Sonar verbose.'
 
   # Translations for '/sonar notify'
   notify:
-    # Message that is shown when a player subscribes to Sonar attack notifications
+    # Message shown when a player subscribes to Sonar attack notifications
     subscribed: '%prefix%You are now viewing Sonar attack notifications.'
-    # Message that is shown when a player unsubscribes from Sonar attack notifications
+    # Message shown when a player unsubscribes from Sonar attack notifications
     unsubscribed: '%prefix%You are no longer viewing Sonar attack notifications.'
 
   # Translations for '/sonar blacklist'
   blacklist:
-    # Message that is shown when someone tries clearing the blacklist but is empty
+    # Message shown when someone tries clearing the blacklist but is empty
     empty: '%prefix%The blacklist is currently empty. Therefore, no IP addresses were
       removed from the blacklist.'
-    # Message that is shown when someone clears the blacklist
+    # Message shown when someone clears the blacklist
     cleared: '%prefix%You successfully removed a total of %removed% IP address(es)
       from the blacklist.'
-    # Message that is shown when someone checks the size of the blacklist
+    # Message shown when someone checks the size of the blacklist
     size: '%prefix%The blacklist currently contains %amount% IP address(es).'
-    # Message that is shown when someone adds an IP address to the blacklist
+    # Message shown when someone adds an IP address to the blacklist
     added: '%prefix%Successfully added %ip% to the blacklist.'
-    # Message that is shown when someone adds an IP address to the blacklist that is verified
+    # Message shown when someone adds an IP address to the blacklist that is verified
     added-warning: '%prefix%<red>Warning: <white>%ip% is currently whitelisted. Consider
       removing the IP address from the list of verified players to avoid potential
       issues.'
-    # Message that is shown when someone removes an IP address from the blacklist
+    # Message shown when someone removes an IP address from the blacklist
     removed: '%prefix%Successfully removed %ip% from the blacklist.'
-    # Message that is shown when someone adds an IP address to the blacklist, but it is already blacklisted
+    # Message shown when someone adds an IP address to the blacklist, but it is already blacklisted
     duplicate-ip: '%prefix%The IP address you provided is already blacklisted.'
-    # Message that is shown when someone removes an IP address from the blacklist, but it is not blacklisted
+    # Message shown when someone removes an IP address from the blacklist, but it is not blacklisted
     ip-not-found: '%prefix%The IP address you provided is not blacklisted.'
 
   # Translations for '/sonar verified'
   verified:
-    # Message that is shown when someone tries clearing the list of verified players but is empty
+    # Message shown when someone tries clearing the list of verified players but is empty
     empty: '%prefix%The list of verified players is currently empty. Therefore, no
       players were unverified.'
-    # Message that is shown when someone clears the list of verified players
+    # Message shown when someone clears the list of verified players
     cleared: '%prefix%You successfully unverified a total of %removed% unique player(s).'
-    # Message that is shown when someone checks the size of the list of verified players
+    # Message shown when someone checks the size of the list of verified players
     size: '%prefix%There are currently %amount% unique player(s) verified.'
-    # Message that is shown when someone un-verifies an IP address
+    # Message shown when someone un-verifies an IP address
     removed: '%prefix%Successfully unverified %ip%.'
-    # Message that is shown when someone verifies an IP address
+    # Message shown when someone verifies an IP address
     added: '%prefix%Successfully verified %ip%.'
-    # Message that is shown when someone tries to verify an IP address/UUID that are already verified
+    # Message shown when someone tries to verify an IP address/UUID that are already verified
     already: '%prefix%The IP address and UUID you provided are already verified.'
-    # Message that is shown when someone un-verifies an IP address, but it is not verified
+    # Message shown when someone un-verifies an IP address, but it is not verified
     ip-not-found: '%prefix%The IP address you provided is not verified.'
-    # Message that is shown when someone tries un-verifying the same IP address twice (double operation)
+    # Message shown when someone tries un-verifying the same IP address twice (double operation)
     blocked: '%prefix%Please wait for the current operation to finish.'
 
   # Translations for '/sonar statistics'
   statistics:
     # Informational message that is shown above everything when viewing the statistics
     header: '%prefix%Showing %type% statistics for this session:'
-    # Message that is shown when a player tries viewing an unknown statistic
+    # Message shown when a player tries viewing an unknown statistic
     unknown-type: '%prefix%<red>Unknown statistics type! Available statistics: <gray>%statistics%'
     # Format of the general statistics message
     general:
@@ -174,21 +174,21 @@ commands:
 verification:
   # Translations for all debug messages during the verification
   logs:
-    # Message that is logged to console whenever a new player joins the server
+    # Message logged to console whenever a new player joins the server
     connection: '%name%%ip% (%protocol%) has connected.'
-    # Message that is logged to console whenever a player fails verification
+    # Message logged to console whenever a player fails verification
     failed: '%ip% (%protocol%) has failed the bot check for: %reason%'
-    # Message that is logged to console whenever a player is blacklisted
+    # Message logged to console whenever a player is blacklisted
     blacklisted: '%ip% (%protocol%) was blacklisted for too many failed attempts'
-    # Message that is logged to console whenever a player is verified
+    # Message logged to console whenever a player is verified
     successful: '%name% has been verified successfully (%time%s!).'
 
   # Messages that are shown to the player when they are supposed to enter the CAPTCHA
   captcha:
-    # Message that is shown to the player when they have to enter the answer to the captcha
+    # Message shown to the player when they have to enter the answer to the captcha
     enter-code: '%prefix%<green>Please enter the code in chat that is displayed on
       the map.'
-    # Message that is shown to the player when they enter the wrong answer in chat
+    # Message shown to the player when they enter the wrong answer in chat
     incorrect: '%prefix%<red>You have entered the wrong code. Please try again.'
 
   # Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet

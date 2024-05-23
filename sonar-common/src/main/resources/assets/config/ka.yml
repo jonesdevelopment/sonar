@@ -66,7 +66,7 @@ verification:
   # როდის უნდა გადაამოწმოს Sonar-მა ახალი მოთამაშეები?
   # შესაძლო ტიპები: ALWAYS, DURING_ATTACK, NEVER
   # - ALWAYS: ახალი მოთამაშეები ყოველთვის მოწმდება (რეკომენდებულია)
-  # - DURING_ATTACK: ახალი მოთამაშეები შემოწმდებიან მხოლოდ შეტევის დროს
+  # - DURING_ATTACK: ახალი მოთამაშეები შემოწმდებიან მხოლოდ შეტევის დროსდროს
   # - NEVER: ახალი მოთამაშეები არასოდეს შემოწმდებიან
   timing: ALWAYS
   checks:
@@ -105,38 +105,38 @@ verification:
       # - NEVER: ახალ მოთამაშეებს არასდროს მოუწევთ CAPTCHA-ს გაკეთება (Recommended)
       timing: NEVER
       # ეფექტების პარამეტრები გამოსახულებაზე, რომელიც აჩვენა მოთამაშეს
-      # You should only edit this if you know what you're doing
+      # თქვენ უნდა შეცვალოთ ეს მხოლოდ იმ შემთხვევაში, თუ იცით, რას აკეთებთ
       effects:
-        # Adds random lines to the image
+        # მატებს შემთხვევითი ხაზების ეფექტს გამოსახულებაზე
         scratches: true
-        # Applies a ripple filter (wavy effect)
+        # აყენებს ტალღური ეფექტის ფილტრს (ტალღისებური ეფექტი)
         ripple: true
-        # Applies a bump filter (sharpened text)
+        # აყენებს ამობურცული ტექსტის ფილტრს (გამხრწნილი ტექსტი)
         bump: true
-        # Distortion filter
+        # დამახინჯების ფილტრი
         distortion:
-          # Should Sonar apply a distortion filter?
+          # უნდა დაამატოს თუ არა Sonar-მა დამახინჯების ფილტრი?
           enabled: true
-          # What shape should Sonar use for the distortion filter?
-          # Possible types: 0, 1, 2, 3
-          # - 0: Crosses
-          # - 1: Lines
-          # - 2: Circles
-          # - 3: Squares
+          # რა ფორმას უნდა გამოიყენოს Sonar-მა დამახინჯების ფილტრისთვის?
+          # შესაძლო ტიპები: 0, 1, 2, 3
+          # - 0: ჯვრები
+          # - 1: ხაზები
+          # - 2: წრეები
+          # - 3: კვადრატები
           shape: 2
-          # Distance between distorted pixels/objects
+          # მანძილი დამახინჯებულ პიქსელებს/ობიექტებს შორის
           distance: 5
-          # Density of the distorted pixels/objects
+          # დამახინჯებული პიქსელების/ობიექტების სიხშირე
           density: 0.1
-          # Amount of blending between the colors of objects
+          # შერევის ხარისხი ობიექტების ფერებს შორის
           mix: 0.15
-      # Path to the background image Sonar uses for the CAPTCHA
-      # If the image isn't found, a noise will be used as the default background
-      # You can simply put the name of the file here if file is in the plugin directory
+      # CAPTCHA-სთვის Sonar-ის მიერ გამოყენებული ფონური გამოსახულების ბილიკი
+      # თუ გამოსახულება არ მოიძებნა, ფონად გამოყენებული იქნება noise ი
+      # შეგიძლიათ უბრალოდ ჩაწეროთ ფაილის სახელი, თუ ის პლაგინის დირექტორიაშია
       background: ''
-      # Should Sonar automatically detect the background color?
-      # This is done to create a contrast between the background image and the text
-      # If this is disabled, Sonar will use a random gradient for the colors
+      # უნდა განსაზღვროს თუ არა Sonar-მა ავტომატურად ფონის ფერი?
+      # ეს კეთდება იმისთვის, რომ შეიქმნას კონტრასტი ფონის გამოსახულებასა და ტექსტს შორის
+      # თუ ეს გამორთულია, Sonar-ი გამოიყენებს შემთხვევით გრადიენტს ფერებისთვის
       auto-color: false
       # რამდენი პასუხი უნდა მოამზადოს Sonar-მა?
       # ეს ხდება ასინქრონულად უკანა ფონზე
@@ -193,9 +193,9 @@ verification:
   # ჩაიწეროს თუ არა Sonar-მა ყოველი მოძრაობა/პოზიცია ვერიფიკაციის დროს?
   # ეს არ არის რეკომენდირებული აქტიურ სერვერებისთვის, მაგრამ შეიძლება გამოსადეგი იყოს ცრუ პოსიტივების გამოსასწორებლად.
   debug-xyz-positions: false
-  # Should Sonar also check Geyser (Bedrock) players?
-  # This feature is experimental and might cause issues
-  # If this is disabled, Bedrock players will be skipped
+  # უნდა შეამოწმოს თუ არა Sonar-მა Geyser (Bedrock) მოთამაშეები?
+  # ეს ფუნქცია ექსპერიმენტულია და შეიძლება გამოიწვიოს პრობლემები
+  # თუ ეს გამორთულია, Bedrock მოთამაშეები გამოვლენილი იქნება
   check-geyser-players: true
   # დროის ოდენობა, რომელიც უნდა გავიდეს, სანამ მოთამაშე ტაიმაუტდება სერვერიდან.
   # (ეს არის ნაჩვენები მილიწამებში: 1 წამი = 1000 მილიწამი)
@@ -203,7 +203,7 @@ verification:
   # რამდენ ხანს უნდა დაელოდოს მოთამაშე ვერიფიკაციის დროს ხელახლა დაკავშირებამდე?
   # (ეს არის ნაჩვენები მილიწამებში: 1 წამი = 1000 მილიწამი)
   rejoin-delay: 8000
-  # How long should Sonar remember the amount of failed verifications for a player?
+  # რამდენ ხანს უნდა ახსოვდეს Sonar-ს მოთამაშე რამდენჯერ იყო წარუმატებელი ვერიფიკაციის დროს?
   # (ეს არის ნაჩვენები მილიწამებში: 1 წამი = 1000 მილიწამი)
   remember-time: 120000
   # რამდენ ხნით უნდა აეკრძალოს IP მისამართს შესვლა, როდესაც ვერიფიკაციას ძალიან ხშირად ვერ აკეთებს?

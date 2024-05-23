@@ -294,7 +294,7 @@ notifications:
   # Lay-out voor de titel van de aanval meldingen van Sonar
   title: <yellow><b>Sonar<reset>
   # Lay-out voor de ondertitel van Sonar's aanval meldingen
-  subtitle: <gray>A bot attack has been detected
+  subtitle: <gray>Er is een bot-aanval gedetecteerd
   # Lay-out voor de aanval meldingen van Sonar in de chat
   chat:
     - ''
