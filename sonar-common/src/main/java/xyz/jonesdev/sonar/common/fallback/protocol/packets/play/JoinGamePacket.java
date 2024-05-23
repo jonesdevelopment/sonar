@@ -47,7 +47,7 @@ public final class JoinGamePacket implements FallbackPacket {
   private String levelName;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeInt(entityId);
 
     if (protocolVersion.inBetween(MINECRAFT_1_7_2, MINECRAFT_1_7_6)) {

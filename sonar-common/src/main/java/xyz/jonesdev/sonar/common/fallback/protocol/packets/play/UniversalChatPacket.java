@@ -56,7 +56,7 @@ public final class UniversalChatPacket implements FallbackPacket {
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     // Serialized message
     componentHolder.write(byteBuf, protocolVersion);
 
@@ -77,7 +77,7 @@ public final class UniversalChatPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     message = readString(byteBuf, 256);
 
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {

@@ -40,7 +40,7 @@ public final class PluginMessagePacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     channel = readString(byteBuf, 512);
 
     if (protocolVersion.compareTo(MINECRAFT_1_13) >= 0) {

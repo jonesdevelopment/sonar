@@ -51,7 +51,7 @@ public final class ClientSettingsPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     locale = readString(byteBuf, 16);
     viewDistance = byteBuf.readByte();
     chatVisibility = readVarInt(byteBuf);

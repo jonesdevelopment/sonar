@@ -38,7 +38,7 @@ public final class SetExperiencePacket implements FallbackPacket {
   private int totalExperience;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeFloat(experienceBar);
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
       byteBuf.writeShort(level);

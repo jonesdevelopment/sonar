@@ -39,7 +39,7 @@ public final class PlayerPositionIdlePacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     onGround = byteBuf.readBoolean();
   }
 }

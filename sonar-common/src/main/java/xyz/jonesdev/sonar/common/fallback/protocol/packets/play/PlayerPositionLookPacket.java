@@ -64,10 +64,10 @@ public final class PlayerPositionLookPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
       y = byteBuf.readDouble(); // Account for weird y positions on 1.7
     }
     z = byteBuf.readDouble();
@@ -78,7 +78,7 @@ public final class PlayerPositionLookPacket implements FallbackPacket {
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 41 : 33;
+    return protocolVersion.compareTo(MINECRAFT_1_8) < 0 ? 41 : 33;
   }
 
   @Override

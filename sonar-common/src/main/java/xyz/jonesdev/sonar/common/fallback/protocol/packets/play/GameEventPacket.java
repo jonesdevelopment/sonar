@@ -33,7 +33,7 @@ public final class GameEventPacket implements FallbackPacket {
   private float value;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeByte(type);
     byteBuf.writeFloat(value);
   }

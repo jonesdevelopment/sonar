@@ -35,7 +35,7 @@ public final class ClientAbilitiesPacket implements FallbackPacket {
   private float flySpeed, walkSpeed;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeByte(encodedFlags);
     byteBuf.writeFloat(flySpeed);
     byteBuf.writeFloat(walkSpeed);

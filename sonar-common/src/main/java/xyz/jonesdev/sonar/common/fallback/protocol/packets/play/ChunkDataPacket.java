@@ -66,7 +66,7 @@ public final class ChunkDataPacket implements FallbackPacket {
   }
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeInt(x);
     byteBuf.writeInt(z);
 
