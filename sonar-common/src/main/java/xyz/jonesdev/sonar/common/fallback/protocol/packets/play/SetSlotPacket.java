@@ -44,7 +44,7 @@ public final class SetSlotPacket implements FallbackPacket {
     .build();
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeByte(0); // windowId
 
     if (protocolVersion.compareTo(MINECRAFT_1_17_1) >= 0) {

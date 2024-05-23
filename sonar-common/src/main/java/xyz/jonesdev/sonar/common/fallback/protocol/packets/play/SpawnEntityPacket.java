@@ -39,7 +39,7 @@ public final class SpawnEntityPacket implements FallbackPacket {
   private double x, y, z;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     writeVarInt(byteBuf, entityId);
 
     final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_8) > 0;

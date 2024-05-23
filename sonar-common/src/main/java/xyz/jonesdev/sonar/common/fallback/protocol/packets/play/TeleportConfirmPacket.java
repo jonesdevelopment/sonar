@@ -40,7 +40,7 @@ public final class TeleportConfirmPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     teleportId = readVarInt(byteBuf);
   }
 }

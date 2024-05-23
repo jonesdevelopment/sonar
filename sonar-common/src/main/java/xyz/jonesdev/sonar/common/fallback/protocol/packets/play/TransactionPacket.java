@@ -37,7 +37,7 @@ public final class TransactionPacket implements FallbackPacket {
   private boolean accepted;
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
       windowId = byteBuf.readByte();
       transactionId = byteBuf.readShort();
@@ -51,7 +51,7 @@ public final class TransactionPacket implements FallbackPacket {
   }
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
       byteBuf.writeByte(windowId);
       byteBuf.writeShort((short) transactionId);

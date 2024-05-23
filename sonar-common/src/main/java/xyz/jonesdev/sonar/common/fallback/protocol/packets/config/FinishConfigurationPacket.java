@@ -18,11 +18,9 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
 
 import io.netty.buffer.ByteBuf;
-import lombok.ToString;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-@ToString
 public final class FinishConfigurationPacket implements FallbackPacket {
 
   @Override
@@ -35,6 +33,7 @@ public final class FinishConfigurationPacket implements FallbackPacket {
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    // This packet is always empty; see https://wiki.vg/Protocol#Finish_Configuration
     return 0;
   }
 }

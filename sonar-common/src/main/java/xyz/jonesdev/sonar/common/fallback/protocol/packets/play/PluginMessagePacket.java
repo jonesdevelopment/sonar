@@ -24,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readRetainedByteBufSlice17;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readString;
 
 @Getter
 @ToString
@@ -40,12 +40,8 @@ public final class PluginMessagePacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    channel = readString(byteBuf, 512);
-
-    if (protocolVersion.compareTo(MINECRAFT_1_13) >= 0) {
-      channel = transformLegacyToModernChannel(channel);
-    }
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
+    channel = readString(byteBuf, 64);
 
     if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
       slicedBuffer = byteBuf.readRetainedSlice(byteBuf.readableBytes());

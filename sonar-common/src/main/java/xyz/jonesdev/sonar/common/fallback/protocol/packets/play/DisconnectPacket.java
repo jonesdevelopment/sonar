@@ -37,7 +37,7 @@ public final class DisconnectPacket implements FallbackPacket {
   private boolean login;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     componentHolder.write(byteBuf, login ? ProtocolVersion.MINECRAFT_1_20_2 : protocolVersion);
   }
 
@@ -46,8 +46,7 @@ public final class DisconnectPacket implements FallbackPacket {
     throw new UnsupportedOperationException();
   }
 
-  public static @NotNull DisconnectPacket create(final @NotNull Component component,
-                                                 final boolean login) {
-    return new DisconnectPacket(new ComponentHolder(component), login);
+  public static @NotNull DisconnectPacket create(final @NotNull Component component, final boolean duringLogin) {
+    return new DisconnectPacket(new ComponentHolder(component), duringLogin);
   }
 }

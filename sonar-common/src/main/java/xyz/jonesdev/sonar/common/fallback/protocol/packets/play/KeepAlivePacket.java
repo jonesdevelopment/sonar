@@ -39,7 +39,7 @@ public final class KeepAlivePacket implements FallbackPacket {
   private long id;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
       byteBuf.writeLong(id);
     } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
@@ -50,7 +50,7 @@ public final class KeepAlivePacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
       id = byteBuf.readLong();
     } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {

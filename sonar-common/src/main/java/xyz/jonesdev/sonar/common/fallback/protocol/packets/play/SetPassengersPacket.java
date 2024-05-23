@@ -36,7 +36,7 @@ public final class SetPassengersPacket implements FallbackPacket {
   private int entityId, passengerId;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     // You can find this in the EntityAttach packet,
     // which was later replaced by SetPassengers in 1.9+
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_9) < 0) {

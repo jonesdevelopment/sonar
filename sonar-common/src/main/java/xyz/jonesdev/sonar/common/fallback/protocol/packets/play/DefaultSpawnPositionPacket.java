@@ -37,7 +37,7 @@ public final class DefaultSpawnPositionPacket implements FallbackPacket {
   private int x, y, z;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
       byteBuf.writeInt(x);
       byteBuf.writeInt(y);

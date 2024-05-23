@@ -40,7 +40,7 @@ public final class PlayerInputPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     sideways = byteBuf.readFloat();
     forward = byteBuf.readFloat();
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {

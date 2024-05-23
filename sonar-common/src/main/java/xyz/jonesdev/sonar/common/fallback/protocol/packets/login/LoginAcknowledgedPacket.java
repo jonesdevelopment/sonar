@@ -34,7 +34,7 @@ public final class LoginAcknowledgedPacket implements FallbackPacket {
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/LoginAcknowledgedPacket.java#L41
+    // This packet is always empty; see https://wiki.vg/Protocol#Login_Acknowledged
     return 0;
   }
 }

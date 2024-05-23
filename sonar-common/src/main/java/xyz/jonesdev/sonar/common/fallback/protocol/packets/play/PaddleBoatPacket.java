@@ -39,7 +39,7 @@ public final class PaddleBoatPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     leftPaddle = byteBuf.readBoolean();
     rightPaddle = byteBuf.readBoolean();
   }

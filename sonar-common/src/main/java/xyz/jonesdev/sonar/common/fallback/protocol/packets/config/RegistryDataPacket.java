@@ -41,7 +41,7 @@ public final class RegistryDataPacket implements FallbackPacket {
   private List<RegistryDataPacket.Bundle> bundles;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_5) < 0) {
       writeNamelessCompoundTag(byteBuf, tag);
     } else if (type != null) {

@@ -38,7 +38,7 @@ public final class TransferPacket implements FallbackPacket {
   private int destinationPort;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     writeString(byteBuf, destinationHost);
     writeVarInt(byteBuf, destinationPort);
   }

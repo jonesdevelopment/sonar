@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+
 @Getter
 @ToString
 @NoArgsConstructor
@@ -40,10 +42,10 @@ public final class PlayerPositionPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
       y = byteBuf.readDouble(); // Account for weird y positions on 1.7
     }
     z = byteBuf.readDouble();
@@ -52,7 +54,7 @@ public final class PlayerPositionPacket implements FallbackPacket {
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    return protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0 ? 33 : 25;
+    return protocolVersion.compareTo(MINECRAFT_1_8) < 0 ? 33 : 25;
   }
 
   @Override
