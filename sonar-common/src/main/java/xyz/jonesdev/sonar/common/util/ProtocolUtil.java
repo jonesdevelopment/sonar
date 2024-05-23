@@ -31,21 +31,15 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
-// Taken from
+// Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
 public class ProtocolUtil {
   private static final int FORGE_MAX_ARRAY_LENGTH = Integer.MAX_VALUE & 0x1FFF9A;
 
-  private static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
-  private static final String BRAND_CHANNEL = "minecraft:brand";
-  private static final String REGISTER_CHANNEL_LEGACY = "REGISTER";
-  private static final String REGISTER_CHANNEL = "minecraft:register";
-  private static final String UNREGISTER_CHANNEL_LEGACY = "UNREGISTER";
-  private static final String UNREGISTER_CHANNEL = "minecraft:unregister";
-  private static final Pattern INVALID_IDENTIFIER_REGEX = Pattern.compile("[^a-z0-9\\-_]*");
+  public static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
+  public static final String BRAND_CHANNEL = "minecraft:brand";
 
   public static int readVarInt(final ByteBuf byteBuf) {
     int read = readVarIntSafely(byteBuf);
@@ -247,7 +241,7 @@ public class ProtocolUtil {
     }
   }
 
-  public static void writeCompoundTag(final ByteBuf byteBuf, final CompoundBinaryTag compoundTag) {
+  public static void writeCompoundTag(final @NotNull ByteBuf byteBuf, final @NotNull CompoundBinaryTag compoundTag) {
     try {
       BinaryTagIO.writer().write(compoundTag, (DataOutput) new ByteBufOutputStream(byteBuf));
     } catch (IOException exception) {
@@ -308,26 +302,6 @@ public class ProtocolUtil {
     final int length = readExtendedForgeShort(byteBuf);
     checkFrame(length <= FORGE_MAX_ARRAY_LENGTH, "Too long");
     return byteBuf.readRetainedSlice(length);
-  }
-
-  public static @NotNull String transformLegacyToModernChannel(@NotNull final String name) {
-    if (name.indexOf(':') != -1) {
-      return name;
-    }
-
-    switch (name) {
-      case REGISTER_CHANNEL_LEGACY:
-        return REGISTER_CHANNEL;
-      case UNREGISTER_CHANNEL_LEGACY:
-        return UNREGISTER_CHANNEL;
-      case BRAND_CHANNEL_LEGACY:
-        return BRAND_CHANNEL;
-      case "BungeeCord":
-        return "bungeecord:main";
-      default:
-        final String lower = name.toLowerCase();
-        return "legacy:" + INVALID_IDENTIFIER_REGEX.matcher(lower).replaceAll("");
-    }
   }
 
   private void checkFrame(final boolean expression, final String message) {

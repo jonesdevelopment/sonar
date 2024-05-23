@@ -51,6 +51,8 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_
 import static xyz.jonesdev.sonar.api.fallback.FallbackUserState.*;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL_LEGACY;
 
 public final class FallbackVerificationHandler implements FallbackPacketListener {
   private static final Random RANDOM = new Random();
@@ -398,7 +400,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
       checkFrame(validateClientLocale(user, clientSettings.getLocale()), "invalid locale");
 
       // Clients sometimes mess up the ClientSettings or PluginMessage packet.
-      // Probably caused by some weird race condition in Minecraft 1.13+
+      // Probably caused by some race condition in Minecraft 1.13+
       if (user.getState() == CLIENT_SETTINGS) {
         user.setState(PLUGIN_MESSAGE);
       }
@@ -411,9 +413,11 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
     if (packet instanceof PluginMessagePacket) {
       final PluginMessagePacket pluginMessage = (PluginMessagePacket) packet;
 
+      final boolean usingModernChannel = pluginMessage.getChannel().equals(BRAND_CHANNEL);
+      final boolean usingLegacyChannel = pluginMessage.getChannel().equals(BRAND_CHANNEL_LEGACY);
+
       // Only the brand channel is important, drop the rest
-      if (pluginMessage.getChannel().equals("MC|Brand")
-        || pluginMessage.getChannel().equals("minecraft:brand")) {
+      if (usingModernChannel || usingLegacyChannel) {
         // Check if the brand packet was sent twice,
         // which is not possible when using a vanilla Minecraft client.
         checkFrame(!resolvedClientBrand, "duplicate client brand packet");
@@ -422,7 +426,7 @@ public final class FallbackVerificationHandler implements FallbackPacketListener
         // system ('minecraft:' + channel) and anything below 1.13 uses
         // the legacy namespace system ('MC|' + channel).
         final boolean v1_13 = user.getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0;
-        checkFrame(pluginMessage.getChannel().equals("MC|Brand") || v1_13, "invalid channel");
+        checkFrame(usingLegacyChannel || v1_13, "invalid channel");
 
         // Validate the client branding using a regex to filter unwanted characters.
         if (Sonar.get().getConfig().getVerification().getBrand().isEnabled()) {
