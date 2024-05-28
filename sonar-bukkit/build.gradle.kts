@@ -1,13 +1,12 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
-  id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
+  id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply true
 }
-
-apply(plugin = "net.minecrell.plugin-yml.bukkit")
 
 bukkit {
   name = rootProject.name
+  description = rootProject.description
   version = rootProject.version.toString().split("-")[0]
   main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
   authors = listOf("Jones Development", "Sonar Contributors")
@@ -33,21 +32,14 @@ dependencies {
   implementation(project(":api"))
   implementation(project(":common"))
 
-  // adventure platform support
-  implementation("net.kyori:adventure-platform-bukkit:4.3.2")
-  implementation("net.kyori:adventure-platform-api:4.3.2")
-  implementation("net.kyori:adventure-platform-facet:4.3.2")
-  // adventure nbt
-  implementation("net.kyori:adventure-nbt:4.17.0")
+  compileOnly(rootProject.libs.spigot)
 
-  // We have to use 1.8 for backwards compatibility
-  compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
-
-  // Implement bStats.org for metrics
-  implementation("org.bstats:bstats-bukkit:3.0.2")
-
-  // Library/dependency loading
-  implementation("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")
+  implementation(rootProject.libs.adventure.platform.bukkit)
+  implementation(rootProject.libs.adventure.platform.api)
+  implementation(rootProject.libs.adventure.platform.facet)
+  implementation(rootProject.libs.adventure.nbt)
+  implementation(rootProject.libs.bstats.bukkit)
+  implementation(rootProject.libs.libby.bukkit)
 }
 
 tasks {

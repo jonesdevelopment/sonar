@@ -1,16 +1,8 @@
-buildscript {
-  dependencies {
-    classpath("gradle.plugin.io.toolebox:gradle-git-versioner:1.6.7")
-  }
-}
-
 plugins {
-  id("java")
-  id("io.github.goooler.shadow") version "8.1.7"
-  id("io.toolebox.git-versioner") version "1.6.7"
+  java
+  alias(libs.plugins.shadow)
+  alias(libs.plugins.versioner) apply true
 }
-
-apply(plugin = "io.toolebox.git-versioner")
 
 versioner {
   pattern {
@@ -20,7 +12,7 @@ versioner {
 
 allprojects {
   repositories {
-    mavenCentral() // Lombok
+    mavenCentral()
     maven(url = "https://repo.jonesdev.xyz/releases/") // Bungee & Velocity proxy module
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") // libby
   }
@@ -29,22 +21,18 @@ allprojects {
   apply(plugin = "io.github.goooler.shadow")
 
   dependencies {
-    compileOnly("org.projectlombok:lombok:1.18.32")
-    annotationProcessor("org.projectlombok:lombok:1.18.32")
+    compileOnly(rootProject.libs.lombok)
+    annotationProcessor(rootProject.libs.lombok)
 
-    testCompileOnly("org.projectlombok:lombok:1.18.32")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
+    testCompileOnly(rootProject.libs.lombok)
+    testAnnotationProcessor(rootProject.libs.lombok)
 
-    // adventure
-    compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.17.0")
-
-    compileOnly("com.j256.ormlite:ormlite-jdbc:6.1") // ORMLite
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.8") // caching
-    compileOnly("io.netty:netty-all:4.1.110.Final") // netty
-
-    // Library/dependency loading
-    compileOnly("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
+    compileOnly(rootProject.libs.adventure.minimessage)
+    compileOnly(rootProject.libs.adventure.serializer)
+    compileOnly(rootProject.libs.ormlite)
+    compileOnly(rootProject.libs.caffeine)
+    compileOnly(rootProject.libs.netty)
+    compileOnly(rootProject.libs.libby.core)
   }
 
   tasks {
