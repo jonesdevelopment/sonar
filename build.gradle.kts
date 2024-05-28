@@ -56,6 +56,11 @@ allprojects {
 
       // Exclude unnecessary metadata information
       exclude("META-INF/*/**")
+
+      // Minimize shadowed jar file
+      minimize {
+        exclude(project(":api"))
+      }
     }
 
     compileJava {
