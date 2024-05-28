@@ -1,17 +1,12 @@
-val velocityVersion = "3.3.0-SNAPSHOT"
-
 dependencies {
   implementation(project(":api"))
   implementation(project(":common"))
 
-  compileOnly("com.velocitypowered:velocity-proxy:$velocityVersion")
-  testCompileOnly("com.velocitypowered:velocity-proxy:$velocityVersion")
+  compileOnly(rootProject.libs.velocity)
+  testCompileOnly(rootProject.libs.velocity)
 
-  // Implement bStats.org for metrics
-  implementation("org.bstats:bstats-velocity:3.0.2")
-
-  // Library/dependency loading
-  implementation("com.alessiodp.libby:libby-velocity:2.0.0-SNAPSHOT")
+  implementation(rootProject.libs.bstats.velocity)
+  implementation(rootProject.libs.libby.velocity)
 }
 
 tasks {

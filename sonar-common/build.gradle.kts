@@ -1,11 +1,9 @@
 dependencies {
   compileOnly(project(":api"))
 
-  // adventure nbt for packets
-  compileOnly("net.kyori:adventure-nbt:4.17.0")
+  compileOnly(rootProject.libs.adventure.nbt)
 
-  // CAPTCHA image generation
-  implementation("xyz.jonesdev:capja:1.0.3")
+  implementation(rootProject.libs.capja)
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11
