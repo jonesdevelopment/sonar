@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://docs.jonesdev.xyz/
+    about: Need help configuring Sonar or have questions regarding the installation and usage?
+  - name: Discord
+    url: https://jonesdev.xyz/discord/
+    about: If you have any further questions, please feel free to join the Discord server and open a ticket.
