@@ -172,6 +172,15 @@ public final class SonarConfiguration {
 
     // Verification
     verification.timing = Verification.Timing.valueOf(generalConfig.getString("verification.timing"));
+    // Warn the user if the verification timing is set to NEVER
+    if (verification.timing == Verification.Timing.NEVER) {
+      LOGGER.warn(" ");
+      LOGGER.warn("You have set the verification timing to 'NEVER'.");
+      LOGGER.warn("Sonar will NOT perform the bot verification at all, therefore making it useless.");
+      LOGGER.warn("It is highly suggested to set this option to either 'DURING_ATTACK' or 'ALWAYS'.");
+      LOGGER.warn("Please only edit this option if you really know what you are doing.");
+      LOGGER.warn(" ");
+    }
 
     verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled");
     verification.gravity.checkCollisions = generalConfig.getBoolean("verification.checks.gravity.check-collisions");
