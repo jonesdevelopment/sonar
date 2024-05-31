@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.TimeUnit;
 
 public final class FallbackTimeoutHandler extends IdleStateHandler {
-  private boolean knownDisconnect;
-
   public FallbackTimeoutHandler(final long timeout, final TimeUnit timeUnit) {
     super(timeout, 0L, 0L, timeUnit);
   }
@@ -35,21 +33,16 @@ public final class FallbackTimeoutHandler extends IdleStateHandler {
   @Override
   protected void channelIdle(final ChannelHandlerContext ctx,
                              final @NotNull IdleStateEvent idleStateEvent) throws Exception {
-    assert idleStateEvent.state() == IdleState.READER_IDLE;
-    readTimedOut(ctx);
-  }
+    // We are only checking the read timeout state - skip all other states
+    if (idleStateEvent.state() != IdleState.READER_IDLE) {
+      return;
+    }
 
-  private void readTimedOut(final ChannelHandlerContext ctx) {
-    if (!knownDisconnect) {
-
-      // The netty (default) ReadTimeoutHandler would normally just throw an Exception
-      // The default ReadTimeoutHandler does only check for the boolean 'closed' and
-      // still throws the Exception even if the channel is closed
-      if (ctx.channel().isActive()) {
-        ctx.close();
-      }
-
-      knownDisconnect = true;
+    // The netty (default) ReadTimeoutHandler would normally just throw an Exception
+    // The default ReadTimeoutHandler does only check for the boolean 'closed' and
+    // still throws the Exception even if the channel is closed
+    if (ctx.channel().isActive()) {
+      ctx.close();
     }
   }
 }
