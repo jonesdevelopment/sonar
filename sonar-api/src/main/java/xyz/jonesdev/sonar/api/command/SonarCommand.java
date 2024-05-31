@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api.command;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -40,6 +41,7 @@ public interface SonarCommand {
 
   Cache<Audience, Long> COMMAND_DELAY = Caffeine.newBuilder()
     .expireAfterWrite(Duration.ofMillis(500))
+    .ticker(Ticker.systemTicker())
     .build();
 
   List<Component> CACHED_HELP_MESSAGE = new ArrayList<>();
@@ -52,10 +54,8 @@ public interface SonarCommand {
         return;
       }
 
-      COMMAND_DELAY.cleanUp(); // Clean up the cache
-
       final long timestamp = System.currentTimeMillis();
-      final long mapTimestamp = COMMAND_DELAY.asMap().getOrDefault(source.getAudience(), -1L);
+      final long mapTimestamp = COMMAND_DELAY.get(source.getAudience(), audience -> -1L);
 
       // There were some exploits with spamming commands in the past.
       // Spamming should be prevented, especially if some heavy operations are done,

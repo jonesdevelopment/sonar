@@ -66,8 +66,6 @@ public final class GlobalSonarStatistics implements SonarStatistics {
   public void cleanUpCache() {
     LOGINS_PER_SECOND.cleanUp();
     CONNECTIONS_PER_SECOND.cleanUp();
-    // Also clean up the blacklist
-    Sonar.get().getFallback().getBlacklist().cleanUp();
   }
 
   @Override

@@ -48,8 +48,8 @@ public final class Fallback {
   @Setter
   private long blacklistTime;
 
-  private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;
-  private final @NotNull FallbackRatelimiter ratelimiter = FallbackRatelimiter.INSTANCE;
+  private final @NotNull FallbackQueue queue = new FallbackQueue();
+  private final @NotNull FallbackRatelimiter ratelimiter = new FallbackRatelimiter();
 
   private final LoggerWrapper logger = new LoggerWrapper() {
 

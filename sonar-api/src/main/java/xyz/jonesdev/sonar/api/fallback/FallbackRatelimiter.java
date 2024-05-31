@@ -27,40 +27,25 @@ import org.jetbrains.annotations.NotNull;
 import java.net.InetAddress;
 
 @Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackRatelimiter {
-  static final FallbackRatelimiter INSTANCE = new FallbackRatelimiter();
-
-  private Cache<InetAddress, Byte> attemptCache;
+  private long timeout;
+  private Cache<InetAddress, Long> attemptCache;
   @Getter
   private Cache<InetAddress, Integer> failCountCache;
 
   /**
-   * We don't want to clean up the cache in the
-   * {@link #attempt(InetAddress)} method because
-   * it would take up too many resources.
-   */
-  public void cleanUpCache() {
-    attemptCache.cleanUp();
-    failCountCache.cleanUp();
-  }
-
-  /**
-   * Checks if the player has tried verifying too fast
+   * Attempts to rate-limit the client
    *
    * @param inetAddress IP address of the player
    * @return Whether the player is allowed to verify
    */
-  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean attempt(final @NotNull InetAddress inetAddress) {
-    // Cache the IP address if it's not already cached
-    if (!attemptCache.asMap().containsKey(inetAddress)) {
-      // Cache the IP address
-      attemptCache.put(inetAddress, (byte) 0);
-      return true;
-    }
-    // Deny the connection attempt
-    return false;
+    final long expectedTimestamp = System.currentTimeMillis() + timeout;
+    // Check if the time since the last join has not exceeded the timeout
+    // The idea for this check was Taken from Velocity
+    final long last = attemptCache.get(inetAddress, result -> expectedTimestamp);
+    return expectedTimestamp == last;
   }
 
   /**

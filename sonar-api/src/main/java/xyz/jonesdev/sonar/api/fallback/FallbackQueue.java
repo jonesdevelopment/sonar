@@ -31,15 +31,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
-  static final FallbackQueue INSTANCE = new FallbackQueue();
-  private final ConcurrentMap<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(
-    128, 0.75f, Runtime.getRuntime().availableProcessors());
-
   // Fixed thread pool executor for all new verifications
   private static final int THREAD_POOL_SIZE = Math.min(0x7fff, Runtime.getRuntime().availableProcessors() * 2);
   private static final ExecutorService QUEUE_EXECUTOR = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
+  private final ConcurrentMap<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(
+    128, 0.75f, Runtime.getRuntime().availableProcessors());
 
   public void poll() {
     final int maxQueuePolls = Sonar.get().getConfig().getQueue().getMaxQueuePolls();
