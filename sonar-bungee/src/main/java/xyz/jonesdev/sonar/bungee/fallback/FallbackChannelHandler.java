@@ -54,7 +54,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
     // Intercept any packets processed by BungeeCord
-    if (msg instanceof PacketWrapper) {
+    if (listenForPackets && msg instanceof PacketWrapper) {
       final PacketWrapper packetWrapper = (PacketWrapper) msg;
       final DefinedPacket wrappedPacket = packetWrapper.packet;
       // Don't handle any invalid packets
@@ -65,7 +65,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
           handleHandshake(handshake.getHost(), handshake.getProtocolVersion());
         }
         // Intercept any server login packet by the client
-        if (wrappedPacket instanceof LoginRequest) {
+        else if (wrappedPacket instanceof LoginRequest) {
           // Make sure to use the potentially modified, real IP
           final LoginRequest loginRequest = (LoginRequest) wrappedPacket;
           final HandlerBoss handlerBoss = channel.pipeline().get(HandlerBoss.class);

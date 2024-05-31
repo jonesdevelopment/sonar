@@ -38,6 +38,8 @@ public final class Fallback {
   public static final Fallback INSTANCE = new Fallback();
   private static final @NotNull Sonar SONAR = Objects.requireNonNull(Sonar.get());
 
+  // Map of all players connected to the server in general
+  private final Map<InetAddress, Integer> online = new ConcurrentHashMap<>(128);
   // Map of all connected usernames and their respective IP addresses (used for fast checking)
   private final Map<String, InetAddress> connected = new ConcurrentHashMap<>(64, 0.75f);
   // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
