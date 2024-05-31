@@ -70,12 +70,13 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       FALLBACK.getQueue().getQueuedPlayers().remove(inetAddress);
       // Remove this account from the online players
       // or decrement the number of accounts with the same IP
-      final int online = FALLBACK.getOnline().getOrDefault(inetAddress, 0);
-      if (online > 1) {
-        FALLBACK.getOnline().put(inetAddress, online - 1);
-      } else if (online > 0) {
-        FALLBACK.getOnline().remove(inetAddress);
-      }
+      FALLBACK.getOnline().compute(inetAddress, (key, value) -> {
+        if (value == null || value <= 1) {
+          return null;
+        } else {
+          return value - 1;
+        }
+      });
     }
     // Make sure to let the server handle the rest
     ctx.fireChannelInactive();
@@ -144,10 +145,6 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     // Store the username and IP address
     this.username = username;
     this.inetAddress = socketAddress.getAddress();
-
-    // Increment the number of accounts with the same IP
-    final int online = FALLBACK.getOnline().getOrDefault(inetAddress, 0);
-    FALLBACK.getOnline().put(inetAddress, online + 1);
 
     // Check the blacklist here since we cannot let the player "ghost join"
     if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
@@ -237,6 +234,9 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
                                     final @NotNull Object loginPacket,
                                     final @NotNull String encoder,
                                     final @NotNull String handler) throws Exception {
+    // Increment the number of accounts with the same IP
+    FALLBACK.getOnline().compute(inetAddress, (key, value) -> value == null ? 1 : value + 1);
+
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
     // Skip the maximum online per IP check if it's disabled in the configuration
     if (maxOnlinePerIp > 0) {
@@ -248,6 +248,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
         return;
       }
     }
+
     // Don't listen for further packets
     // TODO: deject the pipeline without breaking disconnect logic
     listenForPackets = false;

@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common.boot;
 
 import com.alessiodp.libby.LibraryManager;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import com.j256.ormlite.logger.Level;
 import com.j256.ormlite.logger.Logger;
 import lombok.Getter;
@@ -137,9 +138,11 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Update ratelimiter caches
     getFallback().getRatelimiter().setAttemptCache(Caffeine.newBuilder()
       .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getReconnectDelay()))
+      .ticker(Ticker.systemTicker())
       .build());
     getFallback().getRatelimiter().setFailCountCache(Caffeine.newBuilder()
       .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getRememberTime()))
+      .ticker(Ticker.systemTicker())
       .build());
 
     // Update blacklist cache
@@ -148,9 +151,10 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Make sure the blacklist is only set when we need it to prevent data loss
     if (!blacklistExists // Make sure we create a new cache if it doesn't exist yet
       || getFallback().getBlacklistTime() != blacklistTime) {
-      // Create new cache with the configured blacklist time
+      // Create a new cache with the configured blacklist time
       getFallback().setBlacklist(Caffeine.newBuilder()
         .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getBlacklistTime()))
+        .ticker(Ticker.systemTicker())
         .build());
       // Store the new blacklist time, so we don't have to reset the blacklist every reload
       getFallback().setBlacklistTime(blacklistTime);

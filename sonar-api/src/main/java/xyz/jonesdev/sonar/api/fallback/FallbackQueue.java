@@ -26,34 +26,32 @@ import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Executors;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class FallbackQueue {
-  static final FallbackQueue INSTANCE = new FallbackQueue();
-  private final Map<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(64);
-  // Async executor for all new verifications
-  public static final ExecutorService QUEUE_EXECUTOR = new ForkJoinPool(
-    Math.min(0x7fff, Runtime.getRuntime().availableProcessors()),
-    ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true);
+  // Fixed thread pool executor for all new verifications
+  private static final int THREAD_POOL_SIZE = Math.min(0x7fff, Runtime.getRuntime().availableProcessors() * 2);
+  private static final ExecutorService QUEUE_EXECUTOR = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
+  private final ConcurrentMap<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(
+    128, 0.75f, Runtime.getRuntime().availableProcessors());
 
   public void poll() {
     final int maxQueuePolls = Sonar.get().getConfig().getQueue().getMaxQueuePolls();
     int index = 0;
 
-    // We need to be cautious here since we don't want any concurrency issues.
+    // Iterate through the map and process up to maxQueuePolls entries
+    // We need to be cautious here since we don't want any concurrency issues
     final Iterator<Map.Entry<InetAddress, Runnable>> iterator = queuedPlayers.entrySet().iterator();
-    while (iterator.hasNext()) {
-      // Break if we reached our maximum entries
-      if (++index > maxQueuePolls) {
-        break;
-      }
+    while (iterator.hasNext() && index++ < maxQueuePolls) {
       // Run the cached runnable
       final Map.Entry<InetAddress, Runnable> entry = iterator.next();
       QUEUE_EXECUTOR.execute(entry.getValue());
-      // Remove runnable from iterator
+      // Remove runnable from the map
       iterator.remove();
     }
   }

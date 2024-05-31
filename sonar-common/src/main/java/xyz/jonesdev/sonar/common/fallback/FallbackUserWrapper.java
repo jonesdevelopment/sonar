@@ -144,7 +144,7 @@ public final class FallbackUserWrapper implements FallbackUser {
 
   @Override
   public void fail(final @NotNull String reason) {
-    // Make sure to set the state to failed to drop all handlers
+    // Make sure to set the state to FAILED to drop all packets
     setState(FallbackUserState.FAILED);
 
     // Only log the failed message if the server isn't currently under attack.
@@ -164,7 +164,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       }
     }
 
-    // Increment amount of total failed verifications
+    // Increment number of total failed verifications
     GlobalSonarStatistics.totalFailedVerifications++;
 
     // Call the VerifyFailedEvent for external API usage
@@ -178,20 +178,18 @@ public final class FallbackUserWrapper implements FallbackUser {
       if (blacklistThreshold <= 0) break blacklist;
 
       // Use 1 as the default amount of fails since we haven't cached anything yet
-      final int failCount = Sonar.get().getFallback().getRatelimiter().getFailCountCache()
-        .asMap().getOrDefault(inetAddress, 1);
-
+      final int fails = Sonar.get().getFallback().getRatelimiter().getFailCountCache().get(inetAddress, ignored -> 1);
       // Now we simply need to check if the threshold is reached
-      if (failCount < blacklistThreshold) {
+      if (fails < blacklistThreshold) {
         // Make sure we increment the number of fails
-        Sonar.get().getFallback().getRatelimiter().incrementFails(inetAddress, failCount);
+        Sonar.get().getFallback().getRatelimiter().incrementFails(inetAddress, fails);
         break blacklist;
       }
 
       // Call the BotBlacklistedEvent for external API usage
       Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
 
-      // Increment amount of total blacklisted players
+      // Increment number of total blacklisted players
       GlobalSonarStatistics.totalBlacklistedPlayers++;
 
       Sonar.get().getFallback().getBlacklist().put(getInetAddress(), (byte) 0);

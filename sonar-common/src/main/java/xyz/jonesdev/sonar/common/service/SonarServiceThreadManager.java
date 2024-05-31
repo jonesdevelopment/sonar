@@ -23,25 +23,22 @@ import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 
 @UtilityClass
 public final class SonarServiceThreadManager {
-  private static final SonarServiceThread VERBOSE = new SonarServiceThread("sonar-verbose-thread", 250L,
-    () -> {
-      // Make sure to clean up the cached statistics
-      // since we don't want to display wrong values.
-      Sonar.get().getStatistics().cleanUpCache();
-      // Update the attack tracker
-      Sonar.get().getAttackTracker().checkIfUnderAttack();
-      // Update the action bar verbose
-      Sonar.get().getVerboseHandler().update();
-    });
-  private static final SonarServiceThread FALLBACK_QUEUE = new SonarServiceThread("sonar-fallback-queue-thread", 1000L,
-    () -> Sonar.get().getFallback().getQueue().poll());
-  private static final SonarServiceThread STATISTICS = new SonarServiceThread("sonar-statistics-thread", 1000L,
-    () -> {
-      // Clean up bandwidth statistics
-      CachedBandwidthStatistics.reset();
-      // Clean up the cache of rate-limited IPs
-      Sonar.get().getFallback().getRatelimiter().cleanUpCache();
-    });
+  private static final SonarServiceThread VERBOSE = new SonarServiceThread("sonar-verbose-thread",
+    250L, () -> {
+    // Make sure to clean up the cached statistics
+    // since we don't want to display wrong values.
+    Sonar.get().getStatistics().cleanUpCache();
+    Sonar.get().getFallback().getRatelimiter().getFailCountCache().cleanUp();
+    Sonar.get().getFallback().getBlacklist().cleanUp();
+    // Update the attack tracker
+    Sonar.get().getAttackTracker().checkIfUnderAttack();
+    // Update the action bar verbose
+    Sonar.get().getVerboseHandler().update();
+  });
+  private static final SonarServiceThread FALLBACK_QUEUE = new SonarServiceThread("sonar-fallback-queue-thread",
+    1000L, () -> Sonar.get().getFallback().getQueue().poll());
+  private static final SonarServiceThread STATISTICS = new SonarServiceThread("sonar-statistics-thread",
+    1000L, CachedBandwidthStatistics::reset);
 
   public void start() {
     VERBOSE.start();

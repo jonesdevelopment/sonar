@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.api.statistics;
 
 import org.jetbrains.annotations.ApiStatus;
 
+@SuppressWarnings("unused")
 public interface SonarStatistics {
 
   /**
@@ -108,7 +109,7 @@ public interface SonarStatistics {
 
   /**
    * @return Total number of cases where an IP was blacklisted
-   * @apiNote This does not describe the current amount of blacklisted IPs
+   * @apiNote This does not describe the current number of blacklisted IPs
    */
   long getTotalBlacklistSize();
 

@@ -28,9 +28,9 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.net.InetAddress;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -39,17 +39,17 @@ public final class Fallback {
   private static final @NotNull Sonar SONAR = Objects.requireNonNull(Sonar.get());
 
   // Map of all players connected to the server in general
-  private final Map<InetAddress, Integer> online = new ConcurrentHashMap<>(128);
+  private final ConcurrentMap<InetAddress, Integer> online = new ConcurrentHashMap<>(128);
   // Map of all connected usernames and their respective IP addresses (used for fast checking)
-  private final Map<InetAddress, String> connected = new ConcurrentHashMap<>(64, 0.75f);
+  private final ConcurrentMap<InetAddress, String> connected = new ConcurrentHashMap<>();
   // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
   @Setter
   private Cache<InetAddress, Byte> blacklist;
   @Setter
   private long blacklistTime;
 
-  private final @NotNull FallbackQueue queue = FallbackQueue.INSTANCE;
-  private final @NotNull FallbackRatelimiter ratelimiter = FallbackRatelimiter.INSTANCE;
+  private final @NotNull FallbackQueue queue = new FallbackQueue();
+  private final @NotNull FallbackRatelimiter ratelimiter = new FallbackRatelimiter();
 
   private final LoggerWrapper logger = new LoggerWrapper() {
 
