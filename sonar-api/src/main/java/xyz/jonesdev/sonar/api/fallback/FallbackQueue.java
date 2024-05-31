@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 
@@ -33,7 +34,7 @@ import java.util.concurrent.ForkJoinPool;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FallbackQueue {
   static final FallbackQueue INSTANCE = new FallbackQueue();
-  private final Map<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(64);
+  private final ConcurrentMap<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(64);
   // Async executor for all new verifications
   public static final ExecutorService QUEUE_EXECUTOR = new ForkJoinPool(
     Math.min(0x7fff, Runtime.getRuntime().availableProcessors()),
