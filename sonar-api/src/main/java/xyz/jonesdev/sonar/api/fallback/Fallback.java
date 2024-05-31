@@ -41,7 +41,7 @@ public final class Fallback {
   // Map of all players connected to the server in general
   private final Map<InetAddress, Integer> online = new ConcurrentHashMap<>(128);
   // Map of all connected usernames and their respective IP addresses (used for fast checking)
-  private final Map<String, InetAddress> connected = new ConcurrentHashMap<>(64, 0.75f);
+  private final Map<InetAddress, String> connected = new ConcurrentHashMap<>(64, 0.75f);
   // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
   @Setter
   private Cache<InetAddress, Byte> blacklist;
