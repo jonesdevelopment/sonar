@@ -243,7 +243,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       // Check if the number of online players using the same IP address as
       // the connecting player is greater than the configured amount
       final int onlinePerIp = FALLBACK.getOnline().getOrDefault(inetAddress, 0);
-      if (onlinePerIp >= maxOnlinePerIp) {
+      if (onlinePerIp > maxOnlinePerIp) {
         customDisconnect(channel, protocolVersion, tooManyOnlinePerIP, encoder, handler);
         return;
       }
