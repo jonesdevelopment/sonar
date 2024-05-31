@@ -38,17 +38,19 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
     // Intercept any handshake packet by the client
-    if (msg instanceof HandshakePacket handshake) {
-      handleHandshake(handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
-    }
-    // Intercept any server login packet by the client
-    if (msg instanceof ServerLoginPacket serverLogin) {
-      // Make sure to use the potentially modified, original IP
-      final MinecraftConnection minecraftConnection = (MinecraftConnection) channel.pipeline().get(HANDLER);
-      final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
-      handleLogin(ctx, serverLogin, serverLogin.getUsername(), socketAddress,
-        MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
-      return;
+    if (listenForPackets) {
+      if (msg instanceof HandshakePacket handshake) {
+        handleHandshake(handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
+      }
+      // Intercept any server login packet by the client
+      else if (msg instanceof ServerLoginPacket serverLogin) {
+        // Make sure to use the potentially modified, original IP
+        final MinecraftConnection minecraftConnection = (MinecraftConnection) channel.pipeline().get(HANDLER);
+        final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
+        handleLogin(ctx, serverLogin, serverLogin.getUsername(), socketAddress,
+          MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
+        return;
+      }
     }
     // Make sure to let the server handle the rest
     ctx.fireChannelRead(msg);

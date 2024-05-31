@@ -33,7 +33,6 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 
-import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.UUID;
 
@@ -51,11 +50,6 @@ public interface Sonar {
    * @return The platform the plugin is being run on
    */
   @NotNull SonarPlatform getPlatform();
-
-  /**
-   * @return If the amount of players online with the same IP address is greater than a maximum
-   */
-  boolean hasTooManyAccounts(final @NotNull InetAddress inetAddress, final int limit);
 
   /**
    * @return A small wrapper for the plugin logger so we can use the logger everywhere

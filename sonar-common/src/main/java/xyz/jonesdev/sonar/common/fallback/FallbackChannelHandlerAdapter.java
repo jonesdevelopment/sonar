@@ -38,7 +38,6 @@ import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.customDisconnect;
-import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.deject;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 @RequiredArgsConstructor
@@ -48,11 +47,12 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   protected InetAddress inetAddress;
   protected ProtocolVersion protocolVersion;
   protected @Nullable FallbackUser user;
+  protected boolean listenForPackets = true;
 
   protected static final Fallback FALLBACK = Sonar.get().getFallback();
 
   @Override
-  public final void channelActive(final @NotNull ChannelHandlerContext ctx) {
+  public final void channelActive(final @NotNull ChannelHandlerContext ctx) throws Exception {
     // Increase connections per second for the action bar verbose
     GlobalSonarStatistics.countConnection();
     // Make sure to let the server handle the rest
@@ -60,7 +60,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   }
 
   @Override
-  public final void channelInactive(final @NotNull ChannelHandlerContext ctx) {
+  public final void channelInactive(final @NotNull ChannelHandlerContext ctx) throws Exception {
     // The player can disconnect without sending the login packet first
     if (username != null) {
       // Remove the username from the connected players
@@ -70,6 +70,14 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     if (inetAddress != null) {
       // Remove the IP address from the queue
       FALLBACK.getQueue().getQueuedPlayers().remove(inetAddress);
+      // Remove this account from the online players
+      // or decrement the number of accounts with the same IP
+      final int online = FALLBACK.getOnline().getOrDefault(inetAddress, 0);
+      if (online > 1) {
+        FALLBACK.getOnline().put(inetAddress, online - 1);
+      } else if (online > 0) {
+        FALLBACK.getOnline().remove(inetAddress);
+      }
     }
     // Make sure to let the server handle the rest
     ctx.fireChannelInactive();
@@ -81,7 +89,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   @Override
   public final void exceptionCaught(final @NotNull ChannelHandlerContext ctx,
                                     final @NotNull Throwable cause) throws Exception {
-    // Simply close the channel if we encounter any errors.
+    // Close the channel if we encounter any errors.
     ctx.close();
   }
 
@@ -130,8 +138,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     // Connections from unknown protocol versions will be discarded
     // as this is the safest way of handling unwanted connections
     if (protocolVersion.isUnknown()) {
-      // Sonar does NOT support snapshots or unknown versions;
-      // I'll try my best to stay up-to-date!
+      // Sonar does not support snapshots or Minecraft versions older than 1.7.2
       throw new CorruptedFrameException("Unknown protocol version");
     }
     // Increase joins per second for the action bar verbose
@@ -139,6 +146,10 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     // Store the username and IP address
     this.username = username;
     this.inetAddress = socketAddress.getAddress();
+
+    // Increment the number of accounts with the same IP
+    final int online = FALLBACK.getOnline().getOrDefault(inetAddress, 0);
+    FALLBACK.getOnline().put(inetAddress, online + 1);
 
     // Check the blacklist here since we cannot let the player "ghost join"
     if (FALLBACK.getBlacklist().asMap().containsKey(inetAddress)) {
@@ -233,14 +244,16 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     if (maxOnlinePerIp > 0) {
       // Check if the number of online players using the same IP address as
       // the connecting player is greater than the configured amount
-      if (Sonar.get().hasTooManyAccounts(inetAddress, maxOnlinePerIp)) {
+      final int onlinePerIp = FALLBACK.getOnline().getOrDefault(inetAddress, 0);
+      if (onlinePerIp >= maxOnlinePerIp) {
         customDisconnect(channel, protocolVersion, tooManyOnlinePerIP, encoder, handler);
         return;
       }
     }
-
+    // Don't listen for further packets
+    // TODO: deject the pipeline without breaking disconnect logic
+    listenForPackets = false;
+    // Let the server know about the login packet
     ctx.fireChannelRead(loginPacket);
-    // Deject the channel since we don't need it anymore
-    deject(channel.pipeline());
   }
 }

@@ -23,7 +23,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.SonarPlatform;
@@ -31,7 +30,6 @@ import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
-import java.net.InetAddress;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -56,20 +54,6 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
       return null;
     }
     return bukkitAudiences.player(uniqueId);
-  }
-
-  @Override
-  public boolean hasTooManyAccounts(final @NotNull InetAddress inetAddress, final int limit) {
-    int count = 1;
-    for (final Player player : getPlugin().getServer().getOnlinePlayers()) {
-      // I don't know why, but Bukkit is *special*
-      if (Objects.isNull(player.getAddress())) continue;
-      // Check if the IP address of the player is equal to the IP trying to connect
-      if (!Objects.equals(player.getAddress().getAddress(), inetAddress)) continue;
-      // Increment count of duplicated accounts
-      if (++count >= limit) return true;
-    }
-    return false;
   }
 
   /**

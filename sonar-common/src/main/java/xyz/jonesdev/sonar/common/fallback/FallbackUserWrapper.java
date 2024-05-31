@@ -44,7 +44,8 @@ import java.net.InetAddress;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.CONFIG;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
@@ -256,12 +257,12 @@ public final class FallbackUserWrapper implements FallbackUser {
                                         final @NotNull FallbackPacket packet,
                                         final @NotNull String encoder,
                                         final @NotNull String boss) {
-    // Remove main pipeline to completely take over the channel
+    // Remove the main pipeline to completely take over the channel
     if (channel.pipeline().get(boss) != null) {
       channel.pipeline().remove(boss);
     }
     final ChannelHandler currentEncoder = channel.pipeline().get(encoder);
-    // Simply close the channel if no decoder exists
+    // Close the channel if no decoder exists
     if (currentEncoder != null) {
       // We don't need to update the encoder if it's already present
       if (!(currentEncoder instanceof FallbackPacketEncoder)) {
@@ -271,19 +272,6 @@ public final class FallbackUserWrapper implements FallbackUser {
       closeWith(channel, protocolVersion, packet);
     } else {
       channel.close();
-    }
-  }
-
-  /**
-   * Removes Sonar's pipelines from a channel to save
-   * unnecessary RAM and CPU usage
-   *
-   * @param pipeline Pipeline object of the channel
-   */
-  public static void deject(final @NotNull ChannelPipeline pipeline) {
-    // Remove Sonar's pipelines if they exist
-    if (pipeline.get(FALLBACK_HANDLER) != null) {
-      pipeline.remove(FALLBACK_HANDLER);
     }
   }
 }

@@ -21,7 +21,6 @@ import com.alessiodp.libby.BungeeLibraryManager;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bstats.bungeecord.Metrics;
 import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +31,6 @@ import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
 import xyz.jonesdev.sonar.bungee.fallback.FallbackInjectionHelper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
-import java.net.InetAddress;
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -56,19 +53,6 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
       return null;
     }
     return bungeeAudiences.player(uniqueId);
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public boolean hasTooManyAccounts(final @NotNull InetAddress inetAddress, final int limit) {
-    int count = 1;
-    for (final ProxiedPlayer player : getPlugin().getServer().getPlayers()) {
-      // Check if the IP address of the player is equal to the IP trying to connect
-      if (!Objects.equals(player.getAddress().getAddress(), inetAddress)) continue;
-      // Increment count of duplicated accounts
-      if (++count >= limit) return true;
-    }
-    return false;
   }
 
   /**

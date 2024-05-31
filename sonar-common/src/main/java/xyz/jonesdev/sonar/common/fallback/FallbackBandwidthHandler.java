@@ -39,7 +39,7 @@ public final class FallbackBandwidthHandler extends ChannelDuplexHandler {
                           final @NotNull Object msg) throws Exception {
     // We can only get the size of a message if it's a ByteBuf
     if (msg instanceof ByteBuf) {
-      // Increment the incoming traffic by the amount of readable bytes
+      // Increment the incoming traffic by the number of readable bytes
       INCOMING.increment(((ByteBuf) msg).readableBytes());
     }
     // Make sure to let the server handle the rest
@@ -52,7 +52,7 @@ public final class FallbackBandwidthHandler extends ChannelDuplexHandler {
                     final ChannelPromise promise) throws Exception {
     // We can only get the size of a message if it's a ByteBuf
     if (msg instanceof ByteBuf) {
-      // Increment the outgoing traffic by the amount of readable bytes
+      // Increment the outgoing traffic by the number of readable bytes
       OUTGOING.increment(((ByteBuf) msg).readableBytes());
     }
     // Make sure to let the server handle the rest
