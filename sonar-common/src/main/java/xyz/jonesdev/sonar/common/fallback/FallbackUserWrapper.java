@@ -100,7 +100,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(username, this));
 
     // Mark the player as connected → verifying players
-    Sonar.get().getFallback().getConnected().put(username, inetAddress);
+    Sonar.get().getFallback().getConnected().put(inetAddress, username);
 
     // Add better timeout handler to avoid known exploits or issues
     // We also want to timeout bots quickly to avoid flooding
@@ -112,7 +112,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     pipeline.replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
 
     channel.eventLoop().execute(() -> {
-      // Remove main pipeline to completely take over the channel
+      // Remove the main pipeline to completely take over the channel
       if (pipeline.get(handler) != null) {
         pipeline.remove(handler);
       }

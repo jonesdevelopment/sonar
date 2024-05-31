@@ -62,12 +62,10 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   @Override
   public final void channelInactive(final @NotNull ChannelHandlerContext ctx) throws Exception {
     // The player can disconnect without sending the login packet first
-    if (username != null) {
-      // Remove the username from the connected players
-      FALLBACK.getConnected().remove(username);
-    }
-    // The player cannot be in the queue if the IP address is invalid
+    // Account for this by checking if the inetAddress has been set yet
     if (inetAddress != null) {
+      // Remove the IP address from the connected players
+      FALLBACK.getConnected().remove(inetAddress);
       // Remove the IP address from the queue
       FALLBACK.getQueue().getQueuedPlayers().remove(inetAddress);
       // Remove this account from the online players
@@ -178,8 +176,8 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
 
     // Check if Fallback is already verifying a player
     // → is another player with the same IP address connected to Fallback?
-    if (FALLBACK.getConnected().containsKey(username)
-      || FALLBACK.getConnected().containsValue(inetAddress)) {
+    if (FALLBACK.getConnected().containsKey(inetAddress)
+      || FALLBACK.getConnected().containsValue(username)) {
       customDisconnect(channel, protocolVersion, alreadyVerifying, encoder, handler);
       return;
     }
