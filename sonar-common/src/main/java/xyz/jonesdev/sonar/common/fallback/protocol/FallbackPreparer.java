@@ -24,8 +24,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
@@ -60,10 +60,16 @@ public class FallbackPreparer {
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
+  // Player Info
+  public final FallbackPacket PLAYER_INFO = new FallbackPacketSnapshot(new PlayerInfoPacket(
+    "", new UUID(1L, 1L), 2));
   // Default Spawn Position
-  public FallbackPacket dynamicSpawnPosition;
+  public FallbackPacket defaultSpawnPosition;
+  // Spawn Position
+  public final int TELEPORT_ID = ThreadLocalRandom.current().nextInt();
+  public FallbackPacket spawnPosition;
   // Transfer packet
-  public FallbackPacket transferToOrigin;
+  public static FallbackPacket transferToOrigin;
 
   // Disconnect messages
   public FallbackPacket blacklisted;
@@ -76,7 +82,7 @@ public class FallbackPreparer {
 
   // Vehicle
   public FallbackPacket removeEntities;
-  public FallbackPacket setPassengers;
+  public static FallbackPacket setPassengers;
   public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1;
 
   // Collisions
@@ -91,10 +97,8 @@ public class FallbackPreparer {
   public final FallbackPacket CAPTCHA_SPAWN_POSITION = new FallbackPacketSnapshot(new DefaultSpawnPositionPacket(
     SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION));
 
-  // Blocks
-  private final BlockUpdate[] CHANGED_BLOCKS = new BlockUpdate[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
+  // Platform
   public BlockType blockType = BlockType.BARRIER;
-
   public int maxMovementTick, dynamicSpawnYPosition;
   public double[] preparedCachedYMotions;
   public double maxFallDistance;
@@ -126,10 +130,15 @@ public class FallbackPreparer {
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
     dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + (int) Math.ceil(maxFallDistance);
-    dynamicSpawnPosition = new FallbackPacketSnapshot(new DefaultSpawnPositionPacket(
+    defaultSpawnPosition = new FallbackPacketSnapshot(new DefaultSpawnPositionPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION));
+    spawnPosition = new FallbackPacketSnapshot(new PlayerPositionLookPacket(
+      SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
+      0, -90, TELEPORT_ID, false));
 
     // Prepare collision platform positions
+    final BlockUpdate[] changedBlocks = new BlockUpdate[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
+
     int index = 0;
     for (int x = 0; x < BLOCKS_PER_ROW; x++) {
       for (int z = 0; z < BLOCKS_PER_ROW; z++) {
@@ -138,12 +147,11 @@ public class FallbackPreparer {
           DEFAULT_Y_COLLIDE_POSITION,
           z + (BLOCKS_PER_ROW / 2),
           0, 0);
-        CHANGED_BLOCKS[index++] = new BlockUpdate(position, blockType);
+        changedBlocks[index++] = new BlockUpdate(position, blockType);
       }
     }
 
-    // Prepare UpdateSectionBlocks packet
-    updateSectionBlocks = new FallbackPacketSnapshot(new UpdateSectionBlocksPacket(0, 0, CHANGED_BLOCKS));
+    updateSectionBlocks = new FallbackPacketSnapshot(new UpdateSectionBlocksPacket(0, 0, changedBlocks));
 
     // Prepare disconnect packets during login
     blacklisted = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getBlacklisted(), true));

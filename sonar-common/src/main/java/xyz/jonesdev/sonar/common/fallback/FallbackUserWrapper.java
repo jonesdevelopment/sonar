@@ -31,13 +31,14 @@ import xyz.jonesdev.sonar.api.event.impl.UserBlacklistedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
-import xyz.jonesdev.sonar.api.fallback.FallbackUserState;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.DisconnectPacket;
+import xyz.jonesdev.sonar.common.fallback.session.FallbackLoginSessionHandler;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.net.InetAddress;
@@ -57,9 +58,14 @@ public final class FallbackUserWrapper implements FallbackUser {
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
-  private final boolean geyser;
   @Setter
-  private FallbackUserState state = FallbackUserState.LOGIN_ACK; // 1.20.2+
+  private int expectedTransactionId;
+  @Setter
+  private boolean receivedClientSettings;
+  @Setter
+  private boolean receivedPluginMessage;
+  private final boolean geyser;
+  private final SystemTimer loginTimer = new SystemTimer();
 
   public FallbackUserWrapper(final @NotNull Channel channel,
                              final @NotNull InetAddress inetAddress,
@@ -125,15 +131,10 @@ public final class FallbackUserWrapper implements FallbackUser {
 
       try {
         // Prepare custom packet decoder and verification handler
-        final FallbackVerificationHandler verification = new FallbackVerificationHandler(this, username, uuid);
-        final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(this, verification);
+        final FallbackLoginSessionHandler session = new FallbackLoginSessionHandler(this, username, uuid);
+        final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(protocolVersion, session);
         // Replace normal decoder to allow custom packets
         pipeline.replace(decoder, FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
-
-        if (protocolVersion.compareTo(MINECRAFT_1_20_2) < 0) {
-          // Start initializing the actual join process for pre-1.20.2 clients
-          verification.initialJoinProcess();
-        }
       } catch (Throwable throwable) {
         // This rarely happens when the channel hangs and the player is still connecting
         // I honestly have no idea how else I'm supposed to fix this
@@ -144,9 +145,6 @@ public final class FallbackUserWrapper implements FallbackUser {
 
   @Override
   public void fail(final @NotNull String reason) {
-    // Make sure to set the state to FAILED to drop all packets
-    setState(FallbackUserState.FAILED);
-
     // Only log the failed message if the server isn't currently under attack.
     // However, we let the user override this through the configuration.
     final boolean shouldLog = Sonar.get().getAttackTracker().getCurrentAttack() == null

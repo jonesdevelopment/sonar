@@ -15,27 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback;
+package xyz.jonesdev.sonar.common.fallback.session;
 
-public enum FallbackUserState {
-  // 1.20.2 configuration state
-  LOGIN_ACK, CONFIGURE,
-  // pre-JOIN ping check
-  KEEP_ALIVE,
-  // post-JOIN checks
-  CLIENT_SETTINGS, PLUGIN_MESSAGE, TRANSACTION,
-  // PLAY checks
-  TELEPORT, POSITION,
-  // Vehicle check
-  VEHICLE,
-  // CAPTCHA
-  CAPTCHA,
-  // Done
-  SUCCESS,
-  // Placeholder
-  FAILED;
+import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-  public boolean canReceivePackets() {
-    return this != FAILED && this != SUCCESS;
+import java.util.UUID;
+
+public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler {
+
+  public FallbackCAPTCHASessionHandler(final FallbackUser user, final String username, final UUID uuid) {
+    super(user, username, uuid);
+  }
+
+  @Override
+  public void handle(final @NotNull FallbackPacket packet) {
+    System.out.println(packet);
   }
 }

@@ -23,6 +23,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -38,11 +39,21 @@ public interface FallbackUser {
   ProtocolVersion getProtocolVersion();
 
   @NotNull
-  FallbackUserState getState();
+  SystemTimer getLoginTimer();
+
+  int getExpectedTransactionId();
+
+  void setExpectedTransactionId(final int expectedTransactionId);
+
+  boolean isReceivedClientSettings();
+
+  void setReceivedClientSettings(final boolean receivedClientSettings);
+
+  boolean isReceivedPluginMessage();
+
+  void setReceivedPluginMessage(final boolean receivedPluginMessage);
 
   boolean isGeyser();
-
-  void setState(final FallbackUserState state);
 
   /**
    * Disconnect the player during/after verification

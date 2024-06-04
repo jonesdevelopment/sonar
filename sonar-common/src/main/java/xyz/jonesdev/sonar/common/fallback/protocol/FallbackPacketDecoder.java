@@ -21,8 +21,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
@@ -31,19 +32,20 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
-  private final FallbackUser user;
-  private final FallbackPacketListener listener;
+  private final ProtocolVersion protocolVersion;
   private FallbackPacketRegistry.ProtocolRegistry registry;
+  @Setter
+  private FallbackPacketListener listener;
 
-  public FallbackPacketDecoder(final @NotNull FallbackUser user,
+  public FallbackPacketDecoder(final @NotNull ProtocolVersion protocolVersion,
                                final @NotNull FallbackPacketListener listener) {
-    this.user = user;
+    this.protocolVersion = protocolVersion;
     this.listener = listener;
-    updateRegistry(user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME);
+    updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME);
   }
 
   public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
-    this.registry = registry.getProtocolRegistry(SERVERBOUND, user.getProtocolVersion());
+    this.registry = registry.getProtocolRegistry(SERVERBOUND, protocolVersion);
   }
 
   @Override
@@ -77,15 +79,13 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         try {
           // Try to decode the packet for the given protocol version
-          packet.decode(byteBuf, user.getProtocolVersion());
+          packet.decode(byteBuf, protocolVersion);
         } catch (Throwable throwable) {
-          user.fail("failed to decode packet (" + byteBuf.readableBytes() + " bytes)");
           throw new CorruptedFrameException("Failed to decode packet");
         }
 
         // Check if the packet still has bytes left after we decoded it
         if (byteBuf.isReadable()) {
-          user.fail("could not read packet to end (" + byteBuf.readableBytes() + " bytes left)");
           throw new CorruptedFrameException("Could not read packet to end");
         }
 
@@ -103,15 +103,13 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
   private void doLengthSanityChecks(final @NotNull ByteBuf byteBuf,
                                     final @NotNull FallbackPacket packet) throws Exception {
-    final int expectedMaxLen = packet.expectedMaxLength(byteBuf, user.getProtocolVersion());
+    final int expectedMaxLen = packet.expectedMaxLength(byteBuf, protocolVersion);
     if (expectedMaxLen != -1 && byteBuf.readableBytes() > expectedMaxLen) {
-      user.fail("packet too large (" + byteBuf.readableBytes() + " bytes)");
       throw new CorruptedFrameException("Packet too large");
     }
 
-    final int expectedMinLen = packet.expectedMinLength(byteBuf, user.getProtocolVersion());
+    final int expectedMinLen = packet.expectedMinLength(byteBuf, protocolVersion);
     if (byteBuf.readableBytes() < expectedMinLen) {
-      user.fail("packet too small (" + byteBuf.readableBytes() + " bytes)");
       throw new CorruptedFrameException("Packet too small");
     }
   }

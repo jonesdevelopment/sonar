@@ -1,0 +1,174 @@
+/*
+ * Copyright (C) 2023-2024 Sonar Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package xyz.jonesdev.sonar.common.fallback.session;
+
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientSettingsPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.KeepAlivePacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PluginMessagePacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
+
+import java.util.UUID;
+
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
+
+/**
+ * Flow for this session handler
+ *
+ * <li>
+ *   KeepAlive packet is sent to the client*
+ *   <br>
+ *   See more: {@link FallbackLoginSessionHandler#initialize18()}
+ * </li>
+ * <li>
+ *   After the KeepAlive packet is validated, the client enters the configuration phase.**
+ * </li>
+ * <li>
+ *   Next, a transaction packet is sent to the client.
+ *   Then, the session handler is set to the {@link FallbackGravitySessionHandler}.
+ *   <br>
+ *   See more: {@link FallbackLoginSessionHandler#sendTransaction()}
+ * </li>
+ * <br>
+ * * The KeepAlive check is skipped on 1.7, as KeepAlive packets don't exist during the LOGIN state.
+ * ** The internals of the configuration phase were not mentioned.
+ * Find out more about the client configuration and registry synchronization:
+ * {@link #synchronizeClientRegistry()}, {@link #updateEncoderDecoderState(FallbackPacketRegistry)}
+ */
+public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
+
+  public FallbackLoginSessionHandler(final FallbackUser user, final String username, final UUID uuid) {
+    super(user, username, uuid);
+
+    // Start initializing the actual join process for pre-1.20.2 clients
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
+      // This trick helps in reducing unnecessary outgoing server traffic
+      // by avoiding sending other packets to clients that are potentially bots.
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+        sendTransaction();
+      } else {
+        initialize18();
+      }
+    }
+  }
+
+  private int expectedKeepAliveId;
+
+  /**
+   * The purpose of these keepalive packets is to confirm that the connection
+   * is active and legitimate, thereby preventing bot connections that
+   * could flood the server with login attempts and other unwanted traffic.
+   */
+  private void initialize18() {
+    // Send a KeepAlive packet with a random ID
+    expectedKeepAliveId = RANDOM.nextInt();
+    user.write(new KeepAlivePacket(expectedKeepAliveId));
+  }
+
+  /**
+   * Uses ping packets to check for an immediate, legitimate response from the client
+   * <br>
+   * <a href="https://wiki.vg/Protocol#Ping_.28configuration.29">Wiki.vg - Ping (configuration)</a>
+   * <a href="https://wiki.vg/Protocol#Ping_.28play.29">Wiki.vg - Ping (play)</a>
+   */
+  private void sendTransaction() {
+    // Set the decoder state to GAME, so we can continue sending these packets
+    updateEncoderDecoderState(FallbackPacketRegistry.GAME);
+    // Pass the player to the next verification handler
+    final FallbackGravitySessionHandler gravitySessionHandler = new FallbackGravitySessionHandler(user, username, uuid);
+    val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
+    decoder.setListener(gravitySessionHandler);
+    // Send a Transaction (Ping) packet with a random ID
+    final short expectedTransactionId = (short) RANDOM.nextInt();
+    user.setExpectedTransactionId(expectedTransactionId);
+    user.write(new TransactionPacket(0, expectedTransactionId, false));
+  }
+
+  @Override
+  public void handle(final @NotNull FallbackPacket packet) {
+    if (packet instanceof KeepAlivePacket) {
+      // This is the first packet we expect from the client
+      final KeepAlivePacket keepAlive = (KeepAlivePacket) packet;
+
+      // Check if the KeepAlive ID matches the expected ID
+      final long keepAliveId = keepAlive.getId();
+      checkState(keepAliveId == expectedKeepAliveId,
+        "expected K ID " + expectedKeepAliveId + " but got " + keepAliveId);
+
+      // 1.8 clients send KeepAlive packets with the ID 0 every second
+      // while the player is in the "Downloading terrain" screen.
+      expectedKeepAliveId = 0;
+
+      // Spawn the player in the virtual world if the client does not need
+      // any configuration (pre-1.20.2).
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
+        // Send a transaction packet for further packet validation/confirmation
+        sendTransaction();
+      }
+    } else if (packet instanceof LoginAcknowledgedPacket) {
+      synchronizeClientRegistry();
+      // Write the FinishConfiguration packet to the buffer
+      user.delayedWrite(FINISH_CONFIGURATION);
+      // Send all packets in one flush
+      user.getChannel().flush();
+      // Set decoder state to actually catch all packets
+      updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
+    } else if (packet instanceof FinishConfigurationPacket) {
+      // Send a transaction packet for further packet validation/confirmation
+      sendTransaction();
+    }
+    // Make sure to catch all ClientSettings and PluginMessage packets during the configuration phase.
+    else if (packet instanceof ClientSettingsPacket) {
+      // Let the session handler itself know about this packet
+      checkClientSettings((ClientSettingsPacket) packet);
+    } else if (packet instanceof PluginMessagePacket) {
+      // Let the session handler itself know about this packet
+      checkPluginMessage((PluginMessagePacket) packet);
+    }
+  }
+
+  private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
+    val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
+    val encoder = (FallbackPacketEncoder) user.getChannel().pipeline().get(FallbackPacketEncoder.class);
+    // Update the packet registry state in the encoder and decoder pipelines
+    decoder.updateRegistry(registry);
+    encoder.updateRegistry(registry);
+  }
+
+  private void synchronizeClientRegistry() {
+    // 1.20.5+ adds new "game bundle features" which overcomplicate all of this...
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
+      // Write the new RegistrySync packets to the buffer
+      for (final FallbackPacket syncPacket : REGISTRY_SYNC_1_20_5) {
+        user.delayedWrite(syncPacket);
+      }
+    } else {
+      // Write the old RegistrySync packet to the buffer
+      user.delayedWrite(REGISTRY_SYNC_LEGACY);
+    }
+  }
+}
