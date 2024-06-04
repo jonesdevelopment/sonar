@@ -41,7 +41,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  *   {@link SpawnEntityPacket} and {@link SetPassengersPacket} packets are sent to the client,
  *   therefore, making the player enter a boat.
  *   <br>
- *   See more: {@link FallbackLoginSessionHandler}
+ *   See more: {@link FallbackVehicleSessionHandler}
  * </li>
  * <li>
  *   Then, all we do is listen for incoming {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets.

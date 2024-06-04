@@ -23,15 +23,25 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PlayerPositionLookPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PlayerPositionPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetSlotPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.UniversalChatPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
+/**
+ * Flow for this session handler
+ *
+ * <li>
+ *   {@link SetSlotPacket} and {@link MapDataPacket} packets are sent to the client,
+ *   therefore, setting the player's item to a map with a code on it (CAPTCHA).
+ *   <br>
+ *   See more: {@link FallbackCAPTCHASessionHandler}, {@link MapCaptchaInfo}
+ * </li>
+ * <li>
+ *   Then, we wait for the player to enter the {@link FallbackCAPTCHASessionHandler#answer} in chat.
+ * </li>
+ */
 public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler {
 
   public FallbackCAPTCHASessionHandler(final FallbackUser user, final String username, final UUID uuid) {
