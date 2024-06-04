@@ -31,8 +31,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SpawnEntityPacke
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.VEHICLE_ENTITY_ID;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.setPassengers;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackVehicleSessionHandler extends FallbackSessionHandler {
 
@@ -59,6 +58,9 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
     // Pass the player to the next best verification handler
     if (Sonar.get().getFallback().shouldPerformCaptcha()) {
+      // Make sure the player exits the vehicle before sending the CAPTCHA
+      user.delayedWrite(removeEntities);
+      // Send the player to the CAPTCHA handler
       decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
     } else {
       // The player has passed all checks
