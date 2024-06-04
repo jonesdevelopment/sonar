@@ -23,6 +23,8 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PlayerPositionLookPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PlayerPositionPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetSlotPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.UniversalChatPacket;
 
@@ -55,7 +57,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
   }
 
   private final String answer;
-  private int tries;
+  private int tries, lastCountdownIndex, keepAliveStreak;
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
@@ -76,6 +78,23 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
       // Captcha is incorrect, remove one try
       checkState(tries-- > 0, "failed captcha too often");
       user.write(incorrectCaptcha);
+    } else if (packet instanceof PlayerPositionPacket
+      || packet instanceof PlayerPositionLookPacket) {
+      // A position packet is sent approximately every second
+      final long difference = maxDuration - user.getLoginTimer().delay();
+      final int index = (int) (difference / 1000D);
+      // Make sure we can actually safely get and send the packet
+      if (lastCountdownIndex != index && index >= 0 && xpCountdown.length > index) {
+        // Send the countdown using the experience bar
+        user.write(xpCountdown[index]);
+      }
+      lastCountdownIndex = index;
+      // Send a KeepAlive packet every few seconds
+      if (keepAliveStreak++ > 20) {
+        keepAliveStreak = 0;
+        // Send a KeepAlive packet to prevent timeout
+        user.write(CAPTCHA_KEEP_ALIVE);
+      }
     }
   }
 }
