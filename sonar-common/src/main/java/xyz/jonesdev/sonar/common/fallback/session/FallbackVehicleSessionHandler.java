@@ -26,6 +26,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PaddleBoatPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PlayerInputPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetPassengersPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SpawnEntityPacket;
 
 import java.util.UUID;
@@ -33,6 +34,19 @@ import java.util.UUID;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
+/**
+ * Flow for this session handler
+ *
+ * <li>
+ *   {@link SpawnEntityPacket} and {@link SetPassengersPacket} packets are sent to the client,
+ *   therefore, making the player enter a boat.
+ *   <br>
+ *   See more: {@link FallbackLoginSessionHandler}
+ * </li>
+ * <li>
+ *   Then, all we do is listen for incoming {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets.
+ * </li>
+ */
 public final class FallbackVehicleSessionHandler extends FallbackSessionHandler {
 
   public FallbackVehicleSessionHandler(final @NotNull FallbackUser user,

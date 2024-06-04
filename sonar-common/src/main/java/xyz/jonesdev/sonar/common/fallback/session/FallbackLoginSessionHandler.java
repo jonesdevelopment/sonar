@@ -40,7 +40,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  * Flow for this session handler
  *
  * <li>
- *   KeepAlive packet is sent to the client*
+ *   A {@link KeepAlivePacket} packet is sent to the client*
  *   <br>
  *   See more: {@link FallbackLoginSessionHandler#initialize18()}
  * </li>
