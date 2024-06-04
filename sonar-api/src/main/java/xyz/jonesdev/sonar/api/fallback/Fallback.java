@@ -28,6 +28,8 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.net.InetAddress;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -41,7 +43,7 @@ public final class Fallback {
   // Map of all players connected to the server in general
   private final ConcurrentMap<InetAddress, Integer> online = new ConcurrentHashMap<>(128);
   // Map of all connected usernames and their respective IP addresses (used for fast checking)
-  private final ConcurrentMap<InetAddress, String> connected = new ConcurrentHashMap<>();
+  private final Collection<InetAddress> connected = new HashSet<>(128);
   // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
   @Setter
   private Cache<InetAddress, Byte> blacklist;

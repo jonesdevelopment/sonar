@@ -106,7 +106,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(username, this));
 
     // Mark the player as connected → verifying players
-    Sonar.get().getFallback().getConnected().put(inetAddress, username);
+    Sonar.get().getFallback().getConnected().add(inetAddress);
 
     // Add better timeout handler to avoid known exploits or issues
     // We also want to timeout bots quickly to avoid flooding

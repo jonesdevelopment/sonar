@@ -46,7 +46,6 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   protected @Nullable String username;
   protected InetAddress inetAddress;
   protected ProtocolVersion protocolVersion;
-  protected @Nullable FallbackUser user;
   protected boolean listenForPackets = true;
 
   protected static final Fallback FALLBACK = Sonar.get().getFallback();
@@ -171,10 +170,8 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       return;
     }
 
-    // Check if Fallback is already verifying a player
-    // → is another player with the same IP address connected to Fallback?
-    if (FALLBACK.getConnected().containsKey(inetAddress)
-      || FALLBACK.getConnected().containsValue(username)) {
+    // Check if Fallback is already verifying a player with the same IP address
+    if (FALLBACK.getConnected().contains(inetAddress)) {
       customDisconnect(channel, protocolVersion, alreadyVerifying, encoder, handler);
       return;
     }
@@ -218,7 +215,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       }
 
       // Create an instance for the Fallback connection
-      user = new FallbackUserWrapper(channel, inetAddress, protocolVersion, geyser);
+      final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion, geyser);
       // Let the verification handler take over the channel
       user.hijack(username, offlineUUID, encoder, decoder, timeout, handler);
     });
