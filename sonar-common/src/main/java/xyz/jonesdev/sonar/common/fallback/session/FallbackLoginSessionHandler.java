@@ -54,6 +54,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  * </li>
  * <br>
  * * The KeepAlive check is skipped on 1.7, as KeepAlive packets don't exist during the LOGIN state.
+ * <br>
  * ** The internals of the configuration phase were not mentioned.
  * Find out more about the client configuration and registry synchronization:
  * {@link #synchronizeClientRegistry()}, {@link #updateEncoderDecoderState(FallbackPacketRegistry)}
@@ -78,7 +79,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
   private int expectedKeepAliveId;
 
   /**
-   * The purpose of these keepalive packets is to confirm that the connection
+   * The purpose of these KeepAlive packets is to confirm that the connection
    * is active and legitimate, thereby preventing bot connections that
    * could flood the server with login attempts and other unwanted traffic.
    */
