@@ -40,10 +40,18 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
     this.enableGravityCheck = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isEnabled();
     this.enableCollisionsCheck = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
+
+    // Send the initial JoinGame, PositionLook, etc. packets to the player
+    SPAWN_PACKETS.accept(user, this);
+    // 1.8 and below don't have TeleportConfirm packets, which is why we're skipping that check.
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
+      markTeleported();
+    }
   }
 
   private final boolean enableGravityCheck, enableCollisionsCheck;
-  private boolean teleported, spawned, checkMovement;
+  private boolean teleported, checkMovement;
+  private short expectedTransactionId = 1;
   private double x, y, z, deltaY;
   private int movementTick;
 
@@ -95,10 +103,31 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     checkState(user.isReceivedPluginMessage(), "didn't send plugin message");
   }
 
-  private void markSuccess() {
+  /**
+   * Uses ping packets to check for an immediate, legitimate response from the client
+   * <br>
+   * <a href="https://wiki.vg/Protocol#Ping_.28configuration.29">Wiki.vg - Ping (configuration)</a>
+   * <a href="https://wiki.vg/Protocol#Ping_.28play.29">Wiki.vg - Ping (play)</a>
+   */
+  private void sendTransaction() {
     // Interrupt any ongoing process/check
     markNextStage();
 
+    // Send a Transaction (Ping) packet with a random ID
+    expectedTransactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
+    user.write(new TransactionPacket(0, expectedTransactionId, false));
+  }
+
+  private void forceCAPTCHA() {
+    // Interrupt any ongoing process/check
+    markNextStage();
+
+    // Forcefully make the player solve a CAPTCHA
+    val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
+    decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
+  }
+
+  private void markSuccess() {
     // Either send the player to the vehicle check,
     // send the player to the CAPTCHA, or finish the verification.
     val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
@@ -113,38 +142,22 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     }
   }
 
-  private void forceCAPTCHA() {
-    // Interrupt any ongoing process/check
-    markNextStage();
-
-    // Forcefully make the player solve a CAPTCHA
-    val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
-    decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
-  }
-
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof TransactionPacket) {
       final TransactionPacket transaction = (TransactionPacket) packet;
 
-      // Make sure the player hasn't been spawned in the virtual world yet
-      checkState(!spawned, "player has already spawned");
+      // Make sure random transactions aren't counted
+      checkState(expectedTransactionId <= 0, "unexpected transaction");
       // Make sure the transaction was accepted
       // This must - by vanilla protocol - always be accepted
       checkState(transaction.isAccepted(), "didn't accept transaction");
       // Also check if the transaction ID matches the expected ID
       final long transactionId = transaction.getTransactionId();
-      final int expectedTransactionId = user.getExpectedTransactionId();
       checkState(transactionId == expectedTransactionId,
         "expected T ID " + expectedTransactionId + ", but got " + transactionId);
 
-      spawned = true;
-      // Send the initial JoinGame, PositionLook, etc. packets to the player
-      SPAWN_PACKETS.accept(user, this);
-      // 1.8 and below don't have TeleportConfirm packets, which is why we're skipping that check.
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
-        markTeleported();
-      }
+      markSuccess();
     } else if (packet instanceof PlayerPositionLookPacket) {
       // Make sure the player has teleported before checking for position packets
       if (teleported) {
@@ -160,8 +173,6 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     } else if (packet instanceof TeleportConfirmPacket) {
       final TeleportConfirmPacket teleportConfirm = (TeleportConfirmPacket) packet;
 
-      // Make sure the player has been spawned in the virtual world
-      checkState(spawned, "player has not spawned yet");
       // Only expect this packet to be sent once
       checkState(!teleported, "duplicate teleport confirm");
       // Check if the teleport ID matches the expected ID
@@ -236,7 +247,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
       // The player is obeying gravity, go on to the next stage if the collision check is disabled.
       if (++movementTick == maxMovementTick && !enableCollisionsCheck) {
-        markSuccess();
+        sendTransaction();
       }
     } else if (enableCollisionsCheck) {
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
@@ -249,7 +260,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       // Make sure the player is actually colliding with the blocks and not only spoofing ground
       checkState(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
       // The player has collided with the blocks, go on to the next stage
-      markSuccess();
+      sendTransaction();
     }
   }
 }

@@ -41,10 +41,6 @@ public interface FallbackUser {
   @NotNull
   SystemTimer getLoginTimer();
 
-  int getExpectedTransactionId();
-
-  void setExpectedTransactionId(final int expectedTransactionId);
-
   boolean isReceivedClientSettings();
 
   void setReceivedClientSettings(final boolean receivedClientSettings);

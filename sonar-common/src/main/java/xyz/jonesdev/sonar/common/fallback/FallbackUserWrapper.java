@@ -59,8 +59,6 @@ public final class FallbackUserWrapper implements FallbackUser {
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
   @Setter
-  private int expectedTransactionId;
-  @Setter
   private boolean receivedClientSettings;
   @Setter
   private boolean receivedPluginMessage;

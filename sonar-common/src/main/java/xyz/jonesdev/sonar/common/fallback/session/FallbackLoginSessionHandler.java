@@ -29,7 +29,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledg
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientSettingsPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.KeepAlivePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PluginMessagePacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
 
 import java.util.UUID;
 
@@ -48,10 +47,9 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  *   After the KeepAlive packet is validated, the client enters the configuration phase.**
  * </li>
  * <li>
- *   Next, a transaction packet is sent to the client.
  *   Then, the session handler is set to the {@link FallbackGravitySessionHandler}.
  *   <br>
- *   See more: {@link FallbackLoginSessionHandler#sendTransaction()}
+ *   See more: {@link FallbackLoginSessionHandler#markSuccess()}
  * </li>
  * <br>
  * * The KeepAlive check is skipped on 1.7, as KeepAlive packets don't exist during the LOGIN state.
@@ -69,7 +67,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       // This trick helps in reducing unnecessary outgoing server traffic
       // by avoiding sending other packets to clients that are potentially bots.
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-        sendTransaction();
+        markSuccess();
       } else {
         initialize18();
       }
@@ -89,23 +87,13 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
     user.write(new KeepAlivePacket(expectedKeepAliveId));
   }
 
-  /**
-   * Uses ping packets to check for an immediate, legitimate response from the client
-   * <br>
-   * <a href="https://wiki.vg/Protocol#Ping_.28configuration.29">Wiki.vg - Ping (configuration)</a>
-   * <a href="https://wiki.vg/Protocol#Ping_.28play.29">Wiki.vg - Ping (play)</a>
-   */
-  private void sendTransaction() {
+  private void markSuccess() {
     // Set the decoder state to GAME, so we can continue sending these packets
     updateEncoderDecoderState(FallbackPacketRegistry.GAME);
     // Pass the player to the next verification handler
     final FallbackGravitySessionHandler gravitySessionHandler = new FallbackGravitySessionHandler(user, username, uuid);
     val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
     decoder.setListener(gravitySessionHandler);
-    // Send a Transaction (Ping) packet with a random ID
-    final short expectedTransactionId = (short) RANDOM.nextInt();
-    user.setExpectedTransactionId(expectedTransactionId);
-    user.write(new TransactionPacket(0, expectedTransactionId, false));
   }
 
   @Override
@@ -126,8 +114,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       // Spawn the player in the virtual world if the client does not need
       // any configuration (pre-1.20.2).
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
-        // Send a transaction packet for further packet validation/confirmation
-        sendTransaction();
+        markSuccess();
       }
     } else if (packet instanceof LoginAcknowledgedPacket) {
       synchronizeClientRegistry();
@@ -138,8 +125,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       // Set decoder state to actually catch all packets
       updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
     } else if (packet instanceof FinishConfigurationPacket) {
-      // Send a transaction packet for further packet validation/confirmation
-      sendTransaction();
+      markSuccess();
     }
     // Make sure to catch all ClientSettings and PluginMessage packets during the configuration phase.
     else if (packet instanceof ClientSettingsPacket) {
