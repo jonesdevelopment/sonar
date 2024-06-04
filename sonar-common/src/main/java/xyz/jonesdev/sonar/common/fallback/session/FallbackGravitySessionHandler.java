@@ -26,7 +26,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
 import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Gravity.Gamemode.CREATIVE;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
@@ -41,22 +40,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     this.enableGravityCheck = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isEnabled();
     this.enableCollisionsCheck = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
 
-    // Send the initial JoinGame, PositionLook, etc. packets to the player
-    SPAWN_PACKETS.accept(user, this);
-    // 1.8 and below don't have TeleportConfirm packets, which is why we're skipping that check.
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
-      markTeleported();
-    }
-  }
-
-  private final boolean enableGravityCheck, enableCollisionsCheck;
-  private boolean teleported, checkMovement;
-  private short expectedTransactionId = 1;
-  private double x, y, z, deltaY;
-  private int movementTick;
-
-  // FIXME: 1.18.2-1.19.3 weird loading world issue
-  private static final BiConsumer<FallbackUser, FallbackGravitySessionHandler> SPAWN_PACKETS = (user, handler) -> {
+    // FIXME: 1.18.2-1.19.3 weird loading world issue
     // First, write the JoinGame packet to the buffer
     user.delayedWrite(joinGame);
     // Then, write the ClientAbilities packet to the buffer
@@ -82,12 +66,23 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     // Teleport player into an empty world by sending an empty chunk packet
     user.delayedWrite(EMPTY_CHUNK_DATA);
     // Spawn the invisible platform below the player
-    if (handler.enableCollisionsCheck) {
+    if (this.enableCollisionsCheck) {
       user.delayedWrite(updateSectionBlocks);
     }
     // Send all packets at once
     user.getChannel().flush();
-  };
+
+    // 1.8 and below don't have TeleportConfirm packets, which is why we're skipping that check.
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
+      markTeleported();
+    }
+  }
+
+  private final boolean enableGravityCheck, enableCollisionsCheck;
+  private boolean teleported, checkMovement;
+  private short expectedTransactionId = 1;
+  private double x, y, z, deltaY;
+  private int movementTick;
 
   private void markTeleported() {
     // Activate the movement checks

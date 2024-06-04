@@ -37,10 +37,8 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   @Setter
   private FallbackPacketListener listener;
 
-  public FallbackPacketDecoder(final @NotNull ProtocolVersion protocolVersion,
-                               final @NotNull FallbackPacketListener listener) {
+  public FallbackPacketDecoder(final @NotNull ProtocolVersion protocolVersion) {
     this.protocolVersion = protocolVersion;
-    this.listener = listener;
     updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME);
   }
 
@@ -90,7 +88,9 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
         }
 
         // Let our verification handler process the packet
-        listener.handle(packet);
+        if (listener != null) {
+          listener.handle(packet);
+        }
 
         // Fire channel read to avoid timeout
         ctx.fireChannelRead(packet);

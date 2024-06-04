@@ -88,7 +88,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
   }
 
   private void markSuccess() {
-    // Set the decoder state to GAME, so we can continue sending these packets
+    // Make sure we can actually switch over to the next check
     updateEncoderDecoderState(FallbackPacketRegistry.GAME);
     // Pass the player to the next verification handler
     final FallbackGravitySessionHandler gravitySessionHandler = new FallbackGravitySessionHandler(user, username, uuid);
