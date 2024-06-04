@@ -31,6 +31,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.KeepAlivePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PluginMessagePacket;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
@@ -67,7 +68,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       // This trick helps in reducing unnecessary outgoing server traffic
       // by avoiding sending other packets to clients that are potentially bots.
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-        markSuccess();
+        user.getChannel().eventLoop().schedule(this::markSuccess, 250L, TimeUnit.MILLISECONDS);
       } else {
         initialize18();
       }

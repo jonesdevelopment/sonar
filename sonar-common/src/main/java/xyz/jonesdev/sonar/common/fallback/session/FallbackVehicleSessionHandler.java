@@ -98,9 +98,6 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       }
       // Mark the PlayerInput packet as received
       receivedInput = true;
-    } else {
-      // Fail the verification if the user sends any other packets
-      user.fail("unexpected packet " + packet.getClass().getCanonicalName());
     }
   }
 }
