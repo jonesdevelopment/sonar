@@ -210,8 +210,8 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
     // Log/debug position if enabled in the configuration
     if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-      Sonar.get().getFallback().getLogger().info("{}: {}/{}/{}, dy={}, g={}",
-        username, x, y, z, deltaY, isOnGround);
+      Sonar.get().getFallback().getLogger().info("{}: {}/{}/{}, ly={}/dy={}, {}",
+        username, x, y, z, lastY, deltaY, isOnGround);
     }
 
     // The player is not allowed to move away from the collision platform.
@@ -229,8 +229,10 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       }
 
       if (enableGravityCheck) {
+        // Predict the player's current motion based on the last motion
+        // https://minecraft.wiki/w/Entity#Motion_of_entities
         final double predicted = (lastDeltaY - 0.08) * 0.98f;
-        final double difference = deltaY - predicted;
+        final double difference = Math.abs(deltaY - predicted);
 
         // Check if the difference between the predicted motion and
         // the actual motion is greater than our minimum threshold.
