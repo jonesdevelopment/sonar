@@ -76,6 +76,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
     }
   }
 
+  private boolean acknowledgedLogin;
   private int expectedKeepAliveId;
 
   /**
@@ -96,6 +97,18 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
     final FallbackGravitySessionHandler gravitySessionHandler = new FallbackGravitySessionHandler(user, username, uuid);
     val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
     decoder.setListener(gravitySessionHandler);
+  }
+
+  private void markAcknowledged() {
+    acknowledgedLogin = true;
+
+    synchronizeClientRegistry();
+    // Write the FinishConfiguration packet to the buffer
+    user.delayedWrite(FINISH_CONFIGURATION);
+    // Send all packets in one flush
+    user.getChannel().flush();
+    // Set decoder state to actually catch all packets
+    updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
   }
 
   @Override
@@ -119,13 +132,9 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
         markSuccess();
       }
     } else if (packet instanceof LoginAcknowledgedPacket) {
-      synchronizeClientRegistry();
-      // Write the FinishConfiguration packet to the buffer
-      user.delayedWrite(FINISH_CONFIGURATION);
-      // Send all packets in one flush
-      user.getChannel().flush();
-      // Set decoder state to actually catch all packets
-      updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
+      // Prevent users from sending multiple LoginAcknowledged packets
+      checkState(!acknowledgedLogin, "sent login ack twice");
+      markAcknowledged();
     } else if (packet instanceof FinishConfigurationPacket) {
       markSuccess();
     }
