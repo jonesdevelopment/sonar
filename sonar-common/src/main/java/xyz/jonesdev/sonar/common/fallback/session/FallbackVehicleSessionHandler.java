@@ -56,8 +56,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     super(user, username, uuid);
 
     // Send the necessary packets to mount the player on the vehicle
-    final int vehicleType = EntityType.BOAT.getId(user.getProtocolVersion());
-    user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, vehicleType, x, y, z));
+    final int entityTypeId = EntityType.BOAT.getId(user.getProtocolVersion());
+    user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, entityTypeId, x, y, z));
     user.delayedWrite(setPassengers);
     user.getChannel().flush();
   }
