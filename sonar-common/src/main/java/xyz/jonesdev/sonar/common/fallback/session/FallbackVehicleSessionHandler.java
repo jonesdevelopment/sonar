@@ -61,12 +61,9 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     user.getChannel().flush();
   }
 
-  private boolean receivedPaddle, receivedInput, dropFurther;
+  private boolean receivedPaddle, receivedInput;
 
   private void markSuccess() {
-    // Force-stop the check
-    dropFurther = true;
-
     // Pass the player to the next best verification handler
     if (Sonar.get().getFallback().shouldPerformCaptcha()) {
       // Make sure the player exits the vehicle before sending the CAPTCHA
@@ -100,7 +97,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
       // Mark this check as success if the player has sent
       // two PlayerInput and a minimum of one PaddleBoat packets.
-      if (receivedInput && receivedPaddle && !dropFurther) {
+      if (receivedInput && receivedPaddle) {
         markSuccess();
       }
 
