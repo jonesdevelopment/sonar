@@ -133,7 +133,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       }
     } else if (packet instanceof LoginAcknowledgedPacket) {
       // Prevent users from sending multiple LoginAcknowledged packets
-      checkState(!acknowledgedLogin, "sent login ack twice");
+      checkState(!acknowledgedLogin, "sent duplicate login ack");
       markAcknowledged();
     } else if (packet instanceof FinishConfigurationPacket) {
       markSuccess();

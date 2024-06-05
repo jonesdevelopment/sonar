@@ -110,6 +110,8 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
       return;
     }
 
+    // Make sure the player isn't sending the client brand multiple times
+    checkState(user.isReceivedPluginMessage(), "sent duplicate plugin message");
     // Check if the channel is correct - 1.13 uses the new namespace
     // system ('minecraft:' + channel) and anything below 1.13 uses
     // the legacy namespace system ('MC|' + channel).
