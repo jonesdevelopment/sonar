@@ -118,14 +118,14 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     markNextStage();
 
     // Forcefully make the player solve a CAPTCHA
-    val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
+    val decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
     decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
   }
 
   private void markSuccess() {
     // Either send the player to the vehicle check,
     // send the player to the CAPTCHA, or finish the verification.
-    val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
+    val decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
     // Pass the player to the next best verification handler
     if (Sonar.get().getFallback().shouldPerformVehicleCheck()) {
       decoder.setListener(new FallbackVehicleSessionHandler(user, username, uuid, x, y, z));

@@ -69,7 +69,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     dropFurther = true;
 
     // Either send the player to the CAPTCHA, or finish the verification.
-    val decoder = (FallbackPacketDecoder) user.getChannel().pipeline().get(FallbackPacketDecoder.class);
+    val decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
     // Pass the player to the next best verification handler
     if (Sonar.get().getFallback().shouldPerformCaptcha()) {
       // Make sure the player exits the vehicle before sending the CAPTCHA

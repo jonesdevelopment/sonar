@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.api.fallback;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
@@ -31,6 +32,9 @@ import java.util.UUID;
 public interface FallbackUser {
   @NotNull
   Channel getChannel();
+
+  @NotNull
+  ChannelPipeline getPipeline();
 
   @NotNull
   InetAddress getInetAddress();
