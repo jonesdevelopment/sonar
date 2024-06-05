@@ -38,14 +38,13 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 public enum FallbackPacketRegistry {
   LOGIN {
     {
-      serverbound.register(LoginAcknowledgedPacket.class, LoginAcknowledgedPacket::new,
-        map(0x03, MINECRAFT_1_20_2, false));
-
-      clientbound.register(LoginSuccessPacket.class, LoginSuccessPacket::new,
-        map(0x02, MINECRAFT_1_7_2, false));
-
       clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
         map(0x00, MINECRAFT_1_7_2, true));
+      clientbound.register(LoginSuccessPacket.class, LoginSuccessPacket::new,
+        map(0x02, MINECRAFT_1_7_2, true));
+
+      serverbound.register(LoginAcknowledgedPacket.class, LoginAcknowledgedPacket::new,
+        map(0x03, MINECRAFT_1_20_2, false));
     }
   },
   CONFIG {
@@ -59,7 +58,6 @@ public enum FallbackPacketRegistry {
       clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
         map(0x03, MINECRAFT_1_20_2, false),
         map(0x04, MINECRAFT_1_20_5, false));
-
       clientbound.register(RegistryDataPacket.class, RegistryDataPacket::new,
         map(0x05, MINECRAFT_1_20_2, true),
         map(0x07, MINECRAFT_1_20_5, true));
