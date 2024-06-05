@@ -238,11 +238,11 @@ public final class VerifiedPlayerController {
    */
   private void _add(final @NotNull VerifiedPlayer player) {
     cache.computeIfAbsent(player.getInetAddress(), v -> new ArrayList<>())
-      .add(player.getPlayerUUID());
+      .add(player.getPlayerUuid());
   }
 
   /**
-   * Returns the amount of verified IP addresses
+   * Returns the number of verified IP addresses
    *
    * @return Estimated size of the local cache
    */
