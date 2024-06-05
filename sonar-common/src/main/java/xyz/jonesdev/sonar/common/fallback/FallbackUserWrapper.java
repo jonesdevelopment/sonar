@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.CorruptedFrameException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -77,8 +78,8 @@ public final class FallbackUserWrapper implements FallbackUser {
   }
 
   @Override
-  public void disconnect(final @NotNull Component reason) {
-    closeWith(channel, protocolVersion, DisconnectPacket.create(reason, false));
+  public void disconnect(final @NotNull Component reason, final boolean duringLogin) {
+    closeWith(channel, protocolVersion, DisconnectPacket.create(reason, duringLogin));
   }
 
   @Override
@@ -143,21 +144,18 @@ public final class FallbackUserWrapper implements FallbackUser {
 
   @Override
   public void fail(final @NotNull String reason) {
+    disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed(), false);
+
     // Only log the failed message if the server isn't currently under attack.
     // However, we let the user override this through the configuration.
     final boolean shouldLog = Sonar.get().getAttackTracker().getCurrentAttack() == null
       || Sonar.get().getConfig().getVerification().isLogDuringAttack();
 
-    // Only disconnect the player and log if the channel is active
-    if (channel.isActive()) {
-      disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
-
-      if (shouldLog) {
-        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
-          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
-          .replace("%reason%", reason));
-      }
+    if (shouldLog) {
+      Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
+        .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
+        .replace("%reason%", reason));
     }
 
     // Increment number of total failed verifications
@@ -199,6 +197,9 @@ public final class FallbackUserWrapper implements FallbackUser {
       // Invalidate the cached entry to ensure memory safety
       Sonar.get().getFallback().getRatelimiter().getFailCountCache().invalidate(inetAddress);
     }
+
+    // Throw an exception to avoid further code execution
+    throw new CorruptedFrameException();
   }
 
   /**

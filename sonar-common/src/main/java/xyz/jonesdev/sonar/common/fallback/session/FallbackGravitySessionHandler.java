@@ -242,7 +242,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
             forceCAPTCHA();
             return;
           }
-          fail("incorrect gravity; predicted: " + predicted + " deltaY: " + deltaY + " y: " + y);
+          user.fail("incorrect gravity; predicted: " + predicted + " deltaY: " + deltaY + " y: " + y);
         }
       }
 

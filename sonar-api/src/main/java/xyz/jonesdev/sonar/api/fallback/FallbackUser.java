@@ -55,10 +55,11 @@ public interface FallbackUser {
    * Disconnect the player during/after verification
    * using our custom Disconnect packet.
    *
-   * @param reason Disconnect message component
+   * @param reason      Disconnect message component
+   * @param duringLogin True, if the player has not joined yet
    */
   @ApiStatus.Internal
-  void disconnect(final @NotNull Component reason);
+  void disconnect(final @NotNull Component reason, final boolean duringLogin);
 
   /**
    * Takes over the channel and begins the verification process

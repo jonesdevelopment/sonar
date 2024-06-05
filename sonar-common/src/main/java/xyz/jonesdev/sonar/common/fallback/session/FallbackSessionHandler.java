@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.common.fallback.session;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CorruptedFrameException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -52,15 +51,9 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
   protected void checkState(final boolean state, final String failReason) {
     // Fails the verification if the condition is not met
     if (!state) {
-      fail(failReason);
+      // Let the API know that the user has failed the verification
+      user.fail(failReason);
     }
-  }
-
-  protected void fail(final String failReason) {
-    // Let the API know that the user has failed the verification
-    user.fail(failReason);
-    // Make sure to interrupt the connection by throwing an exception
-    throw new CorruptedFrameException();
   }
 
   protected final void finishVerification() {
@@ -84,7 +77,7 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
     }
 
     // Disconnect player with the verification success message
-    user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());
+    user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess(), false);
 
     Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getSuccessLog()
       .replace("%name%", username)
