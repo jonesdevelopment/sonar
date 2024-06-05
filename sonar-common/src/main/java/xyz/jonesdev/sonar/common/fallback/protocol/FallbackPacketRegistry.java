@@ -19,7 +19,9 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
@@ -525,7 +527,7 @@ public enum FallbackPacketRegistry {
         final PacketMapping next = (i + 1 < mappings.length) ? mappings[i + 1] : current;
 
         final ProtocolVersion from = current.protocolVersion;
-        final ProtocolVersion to = getProtocolVersion(current, next, from);
+        final ProtocolVersion to = getProtocolVersion(current, next);
 
         for (final ProtocolVersion protocol : EnumSet.range(from, to)) {
           if (protocol == to && next != current) {
@@ -534,19 +536,18 @@ public enum FallbackPacketRegistry {
 
           final ProtocolRegistry registry = versions.get(protocol);
           if (registry == null) {
-            throw new IllegalArgumentException("Unknown protocol version "
-              + current.protocolVersion);
+            throw new IllegalArgumentException("Unknown protocol version " + from);
           }
 
           if (registry.packetIdToSupplier.containsKey(current.id)) {
             throw new IllegalArgumentException("Can not register class " + clazz.getSimpleName()
-              + " with id " + current.id + " for " + registry.version
+              + " with id " + current.id + " for " + registry.protocolVersion
               + " because another packet is already registered");
           }
 
           if (registry.packetClassToId.containsKey(clazz)) {
             throw new IllegalArgumentException(clazz.getSimpleName()
-              + " is already registered for version " + registry.version);
+              + " is already registered for version " + registry.protocolVersion);
           }
 
           if (!current.encodeOnly) {
@@ -559,22 +560,18 @@ public enum FallbackPacketRegistry {
 
     @NotNull
     private static ProtocolVersion getProtocolVersion(final @NotNull PacketMapping current,
-                                                      final @NotNull PacketMapping next,
-                                                      final @NotNull ProtocolVersion from) {
+                                                      final @NotNull PacketMapping next) {
       return current == next ? LATEST_VERSION : next.protocolVersion;
     }
   }
 
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class ProtocolRegistry {
-    private final ProtocolVersion version;
+    private final ProtocolVersion protocolVersion;
     private final IntObjectMap<Supplier<? extends FallbackPacket>> packetIdToSupplier =
       new IntObjectHashMap<>(16, 0.5f);
     private final Map<Class<? extends FallbackPacket>, Integer> packetClassToId =
       new HashMap<>(16, 0.5f);
-
-    ProtocolRegistry(final ProtocolVersion version) {
-      this.version = version;
-    }
 
     public FallbackPacket createPacket(final int id) {
       final Supplier<? extends FallbackPacket> supplier = packetIdToSupplier.get(id);
@@ -603,16 +600,16 @@ public enum FallbackPacketRegistry {
 
     PacketMapping(final int id,
                   final ProtocolVersion protocolVersion,
-                  final boolean packetDecoding) {
+                  final boolean encodeOnly) {
       this.id = id;
       this.protocolVersion = protocolVersion;
-      this.encodeOnly = packetDecoding;
+      this.encodeOnly = encodeOnly;
     }
   }
 
   private static @NotNull PacketMapping map(final int id,
-                                            final ProtocolVersion version,
+                                            final ProtocolVersion protocolVersion,
                                             final boolean encodeOnly) {
-    return new PacketMapping(id, version, encodeOnly);
+    return new PacketMapping(id, protocolVersion, encodeOnly);
   }
 }
