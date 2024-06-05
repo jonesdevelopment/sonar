@@ -62,9 +62,7 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
 
     // Add verified player to the database
     final long timeTaken = user.getLoginTimer().delay();
-    final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(
-      user.getInetAddress().toString(), uuid, timeTaken);
-    Sonar.get().getVerifiedPlayerController().add(verifiedPlayer);
+    Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(user.getInetAddress(), uuid, timeTaken));
 
     // Call the VerifySuccessEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, uuid, user, timeTaken));

@@ -23,7 +23,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
+import java.net.InetAddress;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -50,7 +52,7 @@ public final class VerifiedPlayer {
     uniqueIndexName = "ip_address_player_uuid_idx",
     width = 36
   )
-  private UUID playerUUID;
+  private UUID playerUuid;
 
   @DatabaseField(
     columnName = "timestamp",
@@ -58,9 +60,11 @@ public final class VerifiedPlayer {
   )
   private Timestamp timestamp;
 
-  public VerifiedPlayer(final String inetAddress, final UUID playerUUID, final long timestamp) {
-    this.inetAddress = inetAddress;
-    this.playerUUID = playerUUID;
+  public VerifiedPlayer(final @NotNull InetAddress inetAddress,
+                        final @NotNull UUID playerUuid,
+                        final long timestamp) {
+    this.inetAddress = inetAddress.toString();
+    this.playerUuid = playerUuid;
     this.timestamp = new Timestamp(timestamp);
   }
 }
