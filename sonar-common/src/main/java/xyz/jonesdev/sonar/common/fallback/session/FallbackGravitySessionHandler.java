@@ -94,7 +94,10 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
     // Check if the player sent all necessary packets
     checkState(user.isReceivedClientSettings(), "didn't send client settings");
-    checkState(user.isReceivedPluginMessage(), "didn't send plugin message");
+    // Don't check Geyser players for plugin messages
+    if (!user.isGeyser()) {
+      checkState(user.isReceivedPluginMessage(), "didn't send plugin message");
+    }
   }
 
   /**
