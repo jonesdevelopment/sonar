@@ -228,16 +228,20 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
         return;
       }
 
-      final double predicted = (lastDeltaY - 0.08) * 0.98f;
-      final double difference = deltaY - predicted;
-      final boolean passed = !enableGravityCheck || difference < 1e-7;
+      if (enableGravityCheck) {
+        final double predicted = (lastDeltaY - 0.08) * 0.98f;
+        final double difference = deltaY - predicted;
 
-      // Do not throw an exception if the user configured to display the CAPTCHA instead
-      if (!passed && Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-        forceCAPTCHA();
-        return;
-      } else {
-        checkState(passed, "incorrect gravity; predicted: " + predicted + " deltaY: " + deltaY + " y: " + y);
+        // Check if the difference between the predicted motion and
+        // the actual motion is greater than our minimum threshold.
+        if (difference > 1e-7) {
+          // Do not throw an exception if the user configured to display the CAPTCHA instead
+          if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+            forceCAPTCHA();
+            return;
+          }
+          fail("incorrect gravity; predicted: " + predicted + " deltaY: " + deltaY + " y: " + y);
+        }
       }
 
       // The player is obeying gravity, go on to the next stage if the collision check is disabled.

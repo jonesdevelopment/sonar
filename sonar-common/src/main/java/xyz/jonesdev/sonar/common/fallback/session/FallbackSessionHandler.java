@@ -50,10 +50,17 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
   protected static final Random RANDOM = new Random();
 
   protected void checkState(final boolean state, final String failReason) {
+    // Fails the verification if the condition is not met
     if (!state) {
-      user.fail(failReason);
-      throw new CorruptedFrameException();
+      fail(failReason);
     }
+  }
+
+  protected void fail(final String failReason) {
+    // Let the API know that the user has failed the verification
+    user.fail(failReason);
+    // Make sure to interrupt the connection by throwing an exception
+    throw new CorruptedFrameException();
   }
 
   protected final void finishVerification() {
