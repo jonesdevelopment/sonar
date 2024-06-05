@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.common.fallback.session;
 
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
@@ -68,12 +67,12 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     // Force-stop the check
     dropFurther = true;
 
-    // Either send the player to the CAPTCHA, or finish the verification.
-    val decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
     // Pass the player to the next best verification handler
     if (Sonar.get().getFallback().shouldPerformCaptcha()) {
       // Make sure the player exits the vehicle before sending the CAPTCHA
       user.delayedWrite(removeEntities);
+      // Either send the player to the CAPTCHA, or finish the verification.
+      final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
       decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
     } else {

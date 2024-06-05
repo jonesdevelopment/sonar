@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.common.fallback.session;
 
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -95,7 +94,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
     updateEncoderDecoderState(FallbackPacketRegistry.GAME);
     // Pass the player to the next verification handler
     final FallbackGravitySessionHandler gravitySessionHandler = new FallbackGravitySessionHandler(user, username, uuid);
-    val decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
+    final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
     decoder.setListener(gravitySessionHandler);
   }
 
@@ -149,8 +148,8 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
   }
 
   private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
-    val decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
-    val encoder = (FallbackPacketEncoder) user.getPipeline().get(FallbackPacketEncoder.class);
+    final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
+    final var encoder = (FallbackPacketEncoder) user.getPipeline().get(FallbackPacketEncoder.class);
     // Update the packet registry state in the encoder and decoder pipelines
     decoder.updateRegistry(registry);
     encoder.updateRegistry(registry);
