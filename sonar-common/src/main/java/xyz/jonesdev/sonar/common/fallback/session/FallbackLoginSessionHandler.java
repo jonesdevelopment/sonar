@@ -68,7 +68,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       // This trick helps in reducing unnecessary outgoing server traffic
       // by avoiding sending other packets to clients that are potentially bots.
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-        user.getChannel().eventLoop().schedule(this::markSuccess, 250L, TimeUnit.MILLISECONDS);
+        user.getChannel().eventLoop().schedule(this::markSuccess, 100L, TimeUnit.MILLISECONDS);
       } else {
         initialize18();
       }
