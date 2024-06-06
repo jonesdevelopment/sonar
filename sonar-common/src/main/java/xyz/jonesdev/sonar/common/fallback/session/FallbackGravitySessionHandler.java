@@ -192,6 +192,13 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
   private void handleMovement(final double x, final double y, final double z, final boolean isOnGround) {
     // Check if the client hasn't moved before sending the first movement packet
     if (!checkMovement) {
+      // No need to continue checking if the gravity and collision checks are disabled
+      // Continue with the next stage of the verification
+      if (!enableGravityCheck && !enableCollisionsCheck) {
+        sendTransaction();
+        return;
+      }
+
       if (x == SPAWN_X_POSITION && z == SPAWN_Z_POSITION) {
         // Now, once we verified the X and Z position, we can safely check for gravity
         checkMovement = true;
@@ -246,11 +253,11 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
           }
           user.fail("incorrect gravity; predicted: " + predicted + " deltaY: " + deltaY + " y: " + y);
         }
-      }
 
-      // The player is obeying gravity, go on to the next stage if the collision check is disabled.
-      if (++movementTick == maxMovementTick && !enableCollisionsCheck) {
-        sendTransaction();
+        // The player is obeying gravity, go on to the next stage if the collision check is disabled.
+        if (++movementTick == maxMovementTick && !enableCollisionsCheck) {
+          sendTransaction();
+        }
       }
     } else if (enableCollisionsCheck) {
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
