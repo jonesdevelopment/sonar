@@ -170,7 +170,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
 
     // Check if Fallback is already verifying a player with the same IP address
-    if (FALLBACK.getConnected().contains(inetAddress)) {
+    if (FALLBACK.getConnected().containsKey(inetAddress)) {
       customDisconnect(channel, protocolVersion, alreadyVerifying, encoder, handler);
       return;
     }
