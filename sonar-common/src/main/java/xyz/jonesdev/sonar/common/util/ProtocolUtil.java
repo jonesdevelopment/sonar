@@ -30,12 +30,17 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.EnumSet;
 import java.util.UUID;
 
 // Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
 public class ProtocolUtil {
+  public static final UUID EMPTY_UUID = new UUID(0L, 0L);
+
   private static final int FORGE_MAX_ARRAY_LENGTH = Integer.MAX_VALUE & 0x1FFF9A;
 
   public static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
@@ -241,6 +246,28 @@ public class ProtocolUtil {
     }
   }
 
+  // Taken from
+  // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/ByteMessage.java#L276
+  public <E extends Enum<E>> void writeEnumSet(final ByteBuf byteBuf,
+                                               final EnumSet<E> enumset,
+                                               final @NotNull Class<E> oclass) {
+    final E[] enums = oclass.getEnumConstants();
+    final BitSet bits = new BitSet(enums.length);
+
+    for (int i = 0; i < enums.length; ++i) {
+      bits.set(i, enumset.contains(enums[i]));
+    }
+
+    writeFixedBitSet(byteBuf, bits, enums.length);
+  }
+
+  private static void writeFixedBitSet(final ByteBuf byteBuf, final @NotNull BitSet bits, final int size) {
+    if (bits.length() > size) {
+      throw new StackOverflowError("BitSet too large (expected " + size + " got " + bits.size() + ")");
+    }
+    byteBuf.writeBytes(Arrays.copyOf(bits.toByteArray(), (size + 8) >> 3));
+  }
+
   public static void writeCompoundTag(final @NotNull ByteBuf byteBuf, final @NotNull CompoundBinaryTag compoundTag) {
     try {
       BinaryTagIO.writer().write(compoundTag, (DataOutput) new ByteBufOutputStream(byteBuf));
@@ -250,7 +277,7 @@ public class ProtocolUtil {
   }
 
   // Taken from
-  // https://github.com/Nan1t/NanoLimbo/pull/79/files#diff-4aa8208044741102c6326c7e85086e6fa8fcc7c064f7df6fd0411baf5f2b4504
+  // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/ByteMessage.java#L219
   public static void writeNamelessCompoundTag(final @NotNull ByteBuf byteBuf, final @NotNull BinaryTag binaryTag) {
     try (final ByteBufOutputStream output = new ByteBufOutputStream(byteBuf)) {
       // TODO: Find a way to improve this...

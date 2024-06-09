@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets.config;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration;
 
 import io.netty.buffer.ByteBuf;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;

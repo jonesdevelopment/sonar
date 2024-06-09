@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.api.verbose;
 
 import lombok.Getter;
-import lombok.val;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -66,7 +65,7 @@ public final class Verbose implements Observable {
   }
 
   public String nextAnimation() {
-    val animations = Sonar.get().getConfig().getVerbose().getAnimation();
+    final var animations = Sonar.get().getConfig().getVerbose().getAnimation();
     final int nextIndex = ++animationIndex % animations.size();
     return animations.toArray(new String[0])[nextIndex];
   }

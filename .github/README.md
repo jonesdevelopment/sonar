@@ -63,7 +63,7 @@ Fallback is unlikely to ever falsely prevent a player from joining the server si
 
 ## Building
 
-If you want to build your own version of Sonar, please take a look at the [Sonar building documentation](https://docs.jonesdev.xyz/sonar/building).
+If you want to build your own version of Sonar, please take a look at the [Sonar building documentation](https://docs.jonesdev.xyz/development/building).
 <br>
 You can also take a look at the [gradle documentation](https://docs.gradle.org/current/userguide/userguide.html) for a better understanding of Gradle.
 

@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.common.subcommand.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import xyz.jonesdev.sonar.api.SonarPlatform;
@@ -56,7 +55,7 @@ public final class DumpCommand extends Subcommand {
 
   @Unmodifiable
   private @NotNull Map<String, Object> collectMappedInformation() {
-    val mappings = new WeakHashMap<String, Object>();
+    final var mappings = new WeakHashMap<String, Object>();
     mappings.put("sonar", new Dump.Sonar(
       SONAR.getVersion().getFull(),
       SONAR.getPlatform(),

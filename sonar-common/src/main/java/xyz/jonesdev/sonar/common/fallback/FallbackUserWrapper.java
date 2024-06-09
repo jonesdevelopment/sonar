@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.CorruptedFrameException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -31,13 +32,14 @@ import xyz.jonesdev.sonar.api.event.impl.UserBlacklistedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
-import xyz.jonesdev.sonar.api.fallback.FallbackUserState;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.DisconnectPacket;
+import xyz.jonesdev.sonar.common.fallback.session.FallbackLoginSessionHandler;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.net.InetAddress;
@@ -57,9 +59,12 @@ public final class FallbackUserWrapper implements FallbackUser {
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
-  private final boolean geyser;
   @Setter
-  private FallbackUserState state = FallbackUserState.LOGIN_ACK; // 1.20.2+
+  private boolean receivedClientSettings;
+  @Setter
+  private boolean receivedPluginMessage;
+  private final boolean geyser;
+  private final SystemTimer loginTimer = new SystemTimer();
 
   public FallbackUserWrapper(final @NotNull Channel channel,
                              final @NotNull InetAddress inetAddress,
@@ -73,8 +78,8 @@ public final class FallbackUserWrapper implements FallbackUser {
   }
 
   @Override
-  public void disconnect(final @NotNull Component reason) {
-    closeWith(channel, protocolVersion, DisconnectPacket.create(reason, false));
+  public void disconnect(final @NotNull Component reason, final boolean duringLogin) {
+    closeWith(channel, protocolVersion, DisconnectPacket.create(reason, duringLogin));
   }
 
   @Override
@@ -100,7 +105,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(username, this));
 
     // Mark the player as connected → verifying players
-    Sonar.get().getFallback().getConnected().put(inetAddress, username);
+    Sonar.get().getFallback().getConnected().put(inetAddress, (byte) 0);
 
     // Add better timeout handler to avoid known exploits or issues
     // We also want to timeout bots quickly to avoid flooding
@@ -124,16 +129,11 @@ public final class FallbackUserWrapper implements FallbackUser {
       newEncoder.updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME);
 
       try {
-        // Prepare custom packet decoder and verification handler
-        final FallbackVerificationHandler verification = new FallbackVerificationHandler(this, username, uuid);
-        final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(this, verification);
         // Replace normal decoder to allow custom packets
+        final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(protocolVersion);
         pipeline.replace(decoder, FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
-
-        if (protocolVersion.compareTo(MINECRAFT_1_20_2) < 0) {
-          // Start initializing the actual join process for pre-1.20.2 clients
-          verification.initialJoinProcess();
-        }
+        // Listen for all incoming packets by setting the packet listener
+        fallbackPacketDecoder.setListener(new FallbackLoginSessionHandler(this, username, uuid));
       } catch (Throwable throwable) {
         // This rarely happens when the channel hangs and the player is still connecting
         // I honestly have no idea how else I'm supposed to fix this
@@ -144,24 +144,18 @@ public final class FallbackUserWrapper implements FallbackUser {
 
   @Override
   public void fail(final @NotNull String reason) {
-    // Make sure to set the state to FAILED to drop all packets
-    setState(FallbackUserState.FAILED);
+    disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed(), false);
 
     // Only log the failed message if the server isn't currently under attack.
     // However, we let the user override this through the configuration.
     final boolean shouldLog = Sonar.get().getAttackTracker().getCurrentAttack() == null
       || Sonar.get().getConfig().getVerification().isLogDuringAttack();
 
-    // Only disconnect the player and log if the channel is active
-    if (channel.isActive()) {
-      disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
-
-      if (shouldLog) {
-        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
-          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
-          .replace("%reason%", reason));
-      }
+    if (shouldLog) {
+      Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
+        .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
+        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
+        .replace("%reason%", reason));
     }
 
     // Increment number of total failed verifications
@@ -203,6 +197,9 @@ public final class FallbackUserWrapper implements FallbackUser {
       // Invalidate the cached entry to ensure memory safety
       Sonar.get().getFallback().getRatelimiter().getFailCountCache().invalidate(inetAddress);
     }
+
+    // Throw an exception to avoid further code execution
+    throw new CorruptedFrameException();
   }
 
   /**

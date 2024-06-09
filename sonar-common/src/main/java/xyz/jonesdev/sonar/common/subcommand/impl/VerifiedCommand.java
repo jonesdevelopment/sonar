@@ -145,8 +145,7 @@ public final class VerifiedCommand extends Subcommand {
         LOCK.add(rawInetAddress);
         // Add verified player to the database
         final long timestamp = System.currentTimeMillis();
-        final VerifiedPlayer verifiedPlayer = new VerifiedPlayer(inetAddress.toString(), uuid, timestamp);
-        Sonar.get().getVerifiedPlayerController().add(verifiedPlayer);
+        Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(inetAddress, uuid, timestamp));
 
         invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerifiedAdd()
           .replace("%ip%", rawInetAddress));

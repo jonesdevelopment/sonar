@@ -26,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
+import java.util.EnumSet;
+import java.util.UUID;
+
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
@@ -33,60 +36,63 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class SpawnEntityPacket implements FallbackPacket {
-  private int entityId, entityType;
-  private double x, y, z;
+public final class PlayerInfoPacket implements FallbackPacket {
+  private String username;
+  private UUID uuid;
+  private int gamemode;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    writeVarInt(byteBuf, entityId);
-
-    final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_8) > 0;
-
-    if (v1_9orHigher) {
-      writeUUID(byteBuf, EMPTY_UUID);
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+      writeString(byteBuf, username);
+      byteBuf.writeBoolean(true); // online
+      byteBuf.writeShort(0);
+      return;
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      writeVarInt(byteBuf, entityType);
-    } else {
-      byteBuf.writeByte(entityType);
+    // https://wiki.vg/Protocol#player-info:player-actions
+    if (protocolVersion.compareTo(MINECRAFT_1_19_3) >= 0) {
+      final EnumSet<Action> actions = EnumSet.noneOf(Action.class);
+      actions.add(Action.ADD_PLAYER);
+      actions.add(Action.UPDATE_LISTED);
+      actions.add(Action.UPDATE_GAMEMODE);
+      writeEnumSet(byteBuf, actions, Action.class);
+
+      writeVarInt(byteBuf, 1); // size
+      writeUUID(byteBuf, uuid);
+      writeString(byteBuf, username);
+      writeVarInt(byteBuf, 0); // properties
+
+      byteBuf.writeBoolean(true); // update listed
+      writeVarInt(byteBuf, gamemode);
+      return;
     }
 
-    if (v1_9orHigher) {
-      byteBuf.writeDouble(x);
-      byteBuf.writeDouble(y);
-      byteBuf.writeDouble(z);
-    } else {
-      byteBuf.writeInt(floor(x * 32D));
-      byteBuf.writeInt(floor(y * 32D));
-      byteBuf.writeInt(floor(z * 32D));
-    }
-
-    byteBuf.writeByte(0); // pitch or yaw
-    byteBuf.writeByte(0); // yaw or pitch
+    writeVarInt(byteBuf, 0); // ADD_PLAYER
+    writeVarInt(byteBuf, 1);
+    writeUUID(byteBuf, uuid);
+    writeString(byteBuf, username);
+    writeVarInt(byteBuf, 0);
+    writeVarInt(byteBuf, gamemode);
+    writeVarInt(byteBuf, 60);
+    byteBuf.writeBoolean(false);
 
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      byteBuf.writeByte(0); // head yaw
-      writeVarInt(byteBuf, 0); // data
-    } else {
-      byteBuf.writeInt(0); // data
+      byteBuf.writeBoolean(false);
     }
-
-    if (v1_9orHigher) {
-      byteBuf.writeShort(0); // velocity X
-      byteBuf.writeShort(0); // velocity Y
-      byteBuf.writeShort(0); // velocity Z
-    }
-  }
-
-  private static int floor(final double value) {
-    final int __value = (int) value;
-    return value < (double) __value ? __value - 1 : __value;
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
+  }
+
+  public enum Action {
+    ADD_PLAYER,
+    INITIALIZE_CHAT,
+    UPDATE_GAMEMODE,
+    UPDATE_LISTED,
+    UPDATE_LATENCY,
+    UPDATE_DISPLAY_NAME
   }
 }

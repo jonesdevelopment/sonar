@@ -28,7 +28,6 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.net.InetAddress;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -36,12 +35,11 @@ import java.util.concurrent.ConcurrentMap;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Fallback {
   public static final Fallback INSTANCE = new Fallback();
-  private static final @NotNull Sonar SONAR = Objects.requireNonNull(Sonar.get());
 
   // Map of all players connected to the server in general
   private final ConcurrentMap<InetAddress, Integer> online = new ConcurrentHashMap<>(128);
-  // Map of all connected usernames and their respective IP addresses (used for fast checking)
-  private final ConcurrentMap<InetAddress, String> connected = new ConcurrentHashMap<>();
+  // Map of all connected IP addresses (used for fast checking)
+  private final ConcurrentMap<InetAddress, Byte> connected = new ConcurrentHashMap<>(128);
   // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
   @Setter
   private Cache<InetAddress, Byte> blacklist;
@@ -55,21 +53,20 @@ public final class Fallback {
 
     @Override
     public void info(final String message, final Object... args) {
-      SONAR.getLogger().info("[fallback] " + message, args);
+      Sonar.get().getLogger().info("[fallback] " + message, args);
     }
 
     @Override
     public void warn(final String message, final Object... args) {
-      SONAR.getLogger().warn("[fallback] " + message, args);
+      Sonar.get().getLogger().warn("[fallback] " + message, args);
     }
 
     @Override
     public void error(final String message, final Object... args) {
-      SONAR.getLogger().error("[fallback] " + message, args);
+      Sonar.get().getLogger().error("[fallback] " + message, args);
     }
   };
 
-  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean shouldVerifyNewPlayers() {
     return shouldPerform(Sonar.get().getConfig().getVerification().getTiming());
   }

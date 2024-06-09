@@ -18,11 +18,13 @@
 package xyz.jonesdev.sonar.api.fallback;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -32,26 +34,36 @@ public interface FallbackUser {
   Channel getChannel();
 
   @NotNull
+  ChannelPipeline getPipeline();
+
+  @NotNull
   InetAddress getInetAddress();
 
   @NotNull
   ProtocolVersion getProtocolVersion();
 
   @NotNull
-  FallbackUserState getState();
+  SystemTimer getLoginTimer();
+
+  boolean isReceivedClientSettings();
+
+  void setReceivedClientSettings(final boolean receivedClientSettings);
+
+  boolean isReceivedPluginMessage();
+
+  void setReceivedPluginMessage(final boolean receivedPluginMessage);
 
   boolean isGeyser();
-
-  void setState(final FallbackUserState state);
 
   /**
    * Disconnect the player during/after verification
    * using our custom Disconnect packet.
    *
-   * @param reason Disconnect message component
+   * @param reason      Disconnect message component
+   * @param duringLogin True, if the player has not joined yet
    */
   @ApiStatus.Internal
-  void disconnect(final @NotNull Component reason);
+  void disconnect(final @NotNull Component reason, final boolean duringLogin);
 
   /**
    * Takes over the channel and begins the verification process

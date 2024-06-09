@@ -46,7 +46,6 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   protected @Nullable String username;
   protected InetAddress inetAddress;
   protected ProtocolVersion protocolVersion;
-  protected @Nullable FallbackUser user;
   protected boolean listenForPackets = true;
 
   protected static final Fallback FALLBACK = Sonar.get().getFallback();
@@ -55,6 +54,8 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   public final void channelActive(final @NotNull ChannelHandlerContext ctx) throws Exception {
     // Increase connections per second for the action bar verbose
     GlobalSonarStatistics.countConnection();
+    // Hook the traffic listener
+    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
     // Make sure to let the server handle the rest
     ctx.fireChannelActive();
   }
@@ -109,9 +110,6 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
     // Store the protocol version
     protocolVersion = ProtocolVersion.fromId(protocol);
-    // Hook the traffic listener
-    // TODO: Can we implement this in channelActive?
-    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
   }
 
   /**
@@ -171,10 +169,8 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       return;
     }
 
-    // Check if Fallback is already verifying a player
-    // → is another player with the same IP address connected to Fallback?
-    if (FALLBACK.getConnected().containsKey(inetAddress)
-      || FALLBACK.getConnected().containsValue(username)) {
+    // Check if Fallback is already verifying a player with the same IP address
+    if (FALLBACK.getConnected().containsKey(inetAddress)) {
       customDisconnect(channel, protocolVersion, alreadyVerifying, encoder, handler);
       return;
     }
@@ -218,7 +214,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       }
 
       // Create an instance for the Fallback connection
-      user = new FallbackUserWrapper(channel, inetAddress, protocolVersion, geyser);
+      final FallbackUser user = new FallbackUserWrapper(channel, inetAddress, protocolVersion, geyser);
       // Let the verification handler take over the channel
       user.hijack(username, offlineUUID, encoder, decoder, timeout, handler);
     });

@@ -19,11 +19,13 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.FinishConfigurationPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.config.RegistryDataPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
@@ -38,14 +40,13 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 public enum FallbackPacketRegistry {
   LOGIN {
     {
-      serverbound.register(LoginAcknowledgedPacket.class, LoginAcknowledgedPacket::new,
-        map(0x03, MINECRAFT_1_20_2, false));
-
-      clientbound.register(LoginSuccessPacket.class, LoginSuccessPacket::new,
-        map(0x02, MINECRAFT_1_7_2, false));
-
       clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
         map(0x00, MINECRAFT_1_7_2, true));
+      clientbound.register(LoginSuccessPacket.class, LoginSuccessPacket::new,
+        map(0x02, MINECRAFT_1_7_2, true));
+
+      serverbound.register(LoginAcknowledgedPacket.class, LoginAcknowledgedPacket::new,
+        map(0x03, MINECRAFT_1_20_2, false));
     }
   },
   CONFIG {
@@ -59,7 +60,6 @@ public enum FallbackPacketRegistry {
       clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
         map(0x03, MINECRAFT_1_20_2, false),
         map(0x04, MINECRAFT_1_20_5, false));
-
       clientbound.register(RegistryDataPacket.class, RegistryDataPacket::new,
         map(0x05, MINECRAFT_1_20_2, true),
         map(0x07, MINECRAFT_1_20_5, true));
@@ -208,6 +208,22 @@ public enum FallbackPacketRegistry {
         map(0x0E, MINECRAFT_1_7_2, true),
         map(0x00, MINECRAFT_1_9, true),
         map(0x01, MINECRAFT_1_19_4, true));
+      clientbound.register(PlayerInfoPacket.class, PlayerInfoPacket::new,
+        map(0x38, MINECRAFT_1_7_2, true),
+        map(0x2D, MINECRAFT_1_9, true),
+        map(0x2E, MINECRAFT_1_12_1, true),
+        map(0x30, MINECRAFT_1_13, true),
+        map(0x33, MINECRAFT_1_14, true),
+        map(0x34, MINECRAFT_1_15, true),
+        map(0x33, MINECRAFT_1_16, true),
+        map(0x32, MINECRAFT_1_16_2, true),
+        map(0x36, MINECRAFT_1_17, true),
+        map(0x34, MINECRAFT_1_19, true),
+        map(0x37, MINECRAFT_1_19_1, true),
+        map(0x36, MINECRAFT_1_19_3, true),
+        map(0x3A, MINECRAFT_1_19_4, true),
+        map(0x3C, MINECRAFT_1_20_2, true),
+        map(0x3E, MINECRAFT_1_20_5, true));
       clientbound.register(UpdateSectionBlocksPacket.class, UpdateSectionBlocksPacket::new,
         map(0x22, MINECRAFT_1_7_2, true),
         map(0x10, MINECRAFT_1_9, true),
@@ -511,7 +527,7 @@ public enum FallbackPacketRegistry {
         final PacketMapping next = (i + 1 < mappings.length) ? mappings[i + 1] : current;
 
         final ProtocolVersion from = current.protocolVersion;
-        final ProtocolVersion to = getProtocolVersion(current, next, from);
+        final ProtocolVersion to = getProtocolVersion(current, next);
 
         for (final ProtocolVersion protocol : EnumSet.range(from, to)) {
           if (protocol == to && next != current) {
@@ -520,19 +536,18 @@ public enum FallbackPacketRegistry {
 
           final ProtocolRegistry registry = versions.get(protocol);
           if (registry == null) {
-            throw new IllegalArgumentException("Unknown protocol version "
-              + current.protocolVersion);
+            throw new IllegalArgumentException("Unknown protocol version " + from);
           }
 
           if (registry.packetIdToSupplier.containsKey(current.id)) {
             throw new IllegalArgumentException("Can not register class " + clazz.getSimpleName()
-              + " with id " + current.id + " for " + registry.version
+              + " with id " + current.id + " for " + registry.protocolVersion
               + " because another packet is already registered");
           }
 
           if (registry.packetClassToId.containsKey(clazz)) {
             throw new IllegalArgumentException(clazz.getSimpleName()
-              + " is already registered for version " + registry.version);
+              + " is already registered for version " + registry.protocolVersion);
           }
 
           if (!current.encodeOnly) {
@@ -545,22 +560,18 @@ public enum FallbackPacketRegistry {
 
     @NotNull
     private static ProtocolVersion getProtocolVersion(final @NotNull PacketMapping current,
-                                                      final @NotNull PacketMapping next,
-                                                      final @NotNull ProtocolVersion from) {
+                                                      final @NotNull PacketMapping next) {
       return current == next ? LATEST_VERSION : next.protocolVersion;
     }
   }
 
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class ProtocolRegistry {
-    private final ProtocolVersion version;
+    private final ProtocolVersion protocolVersion;
     private final IntObjectMap<Supplier<? extends FallbackPacket>> packetIdToSupplier =
       new IntObjectHashMap<>(16, 0.5f);
     private final Map<Class<? extends FallbackPacket>, Integer> packetClassToId =
       new HashMap<>(16, 0.5f);
-
-    ProtocolRegistry(final ProtocolVersion version) {
-      this.version = version;
-    }
 
     public FallbackPacket createPacket(final int id) {
       final Supplier<? extends FallbackPacket> supplier = packetIdToSupplier.get(id);
@@ -589,16 +600,16 @@ public enum FallbackPacketRegistry {
 
     PacketMapping(final int id,
                   final ProtocolVersion protocolVersion,
-                  final boolean packetDecoding) {
+                  final boolean encodeOnly) {
       this.id = id;
       this.protocolVersion = protocolVersion;
-      this.encodeOnly = packetDecoding;
+      this.encodeOnly = encodeOnly;
     }
   }
 
   private static @NotNull PacketMapping map(final int id,
-                                            final ProtocolVersion version,
+                                            final ProtocolVersion protocolVersion,
                                             final boolean encodeOnly) {
-    return new PacketMapping(id, version, encodeOnly);
+    return new PacketMapping(id, protocolVersion, encodeOnly);
   }
 }
