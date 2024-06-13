@@ -73,6 +73,7 @@ public enum ItemType {
       case MINECRAFT_1_20_3:
         return 979;
       case MINECRAFT_1_20_5:
+      case MINECRAFT_1_21:
         return 982;
     }
   });
