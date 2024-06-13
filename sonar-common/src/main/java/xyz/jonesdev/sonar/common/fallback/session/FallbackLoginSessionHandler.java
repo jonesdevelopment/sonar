@@ -159,7 +159,10 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
     // 1.20.5+ adds new "game bundle features" which overcomplicate all of this...
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
       // Write the new RegistrySync packets to the buffer
-      for (final FallbackPacket syncPacket : REGISTRY_SYNC_1_20_5) {
+      FallbackPacket[] registryPackets = user.getProtocolVersion().compareTo(MINECRAFT_1_21) < 0
+        ? REGISTRY_SYNC_1_20_5
+        : REGISTRY_SYNC_1_21;
+      for (final FallbackPacket syncPacket : registryPackets) {
         user.delayedWrite(syncPacket);
       }
     } else {
