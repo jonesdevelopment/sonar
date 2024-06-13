@@ -23,6 +23,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
@@ -64,7 +65,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
       // Read the packet ID and then create the packet from it
       final int packetId = readVarInt(byteBuf);
       final FallbackPacket packet = registry.createPacket(packetId);
-
+      Sonar.get().getFallback().getLogger().info("Trying decode packet {} with id {} and {} bytes", packet == null ? "null" : packet.getClass().getSimpleName(), packetId, byteBuf.readableBytes());
       // If the packet isn't found, skip it
       if (packet == null) {
         byteBuf.readerIndex(originalReaderIndex);
