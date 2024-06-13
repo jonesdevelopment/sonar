@@ -184,7 +184,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
       // Only continue checking if we're actually expecting a SetHeldItem packet
       // The player can send a SetHeldItem packet by themselves -> exempt
-      if (expectedSlotId > 0
+      if (expectedSlotId != -1
         // Check if the slot ID matches the expected slot ID
         // This can false flag if a player spams these packets, which is why we don't fail for this
         && slotId == expectedSlotId) {
