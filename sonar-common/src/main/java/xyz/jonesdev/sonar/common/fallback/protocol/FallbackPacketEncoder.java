@@ -50,6 +50,6 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
     final int packetId = registry.getPacketId(originalPacket);
     writeVarInt(out, packetId);
     packet.encode(out, protocolVersion);
-    Sonar.get().getFallback().getLogger().info("Encode packet {} (id: {}) with {} bytes", packet.getClass().getSimpleName(), packetId, out.readableBytes());
+    Sonar.get().getFallback().getLogger().info("Encode packet {} (id: {}) with {} bytes", originalPacket.getClass().getSimpleName(), packetId, out.readableBytes());
   }
 }
