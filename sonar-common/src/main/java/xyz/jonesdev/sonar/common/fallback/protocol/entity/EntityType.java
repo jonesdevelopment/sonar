@@ -78,6 +78,7 @@ public enum EntityType {
       case MINECRAFT_1_20_3:
         return 9;
       case MINECRAFT_1_20_5:
+      case MINECRAFT_1_21:
         return 10;
     }
   });
