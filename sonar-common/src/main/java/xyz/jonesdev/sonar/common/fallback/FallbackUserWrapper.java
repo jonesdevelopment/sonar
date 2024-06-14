@@ -86,6 +86,11 @@ public final class FallbackUserWrapper implements FallbackUser {
   public void hijack(final @NotNull String username, final @NotNull UUID uuid,
                      final @NotNull String encoder, final @NotNull String decoder,
                      final @NotNull String timeout, final @NotNull String handler) {
+    // Check if the encoder and decoder pipelines are present. If not, throw an exception.
+    if (pipeline.context(encoder) == null || pipeline.context(decoder) == null) {
+      throw new CorruptedFrameException("Default encoder/decoder pipelines are missing!?");
+    }
+
     // The player has joined the verification
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
@@ -253,7 +258,7 @@ public final class FallbackUserWrapper implements FallbackUser {
                                         final @NotNull String encoder,
                                         final @NotNull String boss) {
     // Remove the main pipeline to completely take over the channel
-    if (channel.pipeline().get(boss) != null) {
+    if (channel.pipeline().context(boss) != null) {
       channel.pipeline().remove(boss);
     }
     final ChannelHandler currentEncoder = channel.pipeline().get(encoder);
