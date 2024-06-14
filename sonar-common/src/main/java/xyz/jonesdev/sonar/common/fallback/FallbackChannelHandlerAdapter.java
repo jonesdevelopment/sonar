@@ -54,8 +54,6 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
   public final void channelActive(final @NotNull ChannelHandlerContext ctx) throws Exception {
     // Increase connections per second for the action bar verbose
     GlobalSonarStatistics.countConnection();
-    // Hook the traffic listener
-    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
     // Make sure to let the server handle the rest
     ctx.fireChannelActive();
   }
@@ -110,6 +108,8 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
     // Store the protocol version
     protocolVersion = ProtocolVersion.fromId(protocol);
+    // Hook the traffic listener
+    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
   }
 
   /**
