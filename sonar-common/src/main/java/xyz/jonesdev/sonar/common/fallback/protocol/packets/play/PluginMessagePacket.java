@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.CorruptedFrameException;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
@@ -25,14 +26,16 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readRetainedByteBufSlice17;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readExtendedForgeShort;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readString;
 
 @Getter
 @ToString
 public final class PluginMessagePacket implements FallbackPacket {
   private String channel;
-  private ByteBuf slicedBuffer;
+  private byte[] data;
+
+  private static final int FORGE_MAX_ARRAY_LENGTH = Integer.MAX_VALUE & 0x1FFF9A;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -41,13 +44,23 @@ public final class PluginMessagePacket implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    channel = readString(byteBuf, 64);
+    channel = readString(byteBuf, 48);
 
+    final int length;
     if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-      slicedBuffer = byteBuf.readRetainedSlice(byteBuf.readableBytes());
+      length = byteBuf.readableBytes();
+      if (length > Short.MAX_VALUE) {
+        throw new CorruptedFrameException("Got too much data: " + length);
+      }
     } else {
-      slicedBuffer = readRetainedByteBufSlice17(byteBuf);
+      length = readExtendedForgeShort(byteBuf);
+      if (length > FORGE_MAX_ARRAY_LENGTH) {
+        throw new CorruptedFrameException("Got too much data: " + length);
+      }
     }
+
+    data = new byte[length];
+    byteBuf.readBytes(data);
   }
 
   @Override

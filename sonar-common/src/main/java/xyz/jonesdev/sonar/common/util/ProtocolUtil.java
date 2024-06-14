@@ -21,7 +21,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.CorruptedFrameException;
-import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.*;
@@ -40,8 +39,6 @@ import java.util.UUID;
 @UtilityClass
 public class ProtocolUtil {
   public static final UUID EMPTY_UUID = new UUID(0L, 0L);
-
-  private static final int FORGE_MAX_ARRAY_LENGTH = Integer.MAX_VALUE & 0x1FFF9A;
 
   public static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
   public static final String BRAND_CHANNEL = "minecraft:brand";
@@ -184,15 +181,6 @@ public class ProtocolUtil {
     return array;
   }
 
-  public static @NotNull String readBrandMessage(final @NotNull ByteBuf content) throws DecoderException {
-    final ByteBuf slice = content.slice();
-    try {
-      return readString(slice);
-    } catch (DecoderException exception) {
-      return readString(slice, 65536, slice.readableBytes());
-    }
-  }
-
   public static @NotNull String readString(final ByteBuf byteBuf) throws CorruptedFrameException {
     return readString(byteBuf, Short.MAX_VALUE);
   }
@@ -210,7 +198,7 @@ public class ProtocolUtil {
     checkFrame(length <= cap * 3, "Bad string size");
     checkFrame(byteBuf.isReadable(length), "Tried to read a too-long string");
     final String str = byteBuf.toString(byteBuf.readerIndex(), length, StandardCharsets.UTF_8);
-    byteBuf.skipBytes(length);
+    byteBuf.readerIndex(byteBuf.readerIndex() + length);
     checkFrame(str.length() <= cap, "Got a too-long string");
     return str;
   }
@@ -315,7 +303,7 @@ public class ProtocolUtil {
     }
   }
 
-  private static int readExtendedForgeShort(final @NotNull ByteBuf byteBuf) {
+  public static int readExtendedForgeShort(final @NotNull ByteBuf byteBuf) {
     int low = byteBuf.readUnsignedShort();
     int high = 0;
     if ((low & 0x8000) != 0) {
@@ -323,12 +311,6 @@ public class ProtocolUtil {
       high = byteBuf.readUnsignedByte();
     }
     return ((high & 0xFF) << 15) | low;
-  }
-
-  public static ByteBuf readRetainedByteBufSlice17(final ByteBuf byteBuf) {
-    final int length = readExtendedForgeShort(byteBuf);
-    checkFrame(length <= FORGE_MAX_ARRAY_LENGTH, "Too long");
-    return byteBuf.readRetainedSlice(length);
   }
 
   private void checkFrame(final boolean expression, final String message) {

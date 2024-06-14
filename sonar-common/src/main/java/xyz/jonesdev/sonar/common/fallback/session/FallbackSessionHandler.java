@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.common.fallback.session;
 
-import io.netty.buffer.ByteBuf;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -28,14 +27,13 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientSettingsPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PluginMessagePacket;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
-import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_5;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.transferToOrigin;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL_LEGACY;
@@ -113,17 +111,22 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
 
     // Validate the client branding using a regex to filter unwanted characters.
     if (Sonar.get().getConfig().getVerification().getBrand().isEnabled()) {
-      validateClientBrand(pluginMessage.getSlicedBuffer());
+      validateClientBrand(pluginMessage.getData());
     }
 
     // Mark the PluginMessage packet as received
     user.setReceivedPluginMessage(true);
   }
 
-  protected final void validateClientBrand(final @NotNull ByteBuf content) {
+  protected final void validateClientBrand(final byte @NotNull [] data) {
     // No need to check for empty brands since ProtocolUtil#readBrandMessage
     // already performs invalid string checks by default.
-    final String read = ProtocolUtil.readBrandMessage(content);
+    String read = new String(data, StandardCharsets.UTF_8);
+    checkState(read.length() > 1, "client brand is too short");
+    // Remove the invalid character at the beginning of the client brand
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+      read = read.substring(1);
+    }
     // Check if the decoded client brand string is too long
     checkState(read.length() < Sonar.get().getConfig().getVerification().getBrand().getMaxLength(),
       "client brand is too long: " + read.length());
