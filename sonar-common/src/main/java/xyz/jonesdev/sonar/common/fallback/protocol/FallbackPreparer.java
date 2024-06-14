@@ -108,7 +108,12 @@ public class FallbackPreparer {
   // XP packets
   public FallbackPacket[] xpCountdown;
 
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   public void prepare() {
+    // Preload the packet registry to avoid CPU/RAM issues on 1st connection
+    Sonar.get().getLogger().info("Preloading all registered packets...");
+    FallbackPacketRegistry.values();
+
     // Prepare JoinGame packet
     joinGame = new JoinGamePacket(PLAYER_ENTITY_ID,
       Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
