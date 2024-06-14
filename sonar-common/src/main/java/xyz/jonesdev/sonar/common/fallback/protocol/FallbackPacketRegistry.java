@@ -331,7 +331,37 @@ public enum FallbackPacketRegistry {
         map(0x22, MINECRAFT_1_20_5, true));
       clientbound.register(TransferPacket.class, TransferPacket::new,
         map(0x73, MINECRAFT_1_20_5, true));
+      clientbound.register(SetHeldItemPacket.class, SetHeldItemPacket::new,
+        map(0x09, MINECRAFT_1_7_2, true),
+        map(0x37, MINECRAFT_1_9, true),
+        map(0x39, MINECRAFT_1_12, true),
+        map(0x3A, MINECRAFT_1_12_1, true),
+        map(0x3D, MINECRAFT_1_13, true),
+        map(0x3F, MINECRAFT_1_14, true),
+        map(0x40, MINECRAFT_1_15, true),
+        map(0x3F, MINECRAFT_1_16, true),
+        map(0x48, MINECRAFT_1_17, true),
+        map(0x47, MINECRAFT_1_19, true),
+        map(0x4A, MINECRAFT_1_19_1, true),
+        map(0x49, MINECRAFT_1_19_3, true),
+        map(0x4D, MINECRAFT_1_19_4, true),
+        map(0x4F, MINECRAFT_1_20_2, true),
+        map(0x51, MINECRAFT_1_20_3, true),
+        map(0x53, MINECRAFT_1_21, true));
 
+      serverbound.register(SetHeldItemPacket.class, SetHeldItemPacket::new,
+        map(0x09, MINECRAFT_1_7_2, false),
+        map(0x17, MINECRAFT_1_9, false),
+        map(0x1A, MINECRAFT_1_12, false),
+        map(0x21, MINECRAFT_1_13, false),
+        map(0x23, MINECRAFT_1_14, false),
+        map(0x24, MINECRAFT_1_16, false),
+        map(0x25, MINECRAFT_1_16_2, false),
+        map(0x27, MINECRAFT_1_19, false),
+        map(0x28, MINECRAFT_1_19_1, false),
+        map(0x2B, MINECRAFT_1_20_2, false),
+        map(0x2C, MINECRAFT_1_20_3, false),
+        map(0x2F, MINECRAFT_1_21, false));
       serverbound.register(PaddleBoatPacket.class, PaddleBoatPacket::new,
         map(0x11, MINECRAFT_1_9, false),
         map(0x12, MINECRAFT_1_12, false),
@@ -412,7 +442,8 @@ public enum FallbackPacketRegistry {
         map(0x0D, MINECRAFT_1_19_1, false),
         map(0x0C, MINECRAFT_1_19_3, false),
         map(0x0D, MINECRAFT_1_19_4, false),
-        map(0x0F, MINECRAFT_1_20_2, false));
+        map(0x0F, MINECRAFT_1_20_2, false),
+        map(0x12, MINECRAFT_1_21, false));
       serverbound.register(PlayerPositionLookPacket.class, PlayerPositionLookPacket::new,
         map(0x06, MINECRAFT_1_7_2, false),
         map(0x0D, MINECRAFT_1_9, false),
