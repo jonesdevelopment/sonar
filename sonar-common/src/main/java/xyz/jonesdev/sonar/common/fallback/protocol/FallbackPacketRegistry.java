@@ -346,7 +346,8 @@ public enum FallbackPacketRegistry {
         map(0x49, MINECRAFT_1_19_3, true),
         map(0x4D, MINECRAFT_1_19_4, true),
         map(0x4F, MINECRAFT_1_20_2, true),
-        map(0x51, MINECRAFT_1_20_3, true));
+        map(0x51, MINECRAFT_1_20_3, true),
+        map(0x53, MINECRAFT_1_21, true));
 
       serverbound.register(SetHeldItemPacket.class, SetHeldItemPacket::new,
         map(0x09, MINECRAFT_1_7_2, false),
@@ -359,7 +360,8 @@ public enum FallbackPacketRegistry {
         map(0x27, MINECRAFT_1_19, false),
         map(0x28, MINECRAFT_1_19_1, false),
         map(0x2B, MINECRAFT_1_20_2, false),
-        map(0x2C, MINECRAFT_1_20_3, false));
+        map(0x2C, MINECRAFT_1_20_3, false),
+        map(0x2F, MINECRAFT_1_21, false));
       serverbound.register(PaddleBoatPacket.class, PaddleBoatPacket::new,
         map(0x11, MINECRAFT_1_9, false),
         map(0x12, MINECRAFT_1_12, false),
