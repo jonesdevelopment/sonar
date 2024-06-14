@@ -81,7 +81,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
   private boolean teleported, checkMovement;
   private short expectedTransactionId = 1;
   private double x, y, z, deltaY;
-  private int movementTick;
+  private int movementTick, currentClientSlotId, expectedSlotId = -1;
 
   private void markTeleported() {
     // Activate the movement checks
@@ -113,6 +113,24 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     // Send a Transaction (Ping) packet with a random ID
     expectedTransactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
     user.write(new TransactionPacket(0, expectedTransactionId, false));
+  }
+
+  /**
+   * Uses slot packets to check for a legitimate response from the client
+   * <br>
+   * <a href="https://wiki.vg/Protocol#Set_Held_Item_.28serverbound.29">Wiki.vg - SetHeldItem (play)</a>
+   */
+  private void sendSetHeldItem() {
+    // Move the player's slot by 4 (slot limit divided by 2),
+    // and then modulo it by the slot limit (8) to ensure that we don't send invalid slot IDs.
+    expectedSlotId = (currentClientSlotId + 4) % 8;
+    // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
+    // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
+    // We can take advantage of this by sending two packets with the same content to check for a valid response.
+    final SetHeldItemPacket heldItemPacket = new SetHeldItemPacket(expectedSlotId);
+    user.delayedWrite(heldItemPacket);
+    user.delayedWrite(heldItemPacket);
+    user.getChannel().flush();
   }
 
   private void forceCAPTCHA() {
@@ -154,7 +172,28 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       checkState(transactionId == expectedTransactionId,
         "expected T ID " + expectedTransactionId + ", but got " + transactionId);
 
-      markSuccess();
+      sendSetHeldItem();
+    } else if (packet instanceof SetHeldItemPacket) {
+      final SetHeldItemPacket heldItemPacket = (SetHeldItemPacket) packet;
+
+      final int slotId = heldItemPacket.getSlot();
+      if (!user.isGeyser()) {
+        // Check if the player sent a duplicate slot packet which is impossible by vanilla protocol
+        checkState(slotId != currentClientSlotId, "invalid slot: " + slotId);
+        // Also check if the player sent an invalid slot which is impossible by vanilla protocol
+        checkState(slotId >= 0 && slotId <= 8, "slot out of range: " + slotId);
+      }
+
+      // Only continue checking if we're actually expecting a SetHeldItem packet
+      // The player can send a SetHeldItem packet by themselves -> exempt
+      if (expectedSlotId != -1
+        // Check if the slot ID matches the expected slot ID
+        // This can false flag if a player spams these packets, which is why we don't fail for this
+        && slotId == expectedSlotId) {
+        markSuccess();
+      }
+
+      currentClientSlotId = slotId;
     } else if (packet instanceof PlayerPositionLookPacket) {
       // Make sure the player has teleported before checking for position packets
       if (teleported) {

@@ -30,19 +30,16 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class ClientAbilitiesPacket implements FallbackPacket {
-  private int encodedFlags;
-  private float flySpeed, walkSpeed;
+public final class SetHeldItemPacket implements FallbackPacket {
+  private int slot;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
-    byteBuf.writeByte(encodedFlags);
-    byteBuf.writeFloat(flySpeed);
-    byteBuf.writeFloat(walkSpeed);
+    byteBuf.writeByte(slot);
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    slot = byteBuf.readShort();
   }
 }
