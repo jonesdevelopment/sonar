@@ -177,11 +177,11 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       final SetHeldItemPacket heldItemPacket = (SetHeldItemPacket) packet;
 
       final int slotId = heldItemPacket.getSlot();
+      // Also check if the player sent an invalid slot which is impossible by vanilla protocol
+      checkState(slotId >= 0 && slotId <= 8, "slot out of range: " + slotId);
       if (!user.isGeyser()) {
         // Check if the player sent a duplicate slot packet which is impossible by vanilla protocol
         checkState(slotId != currentClientSlotId, "invalid slot: " + slotId);
-        // Also check if the player sent an invalid slot which is impossible by vanilla protocol
-        checkState(slotId >= 0 && slotId <= 8, "slot out of range: " + slotId);
       }
 
       // Only continue checking if we're actually expecting a SetHeldItem packet
