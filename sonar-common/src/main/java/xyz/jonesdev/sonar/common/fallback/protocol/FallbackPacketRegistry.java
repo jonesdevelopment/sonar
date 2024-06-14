@@ -440,7 +440,8 @@ public enum FallbackPacketRegistry {
         map(0x0D, MINECRAFT_1_19_1, false),
         map(0x0C, MINECRAFT_1_19_3, false),
         map(0x0D, MINECRAFT_1_19_4, false),
-        map(0x0F, MINECRAFT_1_20_2, false));
+        map(0x0F, MINECRAFT_1_20_2, false),
+        map(0x12, MINECRAFT_1_21, false));
       serverbound.register(PlayerPositionLookPacket.class, PlayerPositionLookPacket::new,
         map(0x06, MINECRAFT_1_7_2, false),
         map(0x0D, MINECRAFT_1_9, false),
