@@ -45,8 +45,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
 
   static {
     try {
-      CHANNEL_WRAPPER_GETTER = MethodHandles
-        .privateLookupIn(HandlerBoss.class, MethodHandles.lookup())
+      CHANNEL_WRAPPER_GETTER = MethodHandles.privateLookupIn(HandlerBoss.class, MethodHandles.lookup())
         .findGetter(HandlerBoss.class, "channel", ChannelWrapper.class);
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
