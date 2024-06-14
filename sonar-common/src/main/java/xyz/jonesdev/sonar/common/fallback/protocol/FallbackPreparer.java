@@ -115,11 +115,11 @@ public class FallbackPreparer {
     FallbackPacketRegistry.values();
 
     // Prepare JoinGame packet
-    joinGame = new JoinGamePacket(PLAYER_ENTITY_ID,
+    joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
       Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
       0, false, 0,
       true, false, false,
-      new String[]{"minecraft:overworld"}, "minecraft:overworld");
+      new String[]{"minecraft:overworld"}, "minecraft:overworld"));
 
     // Prepare cached motions for the gravity check
     maxFallDistance = 0;
