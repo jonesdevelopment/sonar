@@ -20,10 +20,8 @@ package xyz.jonesdev.sonar.api.fallback.protocol;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
@@ -78,27 +76,14 @@ public enum ProtocolVersion {
   public static final Map<Integer, ProtocolVersion> ID_TO_PROTOCOL_CONSTANT;
 
   static {
-    {
-      final Map<Integer, ProtocolVersion> versions = new HashMap<>();
+    final Map<Integer, ProtocolVersion> versions = new HashMap<>();
 
-      for (final ProtocolVersion version : values()) {
-        versions.putIfAbsent(version.protocol, version);
-      }
-
-      ID_TO_PROTOCOL_CONSTANT = versions;
+    for (final ProtocolVersion version : values()) {
+      versions.putIfAbsent(version.protocol, version);
     }
 
-    {
-      final Set<ProtocolVersion> versions = EnumSet.noneOf(ProtocolVersion.class);
-
-      for (final ProtocolVersion value : values()) {
-        if (!value.isUnknown()) {
-          versions.add(value);
-        }
-      }
-
-      LATEST_VERSION = (ProtocolVersion) versions.toArray()[versions.size() - 1];
-    }
+    ID_TO_PROTOCOL_CONSTANT = versions;
+    LATEST_VERSION = values()[values().length - 1];
   }
 
   public static ProtocolVersion fromId(final int protocol) {
