@@ -52,26 +52,23 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     if (msg instanceof ByteBuf) {
       final ByteBuf byteBuf = (ByteBuf) msg;
 
-      // Release the ByteBuf if the connection is not active
-      // or the ByteBuf doesn't contain any data to avoid
-      // memory leaks or other potential exploits.
-      if (!ctx.channel().isActive() || !byteBuf.isReadable()) {
-        byteBuf.release();
-        return;
-      }
-
-      final int originalReaderIndex = byteBuf.readerIndex();
-      // Read the packet ID and then create the packet from it
-      final int packetId = readVarInt(byteBuf);
-      final FallbackPacket packet = registry.createPacket(packetId);
-
-      // If the packet isn't found, skip it
-      if (packet == null) {
-        byteBuf.readerIndex(originalReaderIndex);
-        return;
-      }
-
       try {
+        // Release the ByteBuf if the connection is not active
+        // or the ByteBuf doesn't contain any data to avoid
+        // memory leaks or other potential exploits.
+        if (!ctx.channel().isActive() || !byteBuf.isReadable()) {
+          return;
+        }
+
+        // Read the packet ID and then create the packet from it
+        final int packetId = readVarInt(byteBuf);
+        final FallbackPacket packet = registry.createPacket(packetId);
+
+        // Skip the packet if it's not registered within Sonar's packet registry
+        if (packet == null) {
+          return;
+        }
+
         // Ensure that the packet isn't too large or too small
         checkPacketSize(byteBuf, packet);
 
