@@ -22,11 +22,12 @@ import io.netty.handler.codec.CorruptedFrameException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
+
+import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
@@ -34,25 +35,14 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public final class UniversalChatPacket implements FallbackPacket {
+public final class SystemChatPacket implements FallbackPacket {
   private static final int DIV_FLOOR = -Math.floorDiv(-20, 8);
-
-  public static final byte CHAT_TYPE = (byte) 0;
-  public static final byte SYSTEM_TYPE = (byte) 1;
-  public static final byte GAME_INFO_TYPE = (byte) 2;
 
   private ComponentHolder componentHolder;
   private String message;
-  private byte type;
-  private byte[] signature;
 
-  public UniversalChatPacket(final @NotNull Component component, final byte type) {
-    this(new ComponentHolder(component), type);
-  }
-
-  public UniversalChatPacket(final ComponentHolder componentHolder, final byte type) {
+  public SystemChatPacket(final @NotNull ComponentHolder componentHolder) {
     this.componentHolder = componentHolder;
-    this.type = type;
   }
 
   @Override
@@ -62,17 +52,17 @@ public final class UniversalChatPacket implements FallbackPacket {
 
     // Type
     if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-      byteBuf.writeBoolean(type == GAME_INFO_TYPE);
+      byteBuf.writeBoolean(false); // it's not the GAME_INFO type
     } else if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeVarInt(byteBuf, type);
+      writeVarInt(byteBuf, 1); // system chat
     } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-      byteBuf.writeByte(type);
+      byteBuf.writeByte(1); // system chat
     }
 
     // Sender
     if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
       && protocolVersion.compareTo(MINECRAFT_1_19) < 0) {
-      writeUUID(byteBuf, EMPTY_UUID);
+      writeUUID(byteBuf, UUID.randomUUID());
     }
   }
 
@@ -88,7 +78,7 @@ public final class UniversalChatPacket implements FallbackPacket {
         boolean unsigned = false;
 
         if (saltLong != 0L && signatureBytes.length > 0) {
-          signature = signatureBytes;
+          // No need to store the valid signature
         } else if ((protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0
           || saltLong == 0L) && signatureBytes.length == 0) {
           unsigned = true;
@@ -125,9 +115,6 @@ public final class UniversalChatPacket implements FallbackPacket {
         if (signed) {
           final byte[] sign = new byte[256];
           byteBuf.readBytes(sign);
-          signature = sign;
-        } else {
-          signature = new byte[0];
         }
 
         readVarInt(byteBuf);

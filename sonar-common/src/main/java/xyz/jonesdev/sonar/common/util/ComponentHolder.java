@@ -31,11 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_3;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeNamelessCompoundTag;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeString;
 
-// Mostly taken from
-// https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
 public final class ComponentHolder {
   private final String serializedComponent;
   private BinaryTag cachedBinaryTag;
@@ -44,6 +43,8 @@ public final class ComponentHolder {
     this.serializedComponent = GsonComponentSerializer.gson().serialize(component);
   }
 
+  // Mostly taken from
+  // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
   private BinaryTag serialize(final JsonElement json) {
     if (json instanceof JsonPrimitive) {
       final JsonPrimitive jsonPrimitive = (JsonPrimitive) json;
@@ -143,7 +144,7 @@ public final class ComponentHolder {
 
   public void write(final @NotNull ByteBuf byteBuf,
                     final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_3) >= 0) {
+    if (protocolVersion.compareTo(MINECRAFT_1_20_3) >= 0) {
       if (cachedBinaryTag == null) {
         cachedBinaryTag = serialize(new JsonParser().parse(serializedComponent));
       }

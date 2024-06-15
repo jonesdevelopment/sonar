@@ -25,7 +25,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientSettingsPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientInformationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.KeepAlivePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PluginMessagePacket;
 
@@ -138,9 +138,9 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       markSuccess();
     }
     // Make sure to catch all ClientSettings and PluginMessage packets during the configuration phase.
-    else if (packet instanceof ClientSettingsPacket) {
+    else if (packet instanceof ClientInformationPacket) {
       // Let the session handler itself know about this packet
-      checkClientSettings((ClientSettingsPacket) packet);
+      checkClientInformation((ClientInformationPacket) packet);
     } else if (packet instanceof PluginMessagePacket) {
       // Let the session handler itself know about this packet
       checkPluginMessage((PluginMessagePacket) packet);

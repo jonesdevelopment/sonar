@@ -22,25 +22,27 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class TeleportConfirmPacket implements FallbackPacket {
-  private int teleportId;
+public final class PlayerAbilitiesPacket implements FallbackPacket {
+  private int encodedFlags;
+  private float flySpeed, walkSpeed;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
+    byteBuf.writeByte(encodedFlags);
+    byteBuf.writeFloat(flySpeed);
+    byteBuf.writeFloat(walkSpeed);
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
-    teleportId = readVarInt(byteBuf);
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    throw new UnsupportedOperationException();
   }
 }

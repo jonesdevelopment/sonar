@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishC
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
+import xyz.jonesdev.sonar.common.util.ComponentHolder;
 
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -38,9 +39,9 @@ public class FallbackPreparer {
   // LoginSuccess
   public final FallbackPacket LOGIN_SUCCESS = new FallbackPacketSnapshot(new LoginSuccessPacket(new UUID(1L, 1L), "Sonar"));
   // Abilities
-  public final FallbackPacket DEFAULT_ABILITIES = new FallbackPacketSnapshot(new ClientAbilitiesPacket(0x00, 0f, 0f));
-  public final FallbackPacket CAPTCHA_ABILITIES = new FallbackPacketSnapshot(new ClientAbilitiesPacket(0x02, 0f, 0f));
-  public final FallbackPacket CAPTCHA_ABILITIES_BEDROCK = new FallbackPacketSnapshot(new ClientAbilitiesPacket(0x06, 0f, 0f));
+  public final FallbackPacket DEFAULT_ABILITIES = new FallbackPacketSnapshot(new PlayerAbilitiesPacket(0x00, 0f, 0f));
+  public final FallbackPacket CAPTCHA_ABILITIES = new FallbackPacketSnapshot(new PlayerAbilitiesPacket(0x02, 0f, 0f));
+  public final FallbackPacket CAPTCHA_ABILITIES_BEDROCK = new FallbackPacketSnapshot(new PlayerAbilitiesPacket(0x06, 0f, 0f));
   // Chunks
   public final FallbackPacket EMPTY_CHUNK_DATA = new FallbackPacketSnapshot(new ChunkDataPacket(0, 0));
   // Finish Configuration
@@ -93,7 +94,7 @@ public class FallbackPreparer {
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
 
   // Captcha position
-  public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new PlayerPositionLookPacket(
+  public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotation(
     SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false));
 
   // Platform
@@ -134,9 +135,9 @@ public class FallbackPreparer {
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
     dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + (int) Math.ceil(maxFallDistance);
-    defaultSpawnPosition = new FallbackPacketSnapshot(new DefaultSpawnPositionPacket(
+    defaultSpawnPosition = new FallbackPacketSnapshot(new SetDefaultSpawnPositionPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION));
-    spawnPosition = new FallbackPacketSnapshot(new PlayerPositionLookPacket(
+    spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotation(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
       0, -90, TELEPORT_ID, false));
 
@@ -178,10 +179,10 @@ public class FallbackPreparer {
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
       || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
       // Prepare CAPTCHA messages
-      enterCodeMessage = new FallbackPacketSnapshot(new UniversalChatPacket(
-        Sonar.get().getConfig().getVerification().getMap().getEnterCode(), UniversalChatPacket.SYSTEM_TYPE));
-      incorrectCaptcha = new FallbackPacketSnapshot(new UniversalChatPacket(
-        Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha(), UniversalChatPacket.SYSTEM_TYPE));
+      enterCodeMessage = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
+        Sonar.get().getConfig().getVerification().getMap().getEnterCode())));
+      incorrectCaptcha = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
+        Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha())));
 
       // Prepare countdown
       xpCountdown = new FallbackPacket[Sonar.get().getConfig().getVerification().getMap().getMaxDuration() / 1000];

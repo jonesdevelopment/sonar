@@ -33,7 +33,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class PlayerPositionLookPacket implements FallbackPacket {
+public final class SetPlayerPositionRotation implements FallbackPacket {
   private double x, y, z;
   private float yaw, pitch;
   private int teleportId;
@@ -68,7 +68,7 @@ public final class PlayerPositionLookPacket implements FallbackPacket {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
     if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-      y = byteBuf.readDouble(); // Account for weird y positions on 1.7
+      y = byteBuf.readDouble(); // Account 1.7 bounding box
     }
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();

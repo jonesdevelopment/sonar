@@ -26,8 +26,11 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
+import java.util.UUID;
+
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeUUID;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @ToString
@@ -44,7 +47,7 @@ public final class SpawnEntityPacket implements FallbackPacket {
     final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_8) > 0;
 
     if (v1_9orHigher) {
-      writeUUID(byteBuf, EMPTY_UUID);
+      writeUUID(byteBuf, UUID.randomUUID());
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {

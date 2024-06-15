@@ -33,7 +33,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  * Flow for this session handler
  *
  * <li>
- *   {@link SetSlotPacket} and {@link MapDataPacket} packets are sent to the client,
+ *   {@link SetContainerSlotPacket} and {@link MapDataPacket} packets are sent to the client,
  *   therefore, setting the player's item to a map with a code on it (CAPTCHA).
  *   <br>
  *   See more: {@link FallbackCAPTCHASessionHandler}, {@link MapCaptchaInfo}
@@ -50,8 +50,8 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     this.tries = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
     // Set slot to map
-    user.delayedWrite(new SetSlotPacket(36, 1,
-      ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetSlotPacket.MAP_NBT));
+    user.delayedWrite(new SetContainerSlotPacket(36, 1,
+      ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetContainerSlotPacket.MAP_NBT));
     // Send random captcha to the player
     final MapCaptchaInfo captcha = MAP_INFO_PREPARER.getRandomCaptcha();
     this.answer = captcha.getAnswer();
@@ -76,8 +76,8 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     checkState(!user.getLoginTimer().elapsed(maxDuration), "took too long to enter captcha");
 
     // Handle incoming chat messages
-    if (packet instanceof UniversalChatPacket) {
-      final UniversalChatPacket chat = (UniversalChatPacket) packet;
+    if (packet instanceof SystemChatPacket) {
+      final SystemChatPacket chat = (SystemChatPacket) packet;
 
       // Captcha is correct, finish verification
       if (chat.getMessage().equals(answer)) {
@@ -88,8 +88,8 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
       // Captcha is incorrect, remove one try
       checkState(tries-- > 0, "failed captcha too often");
       user.write(incorrectCaptcha);
-    } else if (packet instanceof PlayerPositionPacket
-      || packet instanceof PlayerPositionLookPacket) {
+    } else if (packet instanceof SetPlayerPositionPacket
+      || packet instanceof SetPlayerPositionRotation) {
       // A position packet is sent approximately every second
       final long difference = maxDuration - user.getLoginTimer().delay();
       final int index = (int) (difference / 1000D);

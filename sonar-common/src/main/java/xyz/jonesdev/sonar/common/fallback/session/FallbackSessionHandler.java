@@ -24,7 +24,7 @@ import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientSettingsPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientInformationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PluginMessagePacket;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
@@ -82,7 +82,7 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
       .replace("%time%", user.getLoginTimer().toString()));
   }
 
-  protected final void checkClientSettings(final @NotNull ClientSettingsPacket clientSettings) {
+  protected final void checkClientInformation(final @NotNull ClientInformationPacket clientSettings) {
     // Ensure that the client locale is correct
     validateClientLocale(clientSettings.getLocale());
     // Check if the player sent an unused bit flag in the skin section

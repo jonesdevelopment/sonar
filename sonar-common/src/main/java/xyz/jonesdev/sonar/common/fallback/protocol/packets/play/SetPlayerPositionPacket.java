@@ -32,7 +32,7 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class PlayerPositionPacket implements FallbackPacket {
+public final class SetPlayerPositionPacket implements FallbackPacket {
   private double x, y, z;
   private boolean onGround;
 
@@ -46,7 +46,7 @@ public final class PlayerPositionPacket implements FallbackPacket {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
     if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-      y = byteBuf.readDouble(); // Account for weird y positions on 1.7
+      y = byteBuf.readDouble(); // Account 1.7 bounding box
     }
     z = byteBuf.readDouble();
     onGround = byteBuf.readBoolean();

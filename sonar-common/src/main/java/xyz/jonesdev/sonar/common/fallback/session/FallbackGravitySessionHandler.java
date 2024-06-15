@@ -200,20 +200,20 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       }
 
       currentClientSlotId = slotId;
-    } else if (packet instanceof PlayerPositionLookPacket) {
+    } else if (packet instanceof SetPlayerPositionRotation) {
       // Make sure the player has teleported before checking for position packets
       if (teleported) {
-        final PlayerPositionLookPacket positionLook = (PlayerPositionLookPacket) packet;
+        final SetPlayerPositionRotation positionLook = (SetPlayerPositionRotation) packet;
         handleMovement(positionLook.getX(), positionLook.getY(), positionLook.getZ(), positionLook.isOnGround());
       }
-    } else if (packet instanceof PlayerPositionPacket) {
+    } else if (packet instanceof SetPlayerPositionPacket) {
       // Make sure the player has teleported before checking for position packets
       if (teleported) {
-        final PlayerPositionPacket position = (PlayerPositionPacket) packet;
+        final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
         handleMovement(position.getX(), position.getY(), position.getZ(), position.isOnGround());
       }
-    } else if (packet instanceof TeleportConfirmPacket) {
-      final TeleportConfirmPacket teleportConfirm = (TeleportConfirmPacket) packet;
+    } else if (packet instanceof ConfirmTeleportationPacket) {
+      final ConfirmTeleportationPacket teleportConfirm = (ConfirmTeleportationPacket) packet;
 
       // Only expect this packet to be sent once
       checkState(!teleported, "duplicate teleport confirm");
@@ -225,9 +225,9 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       markTeleported();
     }
     // Make sure to catch all ClientSettings and PluginMessage packets during the play phase.
-    else if (packet instanceof ClientSettingsPacket) {
+    else if (packet instanceof ClientInformationPacket) {
       // Let the session handler itself know about this packet
-      checkClientSettings((ClientSettingsPacket) packet);
+      checkClientInformation((ClientInformationPacket) packet);
     } else if (packet instanceof PluginMessagePacket) {
       // Let the session handler itself know about this packet
       checkPluginMessage((PluginMessagePacket) packet);

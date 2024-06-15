@@ -55,8 +55,6 @@ public final class TransactionPacket implements FallbackPacket {
     if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
       byteBuf.writeByte(windowId);
       byteBuf.writeShort((short) transactionId);
-      // The "accepted" field is actually really unnecessary since
-      // it's never even used in the client.
       byteBuf.writeBoolean(accepted);
     } else {
       byteBuf.writeInt(transactionId);
