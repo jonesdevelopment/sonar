@@ -49,8 +49,8 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
 
     this.tries = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
-    // Set slot to map
-    user.delayedWrite(new SetContainerSlotPacket(36, 1,
+    // Set the 5th slot (ID 4) in the player's hotbar to the map
+    user.delayedWrite(new SetContainerSlotPacket(40, 1,
       ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetContainerSlotPacket.MAP_NBT));
     // Send random captcha to the player
     final MapCaptchaInfo captcha = MAP_INFO_PREPARER.getRandomCaptcha();
