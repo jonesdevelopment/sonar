@@ -277,14 +277,14 @@ public final class SonarConfiguration {
     }
 
     // Messages
-    prefix = formatString(messagesConfig.getString("prefix"));
+    prefix = deserialize(messagesConfig.getString("prefix"));
     supportUrl = messagesConfig.getString("support-url");
 
     header = fromList(messagesConfig.getStringList("header"));
     footer = fromList(messagesConfig.getStringList("footer"));
     tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("too-many-online-per-ip")));
 
-    noPermission = formatString(messagesConfig.getString("commands.no-permission"));
+    noPermission = deserialize(messagesConfig.getString("commands.no-permission"));
     commands.incorrectCommandUsage = formatString(messagesConfig.getString("commands.incorrect-usage"));
     commands.invalidIpAddress = formatString(messagesConfig.getString("commands.invalid-ip-address"));
     commands.playersOnly = formatString(messagesConfig.getString("commands.player-only"));
@@ -392,7 +392,6 @@ public final class SonarConfiguration {
 
   private @NotNull String formatString(final @NotNull String str) {
     return str
-      .replace("%prefix%", prefix == null ? "" : prefix)
       .replace("%support-url%", supportUrl == null ? "" : supportUrl)
       .replace("%header%", header == null ? "" : header)
       .replace("%footer%", footer == null ? "" : footer);
@@ -414,10 +413,10 @@ public final class SonarConfiguration {
   private final Notifications notifications = new Notifications();
 
   @Getter
-  private String prefix;
-  private String supportUrl;
+  private Component prefix;
   @Getter
-  private String noPermission;
+  private Component noPermission;
+  private String supportUrl;
   private String header, footer;
   private boolean logPlayerAddresses;
   @Getter
