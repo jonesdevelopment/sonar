@@ -60,7 +60,9 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  */
 public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
 
-  public FallbackLoginSessionHandler(final FallbackUser user, final String username, final UUID uuid) {
+  public FallbackLoginSessionHandler(final @NotNull FallbackUser user,
+                                     final @NotNull String username,
+                                     final @NotNull UUID uuid) {
     super(user, username, uuid);
 
     // Start initializing the actual join process for pre-1.20.2 clients

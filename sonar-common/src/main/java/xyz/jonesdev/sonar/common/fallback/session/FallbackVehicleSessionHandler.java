@@ -51,21 +51,25 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   public FallbackVehicleSessionHandler(final @NotNull FallbackUser user,
                                        final @NotNull String username,
                                        final @NotNull UUID uuid,
-                                       final double x, final double y, final double z) {
+                                       final boolean forceCAPTCHA) {
     super(user, username, uuid);
+
+    this.forceCAPTCHA = forceCAPTCHA;
 
     // Send the necessary packets to mount the player on the vehicle
     final int entityTypeId = EntityType.BOAT.getId(user.getProtocolVersion());
-    user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, entityTypeId, x, y, z));
+    user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, entityTypeId,
+      SPAWN_X_POSITION, DEFAULT_Y_COLLIDE_POSITION, SPAWN_Z_POSITION));
     user.delayedWrite(setPassengers);
     user.getChannel().flush();
   }
 
+  private final boolean forceCAPTCHA;
   private boolean receivedPaddle, receivedInput;
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
-    if (Sonar.get().getFallback().shouldPerformCaptcha()) {
+    if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
       // Make sure the player exits the vehicle before sending the CAPTCHA
       user.delayedWrite(removeEntities);
       // Either send the player to the CAPTCHA, or finish the verification.

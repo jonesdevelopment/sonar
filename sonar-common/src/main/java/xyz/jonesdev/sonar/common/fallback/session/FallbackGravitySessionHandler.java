@@ -32,7 +32,9 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackGravitySessionHandler extends FallbackSessionHandler {
 
-  public FallbackGravitySessionHandler(final FallbackUser user, final String username, final UUID uuid) {
+  public FallbackGravitySessionHandler(final @NotNull FallbackUser user,
+                                       final @NotNull String username,
+                                       final @NotNull UUID uuid) {
     super(user, username, uuid);
 
     // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
@@ -79,16 +81,15 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
   private final boolean enableGravityCheck, enableCollisionsCheck;
   private boolean teleported, checkMovement;
-  private short expectedTransactionId = 1;
-  private double x, y, z, deltaY;
-  private int movementTick, currentClientSlotId, expectedSlotId = -1;
+  private double y, deltaY;
+  private int movementTick;
 
   private void markTeleported() {
     // Activate the movement checks
     teleported = true;
   }
 
-  private void markNextStage() {
+  private void markSuccess(final boolean forceCAPTCHA) {
     // Force-stop the movement checks
     teleported = false;
 
@@ -98,109 +99,15 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     if (!user.isGeyser()) {
       checkState(user.isReceivedPluginMessage(), "didn't send plugin message");
     }
-  }
 
-  /**
-   * Uses Transaction (ping) packets to check for an immediate, legitimate response from the client
-   * <br>
-   * <a href="https://wiki.vg/Protocol#Ping_.28configuration.29">Wiki.vg - Ping (configuration)</a>
-   * <a href="https://wiki.vg/Protocol#Ping_.28play.29">Wiki.vg - Ping (play)</a>
-   */
-  private void sendTransaction() {
-    // Interrupt any ongoing process/check
-    markNextStage();
-
-    // Send a Transaction (Ping) packet with a random ID
-    expectedTransactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
-    user.write(new TransactionPacket(0, expectedTransactionId, false));
-  }
-
-  /**
-   * Uses SetHeldItem packets to check for a legitimate response from the client
-   * <br>
-   * <a href="https://wiki.vg/Protocol#Set_Held_Item_.28serverbound.29">Wiki.vg - SetHeldItem (play)</a>
-   */
-  private void sendSetHeldItem() {
-    // Move the player's slot by 4 (slot limit divided by 2),
-    // and then modulo it by the slot limit (8) to ensure that we don't send invalid slot IDs.
-    expectedSlotId = (currentClientSlotId + 4) % 8;
-    // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
-    // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
-    // We can take advantage of this by sending two packets with the same content to check for a valid response.
-    final SetHeldItemPacket heldItemPacket = new SetHeldItemPacket(expectedSlotId);
-    user.delayedWrite(heldItemPacket);
-    user.delayedWrite(heldItemPacket);
-    user.getChannel().flush();
-  }
-
-  private void forceCAPTCHA() {
-    // Interrupt any ongoing process/check
-    markNextStage();
-
-    // Forcefully make the player solve a CAPTCHA
+    // Send the player to the protocol check
     final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
-    decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
-  }
-
-  private void markSuccess() {
-    // Either send the player to the vehicle check,
-    // send the player to the CAPTCHA, or finish the verification.
-    final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
-    // Pass the player to the next best verification handler
-    if (Sonar.get().getFallback().shouldPerformVehicleCheck()) {
-      decoder.setListener(new FallbackVehicleSessionHandler(user, username, uuid, x, y, z));
-    } else if (Sonar.get().getFallback().shouldPerformCaptcha()) {
-      decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
-    } else {
-      // The player has passed all checks
-      finishVerification();
-    }
+    decoder.setListener(new FallbackProtocolSessionHandler(user, username, uuid, forceCAPTCHA));
   }
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    if (packet instanceof TransactionPacket) {
-      final TransactionPacket transaction = (TransactionPacket) packet;
-
-      // Make sure random transactions aren't counted
-      checkState(expectedTransactionId <= 0, "unexpected transaction");
-      // Make sure the transaction was accepted
-      // This must - by vanilla protocol - always be accepted
-      checkState(transaction.isAccepted(), "didn't accept transaction");
-      // Also check if the transaction ID matches the expected ID
-      final long transactionId = transaction.getTransactionId();
-      checkState(transactionId == expectedTransactionId,
-        "expected T ID " + expectedTransactionId + ", but got " + transactionId);
-
-      // Only perform the SetHeldItem check on Java players since the Bedrock protocol breaks this check.
-      // I don't really know why this doesn't work on Bedrock,
-      // but I think it has to do with how Geyser/floodgate translates this packet:
-      // https://wiki.vg/Bedrock_Protocol#Player_Hotbar
-      if (user.isGeyser()) {
-        markSuccess();
-      } else {
-        sendSetHeldItem();
-      }
-    } else if (packet instanceof SetHeldItemPacket) {
-      final SetHeldItemPacket heldItemPacket = (SetHeldItemPacket) packet;
-
-      final int slotId = heldItemPacket.getSlot();
-      // Also check if the player sent an invalid slot which is impossible by vanilla protocol
-      checkState(slotId >= 0 && slotId <= 8, "slot out of range: " + slotId);
-      // Check if the player sent a duplicate slot packet which is impossible by vanilla protocol
-      checkState(slotId != currentClientSlotId, "invalid slot: " + slotId);
-
-      // Only continue checking if we're actually expecting a SetHeldItem packet
-      // The player can send a SetHeldItem packet by themselves -> exempt
-      if (expectedSlotId != -1
-        // Check if the slot ID matches the expected slot ID
-        // This can false flag if a player spams these packets, which is why we don't fail for this
-        && slotId == expectedSlotId) {
-        markSuccess();
-      }
-
-      currentClientSlotId = slotId;
-    } else if (packet instanceof SetPlayerPositionRotation) {
+    if (packet instanceof SetPlayerPositionRotation) {
       // Make sure the player has teleported before checking for position packets
       if (teleported) {
         final SetPlayerPositionRotation positionLook = (SetPlayerPositionRotation) packet;
@@ -240,7 +147,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       // No need to continue checking if the gravity and collision checks are disabled
       // Continue with the next stage of the verification
       if (!enableGravityCheck && !enableCollisionsCheck) {
-        sendTransaction();
+        markSuccess(false);
         return;
       }
 
@@ -258,9 +165,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     final double lastDeltaY = this.deltaY;
     final double lastY = this.y;
     this.deltaY = y - lastY;
-    this.x = x;
     this.y = y;
-    this.z = z;
 
     // Log/debug position if enabled in the configuration
     if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
@@ -293,7 +198,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
         if (difference > 1e-7) {
           // Do not throw an exception if the user configured to display the CAPTCHA instead
           if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-            forceCAPTCHA();
+            markSuccess(true);
             return;
           }
           user.fail("incorrect gravity; predicted: " + predicted + " deltaY: " + deltaY + " y: " + y);
@@ -301,7 +206,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
         // The player is obeying gravity, go on to the next stage if the collision check is disabled.
         if (++movementTick == maxMovementTick && !enableCollisionsCheck) {
-          sendTransaction();
+          markSuccess(false);
         }
       }
     } else if (enableCollisionsCheck) {
@@ -315,7 +220,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       // Make sure the player is actually colliding with the blocks and not only spoofing ground
       checkState(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
       // The player has collided with the blocks, go on to the next stage
-      sendTransaction();
+      markSuccess(false);
     }
   }
 }
