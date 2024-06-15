@@ -29,7 +29,8 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandlerAdapter;
 
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
@@ -40,12 +41,12 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
     super(channel);
   }
 
-  private static final Field CHANNEL_WRAPPER_FIELD;
+  private static final MethodHandle CHANNEL_WRAPPER_GETTER;
 
   static {
     try {
-      CHANNEL_WRAPPER_FIELD = HandlerBoss.class.getDeclaredField("channel");
-      CHANNEL_WRAPPER_FIELD.setAccessible(true);
+      CHANNEL_WRAPPER_GETTER = MethodHandles.privateLookupIn(HandlerBoss.class, MethodHandles.lookup())
+        .findGetter(HandlerBoss.class, "channel", ChannelWrapper.class);
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }
@@ -69,10 +70,16 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
           // Make sure to use the potentially modified, real IP
           final LoginRequest loginRequest = (LoginRequest) wrappedPacket;
           final HandlerBoss handlerBoss = channel.pipeline().get(HandlerBoss.class);
-          final ChannelWrapper channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER_FIELD.get(handlerBoss);
+          final ChannelWrapper channelWrapper;
+          try {
+            channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER_GETTER.invokeExact(handlerBoss);
+          } catch (final Throwable throwable) {
+            throw new ReflectiveOperationException(throwable);
+          }
           final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
           handleLogin(ctx, msg, loginRequest.getData(), socketAddress,
             PACKET_ENCODER, PACKET_DECODER, TIMEOUT_HANDLER, BOSS_HANDLER);
+          packetWrapper.trySingleRelease();
           return;
         }
       }
