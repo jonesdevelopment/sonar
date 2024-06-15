@@ -86,11 +86,6 @@ public final class FallbackUserWrapper implements FallbackUser {
   public void hijack(final @NotNull String username, final @NotNull UUID uuid,
                      final @NotNull String encoder, final @NotNull String decoder,
                      final @NotNull String timeout, final @NotNull String handler) {
-    // Check if the encoder and decoder pipelines are present. If not, throw an exception.
-    if (pipeline.context(encoder) == null || pipeline.context(decoder) == null) {
-      throw new CorruptedFrameException("Default encoder/decoder pipelines are missing!?");
-    }
-
     // The player has joined the verification
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
@@ -112,16 +107,16 @@ public final class FallbackUserWrapper implements FallbackUser {
     // Mark the player as connected → verifying players
     Sonar.get().getFallback().getConnected().put(inetAddress, (byte) 0);
 
-    // Add better timeout handler to avoid known exploits or issues
-    // We also want to timeout bots quickly to avoid flooding
-    final int readTimeout = Sonar.get().getConfig().getVerification().getReadTimeout();
-    pipeline.replace(timeout, timeout, new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
-
-    // Replace normal encoder to allow custom packets
-    final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
-    pipeline.replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
-
     channel.eventLoop().execute(() -> {
+      // Add better timeout handler to avoid known exploits or issues
+      // We also want to timeout bots quickly to avoid flooding
+      final int readTimeout = Sonar.get().getConfig().getVerification().getReadTimeout();
+      pipeline.replace(timeout, timeout, new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
+
+      // Replace normal encoder to allow custom packets
+      final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
+      pipeline.replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
+
       // Remove the main pipeline to completely take over the channel
       if (pipeline.get(handler) != null) {
         pipeline.remove(handler);
