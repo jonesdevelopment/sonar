@@ -210,6 +210,15 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
         }
       }
     } else if (enableCollisionsCheck) {
+      // Make sure the player has actually moved before reaching the platform
+      if (movementTick < maxMovementTick) {
+        // Do not throw an exception if the user configured to display the CAPTCHA instead
+        if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+          markSuccess(true);
+          return;
+        }
+        user.fail("illegal collision tick: " + movementTick);
+      }
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
       double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockType.getBlockHeight()) - y;
       // 1.7 sends the head position instead of the AABB minY
