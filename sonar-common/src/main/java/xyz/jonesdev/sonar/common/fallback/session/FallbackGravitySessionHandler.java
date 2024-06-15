@@ -101,7 +101,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
   }
 
   /**
-   * Uses ping packets to check for an immediate, legitimate response from the client
+   * Uses Transaction (ping) packets to check for an immediate, legitimate response from the client
    * <br>
    * <a href="https://wiki.vg/Protocol#Ping_.28configuration.29">Wiki.vg - Ping (configuration)</a>
    * <a href="https://wiki.vg/Protocol#Ping_.28play.29">Wiki.vg - Ping (play)</a>
@@ -116,7 +116,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
   }
 
   /**
-   * Uses slot packets to check for a legitimate response from the client
+   * Uses SetHeldItem packets to check for a legitimate response from the client
    * <br>
    * <a href="https://wiki.vg/Protocol#Set_Held_Item_.28serverbound.29">Wiki.vg - SetHeldItem (play)</a>
    */
@@ -172,17 +172,23 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       checkState(transactionId == expectedTransactionId,
         "expected T ID " + expectedTransactionId + ", but got " + transactionId);
 
-      sendSetHeldItem();
+      // Only perform the SetHeldItem check on Java players since the Bedrock protocol breaks this check.
+      // I don't really know why this doesn't work on Bedrock,
+      // but I think it has to do with how Geyser/floodgate translates this packet:
+      // https://wiki.vg/Bedrock_Protocol#Player_Hotbar
+      if (user.isGeyser()) {
+        markSuccess();
+      } else {
+        sendSetHeldItem();
+      }
     } else if (packet instanceof SetHeldItemPacket) {
       final SetHeldItemPacket heldItemPacket = (SetHeldItemPacket) packet;
 
       final int slotId = heldItemPacket.getSlot();
       // Also check if the player sent an invalid slot which is impossible by vanilla protocol
       checkState(slotId >= 0 && slotId <= 8, "slot out of range: " + slotId);
-      if (!user.isGeyser()) {
-        // Check if the player sent a duplicate slot packet which is impossible by vanilla protocol
-        checkState(slotId != currentClientSlotId, "invalid slot: " + slotId);
-      }
+      // Check if the player sent a duplicate slot packet which is impossible by vanilla protocol
+      checkState(slotId != currentClientSlotId, "invalid slot: " + slotId);
 
       // Only continue checking if we're actually expecting a SetHeldItem packet
       // The player can send a SetHeldItem packet by themselves -> exempt
