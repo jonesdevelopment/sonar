@@ -187,6 +187,9 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
         return;
       }
 
+      // The movement tick should not be ignored when gravity check is disabled.
+      movementTick++;
+
       if (enableGravityCheck) {
         // Predict the player's current motion based on the last motion
         // https://minecraft.wiki/w/Entity#Motion_of_entities
@@ -205,7 +208,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
         }
 
         // The player is obeying gravity, go on to the next stage if the collision check is disabled.
-        if (++movementTick == maxMovementTick && !enableCollisionsCheck) {
+        if (movementTick == maxMovementTick && !enableCollisionsCheck) {
           markSuccess(false);
         }
       }
