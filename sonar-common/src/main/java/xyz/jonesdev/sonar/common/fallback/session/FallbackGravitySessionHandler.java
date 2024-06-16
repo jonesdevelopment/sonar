@@ -188,7 +188,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       }
 
       // The movement tick should not be ignored when gravity check is disabled.
-      final int currentMovementTick = this.movementTick++;
+      movementTick++;
 
       if (enableGravityCheck) {
         // Predict the player's current motion based on the last motion
@@ -208,7 +208,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
         }
 
         // The player is obeying gravity, go on to the next stage if the collision check is disabled.
-        if (currentMovementTick == maxMovementTick && !enableCollisionsCheck) {
+        if (movementTick == maxMovementTick && !enableCollisionsCheck) {
           markSuccess(false);
         }
       }
