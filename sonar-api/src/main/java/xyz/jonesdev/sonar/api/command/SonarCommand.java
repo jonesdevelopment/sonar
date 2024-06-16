@@ -39,6 +39,12 @@ public interface SonarCommand {
   Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
 
   default void handle(final @NotNull InvocationSource source, final String @NotNull [] args) {
+    // Check if the player actually has the permission to run the command
+    if (source.isPlayer() && !source.getPermissionFunction().test("sonar.command")) {
+      source.sendMessage(Sonar.get().getConfig().getNoPermission());
+      return;
+    }
+
     Optional<Subcommand> subcommand = Optional.empty();
 
     if (args.length > 0) {
