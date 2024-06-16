@@ -56,7 +56,7 @@ commands:
       - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Нажмите чтобы открыть Discord)'>Откройте тикет в Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Нажмите чтобы открыть GitHub)'>или откройте новый вопрос на GitHub.
       - ''
     # Форматирование списка подкоманд
-    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Только игроки: </gray><only-players><br><gray>Требуется консоль: </gray><only-console><br><gray>Permission: </gray><white><permission><br><gray>Псевдонимы: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
+    subcommands: '<hover:show_text:''<gray>Только игроки: </gray><only-players><br><gray>Требуется консоль: </gray><only-console><br><gray>Permission: </gray><white><permission><br><gray>Псевдонимы: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
 
   # Перевод для '/sonar reload'
   reload:
@@ -84,7 +84,7 @@ commands:
     # Сообщение, которое отображается, когда кто-то пытается очистить черный список, но он пустой
     empty: '<prefix>В настоящее время черный список пуст. Поэтому ни один IP-адрес не был удален из черного списка.'
     # Сообщение, которое показывается, когда кто-то очищает черный список
-    clear: '<prefix>Вы успешно удалили %удалено% IP-адресов из черного списка.'
+    clear: '<prefix>Вы успешно удалили <amount> IP-адресов из черного списка.'
     # Сообщение, которое показывается, когда кто-то проверяет размер черного списка
     size: '<prefix>В настоящее время черный список содержит <amount> IP-адрес(ов).'
     # Сообщение, которое показывается, когда кто-то добавляет IP-адрес в черный список
@@ -135,7 +135,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Всего неуникальных соединений: <white><total-joins>'
       - ' <dark_aqua>▪ <gray>Общее количество попыток проверки: <white><total-attempts>'
       - ' <dark_aqua>▪ <gray>Всего неудачных попыток провери: <white><total-failed>'
-      - ' <dark_aqua>▪ <gray>Время работы сервера: <white><uptime>'
+      - ' <dark_aqua>▪ <gray>Время работы сервера: <white><server-uptime>'
     # Формат сообщения статистики процессора
     cpu:
       - ' <dark_aqua>▪ <gray>Использование процессора сервером в данный момент: <white><process-cpu>%'

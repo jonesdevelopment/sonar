@@ -56,7 +56,7 @@ commands:
       - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Discord\'u açmak için tıklayın)'>Discord üzerinden bir bilet açın </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(GitHub\'ı açmak için tıklayın)'>veya GitHub üzerinde yeni bir sorun açın.
       - ''
     # Ana komutu çalıştırırken gösterilen alt komutların listesi için biçimlendirme
-    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Sadece oyuncular: </gray><only-players><br><gray>Konsol gerekli: </gray><only-console><br><gray>İzin: </gray><white><permission><br><gray>Diğer isimler: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
+    subcommands: '<hover:show_text:''<gray>Sadece oyuncular: </gray><only-players><br><gray>Konsol gerekli: </gray><only-console><br><gray>İzin: </gray><white><permission><br><gray>Diğer isimler: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
 
   # '/sonar reload' için çeviriler
   reload:
@@ -135,7 +135,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Toplam benzersiz olmayan girişler: <white><total-joins>'
       - ' <dark_aqua>▪ <gray>Toplam doğrulama denemeleri: <white><total-attempts>'
       - ' <dark_aqua>▪ <gray>Toplam başarısız doğrulama denemesi: <white><total-failed>'
-      - ' <dark_aqua>▪ <gray>Sunucu çalışma süresi: <white><uptime>'
+      - ' <dark_aqua>▪ <gray>Sunucu çalışma süresi: <white><server-uptime>'
     # İşlemci istatistik mesajının biçimi
     cpu:
       - ' <dark_aqua>▪ <gray>Şu anda işlemci CPU kullanımı: <white><process-cpu>%'

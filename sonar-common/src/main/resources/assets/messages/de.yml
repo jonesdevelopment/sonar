@@ -136,7 +136,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Gesamte nicht-einzigartige Beitritte: <white><total-joins>'
       - ' <dark_aqua>▪ <gray>Gesamte Überprüfungsversuche: <white><total-attempts>'
       - ' <dark_aqua>▪ <gray>Gesamte fehlgeschlagene Überprüfungen: <white><total-failed>'
-      - ' <dark_aqua>▪ <gray>Server-Laufzeit: <white><uptime>'
+      - ' <dark_aqua>▪ <gray>Server-Laufzeit: <white><server-uptime>'
     # Format der CPU-Statistiknachricht
     cpu:
       - ' <dark_aqua>▪ <gray>Aktuelle CPU-Nutzung des Prozesses: <white><process-cpu>%'

@@ -20,52 +20,70 @@ package xyz.jonesdev.sonar.api.verbose;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
-import org.jetbrains.annotations.NotNull;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
-import java.util.Collection;
 import java.util.UUID;
-import java.util.Vector;
 
+import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
+import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
 import static xyz.jonesdev.sonar.api.timer.SystemTimer.DATE_FORMATTER;
 
 @Getter
-public final class Verbose implements Observable {
-  private final @NotNull Collection<UUID> subscribers = new Vector<>(0);
+public final class Verbose extends Observable {
   private int animationIndex;
 
-  // Run action bar verbose
-  public void update() {
+  @Override
+  public void observe() {
     // Don't prepare component if there are no subscribers
-    Component component = null;
+    if (subscribers.isEmpty()) {
+      return;
+    }
+
+    // Prepare the action bar verbose
+    final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
+    final SystemTimer attackTimer = attackStatistics == null ? null : attackStatistics.getDuration();
+    final String attackDuration = attackTimer == null ? "00:00" : DATE_FORMATTER.format(attackTimer.delay());
+
+    final Component actionBarComponent = MiniMessage.miniMessage().deserialize(attackTimer == null
+        ? Sonar.get().getConfig().getMessagesConfig().getString("verbose.layout.normal")
+        : Sonar.get().getConfig().getMessagesConfig().getString("verbose.layout.attack"),
+      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+      Placeholder.unparsed("attack-duration", attackDuration),
+      Placeholder.unparsed("animation", nextAnimation()),
+      Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getPlayers().size())),
+      Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
+      Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
+      Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined())),
+      Placeholder.unparsed("logins-per-second", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getLoginsPerSecond())),
+      Placeholder.unparsed("connections-per-second", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getConnectionsPerSecond())),
+      Placeholder.unparsed("verify-total", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications())),
+      Placeholder.unparsed("verify-success", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalSuccessfulVerifications())),
+      Placeholder.unparsed("verify-failed", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications())),
+      Placeholder.unparsed("incoming-traffic", Sonar.get().getStatistics().getCurrentIncomingBandwidthFormatted()),
+      Placeholder.unparsed("outgoing-traffic", Sonar.get().getStatistics().getCurrentOutgoingBandwidthFormatted()),
+      Placeholder.unparsed("incoming-traffic-ttl", Sonar.get().getStatistics().getTotalIncomingBandwidthFormatted()),
+      Placeholder.unparsed("outgoing-traffic-ttl", Sonar.get().getStatistics().getTotalOutgoingBandwidthFormatted()),
+      Placeholder.unparsed("used-memory", formatMemory(getUsedMemory())),
+      Placeholder.unparsed("free-memory", formatMemory(getFreeMemory())),
+      Placeholder.unparsed("total-memory", formatMemory(getTotalMemory())),
+      Placeholder.unparsed("max-memory", formatMemory(getMaxMemory())));
+
+    // Send the action bar to all online players
     for (final UUID subscriber : subscribers) {
       final Audience audience = Sonar.get().audience(subscriber);
       if (audience == null) continue;
 
-      // Only prepare component if there are subscribers
-      if (component == null) {
-        final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
-        final SystemTimer attackDuration = attackStatistics == null ? null : attackStatistics.getDuration();
-        component = replaceStatistic(attackDuration != null
-          ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
-          : Sonar.get().getConfig().getVerbose().getActionBarLayout())
-          .replaceText(TextReplacementConfig.builder().once().matchLiteral("<attack-duration>")
-            .replacement(attackDuration == null ? "00:00" : DATE_FORMATTER.format(attackDuration.delay()))
-            .build())
-          .replaceText(TextReplacementConfig.builder().once().matchLiteral("<animation>")
-            .replacement(nextAnimation())
-            .build());
-      }
       // Send the action bar to all online subscribers
-      audience.sendActionBar(component);
+      audience.sendActionBar(actionBarComponent);
     }
   }
 
   public String nextAnimation() {
-    final var animations = Sonar.get().getConfig().getVerbose().getAnimation();
+    final var animations = Sonar.get().getConfig().getVerboseAnimation();
     final int nextIndex = ++animationIndex % animations.size();
     return animations.toArray(new String[0])[nextIndex];
   }

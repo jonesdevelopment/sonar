@@ -135,7 +135,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Total des connexions non uniques : <white><total-joins>'
       - ' <dark_aqua>▪ <gray>Total des tentatives de vérification : <white><total-attempts>'
       - ' <dark_aqua>▪ <gray>Total des vérifications échouées : <white><total-failed>'
-      - ' <dark_aqua>▪ <gray>Temps de fonctionnement du serveur : <white><uptime>'
+      - ' <dark_aqua>▪ <gray>Temps de fonctionnement du serveur : <white><server-uptime>'
     # Format du message de statistiques CPU
     cpu:
       - ' <dark_aqua>▪ <gray>Utilisation actuelle du CPU du processus : <white><process-cpu>%'
@@ -235,36 +235,10 @@ verification:
 # Translations for Sonar's actionbar verbose messages
 verbose:
   layout:
-    # Mise en page pour le verbeux de la barre d'action de Sonar
-    # Espacements réservés :
-    # - '<queued>' Nombre de connexions en attente
-    # - '<verifying>' Nombre de connexions en cours de vérification
-    # - '<blacklisted>' Nombre d'adresses IP sur liste noire
-    # - '%total-joins%' Nombre total de connexions tentées
-    # - '%verify-total%' Nombre total de tentatives de vérification
-    # - '%verify-success%' Nombre d'adresses IP vérifiées
-    # - '%verify-failed%' Nombre de vérifications échouées
-    # - '<logins-per-second>' Nombre de connexions par seconde
-    # - '<connections-per-second>' Nombre de connexions par seconde
-    # - '<attack-duration>' Durée de l'attaque actuelle
-    # - '<incoming-traffic>' Utilisation de la bande passante entrante par seconde
-    # - '<outgoing-traffic>' Utilisation de la bande passante sortante par seconde
-    # - '%incoming-traffic-ttl%' Utilisation totale de la bande passante entrante
-    # - '%outgoing-traffic-ttl%' Utilisation totale de la bande passante sortante
-    # - '%used-memory%' Quantité de mémoire utilisée par le processus
-    # - '%total-memory%' Quantité de mémoire totale du processus
-    # - '%max-memory%' Quantité de mémoire maximale du processus
-    # - '%free-memory%' Quantité de mémoire libre du processus
-    # - '<animation>' Symbole animé personnalisable
     # Traductions pour la sortie verbeuse normale de Sonar
-    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s
-      <white><logins-per-second> <dark_aqua>╺ <gray>Vérification <white><verifying> <dark_aqua>|
-      <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s <white><logins-per-second> <dark_aqua>╺ <gray>Vérification <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
     # Traductions pour la sortie verbeuse lors d'une attaque
-    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s
-      <white><logins-per-second> <dark_aqua>╺ <gray>Queue <white><queued> <dark_aqua>╺
-      <gray>Vérification <white><verifying> <dark_aqua>╺ <gray>Durée <white><attack-duration>
-      <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s <white><logins-per-second> <dark_aqua>╺ <gray>Queue <white><queued> <dark_aqua>╺ <gray>Vérification <white><verifying> <dark_aqua>╺ <gray>Durée <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
   # Animation pour la sortie verbeuse
   # Alternatives:
   # - ▙, ▛, ▜, ▟
@@ -291,7 +265,5 @@ notifications:
     - ' <dark_aqua>▪ <gray>Vérification des joueurs: <white><verifying>'
     - ' <dark_aqua>▪ <gray>Joueurs en file d''attente: <white><queued>'
     - ''
-    - <gray>View more information using <white><click:run_command:'/sonar verbose'><hover:show_text:'(Click
-      to run)'>/sonar verbose</hover></click><gray> or <white><click:run_command:'/sonar
-      stats'><hover:show_text:'(Click to run)'>/sonar stats</hover></click><gray>.
+    - <gray>View more information using <white><click:run_command:'/sonar verbose'><hover:show_text:'(Click to run)'>/sonar verbose</hover></click><gray> or <white><click:run_command:'/sonar stats'><hover:show_text:'(Click to run)'>/sonar stats</hover></click><gray>.
     - ''

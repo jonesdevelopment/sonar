@@ -53,7 +53,7 @@ public final class AttackTracker {
   public void checkIfUnderAttack() {
     final long joinsPerSecond = Sonar.get().getStatistics().getLoginsPerSecond();
     final int verifyingPlayers = Sonar.get().getFallback().getConnected().size();
-    final int queuedPlayers = Sonar.get().getFallback().getQueue().getQueuedPlayers().size();
+    final int queuedPlayers = Sonar.get().getFallback().getQueue().getPlayers().size();
     final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();
 
     if (joinsPerSecond > minPlayers // Check the number of bots/joins per second.
@@ -68,7 +68,7 @@ public final class AttackTracker {
         currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().estimatedSize();
         currentAttack.failedVerifications = Sonar.get().getStatistics().getTotalFailedVerifications();
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
-        Sonar.get().getNotificationHandler().sendAttackNotification();
+        Sonar.get().getNotificationHandler().observe();
       } else {
         // Reset attack timer if we're still under attack
         currentAttack.timer.reset();

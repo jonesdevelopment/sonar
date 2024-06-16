@@ -56,7 +56,7 @@ commands:
       - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klik om Discord te openen)'>Open een ticket op de Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik om GitHub te openen)'>of open een nieuw probleem op GitHub.
       - ''
     # Opmaak van de lijst met subcommand die wordt weergegeven bij het uitvoeren van de hoofdopdracht
-    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Alleen spelers: </gray><only-players><br><gray>Vereist console: </gray><only-console><br><gray>Toestemming: </gray><white><permission><br><gray>Aliassen: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
+    subcommands: '<hover:show_text:''<gray>Alleen spelers: </gray><only-players><br><gray>Vereist console: </gray><only-console><br><gray>Toestemming: </gray><white><permission><br><gray>Aliassen: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
 
   # Vertalingen voor '/sonar reload'
   reload:
@@ -135,7 +135,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Totaal aantal niet-unieke joins: <white><total-joins>'
       - ' <dark_aqua>▪ <gray>Totaal aantal verificatiepogingen: <white><total-attempts>'
       - ' <dark_aqua>▪ <gray>Totaal aantal mislukte verificaties: <white><total-failed>'
-      - ' <dark_aqua>▪ <gray>Server-uptime: <white><uptime>'
+      - ' <dark_aqua>▪ <gray>Server-uptime: <white><server-uptime>'
     # Formaat van het bericht over CPU-statistieken
     cpu:
       - ' <dark_aqua>▪ <gray>Verwerk het CPU-gebruik nu: <white><process-cpu>%'

@@ -80,8 +80,8 @@ public final class StatisticsCommand extends Subcommand {
           Placeholder.unparsed("verified", DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize())),
           Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
           Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
-          Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size())),
-          Placeholder.unparsed("uptime", String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L)),
+          Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getPlayers().size())),
+          Placeholder.unparsed("server-uptime", String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L)),
           Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined())),
           Placeholder.unparsed("total-attempts", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications())),
           Placeholder.unparsed("total-failed", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications()))

@@ -33,7 +33,7 @@ public final class SonarServiceThreadManager {
     // Update the attack tracker
     Sonar.get().getAttackTracker().checkIfUnderAttack();
     // Update the action bar verbose
-    Sonar.get().getVerboseHandler().update();
+    Sonar.get().getVerboseHandler().observe();
   });
   private static final SonarServiceThread FALLBACK_QUEUE = new SonarServiceThread("sonar-fallback-queue-thread",
     1000L, () -> Sonar.get().getFallback().getQueue().poll());

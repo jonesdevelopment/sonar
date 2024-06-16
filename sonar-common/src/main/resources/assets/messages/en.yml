@@ -135,7 +135,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Total non-unique joins: <white><total-joins>'
       - ' <dark_aqua>▪ <gray>Total verification attempts: <white><total-attempts>'
       - ' <dark_aqua>▪ <gray>Total failed verifications: <white><total-failed>'
-      - ' <dark_aqua>▪ <gray>Server uptime: <white><uptime>'
+      - ' <dark_aqua>▪ <gray>Server uptime: <white><server-uptime>'
     # Format of the CPU statistics message
     cpu:
       - ' <dark_aqua>▪ <gray>Process CPU usage right now: <white><process-cpu>%'
@@ -146,10 +146,10 @@ commands:
       - ' <dark_aqua>▪ <gray>Total amount of virtual cpus: <white><virtual-core-count>'
     # Format of the memory statistics message
     memory:
-      - ' <dark_aqua>▪ <gray>Total free memory: <white><free_memory>'
-      - ' <dark_aqua>▪ <gray>Total used memory: <white><used_memory>'
-      - ' <dark_aqua>▪ <gray>Total maximum memory: <white><max_memory>'
-      - ' <dark_aqua>▪ <gray>Total allocated memory: <white><total_memory>'
+      - ' <dark_aqua>▪ <gray>Total free memory: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>Total used memory: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>Total maximum memory: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>Total allocated memory: <white><total-memory>'
     # Format of the network statistics message
     network:
       - ' <dark_aqua>▪ <gray>Current incoming used bandwidth: <white><incoming-traffic>'
