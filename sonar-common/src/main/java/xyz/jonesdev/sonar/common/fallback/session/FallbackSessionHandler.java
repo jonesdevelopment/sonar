@@ -59,11 +59,12 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
     GlobalSonarStatistics.totalSuccessfulVerifications++;
 
     // Add verified player to the database
-    final long timeTaken = user.getLoginTimer().delay();
-    Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(user.getInetAddress(), uuid, timeTaken));
+    Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(
+      user.getInetAddress(), uuid, user.getLoginTimer().getStart()));
 
     // Call the VerifySuccessEvent for external API usage
-    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(username, uuid, user, timeTaken));
+    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(
+      username, uuid, user, user.getLoginTimer().delay()));
 
     // If enabled, transfer the player back to the origin server.
     // This feature was introduced by Mojang in Minecraft version 1.20.5.
