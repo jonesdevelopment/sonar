@@ -142,7 +142,6 @@ commands:
       - ' <dark_aqua>▪ <gray>Использование процессора системой прямо сейчас: <white><system-cpu>%'
       - ' <dark_aqua>▪ <gray>Использование процессора каждым ядром (сервером): <white><average-process-cpu>%'
       - ' <dark_aqua>▪ <gray>Использование процессора каждым ядром (системой): <white><average-system-cpu>%'
-      - ' <dark_aqua>▪ <gray>Средняя нагрузка на систему: <white><load-average>%'
       - ' <dark_aqua>▪ <gray>Общее количество виртуальных ядер: <white><virtual-core-count>'
     # Формат сообщения статистики памяти
     memory:

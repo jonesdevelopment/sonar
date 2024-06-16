@@ -142,7 +142,6 @@ commands:
       - ' <dark_aqua>▪ <gray>Systeem-CPU-gebruik nu: <white><system-cpu>%'
       - ' <dark_aqua>▪ <gray>CPU-gebruik per kernproces: <white><average-process-cpu>%'
       - ' <dark_aqua>▪ <gray>CPU-gebruik per core systeem: <white><average-system-cpu>%'
-      - ' <dark_aqua>▪ <gray>Algemene systeembelasting: <white><load-average>%'
       - ' <dark_aqua>▪ <gray>Totaal aantal virtuele CPUs: <white><virtual-core-count>'
     # Formaat van het bericht met geheugenstatistieken
     memory:

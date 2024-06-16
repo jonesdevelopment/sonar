@@ -78,14 +78,6 @@ public class JVMProcessInformation {
   }
 
   /**
-   * @return Current system load average in percent
-   * @apiNote This returns the global process load, not the CPU usage
-   */
-  public double getSystemLoadAverage() {
-    return MX.getSystemLoadAverage() * 100;
-  }
-
-  /**
    * @return Memory (in bytes) the JVM will attempt to use
    */
   public long getMaxMemory() {

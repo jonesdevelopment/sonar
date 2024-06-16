@@ -142,7 +142,6 @@ commands:
       - ' <dark_aqua>▪ <gray>Utilisation actuelle du CPU du système : <white><system-cpu>%'
       - ' <dark_aqua>▪ <gray>Utilisation du CPU par cœur du processus : <white><average-process-cpu>%'
       - ' <dark_aqua>▪ <gray>Utilisation du CPU par cœur du système : <white><average-system-cpu>%'
-      - ' <dark_aqua>▪ <gray>Charge système générale : <white><load-average>%'
       - ' <dark_aqua>▪ <gray>Nombre total de processeurs virtuels : <white><virtual-core-count>'
     # Format du message de statistiques de mémoire
     memory:

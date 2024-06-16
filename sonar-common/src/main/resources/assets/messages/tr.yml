@@ -142,7 +142,6 @@ commands:
       - ' <dark_aqua>▪ <gray>Şu anda sistem CPU kullanımı: <white><system-cpu>%'
       - ' <dark_aqua>▪ <gray>Çekirdek başına işlem CPU kullanımı: <white><average-process-cpu>%'
       - ' <dark_aqua>▪ <gray>Çekirdek başına sistem CPU kullanımı: <white><average-system-cpu>%'
-      - ' <dark_aqua>▪ <gray>Genel sistem yük ortalaması: <white><load-average>%'
       - ' <dark_aqua>▪ <gray>Toplam sanal CPU miktarı: <white><virtual-core-count>'
     # Hafıza istatistik mesajının biçimi
     memory:

@@ -96,7 +96,6 @@ public final class StatisticsCommand extends Subcommand {
           Placeholder.unparsed("system-cpu", DECIMAL_FORMAT.format(getSystemCPUUsage())),
           Placeholder.unparsed("average-process-cpu", DECIMAL_FORMAT.format(getAverageProcessCPUUsage())),
           Placeholder.unparsed("average-system-cpu", DECIMAL_FORMAT.format(getAverageSystemCPUUsage())),
-          Placeholder.unparsed("load-average", DECIMAL_FORMAT.format(getSystemLoadAverage())),
           Placeholder.unparsed("virtual-core-count", DECIMAL_FORMAT.format(getVirtualCores()))
         };
         break;

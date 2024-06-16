@@ -142,7 +142,6 @@ commands:
       - ' <dark_aqua>▪ <gray>当前系统的 CPU 使用率: <white><system-cpu>%'
       - ' <dark_aqua>▪ <gray>当前进程的多核平均使用率: <white><average-process-cpu>%'
       - ' <dark_aqua>▪ <gray>当前系统的多核平均使用率: <white><average-system-cpu>%'
-      - ' <dark_aqua>▪ <gray>系统平均负载: <white><load-average>%'
       - ' <dark_aqua>▪ <gray>虚拟核心数量: <white><virtual-core-count>'
     # 内存统计信息
     memory:
