@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
@@ -30,7 +30,6 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.List;
-import java.util.Map;
 import java.util.WeakHashMap;
 
 import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
@@ -49,17 +48,11 @@ public final class DumpCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    final String json = GSON.toJson(collectMappedInformation());
-    SONAR.getLogger().info("Generated dump: {}", json);
-  }
-
-  @Unmodifiable
-  private @NotNull Map<String, Object> collectMappedInformation() {
     final var mappings = new WeakHashMap<String, Object>();
     mappings.put("sonar", new Dump.Sonar(
-      SONAR.getVersion().getFull(),
-      SONAR.getPlatform(),
-      SONAR.getVersion().isOnMainBranch()
+      Sonar.get().getVersion().getFull(),
+      Sonar.get().getPlatform(),
+      Sonar.get().getVersion().isOnMainBranch()
     ));
     mappings.put("runtime", new Dump.Runtime(
       getVirtualCores(),
@@ -79,7 +72,7 @@ public final class DumpCommand extends Subcommand {
       formatMemory(getFreeMemory()),
       formatMemory(getUsedMemory())
     ));
-    return mappings;
+    Sonar.get().getLogger().info("Generated dump: {}", GSON.toJson(mappings));
   }
 
   @SuppressWarnings("unused")

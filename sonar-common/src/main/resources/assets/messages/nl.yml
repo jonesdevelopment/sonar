@@ -13,272 +13,232 @@
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
 
-# Tijdelijke aanduiding voor elke '%prefix%' in dit configuratiebestand
+# Tijdelijke aanduiding voor elke '<prefix>' in dit configuratiebestand
 prefix: <b><yellow>Sonar</b> <gray>» <white>
-# Tijdelijke aanduiding voor elke '%support-url%' in dit configuratiebestand
+# Tijdelijke aanduiding voor elke '<support-url>' in dit configuratiebestand
 support-url: https://jonesdev.xyz/discord/
-# Tijdelijke aanduiding voor elke '%header%' in dit configuratiebestand
+# Tijdelijke aanduiding voor elke '<header>' in dit configuratiebestand
 header:
   - <b><yellow>Sonar</b><reset>
   - ''
-# Tijdelijke aanduiding voor elke '%footer%' in dit configuratiebestand
+# Tijdelijke aanduiding voor elke '<footer>' in dit configuratiebestand
 footer:
   - <gray>Als u denkt dat dit een fout is, neem dan contact op met een beheerder.
 # Verbindingsbericht dat wordt weergegeven als iemand zich aansluit, maar er zijn te veel online spelers met hun IP-adres
 too-many-online-per-ip:
-  - '%header%'
+  - '<header>'
   - <red>Er zijn te veel spelers online met uw IP-adres.
-  - '%footer%'
+  - '<footer>'
 
 # Vertalingen voor commandos
 commands:
   # Bericht dat wordt weergegeven wanneer een speler zonder toestemming /sonar probeert uit te voeren
-  no-permission: '%prefix%<red>U heeft geen toestemming om deze opdracht uit te voeren.'
+  no-permission: '<prefix><red>U heeft geen toestemming om deze opdracht uit te voeren.'
   # Bericht dat verschijnt wanneer iemand een commando verkeerd gebruikt
-  incorrect-usage: '%prefix%<red>Gebruik: /sonar %usage%'
+  incorrect-usage: '<prefix><red>Gebruik: /sonar <subcommand-usage>'
   # Bericht dat wordt weergegeven wanneer iemand een ongeldig IP-adres opgeeft (ongeldig formaat)
-  invalid-ip-address: '%prefix%Het door u opgegeven IP-adres lijkt ongeldig te zijn.'
+  invalid-ip-address: '<prefix>Het door u opgegeven IP-adres lijkt ongeldig te zijn.'
   # Bericht dat wordt weergegeven wanneer de console een opdracht uitvoert die alleen voor spelers is
-  player-only: '%prefix%<red>Je kunt dit commando alleen als speler uitvoeren.'
+  player-only: '<prefix><red>Je kunt dit commando alleen als speler uitvoeren.'
   # Bericht dat wordt weergegeven wanneer een speler een opdracht uitvoert die alleen voor de console geldt
-  console-only: '%prefix%<red>Om veiligheidsredenen kunt u deze opdracht alleen uitvoeren
-     via console.'
-  # Bericht dat wordt weergegeven wanneer een speler Sonar-opdrachten te snel uitvoert
-  cool-down: '%prefix%<red>U kunt dit commando slechts elke 0,5 seconde uitvoeren.'
-  cool-down-left: '%prefix%<red>Wacht nog <bold>%time-left%s<reset><red>.'
+  console-only: '<prefix><red>Om veiligheidsredenen kunt u deze opdracht alleen uitvoeren via console.'
   # Bericht dat wordt getoond wanneer een speler geen toestemming heeft om een bepaald subcommand uit te voeren
-  subcommand-no-permission: '%prefix%<red>U heeft geen toestemming om dit uit te voeren
-    subcommand. <gray>(%permission%)'
+  subcommand-no-permission: '<prefix><red>U heeft geen toestemming om dit uit te voeren subcommand. <gray>(<permission>)'
 
   # Vertalingen voor '/sonar'
   main:
     # Informatief bericht dat boven alles wordt weergegeven bij het uitvoeren van de hoofdopdracht
     header:
-      - <yellow><b>Sonar</b> %version% draaien op %platform%.
-      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) %copyright_year%
-        Jones Development and Sonar Contributors</click>
+      - <yellow><b>Sonar</b> <version> draaien op <platform>.
+      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development and Sonar Contributors</click>
       - ''
       - <gray>Hulp nodig of vragen?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klik
-        om Discord te openen)'>Open een ticket op de Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik
-        om GitHub te openen)'>of open een nieuw probleem op GitHub.
+      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klik om Discord te openen)'>Open een ticket op de Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik om GitHub te openen)'>of open een nieuw probleem op GitHub.
       - ''
     # Opmaak van de lijst met subcommand die wordt weergegeven bij het uitvoeren van de hoofdopdracht
-    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Alleen
-       spelers: </gray>%only_players%<br><gray>Vereist console: </gray>%require_console%<br><gray>Toestemming:
-      </gray><white>%permission%<br><gray>Aliassen: </gray>%aliases%''><dark_aqua>
-      ▪ <gray>/sonar %subcommand%  <white>%description%'
+    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Alleen spelers: </gray><only-players><br><gray>Vereist console: </gray><only-console><br><gray>Toestemming: </gray><white><permission><br><gray>Aliassen: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
 
   # Vertalingen voor '/sonar reload'
   reload:
     # Bericht dat wordt weergegeven wanneer iemand Sonar begint te herladen
-    start: '%prefix%Sonar opnieuw laden...'
+    start: '<prefix>Sonar opnieuw laden...'
     # Bericht dat wordt weergegeven wanneer Sonar klaar is met herladen
-    finish: '%prefix%<green>Opnieuw geladen <gray>(%taken%ms)'
+    finish: '<prefix><green>Opnieuw geladen <gray>(<time-taken>ms)'
 
   # Vertalingen voor '/sonar verbose'
   verbose:
     # Bericht dat wordt weergegeven wanneer een speler zich abonneert op Sonar uitgebreid
-    subscribed: '%prefix%U bekijkt nu Sonar uitgebreid.'
+    subscribe: '<prefix>U bekijkt nu Sonar uitgebreid.'
     # Bericht dat wordt weergegeven wanneer een speler zich afmeldt voor Sonar uitgebreid
-    unsubscribed: '%prefix%Je bekijkt Sonar niet langer uitgebreid.'
+    unsubscribe: '<prefix>Je bekijkt Sonar niet langer uitgebreid.'
 
   # Vertalingen voor '/sonar notify'
   notify:
     # Bericht dat wordt weergegeven wanneer een speler zich abonneert op Sonar aanval meldingen
-    subscribed: '%prefix%U bekijkt nu Sonar aanval meldingen.'
+    subscribe: '<prefix>U bekijkt nu Sonar aanval meldingen.'
     # Bericht dat wordt weergegeven wanneer een speler zich afmeldt voor Sonar aanval meldingen
-    unsubscribed: '%prefix%Je bekijkt Sonar niet langer Sonar aanval meldingen.'
+    unsubscribe: '<prefix>Je bekijkt Sonar niet langer Sonar aanval meldingen.'
 
   # Vertalingen voor '/sonar blacklist'
   blacklist:
     # Bericht dat wordt weergegeven wanneer iemand de zwarte lijst probeert te wissen, maar deze leeg is
-    empty: '%prefix%De zwarte lijst is momenteel leeg. Daarom waren er geen IP-adressen
-       verwijderd van de zwarte lijst.'
+    empty: '<prefix>De zwarte lijst is momenteel leeg. Daarom waren er geen IP-adressen verwijderd van de zwarte lijst.'
     # Bericht dat wordt weergegeven wanneer iemand de zwarte lijst wist
-    cleared: '%prefix%Je hebt in totaal %removed% IP-adres(sen) met succes verwijderd
-       van de zwarte lijst.'
+    clear: '<prefix>Je hebt in totaal <amount> IP-adres(sen) met succes verwijderd van de zwarte lijst.'
     # Bericht dat wordt getoond wanneer iemand de omvang van de zwarte lijst controleert
-    size: '%prefix%De zwarte lijst bevat momenteel %amount% IP-adres(sen).'
+    size: '<prefix>De zwarte lijst bevat momenteel <amount> IP-adres(sen).'
     # Bericht dat wordt getoond wanneer iemand een IP-adres aan de zwarte lijst toevoegt
-    added: '%prefix%%ip% is succesvol toegevoegd aan de zwarte lijst.'
+    add: '<prefix><ip> is succesvol toegevoegd aan de zwarte lijst.'
     # Bericht dat wordt getoond wanneer iemand een IP-adres toevoegt aan de zwarte lijst die is geverifieerd
-    added-warning: '%prefix%<red>Attentie: <white>%ip% staat momenteel op de witte lijst. Overwegen
-       het verwijderen van het IP-adres uit de lijst met geverifieerde spelers om potentieel te voorkomen
-       problemen.'
+    add-warning: '<prefix><red>Attentie: <white><ip> staat momenteel op de witte lijst. Overwegen het verwijderen van het IP-adres uit de lijst met geverifieerde spelers om potentieel te voorkomen problemen.'
     # Bericht dat verschijnt wanneer iemand een IP-adres van de zwarte lijst verwijdert
-    removed: '%prefix%%ip% is met succes verwijderd van de zwarte lijst.'
+    remove: '<prefix><ip> is met succes verwijderd van de zwarte lijst.'
     # Bericht dat wordt weergegeven wanneer iemand een IP-adres aan de zwarte lijst toevoegt, maar dit al op de zwarte lijst staat
-    duplicate-ip: '%prefix%Het door u opgegeven IP-adres staat al op de zwarte lijst.'
+    ip-duplicate: '<prefix>Het door u opgegeven IP-adres staat al op de zwarte lijst.'
     # Bericht dat verschijnt wanneer iemand een IP-adres van de zwarte lijst verwijdert, maar dit niet op de zwarte lijst staat
-    ip-not-found: '%prefix%Het door u opgegeven IP-adres staat niet op de zwarte lijst.'
+    ip-not-found: '<prefix>Het door u opgegeven IP-adres staat niet op de zwarte lijst.'
 
   # Vertalingen voor '/sonar verified'
   verified:
     # Bericht dat wordt weergegeven wanneer iemand de lijst met geverifieerde spelers probeert te wissen, maar leeg is
-    empty: '%prefix%De lijst met geverifieerde spelers is momenteel leeg. Daarom nee
-       spelers waren niet geverifieerd.'
+    empty: '<prefix>De lijst met geverifieerde spelers is momenteel leeg. Daarom nee spelers waren niet geverifieerd.'
     # Bericht dat wordt weergegeven wanneer iemand de lijst met geverifieerde spelers wist
-    cleared: '%prefix%Je hebt met succes de verificatie van in totaal %removed% unieke speler(s) ongedaan gemaakt.'
+    clear: '<prefix>Je hebt met succes de verificatie van in totaal <amount> unieke speler(s) ongedaan gemaakt.'
     # Bericht dat wordt weergegeven wanneer iemand de grootte van de lijst met geverifieerde spelers controleert
-    size: '%prefix%Er zijn momenteel %amount% unieke speler(s) geverifieerd.'
+    size: '<prefix>Er zijn momenteel <amount> unieke speler(s) geverifieerd.'
     # Bericht dat wordt weergegeven wanneer iemand de verificatie van een IP-adres ongedaan maakt
-    removed: '%prefix%De verificatie van %ip% is succesvol ingetrokken.'
+    remove: '<prefix>De verificatie van <ip> is succesvol ingetrokken.'
     # Bericht dat wordt weergegeven wanneer iemand een IP-adres verifieert
-    added: '%prefix%%ip% succesvol geverifieerd.'
+    add: '<prefix><ip> succesvol geverifieerd.'
     # Bericht dat wordt weergegeven wanneer iemand een IP-adres/UUID probeert te verifiëren die al is geverifieerd
-    already: '%prefix%Het IP-adres en de UUID die u heeft opgegeven, zijn al geverifieerd.'
+    already: '<prefix>Het IP-adres en de UUID die u heeft opgegeven, zijn al geverifieerd.'
     # Bericht dat wordt weergegeven wanneer iemand de verificatie van een IP-adres ongedaan maakt, maar het is niet geverifieerd
-    ip-not-found: '%prefix%Het door u opgegeven IP-adres is niet geverifieerd.'
+    ip-not-found: '<prefix>Het door u opgegeven IP-adres is niet geverifieerd.'
     # Bericht dat wordt weergegeven wanneer iemand tweemaal hetzelfde IP-adres probeert te de-verifiëren (dubbele handeling)
-    blocked: '%prefix%Wacht tot de huidige bewerking is voltooid.'
+    blocked: '<prefix>Wacht tot de huidige bewerking is voltooid.'
+    # Message shown when someone looks up the verification history of an IP address
+    history: '<prefix><yellow>Eerdere UUID''s voor <ip>:'
+    history-entry: ' <gray>▪ <white><uuid>'
 
   # Vertalingen voor '/sonar statistics'
   statistics:
     # Informatieve boodschap die boven alles wordt getoond bij het bekijken van de statistieken
-    header: '%prefix%Er worden %type% statistieken voor deze sessie weergegeven:'
+    header: '<prefix>Er worden <statistics-type> statistieken voor deze sessie weergegeven:'
     # Bericht dat wordt weergegeven wanneer een speler een onbekende statistiek probeert te bekijken
-    unknown-type: '%prefix%<red>Onbekend statistieke! Beschikbare statistieken: <gray>%statistics%'
+    unknown-type: '<prefix><red>Onbekend statistieke! Beschikbare statistieken: <gray><statistics>'
     # Formaat van het algemene statistische bericht
     general:
-      - ' <dark_aqua>▪ <gray>Geverifieerde IP-adressen: <white>%verified%'
-      - ' <dark_aqua>▪ <gray>IP-adressen verifiëren: <white>%verifying%'
-      - ' <dark_aqua>▪ <gray>IP-adressen op de zwarte lijst: <white>%blacklisted%'
-      - ' <dark_aqua>▪ <gray>Wachtrij staande aanmeldingen: <white>%queued%'
-      - ' <dark_aqua>▪ <gray>Totaal aantal niet-unieke joins: <white>%total_joins%'
-      - ' <dark_aqua>▪ <gray>Totaal aantal verificatiepogingen: <white>%total_attempts%'
-      - ' <dark_aqua>▪ <gray>Totaal aantal mislukte verificaties: <white>%total_failed%'
-      - ' <dark_aqua>▪ <gray>Server-uptime: <white>%uptime%'
+      - ' <dark_aqua>▪ <gray>Geverifieerde IP-adressen: <white><verified>'
+      - ' <dark_aqua>▪ <gray>IP-adressen verifiëren: <white><verifying>'
+      - ' <dark_aqua>▪ <gray>IP-adressen op de zwarte lijst: <white><blacklisted>'
+      - ' <dark_aqua>▪ <gray>Wachtrij staande aanmeldingen: <white><queued>'
+      - ' <dark_aqua>▪ <gray>Totaal aantal niet-unieke joins: <white><total-joins>'
+      - ' <dark_aqua>▪ <gray>Totaal aantal verificatiepogingen: <white><total-attempts>'
+      - ' <dark_aqua>▪ <gray>Totaal aantal mislukte verificaties: <white><total-failed>'
+      - ' <dark_aqua>▪ <gray>Server-uptime: <white><uptime>'
     # Formaat van het bericht over CPU-statistieken
     cpu:
-      - ' <dark_aqua>▪ <gray>Verwerk het CPU-gebruik nu: <white>%process_cpu%%'
-      - ' <dark_aqua>▪ <gray>Systeem-CPU-gebruik nu: <white>%system_cpu%%'
-      - ' <dark_aqua>▪ <gray>CPU-gebruik per kernproces: <white>%average_process_cpu%%'
-      - ' <dark_aqua>▪ <gray>CPU-gebruik per core systeem: <white>%average_system_cpu%%'
-      - ' <dark_aqua>▪ <gray>Algemene systeembelasting: <white>%load_average%%'
-      - ' <dark_aqua>▪ <gray>Totaal aantal virtuele CPUs: <white>%virtual_cores%'
+      - ' <dark_aqua>▪ <gray>Verwerk het CPU-gebruik nu: <white><process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Systeem-CPU-gebruik nu: <white><system-cpu>%'
+      - ' <dark_aqua>▪ <gray>CPU-gebruik per kernproces: <white><average-process-cpu>%'
+      - ' <dark_aqua>▪ <gray>CPU-gebruik per core systeem: <white><average-system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Algemene systeembelasting: <white><load-average>%'
+      - ' <dark_aqua>▪ <gray>Totaal aantal virtuele CPUs: <white><virtual-core-count>'
     # Formaat van het bericht met geheugenstatistieken
     memory:
-      - ' <dark_aqua>▪ <gray>Totaal vrij geheugen: <white>%free_memory%'
-      - ' <dark_aqua>▪ <gray>Totaal gebruikt geheugen: <white>%used_memory%'
-      - ' <dark_aqua>▪ <gray>Totaal maximaal geheugen: <white>%max_memory%'
-      - ' <dark_aqua>▪ <gray>Totaal toegewezen geheugen: <white>%total_memory%'
+      - ' <dark_aqua>▪ <gray>Totaal vrij geheugen: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>Totaal gebruikt geheugen: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>Totaal maximaal geheugen: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>Totaal toegewezen geheugen: <white><total-memory>'
     # Formaat van het bericht met netwerkstatistieken
     network:
-      - ' <dark_aqua>▪ <gray>Huidige inkomende gebruikte bandbreedte: <white>%incoming%'
-      - ' <dark_aqua>▪ <gray>Huidige uitgaande gebruikte bandbreedte: <white>%outgoing%'
-      - ' <dark_aqua>▪ <gray>Totale inkomende gebruikte bandbreedte: <white>%ttl_incoming%'
-      - ' <dark_aqua>▪ <gray>Totale uitgaande gebruikte bandbreedte: <white>%ttl_outgoing%'
+      - ' <dark_aqua>▪ <gray>Huidige inkomende gebruikte bandbreedte: <white><incoming-traffic>'
+      - ' <dark_aqua>▪ <gray>Huidige uitgaande gebruikte bandbreedte: <white><outgoing-traffic>'
+      - ' <dark_aqua>▪ <gray>Totale inkomende gebruikte bandbreedte: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Totale uitgaande gebruikte bandbreedte: <white><outgoing-traffic-ttl>'
 
 # Vertalingen voor alle berichten tijdens het verificatieproces
 verification:
   # Vertalingen voor alle debug-berichten tijdens de verificatie
   logs:
     # Bericht dat in de console wordt geregistreerd wanneer een nieuwe speler zich bij de server voegt
-    connection: '%name%%ip% (%protocol%) heeft verbinding gemaakt.'
+    connection: '<username><ip> (<protocol>) heeft verbinding gemaakt.'
     # Bericht dat in de console wordt geregistreerd wanneer de verificatie van een speler mislukt
-    failed: '%ip% (%protocol%) heeft de bot-controle niet doorstaan vanwege: %reason%'
+    failed: '<ip> (<protocol>) heeft de bot-controle niet doorstaan vanwege: <reason>'
     # Bericht dat op de console wordt geregistreerd wanneer een speler op de zwarte lijst staat
-    blacklisted: '%ip% (%protocol%) stond op de zwarte lijst vanwege te veel mislukte pogingen'
+    blacklisted: '<ip> (<protocol>) stond op de zwarte lijst vanwege te veel mislukte pogingen'
     # Bericht dat op de console wordt geregistreerd wanneer een speler is geverifieerd
-    successful: '%name% is succesvol geverifieerd (%time%s!).'
+    successful: '<username> is succesvol geverifieerd (<time-taken>s!).'
 
   # Berichten die aan de speler worden getoond wanneer hij of zij de CAPTCHA moet invoeren
   captcha:
     # Bericht dat aan de speler wordt getoond wanneer hij het antwoord op de captcha moet invoeren
-    enter-code: '%prefix%<green>Voer de code in de chat in die wordt weergegeven op
-       de kaart.'
+    enter-code: '<prefix><green>Voer de code in de chat in die wordt weergegeven op de kaart.'
     # Bericht dat aan de speler wordt getoond wanneer hij of zij het verkeerde antwoord invoert in de chat
-    incorrect: '%prefix%<red>U heeft de verkeerde code ingevoerd. Probeer het opnieuw.'
+    incorrect: '<prefix><red>U heeft de verkeerde code ingevoerd. Probeer het opnieuw.'
 
   # Verbindingsbericht dat wordt getoond als iemand zich aansluit terwijl de captcha nog niet is voorbereid
   currently-preparing:
-    - '%header%'
+    - '<header>'
     - <yellow>Uw anti-bot gegevens zijn nog niet voorbereid.
     - <gray>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
-    - '%footer%'
+    - '<footer>'
   # Verbindingsbericht dat wordt weergegeven wanneer iemand tijdens de verificatie te snel opnieuw deelneemt
   too-fast-reconnect:
-    - '%header%'
+    - '<header>'
     - <gold>Je hebt te snel opnieuw verbinding gemaakt. Probeer het later opnieuw.
     - <gray>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
-    - '%footer%'
+    - '<footer>'
   # Verbindingsbericht dat wordt weergegeven wanneer iemand zich aanmeldt, maar zich al aan het verifiëren is
   already-verifying:
-    - '%header%'
+    - '<header>'
     - <red>Uw IP-adres wordt momenteel geverifieerd.
     - <red>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
-    - '%footer%'
+    - '<footer>'
   # Verbindingsbericht dat wordt weergegeven wanneer iemand zich aanmeldt, maar al in de wachtrij staat voor verificatie
   already-queued:
-    - '%header%'
+    - '<header>'
     - <red>Uw IP-adres staat momenteel in de wachtrij voor verificatie.
     - <red>Wacht een paar minuten voordat u opnieuw probeert te verifiëren.
-    - '%footer%'
+    - '<footer>'
   # Verbindingsbericht dat wordt weergegeven wanneer iemand lid wordt, maar tijdelijk op de zwarte lijst staat
   blacklisted:
-    - '%header%'
+    - '<header>'
     - <red>Momenteel wordt u de toegang tot de server ontzegd.
     - <red>Wacht een paar minuten voordat u weer verbinding kunt maken met de server.
-    - <gold>Vals positief? <gray>%support-url%
-    - '%footer%'
+    - <gold>Vals positief? <gray><support-url>
+    - '<footer>'
   # Verbindingsbericht dat wordt weergegeven wanneer iemand zich aanmeldt met een ongeldige gebruikersnaam
   invalid-username:
-    - '%header%'
+    - '<header>'
     - <red>Uw gebruikersnaam bevat ongeldige tekens.
-    - '%footer%'
+    - '<footer>'
   # Verbindingsbericht dat wordt weergegeven wanneer iemand zich aanmeldt met een versie op de zwarte lijst
   blacklisted-protocol:
-    - '%header%'
+    - '<header>'
     - <red>U gebruikt een versie die niet is toegestaan op onze server.
-    - <gold>Hulp nodig bij het inloggen? <gray>%support-url%
-    - '%footer%'
+    - <gold>Hulp nodig bij het inloggen? <gray><support-url>
+    - '<footer>'
   # Verbindingsbericht dat wordt weergegeven wanneer iemand succesvol verifieert
   success:
-    - '%header%'
+    - '<header>'
     - <green>U heeft de verificatie succesvol doorlopen.
     - <white>Wanneer u opnieuw verbinding maakt, kunt u nu op de server spelen.
   # Verbindingsbericht dat wordt weergegeven wanneer iemand de verificatie mislukt
   failed:
-    - '%header%'
+    - '<header>'
     - <red>De bot-verificatie is mislukt.
     - <gray>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
-    - <gold>Hulp nodig? <gray>%support-url%
-    - '%footer%'
+    - <gold>Hulp nodig bij het inloggen? <gray><support-url>
+    - '<footer>'
 
 # Vertalingen voor Sonar's actiebalk uitgebreide berichten
 verbose:
   layout:
-    # Lay-out voor de actiebalk van Sonar, uitgebreid
-    # Tijdelijke aanduidingen:
-    # - '%queued%' Aantal verbindingen in de wachtrij
-    # - '%verifying%' Aantal verifiërende verbindingen
-    # - '%blacklisted%' Aantal op de zwarte lijst geplaatste IP-adressen
-    # - '%total-joins%' Aantal totale pogingen tot deelname
-    # - '%verify-total%' Aantal totale verificatiepogingen
-    # - '%verify-success%' Aantal geverifieerde IP-adressen
-    # - '%verify-failed%' Aantal mislukte verificaties
-    # - '%logins-per-second%' Aantal logins per seconde
-    # - '%connections-per-second%' Aantal verbindingen per seconde
-    # - '%attack-duration%' Duur van de huidige aanval
-    # - '%incoming-traffic%' Inkomend bandbreedtegebruik per seconde
-    # - '%outgoing-traffic%' Uitgaand bandbreedtegebruik per seconde
-    # - '%incoming-traffic-ttl%' Totaal inkomend bandbreedtegebruik
-    # - '%outgoing-traffic-ttl%' Totaal uitgaand bandbreedtegebruik
-    # - '%used-memory%' Hoeveelheid gebruikt geheugen van het proces
-    # - '%total-memory%' Hoeveelheid totale geheugen van het proces
-    # - '%max-memory%' Hoeveelheid maximaal geheugen van het proces
-    # - '%free-memory%' Hoeveelheid vrij geheugen van het proces
-    # - '%animation%' Aanpasbaar geanimeerd symbool
-    # Vertalingen voor de normale uitgebreide uitvoer van Sonar
-    normal: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Inloggen/s
-      <white>%logins-per-second% <dark_aqua>╺ <gray>Verifiëren <white>%verifying% <dark_aqua>|
-      <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
-    # Layout for Sonar's actionbar verbose during an attack
-    attack: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Inloggen/s
-      <white>%logins-per-second% <dark_aqua>╺ <gray>Wachtrij <white>%queued% <dark_aqua>╺
-      <gray>Verifiëren <white>%verifying% <dark_aqua>╺ <gray>Duur <white>%attack-duration%
-      <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
+    # Lay-out voor de actiebalk van Sonar
+    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Inloggen/s <white><logins-per-second> <dark_aqua>╺ <gray>Verifiëren <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    # Lay-out voor Sonars actiebalk verbose tijdens een aanval
+    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Inloggen/s <white><logins-per-second> <dark_aqua>╺ <gray>Wachtrij <white><queued> <dark_aqua>╺ <gray>Verifiëren <white><verifying> <dark_aqua>╺ <gray>Duur <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
   # Animatie voor de actiebalk
   # Alternatieven:
   # - ▙, ▛, ▜, ▟
@@ -301,11 +261,9 @@ notifications:
     - <yellow><b>Sonar<reset>
     - ''
     - <gray>Er is een bot-aanval gedetecteerd.
-    - ' <dark_aqua>▪ <gray>Inloggen per seconde: <white>%logins-per-second%'
-    - ' <dark_aqua>▪ <gray>Spelers verifiëren: <white>%verifying%'
-    - ' <dark_aqua>▪ <gray>Spelers in de wachtrij: <white>%queued%'
+    - ' <dark_aqua>▪ <gray>Inloggen per seconde: <white><logins-per-second>'
+    - ' <dark_aqua>▪ <gray>Spelers verifiëren: <white><verifying>'
+    - ' <dark_aqua>▪ <gray>Spelers in de wachtrij: <white><queued>'
     - ''
-    - <gray>Bekijk meer informatie via <white><click:run_command:'/sonar verbose'><hover:show_text:'(Klik
-      om uit te voeren)'>/sonar verbose</hover></click><gray> of <white><click:run_command:'/sonar
-      stats'><hover:show_text:'(Klik om uit te voeren)'>/sonar stats</hover></click><gray>.
+    - <gray>Bekijk meer informatie via <white><click:run_command:'/sonar verbose'><hover:show_text:'(Klik om uit te voeren)'>/sonar verbose</hover></click><gray> of <white><click:run_command:'/sonar stats'><hover:show_text:'(Klik om uit te voeren)'>/sonar stats</hover></click><gray>.
     - ''

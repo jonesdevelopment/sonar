@@ -17,6 +17,8 @@
 
 package xyz.jonesdev.sonar.common.subcommand.impl;
 
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
@@ -43,83 +45,100 @@ public final class BlacklistCommand extends Subcommand {
     switch (invocation.getRawArguments()[1].toLowerCase()) {
       case "add": {
         if (invocation.getRawArguments().length <= 2) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getIncorrectCommandUsage()
-            .replace("%usage%", "blacklist add <IP address>"));
+          incorrectUsage(invocation.getSource(), "blacklist add <IP address>");
           return;
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSender(), rawInetAddress);
+        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSource(), rawInetAddress);
         // Make sure the given IP address is valid
         if (inetAddress == null) return;
 
         // Make sure the IP is not blacklisted already
-        if (SONAR.getFallback().getBlacklist().asMap().containsKey(inetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistDuplicate());
+        if (Sonar.get().getFallback().getBlacklist().asMap().containsKey(inetAddress)) {
+          invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+            Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.ip-duplicate"),
+            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+            Placeholder.unparsed("ip", rawInetAddress)));
           return;
         }
 
         // Display a warning if the IP is verified but being added to the blacklist
-        if (SONAR.getVerifiedPlayerController().has(inetAddress.toString())) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistAddWarning()
-            .replace("%ip%", rawInetAddress));
+        if (Sonar.get().getVerifiedPlayerController().has(inetAddress.toString())) {
+          invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+            Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.add-warning"),
+            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+            Placeholder.unparsed("ip", rawInetAddress)));
         }
 
         // Blacklist the given IP address
-        SONAR.getFallback().getBlacklist().put(inetAddress, (byte) 0);
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistAdd()
-          .replace("%ip%", rawInetAddress));
+        Sonar.get().getFallback().getBlacklist().put(inetAddress, (byte) 0);
+        invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.add"),
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("ip", rawInetAddress)));
         break;
       }
 
       case "remove": {
         if (invocation.getRawArguments().length <= 2) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getIncorrectCommandUsage()
-            .replace("%usage%", "blacklist remove <IP address>"));
+          incorrectUsage(invocation.getSource(), "blacklist remove <IP address>");
           return;
         }
 
         final String rawInetAddress = invocation.getRawArguments()[2];
-        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSender(), rawInetAddress);
+        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSource(), rawInetAddress);
         // Make sure the given IP address is valid
         if (inetAddress == null) return;
 
         // Make sure the IP is blacklisted
-        if (!SONAR.getFallback().getBlacklist().asMap().containsKey(inetAddress)) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistNotFound());
+        if (!Sonar.get().getFallback().getBlacklist().asMap().containsKey(inetAddress)) {
+          invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+            Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.ip-not-found"),
+            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
           return;
         }
 
         // Invalidate the cache entry of the blacklisted IP address
-        SONAR.getFallback().getBlacklist().invalidate(inetAddress);
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistRemove()
-          .replace("%ip%", rawInetAddress));
+        Sonar.get().getFallback().getBlacklist().invalidate(inetAddress);
+        invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.remove"),
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("ip", rawInetAddress)));
         break;
       }
 
       case "clear": {
-        final long blacklisted = SONAR.getFallback().getBlacklist().estimatedSize();
+        final long blacklistSize = Sonar.get().getFallback().getBlacklist().estimatedSize();
 
-        if (blacklisted == 0) {
-          invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistEmpty());
+        if (blacklistSize == 0) {
+          invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+            Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.empty"),
+            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
           return;
         }
 
         // Invalidate all cache entries
-        SONAR.getFallback().getBlacklist().invalidateAll();
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistCleared()
-          .replace("%removed%", Sonar.DECIMAL_FORMAT.format(blacklisted)));
+        Sonar.get().getFallback().getBlacklist().invalidateAll();
+        invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.clear"),
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("amount", Sonar.DECIMAL_FORMAT.format(blacklistSize))));
         break;
       }
 
       case "size": {
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getBlacklistSize()
-          .replace("%amount%", Sonar.DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklist().estimatedSize())));
+        final long blacklistSize = Sonar.get().getFallback().getBlacklist().estimatedSize();
+
+        invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.size"),
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("amount", Sonar.DECIMAL_FORMAT.format(blacklistSize))));
         break;
       }
 
       default: {
-        incorrectUsage(invocation.getSender());
+        incorrectUsage(invocation.getSource());
         break;
       }
     }

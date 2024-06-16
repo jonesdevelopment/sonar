@@ -18,6 +18,9 @@
 package xyz.jonesdev.sonar.common.subcommand.impl;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
@@ -41,76 +44,89 @@ import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
   argumentsRequired = false
 )
 public final class StatisticsCommand extends Subcommand {
-  private enum StatisticType {
-    GENERAL,
-    NETWORK,
-    MEMORY,
-    CPU
-  }
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    StatisticType type = StatisticType.GENERAL;
+    String type = "general";
     if (invocation.getRawArguments().length >= 2) {
       try {
-        type = StatisticType.valueOf(invocation.getRawArguments()[1].toUpperCase());
+        type = invocation.getRawArguments()[1].toLowerCase();
       } catch (Exception exception) {
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getUnknownStatisticType()
-          .replace("%statistics%", getArguments()));
+        invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("commands.statistics.unknown-type"),
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("statistics", getArguments())));
         return;
       }
     }
 
-    invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getStatisticsHeader()
-      .replace("%type%", type.name().toLowerCase()));
-    invocation.getSender().sendMessage(Component.empty());
+    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+      Sonar.get().getConfig().getMessagesConfig().getString("commands.statistics.header"),
+      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+      Placeholder.unparsed("statistics-type", type)));
+    invocation.getSource().sendMessage(Component.empty());
+
+    TagResolver.@NotNull Single[] placeholders = null;
 
     switch (type) {
-      case GENERAL: {
+      case "general": {
         final long seconds = Sonar.get().getLaunchTimer().delay() / 1000L;
         final long days = seconds / (24L * 60L * 60L);
         final long hours = (seconds % (24L * 60L * 60L)) / (60L * 60L);
         final long minutes = (seconds % (60L * 60L)) / 60L;
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getGeneralStatistics()
-          .replace("%verified%", DECIMAL_FORMAT.format(SONAR.getVerifiedPlayerController().estimatedSize()))
-          .replace("%verifying%", DECIMAL_FORMAT.format(SONAR.getFallback().getConnected().size()))
-          .replace("%blacklisted%", DECIMAL_FORMAT.format(SONAR.getFallback().getBlacklist().estimatedSize()))
-          .replace("%queued%", DECIMAL_FORMAT.format(SONAR.getFallback().getQueue().getQueuedPlayers().size()))
-          .replace("%uptime%", String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L))
-          .replace("%total_joins%", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined()))
-          .replace("%total_attempts%", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications()))
-          .replace("%total_failed%", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications())));
+
+        placeholders = new TagResolver.Single[]{
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("verified", DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize())),
+          Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
+          Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
+          Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size())),
+          Placeholder.unparsed("uptime", String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L)),
+          Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined())),
+          Placeholder.unparsed("total-attempts", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications())),
+          Placeholder.unparsed("total-failed", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications()))
+        };
         break;
       }
 
-      case CPU: {
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getCpuStatistics()
-          .replace("%process_cpu%", DECIMAL_FORMAT.format(getProcessCPUUsage()))
-          .replace("%system_cpu%", DECIMAL_FORMAT.format(getSystemCPUUsage()))
-          .replace("%average_process_cpu%", DECIMAL_FORMAT.format(getAverageProcessCPUUsage()))
-          .replace("%average_system_cpu%", DECIMAL_FORMAT.format(getAverageSystemCPUUsage()))
-          .replace("%load_average%", DECIMAL_FORMAT.format(getSystemLoadAverage()))
-          .replace("%virtual_cores%", DECIMAL_FORMAT.format(getVirtualCores())));
+      case "cpu": {
+        placeholders = new TagResolver.Single[]{
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("process-cpu", DECIMAL_FORMAT.format(getProcessCPUUsage())),
+          Placeholder.unparsed("system-cpu", DECIMAL_FORMAT.format(getSystemCPUUsage())),
+          Placeholder.unparsed("average-process-cpu", DECIMAL_FORMAT.format(getAverageProcessCPUUsage())),
+          Placeholder.unparsed("average-system-cpu", DECIMAL_FORMAT.format(getAverageSystemCPUUsage())),
+          Placeholder.unparsed("load-average", DECIMAL_FORMAT.format(getSystemLoadAverage())),
+          Placeholder.unparsed("virtual-core-count", DECIMAL_FORMAT.format(getVirtualCores()))
+        };
         break;
       }
 
-      case MEMORY: {
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getMemoryStatistics()
-          .replace("%free_memory%", formatMemory(getFreeMemory()))
-          .replace("%used_memory%", formatMemory(getUsedMemory()))
-          .replace("%max_memory%", formatMemory(getMaxMemory()))
-          .replace("%total_memory%", formatMemory(getTotalMemory())));
+      case "memory": {
+        placeholders = new TagResolver.Single[]{
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("free-memory", formatMemory(getFreeMemory())),
+          Placeholder.unparsed("used-memory", formatMemory(getUsedMemory())),
+          Placeholder.unparsed("max-memory", formatMemory(getMaxMemory())),
+          Placeholder.unparsed("total-memory", formatMemory(getTotalMemory()))
+        };
         break;
       }
 
-      case NETWORK: {
-        invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNetworkStatistics()
-          .replace("%incoming%", CachedBandwidthStatistics.INCOMING.getCachedSecond())
-          .replace("%outgoing%", CachedBandwidthStatistics.OUTGOING.getCachedSecond())
-          .replace("%ttl_incoming%", CachedBandwidthStatistics.INCOMING.getCachedTtl())
-          .replace("%ttl_outgoing%", CachedBandwidthStatistics.OUTGOING.getCachedTtl()));
+      case "network": {
+        placeholders = new TagResolver.Single[]{
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("incoming-traffic", CachedBandwidthStatistics.INCOMING.getCachedSecond()),
+          Placeholder.unparsed("outgoing-traffic", CachedBandwidthStatistics.OUTGOING.getCachedSecond()),
+          Placeholder.unparsed("incoming-traffic-ttl", CachedBandwidthStatistics.INCOMING.getCachedTtl()),
+          Placeholder.unparsed("outgoing-traffic-ttl", CachedBandwidthStatistics.OUTGOING.getCachedTtl())
+        };
         break;
       }
+    }
+
+    for (final String msg : Sonar.get().getConfig().getMessagesConfig().getStringList("commands.statistics." + type)) {
+      invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(msg, placeholders));
     }
   }
 }

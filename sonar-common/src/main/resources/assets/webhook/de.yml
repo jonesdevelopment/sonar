@@ -41,17 +41,17 @@ webhook:
     description:
       - Der Angriff auf deinen Server wurde abgewehrt.
       - ''
-      - 'Angriffsbeginn: <t:%start-timestamp%:T>'
-      - 'Angriffsende: <t:%end-timestamp%:T>'
-      - 'Angriffsdauer: %duration%'
+      - 'Angriffsbeginn: <t:<start-timestamp>:T>'
+      - 'Angriffsende: <t:<end-timestamp>:T>'
+      - 'Angriffsdauer: <attack-duration>'
       - ''
-      - 'Spitzenauslastung der CPU des Prozesses während des Angriffs: %peak-cpu%%'
-      - 'Spitzenauslastung des Arbeitsspeichers des Prozesses während des Angriffs: %peak-memory%'
-      - 'Spitzenwert der Bots pro Sekunde während des Angriffs: %peak-bps%'
+      - 'Spitzenauslastung der CPU des Prozesses während des Angriffs: <peak-cpu>%'
+      - 'Spitzenauslastung des Arbeitsspeichers des Prozesses während des Angriffs: <peak-memory>'
+      - 'Spitzenwert der Bots pro Sekunde während des Angriffs: <peak-bps>'
       - ''
-      - 'Während des Angriffs auf die Blacklist gesetzte IP-Adressen: %total-blacklisted%'
-      - 'Gescheiterte Verifizierungen während des Angriffs: %total-failed%'
-      - 'Erfolgreiche Verifizierungen während des Angriffs: %total-success%'
+      - 'Während des Angriffs auf die Blacklist gesetzte IP-Adressen: <total-blacklisted>'
+      - 'Gescheiterte Verifizierungen während des Angriffs: <total-failed>'
+      - 'Erfolgreiche Verifizierungen während des Angriffs: <total-success>'
     # RGB-Farben der eingebetteten Discord-Webhook-Nachricht
     # Color picker: https://www.rapidtables.com/web/color/RGB_Color.html
     color:

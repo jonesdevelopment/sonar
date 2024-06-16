@@ -125,16 +125,16 @@ public final class AttackTracker {
               webhook.post(() -> {
                 final SonarConfiguration.Webhook.Embed config = Sonar.get().getConfig().getWebhook().getEmbed();
                 final String description = config.getDescription()
-                  .replace("%start-timestamp%", startTimestamp)
-                  .replace("%end-timestamp%", endTimestamp)
-                  .replace("%duration%", formattedDuration)
-                  .replace("%peak-cpu%", peakCPU)
-                  .replace("%peak-memory%", peakMem)
-                  .replace("%peak-bps%", peakBPS)
-                  .replace("%peak-cps%", peakCPS)
-                  .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(blacklisted))
-                  .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(failed))
-                  .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(verified));
+                  .replace("<start-timestamp>", startTimestamp)
+                  .replace("<end-timestamp>", endTimestamp)
+                  .replace("<attack-duration>", formattedDuration)
+                  .replace("<peak-cpu>", peakCPU)
+                  .replace("<peak-memory>", peakMem)
+                  .replace("<peak-bps>", peakBPS)
+                  .replace("<peak-cps>", peakCPS)
+                  .replace("<total-blacklisted>", Sonar.DECIMAL_FORMAT.format(blacklisted))
+                  .replace("<total-failed>", Sonar.DECIMAL_FORMAT.format(failed))
+                  .replace("<total-success>", Sonar.DECIMAL_FORMAT.format(verified));
                 return new SonarConfiguration.Webhook.Embed(
                   config.getTitle(), config.getTitleUrl(), description, config.getR(), config.getG(), config.getB());
               });

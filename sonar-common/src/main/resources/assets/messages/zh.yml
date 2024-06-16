@@ -13,264 +13,232 @@
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
 
-# %prefix% 占位符
+# <prefix> 占位符
 prefix: <b><yellow>Sonar</b> <gray>» <white>
-# %support-url% 占位符
+# <support-url> 占位符
 support-url: https://jonesdev.xyz/discord/
-# %header% 占位符. (支持多行)
+# <header> 占位符. (支持多行)
 header:
   - <b><yellow>Sonar</b><reset>
   - ''
-# %footer% 占位符. (支持多行)
+# <footer> 占位符. (支持多行)
 footer:
   - <gray>如果您认为这是一个错误, 请联系服务器管理员.
 # 当玩家尝试加入但有太多在线玩家同时使用者玩家的 IP 地址时显示的踢出消息.
 too-many-online-per-ip:
-  - '%header%'
+  - '<header>'
   - <red>您所使用的 IP 地址已经无法再登录更多账户了.
-  - '%footer%'
+  - '<footer>'
 
 # 有关命令的语言配置.
 commands:
   # 当玩家尝试在没有权限的情况下运行 /sonar 时显示的消息
-  no-permission: '%prefix%<red>您没有足够的权限使用该命令.'
+  no-permission: '<prefix><red>您没有足够的权限使用该命令.'
   # 当命令用法不正确时显示的消息
-  incorrect-usage: '%prefix%<red>用法: /sonar %usage%'
+  incorrect-usage: '<prefix><red>用法: /sonar <subcommand-usage>'
   # 当提供无效的 IP 地址时显示的消息
-  invalid-ip-address: '%prefix%无法正确识别您提供的IP地址 请检查输入是否有误.'
+  invalid-ip-address: '<prefix>无法正确识别您提供的IP地址 请检查输入是否有误.'
   # 当控制台尝试执行只有玩家能执行的命令时显示的消息
-  player-only: '%prefix%<red>只有玩家才可以执行该命令.'
+  player-only: '<prefix><red>只有玩家才可以执行该命令.'
   # 当玩家尝试执行只有控制台能执行的命令时显示的消息
-  console-only: '%prefix%<red>出于安全考虑 只允许通过控制台执行该命令.'
-  # 玩家执行Sonar命令的速度过快时显示的消息
-  cool-down: '%prefix%<red>您只能每 0.5 秒执行一次此命令.'
-  cool-down-left: '%prefix%<red>请等待 <bold>%time-left% 秒<reset><red> 后执行该命令.'
+  console-only: '<prefix><red>出于安全考虑 只允许通过控制台执行该命令.'
   # 当玩家没有权限执行某个子命令时显示的消息
-  subcommand-no-permission: '%prefix%<red>您没有足够的权限使用该子命令. <gray>(%permission%)'
+  subcommand-no-permission: '<prefix><red>您没有足够的权限使用该子命令. <gray>(<permission>)'
 
   # 根命令
   main:
     # 执行根命令时显示在所有输出内容(由该命令输出的消息)上方的消息
     header:
-      - <yellow>正在在 %platform% 平台上运行 <b>Sonar</b> %version%.
-      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) %copyright_year%
-        Jones Development and Sonar Contributors</click>
+      - <yellow>正在在 <platform> 平台上运行 <b>Sonar</b> <version>.
+      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development and Sonar Contributors</click>
       - ''
       - <gray>有问题或需要帮助?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Click
-        to open Discord)'>在我们的Discord上打开一张ticket </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Click
-        to open GitHub)'>或在Github打开新的问题.
+      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Click to open Discord)'>在我们的Discord上打开一张ticket </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Click to open GitHub)'>或在Github打开新的问题.
       - ''
     # 执行根命令时 对于子命令的描述.
-    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>只有玩家可以执行该命令: 
-    </gray>%only_players%<br><gray>只有控制台可以执行该命令: </gray>%require_console%<br><gray>需要的权限:
-      </gray><white>%permission%<br><gray>别名: </gray>%aliases%''><dark_aqua>
-      ▪ <gray>/sonar %subcommand%  <white>%description%'
+    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>只有玩家可以执行该命令: </gray><only-players><br><gray>只有控制台可以执行该命令: </gray><only-console><br><gray>需要的权限: </gray><white><permission><br><gray>别名: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
 
   # 重新加载命令
   reload:
     # 当有人开始重载插件时显示的消息
-    start: '%prefix%正在重新加载 Sonar...'
+    start: '<prefix>正在重新加载 Sonar...'
     # 插件完成重载时显示的消息
-    finish: '%prefix%<green>成功重新加载配置文件. <gray>(花费 %taken% 毫秒)'
+    finish: '<prefix><green>成功重新加载配置文件. <gray>(花费 <time-taken> 毫秒)'
 
   # '/sonar verbose' 命令的消息
   verbose:
     # 玩家订阅详细信息时显示的消息
-    subscribed: '%prefix%已为您显示 Sonar 的详细信息.'
+    subscribe: '<prefix>已为您显示 Sonar 的详细信息.'
     # 玩家取消订阅详细信息时显示的消息
-    unsubscribed: '%prefix%不再为您显示 Sonar 的详细信息.'
+    unsubscribe: '<prefix>不再为您显示 Sonar 的详细信息.'
 
   # '/sonar notify' 命令的消息
   notify:
     # 玩家订阅攻击通知时显示的消息
-    subscribed: '%prefix%已订阅攻击通知. 当服务器受到攻击时将会提醒您.'
+    subscribe: '<prefix>已订阅攻击通知. 当服务器受到攻击时将会提醒您.'
     # 玩家取消订阅攻击通知时显示的消息
-    unsubscribed: '%prefix%已退订攻击通知'
+    unsubscribe: '<prefix>已退订攻击通知'
 
   # '/sonar blacklist' 命令的消息
   blacklist:
     # 当尝试清理黑名单但黑名单中没有任何 IP 地址显示的消息
-    empty: '%prefix%黑名单中没有任何 IP 地址.'
+    empty: '<prefix>黑名单中没有任何 IP 地址.'
     # 当成功清理黑名单时显示的消息
-    cleared: '%prefix%您已成功从黑名单中删除 %removed% 个 IP 地址.'
+    clear: '<prefix>您已成功从黑名单中删除 <amount> 个 IP 地址.'
     # 当查看黑名单的大小时显示的消息
-    size: '%prefix%黑名单中目前有 %amount% 个 IP 地址.'
+    size: '<prefix>黑名单中目前有 <amount> 个 IP 地址.'
     # 当手动将一个 IP 地址添加到黑名单时显示的消息
-    added: '%prefix%成功将 IP 地址 %ip% 列入黑名单.'
+    add: '<prefix>成功将 IP 地址 <ip> 列入黑名单.'
     # 当尝试将白名单中的 IP 地址添加到黑名单中时显示的警告消息
-    added-warning: '%prefix%<red>警告: <white>IP 地址 %ip% 在白名单中. 添加到黑名单则意味着它将被同时从白名单中移除.'
+    add-warning: '<prefix><red>警告: <white>IP 地址 <ip> 在白名单中. 添加到黑名单则意味着它将被同时从白名单中移除.'
     # 当尝试从黑名单中移除一个 IP 地址时显示的消息
-    removed: '%prefix%成功将 IP 地址 %ip% 移出黑名单.'
+    remove: '<prefix>成功将 IP 地址 <ip> 移出黑名单.'
     # 当尝试向黑名单添加一个已经在黑名单中的 IP 地址时显示的消息
-    duplicate-ip: '%prefix%该 IP 地址已经在黑名单里了.'
+    ip-duplicate: '<prefix>该 IP 地址已经在黑名单里了.'
     # 当尝试移除一个不在黑名单中的 IP 地址时显示的消息
-    ip-not-found: '%prefix%您提供的 IP 地址并不在黑名单中.'
+    ip-not-found: '<prefix>您提供的 IP 地址并不在黑名单中.'
 
   #  '/sonar verified' 命令的消息
   verified:
     # 当尝试清除白名单但为空时显示的消息
-    empty: '%prefix%白名单中没有任何玩家.'
+    empty: '<prefix>白名单中没有任何玩家.'
     # 当成功清理白名单时显示的消息
-    cleared: '%prefix%您已成功从白名单中删除 %removed% 个玩家.'
+    clear: '<prefix>您已成功从白名单中删除 <amount> 个玩家.'
     # 当查看白名单的大小时显示的消息
-    size: '%prefix%白名单中目前有 %amount% 个已验证的玩家.'
+    size: '<prefix>白名单中目前有 <amount> 个已验证的玩家.'
     # 当成功将一个 IP 地址内所有已验证的玩家移出白名单时显示的消息
-    removed: '%prefix%成功将所有使用 IP 地址 (%ip%) 的玩家移出白名单.'
+    remove: '<prefix>成功将所有使用 IP 地址 (<ip>) 的玩家移出白名单.'
     # 当手动将一个 IP 地址添加到白名单中显示的消息
-    added: '%prefix%成功将 IP 地址 %ip% 列入白名单.'
+    add: '<prefix>成功将 IP 地址 <ip> 列入白名单.'
     # 当尝试添加一个已经在白名单中的 IP 地址和玩家的UUID 时显示的消息
-    already: '%prefix%您提供的 IP 地址和玩家的UUID已经在白名单中了.'
+    already: '<prefix>您提供的 IP 地址和玩家的UUID已经在白名单中了.'
     # 当尝试移除一个不在白名单中的 IP 地址时显示的消息
-    ip-not-found: '%prefix%您提供的 IP 地址不在白名单中.'
+    ip-not-found: '<prefix>您提供的 IP 地址不在白名单中.'
     # 当操作冲突时(例如同时将一个 IP 地址移除白名单)显示的消息
-    blocked: '%prefix%请等待当前操作完成.'
+    blocked: '<prefix>请等待当前操作完成.'
+    # Message shown when someone looks up the verification history of an IP address
+    history: '<prefix><yellow>以前的 UUID 用于 <ip>:'
+    history-entry: ' <gray>▪ <white><uuid>'
 
   # '/sonar statistics' 命令的消息
   statistics:
     # 执行该命令时显示在所有输出内容(由该命令输出的消息)上方的消息
-    header: '%prefix%当前会话中的 %type% 类型的统计信息:'
+    header: '<prefix>当前会话中的 <statistics-type> 类型的统计信息:'
     # 当查看一个未知的统计信息时显示的消息
-    unknown-type: '%prefix%<red>未知的统计信息! 可用的统计信息: <gray>%statistics%'
+    unknown-type: '<prefix><red>未知的统计信息! 可用的统计信息: <gray><statistics>'
     # 默认统计信息的消息
     general:
-      - ' <dark_aqua>▪ <gray>白名单中的 IP 地址数量: <white>%verified%'
-      - ' <dark_aqua>▪ <gray>正在进行验证的 IP 地址数量: <white>%verifying%'
-      - ' <dark_aqua>▪ <gray>黑名单中的 IP 地址数量: <white>%blacklisted%'
-      - ' <dark_aqua>▪ <gray>缓冲队列中的等待登录的数量: <white>%queued%'
-      - ' <dark_aqua>▪ <gray>玩家加入次数: <white>%total_joins%'
-      - ' <dark_aqua>▪ <gray>总验证次数: <white>%total_attempts%'
-      - ' <dark_aqua>▪ <gray>验证失败的次数: <white>%total_failed%'
-      - ' <dark_aqua>▪ <gray>服务器当前会话的运行时间: <white>%uptime%'
+      - ' <dark_aqua>▪ <gray>白名单中的 IP 地址数量: <white><verified>'
+      - ' <dark_aqua>▪ <gray>正在进行验证的 IP 地址数量: <white><verifying>'
+      - ' <dark_aqua>▪ <gray>黑名单中的 IP 地址数量: <white><blacklisted>'
+      - ' <dark_aqua>▪ <gray>缓冲队列中的等待登录的数量: <white><queued>'
+      - ' <dark_aqua>▪ <gray>玩家加入次数: <white><total-joins>'
+      - ' <dark_aqua>▪ <gray>总验证次数: <white><total-attempts>'
+      - ' <dark_aqua>▪ <gray>验证失败的次数: <white><total-failed>'
+      - ' <dark_aqua>▪ <gray>服务器当前会话的运行时间: <white><uptime>'
     # CPU 统计信息
     cpu:
-      - ' <dark_aqua>▪ <gray>当前进程的 CPU 使用率: <white>%process_cpu%%'
-      - ' <dark_aqua>▪ <gray>当前系统的 CPU 使用率: <white>%system_cpu%%'
-      - ' <dark_aqua>▪ <gray>当前进程的多核平均使用率: <white>%average_process_cpu%%'
-      - ' <dark_aqua>▪ <gray>当前系统的多核平均使用率: <white>%average_system_cpu%%'
-      - ' <dark_aqua>▪ <gray>系统平均负载: <white>%load_average%%'
-      - ' <dark_aqua>▪ <gray>虚拟核心数量: <white>%virtual_cores%'
+      - ' <dark_aqua>▪ <gray>当前进程的 CPU 使用率: <white><process-cpu>%'
+      - ' <dark_aqua>▪ <gray>当前系统的 CPU 使用率: <white><system-cpu>%'
+      - ' <dark_aqua>▪ <gray>当前进程的多核平均使用率: <white><average-process-cpu>%'
+      - ' <dark_aqua>▪ <gray>当前系统的多核平均使用率: <white><average-system-cpu>%'
+      - ' <dark_aqua>▪ <gray>系统平均负载: <white><load-average>%'
+      - ' <dark_aqua>▪ <gray>虚拟核心数量: <white><virtual-core-count>'
     # 内存统计信息
     memory:
-      - ' <dark_aqua>▪ <gray>可用内存: <white>%free_memory%'
-      - ' <dark_aqua>▪ <gray>已使用的内存: <white>%used_memory%'
-      - ' <dark_aqua>▪ <gray>最大可用内存: <white>%max_memory%'
-      - ' <dark_aqua>▪ <gray>已分配的内存: <white>%total_memory%'
+      - ' <dark_aqua>▪ <gray>可用内存: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>已使用的内存: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>最大可用内存: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>已分配的内存: <white><total-memory>'
     # 网络统计信息
     network:
-      - ' <dark_aqua>▪ <gray>当前下行: <white>%incoming%'
-      - ' <dark_aqua>▪ <gray>当前上行: <white>%outgoing%'
-      - ' <dark_aqua>▪ <gray>下行总量: <white>%ttl_incoming%'
-      - ' <dark_aqua>▪ <gray>上行总量: <white>%ttl_outgoing%'
+      - ' <dark_aqua>▪ <gray>当前下行: <white><incoming-traffic>'
+      - ' <dark_aqua>▪ <gray>当前上行: <white><outgoing-traffic>'
+      - ' <dark_aqua>▪ <gray>下行总量: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>上行总量: <white><outgoing-traffic-ttl>'
 
 # 验证过程中所有消息的翻译
 verification:
   # 验证过程中向控制台打印的调试信息
   logs:
     # 当玩家进入服务器并验证时显示的消息
-    connection: '%name%%ip% (%protocol%) 连接到了服务器.'
+    connection: '<username><ip> (<protocol>) 连接到了服务器.'
     # 当玩家未通过检查时打印的消息
-    failed: '%ip% (%protocol%) 由于原因 %reason% 无法通过检查.'
+    failed: '<ip> (<protocol>) 由于原因 <reason> 无法通过检查.'
     # 当玩家被自动列入黑名单时打印的消息
-    blacklisted: '%ip% (%protocol%) 因太多次无法完成验证而被列入黑名单.'
+    blacklisted: '<ip> (<protocol>) 因太多次无法完成验证而被列入黑名单.'
     # 当玩家完成验证时打印的消息
-    successful: '%name% 成功通过了验证 (耗时 %time% 秒!).'
+    successful: '<username> 成功通过了验证 (耗时 <time-taken> 秒!).'
 
   # 当验证中的玩家需要解决验证码时显示的消息
   captcha:
     # 玩家需要输入验证码答案时显示的消息
-    enter-code: '%prefix%<green>请在聊天框中发送地图上的验证码.'
+    enter-code: '<prefix><green>请在聊天框中发送地图上的验证码.'
     # 当玩家输入错误的验证码时显示的消息
-    incorrect: '%prefix%<red>您输入了错误的验证码. 请再试一次'
+    incorrect: '<prefix><red>您输入了错误的验证码. 请再试一次'
 
   # 当验证码还在准备的时候显示的踢出消息
   currently-preparing:
-    - '%header%'
+    - '<header>'
     - <yellow>反机器人还在准备所需的数据
     - <gray>请稍后重新加入服务器
-    - '%footer%'
+    - '<footer>'
   # 当玩家需要验证时重新连接速度太快时显示的踢出消息
   too-fast-reconnect:
-    - '%header%'
+    - '<header>'
     - <gold>您的重新连接速度过快
     - <gray>请稍后重新加入服务器
-    - '%footer%'
+    - '<footer>'
   # 当玩家尝试加入但它的 IP 已经有另一位玩家在验证时显示的踢出消息
   already-verifying:
-    - '%header%'
+    - '<header>'
     - <red>有另一位玩家正在使用您当前的 IP 地址进行验证
     - <red>请稍后重新加入服务器
-    - '%footer%'
+    - '<footer>'
   # 已经在排队等待验证的人加入时显示的踢出消息
   already-queued:
-    - '%header%'
+    - '<header>'
     - <red>您的 IP 地址当前正在排队等待验证
     - <red>请稍后重新加入服务器
-    - '%footer%'
+    - '<footer>'
   # 当玩家尝试加入但暂时被列入黑名单时显示的踢出消息
   blacklisted:
-    - '%header%'
+    - '<header>'
     - <red>您已被临时禁止加入服务器
     - <red>请等待几分钟后重新加入服务器
-    - <gold>您认为您不应该被禁止? <gray>%support-url%
-    - '%footer%'
+    - <gold>您认为您不应该被禁止? <gray><support-url>
+    - '<footer>'
   # 当玩家尝试加入 但他们的用户名包含不允许的字符时显示的踢出消息
   invalid-username:
-    - '%header%'
+    - '<header>'
     - <red>您的用户名包含无效的字符. 请更改您的用户名 然后再试.
-    - '%footer%'
+    - '<footer>'
   # 当玩家使用列入黑名单的版本加入时显示的踢出消息
   blacklisted-protocol:
-    - '%header%'
+    - '<header>'
     - <red>您当前所使用的协议/客户端版本已被服务器禁止
-    - <gold>需要帮助以便您能登录服务器? <gray>%support-url%
-    - '%footer%'
+    - <gold>需要帮助以便您能登录服务器? <gray><support-url>
+    - '<footer>'
   # 当玩家验证成功时显示的踢出消息
   success:
-    - '%header%'
+    - '<header>'
     - <green>您已成功通过验证
     - <white>请重新连接以加入服务器
   # 当玩家未能通过验证时显示的消息
   failed:
-    - '%header%'
+    - '<header>'
     - <red>无法验证您是否是机器人
     - <gray>请等待几秒后重新加入服务器以重新验证
-    - <gold>需要帮助? <gray>%support-url%
-    - '%footer%'
+    - <gold>需要帮助以便您能登录服务器? <gray><support-url>
+    - '<footer>'
 
 # 状态栏详细信息
 verbose:
   layout:
-    # 详细信息状态栏样式
-    # 占位符:
-    # - '%queued%' 正在排队的连接数数量
-    # - '%verifying%' 正在进行验证的连接数数量
-    # - '%blacklisted%' 黑名单大小
-    # - '%total-joins%' 玩家加入次数
-    # - '%verify-total%' 已执行的验证次数
-    # - '%verify-success%' 成功验证的 IP 的数量
-    # - '%verify-failed%' 验证失败的次数
-    # - '%logins-per-second%' 每秒登录服务器次数
-    # - '%connections-per-second%' 每秒接受连接次数
-    # - '%attack-duration%' 攻击持续时间
-    # - '%incoming-traffic%' 每秒下行带宽
-    # - '%outgoing-traffic%' 每秒上行带宽
-    # - '%incoming-traffic-ttl%' 已使用的下行带宽
-    # - '%outgoing-traffic-ttl%' 已使用的上行带宽
-    # - '%used-memory%' 已使用的内存
-    # - '%total-memory%' 已分配的内存
-    # - '%max-memory%' 最大可用内存
-    # - '%free-memory%' 可用内存
-    # - '%animation%' 可自定义的动画符号
     # 默认的状态栏
-    normal: '%prefix%<gray>每秒连接数 <white>%connections-per-second% <dark_aqua>╺ <gray>每秒登录次数
-      <white>%logins-per-second% <dark_aqua>╺ <gray>正在验证的连接数 <white>%verifying% <dark_aqua>|
-      <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
+    normal: '<prefix><gray>每秒连接数 <white><connections-per-second> <dark_aqua>╺ <gray>每秒登录次数 <white><logins-per-second> <dark_aqua>╺ <gray>正在验证的连接数 <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
     # 遭受攻击时的状态栏
-    attack: '%prefix%<gray>每秒连接数 <white>%connections-per-second% <dark_aqua>╺ <gray>每秒登录次数
-      <white>%logins-per-second% <dark_aqua>╺ <gray>排队连接数 <white>%queued% <dark_aqua>╺
-      <gray>正在验证的连接数 <white>%verifying% <dark_aqua>╺ <gray>攻击持续时间 <white>%attack-duration%
-      <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
+    attack: '<prefix><gray>每秒连接数 <white><connections-per-second> <dark_aqua>╺ <gray>每秒登录次数 <white><logins-per-second> <dark_aqua>╺ <gray>排队连接数 <white><queued> <dark_aqua>╺ <gray>正在验证的连接数 <white><verifying> <dark_aqua>╺ <gray>攻击持续时间 <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
   # 动画占位符
   # 其它预设:
   # - ▙, ▛, ▜, ▟
@@ -293,11 +261,9 @@ notifications:
     - <yellow><b>Sonar<reset>
     - ''
     - <gray>检测到活动的机器人攻击
-    - ' <dark_aqua>▪ <gray>每秒登录次数: <white>%logins-per-second%'
-    - ' <dark_aqua>▪ <gray>正在验证的连接数: <white>%verifying%'
-    - ' <dark_aqua>▪ <gray>排队连接数: <white>%queued%'
+    - ' <dark_aqua>▪ <gray>每秒登录次数: <white><logins-per-second>'
+    - ' <dark_aqua>▪ <gray>正在验证的连接数: <white><verifying>'
+    - ' <dark_aqua>▪ <gray>排队连接数: <white><queued>'
     - ''
-    - <gray>使用 <white><click:run_command:'/sonar verbose'><hover:show_text:'(
-    - 点击执行)'>/sonar verbose</hover></click><gray> 或 <white><click:run_command:'/sonar
-      stats'><hover:show_text:'(点击执行)'>/sonar stats</hover></click><gray> 来查看更多信息.
+    - <gray>使用 <white><click:run_command:'/sonar verbose'><hover:show_text:'(点击执行)'>/sonar verbose</hover></click><gray> 或 <white><click:run_command:'/sonar stats'><hover:show_text:'(点击执行)'>/sonar stats</hover></click><gray> 来查看更多信息.
     - ''

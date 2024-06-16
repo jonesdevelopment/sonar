@@ -41,17 +41,17 @@ webhook:
     description:
       - Útok na váš server byl ukončen!.
       - ''
-      - 'Začátek útoku: <t:%start-timestamp%:T>'
-      - 'Konec útoku: <t:%end-timestamp%:T>'
-      - 'Délka útoku: %duration%'
+      - 'Začátek útoku: <t:<start-timestamp>:T>'
+      - 'Konec útoku: <t:<end-timestamp>:T>'
+      - 'Délka útoku: <attack-duration>'
       - ''
-      - 'Nejvyšší využití CPU při útoku: %peak-cpu%%'
-      - 'Nejvyšší využití paměti při útoku: %peak-memory%'
-      - 'Nejvyšší počet botů za sekundu při útoku: %peak-bps%'
+      - 'Nejvyšší využití CPU při útoku: <peak-cpu>%'
+      - 'Nejvyšší využití paměti při útoku: <peak-memory>'
+      - 'Nejvyšší počet botů za sekundu při útoku: <peak-bps>'
       - ''
-      - 'IP přidány na černou listinu: %total-blacklisted%'
-      - 'Nepovedené verifikace při útoku: %total-failed%'
-      - 'Povedené verifikace při útoku: %total-success%'
+      - 'IP přidány na černou listinu: <total-blacklisted>'
+      - 'Nepovedené verifikace při útoku: <total-failed>'
+      - 'Povedené verifikace při útoku: <total-success>'
     # RGB barvy discord webhook zprávy
     # Barvy: https://www.rapidtables.com/web/color/RGB_Color.html
     color:

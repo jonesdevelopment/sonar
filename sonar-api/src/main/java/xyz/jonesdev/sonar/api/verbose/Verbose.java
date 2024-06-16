@@ -52,10 +52,10 @@ public final class Verbose implements Observable {
         component = replaceStatistic(attackDuration != null
           ? Sonar.get().getConfig().getVerbose().getActionBarLayoutDuringAttack()
           : Sonar.get().getConfig().getVerbose().getActionBarLayout())
-          .replaceText(TextReplacementConfig.builder().once().matchLiteral("%attack-duration%")
+          .replaceText(TextReplacementConfig.builder().once().matchLiteral("<attack-duration>")
             .replacement(attackDuration == null ? "00:00" : DATE_FORMATTER.format(attackDuration.delay()))
             .build())
-          .replaceText(TextReplacementConfig.builder().once().matchLiteral("%animation%")
+          .replaceText(TextReplacementConfig.builder().once().matchLiteral("<animation>")
             .replacement(nextAnimation())
             .build());
       }

@@ -41,17 +41,17 @@ webhook:
     description:
       - The attack on your server has been mitigated.
       - ''
-      - 'Attack start: <t:%start-timestamp%:T>'
-      - 'Attack end: <t:%end-timestamp%:T>'
-      - 'Attack duration: %duration%'
+      - 'Attack start: <t:<start-timestamp>:T>'
+      - 'Attack end: <t:<end-timestamp>:T>'
+      - 'Attack duration: <attack-duration>'
       - ''
-      - 'Peak process CPU usage during the attack: %peak-cpu%%'
-      - 'Peak process memory usage during the attack: %peak-memory%'
-      - 'Peak bots per second during the attack: %peak-bps%'
+      - 'Peak process CPU usage during the attack: <peak-cpu>%'
+      - 'Peak process memory usage during the attack: <peak-memory>'
+      - 'Peak bots per second during the attack: <peak-bps>'
       - ''
-      - 'Blacklisted IP addresses during the attack: %total-blacklisted%'
-      - 'Failed verifications during the attack: %total-failed%'
-      - 'Successful verifications during the attack: %total-success%'
+      - 'Blacklisted IP addresses during the attack: <total-blacklisted>'
+      - 'Failed verifications during the attack: <total-failed>'
+      - 'Successful verifications during the attack: <total-success>'
     # RGB colors of the Discord webhook embed
     # Color picker: https://www.rapidtables.com/web/color/RGB_Color.html
     color:

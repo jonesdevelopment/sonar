@@ -94,10 +94,11 @@ public final class FallbackUserWrapper implements FallbackUser {
       // We let the user override this through the configuration.
       if (Sonar.get().getAttackTracker().getCurrentAttack() == null
         || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getConnectLog()
-          .replace("%name%", username)
-          .replace("%ip%", Sonar.get().getConfig().formatAddress(inetAddress))
-          .replace("%protocol%", String.valueOf(protocolVersion.getProtocol())));
+        Sonar.get().getFallback().getLogger().info(
+          Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.connection")
+            .replace("<username>", username)
+            .replace("<ip>", Sonar.get().getConfig().formatAddress(inetAddress))
+            .replace("<protocol>", String.valueOf(protocolVersion.getProtocol())));
       }
     }
 
@@ -152,10 +153,11 @@ public final class FallbackUserWrapper implements FallbackUser {
       || Sonar.get().getConfig().getVerification().isLogDuringAttack();
 
     if (shouldLog) {
-      Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getFailedLog()
-        .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-        .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol()))
-        .replace("%reason%", reason));
+      Sonar.get().getFallback().getLogger().info(
+        Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.failed")
+          .replace("<ip>", Sonar.get().getConfig().formatAddress(getInetAddress()))
+          .replace("<protocol>", String.valueOf(getProtocolVersion().getProtocol()))
+          .replace("<reason>", reason));
     }
 
     // Increment number of total failed verifications
@@ -189,9 +191,10 @@ public final class FallbackUserWrapper implements FallbackUser {
       Sonar.get().getFallback().getBlacklist().put(getInetAddress(), (byte) 0);
 
       if (shouldLog) {
-        Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getBlacklistLog()
-          .replace("%ip%", Sonar.get().getConfig().formatAddress(getInetAddress()))
-          .replace("%protocol%", String.valueOf(getProtocolVersion().getProtocol())));
+        Sonar.get().getFallback().getLogger().info(
+          Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.blacklisted")
+            .replace("<ip>", Sonar.get().getConfig().formatAddress(getInetAddress()))
+            .replace("<protocol>", String.valueOf(getProtocolVersion().getProtocol())));
       }
 
       // Invalidate the cached entry to ensure memory safety

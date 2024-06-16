@@ -260,8 +260,7 @@ public final class SonarConfiguration {
 
     webhook.embed.title = webhookConfig.getString(embedPath + "title");
     webhook.embed.titleUrl = webhookConfig.getString(embedPath + "title-url");
-    webhook.embed.description = formatString(String.join("\n",
-      webhookConfig.getStringList(embedPath + "description")));
+    webhook.embed.description = String.join("\n", webhookConfig.getStringList(embedPath + "description"));
     webhook.embed.r = webhookConfig.getInt(embedPath + "color.red");
     webhook.embed.g = webhookConfig.getInt(embedPath + "color.green");
     webhook.embed.b = webhookConfig.getInt(embedPath + "color.blue");
@@ -278,86 +277,37 @@ public final class SonarConfiguration {
 
     // Messages
     prefix = deserialize(messagesConfig.getString("prefix"));
+    noPermission = deserialize(messagesConfig.getString("commands.no-permission"));
     supportUrl = messagesConfig.getString("support-url");
 
-    header = fromList(messagesConfig.getStringList("header"));
-    footer = fromList(messagesConfig.getStringList("footer"));
-    tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("too-many-online-per-ip")));
-
-    noPermission = deserialize(messagesConfig.getString("commands.no-permission"));
-    commands.incorrectCommandUsage = formatString(messagesConfig.getString("commands.incorrect-usage"));
-    commands.invalidIpAddress = formatString(messagesConfig.getString("commands.invalid-ip-address"));
-    commands.playersOnly = formatString(messagesConfig.getString("commands.player-only"));
-    commands.consoleOnly = formatString(messagesConfig.getString("commands.console-only"));
-    commands.commandCoolDown = formatString(messagesConfig.getString("commands.cool-down"));
-    commands.commandCoolDownLeft = formatString(messagesConfig.getString("commands.cool-down-left"));
-    commands.subCommandNoPerm = formatString(messagesConfig.getString("commands.subcommand-no-permission"));
-    commands.helpHeader = messagesConfig.getStringList("commands.main.header");
-    commands.helpSubcommands = formatString(messagesConfig.getString("commands.main.subcommands"));
+    header = String.join("<newline>", messagesConfig.getStringList("header"));
+    footer = String.join("<newline>", messagesConfig.getStringList("footer"));
+    tooManyOnlinePerIp = deserialize(String.join("<newline>", messagesConfig.getStringList("too-many-online-per-ip")));
 
     SonarCommand.prepareCachedMessages();
 
-    commands.reloading = formatString(messagesConfig.getString("commands.reload.start"));
-    commands.reloaded = formatString(messagesConfig.getString("commands.reload.finish"));
+    verification.map.enterCode = deserialize(messagesConfig.getString("verification.captcha.enter-code"));
+    verification.map.failedCaptcha = deserialize(messagesConfig.getString("verification.captcha.incorrect"));
+    verification.currentlyPreparing = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.currently-preparing")));
+    verification.tooFastReconnect = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.too-fast-reconnect")));
+    verification.alreadyVerifying = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.already-verifying")));
+    verification.alreadyQueued = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.already-queued")));
+    verification.blacklisted = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.blacklisted")));
+    verification.invalidUsername = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.invalid-username")));
+    verification.protocolBlacklisted = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.blacklisted-protocol")));
+    verification.verificationSuccess = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.success")));
+    verification.verificationFailed = deserialize(String.join("<newline>", messagesConfig.getStringList("verification.failed")));
 
-    commands.verboseSubscribed = formatString(messagesConfig.getString("commands.verbose.subscribed"));
-    commands.verboseUnsubscribed = formatString(messagesConfig.getString("commands.verbose.unsubscribed"));
-
-    commands.notificationsSubscribed = formatString(messagesConfig.getString("commands.notify.subscribed"));
-    commands.notificationsUnsubscribed = formatString(messagesConfig.getString("commands.notify.unsubscribed"));
-
-    commands.blacklistEmpty = formatString(messagesConfig.getString("commands.blacklist.empty"));
-    commands.blacklistCleared = formatString(messagesConfig.getString("commands.blacklist.cleared"));
-    commands.blacklistSize = formatString(messagesConfig.getString("commands.blacklist.size"));
-    commands.blacklistAdd = formatString(messagesConfig.getString("commands.blacklist.added"));
-    commands.blacklistAddWarning = formatString(messagesConfig.getString("commands.blacklist.added-warning"));
-    commands.blacklistRemove = formatString(messagesConfig.getString("commands.blacklist.removed"));
-    commands.blacklistDuplicate = formatString(messagesConfig.getString("commands.blacklist.duplicate-ip"));
-    commands.blacklistNotFound = formatString(messagesConfig.getString("commands.blacklist.ip-not-found"));
-
-    commands.verifiedEmpty = formatString(messagesConfig.getString("commands.verified.empty"));
-    commands.verifiedCleared = formatString(messagesConfig.getString("commands.verified.cleared"));
-    commands.verifiedSize = formatString(messagesConfig.getString("commands.verified.size"));
-    commands.verifiedRemove = formatString(messagesConfig.getString("commands.verified.removed"));
-    commands.verifiedAdd = formatString(messagesConfig.getString("commands.verified.added"));
-    commands.verifiedAlready = formatString(messagesConfig.getString("commands.verified.already"));
-    commands.verifiedNotFound = formatString(messagesConfig.getString("commands.verified.ip-not-found"));
-    commands.verifiedBlocked = formatString(messagesConfig.getString("commands.verified.blocked"));
-
-    commands.statisticsHeader = formatString(messagesConfig.getString("commands.statistics.header"));
-    commands.unknownStatisticType = formatString(messagesConfig.getString("commands.statistics.unknown-type"));
-    commands.generalStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.general")));
-    commands.cpuStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.cpu")));
-    commands.memoryStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.memory")));
-    commands.networkStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.network")));
-
-    verification.connectLog = formatString(messagesConfig.getString("verification.logs.connection"));
-    verification.failedLog = formatString(messagesConfig.getString("verification.logs.failed"));
-    verification.blacklistLog = formatString(messagesConfig.getString("verification.logs.blacklisted"));
-    verification.successLog = formatString(messagesConfig.getString("verification.logs.successful"));
-
-    verification.map.enterCode = deserialize(formatString(messagesConfig.getString("verification.captcha.enter-code")));
-    verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect")));
-    verification.currentlyPreparing = deserialize(fromList(messagesConfig.getStringList("verification.currently-preparing")));
-    verification.tooFastReconnect = deserialize(fromList(messagesConfig.getStringList("verification.too-fast-reconnect")));
-    verification.alreadyVerifying = deserialize(fromList(messagesConfig.getStringList("verification.already-verifying")));
-    verification.alreadyQueued = deserialize(fromList(messagesConfig.getStringList("verification.already-queued")));
-    verification.blacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted")));
-    verification.invalidUsername = deserialize(fromList(messagesConfig.getStringList("verification.invalid-username")));
-    verification.protocolBlacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted-protocol")));
-    verification.verificationSuccess = deserialize(fromList(messagesConfig.getStringList("verification.success")));
-    verification.verificationFailed = deserialize(fromList(messagesConfig.getStringList("verification.failed")));
-
-    verbose.actionBarLayout = deserialize(formatString(messagesConfig.getString("verbose.layout.normal")));
-    verbose.actionBarLayoutDuringAttack = deserialize(formatString(messagesConfig.getString("verbose.layout.attack")));
+    verbose.actionBarLayout = deserialize(messagesConfig.getString("verbose.layout.normal"));
+    verbose.actionBarLayoutDuringAttack = deserialize(messagesConfig.getString("verbose.layout.attack"));
     verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation"));
 
-    notifications.notificationTitle = deserialize(formatString(messagesConfig.getString("notifications.title")));
-    notifications.notificationSubtitle = deserialize(formatString(messagesConfig.getString("notifications.subtitle")));
+    notifications.notificationTitle = deserialize(messagesConfig.getString("notifications.title"));
+    notifications.notificationSubtitle = deserialize(messagesConfig.getString("notifications.subtitle"));
     notifications.title = Title.title(
       Sonar.get().getConfig().getNotifications().getNotificationTitle(),
       Sonar.get().getConfig().getNotifications().getNotificationSubtitle());
-    notifications.notificationChat = deserialize(formatString(fromList(messagesConfig.getStringList("notifications.chat"))));
+    notifications.notificationChat = deserialize(String.join("<newline>", messagesConfig.getStringList("notifications.chat")));
   }
 
   private @NotNull URL getAsset(final String url, final @NotNull Language language) {
@@ -382,25 +332,12 @@ public final class SonarConfiguration {
     return logPlayerAddresses ? inetAddress.toString() : "/<ip address withheld>";
   }
 
-  private @NotNull String fromList(final @NotNull Collection<String> list) {
-    return formatString(String.join("<newline>", list));
-  }
-
   private static @NotNull Component deserialize(final String legacy) {
     return MiniMessage.miniMessage().deserialize(legacy);
   }
 
-  private @NotNull String formatString(final @NotNull String str) {
-    return str
-      .replace("%support-url%", supportUrl == null ? "" : supportUrl)
-      .replace("%header%", header == null ? "" : header)
-      .replace("%footer%", footer == null ? "" : footer);
-  }
-
   @Getter
   private final Verbose verbose = new Verbose();
-  @Getter
-  private final Commands commands = new Commands();
   @Getter
   private final Queue queue = new Queue();
   @Getter
@@ -549,10 +486,6 @@ public final class SonarConfiguration {
     private boolean debugXYZPositions;
     private Pattern validNameRegex;
     private Pattern validLocaleRegex;
-    private String connectLog;
-    private String failedLog;
-    private String successLog;
-    private String blacklistLog;
 
     private int maxLoginPackets;
     private int readTimeout;
@@ -572,55 +505,6 @@ public final class SonarConfiguration {
     private Component blacklisted;
     private Component protocolBlacklisted;
     private Component currentlyPreparing;
-  }
-
-  @Getter
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static final class Commands {
-    private String incorrectCommandUsage;
-    private String invalidIpAddress;
-    private String subCommandNoPerm;
-    private String playersOnly;
-    private String consoleOnly;
-    private String commandCoolDown;
-    private String commandCoolDownLeft;
-
-    private String blacklistEmpty;
-    private String blacklistAdd;
-    private String blacklistAddWarning;
-    private String blacklistDuplicate;
-    private String blacklistNotFound;
-    private String blacklistRemove;
-    private String blacklistCleared;
-    private String blacklistSize;
-
-    private String verifiedRemove;
-    private String verifiedAdd;
-    private String verifiedAlready;
-    private String verifiedNotFound;
-    private String verifiedCleared;
-    private String verifiedSize;
-    private String verifiedEmpty;
-    private String verifiedBlocked;
-
-    private String statisticsHeader;
-    private String unknownStatisticType;
-    private String generalStatistics;
-    private String memoryStatistics;
-    private String networkStatistics;
-    private String cpuStatistics;
-
-    private List<String> helpHeader;
-    private String helpSubcommands;
-
-    private String verboseSubscribed;
-    private String verboseUnsubscribed;
-
-    private String notificationsSubscribed;
-    private String notificationsUnsubscribed;
-
-    private String reloading;
-    private String reloaded;
   }
 
   @Getter

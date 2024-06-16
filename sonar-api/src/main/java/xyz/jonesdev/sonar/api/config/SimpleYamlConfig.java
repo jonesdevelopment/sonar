@@ -88,22 +88,12 @@ public final class SimpleYamlConfig {
     yaml.set(path, v);
   }
 
-  public int getInt(final String path, final int def) {
-    yaml.addDefault(path, def);
-    return yaml.getInt(path, def);
-  }
-
   public int getInt(final String path) {
     if (!yaml.contains(path)) {
       LOGGER.warn("Could not find {} in {}.", path, file.getName());
       return 0;
     }
     return yaml.getInt(path);
-  }
-
-  public boolean getBoolean(final String path, final boolean def) {
-    yaml.addDefault(path, def);
-    return yaml.getBoolean(path, def);
   }
 
   public boolean getBoolean(final String path) {
@@ -114,40 +104,16 @@ public final class SimpleYamlConfig {
     return yaml.getBoolean(path);
   }
 
-  public String getString(final String path, final String def) {
-    final Object object = getObject(path, def);
-    if (object instanceof String) {
-      return (String) object;
-    }
-    LOGGER.info("[config] Migrated {} to {}", path, def);
-    set(path, def);
-    return def;
-  }
-
   public @NotNull String getString(final String path) {
     if (!yaml.contains(path)) {
       LOGGER.warn("Could not find {} in {}.", path, file.getName());
       return "";
     }
-    final Object object = getObject(path);
+    final Object object = yaml.get(path);
     if (object instanceof String) {
       return (String) object;
     }
     throw new IllegalStateException("Invalid entry " + path);
-  }
-
-  public Object getObject(final String path, final Object def) {
-    yaml.addDefault(path, def);
-    return yaml.get(path, def);
-  }
-
-  public Object getObject(final String path) {
-    return yaml.get(path);
-  }
-
-  public List<String> getStringList(final String path, final List<String> def) {
-    yaml.addDefault(path, def);
-    return yaml.getStringList(path);
   }
 
   public List<String> getStringList(final String path) {
@@ -156,11 +122,6 @@ public final class SimpleYamlConfig {
       return new ArrayList<>(0);
     }
     return yaml.getStringList(path);
-  }
-
-  public List<Integer> getIntList(final String path, final List<Integer> def) {
-    yaml.addDefault(path, def);
-    return yaml.getIntegerList(path);
   }
 
   public List<Integer> getIntList(final String path) {

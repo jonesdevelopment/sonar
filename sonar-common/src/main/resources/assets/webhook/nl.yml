@@ -41,17 +41,17 @@ webhook:
     description:
       - De aanval op uw server is afgezwakt.
       - ''
-      - 'Aanval beginnen: <t:%start-timestamp%:T>'
-      - 'Einde aanval: <t:%end-timestamp%:T>'
-      - 'Duur van de aanval: %duration%'
+      - 'Aanval beginnen: <t:<start-timestamp>:T>'
+      - 'Einde aanval: <t:<end-timestamp>:T>'
+      - 'Duur van de aanval: <attack-duration>'
       - ''
-      - 'Maximaal proces CPU-gebruik tijdens de aanval: %peak-cpu%%'
-      - 'Maximaal proces-geheugengebruik tijdens de aanval: %peak-memory%'
-      - 'Maximaal bots per seconde tijdens de aanval: %peak-bps%'
+      - 'Maximaal proces CPU-gebruik tijdens de aanval: <peak-cpu>%'
+      - 'Maximaal proces-geheugengebruik tijdens de aanval: <peak-memory>'
+      - 'Maximaal bots per seconde tijdens de aanval: <peak-bps>'
       - ''
-      - 'IP-adressen op de zwarte lijst gezet tijdens de aanval: %total-blacklisted%'
-      - 'Mislukte verificaties tijdens de aanval: %total-failed%'
-      - 'Succesvolle verificaties tijdens de aanval: %total-success%'
+      - 'IP-adressen op de zwarte lijst gezet tijdens de aanval: <total-blacklisted>'
+      - 'Mislukte verificaties tijdens de aanval: <total-failed>'
+      - 'Succesvolle verificaties tijdens de aanval: <total-success>'
     # RGB-kleuren van de Discord-webhook-insluiting
     # Kleur kiezer: https://www.rapidtables.com/web/color/RGB_Color.html
     color:

@@ -17,7 +17,10 @@
 
 package xyz.jonesdev.sonar.common.subcommand.impl;
 
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
@@ -31,13 +34,17 @@ public final class NotifyCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    if (SONAR.getNotificationHandler().isSubscribed(invocation.getSender().getUuid())) {
-      SONAR.getNotificationHandler().unsubscribe(invocation.getSender().getUuid());
-      invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNotificationsUnsubscribed());
+    if (Sonar.get().getNotificationHandler().isSubscribed(invocation.getSource().getUuid())) {
+      Sonar.get().getNotificationHandler().unsubscribe(invocation.getSource().getUuid());
+      invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+        Sonar.get().getConfig().getMessagesConfig().getString("commands.notify.unsubscribe"),
+        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
       return;
     }
 
-    invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getNotificationsSubscribed());
-    SONAR.getNotificationHandler().subscribe(invocation.getSender().getUuid());
+    Sonar.get().getNotificationHandler().subscribe(invocation.getSource().getUuid());
+    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+      Sonar.get().getConfig().getMessagesConfig().getString("commands.notify.subscribe"),
+      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
   }
 }

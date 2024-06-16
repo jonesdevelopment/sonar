@@ -13,275 +13,242 @@
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
 
-# Плейсхолдер для '%prefix%' в конфиге
+# Плейсхолдер для '<prefix>' в конфиге
 prefix: <b><yellow>Sonar</b> <gray>» <white>
-# Плейсхолдер для '%support-url%' в конфиге
+# Плейсхолдер для '<support-url>' в конфиге
 support-url: https://jonesdev.xyz/discord/
-# Плейсхолдер для '%header%' в конфиге
+# Плейсхолдер для '<header>' в конфиге
 header:
   - <b><yellow>Sonar</b><reset>
   - ''
-# Плейсхолдер для '%footer%' в конфиге
+# Плейсхолдер для '<footer>' в конфиге
 footer:
   - <gray>Если вы считаете что это ошибка, обратитесь к администратору.
 # Сообщение, которое показывается когда кто-то заходит на сервер, но в сети слишком много игроков с его IP-адресом
 too-many-online-per-ip:
-  - '%header%'
+  - '<header>'
   - <red>С вашего IP-адреса в сети слишком много игроков.
-  - '%footer%'
+  - '<footer>'
 
 # Перевод для команд
 commands:
   # Сообщение, которое будет показано, когда игрок попытается выполнить команду /sonar без разрешения
-  no-permission: '%prefix%<red>У вас нет прав на использование этой команды.'
+  no-permission: '<prefix><red>У вас нет прав на использование этой команды.'
   # Сообщение, которое отображается при неправильном использовании команды
-  incorrect-usage: '%prefix%<red>Применение: /sonar %usage%'
+  incorrect-usage: '<prefix><red>Применение: /sonar <subcommand-usage>'
   # Сообщение, которое отображается, когда кто-то предоставляет неверный формат IP-адреса
-  invalid-ip-address: '%prefix%Указанный вами IP-адрес недействителен'
+  invalid-ip-address: '<prefix>Указанный вами IP-адрес недействителен'
   # Сообщение, которое отображается, когда консоль выполняет команду, предназначенную только для игроков
-  player-only: '%prefix%<red>Эта команда может быть выполнена только игроком.'
+  player-only: '<prefix><red>Эта команда может быть выполнена только игроком.'
   # Сообщение, которое отображается, когда игрок выполняет команду, доступную только для консоли
-  console-only: '%prefix%<red>Эту команду можно выполнить только только через консоль.'
-  # Сообщение, которое появляется, когда игрок выполняет команды плагина слишком быстро
-  cool-down: '%prefix%<red>Эту команду можно использовать только каждые 0,5 секунды.'
-  cool-down-left: '%prefix%<red>Подождите еще <bold>%time-left%s<reset><red>.'
+  console-only: '<prefix><red>Эту команду можно выполнить только только через консоль.'
   # Сообщение, которое отображается, когда у игрока нет разрешения на выполнение подкоманды
-  subcommand-no-permission: '%prefix%<red>У вас нет разрешения на выполнение этой
-    подкоманды. <gray>(%permission%)'
+  subcommand-no-permission: '<prefix><red>У вас нет разрешения на выполнение этой подкоманды. <gray>(<permission>)'
 
   # Перевод для '/sonar'
   main:
     # Информационное сообщение, которое показывается поверх всего при выполнении главной команды
     header:
-      - <yellow>Запущен <b>Sonar</b> %version% на %platform%.
-      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) %copyright_year%
-        Jones Development and Sonar Contributors</click>
+      - <yellow>Запущен <b>Sonar</b> <version> на <platform>.
+      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development and Sonar Contributors</click>
       - ''
       - <gray>Нужна помощь или есть вопросы?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Нажмите
-        чтобы открыть Discord)'>Откройте тикет в Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Нажмите
-        чтобы открыть GitHub)'>или откройте новый вопрос на GitHub.
+      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Нажмите чтобы открыть Discord)'>Откройте тикет в Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Нажмите чтобы открыть GitHub)'>или откройте новый вопрос на GitHub.
       - ''
     # Форматирование списка подкоманд
-    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Только
-      игроки: </gray>%only_players%<br><gray>Требуется консоль: </gray>%require_console%<br><gray>Permission:
-      </gray><white>%permission%<br><gray>Псевдонимы: </gray>%aliases%''><dark_aqua>
-      ▪ <gray>/sonar %subcommand%  <white>%description%'
+    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Только игроки: </gray><only-players><br><gray>Требуется консоль: </gray><only-console><br><gray>Permission: </gray><white><permission><br><gray>Псевдонимы: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
 
   # Перевод для '/sonar reload'
   reload:
     # Сообщение, которое отображается, когда кто-то начинает перезагружать Sonar
-    start: '%prefix%Перезагрузка...'
+    start: '<prefix>Перезагрузка...'
     # Сообщение, которое отображается, когда Sonar завершает перезагрузку
-    finish: '%prefix%<green>Успешная перезагрузка <gray>(%taken%ms)'
+    finish: '<prefix><green>Успешная перезагрузка <gray>(<time-taken>ms)'
 
   # Перевод для '/sonar verbose'
   verbose:
     # Сообщение, которое отображается, когда игрок прослушивает Sonar verbose
-    subscribed: '%prefix%Вы просматриваете подробную информацию о Sonar.'
+    subscribe: '<prefix>Вы просматриваете подробную информацию о Sonar.'
     # Сообщение, которое отображается, когда игрок перестает прослушивать Sonar verbose
-    unsubscribed: '%prefix%Вы больше не просматриваете подробную информацию о Sonar.'
+    unsubscribe: '<prefix>Вы больше не просматриваете подробную информацию о Sonar.'
 
   # Перевод для '/sonar notify'
   notify:
     # Сообщение, которое отображается, когда игрок подписывается на уведомления об атаках
-    subscribed: '%prefix%Вы получаете уведомления об атаках.'
+    subscribe: '<prefix>Вы получаете уведомления об атаках.'
     # Сообщение, которое отображается, когда игрок отписывается на уведомления об атаках
-    unsubscribed: '%prefix%Вы больше не получаете уведомления об атаках.'
+    unsubscribe: '<prefix>Вы больше не получаете уведомления об атаках.'
 
   # Перевод для '/sonar blacklist'
   blacklist:
     # Сообщение, которое отображается, когда кто-то пытается очистить черный список, но он пустой
-    empty: '%prefix%В настоящее время черный список пуст. Поэтому ни один IP-адрес
-      не был удален из черного списка.'
+    empty: '<prefix>В настоящее время черный список пуст. Поэтому ни один IP-адрес не был удален из черного списка.'
     # Сообщение, которое показывается, когда кто-то очищает черный список
-    cleared: '%prefix%Вы успешно удалили %удалено% IP-адресов из черного списка.'
+    clear: '<prefix>Вы успешно удалили %удалено% IP-адресов из черного списка.'
     # Сообщение, которое показывается, когда кто-то проверяет размер черного списка
-    size: '%prefix%В настоящее время черный список содержит %amount% IP-адрес(ов).'
+    size: '<prefix>В настоящее время черный список содержит <amount> IP-адрес(ов).'
     # Сообщение, которое показывается, когда кто-то добавляет IP-адрес в черный список
-    added: '%prefix%Успешно добавлен %ip% в черный список.'
+    add: '<prefix>Успешно добавлен <ip> в черный список.'
     # Сообщение, которое отображается, когда кто-то добавляет IP-адрес в черный список, который находится в белом списке
-    added-warning: '%prefix%<red>Предупреждение: <white>%ip% находится в белом списке.
-      Рассмотрите возможность удалить IP-адрес из белого списка игроков, чтобы избежать
-      потенциальных ошибок.'
+    add-warning: '<prefix><red>Предупреждение: <white><ip> находится в белом списке. Рассмотрите возможность удалить IP-адрес из белого списка игроков, чтобы избежать потенциальных ошибок.'
     # Сообщение, которое показывается, когда кто-то удаляет IP-адрес из черного списка
-    removed: '%prefix%Успешно удален %ip% из черного списка.'
+    remove: '<prefix>Успешно удален <ip> из черного списка.'
     # Сообщение, которое отображается, когда кто-то добавляет IP-адрес в черный список, но он уже находится в черном списке
-    duplicate-ip: '%prefix%Указанный вами IP-адрес уже внесен в черный список.'
+    ip-duplicate: '<prefix>Указанный вами IP-адрес уже внесен в черный список.'
     # Сообщение, которое отображается, когда кто-то удаляет IP-адрес из черного списка, но он не занесен в черный список
-    ip-not-found: '%prefix%Указанный вами IP-адрес не внесен в черный список.'
+    ip-not-found: '<prefix>Указанный вами IP-адрес не внесен в черный список.'
 
   # Перевод для '/sonar verified'
   verified:
     # Сообщение, которое отображается, когда кто-то пытается очистить список проверенных игроков, но он пустой
-    empty: '%prefix%Список проверенных игроков в настоящее время пуст. Поэтому, ни
-      один игрок не был удален.'
+    empty: '<prefix>Список проверенных игроков в настоящее время пуст. Поэтому, ни один игрок не был удален.'
     # Сообщение, которое отображается когда кто-то отчистил список уникальных игроков
-    cleared: '%prefix%Вы успешно очистили %removed% уникального игрока(ов).'
+    clear: '<prefix>Вы успешно очистили <amount> уникального игрока(ов).'
     # Сообщение, которое отображается когда кто-то проверяет размер списка проврененных игроков
-    size: '%prefix%В настоящее время проверено %amount% уникальных игроков.'
+    size: '<prefix>В настоящее время проверено <amount> уникальных игроков.'
     # Сообщение, которое отображается при удалении IP-адреса из списка проверенных игроков
-    removed: '%prefix%Успешно удален %ip%.'
+    remove: '<prefix>Успешно удален <ip>.'
     # Message that is shown when someone verifies an IP address
-    added: '%prefix%Successfully verified %ip%.'
+    add: '<prefix>Successfully verified <ip>.'
     # Message that is shown when someone tries to verify an IP address/UUID that are already verified
-    already: '%prefix%The IP address and UUID you provided are already verified.'
+    already: '<prefix>The IP address and UUID you provided are already verified.'
     # Сообщение, которое показывается когда кто-то удаляет IP из списка но его небыло в списке
-    ip-not-found: '%prefix%Указанный вами IP-адрес не в списке.'
+    ip-not-found: '<prefix>Указанный вами IP-адрес не в списке.'
     # Сообщение, которое показывается когда выполняю сразу две операции (двойная операция)
-    blocked: '%prefix%Пожалуйста, дождитесь завершения текущей операции.'
+    blocked: '<prefix>Пожалуйста, дождитесь завершения текущей операции.'
+    # Message shown when someone looks up the verification history of an IP address
+    history: '<prefix><yellow>Previous UUIDs for <ip>:'
+    history-entry: ' <gray>▪ <white><uuid>'
 
   # Перевод для '/sonar statistics'
   statistics:
     # Информационное сообщение, которое отображается поверх всего при просмотре статистики
-    header: '%prefix%Показываем статистику %type% для этой сессии:'
+    header: '<prefix>Показываем статистику <statistics-type> для этой сессии:'
     # Сообщение, которое отображается, когда игрок пытается просмотреть неизвестную статистику
-    unknown-type: '%prefix%<redНеизвестный тип статистики! Доступные статистики: <gray>%statistics%'
+    unknown-type: '<prefix><redНеизвестный тип статистики! Доступные статистики: <gray><statistics>'
     # Формат сообщения общей статистики
     general:
-      - ' <dark_aqua>▪ <gray>Проверенные IP-адреса: <white>%verified%'
-      - ' <dark_aqua>▪ <gray>Проверяющиеся IP-адреса: <white>%verifying%'
-      - ' <dark_aqua>▪ <gray>IP-адреса в черном списке: <white>%blacklisted%'
-      - ' <dark_aqua>▪ <gray>Текущая очередь на проверку: <white>%queued%'
-      - ' <dark_aqua>▪ <gray>Всего неуникальных соединений: <white>%total_joins%'
-      - ' <dark_aqua>▪ <gray>Общее количество попыток проверки: <white>%total_attempts%'
-      - ' <dark_aqua>▪ <gray>Всего неудачных попыток провери: <white>%total_failed%'
-      - ' <dark_aqua>▪ <gray>Время работы сервера: <white>%uptime%'
+      - ' <dark_aqua>▪ <gray>Проверенные IP-адреса: <white><verified>'
+      - ' <dark_aqua>▪ <gray>Проверяющиеся IP-адреса: <white><verifying>'
+      - ' <dark_aqua>▪ <gray>IP-адреса в черном списке: <white><blacklisted>'
+      - ' <dark_aqua>▪ <gray>Текущая очередь на проверку: <white><queued>'
+      - ' <dark_aqua>▪ <gray>Всего неуникальных соединений: <white><total-joins>'
+      - ' <dark_aqua>▪ <gray>Общее количество попыток проверки: <white><total-attempts>'
+      - ' <dark_aqua>▪ <gray>Всего неудачных попыток провери: <white><total-failed>'
+      - ' <dark_aqua>▪ <gray>Время работы сервера: <white><uptime>'
     # Формат сообщения статистики процессора
     cpu:
-      - ' <dark_aqua>▪ <gray>Использование процессора сервером в данный момент: <white>%process_cpu%%'
-      - ' <dark_aqua>▪ <gray>Использование процессора системой прямо сейчас: <white>%system_cpu%%'
-      - ' <dark_aqua>▪ <gray>Использование процессора каждым ядром (сервером): <white>%average_process_cpu%%'
-      - ' <dark_aqua>▪ <gray>Использование процессора каждым ядром (системой): <white>%average_system_cpu%%'
-      - ' <dark_aqua>▪ <gray>Средняя нагрузка на систему: <white>%load_average%%'
-      - ' <dark_aqua>▪ <gray>Общее количество виртуальных ядер: <white>%virtual_cores%'
+      - ' <dark_aqua>▪ <gray>Использование процессора сервером в данный момент: <white><process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Использование процессора системой прямо сейчас: <white><system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Использование процессора каждым ядром (сервером): <white><average-process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Использование процессора каждым ядром (системой): <white><average-system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Средняя нагрузка на систему: <white><load-average>%'
+      - ' <dark_aqua>▪ <gray>Общее количество виртуальных ядер: <white><virtual-core-count>'
     # Формат сообщения статистики памяти
     memory:
-      - ' <dark_aqua>▪ <gray>Общее количество свободной памяти: <white>%free_memory%'
-      - ' <dark_aqua>▪ <gray>Общее количество используемой памяти: <white>%used_memory%'
-      - ' <dark_aqua>▪ <gray>Общий объем максимальной памяти: <white>%max_memory%'
-      - ' <dark_aqua>▪ <gray>Общее количество выделенной памяти: <white>%total_memory%'
+      - ' <dark_aqua>▪ <gray>Общее количество свободной памяти: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>Общее количество используемой памяти: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>Общий объем максимальной памяти: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>Общее количество выделенной памяти: <white><total-memory>'
     # Формат сообщения сетевой статистики
     network:
-      - ' <dark_aqua>▪ <gray>Текущая входящая используемая полоса пропускания: <white>%incoming%'
-      - ' <dark_aqua>▪ <gray>Текущая исходящая используемая полоса пропускания: <white>%outgoing%'
-      - ' <dark_aqua>▪ <gray>Общая входящая использованная полоса пропускания: <white>%ttl_incoming%'
-      - ' <dark_aqua>▪ <gray>Общая исходящая использованная полоса пропускания: <white>%ttl_outgoing%'
+      - ' <dark_aqua>▪ <gray>Текущая входящая используемая полоса пропускания: <white><incoming-traffic>'
+      - ' <dark_aqua>▪ <gray>Текущая исходящая используемая полоса пропускания: <white><outgoing-traffic>'
+      - ' <dark_aqua>▪ <gray>Общая входящая использованная полоса пропускания: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Общая исходящая использованная полоса пропускания: <white><outgoing-traffic-ttl>'
 
 # Переводы всех сообщений во время проверки
 verification:
   # Переводы всех консольных сообщений во время проверки
   logs:
     # Сообщение, которое показыватся когда на сервер заходит новый игрок
-    connection: '%name%%ip% (%protocol%) подключился.'
+    connection: '<username><ip> (<protocol>) подключился.'
     # Сообщение, которое показывается когда кто-то не прошел проверку на бота
-    failed: '%ip% (%protocol%) не прошел проверку бота на: %reason%'
+    failed: '<ip> (<protocol>) не прошел проверку бота на: <reason>'
     # Сообщение, которое показывается когда кто-то было занесен в черный список
-    blacklisted: '%ip% (%protocol%) был занесен в черный список за слишком большое
-      количество неудачных попыток'
+    blacklisted: '<ip> (<protocol>) был занесен в черный список за слишком большое количество неудачных попыток'
     # Сообщение, которое выводится в консоль при успешной проверке игрока
-    successful: '%name% прошел проверку (%time%s!).'
+    successful: '<username> прошел проверку (<time-taken>s!).'
 
   captcha:
     # Сообщение, которое показывается игроку, когда он должен ввести ответ на капчу
-    enter-code: '%prefix%<green>Введите код в чате, который отображается на карте.'
+    enter-code: '<prefix><green>Введите код в чате, который отображается на карте.'
     # Сообщение, которое показывается игроку, когда он вводит неправильную капчу в чат
-    incorrect: '%prefix%<red>Вы ввели неправильный код. Пожалуйста, попробуйте еще раз.'
+    incorrect: '<prefix><red>Вы ввели неправильный код. Пожалуйста, попробуйте еще раз.'
 
   # Сообщение, которое показывается когда капча еще не подготовлена
   currently-preparing:
-    - '%header%'
+    - '<header>'
     - <yellow>Капча еще не подготовлена.
     - <gray>Пожалуйста, подождите несколько секунд, прежде чем повторить попытку.
-    - '%footer%'
+    - '<footer>'
   # Сообщение, которое показывается когда слишком много людей проходят проверку
   too-many-players:
-    - '%header%'
+    - '<header>'
     - <gold>Слишком много игроков пытаются войти на сервер.
     - <gray>Пожалуйста, подождите несколько секунд, прежде чем повторить попытку.
-    - '%footer%'
+    - '<footer>'
   # Сообщение, которое показывается когда кто-то слишком быстро перезаходит
   too-fast-reconnect:
-    - '%header%'
+    - '<header>'
     - <gold>Вы перезаходите слишком быстро, повторите попытку позже.
     - <gray>Пожалуйста, подождите несколько секунд, прежде чем повторить попытку.
-    - '%footer%'
+    - '<footer>'
   # Сообщение, которое показывается когда чей то IP-адрес уже проходит верефикацию
   already-verifying:
-    - '%header%'
+    - '<header>'
     - <red>Ваш IP-адрес в настоящее время проверяется.
     - <gray>Пожалуйста, подождите несколько секунд, прежде чем повторить попытку.
-    - '%footer%'
+    - '<footer>'
   # Сообщение, которое показывается когда кто-то находится в очереди на проверку
   already-queued:
-    - '%header%'
+    - '<header>'
     - <red>Ваш IP-адрес в настоящее время находится в очереди на проверку.
     - <gray>Пожалуйста, подождите несколько секунд, прежде чем повторить попытку.
-    - '%footer%'
+    - '<footer>'
   # Сообщение, которое показывается когда кто-то временно заблокирован на сервере
   blacklisted:
-    - '%header%'
+    - '<header>'
     - <red>Вам запрещено входить на сервер.
     - <red>Пожалуйста, подождите несколько минут, чтобы снова присоединиться к серверу.
-    - <gold>Вы считаете что это ошибка? <gray>%support-url%
-    - '%footer%'
+    - <gold>Вы считаете что это ошибка? <gray><support-url>
+    - '<footer>'
   # Сообщение, которое показывается когда кто-то входит на сервер с некорректным ником
   invalid-username:
-    - '%header%'
+    - '<header>'
     - <red>Ваш ник содержит недопустимые символы.
-    - '%footer%'
+    - '<footer>'
   # Сообщение, которое показывается когда кто-то входит на сервер с заблокированной версии
   blacklisted-protocol:
-    - '%header%'
+    - '<header>'
     - <red>Вы используете версию, которая запрещена на нашем сервере.
-    - <gold>Нужна помощь? <gray>%support-url%
-    - '%footer%'
+    - <gold>Нужна помощь? <gray><support-url>
+    - '<footer>'
   # Сообщение которое показывается при успешной верификации
   success:
-    - '%header%'
+    - '<header>'
     - <green>Вы успешно прошли проверку.
     - <white>Пожалуйста, перезайдите.
   # Сообщение которое показывается, когда кто-то не прошел верификацию
   failed:
-    - '%header%'
+    - '<header>'
     - <red>Вы не прошли проверку бота.
     - <gray>Пожалуйста, подождите несколько секунд, прежде чем повторить попытку.
-    - <gold>Нужна помощь? <gray>%support-url%
-    - '%footer%'
+    - <gold>Нужна помощь? <gray><support-url>
+    - '<footer>'
 
 # Перевод для action bar (verbose)
 verbose:
   layout:
-    # Панель действий Sonar verbose
-    # Placeholders:
-    # - '%queued%' Количество игроков в очереди
-    # - '%verifying%' Количество проверяемых игроков
-    # - '%blacklisted%' Количество IP-адресов в черном списке
-    # - '%total-joins%' Количество всех попыток соединения
-    # - '%verify-total%' Количество попыток верификации
-    # - '%verify-success%' Количество проверенных IP-адресов
-    # - '%verify-failed%' Количество неудачных проверок
-    # - '%logins-per-second%' Количество входов на сервер в секунду
-    # - '%connections-per-second%' Количество соединений в секунду
-    # - '%attack-duration%' Продолжительность текущей атаки
-    # - '%incoming-traffic%' Использование входящего трафика в секунду
-    # - '%outgoing-traffic%' Использование исходящего трафика в секунду
-    # - '%incoming-traffic-ttl%' Общее использование входящего трафика пропускания
-    # - '%outgoing-traffic-ttl%' Общее использование исходящего трафика пропускания
-    # - '%used-memory%' Количество использованной памяти
-    # - '%total-memory%' Количество общей памяти
-    # - '%max-memory%' Объем максимальной памяти
-    # - '%free-memory%' Количество свободной памяти
-    # - '%animation%' Настраиваемый анимированный символ
-    # Статистика в режиме реального времени (verbose)
-    normal: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Logins/s
-      <white>%logins-per-second% <dark_aqua>╺ <gray>На проверке <white>%verifying%
-      <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
+    # Action bar отображающей информацию
+    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s
+      <white><logins-per-second> <dark_aqua>╺ <gray>На проверке <white><verifying>
+      <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
     # Action bar отображающей информацию во время атаки
-    attack: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Logins/s
-      <white>%logins-per-second% <dark_aqua>╺ <gray>В очереди <white>%queued% <dark_aqua>╺
-      <gray>На проверке <white>%verifying% <dark_aqua>╺ <gray>Продолжительность <white>%attack-duration%
-      <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
+    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s
+      <white><logins-per-second> <dark_aqua>╺ <gray>В очереди <white><queued> <dark_aqua>╺
+      <gray>На проверке <white><verifying> <dark_aqua>╺ <gray>Продолжительность <white><attack-duration>
+      <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
   # Анимация для загрузки
   # Альтернативы:
   # - ▙, ▛, ▜, ▟
@@ -304,12 +271,9 @@ notifications:
     - <yellow><b>Sonar<reset>
     - ''
     - <gray>Бот-атака была обнаружена.
-    - ' <dark_aqua>▪ <gray>Количество входов в секунду: <white>%logins-per-second%'
-    - ' <dark_aqua>▪ <gray>Игроков проверяется: <white>%verifying%'
-    - ' <dark_aqua>▪ <gray>Игроков в очереди: <white>%queued%'
+    - ' <dark_aqua>▪ <gray>Количество входов в секунду: <white><logins-per-second>'
+    - ' <dark_aqua>▪ <gray>Игроков проверяется: <white><verifying>'
+    - ' <dark_aqua>▪ <gray>Игроков в очереди: <white><queued>'
     - ''
-    - <gray>Просмотреть дополнительную информацию, используя <white><click:run_command:'/sonar
-      verbose'><hover:show_text:'(Нажмите чтобы выполнить команду)'>/sonar verbose</hover></click><gray>
-      или <white><click:run_command:'/sonar stats'><hover:show_text:'(Нажмите чтобы
-      выполнить команду)'>/sonar stats</hover></click><gray>.
+    - <gray>Просмотреть дополнительную информацию, используя <white><click:run_command:'/sonar verbose'><hover:show_text:'(Нажмите чтобы выполнить команду)'>/sonar verbose</hover></click><gray> или <white><click:run_command:'/sonar stats'><hover:show_text:'(Нажмите чтобы выполнить команду)'>/sonar stats</hover></click><gray>.
     - ''

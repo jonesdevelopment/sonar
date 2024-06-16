@@ -13,268 +13,233 @@
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
 
-# Platzhalter für jedes '%prefix%' in dieser Konfigurationsdatei
+# Platzhalter für jedes '<prefix>' in dieser Konfigurationsdatei
 prefix: <b><yellow>Sonar</b> <gray>» <white>
-# Platzhalter für jede '%support-url%' in dieser Konfigurationsdatei
+# Platzhalter für jede '<support-url>' in dieser Konfigurationsdatei
 support-url: https://jonesdev.xyz/discord/
-# Platzhalter für jedes '%header%' in dieser Konfigurationsdatei
+# Platzhalter für jedes '<header>' in dieser Konfigurationsdatei
 header:
   - <b><yellow>Sonar</b><reset>
   - ''
-# Platzhalter für jedes '%footer%' in dieser Konfigurationsdatei
+# Platzhalter für jedes '<footer>' in dieser Konfigurationsdatei
 footer:
   - <gray>Falls du glaubst, dass dies ein Fehler ist, kontaktiere einen Administrator.
 
 # Nachricht, die angezeigt wird, wenn jemand beitritt, aber zu viele Online-Spieler mit ihrer IP-Adresse vorhanden sind
 too-many-online-per-ip:
-  - '%header%'
+  - '<header>'
   - <red>Es sind zu viele Spieler mit deiner IP-Adresse online.
-  - '%footer%'
+  - '<footer>'
 
 # Übersetzungen für Befehle
 commands:
   # Nachricht, die angezeigt wird, wenn ein Spieler versucht, /sonar ohne Berechtigung auszuführen
-  no-permission: '%prefix%<red>Du hast keine Berechtigung, diesen Befehl auszuführen.'
+  no-permission: '<prefix><red>Du hast keine Berechtigung, diesen Befehl auszuführen.'
   # Nachricht, die angezeigt wird, wenn jemand einen Befehl falsch verwendet
-  incorrect-usage: '%prefix%<red>Benutzung: /sonar %usage%'
+  incorrect-usage: '<prefix><red>Benutzung: /sonar <subcommand-usage>'
   # Nachricht, die angezeigt wird, wenn jemand eine ungültige IP-Adresse angibt (Ungültiges Format)
-  invalid-ip-address: '%prefix%Die angegebene IP-Adresse scheint ungültig zu sein.'
+  invalid-ip-address: '<prefix>Die angegebene IP-Adresse scheint ungültig zu sein.'
   # Nachricht, die angezeigt wird, wenn die Konsole einen Befehl ausführt, der nur für Spieler ist
-  player-only: '%prefix%<red>Diesen Befehl kannst du nur als Spieler ausführen.'
+  player-only: '<prefix><red>Diesen Befehl kannst du nur als Spieler ausführen.'
   # Nachricht, die angezeigt wird, wenn ein Spieler einen Befehl ausführt, der nur für die Konsole ist
-  console-only: '%prefix%<red>Aus Sicherheitsgründen kannst du diesen Befehl nur über die Konsole ausführen.'
-  # Nachricht, die angezeigt wird, wenn ein Spieler Sonar-Befehle zu schnell ausführt
-  cool-down: '%prefix%<red>Du kannst diesen Befehl nur alle 0,5 Sekunden ausführen.'
-  cool-down-left: '%prefix%<red>Bitte warte noch <bold>%time-left%s<reset><red>.'
+  console-only: '<prefix><red>Aus Sicherheitsgründen kannst du diesen Befehl nur über die Konsole ausführen.'
   # Nachricht, die angezeigt wird, wenn ein Spieler keine Berechtigung hat, einen bestimmten Unterbefehl auszuführen
-  subcommand-no-permission: '%prefix%<red>Du hast keine Berechtigung, diesen Unterbefehl auszuführen. <gray>(%permission%)'
+  subcommand-no-permission: '<prefix><red>Du hast keine Berechtigung, diesen Unterbefehl auszuführen. <gray>(<permission>)'
 
   # Übersetzungen für '/sonar'
   main:
     # Informationsnachricht, die oben angezeigt wird, wenn der Hauptbefehl ausgeführt wird
     header:
-      - <yellow>Ausführung von <b>Sonar</b> %version% auf %platform%.
-      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) %copyright_year%
-        Jones Development und Sonar Mitwirkende</click>
+      - <yellow>Ausführung von <b>Sonar</b> <version> auf <platform>.
+      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development und Sonar Mitwirkende</click>
       - ''
       - <gray>Brauchst du Hilfe oder hast du Fragen?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klicken
-        um Discord zu öffnen)'>Öffne ein Ticket auf Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klicken
-        um GitHub zu öffnen)'>oder erstelle ein neues Issue auf GitHub.
+      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klicken um Discord zu öffnen)'>Öffne ein Ticket auf Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klicken um GitHub zu öffnen)'>oder erstelle ein neues Issue auf GitHub.
       - ''
     # Formatierung der Liste der Unterbefehle, die angezeigt wird, wenn der Hauptbefehl ausgeführt wird
-    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Nur
-      Spieler: </gray>%only_players%<br><gray>Erfordert Konsole: </gray>%require_console%<br><gray>Berechtigung:
-      </gray><white>%permission%<br><gray>Aliase: </gray>%aliases%''><dark_aqua>
-      ▪ <gray>/sonar %subcommand%  <white>%description%'
+    subcommands: '<hover:show_text:''<gray>Nur Spieler: </gray><only-players><br><gray>Erfordert Konsole: </gray><only-console><br><gray>Berechtigung: </gray><white><permission><br><gray>Aliase: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
 
   # Übersetzungen für '/sonar reload'
   reload:
     # Nachricht, die angezeigt wird, wenn jemand mit dem Neuladen von Sonar beginnt
-    start: '%prefix%Sonar wird neu geladen...'
+    start: '<prefix>Sonar wird neu geladen...'
     # Nachricht, die angezeigt wird, wenn Sonar erfolgreich neu geladen wurde
-    finish: '%prefix%<green>Erfolgreich neu geladen <gray>(%taken%ms)'
+    finish: '<prefix><green>Erfolgreich neu geladen <gray>(<time-taken>ms)'
 
   # Übersetzungen für '/sonar verbose'
   verbose:
     # Nachricht, die angezeigt wird, wenn ein Spieler Sonar Verbose-Informationen abonniert
-    subscribed: '%prefix%Du siehst jetzt Sonar Verbose-Informationen.'
+    subscribe: '<prefix>Du siehst jetzt Sonar Verbose-Informationen.'
     # Nachricht, die angezeigt wird, wenn ein Spieler Sonar Verbose-Informationen abbestellt
-    unsubscribed: '%prefix%Du siehst keine Sonar Verbose-Informationen mehr.'
+    unsubscribe: '<prefix>Du siehst keine Sonar Verbose-Informationen mehr.'
 
   # Übersetzungen für '/sonar notify'
   notify:
     # Nachricht, die angezeigt wird, wenn ein Spieler Sonar Angriffsbenachrichtigungen abonniert
-    subscribed: '%prefix%Du siehst jetzt Sonar Angriffsbenachrichtigungen.'
+    subscribe: '<prefix>Du siehst jetzt Sonar Angriffsbenachrichtigungen.'
     # Nachricht, die angezeigt wird, wenn ein Spieler Sonar Angriffsbenachrichtigungen abbestellt
-    unsubscribed: '%prefix%Du siehst keine Sonar Angriffsbenachrichtigungen mehr.'
+    unsubscribe: '<prefix>Du siehst keine Sonar Angriffsbenachrichtigungen mehr.'
 
   # Übersetzungen für '/sonar blacklist'
   blacklist:
     # Nachricht, die angezeigt wird, wenn jemand versucht, die Blacklist zu leeren, aber sie leer ist
-    empty: '%prefix%Die Blacklist ist derzeit leer. Daher wurden keine IP-Adressen von der Blacklist entfernt.'
+    empty: '<prefix>Die Blacklist ist derzeit leer. Daher wurden keine IP-Adressen von der Blacklist entfernt.'
     # Nachricht, die angezeigt wird, wenn jemand die Blacklist leert
-    cleared: '%prefix%Du hast erfolgreich insgesamt %removed% IP-Adresse(n) von der Blacklist entfernt.'
+    clear: '<prefix>Du hast erfolgreich insgesamt <amount> IP-Adresse(n) von der Blacklist entfernt.'
     # Nachricht, die angezeigt wird, wenn jemand die Größe der Blacklist überprüft
-    size: '%prefix%Die Blacklist enthält derzeit %amount% IP-Adresse(n).'
+    size: '<prefix>Die Blacklist enthält derzeit <amount> IP-Adresse(n).'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse zur Blacklist hinzufügt
-    added: '%prefix%Erfolgreich %ip% zur Blacklist hinzugefügt.'
+    add: '<prefix>Erfolgreich <ip> zur Blacklist hinzugefügt.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse zur Blacklist hinzufügt, die verifiziert ist
-    added-warning: '%prefix%<red>Warnung: <white>%ip% ist derzeit auf der Whitelist. Erwäge,
-      die IP-Adresse aus der Liste der verifizierten Spieler zu entfernen, um potenzielle
-      Probleme zu vermeiden.'
+    add-warning: '<prefix><red>Warnung: <white><ip> ist derzeit auf der Whitelist. Erwäge, die IP-Adresse aus der Liste der verifizierten Spieler zu entfernen, um potenzielle Probleme zu vermeiden.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse von der Blacklist entfernt
-    removed: '%prefix%Erfolgreich %ip% von der Blacklist entfernt.'
+    remove: '<prefix>Erfolgreich <ip> von der Blacklist entfernt.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse zur Blacklist hinzufügt, die bereits auf der Blacklist steht
-    duplicate-ip: '%prefix%Die angegebene IP-Adresse ist bereits auf der Blacklist.'
+    ip-duplicate: '<prefix>Die angegebene IP-Adresse ist bereits auf der Blacklist.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse von der Blacklist entfernt, die nicht auf der Blacklist steht
-    ip-not-found: '%prefix%Die angegebene IP-Adresse ist nicht auf der Blacklist.'
+    ip-not-found: '<prefix>Die angegebene IP-Adresse ist nicht auf der Blacklist.'
 
   # Übersetzungen für '/sonar verified'
   verified:
     # Nachricht, die angezeigt wird, wenn jemand versucht, die Liste der verifizierten Spieler zu leeren, aber sie leer ist
-    empty: '%prefix%Die Liste der verifizierten Spieler ist derzeit leer. Daher wurden keine
-      Spieler unverifiziert.'
+    empty: '<prefix>Die Liste der verifizierten Spieler ist derzeit leer. Daher wurden keine Spieler unverifiziert.'
     # Nachricht, die angezeigt wird, wenn jemand die Liste der verifizierten Spieler leert
-    cleared: '%prefix%Du hast erfolgreich insgesamt %removed% einzigartige Spieler unverifiziert.'
+    clear: '<prefix>Du hast erfolgreich insgesamt <amount> einzigartige Spieler unverifiziert.'
     # Nachricht, die angezeigt wird, wenn jemand die Größe der Liste der verifizierten Spieler überprüft
-    size: '%prefix%Es sind derzeit %amount% einzigartige Spieler verifiziert.'
+    size: '<prefix>Es sind derzeit <amount> einzigartige Spieler verifiziert.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse unverifiziert macht
-    removed: '%prefix%Erfolgreich %ip% unverifiziert.'
+    remove: '<prefix>Erfolgreich <ip> unverifiziert.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse verifiziert macht
-    added: '%prefix%Erfolgreich %ip% verifiziert.'
+    add: '<prefix>Erfolgreich <ip> verifiziert.'
     # Message that is shown when someone tries to verify an IP address/UUID that are already verified
-    already: '%prefix%The IP address and UUID you provided are already verified.'
+    already: '<prefix>The IP address and UUID you provided are already verified.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse unverifiziert macht, die nicht verifiziert ist
-    ip-not-found: '%prefix%Die angegebene IP-Adresse ist nicht verifiziert.'
+    ip-not-found: '<prefix>Die angegebene IP-Adresse ist nicht verifiziert.'
     # Nachricht, die angezeigt wird, wenn jemand versucht, die gleiche IP-Adresse zweimal zu unverifizieren (doppelte Operation)
-    blocked: '%prefix%Bitte warte, bis der aktuelle Vorgang abgeschlossen ist.'
+    blocked: '<prefix>Bitte warte, bis der aktuelle Vorgang abgeschlossen ist.'
+    # Message shown when someone looks up the verification history of an IP address
+    history: '<prefix><yellow>Bisherige UUIDs für <ip>:'
+    history-entry: ' <gray>▪ <white><uuid>'
 
   # Übersetzungen für '/sonar statistics'
   statistics:
     # Informationsnachricht, die oben angezeigt wird, wenn die Statistiken angesehen werden
-    header: '%prefix%Anzeige der %type%-Statistiken für diese Sitzung:'
+    header: '<prefix>Anzeige der <statistics-type>-Statistiken für diese Sitzung:'
     # Nachricht, die angezeigt wird, wenn ein Spieler versucht, eine unbekannte Statistik anzusehen
-    unknown-type: '%prefix%<red>Unbekannter Statistiktyp! Verfügbare Statistiken: <gray>%statistics%'
+    unknown-type: '<prefix><red>Unbekannter Statistiktyp! Verfügbare Statistiken: <gray><statistics>'
     # Format der allgemeinen Statistiknachricht
     general:
-      - ' <dark_aqua>▪ <gray>Verifizierte IP-Adressen: <white>%verified%'
-      - ' <dark_aqua>▪ <gray>IP-Adressen in Überprüfung: <white>%verifying%'
-      - ' <dark_aqua>▪ <gray>Auf der Blacklist stehende IP-Adressen: <white>%blacklisted%'
-      - ' <dark_aqua>▪ <gray>Aktuell in der Warteschlange befindliche Anmeldungen: <white>%queued%'
-      - ' <dark_aqua>▪ <gray>Gesamte nicht-einzigartige Beitritte: <white>%total_joins%'
-      - ' <dark_aqua>▪ <gray>Gesamte Überprüfungsversuche: <white>%total_attempts%'
-      - ' <dark_aqua>▪ <gray>Gesamte fehlgeschlagene Überprüfungen: <white>%total_failed%'
-      - ' <dark_aqua>▪ <gray>Server-Laufzeit: <white>%uptime%'
+      - ' <dark_aqua>▪ <gray>Verifizierte IP-Adressen: <white><verified>'
+      - ' <dark_aqua>▪ <gray>IP-Adressen in Überprüfung: <white><verifying>'
+      - ' <dark_aqua>▪ <gray>Auf der Blacklist stehende IP-Adressen: <white><blacklisted>'
+      - ' <dark_aqua>▪ <gray>Aktuell in der Warteschlange befindliche Anmeldungen: <white><queued>'
+      - ' <dark_aqua>▪ <gray>Gesamte nicht-einzigartige Beitritte: <white><total-joins>'
+      - ' <dark_aqua>▪ <gray>Gesamte Überprüfungsversuche: <white><total-attempts>'
+      - ' <dark_aqua>▪ <gray>Gesamte fehlgeschlagene Überprüfungen: <white><total-failed>'
+      - ' <dark_aqua>▪ <gray>Server-Laufzeit: <white><uptime>'
     # Format der CPU-Statistiknachricht
     cpu:
-      - ' <dark_aqua>▪ <gray>Aktuelle CPU-Nutzung des Prozesses: <white>%process_cpu%%'
-      - ' <dark_aqua>▪ <gray>Aktuelle CPU-Nutzung des Systems: <white>%system_cpu%%'
-      - ' <dark_aqua>▪ <gray>Durchschnittliche CPU-Nutzung des Prozesses pro Kern: <white>%average_process_cpu%%'
-      - ' <dark_aqua>▪ <gray>Durchschnittliche CPU-Nutzung des Systems pro Kern: <white>%average_system_cpu%%'
-      - ' <dark_aqua>▪ <gray>Allgemeine Systemlast im Durchschnitt: <white>%load_average%%'
-      - ' <dark_aqua>▪ <gray>Gesamtanzahl virtueller CPUs: <white>%virtual_cores%'
+      - ' <dark_aqua>▪ <gray>Aktuelle CPU-Nutzung des Prozesses: <white><process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Aktuelle CPU-Nutzung des Systems: <white><system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Durchschnittliche CPU-Nutzung des Prozesses pro Kern: <white><average-process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Durchschnittliche CPU-Nutzung des Systems pro Kern: <white><average-system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Allgemeine Systemlast im Durchschnitt: <white><load-average>%'
+      - ' <dark_aqua>▪ <gray>Gesamtanzahl virtueller CPUs: <white><virtual-core-count>'
     # Format der Speicherstatistiknachricht
     memory:
-      - ' <dark_aqua>▪ <gray>Gesamter freier Speicher: <white>%free_memory%'
-      - ' <dark_aqua>▪ <gray>Gesamter genutzter Speicher: <white>%used_memory%'
-      - ' <dark_aqua>▪ <gray>Gesamter maximaler Speicher: <white>%max_memory%'
-      - ' <dark_aqua>▪ <gray>Gesamter zugewiesener Speicher: <white>%total_memory%'
+      - ' <dark_aqua>▪ <gray>Gesamter freier Speicher: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>Gesamter genutzter Speicher: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>Gesamter maximaler Speicher: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>Gesamter zugewiesener Speicher: <white><total-memory>'
     # Format der Netzwerkstatistiknachricht
     network:
-      - ' <dark_aqua>▪ <gray>Aktuell genutzte eingehende Bandbreite: <white>%incoming%'
-      - ' <dark_aqua>▪ <gray>Aktuell genutzte ausgehende Bandbreite: <white>%outgoing%'
-      - ' <dark_aqua>▪ <gray>Gesamte genutzte eingehende Bandbreite: <white>%ttl_incoming%'
-      - ' <dark_aqua>▪ <gray>Gesamte genutzte ausgehende Bandbreite: <white>%ttl_outgoing%'
+      - ' <dark_aqua>▪ <gray>Aktuell genutzte eingehende Bandbreite: <white><incoming-traffic>'
+      - ' <dark_aqua>▪ <gray>Aktuell genutzte ausgehende Bandbreite: <white><outgoing-traffic>'
+      - ' <dark_aqua>▪ <gray>Gesamte genutzte eingehende Bandbreite: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Gesamte genutzte ausgehende Bandbreite: <white><outgoing-traffic-ttl>'
 
 # Übersetzungen für alle Nachrichten während des Übergabeprozesses
 verification:
   # Übersetzungen für alle Debug-Nachrichten während der Überprüfung
   logs:
     # Nachricht, die im Protokoll angezeigt wird, wenn ein neuer Spieler den Server betretet
-    connection: '%name%%ip% (%protocol%) hat sich verbunden.'
+    connection: '<username><ip> (<protocol>) hat sich verbunden.'
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler die Verifizierung nicht besteht
-    failed: '%ip% (%protocol%) hat den Bot-Check nicht bestanden wegen: %reason%'
+    failed: '<ip> (<protocol>) hat den Bot-Check nicht bestanden wegen: <reason>'
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler aufgrund zu vieler fehlgeschlagener Versuche auf die Blacklist gesetzt wird
-    blacklisted: '%ip% (%protocol%) wurde aufgrund zu vieler fehlgeschlagener Versuche auf die Blacklist gesetzt'
+    blacklisted: '<ip> (<protocol>) wurde aufgrund zu vieler fehlgeschlagener Versuche auf die Blacklist gesetzt'
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler erfolgreich verifiziert wurde
-    successful: '%name% wurde erfolgreich verifiziert (%time%s!).'
+    successful: '<username> wurde erfolgreich verifiziert (<time-taken>s!).'
 
   # Nachrichten, die dem Spieler angezeigt werden, wenn er den CAPTCHA eingeben soll
   captcha:
     # Nachricht, die dem Spieler angezeigt wird, wenn er den CAPTCHA-Code im Chat eingeben muss
-    enter-code: '%prefix%<green>Bitte gib den Code im Chat ein, der auf der Karte angezeigt wird.'
+    enter-code: '<prefix><green>Bitte gib den Code im Chat ein, der auf der Karte angezeigt wird.'
     # Nachricht, die dem Spieler angezeigt wird, wenn er den falschen Code im Chat eingibt
-    incorrect: '%prefix%<red>Du hast den falschen Code eingegeben. Bitte versuche es erneut.'
+    incorrect: '<prefix><red>Du hast den falschen Code eingegeben. Bitte versuche es erneut.'
 
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, während der CAPTCHA noch nicht vorbereitet wurde
   currently-preparing:
-    - '%header%'
+    - '<header>'
     - <yellow>Deine Anti-Bot-Daten wurden noch nicht vorbereitet.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - '%footer%'
+    - '<footer>'
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand zu schnell während der Verifizierung erneut beitritt
   too-fast-reconnect:
-    - '%header%'
+    - '<header>'
     - <gold>Du hast zu schnell erneut eine Verbindung hergestellt, versuche es später noch einmal.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - '%footer%'
+    - '<footer>'
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber bereits verifiziert wird
   already-verifying:
-    - '%header%'
+    - '<header>'
     - <red>Deine IP-Adresse wird derzeit verifiziert.
     - <red>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - '%footer%'
+    - '<footer>'
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber bereits in der Warteschlange für die Verifizierung ist
   already-queued:
-    - '%header%'
+    - '<header>'
     - <red>Deine IP-Adresse befindet sich derzeit in der Warteschlange für die Verifizierung.
     - <red>Bitte warte einige Minuten, bevor du es erneut versuchst.
-    - '%footer%'
+    - '<footer>'
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber vorübergehend auf der Blacklist steht
   blacklisted:
-    - '%header%'
+    - '<header>'
     - <red>Du bist derzeit vom Betreten des Servers ausgeschlossen.
     - <red>Bitte warte einige Minuten, um den Server wieder betreten zu können.
-    - <gold>Falschmeldung? <gray>%support-url%
-    - '%footer%'
+    - <gold>Falschmeldung? <gray><support-url>
+    - '<footer>'
   # Nachricht, die angezeigt wird, wenn jemand mit einem ungültigen Benutzernamen beitritt
   invalid-username:
-    - '%header%'
+    - '<header>'
     - <red>Dein Benutzername enthält ungültige Zeichen.
-    - '%footer%'
+    - '<footer>'
   # Nachricht, die angezeigt wird, wenn jemand mit einer auf der Blacklist stehenden Version beitritt
   blacklisted-protocol:
-    - '%header%'
+    - '<header>'
     - <red>Du verwendest eine Version, die auf unserem Server nicht erlaubt ist.
-    - <gold>Brauchst du Hilfe beim Einloggen? <gray>%support-url%
-    - '%footer%'
+    - <gold>Brauchst du Hilfe beim Einloggen? <gray><support-url>
+    - '<footer>'
   # Nachricht, die angezeigt wird, wenn jemand die Verifizierung erfolgreich abschließt
   success:
-    - '%header%'
+    - '<header>'
     - <green>Du hast die Verifizierung erfolgreich bestanden.
     - <white>Verbinde dich erneut um auf dem Server zu joinen.
   # Nachricht, die angezeigt wird, wenn jemand die Verifizierung nicht besteht
   failed:
-    - '%header%'
+    - '<header>'
     - <red>Du hast die Bot-Verifizierung nicht bestanden.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - <gold>Brauchst du Hilfe? <gray>%support-url%
-    - '%footer%'
+    - <gold>Brauchst du Hilfe beim Einloggen? <gray><support-url>
+    - '<footer>'
 
 # Übersetzungen für Sonars ausführliche Aktionsleisten-Nachrichten
 verbose:
   layout:
     # Layout für Sonars ausführliche Aktionsleiste
-    # Platzhalter:
-    # - '%queued%' Anzahl der in der Warteschlange befindlichen Verbindungen
-    # - '%verifying%' Anzahl der Verifizierungen
-    # - '%blacklisted%' Anzahl der IP-Adressen auf der Blacklist
-    # - '%total-joins%' Gesamtzahl der Versuche beizutreten
-    # - '%verify-total%' Gesamtzahl der Verifizierungsversuche
-    # - '%verify-success%' Anzahl der verifizierten IP-Adressen
-    # - '%verify-failed%' Anzahl der gescheiterten Verifizierungen
-    # - '%logins-per-second%' Anzahl der Anmeldungen pro Sekunde
-    # - '%connections-per-second%' Anzahl der Verbindungen pro Sekunde
-    # - '%attack-duration%' Dauer des aktuellen Angriffs
-    # - '%incoming-traffic%' Eingehende Bandbreitennutzung pro Sekunde
-    # - '%outgoing-traffic%' Ausgehende Bandbreitennutzung pro Sekunde
-    # - '%incoming-traffic-ttl%' Gesamte eingehende Bandbreitennutzung
-    # - '%outgoing-traffic-ttl%' Gesamte ausgehende Bandbreitennutzung
-    # - '%used-memory%' Menge des genutzten Arbeitsspeichers des Prozesses
-    # - '%total-memory%' Menge des gesamten Arbeitsspeichers des Prozesses
-    # - '%max-memory%' Menge des maximalen Arbeitsspeichers des Prozesses
-    # - '%free-memory%' Menge des freien Arbeitsspeichers des Prozesses
-    # - '%animation%' Anpassbares animiertes Symbol
-    # Übersetzungen für Sonars normale ausführliche Ausgabe
-    normal: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Anmeldungen/s
-      <white>%logins-per-second% <dark_aqua>╺ <gray>Verifizierung <white>%verifying% <dark_aqua>|
-      <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
+    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Anmeldungen/s <white><logins-per-second> <dark_aqua>╺ <gray>Verifizierung <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
     # Layout für Sonars ausführliche Aktionsleiste während eines Angriffs
-    attack: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Anmeldungen/s
-      <white>%logins-per-second% <dark_aqua>╺ <gray>Warteschlange <white>%queued% <dark_aqua>╺
-      <gray>Verifizierung <white>%verifying% <dark_aqua>╺ <gray>Dauer <white>%attack-duration%
-      <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
+    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Anmeldungen/s <white><logins-per-second> <dark_aqua>╺ <gray>Warteschlange <white><queued> <dark_aqua>╺ <gray>Verifizierung <white><verifying> <dark_aqua>╺ <gray>Dauer <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
   # Animation für die Aktionsleiste
   # Alternativen:
   # - ▙, ▛, ▜, ▟
@@ -297,11 +262,9 @@ notifications:
     - <yellow><b>Sonar<reset>
     - ''
     - <gray>Ein Bot-Angriff wurde erkannt.
-    - ' <dark_aqua>▪ <gray>Anmeldungen pro Sekunde: <white>%logins-per-second%'
-    - ' <dark_aqua>▪ <gray>Verifizierende Spieler: <white>%verifying%'
-    - ' <dark_aqua>▪ <gray>Spieler in der Warteschlange: <white>%queued%'
+    - ' <dark_aqua>▪ <gray>Anmeldungen pro Sekunde: <white><logins-per-second>'
+    - ' <dark_aqua>▪ <gray>Verifizierende Spieler: <white><verifying>'
+    - ' <dark_aqua>▪ <gray>Spieler in der Warteschlange: <white><queued>'
     - ''
-    - <gray>Zeige mehr Informationen mit <white><click:run_command:'/sonar verbose'><hover:show_text:'(Click
-      to run)'>/sonar verbose</hover></click><gray> oder <white><click:run_command:'/sonar
-      stats'><hover:show_text:'(Click to run)'>/sonar stats</hover></click><gray>.
+    - <gray>Zeige mehr Informationen mit <white><click:run_command:'/sonar verbose'><hover:show_text:'(Click to run)'>/sonar verbose</hover></click><gray> oder <white><click:run_command:'/sonar stats'><hover:show_text:'(Click to run)'>/sonar stats</hover></click><gray>.
     - ''

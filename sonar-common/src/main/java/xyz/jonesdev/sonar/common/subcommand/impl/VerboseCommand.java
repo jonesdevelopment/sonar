@@ -18,7 +18,10 @@
 package xyz.jonesdev.sonar.common.subcommand.impl;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
@@ -32,15 +35,19 @@ public final class VerboseCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    if (SONAR.getVerboseHandler().isSubscribed(invocation.getSender().getUuid())) {
-      SONAR.getVerboseHandler().unsubscribe(invocation.getSender().getUuid());
-      invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerboseUnsubscribed());
+    if (Sonar.get().getVerboseHandler().isSubscribed(invocation.getSource().getUuid())) {
+      Sonar.get().getVerboseHandler().unsubscribe(invocation.getSource().getUuid());
       // Reset ActionBar component when unsubscribing
-      invocation.getSender().getAudience().sendActionBar(Component.empty());
+      invocation.getSource().getAudience().sendActionBar(Component.empty());
+      invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+        Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.unsubscribe"),
+        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
       return;
     }
 
-    invocation.getSender().sendMessage(SONAR.getConfig().getCommands().getVerboseSubscribed());
-    SONAR.getVerboseHandler().subscribe(invocation.getSender().getUuid());
+    Sonar.get().getVerboseHandler().subscribe(invocation.getSource().getUuid());
+    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+      Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.subscribe"),
+      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
   }
 }
