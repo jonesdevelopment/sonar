@@ -204,6 +204,11 @@ public class FallbackPreparer {
 
       // Prepare CAPTCHA answers
       MAP_INFO_PREPARER.prepare();
+    } else {
+      // Throw away if not needed
+      enterCodeMessage = null;
+      incorrectCaptcha = null;
+      xpCountdown = null;
     }
   }
 }
