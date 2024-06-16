@@ -56,7 +56,7 @@ commands:
       - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Click to open Discord)'>在我们的Discord上打开一张ticket </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Click to open GitHub)'>或在Github打开新的问题.
       - ''
     # 执行根命令时 对于子命令的描述.
-    subcommands: '<hover:show_text:''<gray>只有玩家可以执行该命令: </gray><only-players><br><gray>只有控制台可以执行该命令: </gray><only-console><br><gray>需要的权限: </gray><white><permission><br><gray>别名: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
+    subcommands: '<suggest-subcommand><hover:show_text:''<gray>只有玩家可以执行该命令: </gray><only-players><br><gray>只有控制台可以执行该命令: </gray><only-console><br><gray>需要的权限: </gray><white><permission><br><gray>别名: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
 
   # 重新加载命令
   reload:

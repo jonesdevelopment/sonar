@@ -56,7 +56,7 @@ commands:
       - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Нажмите чтобы открыть Discord)'>Откройте тикет в Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Нажмите чтобы открыть GitHub)'>или откройте новый вопрос на GitHub.
       - ''
     # Форматирование списка подкоманд
-    subcommands: '<hover:show_text:''<gray>Только игроки: </gray><only-players><br><gray>Требуется консоль: </gray><only-console><br><gray>Permission: </gray><white><permission><br><gray>Псевдонимы: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
+    subcommands: '<suggest-subcommand><hover:show_text:''<gray>Только игроки: </gray><only-players><br><gray>Требуется консоль: </gray><only-console><br><gray>Permission: </gray><white><permission><br><gray>Псевдонимы: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
 
   # Перевод для '/sonar reload'
   reload:

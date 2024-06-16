@@ -56,7 +56,7 @@ commands:
       - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klik om Discord te openen)'>Open een ticket op de Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik om GitHub te openen)'>of open een nieuw probleem op GitHub.
       - ''
     # Opmaak van de lijst met subcommand die wordt weergegeven bij het uitvoeren van de hoofdopdracht
-    subcommands: '<hover:show_text:''<gray>Alleen spelers: </gray><only-players><br><gray>Vereist console: </gray><only-console><br><gray>Toestemming: </gray><white><permission><br><gray>Aliassen: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
+    subcommands: '<suggest-subcommand><hover:show_text:''<gray>Alleen spelers: </gray><only-players><br><gray>Vereist console: </gray><only-console><br><gray>Toestemming: </gray><white><permission><br><gray>Aliassen: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
 
   # Vertalingen voor '/sonar reload'
   reload:

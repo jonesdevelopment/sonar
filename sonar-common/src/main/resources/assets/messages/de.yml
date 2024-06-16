@@ -57,7 +57,7 @@ commands:
       - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klicken um Discord zu öffnen)'>Öffne ein Ticket auf Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klicken um GitHub zu öffnen)'>oder erstelle ein neues Issue auf GitHub.
       - ''
     # Formatierung der Liste der Unterbefehle, die angezeigt wird, wenn der Hauptbefehl ausgeführt wird
-    subcommands: '<hover:show_text:''<gray>Nur Spieler: </gray><only-players><br><gray>Erfordert Konsole: </gray><only-console><br><gray>Berechtigung: </gray><white><permission><br><gray>Aliase: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description>'
+    subcommands: '<suggest-subcommand><hover:show_text:''<gray>Nur Spieler: </gray><only-players><br><gray>Erfordert Konsole: </gray><only-console><br><gray>Berechtigung: </gray><white><permission><br><gray>Aliase: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
 
   # Übersetzungen für '/sonar reload'
   reload:
