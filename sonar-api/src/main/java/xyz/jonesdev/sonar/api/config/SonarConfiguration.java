@@ -103,8 +103,11 @@ public final class SonarConfiguration {
         return Language.fromCode(property);
       } catch (Throwable throwable) {
         LOGGER.error("Could not find requested language: {}", throwable);
+        LOGGER.error("You can view a full list of valid language codes here:");
+        LOGGER.error("https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes");
+        LOGGER.error("If a translation does not exist yet, Sonar will use English (en).");
       }
-    } catch (Exception exception) {
+    } catch (IOException exception) {
       LOGGER.error("Error reading language file: {}", exception);
     }
     return DEFAULT_FALLBACK_LANGUAGE;
