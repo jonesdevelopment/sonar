@@ -49,8 +49,9 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
 
     this.tries = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
-    // Set the 5th slot (ID 4) in the player's hotbar to the map
-    user.delayedWrite(new SetContainerSlotPacket(40, 1,
+    // If the player is on Java, set the 5th slot (ID 4) in the player's hotbar to the map.
+    // If the player is on Bedrock, set the 1st slot (ID 0) in the player's hotbar to the map.
+    user.delayedWrite(new SetContainerSlotPacket(user.isGeyser() ? 36 : 40, 1,
       ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetContainerSlotPacket.MAP_NBT));
     // Send random captcha to the player
     final MapCaptchaInfo captcha = MAP_INFO_PREPARER.getRandomCaptcha();
