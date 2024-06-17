@@ -37,7 +37,7 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
-import xyz.jonesdev.sonar.common.service.SonarServiceThreadManager;
+import xyz.jonesdev.sonar.common.service.SonarServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.subcommand.SubcommandRegistryHolder;
 import xyz.jonesdev.sonar.common.update.UpdateChecker;
@@ -104,7 +104,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
       // Start threads
       getLogger().info("Starting all managed threads...");
-      SonarServiceThreadManager.start();
+      SonarServiceManager.start();
 
       // Done
       getLogger().info("Done ({}s)!", launchTimer);
@@ -173,10 +173,10 @@ public abstract class SonarBootstrap<T> implements Sonar {
   }
 
   public final void shutdown() {
-    // Initialize shutdown process
+    // Initialize the shutdown process
     getLogger().info("Starting shutdown process...");
     // Interrupt threads
-    SonarServiceThreadManager.stop();
+    SonarServiceManager.stop();
     // Close database connection if present
     if (verifiedPlayerController != null) {
       verifiedPlayerController.close();
