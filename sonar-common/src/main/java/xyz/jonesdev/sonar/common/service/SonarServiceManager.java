@@ -57,7 +57,7 @@ public final class SonarServiceManager {
       // Update the attack tracker
       Sonar.get().getAttackTracker().checkIfUnderAttack();
       // Update the action bar verbose
-      Sonar.get().getVerboseHandler().update();
+      Sonar.get().getVerboseHandler().observe();
     }, 0L, 250L, TimeUnit.MILLISECONDS);
 
     FALLBACK_QUEUE.scheduleAtFixedRate(() -> Sonar.get().getFallback().getQueue().poll(),
