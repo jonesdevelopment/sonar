@@ -185,7 +185,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     // Make sure we actually have to verify the player
     final String offlineUUIDString = "OfflinePlayer:" + username;
     final UUID offlineUUID = UUID.nameUUIDFromBytes(offlineUUIDString.getBytes(StandardCharsets.UTF_8));
-    if (Sonar.get().getVerifiedPlayerController().has(inetAddress, offlineUUID)) {
+    if (Sonar.get().getVerifiedPlayerController().has(inetAddress.toString(), offlineUUID)) {
       initialLogin(ctx, loginPacket, encoder, handler);
       return;
     }

@@ -27,8 +27,6 @@ import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -52,23 +50,14 @@ public abstract class Subcommand {
   private static final Pattern IPv4_REGEX = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
   private static final Pattern IPv6_REGEX = Pattern.compile("(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))");
 
-  protected static @Nullable InetAddress getInetAddressIfValid(final InvocationSource source, final String raw) {
+  protected static @Nullable String validateIP(final InvocationSource source, final String raw) {
     if (!IPv4_REGEX.matcher(raw).matches() && !IPv6_REGEX.matcher(raw).matches()) {
       source.sendMessage(MiniMessage.miniMessage().deserialize(
         Sonar.get().getConfig().getMessagesConfig().getString("commands.invalid-ip-address"),
         Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
       return null;
     }
-    final InetAddress inetAddress;
-    try {
-      inetAddress = InetAddress.getAllByName(raw)[0];
-    } catch (UnknownHostException exception) {
-      source.sendMessage(MiniMessage.miniMessage().deserialize(
-        Sonar.get().getConfig().getMessagesConfig().getString("commands.invalid-ip-address"),
-        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
-      return null;
-    }
-    return inetAddress;
+    return raw;
   }
 
   protected final void incorrectUsage(final @NotNull InvocationSource invocationSource) {

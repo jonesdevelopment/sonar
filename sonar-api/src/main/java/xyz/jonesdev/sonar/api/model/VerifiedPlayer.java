@@ -63,7 +63,13 @@ public final class VerifiedPlayer {
   public VerifiedPlayer(final @NotNull InetAddress inetAddress,
                         final @NotNull UUID playerUuid,
                         final long timestamp) {
-    this.inetAddress = inetAddress.toString();
+    this(inetAddress.toString(), playerUuid, timestamp);
+  }
+
+  public VerifiedPlayer(final @NotNull String inetAddress,
+                        final @NotNull UUID playerUuid,
+                        final long timestamp) {
+    this.inetAddress = inetAddress;
     this.playerUuid = playerUuid;
     this.timestamp = new Timestamp(timestamp);
   }

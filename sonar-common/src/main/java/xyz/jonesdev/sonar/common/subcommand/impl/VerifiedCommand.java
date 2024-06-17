@@ -27,7 +27,6 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
-import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Queue;
 import java.util.UUID;
@@ -56,13 +55,12 @@ public final class VerifiedCommand extends Subcommand {
           return;
         }
 
-        final String rawInetAddress = invocation.getRawArguments()[2];
-        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSource(), rawInetAddress);
+        final String rawAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
         // Make sure the given IP address is valid
-        if (inetAddress == null) return;
+        if (rawAddress == null) return;
 
         // Make sure the IP is verified already
-        if (!Sonar.get().getVerifiedPlayerController().has(inetAddress.toString())) {
+        if (!Sonar.get().getVerifiedPlayerController().has(rawAddress)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.ip-not-found"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
@@ -72,9 +70,9 @@ public final class VerifiedCommand extends Subcommand {
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.history"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("ip", rawInetAddress)));
+          Placeholder.unparsed("ip", rawAddress)));
 
-        for (final UUID uuid : Sonar.get().getVerifiedPlayerController().getUUIDs(inetAddress.toString())) {
+        for (final UUID uuid : Sonar.get().getVerifiedPlayerController().getUUIDs(rawAddress)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.history-entry"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
@@ -89,22 +87,20 @@ public final class VerifiedCommand extends Subcommand {
           return;
         }
 
-        final String rawInetAddress = invocation.getRawArguments()[2];
+        final String rawAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
+        // Make sure the given IP address is valid
+        if (rawAddress == null) return;
 
         // Make sure we aren't currently locking the IP address to avoid a double I/O operation
-        if (LOCK.contains(rawInetAddress)) {
+        if (LOCK.contains(rawAddress)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.blocked"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
           return;
         }
 
-        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSource(), rawInetAddress);
-        // Make sure the given IP address is valid
-        if (inetAddress == null) return;
-
         // Make sure the player is verified already
-        if (!Sonar.get().getVerifiedPlayerController().has(inetAddress.toString())) {
+        if (!Sonar.get().getVerifiedPlayerController().has(rawAddress)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.ip-not-found"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
@@ -113,15 +109,15 @@ public final class VerifiedCommand extends Subcommand {
 
         // Lock the IP address
         // Make sure we don't accidentally run 2 operations at the same time
-        LOCK.add(rawInetAddress);
-        Sonar.get().getVerifiedPlayerController().remove(inetAddress.toString());
+        LOCK.add(rawAddress);
+        Sonar.get().getVerifiedPlayerController().remove(rawAddress);
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.remove"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("ip", rawInetAddress)));
+          Placeholder.unparsed("ip", rawAddress)));
 
         // Unlock the IP address
-        LOCK.remove(rawInetAddress);
+        LOCK.remove(rawAddress);
         break;
       }
 
@@ -131,19 +127,17 @@ public final class VerifiedCommand extends Subcommand {
           return;
         }
 
-        final String rawInetAddress = invocation.getRawArguments()[2];
+        final String rawAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
+        // Make sure the given IP address is valid
+        if (rawAddress == null) return;
 
         // Make sure we aren't currently locking the IP address to avoid a double I/O operation
-        if (LOCK.contains(rawInetAddress)) {
+        if (LOCK.contains(rawAddress)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.blocked"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
           return;
         }
-
-        final InetAddress inetAddress = getInetAddressIfValid(invocation.getSource(), rawInetAddress);
-        // Make sure the given IP address is valid
-        if (inetAddress == null) return;
 
         // Try to parse the UUID (from the username, if needed)
         final String rawUUID = invocation.getRawArguments()[3];
@@ -151,7 +145,7 @@ public final class VerifiedCommand extends Subcommand {
           : UUID.nameUUIDFromBytes(("OfflinePlayer:" + rawUUID).getBytes(StandardCharsets.UTF_8));
 
         // Make sure the player is verified already
-        if (Sonar.get().getVerifiedPlayerController().has(inetAddress.toString(), uuid)) {
+        if (Sonar.get().getVerifiedPlayerController().has(rawAddress, uuid)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.already"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
@@ -160,17 +154,17 @@ public final class VerifiedCommand extends Subcommand {
 
         // Lock the IP address
         // Make sure we don't accidentally run 2 operations at the same time
-        LOCK.add(rawInetAddress);
+        LOCK.add(rawAddress);
         // Add verified player to the database
         final long timestamp = System.currentTimeMillis();
-        Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(inetAddress, uuid, timestamp));
+        Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(rawAddress, uuid, timestamp));
 
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.add"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("ip", rawInetAddress)));
+          Placeholder.unparsed("ip", rawAddress)));
         // Unlock the IP address
-        LOCK.remove(rawInetAddress);
+        LOCK.remove(rawAddress);
         break;
       }
 
