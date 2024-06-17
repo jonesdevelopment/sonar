@@ -115,8 +115,6 @@ commands:
     already: '<prefix>The IP address and UUID you provided are already verified.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse unverifiziert macht, die nicht verifiziert ist
     ip-not-found: '<prefix>Die angegebene IP-Adresse ist nicht verifiziert.'
-    # Nachricht, die angezeigt wird, wenn jemand versucht, die gleiche IP-Adresse zweimal zu unverifizieren (doppelte Operation)
-    blocked: '<prefix>Bitte warte, bis der aktuelle Vorgang abgeschlossen ist.'
     # Message shown when someone looks up the verification history of an IP address
     history: '<prefix><yellow>Bisherige UUIDs für <ip>:'
     history-entry: ' <gray>▪ <white><uuid>'

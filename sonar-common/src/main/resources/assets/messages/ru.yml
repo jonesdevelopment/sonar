@@ -108,16 +108,14 @@ commands:
     size: '<prefix>В настоящее время проверено <amount> уникальных игроков.'
     # Сообщение, которое отображается при удалении IP-адреса из списка проверенных игроков
     remove: '<prefix>Успешно удален <ip>.'
-    # Message that is shown when someone verifies an IP address
-    add: '<prefix>Successfully verified <ip>.'
-    # Message that is shown when someone tries to verify an IP address/UUID that are already verified
-    already: '<prefix>The IP address and UUID you provided are already verified.'
+    # Сообщение, которое отображается при проверке IP-адреса
+    add: '<prefix>Успешно проверен <ip>.'
+    # Сообщение, которое отображается, когда кто-то пытается проверить IP-адрес/UUID, которые уже проверены
+    already: '<prefix>Указанные вами IP-адрес и UUID уже проверены.'
     # Сообщение, которое показывается когда кто-то удаляет IP из списка но его небыло в списке
     ip-not-found: '<prefix>Указанный вами IP-адрес не в списке.'
-    # Сообщение, которое показывается когда выполняю сразу две операции (двойная операция)
-    blocked: '<prefix>Пожалуйста, дождитесь завершения текущей операции.'
-    # Message shown when someone looks up the verification history of an IP address
-    history: '<prefix><yellow>Previous UUIDs for <ip>:'
+    # Сообщение, показываемое, когда кто-то просматривает историю проверки IP-адреса
+    history: '<prefix><yellow>Предыдущие UUID для <ip>:'
     history-entry: ' <gray>▪ <white><uuid>'
 
   # Перевод для '/sonar statistics'

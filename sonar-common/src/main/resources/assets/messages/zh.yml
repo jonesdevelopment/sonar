@@ -114,9 +114,7 @@ commands:
     already: '<prefix>您提供的 IP 地址和玩家的UUID已经在白名单中了.'
     # 当尝试移除一个不在白名单中的 IP 地址时显示的消息
     ip-not-found: '<prefix>您提供的 IP 地址不在白名单中.'
-    # 当操作冲突时(例如同时将一个 IP 地址移除白名单)显示的消息
-    blocked: '<prefix>请等待当前操作完成.'
-    # Message shown when someone looks up the verification history of an IP address
+    # 当尝试移除一个查询 IP 地址的验证历史时显示的信息
     history: '<prefix><yellow>以前的 UUID 用于 <ip>:'
     history-entry: ' <gray>▪ <white><uuid>'
 

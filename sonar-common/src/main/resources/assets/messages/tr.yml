@@ -97,9 +97,6 @@ commands:
     ip-duplicate: '<prefix>Sağladığınız IP adresi zaten kara listede.'
     # Birisi bir IP adresini kara listeden çıkarmaya çalıştığında ama kara listede olmadığında gösterilen mesaj
     ip-not-found: '<prefix>Sağladığınız IP adresi kara listede değil.'
-    # Message shown when someone looks up the verification history of an IP address
-    history: '<prefix><yellow>Önceki UUID''ler için <ip>:'
-    history-entry: ' <gray>▪ <white><uuid>'
 
   # '/sonar verified' için çeviriler
   verified:
@@ -112,13 +109,14 @@ commands:
     # Birisi bir IP adresini doğrulanmamış olarak işaretlediğinde gösterilen mesaj
     remove: '<prefix>Başarıyla <ip> doğrulanmamış olarak işaretlendi.'
     # Message that is shown when someone verifies an IP address
-    add: '<prefix>Successfully verified <ip>.'
+    add: '<prefix><ip> başarıyla doğrulandı.'
     # Message that is shown when someone tries to verify an IP address/UUID that are already verified
-    already: '<prefix>The IP address and UUID you provided are already verified.'
+    already: '<prefix>Sağladığınız IP adresi ve UUID zaten doğrulanmıştır.'
     # Birisi bir IP adresini doğrulanmamış olarak işaretlemeye çalıştığında ama doğrulanmamış olduğunda gösterilen mesaj
     ip-not-found: '<prefix>Sağladığınız IP adresi doğrulanmış olarak işaretlenmemiş.'
-    # Birisi aynı IP adresini iki kez (çift işlem) doğrulanmamış olarak işaretlemeye çalıştığında gösterilen mesaj
-    blocked: '<prefix>Mevcut işlemin bitmesini bekleyin.'
+    # Birisi bir IP adresini doğrulama geçmişine baktığında gösterilen mesaj
+    history: '<prefix><yellow><ip> için önceki UUID''ler:'
+    history-entry: ' <gray>▪ <white><uuid>'
 
   # '/sonar statistics' için çeviriler
   statistics:

@@ -114,8 +114,6 @@ commands:
     already: '<prefix>Het IP-adres en de UUID die u heeft opgegeven, zijn al geverifieerd.'
     # Bericht dat wordt weergegeven wanneer iemand de verificatie van een IP-adres ongedaan maakt, maar het is niet geverifieerd
     ip-not-found: '<prefix>Het door u opgegeven IP-adres is niet geverifieerd.'
-    # Bericht dat wordt weergegeven wanneer iemand tweemaal hetzelfde IP-adres probeert te de-verifiëren (dubbele handeling)
-    blocked: '<prefix>Wacht tot de huidige bewerking is voltooid.'
     # Message shown when someone looks up the verification history of an IP address
     history: '<prefix><yellow>Eerdere UUID''s voor <ip>:'
     history-entry: ' <gray>▪ <white><uuid>'

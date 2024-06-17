@@ -90,7 +90,7 @@ commands:
     # Message affiché lorsque quelqu'un ajoute une adresse IP à la liste noire
     add: '<prefix>Adresse IP <ip> ajoutée avec succès à la liste noire.'
     # Message affiché lorsque quelqu'un ajoute une adresse IP à la liste noire qui est vérifiée
-    added-warning: "<prefix><red>Avertissement : <white><ip> est actuellement sur liste blanche. Considérez la suppression de l'adresse IP de la liste des joueurs vérifiés pour éviter des problèmes potentiels."
+    add-warning: "<prefix><red>Avertissement : <white><ip> est actuellement sur liste blanche. Considérez la suppression de l'adresse IP de la liste des joueurs vérifiés pour éviter des problèmes potentiels."
     # Message affiché lorsque quelqu'un supprime une adresse IP de la liste noire
     remove: '<prefix>Adresse IP <ip> supprimée avec succès de la liste noire.'
     # Message affiché lorsque quelqu'un ajoute une adresse IP à la liste noire, mais qu'elle est déjà en liste noire
@@ -114,8 +114,6 @@ commands:
     already: "<prefix>L'adresse IP et l'UUID que vous avez fournis sont déjà vérifiés."
     # Message affiché lorsque quelqu'un désapprouve une adresse IP, mais qu'elle n'est pas vérifiée
     ip-not-found: "<prefix>L'adresse IP que vous avez fournie n'est pas vérifiée."
-    # Message affiché lorsque quelqu'un tente de désapprouver la même adresse IP deux fois (double opération)
-    blocked: "<prefix>Veuillez attendre la fin de l'opération en cours."
     # Message shown when someone looks up the verification history of an IP address
     history: '<prefix><yellow>UUID précédents pour <ip>:'
     history-entry: ' <gray>▪ <white><uuid>'
