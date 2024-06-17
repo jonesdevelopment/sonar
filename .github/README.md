@@ -46,6 +46,7 @@ Sonar also protects against spambot attacks since it queues the incoming connect
 
 ### False positives
 Sonar is unlikely to ever falsely prevent a player from joining the server since Minecraft uses the TCP protocol, which means that packets are always sent in the correct order. Therefore, lag or ping should not affect the bot check.
+If you or one of your players experiences a false positive, make sure to report it by opening a [GitHub issue](https://github.com/jonesdevelopment/sonar/issues/new/choose) or a ticket on the [Discord server](https://jonesdev.xyz/discord/).
 
 ## Building
 If you want to build your own version of Sonar, please take a look at the [Sonar building documentation](https://docs.jonesdev.xyz/development/building).
