@@ -201,9 +201,12 @@ verification:
   # This feature is experimental and might cause issues
   # If this is disabled, Bedrock players will be skipped
   check-geyser-players: true
-  # Amount of time that has to pass before a player times out
+  # The time since the player stopped sending packets before disconnecting
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   read-timeout: 8000
+  # The time since the server stopped sending packets before disconnecting the player
+  # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
+  write-timeout: 10000
   # How long should a player wait before reconnecting during verification
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   rejoin-delay: 8000

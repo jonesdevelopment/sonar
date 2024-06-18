@@ -111,8 +111,10 @@ public final class FallbackUserWrapper implements FallbackUser {
     channel.eventLoop().execute(() -> {
       // Add better timeout handler to avoid known exploits or issues
       // We also want to timeout bots quickly to avoid flooding
-      final int readTimeout = Sonar.get().getConfig().getVerification().getReadTimeout();
-      pipeline.replace(timeout, timeout, new FallbackTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
+      pipeline.replace(timeout, timeout, new FallbackTimeoutHandler(
+        Sonar.get().getConfig().getVerification().getReadTimeout(),
+        Sonar.get().getConfig().getVerification().getWriteTimeout(),
+        TimeUnit.MILLISECONDS));
 
       // Replace normal encoder to allow custom packets
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);

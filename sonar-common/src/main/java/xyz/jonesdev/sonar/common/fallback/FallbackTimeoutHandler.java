@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.common.fallback;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.jetbrains.annotations.NotNull;
@@ -26,18 +25,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.TimeUnit;
 
 public final class FallbackTimeoutHandler extends IdleStateHandler {
-  public FallbackTimeoutHandler(final long timeout, final TimeUnit timeUnit) {
-    super(timeout, 0L, 0L, timeUnit);
+  public FallbackTimeoutHandler(final int readTimeout, final int writeTimeout, final TimeUnit timeUnit) {
+    super(readTimeout, writeTimeout, 0L, timeUnit);
   }
 
   @Override
   protected void channelIdle(final ChannelHandlerContext ctx,
                              final @NotNull IdleStateEvent idleStateEvent) throws Exception {
-    // We are only checking the read timeout state - skip all other states
-    if (idleStateEvent.state() != IdleState.READER_IDLE) {
-      return;
-    }
-
     // The netty (default) ReadTimeoutHandler would normally just throw an Exception
     // The default ReadTimeoutHandler does only check for the boolean 'closed' and
     // still throws the Exception even if the channel is closed
