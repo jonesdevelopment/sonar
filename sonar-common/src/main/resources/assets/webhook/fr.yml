@@ -41,17 +41,17 @@ webhook:
     description:
       - 'L''attaque sur votre serveur a été mitigé'
       - ''
-      - 'Démarré à: <t:%start-timestamp%:T>'
-      - 'Fini à: <t:%end-timestamp%:T>'
-      - 'Durée: %duration%'
+      - 'Démarré à: <t:<start-timestamp>:T>'
+      - 'Fini à: <t:<end-timestamp>:T>'
+      - 'Durée: <attack-duration>'
       - ''
-      - 'Pique du processeur: %peak-cpu%%'
-      - 'Pique de la mémoire ram: %peak-memory%'
-      - 'Pique du nombre de bots par secondes: %peak-bps%'
+      - 'Pique du processeur: <peak-cpu>%'
+      - 'Pique de la mémoire ram: <peak-memory>'
+      - 'Pique du nombre de bots par secondes: <peak-bps>'
       - ''
-      - "IP Blacklisté durant l'attaque: %total-blacklisted%"
-      - "Vérification échoué durant l'attaque: %total-failed%"
-      - "Vérification réussi durant l'attaque: %total-success%"
+      - "IP Blacklisté durant l'attaque: <total-blacklisted>"
+      - "Vérification échoué durant l'attaque: <total-failed>"
+      - "Vérification réussi durant l'attaque: <total-success>"
     # Code couleur RGB pour l'embed
     # Sélectionner la couleur: https://www.rapidtables.com/web/color/RGB_Color.html
     color:

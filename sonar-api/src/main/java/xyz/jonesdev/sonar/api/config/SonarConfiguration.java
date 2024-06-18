@@ -21,6 +21,7 @@ import com.j256.ormlite.db.DatabaseType;
 import lombok.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -102,8 +103,11 @@ public final class SonarConfiguration {
         return Language.fromCode(property);
       } catch (Throwable throwable) {
         LOGGER.error("Could not find requested language: {}", throwable);
+        LOGGER.error("You can view a full list of valid language codes here:");
+        LOGGER.error("https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes");
+        LOGGER.error("If a translation does not exist yet, Sonar will use English (en).");
       }
-    } catch (Exception exception) {
+    } catch (IOException exception) {
       LOGGER.error("Error reading language file: {}", exception);
     }
     return DEFAULT_FALLBACK_LANGUAGE;
@@ -225,14 +229,6 @@ public final class SonarConfiguration {
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets"), 128, 8192);
 
-    verification.transfer.enabled = generalConfig.getBoolean("verification.transfer.enabled");
-    verification.transfer.host = generalConfig.getString("verification.transfer.destination-host");
-    verification.transfer.port = clamp(generalConfig.getInt("verification.transfer.destination-port"), 0, 0xffff);
-
-    if (verification.transfer.enabled) {
-      Sonar.get().getLogger().info("Transferring 1.20.5+ clients is enabled. Please make sure to follow the instructions in order for this to work properly.");
-    }
-
     verification.checkGeyser = generalConfig.getBoolean("verification.check-geyser-players");
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
     verification.logDuringAttack = generalConfig.getBoolean("verification.log-during-attack");
@@ -260,8 +256,7 @@ public final class SonarConfiguration {
 
     webhook.embed.title = webhookConfig.getString(embedPath + "title");
     webhook.embed.titleUrl = webhookConfig.getString(embedPath + "title-url");
-    webhook.embed.description = formatString(String.join("\n",
-      webhookConfig.getStringList(embedPath + "description")));
+    webhook.embed.description = String.join("\n", webhookConfig.getStringList(embedPath + "description"));
     webhook.embed.r = webhookConfig.getInt(embedPath + "color.red");
     webhook.embed.g = webhookConfig.getInt(embedPath + "color.green");
     webhook.embed.b = webhookConfig.getInt(embedPath + "color.blue");
@@ -277,87 +272,53 @@ public final class SonarConfiguration {
     }
 
     // Messages
-    prefix = formatString(messagesConfig.getString("prefix"));
-    supportUrl = messagesConfig.getString("support-url");
-
-    header = fromList(messagesConfig.getStringList("header"));
-    footer = fromList(messagesConfig.getStringList("footer"));
-    tooManyOnlinePerIp = deserialize(fromList(messagesConfig.getStringList("too-many-online-per-ip")));
-
-    noPermission = formatString(messagesConfig.getString("commands.no-permission"));
-    commands.incorrectCommandUsage = formatString(messagesConfig.getString("commands.incorrect-usage"));
-    commands.invalidIpAddress = formatString(messagesConfig.getString("commands.invalid-ip-address"));
-    commands.playersOnly = formatString(messagesConfig.getString("commands.player-only"));
-    commands.consoleOnly = formatString(messagesConfig.getString("commands.console-only"));
-    commands.commandCoolDown = formatString(messagesConfig.getString("commands.cool-down"));
-    commands.commandCoolDownLeft = formatString(messagesConfig.getString("commands.cool-down-left"));
-    commands.subCommandNoPerm = formatString(messagesConfig.getString("commands.subcommand-no-permission"));
-    commands.helpHeader = messagesConfig.getStringList("commands.main.header");
-    commands.helpSubcommands = formatString(messagesConfig.getString("commands.main.subcommands"));
+    prefix = MiniMessage.miniMessage().deserialize(messagesConfig.getString("prefix"));
+    noPermission = MiniMessage.miniMessage().deserialize(messagesConfig.getString("commands.no-permission"),
+      Placeholder.component("prefix", prefix));
 
     SonarCommand.prepareCachedMessages();
 
-    commands.reloading = formatString(messagesConfig.getString("commands.reload.start"));
-    commands.reloaded = formatString(messagesConfig.getString("commands.reload.finish"));
+    supportUrl = messagesConfig.getString("support-url");
+    header = MiniMessage.miniMessage().deserialize(
+      String.join("<newline>", messagesConfig.getStringList("header")),
+      Placeholder.unparsed("support-url", supportUrl),
+      Placeholder.component("prefix", prefix));
+    footer = MiniMessage.miniMessage().deserialize(
+      String.join("<newline>", messagesConfig.getStringList("footer")),
+      Placeholder.unparsed("support-url", supportUrl),
+      Placeholder.component("prefix", prefix));
 
-    commands.verboseSubscribed = formatString(messagesConfig.getString("commands.verbose.subscribed"));
-    commands.verboseUnsubscribed = formatString(messagesConfig.getString("commands.verbose.unsubscribed"));
+    tooManyOnlinePerIp = deserializeDisconnectMessage("too-many-online-per-ip");
+    verification.currentlyPreparing = deserializeDisconnectMessage("verification.currently-preparing");
+    verification.tooFastReconnect = deserializeDisconnectMessage("verification.too-fast-reconnect");
+    verification.alreadyVerifying = deserializeDisconnectMessage("verification.already-verifying");
+    verification.alreadyQueued = deserializeDisconnectMessage("verification.already-queued");
+    verification.blacklisted = deserializeDisconnectMessage("verification.blacklisted");
+    verification.invalidUsername = deserializeDisconnectMessage("verification.invalid-username");
+    verification.protocolBlacklisted = deserializeDisconnectMessage("verification.blacklisted-protocol");
+    verification.verificationSuccess = deserializeDisconnectMessage("verification.success");
+    verification.verificationFailed = deserializeDisconnectMessage("verification.failed");
 
-    commands.notificationsSubscribed = formatString(messagesConfig.getString("commands.notify.subscribed"));
-    commands.notificationsUnsubscribed = formatString(messagesConfig.getString("commands.notify.unsubscribed"));
+    verboseAnimation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation"));
 
-    commands.blacklistEmpty = formatString(messagesConfig.getString("commands.blacklist.empty"));
-    commands.blacklistCleared = formatString(messagesConfig.getString("commands.blacklist.cleared"));
-    commands.blacklistSize = formatString(messagesConfig.getString("commands.blacklist.size"));
-    commands.blacklistAdd = formatString(messagesConfig.getString("commands.blacklist.added"));
-    commands.blacklistAddWarning = formatString(messagesConfig.getString("commands.blacklist.added-warning"));
-    commands.blacklistRemove = formatString(messagesConfig.getString("commands.blacklist.removed"));
-    commands.blacklistDuplicate = formatString(messagesConfig.getString("commands.blacklist.duplicate-ip"));
-    commands.blacklistNotFound = formatString(messagesConfig.getString("commands.blacklist.ip-not-found"));
-
-    commands.verifiedEmpty = formatString(messagesConfig.getString("commands.verified.empty"));
-    commands.verifiedCleared = formatString(messagesConfig.getString("commands.verified.cleared"));
-    commands.verifiedSize = formatString(messagesConfig.getString("commands.verified.size"));
-    commands.verifiedRemove = formatString(messagesConfig.getString("commands.verified.removed"));
-    commands.verifiedAdd = formatString(messagesConfig.getString("commands.verified.added"));
-    commands.verifiedAlready = formatString(messagesConfig.getString("commands.verified.already"));
-    commands.verifiedNotFound = formatString(messagesConfig.getString("commands.verified.ip-not-found"));
-    commands.verifiedBlocked = formatString(messagesConfig.getString("commands.verified.blocked"));
-
-    commands.statisticsHeader = formatString(messagesConfig.getString("commands.statistics.header"));
-    commands.unknownStatisticType = formatString(messagesConfig.getString("commands.statistics.unknown-type"));
-    commands.generalStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.general")));
-    commands.cpuStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.cpu")));
-    commands.memoryStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.memory")));
-    commands.networkStatistics = formatString(fromList(messagesConfig.getStringList("commands.statistics.network")));
-
-    verification.connectLog = formatString(messagesConfig.getString("verification.logs.connection"));
-    verification.failedLog = formatString(messagesConfig.getString("verification.logs.failed"));
-    verification.blacklistLog = formatString(messagesConfig.getString("verification.logs.blacklisted"));
-    verification.successLog = formatString(messagesConfig.getString("verification.logs.successful"));
-
-    verification.map.enterCode = deserialize(formatString(messagesConfig.getString("verification.captcha.enter-code")));
-    verification.map.failedCaptcha = deserialize(formatString(messagesConfig.getString("verification.captcha.incorrect")));
-    verification.currentlyPreparing = deserialize(fromList(messagesConfig.getStringList("verification.currently-preparing")));
-    verification.tooFastReconnect = deserialize(fromList(messagesConfig.getStringList("verification.too-fast-reconnect")));
-    verification.alreadyVerifying = deserialize(fromList(messagesConfig.getStringList("verification.already-verifying")));
-    verification.alreadyQueued = deserialize(fromList(messagesConfig.getStringList("verification.already-queued")));
-    verification.blacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted")));
-    verification.invalidUsername = deserialize(fromList(messagesConfig.getStringList("verification.invalid-username")));
-    verification.protocolBlacklisted = deserialize(fromList(messagesConfig.getStringList("verification.blacklisted-protocol")));
-    verification.verificationSuccess = deserialize(fromList(messagesConfig.getStringList("verification.success")));
-    verification.verificationFailed = deserialize(fromList(messagesConfig.getStringList("verification.failed")));
-
-    verbose.actionBarLayout = deserialize(formatString(messagesConfig.getString("verbose.layout.normal")));
-    verbose.actionBarLayoutDuringAttack = deserialize(formatString(messagesConfig.getString("verbose.layout.attack")));
-    verbose.animation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation"));
-
-    notifications.notificationTitle = deserialize(formatString(messagesConfig.getString("notifications.title")));
-    notifications.notificationSubtitle = deserialize(formatString(messagesConfig.getString("notifications.subtitle")));
+    notifications.notificationTitle = MiniMessage.miniMessage().deserialize(
+      messagesConfig.getString("notifications.title"));
+    notifications.notificationSubtitle = MiniMessage.miniMessage().deserialize(
+      messagesConfig.getString("notifications.subtitle"));
     notifications.title = Title.title(
       Sonar.get().getConfig().getNotifications().getNotificationTitle(),
       Sonar.get().getConfig().getNotifications().getNotificationSubtitle());
-    notifications.notificationChat = deserialize(formatString(fromList(messagesConfig.getStringList("notifications.chat"))));
+    notifications.notificationChat = MiniMessage.miniMessage().deserialize(
+      String.join("<newline>", messagesConfig.getStringList("notifications.chat")));
+  }
+
+  private @NotNull Component deserializeDisconnectMessage(final String path) {
+    return MiniMessage.miniMessage().deserialize(
+      String.join("<newline>", messagesConfig.getStringList(path)),
+      Placeholder.component("prefix", prefix),
+      Placeholder.component("header", header),
+      Placeholder.component("footer", footer),
+      Placeholder.unparsed("support-url", supportUrl));
   }
 
   private @NotNull URL getAsset(final String url, final @NotNull Language language) {
@@ -382,26 +343,6 @@ public final class SonarConfiguration {
     return logPlayerAddresses ? inetAddress.toString() : "/<ip address withheld>";
   }
 
-  private @NotNull String fromList(final @NotNull Collection<String> list) {
-    return formatString(String.join("<newline>", list));
-  }
-
-  private static @NotNull Component deserialize(final String legacy) {
-    return MiniMessage.miniMessage().deserialize(legacy);
-  }
-
-  private @NotNull String formatString(final @NotNull String str) {
-    return str
-      .replace("%prefix%", prefix == null ? "" : prefix)
-      .replace("%support-url%", supportUrl == null ? "" : supportUrl)
-      .replace("%header%", header == null ? "" : header)
-      .replace("%footer%", footer == null ? "" : footer);
-  }
-
-  @Getter
-  private final Verbose verbose = new Verbose();
-  @Getter
-  private final Commands commands = new Commands();
   @Getter
   private final Queue queue = new Queue();
   @Getter
@@ -414,11 +355,12 @@ public final class SonarConfiguration {
   private final Notifications notifications = new Notifications();
 
   @Getter
-  private String prefix;
+  private Component prefix;
   private String supportUrl;
+  private Component header;
+  private Component footer;
   @Getter
-  private String noPermission;
-  private String header, footer;
+  private Component noPermission;
   private boolean logPlayerAddresses;
   @Getter
   private int maxOnlinePerIp;
@@ -432,14 +374,8 @@ public final class SonarConfiguration {
   private int attackCooldownDelay;
   @Getter
   private Component tooManyOnlinePerIp;
-
   @Getter
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static final class Verbose {
-    private Component actionBarLayout;
-    private Component actionBarLayoutDuringAttack;
-    private List<String> animation;
-  }
+  private List<String> verboseAnimation;
 
   @Getter
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -475,7 +411,6 @@ public final class SonarConfiguration {
     private final Gravity gravity = new Gravity();
     private final Vehicle vehicle = new Vehicle();
     private final Brand brand = new Brand();
-    private final Transfer transfer = new Transfer();
 
     @Getter
     public static final class Map {
@@ -489,8 +424,6 @@ public final class SonarConfiguration {
       private int maxDuration;
       private int maxTries;
       private String dictionary;
-      private Component enterCode;
-      private Component failedCaptcha;
 
       private Smear distortion = new Smear();
 
@@ -537,23 +470,12 @@ public final class SonarConfiguration {
       private Pattern validRegex;
     }
 
-    @Getter
-    public static final class Transfer {
-      private boolean enabled;
-      private String host;
-      private int port;
-    }
-
     private boolean checkGeyser;
     private boolean logConnections;
     private boolean logDuringAttack;
     private boolean debugXYZPositions;
     private Pattern validNameRegex;
     private Pattern validLocaleRegex;
-    private String connectLog;
-    private String failedLog;
-    private String successLog;
-    private String blacklistLog;
 
     private int maxLoginPackets;
     private int readTimeout;
@@ -573,55 +495,6 @@ public final class SonarConfiguration {
     private Component blacklisted;
     private Component protocolBlacklisted;
     private Component currentlyPreparing;
-  }
-
-  @Getter
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static final class Commands {
-    private String incorrectCommandUsage;
-    private String invalidIpAddress;
-    private String subCommandNoPerm;
-    private String playersOnly;
-    private String consoleOnly;
-    private String commandCoolDown;
-    private String commandCoolDownLeft;
-
-    private String blacklistEmpty;
-    private String blacklistAdd;
-    private String blacklistAddWarning;
-    private String blacklistDuplicate;
-    private String blacklistNotFound;
-    private String blacklistRemove;
-    private String blacklistCleared;
-    private String blacklistSize;
-
-    private String verifiedRemove;
-    private String verifiedAdd;
-    private String verifiedAlready;
-    private String verifiedNotFound;
-    private String verifiedCleared;
-    private String verifiedSize;
-    private String verifiedEmpty;
-    private String verifiedBlocked;
-
-    private String statisticsHeader;
-    private String unknownStatisticType;
-    private String generalStatistics;
-    private String memoryStatistics;
-    private String networkStatistics;
-    private String cpuStatistics;
-
-    private List<String> helpHeader;
-    private String helpSubcommands;
-
-    private String verboseSubscribed;
-    private String verboseUnsubscribed;
-
-    private String notificationsSubscribed;
-    private String notificationsUnsubscribed;
-
-    private String reloading;
-    private String reloaded;
   }
 
   @Getter

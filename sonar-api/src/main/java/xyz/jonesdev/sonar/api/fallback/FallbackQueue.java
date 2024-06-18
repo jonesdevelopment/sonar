@@ -37,7 +37,7 @@ public final class FallbackQueue {
   private static final int THREAD_POOL_SIZE = Math.min(0x7fff, Runtime.getRuntime().availableProcessors() * 2);
   private static final ExecutorService QUEUE_EXECUTOR = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
-  private final ConcurrentMap<InetAddress, Runnable> queuedPlayers = new ConcurrentHashMap<>(
+  private final ConcurrentMap<InetAddress, Runnable> players = new ConcurrentHashMap<>(
     128, 0.75f, Runtime.getRuntime().availableProcessors());
 
   public void poll() {
@@ -46,7 +46,7 @@ public final class FallbackQueue {
 
     // Iterate through the map and process up to maxQueuePolls entries
     // We need to be cautious here since we don't want any concurrency issues
-    final Iterator<Map.Entry<InetAddress, Runnable>> iterator = queuedPlayers.entrySet().iterator();
+    final Iterator<Map.Entry<InetAddress, Runnable>> iterator = players.entrySet().iterator();
     while (iterator.hasNext() && index++ < maxQueuePolls) {
       // Run the cached runnable
       final Map.Entry<InetAddress, Runnable> entry = iterator.next();

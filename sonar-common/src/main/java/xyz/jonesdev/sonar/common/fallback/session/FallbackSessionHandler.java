@@ -68,7 +68,7 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
 
     // If enabled, transfer the player back to the origin server.
     // This feature was introduced by Mojang in Minecraft version 1.20.5.
-    if (Sonar.get().getConfig().getVerification().getTransfer().isEnabled()
+    if (transferToOrigin != null
       && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
       user.write(transferToOrigin);
       // Close the channel to ensure that the connection is closed
@@ -78,9 +78,10 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
       user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess(), false);
     }
 
-    Sonar.get().getFallback().getLogger().info(Sonar.get().getConfig().getVerification().getSuccessLog()
-      .replace("%name%", username)
-      .replace("%time%", user.getLoginTimer().toString()));
+    Sonar.get().getFallback().getLogger().info(
+      Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.successful")
+        .replace("<username>", username)
+        .replace("<time-taken>", user.getLoginTimer().toString()));
   }
 
   protected final void checkClientInformation(final @NotNull ClientInformationPacket clientSettings) {

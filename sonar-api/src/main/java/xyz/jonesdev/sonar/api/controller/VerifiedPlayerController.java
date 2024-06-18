@@ -33,7 +33,6 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
-import java.net.InetAddress;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -291,16 +290,6 @@ public final class VerifiedPlayerController {
       return got.contains(uuid);
     }
     return false;
-  }
-
-  /**
-   * @param inetAddress IP address
-   * @param uuid        UUID associated to the IP
-   * @return Whether the local cache contains the IP and UUID
-   * @see #has(String, UUID)
-   */
-  public boolean has(final @NotNull InetAddress inetAddress, final @NotNull UUID uuid) {
-    return has(inetAddress.toString(), uuid);
   }
 
   /**

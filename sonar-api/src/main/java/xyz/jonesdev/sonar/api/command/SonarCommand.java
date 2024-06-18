@@ -17,18 +17,17 @@
 
 package xyz.jonesdev.sonar.api.command;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Ticker;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,92 +38,64 @@ public interface SonarCommand {
 
   Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
 
-  Cache<Audience, Long> COMMAND_DELAY = Caffeine.newBuilder()
-    .expireAfterWrite(Duration.ofMillis(500))
-    .ticker(Ticker.systemTicker())
-    .build();
-
-  List<Component> CACHED_HELP_MESSAGE = new ArrayList<>();
-
-  default void handle(final @NotNull InvocationSource source, final String[] args) {
-    if (source.isPlayer()) {
-      // Check if the player actually has the permission to run the command
-      if (!source.getPermissionFunction().test("sonar.command")) {
-        source.sendMessage(Sonar.get().getConfig().getNoPermission());
-        return;
-      }
-
-      final long timestamp = System.currentTimeMillis();
-      final long mapTimestamp = COMMAND_DELAY.get(source.getAudience(), audience -> -1L);
-
-      // There were some exploits with spamming commands in the past.
-      // Spamming should be prevented, especially if some heavy operations are done,
-      // which is not the case here but let's still stay safe!
-      if (mapTimestamp > 0L) {
-        source.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDown());
-
-        // Format delay
-        final double left = 0.5D - (timestamp - mapTimestamp) / 1000D;
-
-        source.sendMessage(Sonar.get().getConfig().getCommands().getCommandCoolDownLeft()
-          .replace("%time-left%", Sonar.DECIMAL_FORMAT.format(left)));
-        return;
-      }
-
-      COMMAND_DELAY.put(source.getAudience(), timestamp);
+  default void handle(final @NotNull InvocationSource source, final String @NotNull [] args) {
+    // Check if the player actually has the permission to run the command
+    if (source.isPlayer() && !source.getPermissionFunction().test("sonar.command")) {
+      source.sendMessage(Sonar.get().getConfig().getNoPermission());
+      return;
     }
+
+    Optional<Subcommand> subcommand = Optional.empty();
 
     if (args.length > 0) {
       // Search subcommand if command arguments are present
-      final Optional<Subcommand> subcommand = Sonar.get().getSubcommandRegistry().getSubcommands().stream()
+      subcommand = Sonar.get().getSubcommandRegistry().getSubcommands().stream()
         .filter(sub -> sub.getInfo().name().equalsIgnoreCase(args[0])
-          || Arrays.stream(sub.getInfo().aliases())
-          .anyMatch(alias -> alias.equalsIgnoreCase(args[0])))
+          || Arrays.stream(sub.getInfo().aliases()).anyMatch(alias -> alias.equalsIgnoreCase(args[0])))
         .findFirst();
+    }
 
+    subcommand.ifPresentOrElse(command -> {
       // Check permissions for subcommands
-      if (subcommand.isPresent()) {
-        if (!subcommand.get().getInfo().onlyConsole()
-          && !source.getPermissionFunction().test(subcommand.get().getPermission())) {
-          source.sendMessage(Sonar.get().getConfig().getCommands().getSubCommandNoPerm()
-            .replace("%permission%", subcommand.get().getPermission()));
-          return;
-        }
-        subcommand.get().invoke(source, args);
+      if (!command.getInfo().onlyConsole()
+        && !source.getPermissionFunction().test(command.getPermission())) {
+        source.sendMessage(MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("commands.subcommand-no-permission"),
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.unparsed("permission", command.getPermission())));
         return;
       }
-    }
+      // Invoke subcommand
+      command.invoke(source, args);
+    }, () -> {
+      // Print standard help message
+      source.sendMessage(MiniMessage.miniMessage().deserialize(
+        String.join("<newline>",
+          Sonar.get().getConfig().getMessagesConfig().getStringList("commands.main.header")),
+        Placeholder.unparsed("version", Sonar.get().getVersion().getFormatted()),
+        Placeholder.unparsed("platform", Sonar.get().getPlatform().getDisplayName()),
+        Placeholder.unparsed("copyright-year", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))));
 
-    // Re-use the old, cached help message since we don't want to scan
-    // for each subcommand and it's arguments/attributes every time
-    // someone runs /sonar since the subcommand don't change
-    for (final Component component : CACHED_HELP_MESSAGE) {
-      source.sendMessage(component);
-    }
+      final Component yes = MiniMessage.miniMessage().deserialize("<green>✔</green>");
+      final Component no = MiniMessage.miniMessage().deserialize("<red>✗</red>");
+
+      Sonar.get().getSubcommandRegistry().getSubcommands().forEach(command -> {
+        source.sendMessage(MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("commands.main.subcommands"),
+          TagResolver.resolver("suggest-subcommand", (argumentQueue, context) -> {
+            return Tag.styling(ClickEvent.suggestCommand("/sonar " + command.getInfo().name()));
+          }),
+          Placeholder.unparsed("subcommand", command.getInfo().name()),
+          Placeholder.unparsed("description", command.getInfo().description()),
+          Placeholder.unparsed("permission", command.getPermission()),
+          Placeholder.unparsed("aliases", command.getAliases()),
+          Placeholder.component("only-players", command.getInfo().onlyPlayers() ? yes : no),
+          Placeholder.component("only-console", command.getInfo().onlyConsole() ? yes : no)));
+      });
+    });
   }
 
   static void prepareCachedMessages() {
-    // Cache help message
-    CACHED_HELP_MESSAGE.clear();
-    for (final String message : Sonar.get().getConfig().getCommands().getHelpHeader()) {
-      CACHED_HELP_MESSAGE.add(MiniMessage.miniMessage().deserialize(message
-        .replace("%version%", Sonar.get().getVersion().getFormatted())
-        .replace("%platform%", Sonar.get().getPlatform().getDisplayName())
-        .replace("%copyright_year%", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))));
-    }
-
-    final String subcommandFormat = Sonar.get().getConfig().getCommands().getHelpSubcommands();
-    Sonar.get().getSubcommandRegistry().getSubcommands().forEach(subcommand -> {
-      final Component deserialized = MiniMessage.miniMessage().deserialize(subcommandFormat
-        .replace("%subcommand%", subcommand.getInfo().name())
-        .replace("%description%", subcommand.getInfo().description())
-        .replace("%only_players%", subcommand.getInfo().onlyPlayers() ? "<green>✔</green>" : "<red>✗</red>")
-        .replace("%require_console%", subcommand.getInfo().onlyConsole() ? "<green>✔</green>" : "<red>✗</red>")
-        .replace("%permission%", subcommand.getPermission())
-        .replace("%aliases%", subcommand.getAliases()));
-      CACHED_HELP_MESSAGE.add(deserialized);
-    });
-
     // Don't re-cache tab suggestions
     if (!TAB_SUGGESTIONS.isEmpty()) return;
     // Cache tab suggestions

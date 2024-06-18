@@ -66,7 +66,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       // Remove the IP address from the connected players
       FALLBACK.getConnected().remove(inetAddress);
       // Remove the IP address from the queue
-      FALLBACK.getQueue().getQueuedPlayers().remove(inetAddress);
+      FALLBACK.getQueue().getPlayers().remove(inetAddress);
       // Remove this account from the online players
       // or decrement the number of accounts with the same IP
       FALLBACK.getOnline().compute(inetAddress, (key, value) -> {
@@ -164,7 +164,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
 
     // Check if the player is already queued since we don't want bots to flood the queue
-    if (FALLBACK.getQueue().getQueuedPlayers().containsKey(inetAddress)) {
+    if (FALLBACK.getQueue().getPlayers().containsKey(inetAddress)) {
       customDisconnect(channel, protocolVersion, alreadyQueued, encoder, handler);
       return;
     }
@@ -185,7 +185,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     // Make sure we actually have to verify the player
     final String offlineUUIDString = "OfflinePlayer:" + username;
     final UUID offlineUUID = UUID.nameUUIDFromBytes(offlineUUIDString.getBytes(StandardCharsets.UTF_8));
-    if (Sonar.get().getVerifiedPlayerController().has(inetAddress, offlineUUID)) {
+    if (Sonar.get().getVerifiedPlayerController().has(inetAddress.toString(), offlineUUID)) {
       initialLogin(ctx, loginPacket, encoder, handler);
       return;
     }
@@ -204,7 +204,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
 
     // Queue the connection for further processing
-    FALLBACK.getQueue().getQueuedPlayers().put(inetAddress, () -> {
+    FALLBACK.getQueue().getPlayers().put(inetAddress, () -> {
       // Check if the username matches the valid name regex to prevent
       // UTF-16 names or other types of exploits
       if (!Sonar.get().getConfig().getVerification().getValidNameRegex()

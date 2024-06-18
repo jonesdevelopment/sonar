@@ -17,97 +17,38 @@
 
 package xyz.jonesdev.sonar.api.verbose;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.Vector;
 
-import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
+@Getter
+public abstract class Observable {
+  protected final @NotNull Collection<UUID> subscribers = new Vector<>(0);
 
-public interface Observable {
-  Collection<UUID> getSubscribers();
+  public abstract void observe();
 
   /**
    * @param uuid UUID of the player
    * @return Whether the audience is subscribed or not
    */
-  default boolean isSubscribed(final @NotNull UUID uuid) {
+  public final boolean isSubscribed(final @NotNull UUID uuid) {
     return getSubscribers().contains(uuid);
   }
 
   /**
    * @param uuid UUID of the player
    */
-  default void subscribe(final UUID uuid) {
+  public final void subscribe(final UUID uuid) {
     getSubscribers().add(uuid);
   }
 
   /**
    * @param uuid UUID of the player
    */
-  default void unsubscribe(final UUID uuid) {
+  public final void unsubscribe(final UUID uuid) {
     getSubscribers().remove(uuid);
-  }
-
-  // TODO: Make this a bit prettier and better for performance
-  default @NotNull Component replaceStatistic(final @NotNull Component component) {
-    final SonarStatistics statistics = Sonar.get().getStatistics();
-    return component
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%queued%")
-        .replacement(DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getQueuedPlayers().size()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%verifying%")
-        .replacement(DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%blacklisted%")
-        .replacement(DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%total-joins%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getTotalPlayersJoined()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%logins-per-second%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getLoginsPerSecond()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%connections-per-second%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getConnectionsPerSecond()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%verify-total%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getTotalAttemptedVerifications()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%verify-success%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getTotalSuccessfulVerifications()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%verify-failed%")
-        .replacement(DECIMAL_FORMAT.format(statistics.getTotalFailedVerifications()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%incoming-traffic%")
-        .replacement(statistics.getCurrentIncomingBandwidthFormatted())
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%outgoing-traffic%")
-        .replacement(statistics.getCurrentOutgoingBandwidthFormatted())
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%incoming-traffic-ttl%")
-        .replacement(statistics.getTotalIncomingBandwidthFormatted())
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%outgoing-traffic-ttl%")
-        .replacement(statistics.getTotalOutgoingBandwidthFormatted())
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%used-memory%")
-        .replacement(formatMemory(getUsedMemory()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%free-memory%")
-        .replacement(formatMemory(getFreeMemory()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%total-memory%")
-        .replacement(formatMemory(getTotalMemory()))
-        .build())
-      .replaceText(TextReplacementConfig.builder().once().matchLiteral("%max-memory%")
-        .replacement(formatMemory(getMaxMemory()))
-        .build());
   }
 }

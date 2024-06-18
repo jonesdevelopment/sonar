@@ -18,6 +18,8 @@
 package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
@@ -168,9 +170,13 @@ public class FallbackPreparer {
     tooManyOnlinePerIP = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getTooManyOnlinePerIp(), true));
 
     // Prepare transfer packet
-    transferToOrigin = new FallbackPacketSnapshot(new TransferPacket(
-      Sonar.get().getConfig().getVerification().getTransfer().getHost(),
-      Sonar.get().getConfig().getVerification().getTransfer().getPort()));
+    if (Sonar.get().getConfig().getGeneralConfig().getBoolean("verification.transfer.enabled")) {
+      transferToOrigin = new FallbackPacketSnapshot(new TransferPacket(
+        Sonar.get().getConfig().getGeneralConfig().getString("verification.transfer.destination-host"),
+        Sonar.get().getConfig().getGeneralConfig().getInt("verification.transfer.destination-port")));
+    } else {
+      transferToOrigin = null;
+    }
 
     // Prepare packets for the vehicle check
     removeEntities = new FallbackPacketSnapshot(new RemoveEntitiesPacket(VEHICLE_ENTITY_ID));
@@ -180,9 +186,13 @@ public class FallbackPreparer {
       || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
       // Prepare CAPTCHA messages
       enterCodeMessage = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
-        Sonar.get().getConfig().getVerification().getMap().getEnterCode())));
+        MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("verification.captcha.enter-code"),
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())))));
       incorrectCaptcha = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
-        Sonar.get().getConfig().getVerification().getMap().getFailedCaptcha())));
+        MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("verification.captcha.incorrect"),
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())))));
 
       // Prepare countdown
       xpCountdown = new FallbackPacket[Sonar.get().getConfig().getVerification().getMap().getMaxDuration() / 1000];
@@ -194,6 +204,11 @@ public class FallbackPreparer {
 
       // Prepare CAPTCHA answers
       MAP_INFO_PREPARER.prepare();
+    } else {
+      // Throw away if not needed
+      enterCodeMessage = null;
+      incorrectCaptcha = null;
+      xpCountdown = null;
     }
   }
 }

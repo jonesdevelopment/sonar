@@ -13,262 +13,231 @@
 # Jones Development ve Sonar Katkıda Bulunanlar tarafından GPL-3.0 lisansı altında lisanslanmıştır
 #
 
-# Bu yapılandırma dosyasındaki her '%prefix%' için yer tutucu
+# Bu yapılandırma dosyasındaki her '<prefix>' için yer tutucu
 prefix: <b><yellow>Sonar</b> <gray>» <white>
-# Bu yapılandırma dosyasındaki her '%support-url%' için yer tutucu
+# Bu yapılandırma dosyasındaki her '<support-url>' için yer tutucu
 support-url: https://jonesdev.xyz/discord/
-# Bu yapılandırma dosyasındaki her '%header%' için yer tutucu
+# Bu yapılandırma dosyasındaki her '<header>' için yer tutucu
 header:
   - <b><yellow>Sonar</b><reset>
   - ''
-# Bu yapılandırma dosyasındaki her '%footer%' için yer tutucu
+# Bu yapılandırma dosyasındaki her '<footer>' için yer tutucu
 footer:
   - <gray>Bunun bir hata olduğunu düşünüyorsanız lütfen bir yönetici ile iletişime geçin.
 # Birisi bağlandığında ancak IP adresleriyle çevrimiçi olan oyuncu sayısı fazla olduğunda gösterilen bağlantı kesme mesajı
 too-many-online-per-ip:
-  - '%header%'
+  - '<header>'
   - <red>IP adresinizle çevrimiçi olan çok fazla oyuncu var.
-  - '%footer%'
+  - '<footer>'
 
 # Komutlar için çeviriler
 commands:
   # Bir oyuncu /sonar komutunu izinsiz çalıştırdığında gösterilen mesaj
-  no-permission: '%prefix%<red>Bu komutu çalıştırmak için izniniz yok.'
+  no-permission: '<prefix><red>Bu komutu çalıştırmak için izniniz yok.'
   # Birisi bir komutu yanlış kullandığında gösterilen mesaj
-  incorrect-usage: '%prefix%<red>Kullanım: /sonar %usage%'
+  incorrect-usage: '<prefix><red>Kullanım: /sonar <subcommand-usage>'
   # Birisi geçersiz bir IP adresi sağladığında gösterilen mesaj (Geçersiz format)
-  invalid-ip-address: '%prefix%Sağladığınız IP adresi geçersiz görünüyor.'
+  invalid-ip-address: '<prefix>Sağladığınız IP adresi geçersiz görünüyor.'
   # Konsol, sadece oyuncunun çalıştırabileceği bir komut çalıştırdığında gösterilen mesaj
-  player-only: '%prefix%<red>Bu komutu sadece bir oyuncu olarak çalıştırabilirsiniz.'
+  player-only: '<prefix><red>Bu komutu sadece bir oyuncu olarak çalıştırabilirsiniz.'
   # Bir oyuncu, sadece konsolun çalıştırabileceği bir komutu çalıştırdığında gösterilen mesaj
-  console-only: '%prefix%<red>Güvenlik nedeniyle, bu komutu sadece konsoldan çalıştırabilirsiniz.'
-  # Bir oyuncu Sonar komutlarını çok hızlı çalıştırdığında gösterilen mesaj
-  cool-down: '%prefix%<red>Bu komutu her 0,5 saniyede bir çalıştırabilirsiniz.'
-  cool-down-left: '%prefix%<red>Lütfen bir <bold>%time-left%sn<reset><red> daha bekleyin.'
+  console-only: '<prefix><red>Güvenlik nedeniyle, bu komutu sadece konsoldan çalıştırabilirsiniz.'
   # Bir oyuncunun belirli bir alt komutu çalıştırma izni olmadığında gösterilen mesaj
-  subcommand-no-permission: '%prefix%<red>Bu alt komutu çalıştırmak için izniniz yok. <gray>(%permission%)'
+  subcommand-no-permission: '<prefix><red>Bu alt komutu çalıştırmak için izniniz yok. <gray>(<permission>)'
 
   # '/sonar' için çeviriler
   main:
     # Ana komutu çalıştırırken her şeyin üstünde gösterilen bilgilendirici mesaj
     header:
-      - <yellow><b>Sonar</b> %version% sürümü %platform% üzerinde çalışıyor.
-      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) %copyright_year%
-        Jones Development ve Sonar Katkıda Bulunanlar</click>
+      - <yellow><b>Sonar</b> <version> sürümü <platform> üzerinde çalışıyor.
+      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development ve Sonar Katkıda Bulunanlar</click>
       - ''
       - <gray>Yardıma mı ihtiyacınız var veya sorularınız mı var?
       - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Discord\'u açmak için tıklayın)'>Discord üzerinden bir bilet açın </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(GitHub\'ı açmak için tıklayın)'>veya GitHub üzerinde yeni bir sorun açın.
       - ''
     # Ana komutu çalıştırırken gösterilen alt komutların listesi için biçimlendirme
-    subcommands: '<click:suggest_command:''/sonar %subcommand% ''><hover:show_text:''<gray>Sadece oyuncular: </gray>%only_players%<br><gray>Konsol gerekli: </gray>%require_console%<br><gray>İzin: </gray><white>%permission%<br><gray>Diğer isimler: </gray>%aliases%''><dark_aqua>
-      ▪ <gray>/sonar %subcommand%  <white>%description%'
+    subcommands: '<suggest-subcommand><hover:show_text:''<gray>Sadece oyuncular: </gray><only-players><br><gray>Konsol gerekli: </gray><only-console><br><gray>İzin: </gray><white><permission><br><gray>Diğer isimler: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description></hover></suggest-subcommand>'
 
   # '/sonar reload' için çeviriler
   reload:
     # Birisi Sonar'ı yeniden yüklemeye başladığında gösterilen mesaj
-    start: '%prefix%Sonar yeniden yükleniyor...'
+    start: '<prefix>Sonar yeniden yükleniyor...'
     # Sonar yeniden yüklendiğinde gösterilen mesaj
-    finish: '%prefix%<green>Sonar başarıyla yeniden yüklendi <gray>(%taken%ms)'
+    finish: '<prefix><green>Sonar başarıyla yeniden yüklendi <gray>(<time-taken>ms)'
 
   # '/sonar verbose' için çeviriler
   verbose:
     # Bir oyuncu Sonar detaylı bilgilerini görmeye başladığında gösterilen mesaj
-    subscribed: '%prefix%Artık Sonar detaylı bilgilerini görüntülüyorsunuz.'
+    subscribe: '<prefix>Artık Sonar detaylı bilgilerini görüntülüyorsunuz.'
     # Bir oyuncu Sonar detaylı bilgilerinden çıktığında gösterilen mesaj
-    unsubscribed: '%prefix%Artık Sonar detaylı bilgilerini görüntülemiyorsunuz.'
+    unsubscribe: '<prefix>Artık Sonar detaylı bilgilerini görüntülemiyorsunuz.'
 
   # '/sonar notify' için çeviriler
   notify:
     # Bir oyuncu Sonar saldırı bildirimlerini görmeye başladığında gösterilen mesaj
-    subscribed: '%prefix%Artık Sonar saldırı bildirimlerini görüntülüyorsunuz.'
+    subscribe: '<prefix>Artık Sonar saldırı bildirimlerini görüntülüyorsunuz.'
     # Bir oyuncu Sonar saldırı bildirimlerinden çıktığında gösterilen mesaj
-    unsubscribed: '%prefix%Artık Sonar saldırı bildirimlerini görüntülemiyorsunuz.'
+    unsubscribe: '<prefix>Artık Sonar saldırı bildirimlerini görüntülemiyorsunuz.'
 
   # '/sonar blacklist' için çeviriler
   blacklist:
     # Birisi blacklist'i temizlemeye çalıştığında ama boş olduğunda gösterilen mesaj
-    empty: '%prefix%Kara liste şu anda boş. Bu nedenle, kara listeden hiçbir IP adresi kaldırılmadı.'
+    empty: '<prefix>Kara liste şu anda boş. Bu nedenle, kara listeden hiçbir IP adresi kaldırılmadı.'
     # Birisi kara listeyi temizlediğinde gösterilen mesaj
-    cleared: '%prefix%Toplamda %removed% IP adres(ler)i başarıyla kara listeden kaldırıldı.'
+    clear: '<prefix>Toplamda <amount> IP adres(ler)i başarıyla kara listeden kaldırıldı.'
     # Birisi kara listenin boyutunu kontrol ettiğinde gösterilen mesaj
-    size: '%prefix%Kara liste şu anda %amount% IP adres(ler)i içeriyor.'
+    size: '<prefix>Kara liste şu anda <amount> IP adres(ler)i içeriyor.'
     # Birisi bir IP adresini kara listeye eklediğinde gösterilen mesaj
-    added: '%prefix%Başarıyla %ip% kara listeye eklendi.'
+    add: '<prefix>Başarıyla <ip> kara listeye eklendi.'
     # Birisi doğrulanmış olarak işaretlenmiş bir IP adresini kara listeye eklediğinde gösterilen mesaj
-    added-warning: '%prefix%<red>Uyarı: <white>%ip% şu anda beyaz listede. Potansiyel sorunları önlemek için IP adresini doğrulanmış oyuncular listesinden kaldırmayı düşünün.'
+    add-warning: '<prefix><red>Uyarı: <white><ip> şu anda beyaz listede. Potansiyel sorunları önlemek için IP adresini doğrulanmış oyuncular listesinden kaldırmayı düşünün.'
     # Birisi bir IP adresini kara listeden çıkardığında gösterilen mesaj
-    removed: '%prefix%Başarıyla %ip% kara listeden çıkarıldı.'
+    remove: '<prefix>Başarıyla <ip> kara listeden çıkarıldı.'
     # Birisi bir IP adresini kara listeye eklemeye çalıştığında ama zaten kara listede olduğunda gösterilen mesaj
-    duplicate-ip: '%prefix%Sağladığınız IP adresi zaten kara listede.'
+    ip-duplicate: '<prefix>Sağladığınız IP adresi zaten kara listede.'
     # Birisi bir IP adresini kara listeden çıkarmaya çalıştığında ama kara listede olmadığında gösterilen mesaj
-    ip-not-found: '%prefix%Sağladığınız IP adresi kara listede değil.'
+    ip-not-found: '<prefix>Sağladığınız IP adresi kara listede değil.'
 
   # '/sonar verified' için çeviriler
   verified:
     # Birisi doğrulanmış oyuncular listesini temizlemeye çalıştığında ama boş olduğunda gösterilen mesaj
-    empty: '%prefix%Doğrulanmış oyuncular listesi şu anda boş. Bu nedenle, hiçbir oyuncu doğrulanmamış olarak işaretlenmedi.'
+    empty: '<prefix>Doğrulanmış oyuncular listesi şu anda boş. Bu nedenle, hiçbir oyuncu doğrulanmamış olarak işaretlenmedi.'
     # Birisi doğrulanmış oyuncular listesini temizlediğinde gösterilen mesaj
-    cleared: '%prefix%Toplamda %removed% benzersiz oyuncu başarıyla doğrulanmamış olarak işaretlendi.'
+    clear: '<prefix>Toplamda <amount> benzersiz oyuncu başarıyla doğrulanmamış olarak işaretlendi.'
     # Birisi doğrulanmış oyuncular listesinin boyutunu kontrol ettiğinde gösterilen mesaj
-    size: '%prefix%Şu anda %amount% benzersiz oyuncu doğrulanmış.'
+    size: '<prefix>Şu anda <amount> benzersiz oyuncu doğrulanmış.'
     # Birisi bir IP adresini doğrulanmamış olarak işaretlediğinde gösterilen mesaj
-    removed: '%prefix%Başarıyla %ip% doğrulanmamış olarak işaretlendi.'
+    remove: '<prefix>Başarıyla <ip> doğrulanmamış olarak işaretlendi.'
     # Message that is shown when someone verifies an IP address
-    added: '%prefix%Successfully verified %ip%.'
+    add: '<prefix><ip> başarıyla doğrulandı.'
     # Message that is shown when someone tries to verify an IP address/UUID that are already verified
-    already: '%prefix%The IP address and UUID you provided are already verified.'
+    already: '<prefix>Sağladığınız IP adresi ve UUID zaten doğrulanmıştır.'
     # Birisi bir IP adresini doğrulanmamış olarak işaretlemeye çalıştığında ama doğrulanmamış olduğunda gösterilen mesaj
-    ip-not-found: '%prefix%Sağladığınız IP adresi doğrulanmış olarak işaretlenmemiş.'
-    # Birisi aynı IP adresini iki kez (çift işlem) doğrulanmamış olarak işaretlemeye çalıştığında gösterilen mesaj
-    blocked: '%prefix%Mevcut işlemin bitmesini bekleyin.'
+    ip-not-found: '<prefix>Sağladığınız IP adresi doğrulanmış olarak işaretlenmemiş.'
+    # Birisi bir IP adresini doğrulama geçmişine baktığında gösterilen mesaj
+    history: '<prefix><yellow><ip> için önceki UUID''ler:'
+    history-entry: ' <gray>▪ <white><uuid>'
 
   # '/sonar statistics' için çeviriler
   statistics:
     # İstatistikleri görüntülerken her şeyin üzerinde gösterilen bilgilendirme mesajı
-    header: 'Bu oturum için %type% istatistikleri gösteriliyor:'
+    header: 'Bu oturum için <statistics-type> istatistikleri gösteriliyor:'
     # Message that is shown when a player tries viewing an unknown statistic
-    unknown-type: '%prefix%<red>Bilinmeyen istatistik türü! Mevcut istatistikler: <gray>%statistics%'
+    unknown-type: '<prefix><red>Bilinmeyen istatistik türü! Mevcut istatistikler: <gray><statistics>'
     # Genel istatistik mesajının biçimi
     general:
-      - ' <dark_aqua>▪ <gray>Doğrulanmış IP adresleri: <white>%verified%'
-      - ' <dark_aqua>▪ <gray>Doğrulanan IP adresleri: <white>%verifying%'
-      - ' <dark_aqua>▪ <gray>Kara listedeki IP adresleri: <white>%blacklisted%'
-      - ' <dark_aqua>▪ <gray>Şu anda sıraya alınmış girişler: <white>%queued%'
-      - ' <dark_aqua>▪ <gray>Toplam benzersiz olmayan girişler: <white>%total_joins%'
-      - ' <dark_aqua>▪ <gray>Toplam doğrulama denemeleri: <white>%total_attempts%'
-      - ' <dark_aqua>▪ <gray>Toplam başarısız doğrulama denemesi: <white>%total_failed%'
-      - ' <dark_aqua>▪ <gray>Sunucu çalışma süresi: <white>%uptime%'
+      - ' <dark_aqua>▪ <gray>Doğrulanmış IP adresleri: <white><verified>'
+      - ' <dark_aqua>▪ <gray>Doğrulanan IP adresleri: <white><verifying>'
+      - ' <dark_aqua>▪ <gray>Kara listedeki IP adresleri: <white><blacklisted>'
+      - ' <dark_aqua>▪ <gray>Şu anda sıraya alınmış girişler: <white><queued>'
+      - ' <dark_aqua>▪ <gray>Toplam benzersiz olmayan girişler: <white><total-joins>'
+      - ' <dark_aqua>▪ <gray>Toplam doğrulama denemeleri: <white><total-attempts>'
+      - ' <dark_aqua>▪ <gray>Toplam başarısız doğrulama denemesi: <white><total-failed>'
+      - ' <dark_aqua>▪ <gray>Sunucu çalışma süresi: <white><server-uptime>'
     # İşlemci istatistik mesajının biçimi
     cpu:
-      - ' <dark_aqua>▪ <gray>Şu anda işlemci CPU kullanımı: <white>%process_cpu%%'
-      - ' <dark_aqua>▪ <gray>Şu anda sistem CPU kullanımı: <white>%system_cpu%%'
-      - ' <dark_aqua>▪ <gray>Çekirdek başına işlem CPU kullanımı: <white>%average_process_cpu%%'
-      - ' <dark_aqua>▪ <gray>Çekirdek başına sistem CPU kullanımı: <white>%average_system_cpu%%'
-      - ' <dark_aqua>▪ <gray>Genel sistem yük ortalaması: <white>%load_average%%'
-      - ' <dark_aqua>▪ <gray>Toplam sanal CPU miktarı: <white>%virtual_cores%'
+      - ' <dark_aqua>▪ <gray>Şu anda işlemci CPU kullanımı: <white><process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Şu anda sistem CPU kullanımı: <white><system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Çekirdek başına işlem CPU kullanımı: <white><average-process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Çekirdek başına sistem CPU kullanımı: <white><average-system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Toplam sanal CPU miktarı: <white><virtual-core-count>'
     # Hafıza istatistik mesajının biçimi
     memory:
-      - ' <dark_aqua>▪ <gray>Toplam boş hafıza: <white>%free_memory%'
-      - ' <dark_aqua>▪ <gray>Toplam kullanılan hafıza: <white>%used_memory%'
-      - ' <dark_aqua>▪ <gray>Toplam maksimum bellek: <white>%max_memory%'
-      - ' <dark_aqua>▪ <gray>Toplam ayrılmış bellek: <white>%total_memory%'
+      - ' <dark_aqua>▪ <gray>Toplam boş hafıza: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>Toplam kullanılan hafıza: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>Toplam maksimum bellek: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>Toplam ayrılmış bellek: <white><total-memory>'
     # İnternet istatistik mesajının biçimi
     network:
-      - ' <dark_aqua>▪ <gray>Mevcut gelen kullanılan bant genişliği: <white>%incoming%'
-      - ' <dark_aqua>▪ <gray>Mevcut giden kullanılan bant genişliği: <white>%outgoing%'
-      - ' <dark_aqua>▪ <gray>Toplam gelen kullanılan bant genişliği: <white>%ttl_incoming%'
-      - ' <dark_aqua>▪ <gray>Toplam giden kullanılan bant genişliği: <white>%ttl_outgoing%'
+      - ' <dark_aqua>▪ <gray>Mevcut gelen kullanılan bant genişliği: <white><incoming-traffic>'
+      - ' <dark_aqua>▪ <gray>Mevcut giden kullanılan bant genişliği: <white><outgoing-traffic>'
+      - ' <dark_aqua>▪ <gray>Toplam gelen kullanılan bant genişliği: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Toplam giden kullanılan bant genişliği: <white><outgoing-traffic-ttl>'
 
 # Doğrulama işlemi sırasında tüm mesajlar için çeviriler
 verification:
   # Doğrulama sırasında tüm hata ayıklama mesajları için çeviriler
   logs:
     # Sunucuya yeni bir oyuncu katıldığında konsola kaydedilen mesaj
-    connection: '%name%%ip% (%protocol%) sunucuya bağlandı.'
+    connection: '<username><ip> (<protocol>) sunucuya bağlandı.'
     # Bir oyuncu doğrulamada başarısız olduğunda konsola kaydedilen mesaj
-    failed: '%ip% (%protocol%) bot korumasında başarısız oldu: %reason%'
+    failed: '<ip> (<protocol>) bot korumasında başarısız oldu: <reason>'
     # Bir oyuncu kara listeye alındığında konsola kaydedilen mesaj
-    blacklisted: '%ip% (%protocol%) çok fazla doğrulama denemesinden dolayı kara listeye alındı'
+    blacklisted: '<ip> (<protocol>) çok fazla doğrulama denemesinden dolayı kara listeye alındı'
     # Bir oyuncu doğrulandığında konsola kaydedilen mesaj
-    successful: '%name% başarıyla doğrulandı! (%time%s).'
+    successful: '<username> başarıyla doğrulandı! (<time-taken>s).'
 
   # CAPTCHA'yı girmeleri gerektiğinde oyuncuya gösterilen mesajlar
   captcha:
     # Captcha'nın cevabını girmeleri gerektiğinde oyuncuya gösterilen mesaj
-    enter-code: '%prefix%<green>Haritada gösterilen kodu lütfen sohbete girin.'
+    enter-code: '<prefix><green>Haritada gösterilen kodu lütfen sohbete girin.'
     # Message that is shown to the player when they enter the wrong answer in chat
-    incorrect: '%prefix%<red>Yanlış kodu girdiniz. Lütfen tekrar deneyin.'
+    incorrect: '<prefix><red>Yanlış kodu girdiniz. Lütfen tekrar deneyin.'
 
   # Captcha henüz hazırlanmamışken birisi katıldığında gösterilen bağlantıyı kesme mesajı
   currently-preparing:
-    - '%header%'
+    - '<header>'
     - <yellow>Anti-bot verileriniz henüz hazır değil.
     - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
-    - '%footer%'
+    - '<footer>'
   # Doğrulama sırasında birisi çok hızlı bir şekilde yeniden katıldığında gösterilen bağlantıyı kesme mesajı
   too-fast-reconnect:
-    - '%header%'
+    - '<header>'
     - <gold>Çok hızlı yeniden bağlandın.
     - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
-    - '%footer%'
+    - '<footer>'
   # Birisi katıldığında ancak zaten doğrulama yaparken gösterilen bağlantıyı kesme mesajı
   already-verifying:
-    - '%header%'
+    - '<header>'
     - <red>IP adresiniz şu anda doğrulanıyorç
     - <red>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
-    - '%footer%'
+    - '<footer>'
   # Birisi katıldığında gösterilen ancak doğrulama için zaten sıraya alınmış olduğunda gösterilen bağlantıyı kesme mesajı
   already-queued:
-    - '%header%'
+    - '<header>'
     - <red>IP adresiniz şu an doğrulanma sırasında.
     - <red>Tekrar doğrulamayı denemeden önce lütfen birkaç dakika bekleyin.
-    - '%footer%'
+    - '<footer>'
   # Birisi katıldığında ancak geçici olarak kara listeye alındığında gösterilen bağlantıyı kesme mesajı
   blacklisted:
-    - '%header%'
+    - '<header>'
     - <red>Şu anda sunucuya girişiniz engellenmiştir.
     - <red>Sunucuya tekrar katılabilmek için lütfen birkaç dakika bekleyin.
-    - <gold>Bunun bir hata olduğunu mu düşünüyorsunuz? <gray>%support-url%
-    - '%footer%'
+    - <gold>Bunun bir hata olduğunu mu düşünüyorsunuz? <gray><support-url>
+    - '<footer>'
   # Birisi geçersiz bir kullanıcı adıyla katıldığında gösterilen bağlantıyı kesme mesajı
   invalid-username:
-    - '%header%'
+    - '<header>'
     - <red>Kullanıcı adınız geçersiz karakterler içeriyor.
-    - '%footer%'
+    - '<footer>'
   # Birisi kara listeye alınmış bir sürümle katıldığında gösterilen bağlantıyı kes mesajı
   blacklisted-protocol:
-    - '%header%'
+    - '<header>'
     - <red>Sunucumuzda izin verilmeyen bir sürüm ile giriş yapmaya çalışıyorsun.
-    - <gold>Giriş yapma hakkında yardıma mı ihtiyacın var? <gray>%support-url%
-    - '%footer%'
+    - <gold>Giriş yapma hakkında yardıma mı ihtiyacın var? <gray><support-url>
+    - '<footer>'
   # Birisi başarıyla doğrulama yaptığında gösterilen bağlantıyı kesme mesajı
   success:
-    - '%header%'
+    - '<header>'
     - <green>Doğrulamayı başarıyla geçtin.
     - <white>Yeniden bağlandığınızda artık sunucuda oynayabilirsiniz.
   # Birisi doğrulamayı başaramadığında gösterilen bağlantıyı kesme mesajı
   failed:
-    - '%header%'
+    - '<header>'
     - <red>Doğrulamayı geçemediniz.
     - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
-    - <gold>Giriş yapma hakkında yardıma mı ihtiyacın var? <gray>%support-url%
-    - '%footer%'
+    - <gold>Giriş yapma hakkında yardıma mı ihtiyacın var? <gray><support-url>
+    - '<footer>'
 
 # Sonar'ın actionbar verbose mesajları için çeviriler
 verbose:
   layout:
-    # Sonar verbose için yer tutucular
-    # Placeholders:
-    # - '%queued%' Sırada bekleyen bağlantı sayısı
-    # - '%verifying%' Doğrulanıyor olan bağlantı sayısı
-    # - '%blacklisted%' Kara listeye alınmış IP adresi sayısı
-    # - '%total-joins%' Toplam denenen katılım sayısı
-    # - '%verify-total%' Toplam doğrulama denemesi sayısı
-    # - '%verify-success%' Doğrulanmış IP adresi sayısı
-    # - '%verify-failed%' Başarısız doğrulama sayısı
-    # - '%logins-per-second%' Saniye başına giriş sayısı
-    # - '%connections-per-second%' Saniye başına bağlantı sayısı
-    # - '%attack-duration%' Şu anki bağlantının süresi
-    # - '%incoming-traffic%': Saniyedeki gelen bant genişliği kullanımı
-    # - '%outgoing-traffic%': Saniyedeki giden bant genişliği kullanımı
-    # - '%incoming-traffic-ttl%': Toplam gelen bant genişliği kullanımı
-    # - '%outgoing-traffic-ttl%': Toplam giden bant genişliği kullanımı
-    # - '%used-memory%' İşlemin kullanılan bellek miktarı
-    # - '%total-memory%' İşlemin toplam bellek miktarı
-    # - '%max-memory%' İşlemin maksimum bellek miktarı
-    # - '%free-memory%' İşlemin boş bellek miktarı
-    # - '%animation%' Özelleştirilebilir animasyonlu simge
-    # Translations for Sonar's normal verbose output
-    normal: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Girişler/sn
-      <white>%logins-per-second% <dark_aqua>╺ <gray>Doğrulama <white>%verifying% <dark_aqua>|
-      <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
-    # Layout for Sonar's actionbar verbose during an attack
-    attack: '%prefix%<gray>CPS <white>%connections-per-second% <dark_aqua>╺ <gray>Girişler/sn
-      <white>%logins-per-second% <dark_aqua>╺ <gray>Sıra <white>%queued% <dark_aqua>╺
-      <gray>Doğrulama <white>%verifying% <dark_aqua>╺ <gray>Saldırı süresi <white>%attack-duration%
-      <dark_aqua>| <green>⬆ <white>%outgoing-traffic%/s <red>⬇ <white>%incoming-traffic%/s  <green><bold>%animation%<reset>'
-  # Animation for the action bar
-  # Alternatives:
+    # Sonar'ın normal verbose çıktısı için çeviriler
+    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Girişler/sn <white><logins-per-second> <dark_aqua>╺ <gray>Doğrulama <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    # Sonar'ın normal verbose çıktısı için çeviriler bir saldırı sırasında
+    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Girişler/sn <white><logins-per-second> <dark_aqua>╺ <gray>Sıra <white><queued> <dark_aqua>╺ <gray>Doğrulama <white><verifying> <dark_aqua>╺ <gray>Saldırı süresi <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+  # Actionbar için animasyon
+  # Alternatifler:
   # - ▙, ▛, ▜, ▟
   # - ⬈, ⬊, ⬋, ⬉
   animation:
@@ -277,22 +246,21 @@ verbose:
     - ◞
     - ◟
 
-# Translations for Sonar's attack notification messages
+# Sonar'ın saldırı bildirim mesajları için çeviriler
 notifications:
-  # Layout for Sonar's attack notification title
+  # Sonar'ın saldırı bildirimi başlığı için düzen
   title: <yellow><b>Sonar<reset>
-  # Layout for Sonar's attack notification subtitle
+  # Sonar'ın saldırı bildirimi altyazısı için düzen
   subtitle: <gray>Bir bot saldırısı tespit edildi
-  # Layout for Sonar's attack notification in chat
+  # Sohbette Sonar'ın saldırı bildirimi için düzen
   chat:
     - ''
     - <yellow><b>Sonar<reset>
     - ''
     - <gray>Bir bot saldırısı tespit edildi.
-    - ' <dark_aqua>▪ <gray>Saniye başına giriş sayısı: <white>%logins-per-second%'
-    - ' <dark_aqua>▪ <gray>Doğrulanıyor olan oyuncular: <white>%verifying%'
-    - ' <dark_aqua>▪ <gray>Sırada bekleyen oyuncular: <white>%queued%'
+    - ' <dark_aqua>▪ <gray>Saniye başına giriş sayısı: <white><logins-per-second>'
+    - ' <dark_aqua>▪ <gray>Doğrulanıyor olan oyuncular: <white><verifying>'
+    - ' <dark_aqua>▪ <gray>Sırada bekleyen oyuncular: <white><queued>'
     - ''
-    - <gray>Daha fazla bilgi görmek için <white><click:run_command:'/sonar verbose'><hover:show_text:'(Çalıştırmak için tıkla)'>/sonar verbose</hover></click><gray> veya <white><click:run_command:'/sonar
-      stats'><hover:show_text:'(Çalıştırmak için tıkla)'>/sonar stats</hover></click><gray> kullanın.
+    - <gray>Daha fazla bilgi görmek için <white><click:run_command:'/sonar verbose'><hover:show_text:'(Çalıştırmak için tıkla)'>/sonar verbose</hover></click><gray> veya <white><click:run_command:'/sonar stats'><hover:show_text:'(Çalıştırmak için tıkla)'>/sonar stats</hover></click><gray> kullanın.
     - ''

@@ -53,7 +53,7 @@ public final class AttackTracker {
   public void checkIfUnderAttack() {
     final long joinsPerSecond = Sonar.get().getStatistics().getLoginsPerSecond();
     final int verifyingPlayers = Sonar.get().getFallback().getConnected().size();
-    final int queuedPlayers = Sonar.get().getFallback().getQueue().getQueuedPlayers().size();
+    final int queuedPlayers = Sonar.get().getFallback().getQueue().getPlayers().size();
     final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();
 
     if (joinsPerSecond > minPlayers // Check the number of bots/joins per second.
@@ -68,7 +68,7 @@ public final class AttackTracker {
         currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().estimatedSize();
         currentAttack.failedVerifications = Sonar.get().getStatistics().getTotalFailedVerifications();
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
-        Sonar.get().getNotificationHandler().sendAttackNotification();
+        Sonar.get().getNotificationHandler().observe();
       } else {
         // Reset attack timer if we're still under attack
         currentAttack.timer.reset();
@@ -125,16 +125,16 @@ public final class AttackTracker {
               webhook.post(() -> {
                 final SonarConfiguration.Webhook.Embed config = Sonar.get().getConfig().getWebhook().getEmbed();
                 final String description = config.getDescription()
-                  .replace("%start-timestamp%", startTimestamp)
-                  .replace("%end-timestamp%", endTimestamp)
-                  .replace("%duration%", formattedDuration)
-                  .replace("%peak-cpu%", peakCPU)
-                  .replace("%peak-memory%", peakMem)
-                  .replace("%peak-bps%", peakBPS)
-                  .replace("%peak-cps%", peakCPS)
-                  .replace("%total-blacklisted%", Sonar.DECIMAL_FORMAT.format(blacklisted))
-                  .replace("%total-failed%", Sonar.DECIMAL_FORMAT.format(failed))
-                  .replace("%total-success%", Sonar.DECIMAL_FORMAT.format(verified));
+                  .replace("<start-timestamp>", startTimestamp)
+                  .replace("<end-timestamp>", endTimestamp)
+                  .replace("<attack-duration>", formattedDuration)
+                  .replace("<peak-cpu>", peakCPU)
+                  .replace("<peak-memory>", peakMem)
+                  .replace("<peak-bps>", peakBPS)
+                  .replace("<peak-cps>", peakCPS)
+                  .replace("<total-blacklisted>", Sonar.DECIMAL_FORMAT.format(blacklisted))
+                  .replace("<total-failed>", Sonar.DECIMAL_FORMAT.format(failed))
+                  .replace("<total-success>", Sonar.DECIMAL_FORMAT.format(verified));
                 return new SonarConfiguration.Webhook.Embed(
                   config.getTitle(), config.getTitleUrl(), description, config.getR(), config.getG(), config.getB());
               });
