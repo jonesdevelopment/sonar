@@ -115,8 +115,10 @@ public abstract class SonarBootstrap<T> implements Sonar {
       return; // Do not check for updates if the launch failed
     }
 
-    // Check if a new version has been released
-    UpdateChecker.checkForUpdates();
+    // Check if a new version has been released if enabled in the configuration
+    if (Sonar.get().getConfig().getGeneralConfig().getBoolean("general.check-for-updates")) {
+      UpdateChecker.checkForUpdates();
+    }
   }
 
   public abstract void enable();

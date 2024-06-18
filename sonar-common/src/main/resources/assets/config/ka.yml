@@ -15,6 +15,9 @@
 
 # ზოგადი პარამეტრები Sonar-ისთვის
 general:
+  # Should Sonar automatically check for new updates?
+  # Sonar uses the GitHub API to check if the current version is outdated
+  check-for-updates: true
   # უნდა ჩაწეროს თუ არა Sonar-მა მოთამაშეების IP მისამართები კონსოლში?
   log-player-addresses: true
   # მაქსიმალური ერთი და იგივე IP ზე ონლაინ მოთამაშეთა რაოდენობა

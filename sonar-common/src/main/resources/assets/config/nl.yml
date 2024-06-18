@@ -15,6 +15,9 @@
 
 # Algemene instellingen voor Sonar
 general:
+  # Moet Sonar automatisch controleren op nieuwe updates?
+  # Sonar gebruikt de GitHub API om te controleren of de huidige versie verouderd is
+  check-for-updates: true
   # Moet Sonar de IP-adressen van spelers in de console registreren?
   log-player-addresses: true
   # Maximaal aantal spelers online met hetzelfde IP-adres

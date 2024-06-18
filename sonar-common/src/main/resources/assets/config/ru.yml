@@ -15,6 +15,9 @@
 
 # Основные настройки
 general:
+  # Should Sonar automatically check for new updates?
+  # Sonar uses the GitHub API to check if the current version is outdated
+  check-for-updates: true
   # Должен ли Sonar логировать IP-адреса игроков в консоли?
   log-player-addresses: true
   # Максимальное количество игроков онлайн с одного IP-адреса

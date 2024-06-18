@@ -15,6 +15,9 @@
 
 # Paramètre général de Sonar
 general:
+  # Should Sonar automatically check for new updates?
+  # Sonar uses the GitHub API to check if the current version is outdated
+  check-for-updates: true
   # Devrait Sonar enregistrer les adresses IP des joueurs dans la console ?
   log-player-addresses: true
   # Nombre maximum de joueurs en ligne avec la même IP
