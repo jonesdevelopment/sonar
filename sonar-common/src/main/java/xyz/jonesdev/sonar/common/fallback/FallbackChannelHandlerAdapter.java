@@ -64,18 +64,11 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     // Account for this by checking if the inetAddress has been set yet
     if (inetAddress != null) {
       // Remove the IP address from the connected players
-      FALLBACK.getConnected().remove(inetAddress);
+      FALLBACK.getConnected().compute(inetAddress, (key, value) -> null);
       // Remove the IP address from the queue
-      FALLBACK.getQueue().getPlayers().remove(inetAddress);
-      // Remove this account from the online players
-      // or decrement the number of accounts with the same IP
-      FALLBACK.getOnline().compute(inetAddress, (key, value) -> {
-        if (value == null || value <= 1) {
-          return null;
-        } else {
-          return value - 1;
-        }
-      });
+      FALLBACK.getQueue().getPlayers().compute(inetAddress, (key, value) -> null);
+      // Remove this account from the online players or decrement the number of accounts with the same IP
+      FALLBACK.getOnline().compute(inetAddress, (key, value) -> value == null || value <= 1 ? null : value - 1);
     }
     // Make sure to let the server handle the rest
     ctx.fireChannelInactive();
@@ -204,7 +197,7 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     }
 
     // Queue the connection for further processing
-    FALLBACK.getQueue().getPlayers().put(inetAddress, () -> {
+    FALLBACK.getQueue().getPlayers().compute(inetAddress, (key, value) -> () -> {
       // Check if the username matches the valid name regex to prevent
       // UTF-16 names or other types of exploits
       if (!Sonar.get().getConfig().getVerification().getValidNameRegex()

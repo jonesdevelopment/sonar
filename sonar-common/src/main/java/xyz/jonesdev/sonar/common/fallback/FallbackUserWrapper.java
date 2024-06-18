@@ -105,8 +105,8 @@ public final class FallbackUserWrapper implements FallbackUser {
     // Call the VerifyJoinEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(username, this));
 
-    // Mark the player as connected → verifying players
-    Sonar.get().getFallback().getConnected().put(inetAddress, (byte) 0);
+    // Mark the player as connected by caching them in a map of verifying players
+    Sonar.get().getFallback().getConnected().compute(inetAddress, (key, value) -> (byte) 0);
 
     channel.eventLoop().execute(() -> {
       // Add better timeout handler to avoid known exploits or issues
