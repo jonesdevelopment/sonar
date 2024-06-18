@@ -32,16 +32,10 @@ public final class SonarServiceManager {
   private final ScheduledExecutorService FALLBACK_QUEUE = createScheduledExecutor("sonar-queue-thread");
   private final ScheduledExecutorService STATISTICS = createScheduledExecutor("sonar-statistics-thread");
 
-  private final Thread.UncaughtExceptionHandler EXCEPTION_HANDLER = (thread, exception) -> {
-    Sonar.get().getLogger().error("[services] Uncaught exception in thread {}", thread.getName());
-    exception.printStackTrace(System.err);
-  };
-
   private @NotNull ScheduledExecutorService createScheduledExecutor(final String threadName) {
     return Executors.newSingleThreadScheduledExecutor(runnable -> {
       final Thread thread = Executors.defaultThreadFactory().newThread(runnable);
       thread.setName(threadName);
-      thread.setUncaughtExceptionHandler(EXCEPTION_HANDLER);
       thread.setDaemon(true);
       return thread;
     });
