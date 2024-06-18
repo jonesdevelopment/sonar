@@ -22,7 +22,6 @@ import lombok.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -301,16 +300,6 @@ public final class SonarConfiguration {
     verification.verificationFailed = deserializeDisconnectMessage("verification.failed");
 
     verboseAnimation = Collections.unmodifiableList(messagesConfig.getStringList("verbose.animation"));
-
-    notifications.notificationTitle = MiniMessage.miniMessage().deserialize(
-      messagesConfig.getString("notifications.title"));
-    notifications.notificationSubtitle = MiniMessage.miniMessage().deserialize(
-      messagesConfig.getString("notifications.subtitle"));
-    notifications.title = Title.title(
-      Sonar.get().getConfig().getNotifications().getNotificationTitle(),
-      Sonar.get().getConfig().getNotifications().getNotificationSubtitle());
-    notifications.notificationChat = MiniMessage.miniMessage().deserialize(
-      String.join("<newline>", messagesConfig.getStringList("notifications.chat")));
   }
 
   private @NotNull Component deserializeDisconnectMessage(final String path) {
@@ -352,8 +341,6 @@ public final class SonarConfiguration {
   private final Database database = new Database();
   @Getter
   private final Webhook webhook = new Webhook();
-  @Getter
-  private final Notifications notifications = new Notifications();
 
   @Getter
   private Component prefix;
@@ -377,15 +364,6 @@ public final class SonarConfiguration {
   private Component tooManyOnlinePerIp;
   @Getter
   private List<String> verboseAnimation;
-
-  @Getter
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static final class Notifications {
-    private Title title;
-    private Component notificationTitle;
-    private Component notificationSubtitle;
-    private Component notificationChat;
-  }
 
   @Getter
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
