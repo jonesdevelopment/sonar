@@ -143,6 +143,18 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
       return;
     }
 
+    // Check if the player is already queued since we don't want bots to flood the queue
+    if (FALLBACK.getQueue().getPlayers().containsKey(inetAddress)) {
+      customDisconnect(channel, protocolVersion, alreadyQueued, encoder, handler);
+      return;
+    }
+
+    // Check if Fallback is already verifying a player with the same IP address
+    if (FALLBACK.getConnected().containsKey(inetAddress)) {
+      customDisconnect(channel, protocolVersion, alreadyVerifying, encoder, handler);
+      return;
+    }
+
     // Don't continue the verification process if the verification is disabled
     if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
       initialLogin(ctx, loginPacket, encoder, handler);
@@ -153,18 +165,6 @@ public class FallbackChannelHandlerAdapter extends ChannelInboundHandlerAdapter 
     final boolean geyser = GeyserDetection.isGeyserConnection(channel, socketAddress);
     if (geyser && !Sonar.get().getConfig().getVerification().isCheckGeyser()) {
       initialLogin(ctx, loginPacket, encoder, handler);
-      return;
-    }
-
-    // Check if the player is already queued since we don't want bots to flood the queue
-    if (FALLBACK.getQueue().getPlayers().containsKey(inetAddress)) {
-      customDisconnect(channel, protocolVersion, alreadyQueued, encoder, handler);
-      return;
-    }
-
-    // Check if Fallback is already verifying a player with the same IP address
-    if (FALLBACK.getConnected().containsKey(inetAddress)) {
-      customDisconnect(channel, protocolVersion, alreadyVerifying, encoder, handler);
       return;
     }
 
