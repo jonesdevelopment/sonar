@@ -1,0 +1,60 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# 需要帮助吗? https://jonesdev.xyz/discord
+# 源代码: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+#
+
+# 当遭到机器人攻击时也可以将webhook消息发送到Discord服务器中.
+webhook:
+  # Discord webhook 的 URL 链接. (可能需要使用代理!)
+  url: ''
+  # Webhook 的用户名
+  username: Sonar
+  # 指向 Webhook 的头像的 URL 链接. (设置为空就是再 webhook 中设置的默认头像)
+  avatar-url: ''
+  # Webhook 中的原始消息内容 (设置为空即隐藏)
+  # 您可以使用 <@用户ID> 来提及指定的 Discord 用户
+  # 如果你想提及一整个身份组, 则可以使用 <@&组ID>.
+  content: ''
+  # 当攻击停止时向 Discord 发送的嵌入式 webhook 消息
+  embed:
+    # 页脚(位于消息底部的)消息
+    footer:
+      # 页脚消息中的文本内容
+      text: © Jones Development and Sonar Contributors
+      # 页脚消息中的图标指向的 URL 链接
+      icon-url: ''
+    # 嵌入式消息中的标题
+    title: ':white_check_mark: 已缓解攻击'
+    # 标题中可嵌入的 URL 链接
+    title-url: ''
+    # 嵌入式消息中的描述消息
+    description:
+      - 已缓解针对于您服务器的攻击.
+      - ''
+      - '检测到此次攻击的时间: <t:<start-timestamp>:T>'
+      - '此次攻击结束的时间: <t:<end-timestamp>:T>'
+      - '此次攻击的总时长: <attack-duration>'
+      - ''
+      - '攻击期间进程所使用的处理器峰值使用率: <peak-cpu>%'
+      - '攻击期间进程所使用的内存峰值: <peak-memory>'
+      - '攻击期间每秒涌入的机器人数量的峰值: <peak-bps>'
+      - ''
+      - '此次攻击期间被列入黑名单的 IP 地址数量: <total-blacklisted>'
+      - '此次攻击期间验证失败的会话: <total-failed>'
+      - '此次攻击期间通过验证的玩家数量: <total-success>'
+    # 嵌入式消息的左侧边框的颜色
+    # 颜色选取器: https://www.rapidtables.com/web/color/RGB_Color.html
+    color:
+      red: 0
+      green: 255
+      blue: 0
