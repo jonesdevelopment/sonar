@@ -20,26 +20,26 @@ general:
   check-for-updates: true
   # Soll Sonar die IP Adressen von Spielern in der Konsole anzeigen?
   log-player-addresses: true
-  # Maximale Anzahl an Spielern mit der selben IP Adresse
+  # Maximale Anzahl an Spielern mit derselben IP Adresse
   max-online-per-ip: 3
 
 # Sensitivitätseinstellungen für Angriffstracker
-# Bearbeite diese Einstellungen nur wenn du weißt was du tust!
+# Bearbeite diese Einstellungen, nur wenn du weißt, was du tust!
 attack-tracker:
   # Minimale Anzahl an neuen Spielern damit ein Angriff als solcher erkannt wird
   min-players-for-attack: 8
   # Anzahl an Millisekunden bis ein Angriff vorbei ist
   min-attack-duration: 30000
   # Anzahl an gemeldenten Vorfällen damit ein Angriff als solcher erkannt wird
-  # Diese Zahl repräsentiert einen Puffer um falsche Angriffsbenachrichtigungen zu filtern
+  # Diese Zahl repräsentiert einen Puffer, um falsche Angriffsbenachrichtigungen zu filtern
   min-attack-threshold: 2
   # Anzahl an Millisekunden die vergehen muss damit eine neue Attacke erkannt wird
   attack-cooldown-delay: 3000
 
-# Du kannst Sonar mit einer Datenbank verbinden um verifizierte Spieler zu speichern
+# Du kannst Sonar mit einer Datenbank verbinden, um verifizierte Spieler zu speichern
 # Beachte: IP adressen werden im Klartext gespeichert. Du bist für die Sicherheit der Datenbank verantwortlich
 database:
-  # Typ von Datenbank die Sonar verwenden soll um verifizierte Spielerdaten zu speichern
+  # Typ von Datenbank die Sonar verwenden soll, um verifizierte Spielerdaten zu speichern
   # Mögliche Typen: NONE, MYSQL, MARIADB
   type: NONE
   # HOST für die Authentifizierung mit der SQL Datenbank

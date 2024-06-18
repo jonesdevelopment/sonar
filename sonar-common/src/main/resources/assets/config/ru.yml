@@ -15,8 +15,8 @@
 
 # Основные настройки
 general:
-  # Should Sonar automatically check for new updates?
-  # Sonar uses the GitHub API to check if the current version is outdated
+  # Должен ли Sonar автоматически проверять наличие новых обновлений?
+  # Sonar использует API GitHub, чтобы проверить, не устарела ли текущая версия
   check-for-updates: true
   # Должен ли Sonar логировать IP-адреса игроков в консоли?
   log-player-addresses: true

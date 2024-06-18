@@ -15,8 +15,8 @@
 
 # 未归类的设置
 general:
-  # Should Sonar automatically check for new updates?
-  # Sonar uses the GitHub API to check if the current version is outdated
+  # Sonar 是否应该自动检查新的更新？
+  # Sonar 使用 GitHub API 检查当前版本是否过时
   check-for-updates: true
   # Sonar 应该在控制台中打印玩家的 IP 地址吗?
   log-player-addresses: true

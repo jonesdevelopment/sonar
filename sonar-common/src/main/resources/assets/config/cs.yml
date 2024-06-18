@@ -15,8 +15,8 @@
 
 # Obecné nastavení pro Sonar
 general:
-  # Should Sonar automatically check for new updates?
-  # Sonar uses the GitHub API to check if the current version is outdated
+  # Měl by Sonar automaticky kontrolovat nové aktualizace?
+  # Sonar používá GitHub API ke kontrole, zda je aktuální verze zastaralá.
   check-for-updates: true
   # Měl by Sonar vypisovat IP adresy hráču do konzole?
   log-player-addresses: true
