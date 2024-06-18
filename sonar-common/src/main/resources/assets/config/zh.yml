@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# 有问题或需要帮助? https://jonesdev.xyz/discord
+# 需要帮助吗? https://jonesdev.xyz/discord
 # 源代码: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
@@ -106,37 +106,38 @@ verification:
       # - NEVER: 永远不应用该检查
       timing: NEVER
       # 图像效果选项 (用于混淆自动图像识别)
-      # You should only edit this if you know what you're doing
+      # 只有当您知道您在做什么时, 才应该编辑它.
       effects:
-        # Adds random lines to the image
+        # 是否向图像添加随机线条
         scratches: true
-        # Applies a ripple filter (wavy effect)
+        # 是否应用纹波滤镜
         ripple: true
-        # Applies a bump filter (sharpened text)
+        # 是否锐化文本
         bump: true
-        # Distortion filter
+        # 失真滤镜
         distortion:
-          # Should Sonar apply a distortion filter?
+          # 是否在验证码上应用失真滤镜?
           enabled: true
-          # What shape should Sonar use for the distortion filter?
-          # Possible types: 0, 1, 2, 3
-          # - 0: Crosses
-          # - 1: Lines
-          # - 2: Circles
-          # - 3: Squares
+          # Sonar 应该应用什么形状的失真滤镜?
+          # 支持的选项: 0, 1, 2, 3
+          # - 0: 交叉
+          # - 1: 线条
+          # - 2: 圆形
+          # - 3: 方形
           shape: 2
-          # Distance between distorted pixels/objects
+          # 畸变的像素/对象之间的距离
           distance: 5
-          # Density of the distorted pixels/objects
+          # 畸变的像素/对象之间的密度
           density: 0.1
-          # Amount of blending between the colors of objects
+          # 对象与另一个对象之间的颜色的混合的量
           mix: 0.15
-      # Path to the background image Sonar uses for the CAPTCHA
-      # If the image isn't found, a noise will be used as the default background
+      # 用于当作验证码的背景的图片
+      # 如果未找到指定的图片, 则自动通过噪音生成一个随机的背景图片.
+      # 如果图片在该插件的配置文件夹下, 则可以简单地输入图片的文件名.
       background: ''
-      # Should Sonar automatically detect the background color?
-      # This is done to create a contrast between the background image and the text
-      # You can simply put the name of the file here if file is in the plugin directory
+      # Sonar 应该检测背景图片的颜色吗?
+      # 这样做是为了避免无法区分背景和验证码的颜色.
+      # 如果禁用该功能, Sonar 将会随机应用渐变的颜色.
       auto-color: false
       # Sonar 应该一次准备多少个验证码?
       precompute: 500
