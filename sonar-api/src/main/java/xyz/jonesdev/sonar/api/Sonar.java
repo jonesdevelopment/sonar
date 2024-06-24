@@ -89,7 +89,7 @@ public interface Sonar {
 
   @NotNull
   default SonarVersion getVersion() {
-    return SonarVersion.GET;
+    return SonarVersion.INSTANCE;
   }
 
   @NotNull

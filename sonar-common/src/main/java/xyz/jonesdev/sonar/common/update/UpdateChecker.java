@@ -77,13 +77,13 @@ public class UpdateChecker {
         final JsonObject json = parseJson(urlConnection);
         final String latestStableRelease = json.get("tag_name").getAsString();
         final int convertedLatestVersion = convertVersion(latestStableRelease);
-        final int convertedCurrentVersion = convertVersion(Sonar.get().getVersion().getSemanticVersion());
+        final int convertedCurrentVersion = convertVersion(Sonar.get().getVersion().getVersion());
 
         if (convertedCurrentVersion < convertedLatestVersion) {
           LOGGER.warn("A new version of Sonar is available: {}", latestStableRelease);
           LOGGER.warn("Please make sure to update to the latest version to ensure stability and security:");
           LOGGER.warn("https://github.com/jonesdevelopment/sonar/releases/tag/{}", latestStableRelease);
-        } else if (convertedCurrentVersion > convertedLatestVersion || !Sonar.get().getVersion().isOnMainBranch()) {
+        } else if (convertedCurrentVersion > convertedLatestVersion || !Sonar.get().getVersion().getGitBranch().equals("main")) {
           LOGGER.warn("You are currently using an unreleased version of Sonar!");
           LOGGER.warn("The contributors of Sonar are not responsible for any damage done by using an unstable version");
         } else {

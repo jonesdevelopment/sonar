@@ -1,13 +1,9 @@
+import net.kyori.indra.git.IndraGitExtension
+
 plugins {
   java
   alias(libs.plugins.shadow)
-  alias(libs.plugins.versioner) apply true
-}
-
-versioner {
-  pattern {
-    pattern = "$version-%h-%c-%b"
-  }
+  alias(libs.plugins.indra.git) apply true
 }
 
 allprojects {
@@ -69,10 +65,18 @@ allprojects {
 
     jar {
       manifest {
+        val indra = rootProject.extensions.getByType(IndraGitExtension::class.java)
+        val gitBranch = indra.branchName() ?: "unknown"
+        val gitCommit = indra.commit()?.name?.substring(0, 8) ?: "unknown"
+
         // Set the implementation version, so we can create exact version
         // information in-game and make it accessible to the user.
+        attributes["Implementation-Title"] = rootProject.name
         attributes["Implementation-Version"] = rootProject.version
         attributes["Implementation-Vendor"] = "Jones Development, Sonar Contributors"
+        // Include the Git branch and Git commit SHA
+        attributes["Git-Branch"] = gitBranch
+        attributes["Git-Commit"] = gitCommit
       }
     }
   }

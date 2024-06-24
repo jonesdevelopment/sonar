@@ -50,9 +50,10 @@ public final class DumpCommand extends Subcommand {
   protected void execute(final @NotNull CommandInvocation invocation) {
     final var mappings = new WeakHashMap<String, Object>();
     mappings.put("sonar", new Dump.Sonar(
-      Sonar.get().getVersion().getFull(),
+      Sonar.get().getVersion().getFormatted(),
       Sonar.get().getPlatform(),
-      Sonar.get().getVersion().isOnMainBranch()
+      Sonar.get().getVersion().getGitBranch(),
+      Sonar.get().getVersion().getGitCommit()
     ));
     mappings.put("runtime", new Dump.Runtime(
       getVirtualCores(),
@@ -82,7 +83,8 @@ public final class DumpCommand extends Subcommand {
     private static final class Sonar {
       private final String version;
       private final SonarPlatform platform;
-      private final boolean isOnMainBranch;
+      private final String gitBranch;
+      private final String gitCommit;
     }
 
     @RequiredArgsConstructor

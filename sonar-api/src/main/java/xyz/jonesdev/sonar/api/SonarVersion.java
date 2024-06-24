@@ -18,35 +18,49 @@
 package xyz.jonesdev.sonar.api;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.jar.Manifest;
 
 @Getter
 public final class SonarVersion {
-  static final SonarVersion GET = new SonarVersion();
-  private final String semanticVersion, full, formatted, commitSHA;
-  private final int build;
-  private final boolean isOnMainBranch;
+  static final SonarVersion INSTANCE = new SonarVersion();
+
+  private final String version, formatted, gitBranch, gitCommit;
 
   SonarVersion() {
-    final Package manifest = Sonar.class.getPackage();
-    final String versionString = manifest.getImplementationVersion();
+    // No need to null-check since we'll always just throw an exception if
+    // we can't find the version information in this file.
+    final Manifest manifest = getManifest();
 
-    if (versionString == null) {
-      this.full = "<could not retrieve version>";
-      this.semanticVersion = "<unknown version>";
-      this.commitSHA = "<unknown commit>";
-      this.build = -1;
-      this.isOnMainBranch = false;
-      this.formatted = full;
-      Sonar.get().getLogger().warn("Could not find version information. Is the manifest missing?");
-      return;
+    this.version = manifest.getMainAttributes().getValue("Implementation-Version");
+    this.gitBranch = manifest.getMainAttributes().getValue("Git-Branch");
+    this.gitCommit = manifest.getMainAttributes().getValue("Git-Commit");
+    this.formatted = version + " (" + gitCommit + ")";
+  }
+
+  // Taken from
+  // https://github.com/PaperMC/Velocity/pull/1336/
+  private static @NotNull Manifest getManifest() {
+    final String classLocation = "/" + Sonar.class.getName().replace(".", "/") + ".class";
+    final URL resource = Sonar.class.getResource(classLocation);
+
+    if (resource == null) {
+      throw new IllegalStateException("Could not find version information. Is the manifest missing?");
     }
 
-    this.full = versionString;
-    this.semanticVersion = versionString.split("-")[0];
-    this.commitSHA = versionString.split("-")[1];
-    this.build = Integer.parseInt(versionString.split("-")[2]);
-    this.isOnMainBranch = versionString.split("-")[3].equals("main");
-    this.formatted = semanticVersion + " build " + build + " (" + commitSHA + ")";
+    final String classFilePath = resource.toString().replace("\\", "/");
+    final String archivePath = classFilePath.substring(0, classFilePath.length() - classLocation.length());
+    final String manifestPath = archivePath + "/META-INF/MANIFEST.MF";
+
+    try (final InputStream stream = new URL(manifestPath).openStream()) {
+      return new Manifest(stream);
+    } catch (IOException exception) {
+      throw new IllegalStateException(exception);
+    }
   }
 
   @Override

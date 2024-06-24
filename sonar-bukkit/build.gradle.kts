@@ -7,7 +7,7 @@ plugins {
 bukkit {
   name = rootProject.name
   description = rootProject.description
-  version = rootProject.version.toString().split("-")[0]
+  version = rootProject.version.toString()
   main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
   authors = listOf("Jones Development", "Sonar Contributors")
   website = "https://jonesdev.xyz/discord/"

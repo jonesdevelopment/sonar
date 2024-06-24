@@ -12,7 +12,7 @@ dependencies {
 tasks {
   processResources {
     val props = mapOf(
-      "version" to rootProject.version.toString().split("-")[0],
+      "version" to rootProject.version.toString(),
       "description" to rootProject.description,
       "url" to "https://jonesdev.xyz/discord/",
       "main" to "xyz.jonesdev.sonar.velocity.SonarVelocityPlugin"
