@@ -57,9 +57,14 @@ commands:
       - ''
     # Format de la liste des sous-commandes affichée lors de l'exécution de la commande principale
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Seulement pour les joueurs : </gray><only-players><br><gray>Nécessite la console : </gray><only-console><br><gray>Permission : </gray><white><permission><br><gray>Alias : </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
+    # Formatage des valeurs oui (tick) et non (cross) dans le texte de survol des sous-commandes
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
 
   # Traductions pour '/sonar reload'
   reload:
+    # Description de cette sous-commande
+    description: "Recharger toutes les configurations"
     # Message affiché lorsque quelqu'un commence à recharger Sonar
     start: '<prefix>Rechargement de Sonar...'
     # Message affiché lorsque Sonar a fini de recharger
@@ -67,6 +72,8 @@ commands:
 
   # Traductions pour '/sonar verbose'
   verbose:
+    # Description de cette sous-commande
+    description: "Activer ou désactiver la détails verbeux"
     # Message affiché lorsqu'un joueur s'abonne aux détails verbeux de Sonar
     subscribe: '<prefix>Vous visualisez maintenant les détails verbeux de Sonar.'
     # Message affiché lorsqu'un joueur se désabonne des détails verbeux de Sonar
@@ -74,6 +81,8 @@ commands:
 
   # Traductions pour '/sonar notify'
   notify:
+    # Description de cette sous-commande
+    description: "Activer ou désactiver les notifications d'attaque"
     # Message affiché lorsqu'un joueur s'abonne aux notifications d'attaque de Sonar
     subscribed: "<prefix>Vous visualisez maintenant les notifications d'attaque de Sonar."
     # Message affiché lorsqu'un joueur se désabonne des notifications d'attaque de Sonar
@@ -81,6 +90,8 @@ commands:
 
   # Traductions pour '/sonar blacklist'
   blacklist:
+    # Description de cette sous-commande
+    description: "Gérer les adresses IP sur liste noire"
     # Message affiché lorsque quelqu'un tente de vider la liste noire mais qu'elle est vide
     empty: "<prefix>La liste noire est actuellement vide. Par conséquent, aucune adresse IP n'a été supprimée de la liste noire."
     # Message affiché lorsque quelqu'un vide la liste noire
@@ -100,6 +111,8 @@ commands:
 
   # Traductions pour '/sonar verified'
   verified:
+    # Description de cette sous-commande
+    description: "Gérer les adresses IP vérifiées"
     # Message affiché lorsque quelqu'un tente de vider la liste des joueurs vérifiés mais qu'elle est vide
     empty: "<prefix>La liste des joueurs vérifiés est actuellement vide. Par conséquent, aucun joueur n'a été désapprouvé."
     # Message affiché lorsque quelqu'un vide la liste des joueurs vérifiés
@@ -120,6 +133,8 @@ commands:
 
   # Traductions pour '/sonar statistics'
   statistics:
+    # Description de cette sous-commande
+    description: "Afficher les statistiques de session de ce serveur"
     # Message informatif affiché au-dessus de tout lors de la visualisation des statistiques
     header: '<prefix>Affichage des statistiques <statistics-type> pour cette session :'
     # Message affiché lorsqu'un joueur tente de visualiser une statistique inconnue
@@ -153,6 +168,13 @@ commands:
       - ' <dark_aqua>▪ <gray>Bande passante sortante actuelle utilisée : <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Bande passante entrante totale utilisée : <white><incoming-traffic-ttl>'
       - ' <dark_aqua>▪ <gray>Bande passante sortante totale utilisée : <white><outgoing-traffic-ttl>'
+
+  # Traductions pour '/sonar dump'
+  dump:
+    # Description de cette sous-commande
+    description: "Imprimer les informations sur le développeur"
+    # Format des informations envoyées à la console
+    log: "Informations générées : <dumped-json-data>"
 
 # Traductions pour tous les messages pendant le processus de vérification
 verification:

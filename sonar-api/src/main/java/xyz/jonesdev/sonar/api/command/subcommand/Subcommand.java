@@ -25,11 +25,9 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Getter
 public abstract class Subcommand {
@@ -37,14 +35,12 @@ public abstract class Subcommand {
   private final String permission, aliases, arguments;
 
   public Subcommand() {
-    this.info = getClass().getAnnotation(SubcommandInfo.class);
+    this.info = Objects.requireNonNull(getClass().getAnnotation(SubcommandInfo.class));
     this.permission = "sonar." + info.name();
     this.aliases = info.aliases().length == 0 ? "No aliases."
       : String.join(", ", info.aliases());
     this.arguments = info.arguments().length == 0 ? ""
-      : Arrays.stream(info.arguments())
-      .map(Argument::value)
-      .collect(Collectors.joining(", "));
+      : String.join(", ", info.arguments());
   }
 
   private static final Pattern IPv4_REGEX = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
@@ -96,6 +92,11 @@ public abstract class Subcommand {
 
     // Execute the sub command from the invocation source with the given arguments
     execute(new CommandInvocation(invocationSource, arguments));
+  }
+
+  public final @NotNull String getDescription() {
+    final String path = String.format("commands.%s.description", info.name());
+    return Objects.requireNonNull(Sonar.get().getConfig().getMessagesConfig().getString(path));
   }
 
   protected abstract void execute(final @NotNull CommandInvocation invocation);

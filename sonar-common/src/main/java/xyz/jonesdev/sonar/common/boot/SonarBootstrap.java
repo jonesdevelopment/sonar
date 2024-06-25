@@ -39,7 +39,7 @@ import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.service.SonarServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
-import xyz.jonesdev.sonar.common.subcommand.SubcommandRegistryHolder;
+import xyz.jonesdev.sonar.common.subcommands.*;
 import xyz.jonesdev.sonar.common.update.UpdateChecker;
 
 import java.io.File;
@@ -76,7 +76,16 @@ public abstract class SonarBootstrap<T> implements Sonar {
     this.verboseHandler = new Verbose();
     this.notificationHandler = new Notification();
     this.config = new SonarConfiguration(dataDirectory);
-    this.subcommandRegistry = new SubcommandRegistryHolder();
+    this.subcommandRegistry = new SubcommandRegistry();
+    // Register all subcommands
+    this.subcommandRegistry.register(
+      new BlacklistCommand(),
+      new VerifiedCommand(),
+      new StatisticsCommand(),
+      new VerboseCommand(),
+      new ReloadCommand(),
+      new DumpCommand(),
+      new NotifyCommand());
     // Hide unnecessary debug information
     Logger.setGlobalLogLevel(Level.WARNING);
   }

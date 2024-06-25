@@ -57,9 +57,14 @@ commands:
       - ''
     # Opmaak van de lijst met subcommand die wordt weergegeven bij het uitvoeren van de hoofdopdracht
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Alleen spelers: </gray><only-players><br><gray>Vereist console: </gray><only-console><br><gray>Toestemming: </gray><white><permission><br><gray>Aliassen: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
+    # Opmaak voor ja- (tick) en nee- (cross) waarden in de hover-tekst van de subcommands
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
 
   # Vertalingen voor '/sonar reload'
   reload:
+    # Beschrijving van dit subcommand
+    description: "Alle configuraties opnieuw laden"
     # Bericht dat wordt weergegeven wanneer iemand Sonar begint te herladen
     start: '<prefix>Sonar opnieuw laden...'
     # Bericht dat wordt weergegeven wanneer Sonar klaar is met herladen
@@ -67,6 +72,8 @@ commands:
 
   # Vertalingen voor '/sonar verbose'
   verbose:
+    # Beschrijving van dit subcommand
+    description: "Sonar verbose in- of uitschakelen"
     # Bericht dat wordt weergegeven wanneer een speler zich abonneert op Sonar uitgebreid
     subscribe: '<prefix>U bekijkt nu Sonar uitgebreid.'
     # Bericht dat wordt weergegeven wanneer een speler zich afmeldt voor Sonar uitgebreid
@@ -74,6 +81,8 @@ commands:
 
   # Vertalingen voor '/sonar notify'
   notify:
+    # Beschrijving van dit subcommand
+    description: "Aanval meldingen in- of uitschakelen"
     # Bericht dat wordt weergegeven wanneer een speler zich abonneert op Sonar aanval meldingen
     subscribe: '<prefix>U bekijkt nu Sonar aanval meldingen.'
     # Bericht dat wordt weergegeven wanneer een speler zich afmeldt voor Sonar aanval meldingen
@@ -81,6 +90,8 @@ commands:
 
   # Vertalingen voor '/sonar blacklist'
   blacklist:
+    # Beschrijving van dit subcommand
+    description: "Beheer IP-adressen op de zwarte lijst"
     # Bericht dat wordt weergegeven wanneer iemand de zwarte lijst probeert te wissen, maar deze leeg is
     empty: '<prefix>De zwarte lijst is momenteel leeg. Daarom waren er geen IP-adressen verwijderd van de zwarte lijst.'
     # Bericht dat wordt weergegeven wanneer iemand de zwarte lijst wist
@@ -100,6 +111,8 @@ commands:
 
   # Vertalingen voor '/sonar verified'
   verified:
+    # Beschrijving van dit subcommand
+    description: "Geverifieerde IP-adressen beheren"
     # Bericht dat wordt weergegeven wanneer iemand de lijst met geverifieerde spelers probeert te wissen, maar leeg is
     empty: '<prefix>De lijst met geverifieerde spelers is momenteel leeg. Daarom nee spelers waren niet geverifieerd.'
     # Bericht dat wordt weergegeven wanneer iemand de lijst met geverifieerde spelers wist
@@ -120,6 +133,8 @@ commands:
 
   # Vertalingen voor '/sonar statistics'
   statistics:
+    # Beschrijving van dit subcommand
+    description: "Toon sessie statistieken van deze server"
     # Informatieve boodschap die boven alles wordt getoond bij het bekijken van de statistieken
     header: '<prefix>Er worden <statistics-type> statistieken voor deze sessie weergegeven:'
     # Bericht dat wordt weergegeven wanneer een speler een onbekende statistiek probeert te bekijken
@@ -153,6 +168,13 @@ commands:
       - ' <dark_aqua>▪ <gray>Huidige uitgaande gebruikte bandbreedte: <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Totale inkomende gebruikte bandbreedte: <white><incoming-traffic-ttl>'
       - ' <dark_aqua>▪ <gray>Totale uitgaande gebruikte bandbreedte: <white><outgoing-traffic-ttl>'
+
+  # Vertalingen voor '/sonar dump
+  dump:
+    # Beschrijving van dit subcommand
+    description: "Informatie ontwikkelaar afdrukken"
+    # Formaat van de informatie die naar de console wordt gestuurd
+    log: "Informatie gegenereerd: <dumped-json-data>"
 
 # Vertalingen voor alle berichten tijdens het verificatieproces
 verification:

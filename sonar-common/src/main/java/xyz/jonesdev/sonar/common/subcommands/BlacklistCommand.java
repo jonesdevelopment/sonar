@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommand.impl;
+package xyz.jonesdev.sonar.common.subcommands;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -26,20 +26,13 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @SubcommandInfo(
   name = "blacklist",
-  description = "Manage blacklisted IP addresses",
-  arguments = {
-    @Argument("add"),
-    @Argument("remove"),
-    @Argument("clear"),
-    @Argument("size")
-  }
+  arguments = {"add", "remove", "clear", "size"}
 )
 public final class BlacklistCommand extends Subcommand {
 

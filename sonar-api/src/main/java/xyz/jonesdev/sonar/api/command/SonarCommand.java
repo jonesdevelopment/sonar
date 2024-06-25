@@ -26,10 +26,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
@@ -76,17 +74,18 @@ public interface SonarCommand {
         Placeholder.unparsed("platform", Sonar.get().getPlatform().getDisplayName()),
         Placeholder.unparsed("copyright-year", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))));
 
-      final Component yes = MiniMessage.miniMessage().deserialize("<green>✔</green>");
-      final Component no = MiniMessage.miniMessage().deserialize("<red>✗</red>");
+      final Component yes = MiniMessage.miniMessage().deserialize(
+        Sonar.get().getConfig().getMessagesConfig().getString("commands.main.tick"));
+      final Component no = MiniMessage.miniMessage().deserialize(
+        Sonar.get().getConfig().getMessagesConfig().getString("commands.main.cross"));
 
       Sonar.get().getSubcommandRegistry().getSubcommands().forEach(command -> {
         source.sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.main.subcommands"),
-          TagResolver.resolver("suggest-subcommand", (argumentQueue, context) -> {
-            return Tag.styling(ClickEvent.suggestCommand("/sonar " + command.getInfo().name()));
-          }),
+          TagResolver.resolver("suggest-subcommand",
+            (queue, context) -> Tag.styling(ClickEvent.suggestCommand("/sonar " + command.getInfo().name()))),
           Placeholder.unparsed("subcommand", command.getInfo().name()),
-          Placeholder.unparsed("description", command.getInfo().description()),
+          Placeholder.unparsed("description", command.getDescription()),
           Placeholder.unparsed("permission", command.getPermission()),
           Placeholder.unparsed("aliases", command.getAliases()),
           Placeholder.component("only-players", command.getInfo().onlyPlayers() ? yes : no),
@@ -104,12 +103,10 @@ public interface SonarCommand {
       if (subcommand.getInfo().aliases().length > 0) {
         TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
       }
-      final List<String> parsedArguments = Arrays.stream(subcommand.getInfo().arguments())
-        .map(Argument::value)
-        .collect(Collectors.toList());
-      ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), parsedArguments);
+      final List<String> arguments = Arrays.asList(subcommand.getInfo().arguments());
+      ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), arguments);
       for (final String alias : subcommand.getInfo().aliases()) {
-        ARG_TAB_SUGGESTIONS.put(alias, parsedArguments);
+        ARG_TAB_SUGGESTIONS.put(alias, arguments);
       }
     }
   }
@@ -118,8 +115,8 @@ public interface SonarCommand {
     if (arguments.length <= 1) {
       return TAB_SUGGESTIONS;
     } else if (arguments.length == 2) {
-      final String subCommandName = arguments[0].toLowerCase();
-      return ARG_TAB_SUGGESTIONS.getOrDefault(subCommandName, emptyList());
+      final String subcommandName = arguments[0].toLowerCase();
+      return ARG_TAB_SUGGESTIONS.getOrDefault(subcommandName, emptyList());
     }
     return emptyList();
   }

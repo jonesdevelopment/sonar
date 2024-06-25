@@ -57,9 +57,14 @@ commands:
       - ''
     # Ana komutu çalıştırırken gösterilen alt komutların listesi için biçimlendirme
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Sadece oyuncular: </gray><only-players><br><gray>Konsol gerekli: </gray><only-console><br><gray>İzin: </gray><white><permission><br><gray>Diğer isimler: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <suggest-subcommand><subcommand></suggest-subcommand>  <white><description></hover></suggest-subcommand>'
+    # Alt komutların üzerine gelinen metindeki evet (tick) ve hayır (cross) değerleri için biçimlendirme
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
 
   # '/sonar reload' için çeviriler
   reload:
+    # Bu alt komut için açıklama
+    description: "Tüm konfigürasyonları yeniden yükle"
     # Birisi Sonar'ı yeniden yüklemeye başladığında gösterilen mesaj
     start: '<prefix>Sonar yeniden yükleniyor...'
     # Sonar yeniden yüklendiğinde gösterilen mesaj
@@ -67,6 +72,8 @@ commands:
 
   # '/sonar verbose' için çeviriler
   verbose:
+    # Bu alt komut için açıklama
+    description: "Sonar verbose özelliğini etkinleştirme veya devre dışı bırakma"
     # Bir oyuncu Sonar detaylı bilgilerini görmeye başladığında gösterilen mesaj
     subscribe: '<prefix>Artık Sonar detaylı bilgilerini görüntülüyorsunuz.'
     # Bir oyuncu Sonar detaylı bilgilerinden çıktığında gösterilen mesaj
@@ -74,6 +81,8 @@ commands:
 
   # '/sonar notify' için çeviriler
   notify:
+    # Bu alt komut için açıklama
+    description: "Saldırı bildirimlerini etkinleştirme veya devre dışı bırakma"
     # Bir oyuncu Sonar saldırı bildirimlerini görmeye başladığında gösterilen mesaj
     subscribe: '<prefix>Artık Sonar saldırı bildirimlerini görüntülüyorsunuz.'
     # Bir oyuncu Sonar saldırı bildirimlerinden çıktığında gösterilen mesaj
@@ -81,6 +90,8 @@ commands:
 
   # '/sonar blacklist' için çeviriler
   blacklist:
+    # Bu alt komut için açıklama
+    description: "Kara listeye alınmış IP adreslerini yönetme"
     # Birisi blacklist'i temizlemeye çalıştığında ama boş olduğunda gösterilen mesaj
     empty: '<prefix>Kara liste şu anda boş. Bu nedenle, kara listeden hiçbir IP adresi kaldırılmadı.'
     # Birisi kara listeyi temizlediğinde gösterilen mesaj
@@ -100,6 +111,8 @@ commands:
 
   # '/sonar verified' için çeviriler
   verified:
+    # Bu alt komut için açıklama
+    description: "Doğrulanmış IP adreslerini yönetme"
     # Birisi doğrulanmış oyuncular listesini temizlemeye çalıştığında ama boş olduğunda gösterilen mesaj
     empty: '<prefix>Doğrulanmış oyuncular listesi şu anda boş. Bu nedenle, hiçbir oyuncu doğrulanmamış olarak işaretlenmedi.'
     # Birisi doğrulanmış oyuncular listesini temizlediğinde gösterilen mesaj
@@ -120,6 +133,8 @@ commands:
 
   # '/sonar statistics' için çeviriler
   statistics:
+    # Bu alt komut için açıklama
+    description: "Bu sunucunun oturum istatistiklerini göster"
     # İstatistikleri görüntülerken her şeyin üzerinde gösterilen bilgilendirme mesajı
     header: 'Bu oturum için <statistics-type> istatistikleri gösteriliyor:'
     # Message that is shown when a player tries viewing an unknown statistic
@@ -153,6 +168,13 @@ commands:
       - ' <dark_aqua>▪ <gray>Mevcut giden kullanılan bant genişliği: <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Toplam gelen kullanılan bant genişliği: <white><incoming-traffic-ttl>'
       - ' <dark_aqua>▪ <gray>Toplam giden kullanılan bant genişliği: <white><outgoing-traffic-ttl>'
+
+  # '/sonar dump' için çeviriler
+  dump:
+    # Bu alt komut için açıklama
+    description: "Geliştirici bilgilerini yazdır"
+    # Konsola gönderilen bilginin biçimi
+    log: "Oluşturulan döküm: <dumped-json-data>"
 
 # Doğrulama işlemi sırasında tüm mesajlar için çeviriler
 verification:

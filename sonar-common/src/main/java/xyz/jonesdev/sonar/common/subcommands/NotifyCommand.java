@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommand.impl;
+package xyz.jonesdev.sonar.common.subcommands;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -24,27 +24,26 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 @SubcommandInfo(
-  name = "reload",
-  description = "Reload all configurations"
+  name = "notify",
+  onlyPlayers = true
 )
-public final class ReloadCommand extends Subcommand {
+public final class NotifyCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
+    if (Sonar.get().getNotificationHandler().isSubscribed(invocation.getSource().getUuid())) {
+      Sonar.get().getNotificationHandler().unsubscribe(invocation.getSource().getUuid());
+      invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+        Sonar.get().getConfig().getMessagesConfig().getString("commands.notify.unsubscribe"),
+        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+      return;
+    }
+
+    Sonar.get().getNotificationHandler().subscribe(invocation.getSource().getUuid());
     invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.reload.start"),
+      Sonar.get().getConfig().getMessagesConfig().getString("commands.notify.subscribe"),
       Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
-
-    final SystemTimer timer = new SystemTimer();
-
-    Sonar.get().reload();
-
-    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.reload.finish"),
-      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-      Placeholder.unparsed("time-taken", String.valueOf(timer.delay()))));
   }
 }

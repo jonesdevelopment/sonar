@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommand.impl;
+package xyz.jonesdev.sonar.common.subcommands;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -24,7 +24,6 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
 import java.nio.charset.StandardCharsets;
@@ -32,14 +31,7 @@ import java.util.UUID;
 
 @SubcommandInfo(
   name = "verified",
-  description = "Manage verified IP addresses",
-  arguments = {
-    @Argument("history"),
-    @Argument("remove"),
-    @Argument("add"),
-    @Argument("clear"),
-    @Argument("size")
-  }
+  arguments = {"add", "remove", "clear", "size", "history"}
 )
 public final class VerifiedCommand extends Subcommand {
 

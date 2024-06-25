@@ -57,9 +57,14 @@ commands:
       - ''
     # Formatting of the list of subcommands shown when running the main command
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Only players: </gray><only-players><br><gray>Require console: </gray><only-console><br><gray>Permission: </gray><white><permission><br><gray>Aliases: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
+    # Formatting for yes (tick) and no (cross) values in the subcommands hover text
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
 
   # Translations for '/sonar reload'
   reload:
+    # Description for this subcommand
+    description: "Reload all configurations"
     # Message shown when someone starts reloading Sonar
     start: '<prefix>Reloading Sonar...'
     # Message shown when Sonar has finished reloading
@@ -67,6 +72,8 @@ commands:
 
   # Translations for '/sonar verbose'
   verbose:
+    # Description for this subcommand
+    description: "Enable or disable Sonar verbose"
     # Message shown when a player subscribes to Sonar verbose
     subscribe: '<prefix>You are now viewing Sonar verbose.'
     # Message shown when a player unsubscribes from Sonar verbose
@@ -74,6 +81,8 @@ commands:
 
   # Translations for '/sonar notify'
   notify:
+    # Description for this subcommand
+    description: "Enable or disable attack notifications"
     # Message shown when a player subscribes to Sonar attack notifications
     subscribe: '<prefix>You are now viewing Sonar attack notifications.'
     # Message shown when a player unsubscribes from Sonar attack notifications
@@ -81,6 +90,8 @@ commands:
 
   # Translations for '/sonar blacklist'
   blacklist:
+    # Description for this subcommand
+    description: "Manage blacklisted IP addresses"
     # Message shown when someone tries clearing the blacklist but is empty
     empty: '<prefix>The blacklist is currently empty. Therefore, no IP addresses were removed from the blacklist.'
     # Message shown when someone clears the blacklist
@@ -100,6 +111,8 @@ commands:
 
   # Translations for '/sonar verified'
   verified:
+    # Description for this subcommand
+    description: "Manage verified IP addresses"
     # Message shown when someone tries clearing the list of verified players but is empty
     empty: '<prefix>The list of verified players is currently empty. Therefore, no players were unverified.'
     # Message shown when someone clears the list of verified players
@@ -120,6 +133,8 @@ commands:
 
   # Translations for '/sonar statistics'
   statistics:
+    # Description for this subcommand
+    description: "Show session statistics of this server"
     # Informational message that is shown above everything when viewing the statistics
     header: '<prefix>Showing <statistics-type> statistics for this session:'
     # Message shown when a player tries viewing an unknown statistic
@@ -153,6 +168,13 @@ commands:
       - ' <dark_aqua>▪ <gray>Current outgoing used bandwidth: <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Total incoming used bandwidth: <white><incoming-traffic-ttl>'
       - ' <dark_aqua>▪ <gray>Total outgoing used bandwidth: <white><incoming-traffic-ttl>'
+
+  # Translations for '/sonar dump'
+  dump:
+    # Description for this subcommand
+    description: "Print developer information"
+    # Format of the information sent to console
+    log: "Generated dump: <dumped-json-data>"
 
 # Translations for all messages during the verification process
 verification:

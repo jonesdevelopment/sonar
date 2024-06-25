@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommand.impl;
+package xyz.jonesdev.sonar.common.subcommands;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -26,7 +26,6 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
 import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
@@ -35,12 +34,7 @@ import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
 @SubcommandInfo(
   name = "statistics",
   aliases = {"stats"},
-  description = "Show session statistics of this server",
-  arguments = {
-    @Argument("network"),
-    @Argument("memory"),
-    @Argument("cpu")
-  },
+  arguments = {"network", "memory", "cpu"},
   argumentsRequired = false
 )
 public final class StatisticsCommand extends Subcommand {

@@ -57,9 +57,14 @@ commands:
       - ''
     # 执行根命令时 对于子命令的描述.
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>只有玩家可以执行该命令: </gray><only-players><br><gray>只有控制台可以执行该命令: </gray><only-console><br><gray>需要的权限: </gray><white><permission><br><gray>别名: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
+    # 子命令悬停文本中 "是"（tick）和 "否"（cross）值的格式设置
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
 
   # 重新加载命令
   reload:
+    # 该子命令的描述
+    description: "重新加载所有配置"
     # 当有人开始重载插件时显示的消息
     start: '<prefix>正在重新加载 Sonar...'
     # 插件完成重载时显示的消息
@@ -67,6 +72,8 @@ commands:
 
   # '/sonar verbose' 命令的消息
   verbose:
+    # 该子命令的描述
+    description: "启用或禁用 Sonar 冗余"
     # 玩家订阅详细信息时显示的消息
     subscribe: '<prefix>已为您显示 Sonar 的详细信息.'
     # 玩家取消订阅详细信息时显示的消息
@@ -74,6 +81,8 @@ commands:
 
   # '/sonar notify' 命令的消息
   notify:
+    # 该子命令的描述
+    description: "启用或禁用攻击通知"
     # 玩家订阅攻击通知时显示的消息
     subscribe: '<prefix>已订阅攻击通知. 当服务器受到攻击时将会提醒您.'
     # 玩家取消订阅攻击通知时显示的消息
@@ -81,6 +90,8 @@ commands:
 
   # '/sonar blacklist' 命令的消息
   blacklist:
+    # 该子命令的描述
+    description: "管理黑名单 IP 地址"
     # 当尝试清理黑名单但黑名单中没有任何 IP 地址显示的消息
     empty: '<prefix>黑名单中没有任何 IP 地址.'
     # 当成功清理黑名单时显示的消息
@@ -100,6 +111,8 @@ commands:
 
   #  '/sonar verified' 命令的消息
   verified:
+    # 该子命令的描述
+    description: "管理已验证的 IP 地址"
     # 当尝试清除白名单但为空时显示的消息
     empty: '<prefix>白名单中没有任何玩家.'
     # 当成功清理白名单时显示的消息
@@ -120,6 +133,8 @@ commands:
 
   # '/sonar statistics' 命令的消息
   statistics:
+    # 该子命令的描述
+    description: "显示该服务器的会话统计信息"
     # 执行该命令时显示在所有输出内容(由该命令输出的消息)上方的消息
     header: '<prefix>当前会话中的 <statistics-type> 类型的统计信息:'
     # 当查看一个未知的统计信息时显示的消息
@@ -153,6 +168,13 @@ commands:
       - ' <dark_aqua>▪ <gray>当前上行: <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>下行总量: <white><incoming-traffic-ttl>'
       - ' <dark_aqua>▪ <gray>上行总量: <white><outgoing-traffic-ttl>'
+
+  # '/sonar dump' 命令的消息
+  dump:
+    # 该子命令的描述
+    description: "打印开发人员信息"
+    # 发送到控制台的信息格式
+    log: "生成信息: <dumped-json-data>"
 
 # 验证过程中所有消息的翻译
 verification:

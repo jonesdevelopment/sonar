@@ -17,8 +17,6 @@
 
 package xyz.jonesdev.sonar.api.command.subcommand;
 
-import xyz.jonesdev.sonar.api.command.subcommand.argument.Argument;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -34,11 +32,6 @@ public @interface SubcommandInfo {
   String name();
 
   /**
-   * @return Description of the subcommand
-   */
-  String description();
-
-  /**
    * @return Aliases of the subcommand
    */
   String[] aliases() default {};
@@ -46,7 +39,7 @@ public @interface SubcommandInfo {
   /**
    * @return Arguments of the subcommand
    */
-  Argument[] arguments() default {};
+  String[] arguments() default {};
 
   /**
    * @return Whether the subcommands requires arguments

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommand.impl;
+package xyz.jonesdev.sonar.common.subcommands;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,7 +38,6 @@ import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
 // the Sonar contributors to fix issues more quickly
 @SubcommandInfo(
   name = "dump",
-  description = "Print developer information",
   onlyConsole = true
 )
 public final class DumpCommand extends Subcommand {
@@ -73,7 +72,8 @@ public final class DumpCommand extends Subcommand {
       formatMemory(getFreeMemory()),
       formatMemory(getUsedMemory())
     ));
-    Sonar.get().getLogger().info("Generated dump: {}", GSON.toJson(mappings));
+    Sonar.get().getLogger().info(Sonar.get().getConfig().getMessagesConfig().getString("commands.dump.log")
+      .replace("<dumped-json-data>", GSON.toJson(mappings)));
   }
 
   @SuppressWarnings("unused")

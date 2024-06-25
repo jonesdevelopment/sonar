@@ -58,9 +58,14 @@ commands:
       - ''
     # Formatierung der Liste der Unterbefehle, die angezeigt wird, wenn der Hauptbefehl ausgeführt wird
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Nur Spieler: </gray><only-players><br><gray>Erfordert Konsole: </gray><only-console><br><gray>Berechtigung: </gray><white><permission><br><gray>Aliase: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
+    # Formatierung für Ja- (cross) und Nein- (tick) Werte in den Unterbefehlen hover Text
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
 
   # Übersetzungen für '/sonar reload'
   reload:
+    # Beschreibung für diesen Unterbefehl
+    description: "Alle Konfigurationen neu laden"
     # Nachricht, die angezeigt wird, wenn jemand mit dem Neuladen von Sonar beginnt
     start: '<prefix>Sonar wird neu geladen...'
     # Nachricht, die angezeigt wird, wenn Sonar erfolgreich neu geladen wurde
@@ -68,6 +73,8 @@ commands:
 
   # Übersetzungen für '/sonar verbose'
   verbose:
+    # Beschreibung für diesen Unterbefehl
+    description: "Aktivieren oder deaktivieren Sie Verbose-Informationen"
     # Nachricht, die angezeigt wird, wenn ein Spieler Sonar Verbose-Informationen abonniert
     subscribe: '<prefix>Du siehst jetzt Sonar Verbose-Informationen.'
     # Nachricht, die angezeigt wird, wenn ein Spieler Sonar Verbose-Informationen abbestellt
@@ -75,6 +82,8 @@ commands:
 
   # Übersetzungen für '/sonar notify'
   notify:
+    # Beschreibung für diesen Unterbefehl
+    description: "Aktivieren oder deaktivieren Sie Angriffsbenachrichtigungen"
     # Nachricht, die angezeigt wird, wenn ein Spieler Sonar Angriffsbenachrichtigungen abonniert
     subscribe: '<prefix>Du siehst jetzt Sonar Angriffsbenachrichtigungen.'
     # Nachricht, die angezeigt wird, wenn ein Spieler Sonar Angriffsbenachrichtigungen abbestellt
@@ -82,6 +91,8 @@ commands:
 
   # Übersetzungen für '/sonar blacklist'
   blacklist:
+    # Beschreibung für diesen Unterbefehl
+    description: "Verwalten von IP-Adressen auf der schwarzen Liste"
     # Nachricht, die angezeigt wird, wenn jemand versucht, die Blacklist zu leeren, aber sie leer ist
     empty: '<prefix>Die Blacklist ist derzeit leer. Daher wurden keine IP-Adressen von der Blacklist entfernt.'
     # Nachricht, die angezeigt wird, wenn jemand die Blacklist leert
@@ -101,6 +112,8 @@ commands:
 
   # Übersetzungen für '/sonar verified'
   verified:
+    # Beschreibung für diesen Unterbefehl
+    description: "Verwalten Sie verifizierte IP-Adressen"
     # Nachricht, die angezeigt wird, wenn jemand versucht, die Liste der verifizierten Spieler zu leeren, aber sie leer ist
     empty: '<prefix>Die Liste der verifizierten Spieler ist derzeit leer. Daher wurden keine Spieler unverifiziert.'
     # Nachricht, die angezeigt wird, wenn jemand die Liste der verifizierten Spieler leert
@@ -121,6 +134,8 @@ commands:
 
   # Übersetzungen für '/sonar statistics'
   statistics:
+    # Beschreibung für diesen Unterbefehl
+    description: "Sitzungsstatistiken für diesen Server anzeigen"
     # Informationsnachricht, die oben angezeigt wird, wenn die Statistiken angesehen werden
     header: '<prefix>Anzeige der <statistics-type>-Statistiken für diese Sitzung:'
     # Nachricht, die angezeigt wird, wenn ein Spieler versucht, eine unbekannte Statistik anzusehen
@@ -154,6 +169,13 @@ commands:
       - ' <dark_aqua>▪ <gray>Aktuell genutzte ausgehende Bandbreite: <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Gesamte genutzte eingehende Bandbreite: <white><incoming-traffic-ttl>'
       - ' <dark_aqua>▪ <gray>Gesamte genutzte ausgehende Bandbreite: <white><outgoing-traffic-ttl>'
+
+  # Übersetzungen für '/sonar dump'
+  dump:
+    # Beschreibung für diesen Unterbefehl
+    description: "Entwicklerinformationen ausgeben"
+    # Format der an die Konsole gesendeten Informationen
+    log: "Erstellter Dump: <dumped-json-data>"
 
 # Übersetzungen für alle Nachrichten während des Übergabeprozesses
 verification:

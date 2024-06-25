@@ -15,9 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommand.impl;
+package xyz.jonesdev.sonar.common.subcommands;
 
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jetbrains.annotations.NotNull;
@@ -25,29 +24,26 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
+import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 @SubcommandInfo(
-  name = "verbose",
-  description = "Enable or disable Sonar verbose",
-  onlyPlayers = true
+  name = "reload"
 )
-public final class VerboseCommand extends Subcommand {
+public final class ReloadCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    if (Sonar.get().getVerboseHandler().isSubscribed(invocation.getSource().getUuid())) {
-      Sonar.get().getVerboseHandler().unsubscribe(invocation.getSource().getUuid());
-      // Reset ActionBar component when unsubscribing
-      invocation.getSource().getAudience().sendActionBar(Component.empty());
-      invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
-        Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.unsubscribe"),
-        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
-      return;
-    }
-
-    Sonar.get().getVerboseHandler().subscribe(invocation.getSource().getUuid());
     invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.subscribe"),
+      Sonar.get().getConfig().getMessagesConfig().getString("commands.reload.start"),
       Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+
+    final SystemTimer timer = new SystemTimer();
+
+    Sonar.get().reload();
+
+    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+      Sonar.get().getConfig().getMessagesConfig().getString("commands.reload.finish"),
+      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+      Placeholder.unparsed("time-taken", String.valueOf(timer.delay()))));
   }
 }
