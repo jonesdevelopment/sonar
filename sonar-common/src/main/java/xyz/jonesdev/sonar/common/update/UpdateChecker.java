@@ -55,20 +55,6 @@ public class UpdateChecker {
     }
   };
 
-  private int convertVersion(final @NotNull String version) throws NumberFormatException, IllegalStateException {
-    final String[] convertedParts = version.split("\\.");
-    // Validate the length of the converted parts
-    if (convertedParts.length != 3) {
-      throw new IllegalStateException("Converted version length mismatch");
-    }
-    // Major updates are more important than minor updates,
-    // and minor updates are more important than patches.
-    final int convertedMajor = Integer.parseInt(convertedParts[0]) * 100000; // multiply by weight
-    final int convertedMinor = Integer.parseInt(convertedParts[1]) * 10000; // multiply by weight
-    final int patch = Integer.parseInt(convertedParts[2]);
-    return convertedMajor + convertedMinor + patch; // sum the converted version parts
-  }
-
   public void checkForUpdates() {
     ASYNC_EXECUTOR.execute(() -> {
       try {
@@ -89,30 +75,19 @@ public class UpdateChecker {
         } else {
           LOGGER.info("You are currently using the latest stable release of Sonar!");
         }
-      } catch (Exception exception) {
-        LOGGER.warn("Could not retrieve latest version information: {}", exception);
+      } catch (Throwable throwable) {
+        LOGGER.warn("Unable to retrieve version information: {}", throwable);
       }
     });
   }
 
   private @NotNull JsonObject parseJson(final @NotNull HttpsURLConnection urlConnection) throws IOException {
-    try (final InputStream inputStream = urlConnection.getInputStream()) {
-      try (final InputStreamReader inputStreamReader = new InputStreamReader(inputStream)) {
-        final StringBuilder content = new StringBuilder();
-
-        // Read the entire page content
-        try (final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-          String line;
-
-          while ((line = bufferedReader.readLine()) != null) {
-            content.append(line);
-          }
-        }
-
-        // Parse site content as JSON using Gson
-        final JsonParser jsonParser = new JsonParser();
-        return jsonParser.parse(content.toString()).getAsJsonObject();
-      }
+    try (final InputStream inputStream = urlConnection.getInputStream();
+         final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+         final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+      // Parse site content as JSON using Gson
+      final JsonParser jsonParser = new JsonParser();
+      return jsonParser.parse(bufferedReader).getAsJsonObject();
     }
   }
 
@@ -122,12 +97,25 @@ public class UpdateChecker {
     urlConnection.setConnectTimeout(15000);
     urlConnection.setReadTimeout(15000);
     // Set necessary properties
-    urlConnection.setRequestMethod("GET");
     urlConnection.setRequestProperty("Accept", "application/vnd.github.v3+json");
     // Only continue if the connection is a success
     if (urlConnection.getResponseCode() != 200) {
       throw new IllegalStateException("Unexpected response code " + urlConnection.getResponseCode());
     }
     return urlConnection;
+  }
+
+  private int convertVersion(final @NotNull String version) throws NumberFormatException, IllegalStateException {
+    final String[] convertedParts = version.split("\\.");
+    // Validate the length of the converted parts
+    if (convertedParts.length != 3) {
+      throw new IllegalStateException("Converted version length mismatch");
+    }
+    // Major updates are more important than minor updates,
+    // and minor updates are more important than patches.
+    final int convertedMajor = Integer.parseInt(convertedParts[0]) * 100000; // multiply by weight
+    final int convertedMinor = Integer.parseInt(convertedParts[1]) * 10000; // multiply by weight
+    final int patch = Integer.parseInt(convertedParts[2]);
+    return convertedMajor + convertedMinor + patch; // sum the converted version parts
   }
 }
