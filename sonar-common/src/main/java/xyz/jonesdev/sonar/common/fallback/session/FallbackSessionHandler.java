@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
+import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.transferToOrigin;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL_LEGACY;
@@ -70,9 +71,8 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
     // This feature was introduced by Mojang in Minecraft version 1.20.5.
     if (transferToOrigin != null
       && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
-      user.write(transferToOrigin);
-      // Close the channel to ensure that the connection is closed
-      user.getChannel().close();
+      // Send the transfer packet to the player and close the channel
+      closeWith(user.getChannel(), user.getProtocolVersion(), transferToOrigin);
     } else {
       // Disconnect player with the verification success message
       user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());
