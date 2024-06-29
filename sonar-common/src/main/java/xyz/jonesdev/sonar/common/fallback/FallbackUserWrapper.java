@@ -133,17 +133,11 @@ public final class FallbackUserWrapper implements FallbackUser {
       // The LoginSuccess packet has been sent, now we can change the registry state
       newEncoder.updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME);
 
-      try {
-        // Replace normal decoder to allow custom packets
-        final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(protocolVersion);
-        pipeline.replace(decoder, FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
-        // Listen for all incoming packets by setting the packet listener
-        fallbackPacketDecoder.setListener(new FallbackLoginSessionHandler(this, username, uuid));
-      } catch (Throwable throwable) {
-        // This rarely happens when the channel hangs and the player is still connecting
-        // I honestly have no idea how else I'm supposed to fix this
-        channel.close();
-      }
+      // Replace normal decoder to allow custom packets
+      final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(protocolVersion);
+      pipeline.replace(decoder, FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
+      // Listen for all incoming packets by setting the packet listener
+      fallbackPacketDecoder.setListener(new FallbackLoginSessionHandler(this, username, uuid));
     });
   }
 
