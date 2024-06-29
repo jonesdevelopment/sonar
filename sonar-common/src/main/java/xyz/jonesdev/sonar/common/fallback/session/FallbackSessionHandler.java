@@ -75,7 +75,7 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
       user.getChannel().close();
     } else {
       // Disconnect player with the verification success message
-      user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess(), false);
+      user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());
     }
 
     Sonar.get().getFallback().getLogger().info(

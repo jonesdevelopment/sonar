@@ -34,11 +34,11 @@ import xyz.jonesdev.sonar.common.util.ComponentHolder;
 @AllArgsConstructor
 public final class DisconnectPacket implements FallbackPacket {
   private @NotNull ComponentHolder componentHolder;
-  private boolean login;
+  private boolean duringLogin;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    componentHolder.write(byteBuf, login ? ProtocolVersion.MINECRAFT_1_20_2 : protocolVersion);
+    componentHolder.write(byteBuf, duringLogin ? ProtocolVersion.MINECRAFT_1_20_2 : protocolVersion);
   }
 
   @Override

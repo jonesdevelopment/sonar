@@ -21,7 +21,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
@@ -60,10 +59,8 @@ public interface FallbackUser {
    * using our custom Disconnect packet.
    *
    * @param reason      Disconnect message component
-   * @param duringLogin True, if the player has not joined yet
    */
-  @ApiStatus.Internal
-  void disconnect(final @NotNull Component reason, final boolean duringLogin);
+  void disconnect(final @NotNull Component reason);
 
   /**
    * Takes over the channel and begins the verification process
