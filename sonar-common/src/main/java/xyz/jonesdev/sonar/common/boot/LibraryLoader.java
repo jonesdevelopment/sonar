@@ -61,7 +61,7 @@ class LibraryLoader {
       Library.builder()
         .groupId("com{}mysql")
         .artifactId("mysql-connector-j")
-        .version("8.3.0")
+        .version("8.4.0")
         .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
         .build(),
       // MariaDB driver
