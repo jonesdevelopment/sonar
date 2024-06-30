@@ -22,10 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 public final class H2DatabaseTypeAdapter extends H2DatabaseType {
 
-  /**
-   * We need to override the default driver class name
-   * in order to use the custom relocated MySQL driver
-   */
+  // We need to override the default driver class name
+  // to use the custom relocated H2 driver
   @Override
   protected String @NotNull [] getDriverClassNames() {
     return new String[]{"xyz.jonesdev.sonar.libs.h2.Driver"};
