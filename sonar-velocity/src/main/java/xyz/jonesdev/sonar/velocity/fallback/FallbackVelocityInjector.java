@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.velocity.fallback;
 
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.network.ConnectionManager;
 import com.velocitypowered.proxy.network.ServerChannelInitializerHolder;
@@ -25,11 +24,15 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.common.fallback.injection.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
 
+import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
+
 @UtilityClass
-public class FallbackInjectionHelper {
+public class FallbackVelocityInjector {
   private final Field CONNECTION_MANAGER_FIELD;
   private final Field SERVER_CHANNEL_INITIALIZER_FIELD;
 
@@ -45,13 +48,15 @@ public class FallbackInjectionHelper {
     }
   }
 
-  public void inject(final ProxyServer proxyServer) {
+  public void inject(final Object proxyServer) {
     try {
       final ConnectionManager connectionManager = (ConnectionManager) CONNECTION_MANAGER_FIELD.get(proxyServer);
 
       // Make sure to store the original channel initializer
       final ChannelInitializer<Channel> originalInitializer = connectionManager.serverChannelInitializer.get();
-      final ChannelInitializer<Channel> fallbackInitializer = new FallbackChannelInitializer(originalInitializer);
+      final ChannelInitializer<Channel> fallbackInitializer = new FallbackInjectedChannelInitializer(
+        originalInitializer, pipeline -> pipeline.addAfter(MINECRAFT_DECODER, FALLBACK_HANDLER,
+        new FallbackVelocityChannelHandler(pipeline.channel())));
 
       // Replace the original channel initializer
       SERVER_CHANNEL_INITIALIZER_FIELD.set(connectionManager.getServerChannelInitializer(), fallbackInitializer);

@@ -35,9 +35,9 @@ import java.net.InetSocketAddress;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
 
-public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter {
+public final class FallbackBungeeChannelHandler extends FallbackChannelHandlerAdapter {
 
-  public FallbackChannelHandler(final @NotNull Channel channel) {
+  public FallbackBungeeChannelHandler(final @NotNull Channel channel) {
     super(channel);
   }
 
@@ -54,6 +54,7 @@ public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter 
 
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
+    // TODO: put this into a separate handler
     // Intercept any packets processed by BungeeCord
     if (listenForPackets && msg instanceof PacketWrapper) {
       final PacketWrapper packetWrapper = (PacketWrapper) msg;

@@ -29,14 +29,15 @@ import java.net.InetSocketAddress;
 
 import static com.velocitypowered.proxy.network.Connections.*;
 
-public final class FallbackChannelHandler extends FallbackChannelHandlerAdapter {
+public final class FallbackVelocityChannelHandler extends FallbackChannelHandlerAdapter {
 
-  public FallbackChannelHandler(final @NotNull Channel channel) {
+  public FallbackVelocityChannelHandler(final @NotNull Channel channel) {
     super(channel);
   }
 
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
+    // TODO: put this into a separate handler
     // Intercept any handshake packet by the client
     if (listenForPackets) {
       if (msg instanceof HandshakePacket handshake) {

@@ -28,7 +28,7 @@ import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackInjectionHelper;
+import xyz.jonesdev.sonar.velocity.fallback.FallbackVelocityInjector;
 
 import java.util.UUID;
 
@@ -95,7 +95,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
 
     // Make sure to inject into the server's connection handler
-    FallbackInjectionHelper.inject(getPlugin().getServer());
+    FallbackVelocityInjector.inject(getPlugin().getServer());
   }
 
   @Override

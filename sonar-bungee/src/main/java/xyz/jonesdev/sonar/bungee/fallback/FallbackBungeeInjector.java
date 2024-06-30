@@ -23,11 +23,15 @@ import lombok.experimental.UtilityClass;
 import net.md_5.bungee.netty.PipelineUtils;
 import sun.misc.Unsafe;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.common.fallback.injection.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
 
+import static net.md_5.bungee.netty.PipelineUtils.PACKET_DECODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
+
 @UtilityClass
-public class FallbackInjectionHelper {
+public class FallbackBungeeInjector {
   public void inject() {
     try {
       final Field childField = PipelineUtils.class.getField("SERVER_CHILD");
@@ -35,7 +39,9 @@ public class FallbackInjectionHelper {
 
       // Make sure to store the original channel initializer
       final ChannelInitializer<Channel> originalInitializer = PipelineUtils.SERVER_CHILD;
-      final ChannelInitializer<Channel> fallbackInitializer = new FallbackChannelInitializer(originalInitializer);
+      final ChannelInitializer<Channel> fallbackInitializer = new FallbackInjectedChannelInitializer(
+        originalInitializer, pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_HANDLER,
+        new FallbackBungeeChannelHandler(pipeline.channel())));
 
       final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
       unsafeField.setAccessible(true);

@@ -15,22 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.fallback;
+package xyz.jonesdev.sonar.common.fallback.injection;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-
-import static net.md_5.bungee.netty.PipelineUtils.PACKET_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
-public final class FallbackChannelInitializer extends ChannelInitializer<Channel> {
+public final class FallbackInjectedChannelInitializer extends ChannelInitializer<Channel> {
   private static final MethodHandle INIT_CHANNEL_METHOD;
 
   static {
@@ -43,6 +42,7 @@ public final class FallbackChannelInitializer extends ChannelInitializer<Channel
   }
 
   private final ChannelInitializer<Channel> originalChannelInitializer;
+  private final Consumer<ChannelPipeline> sonarPipelineInjector;
 
   @Override
   protected void initChannel(final Channel channel) throws Exception {
@@ -53,8 +53,9 @@ public final class FallbackChannelInitializer extends ChannelInitializer<Channel
       throw new ReflectiveOperationException(throwable);
     }
 
-    if (channel.pipeline().get(PACKET_DECODER) != null) {
-      channel.pipeline().addAfter(PACKET_DECODER, FALLBACK_HANDLER, new FallbackChannelHandler(channel));
+    // Inject Sonar's channel handler into the pipeline
+    if (channel.isActive()) {
+      sonarPipelineInjector.accept(channel.pipeline());
     }
   }
 }
