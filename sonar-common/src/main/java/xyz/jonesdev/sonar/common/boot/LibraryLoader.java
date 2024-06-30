@@ -68,7 +68,7 @@ class LibraryLoader {
       Library.builder()
         .groupId("org{}mariadb{}jdbc")
         .artifactId("mariadb-java-client")
-        .version("3.3.3")
+        .version("3.4.0")
         .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
         .build()
     );
