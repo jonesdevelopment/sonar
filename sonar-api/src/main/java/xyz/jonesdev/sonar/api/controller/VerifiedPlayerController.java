@@ -33,6 +33,7 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -81,16 +82,24 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    // Initialize MySQL/MariaDB driver
     database.getType().getDatabaseType().loadDriver();
 
     try {
-      connectionSource = new JdbcPooledConnectionSource(
-        String.format(database.getType().getConnectionString(),
-          database.getHost(), database.getPort(), database.getName()),
+      String jdbcURL = String.format(database.getType().getConnectionString(),
+        database.getHost(), database.getPort(), database.getName());
+
+      // H2 has a different JDBC URL layout
+      // https://www.codejava.net/java-se/jdbc/connect-to-h2-database-examples
+      if (cachedDatabaseType == SonarConfiguration.Database.Type.H2) {
+        final File file = new File(Sonar.get().getConfig().getPluginFolder(),
+          Sonar.get().getConfig().getDatabase().getFilename());
+        jdbcURL = String.format(database.getType().getConnectionString(), file.getAbsolutePath());
+      }
+
+      connectionSource = new JdbcPooledConnectionSource(jdbcURL,
         database.getUsername(), database.getPassword(), database.getType().getDatabaseType());
 
-      // Create table
+      // Create database table
       try {
         TableUtils.createTableIfNotExists(connectionSource, VerifiedPlayer.class);
       } catch (SQLException exception) {
@@ -126,7 +135,6 @@ public final class VerifiedPlayerController {
     // The connection source will always be null if the database type is NONE.
     if (connectionSource != null) {
       try {
-        // Properly close the connection
         connectionSource.close();
       } catch (Exception exception) {
         LOGGER.error("Error closing database: {}", exception);

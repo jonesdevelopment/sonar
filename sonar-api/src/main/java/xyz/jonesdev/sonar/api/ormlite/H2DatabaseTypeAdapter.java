@@ -17,10 +17,10 @@
 
 package xyz.jonesdev.sonar.api.ormlite;
 
-import com.j256.ormlite.jdbc.db.MysqlDatabaseType;
+import com.j256.ormlite.jdbc.db.H2DatabaseType;
 import org.jetbrains.annotations.NotNull;
 
-public final class MysqlDatabaseTypeAdapter extends MysqlDatabaseType {
+public final class H2DatabaseTypeAdapter extends H2DatabaseType {
 
   /**
    * We need to override the default driver class name
@@ -28,6 +28,6 @@ public final class MysqlDatabaseTypeAdapter extends MysqlDatabaseType {
    */
   @Override
   protected String @NotNull [] getDriverClassNames() {
-    return new String[]{"xyz.jonesdev.sonar.libs.mysql.cj.jdbc.Driver"};
+    return new String[]{"xyz.jonesdev.sonar.libs.h2.Driver"};
   }
 }

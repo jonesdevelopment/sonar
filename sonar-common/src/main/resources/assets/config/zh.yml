@@ -42,8 +42,10 @@ attack-tracker:
 # 提示: IP 地址将以纯文本形式保存 请确保您的数据库安全!
 database:
   # 要连接到的数据库类型
-  # 可用类型: NONE (不使用数据库), MYSQL, MARIADB
+  # 可用类型: NONE (不使用数据库), MYSQL, MARIADB, H2
   type: NONE
+  # Sonar 插件目录中用于 H2 数据库的文件
+  filename: verified_players
   # 数据库的地址
   host: localhost
   # 数据库的端口

@@ -25,7 +25,6 @@ public final class MariaDbDatabaseTypeAdapter extends MariaDbDatabaseType {
   /**
    * We need to override the default driver class name
    * in order to use the custom relocated MariaDB driver
-   * Read more: {@link MysqlDatabaseTypeAdapter}
    */
   @Override
   protected String @NotNull [] getDriverClassNames() {

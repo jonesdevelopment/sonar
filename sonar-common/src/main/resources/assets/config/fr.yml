@@ -42,8 +42,10 @@ attack-tracker:
 # Remarque : Les adresses IP sont enregistrées en texte brut. Vous êtes responsable de la sécurité de votre base de données !
 database:
   # Type de base de données utilisé par Sonar pour stocker les joueurs vérifiés
-  # Types possibles : NONE, MYSQL, MARIADB
+  # Types possibles : NONE, MYSQL, MARIADB, H2
   type: NONE
+  # Fichier dans le répertoire des plugins de Sonar utilisé pour la base de données H2
+  filename: verified_players
   # Adresse de l'hôte pour l'authentification avec la base de données SQL
   host: localhost
   # Port pour l'authentification avec la base de données SQL
