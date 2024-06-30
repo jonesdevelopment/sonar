@@ -42,8 +42,10 @@ attack-tracker:
 # Let op: IP-adressen worden opgeslagen in platte tekst. U bent verantwoordelijk voor het veilig houden van uw database!
 database:
   # Type database dat Sonar gebruikt om geverifieerde spelers op te slaan
-  # Mogelijke typen: NONE, MYSQL, MARIADB
+  # Mogelijke typen: NONE, MYSQL, MARIADB, H2
   type: NONE
+  # Bestand in de plugin-directory van Sonar dat wordt gebruikt voor de H2-database
+  filename: verified_players
   # Adres voor authenticatie met de SQL-database
   host: localhost
   # Poort voor authenticatie met de SQL-database

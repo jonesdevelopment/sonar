@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.api.ormlite.H2DatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.ormlite.MariaDbDatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.ormlite.MysqlDatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
@@ -45,6 +46,7 @@ import java.util.regex.Pattern;
 public final class SonarConfiguration {
   @Getter
   private final SimpleYamlConfig generalConfig, messagesConfig, webhookConfig;
+  @Getter
   private final File languageFile, pluginFolder;
 
   static final LoggerWrapper LOGGER = new LoggerWrapper() {
@@ -163,6 +165,7 @@ public final class SonarConfiguration {
 
     // Database
     database.type = Database.Type.valueOf(generalConfig.getString("database.type").toUpperCase());
+    database.filename = generalConfig.getString("database.filename");
     database.host = generalConfig.getString("database.host");
     database.port = generalConfig.getInt("database.port");
     database.name = generalConfig.getString("database.name");
@@ -486,6 +489,7 @@ public final class SonarConfiguration {
     public enum Type {
       MYSQL("jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter()),
       MARIADB("jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter()),
+      H2("jdbc:h2:file:%s", new H2DatabaseTypeAdapter()),
       NONE(null, null);
 
       private final String connectionString;
@@ -493,6 +497,7 @@ public final class SonarConfiguration {
     }
 
     private Type type;
+    private String filename;
     private String host;
     private int port;
     private String name;
