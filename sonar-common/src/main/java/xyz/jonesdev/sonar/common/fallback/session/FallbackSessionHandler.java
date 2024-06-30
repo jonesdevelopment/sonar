@@ -33,7 +33,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_5;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.transferToOrigin;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
@@ -121,22 +122,20 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
   }
 
   protected final void validateClientBrand(final byte @NotNull [] data) {
-    // No need to check for empty brands since ProtocolUtil#readBrandMessage
-    // already performs invalid string checks by default.
-    String read = new String(data, StandardCharsets.UTF_8);
-    checkState(read.length() > 1, "client brand is too short");
-    // Remove the invalid character at the beginning of the client brand
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
-      read = read.substring(1);
-    }
+    // Check if the client brand is too short. It has to have at least 2 bytes.
+    checkState(data.length > 1, "client brand is too short");
     // Check if the decoded client brand string is too long
-    checkState(read.length() < Sonar.get().getConfig().getVerification().getBrand().getMaxLength(),
-      "client brand is too long: " + read.length());
+    checkState(data.length < Sonar.get().getConfig().getVerification().getBrand().getMaxLength(),
+      "client brand contains too much data: " + data.length);
+    // Don't even ask - Minecraft 1.7 simply sends the string, but all other versions send something else
+    // This is pretty much a lazy-fix, but, hey, it works; I'm not complaining.
+    // Read more: https://discord.com/channels/923308209769426994/1116066363887321199/1256929441053933608
+    final String brand = new String(data, StandardCharsets.UTF_8).replaceFirst("\7", "");
     // Check for illegal client brands
-    checkState(!read.equals("Vanilla"), "illegal client brand: " + read);
+    checkState(!brand.equals("Vanilla"), "illegal client brand: " + brand);
     // Regex pattern for validating client brands
     final Pattern pattern = Sonar.get().getConfig().getVerification().getBrand().getValidRegex();
-    checkState(pattern.matcher(read).matches(), "client brand does not match pattern");
+    checkState(pattern.matcher(brand).matches(), "client brand does not match pattern");
   }
 
   protected final void validateClientLocale(final @NotNull String locale) {
