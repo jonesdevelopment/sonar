@@ -28,7 +28,7 @@ import xyz.jonesdev.sonar.common.fallback.injection.FallbackInjectedChannelIniti
 import java.lang.reflect.Field;
 
 import static net.md_5.bungee.netty.PipelineUtils.PACKET_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_HANDLER;
 
 @UtilityClass
 public class FallbackBungeeInjector {
@@ -39,9 +39,9 @@ public class FallbackBungeeInjector {
 
       // Make sure to store the original channel initializer
       final ChannelInitializer<Channel> originalInitializer = PipelineUtils.SERVER_CHILD;
-      final ChannelInitializer<Channel> fallbackInitializer = new FallbackInjectedChannelInitializer(
-        originalInitializer, pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_HANDLER,
-        new FallbackBungeeChannelHandler(pipeline.channel())));
+      final ChannelInitializer<Channel> injectedInitializer = new FallbackInjectedChannelInitializer(
+      originalInitializer, pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_PACKET_HANDLER,
+        new FallbackBungeePacketHandler()));
 
       final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
       unsafeField.setAccessible(true);
@@ -53,7 +53,7 @@ public class FallbackBungeeInjector {
       final long offset = unsafe.staticFieldOffset(childField);
 
       // Replace the original channel initializer
-      unsafe.putObject(base, offset, fallbackInitializer);
+      unsafe.putObject(base, offset, injectedInitializer);
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }

@@ -20,38 +20,33 @@ package xyz.jonesdev.sonar.velocity.fallback;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.protocol.packet.HandshakePacket;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginPacket;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandlerAdapter;
+import xyz.jonesdev.sonar.common.fallback.FallbackPacketHandlerAdapter;
 
 import java.net.InetSocketAddress;
 
 import static com.velocitypowered.proxy.network.Connections.*;
 
-public final class FallbackVelocityChannelHandler extends FallbackChannelHandlerAdapter {
+public final class FallbackVelocityPacketHandler extends FallbackPacketHandlerAdapter {
 
-  public FallbackVelocityChannelHandler(final @NotNull Channel channel) {
-    super(channel);
+  public FallbackVelocityPacketHandler() {
+    super(MINECRAFT_ENCODER, MINECRAFT_DECODER, HANDLER, READ_TIMEOUT);
   }
 
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
-    // TODO: put this into a separate handler
     // Intercept any handshake packet by the client
-    if (listenForPackets) {
-      if (msg instanceof HandshakePacket handshake) {
-        handleHandshake(handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
-      }
-      // Intercept any server login packet by the client
-      else if (msg instanceof ServerLoginPacket serverLogin) {
-        // Make sure to use the potentially modified, original IP
-        final MinecraftConnection minecraftConnection = (MinecraftConnection) channel.pipeline().get(HANDLER);
-        final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
-        handleLogin(ctx, serverLogin, serverLogin.getUsername(), socketAddress,
-          MINECRAFT_ENCODER, MINECRAFT_DECODER, READ_TIMEOUT, HANDLER);
-        return;
-      }
+    if (msg instanceof HandshakePacket handshake) {
+      handleHandshake(ctx.channel(), handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
+    }
+    // Intercept any server login packet by the client
+    else if (msg instanceof ServerLoginPacket serverLogin) {
+      // Make sure to use the potentially modified, original IP
+      final MinecraftConnection minecraftConnection = (MinecraftConnection) ctx.channel().pipeline().get(HANDLER);
+      final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
+      handleLogin(ctx.channel(), ctx, serverLogin, serverLogin.getUsername(), socketAddress);
+      return;
     }
     // Make sure to let the server handle the rest
     ctx.fireChannelRead(msg);

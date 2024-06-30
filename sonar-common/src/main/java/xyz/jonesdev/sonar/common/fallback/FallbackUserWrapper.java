@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.common.fallback;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.CorruptedFrameException;
 import lombok.Getter;
@@ -34,7 +33,6 @@ import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
@@ -223,51 +221,6 @@ public final class FallbackUserWrapper implements FallbackUser {
       } else {
         channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
       }
-    }
-  }
-
-  /**
-   * Disconnect the player before verification (during login)
-   * by replacing the encoder before running the method.
-   *
-   * @param packet          Disconnect packet
-   * @param encoder         Encoder to replace
-   * @param handler         Main pipeline to remove
-   * @param channel         Channel of the player
-   * @param protocolVersion Protocol version of the player
-   */
-  public static void customDisconnect(final @NotNull Channel channel,
-                                      final @NotNull ProtocolVersion protocolVersion,
-                                      final @NotNull FallbackPacket packet,
-                                      final @NotNull String encoder,
-                                      final @NotNull String handler) {
-    if (channel.eventLoop().inEventLoop()) {
-      _customDisconnect(channel, protocolVersion, packet, encoder, handler);
-    } else {
-      channel.eventLoop().execute(() -> _customDisconnect(channel, protocolVersion, packet, encoder, handler));
-    }
-  }
-
-  private static void _customDisconnect(final @NotNull Channel channel,
-                                        final @NotNull ProtocolVersion protocolVersion,
-                                        final @NotNull FallbackPacket packet,
-                                        final @NotNull String encoder,
-                                        final @NotNull String boss) {
-    // Remove the main pipeline to completely take over the channel
-    if (channel.pipeline().context(boss) != null) {
-      channel.pipeline().remove(boss);
-    }
-    final ChannelHandler currentEncoder = channel.pipeline().get(encoder);
-    // Close the channel if no decoder exists
-    if (currentEncoder != null) {
-      // We don't need to update the encoder if it's already present
-      if (!(currentEncoder instanceof FallbackPacketEncoder)) {
-        final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
-        channel.pipeline().replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
-      }
-      closeWith(channel, protocolVersion, packet);
-    } else {
-      channel.close();
     }
   }
 }

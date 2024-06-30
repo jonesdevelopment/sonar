@@ -22,11 +22,14 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandler;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.function.Consumer;
+
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INBOUND_HANDLER;
 
 @RequiredArgsConstructor
 public final class FallbackInjectedChannelInitializer extends ChannelInitializer<Channel> {
@@ -55,7 +58,7 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
 
     // Inject Sonar's channel handler into the pipeline
     if (channel.isActive()) {
-      sonarPipelineInjector.accept(channel.pipeline());
+      channel.pipeline().addFirst(FALLBACK_INBOUND_HANDLER, new FallbackInboundHandler(sonarPipelineInjector));
     }
   }
 }

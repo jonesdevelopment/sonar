@@ -27,7 +27,7 @@ import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
-import xyz.jonesdev.sonar.common.fallback.FallbackChannelHandlerAdapter;
+import xyz.jonesdev.sonar.common.fallback.FallbackPacketHandlerAdapter;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -35,12 +35,7 @@ import java.net.InetSocketAddress;
 
 import static net.md_5.bungee.netty.PipelineUtils.*;
 
-public final class FallbackBungeeChannelHandler extends FallbackChannelHandlerAdapter {
-
-  public FallbackBungeeChannelHandler(final @NotNull Channel channel) {
-    super(channel);
-  }
-
+public final class FallbackBungeePacketHandler extends FallbackPacketHandlerAdapter {
   private static final MethodHandle CHANNEL_WRAPPER_GETTER;
 
   static {
@@ -52,19 +47,23 @@ public final class FallbackBungeeChannelHandler extends FallbackChannelHandlerAd
     }
   }
 
+  public FallbackBungeePacketHandler() {
+    super(PACKET_ENCODER, PACKET_DECODER, BOSS_HANDLER, TIMEOUT_HANDLER);
+  }
+
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
-    // TODO: put this into a separate handler
     // Intercept any packets processed by BungeeCord
-    if (listenForPackets && msg instanceof PacketWrapper) {
+    if (msg instanceof PacketWrapper) {
       final PacketWrapper packetWrapper = (PacketWrapper) msg;
       final DefinedPacket wrappedPacket = packetWrapper.packet;
       // Don't handle any invalid packets
       if (wrappedPacket != null) {
+        final Channel channel = ctx.channel();
         // Intercept any handshake packet by the client
         if (wrappedPacket instanceof Handshake) {
           final Handshake handshake = (Handshake) wrappedPacket;
-          handleHandshake(handshake.getHost(), handshake.getProtocolVersion());
+          handleHandshake(channel, handshake.getHost(), handshake.getProtocolVersion());
         }
         // Intercept any server login packet by the client
         else if (wrappedPacket instanceof LoginRequest) {
@@ -78,8 +77,7 @@ public final class FallbackBungeeChannelHandler extends FallbackChannelHandlerAd
             throw new ReflectiveOperationException(throwable);
           }
           final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
-          handleLogin(ctx, msg, loginRequest.getData(), socketAddress,
-            PACKET_ENCODER, PACKET_DECODER, TIMEOUT_HANDLER, BOSS_HANDLER);
+          handleLogin(channel, ctx, msg, loginRequest.getData(), socketAddress);
           packetWrapper.trySingleRelease();
           return;
         }
