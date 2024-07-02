@@ -1,0 +1,60 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Butuh bantuan atau punya pertanyaan? https://jonesdev.xyz/discord
+# Kode sumber: https://github.com/jonesdevelopment/sonar
+# Hak cipta Jones Development dan Kontributor Sonar, dilisensikan di bawah GPL-3.0
+#
+
+# Notifikasi serangan bot juga dapat dikirim ke server Discord Anda menggunakan webhook
+webhook:
+  # URL dari webhook Discord (Atur ini ke '' untuk menonaktifkan webhook)
+  url: ''
+  # Nama pengguna pengirim webhook Discord
+  username: Sonar
+  # URL avatar pengirim webhook Discord (Atur ini ke '' untuk menonaktifkan)
+  avatar-url: ''
+  # Konten pesan webhook Discord (Atur ini ke '' untuk menonaktifkan)
+  # Anda dapat menggunakan ini untuk misalnya memberi ping ke anggota staf menggunakan <@userId>
+  # Jika Anda ingin memberi ping ke peran, Anda harus menggunakan <@&roleId>
+  content: ''
+  # Pesan embed webhook Discord yang dikirim ketika serangan telah berhenti
+  embed:
+    # Pesan footer kecil dari embed webhook Discord
+    footer:
+      # Konten pesan footer dari embed webhook Discord
+      text: © Jones Development dan Kontributor Sonar
+      # URL ikon pesan footer dari embed webhook Discord
+      icon-url: ''
+    # Judul dari embed webhook Discord
+    title: '✅ Serangan berhasil diatasi'
+    # URL yang dapat diklik dari judul embed webhook Discord
+    title-url: ''
+    # Deskripsi (konten) dari embed webhook Discord
+    description:
+      - Serangan pada server Anda telah berhasil diatasi.
+      - ''
+      - 'Mulai serangan: <t:<start-timestamp>:T>'
+      - 'Akhir serangan: <t:<end-timestamp>:T>'
+      - 'Durasi serangan: <attack-duration>'
+      - ''
+      - 'Penggunaan CPU proses puncak selama serangan: <peak-cpu>%'
+      - 'Penggunaan memori proses puncak selama serangan: <peak-memory>'
+      - 'Bot per detik puncak selama serangan: <peak-bps>'
+      - ''
+      - 'Alamat IP yang masuk daftar hitam selama serangan: <total-blacklisted>'
+      - 'Verifikasi yang gagal selama serangan: <total-failed>'
+      - 'Verifikasi yang berhasil selama serangan: <total-success>'
+    # Warna RGB dari embed webhook Discord
+    # Pemilih warna: https://www.rapidtables.com/web/color/RGB_Color.html
+    color:
+      red: 0
+      green: 255
+      blue: 0
