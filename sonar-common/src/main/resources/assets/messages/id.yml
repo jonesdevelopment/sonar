@@ -1,0 +1,288 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Butuh bantuan atau memiliki pertanyaan? https://jonesdev.xyz/discord
+# Kode sumber: https://github.com/jonesdevelopment/sonar
+# Hak cipta Jones Development dan Kontributor Sonar, dilisensikan di bawah GPL-3.0
+#
+
+# Placeholder untuk setiap '<prefix>' dalam file konfigurasi ini
+prefix: <b><yellow>Sonar</b> <gray>» <white>
+# Placeholder untuk setiap '<support-url>' dalam file konfigurasi ini
+support-url: https://jonesdev.xyz/discord/
+# Placeholder untuk setiap '<header>' dalam file konfigurasi ini
+header:
+  - <b><yellow>Sonar</b><reset>
+  - ''
+# Placeholder untuk setiap '<footer>' dalam file konfigurasi ini
+footer:
+  - <gray>Jika Anda yakin ini adalah kesalahan, hubungi administrator.
+# Pesan pemutusan yang ditampilkan saat seseorang bergabung, tetapi ada terlalu banyak pemain online dengan alamat IP mereka
+too-many-online-per-ip:
+  - '<header>'
+  - <red>Ada terlalu banyak pemain online dengan alamat IP Anda.
+  - '<footer>'
+
+# Terjemahan untuk perintah
+commands:
+  # Pesan yang ditampilkan saat pemain mencoba menjalankan /sonar tanpa izin
+  no-permission: '<prefix><red>Anda tidak memiliki izin untuk menjalankan perintah ini.'
+  # Pesan yang ditampilkan saat seseorang menggunakan perintah dengan salah
+  incorrect-usage: '<prefix><red>Penggunaan: /sonar <subcommand-usage>'
+  # Pesan yang ditampilkan saat seseorang memberikan alamat IP yang tidak valid (Format tidak valid)
+  invalid-ip-address: '<prefix>Alamat IP yang Anda berikan tampaknya tidak valid.'
+  # Pesan yang ditampilkan saat konsol menjalankan perintah yang hanya untuk pemain
+  player-only: '<prefix><red>Anda hanya dapat menjalankan perintah ini sebagai pemain.'
+  # Pesan yang ditampilkan saat pemain menjalankan perintah yang hanya untuk konsol
+  console-only: '<prefix><red>Demi alasan keamanan, Anda hanya dapat menjalankan perintah ini melalui konsol.'
+  # Pesan yang ditampilkan saat pemain tidak memiliki izin untuk menjalankan sub-perintah tertentu
+  subcommand-no-permission: '<prefix><red>Anda tidak memiliki izin untuk menjalankan sub-perintah ini. <gray>(<permission>)'
+
+  # Terjemahan untuk '/sonar'
+  main:
+    # Pesan informasi yang ditampilkan di atas segalanya saat menjalankan perintah utama
+    header:
+      - <yellow>Menjalankan <b>Sonar</b> <version> di <platform>.
+      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development dan Kontributor Sonar</click>
+      - ''
+      - <gray>Butuh bantuan atau memiliki pertanyaan?
+      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klik untuk membuka Discord)'>Buka tiket di Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik untuk membuka GitHub)'>atau buka masalah baru di GitHub.
+      - ''
+    # Format daftar sub-perintah yang ditampilkan saat menjalankan perintah utama
+    subcommands: '<suggest-subcommand><hover:show_text:''<gray>Hanya pemain: </gray><only-players><br><gray>Membutuhkan konsol: </gray><only-console><br><gray>Izin: </gray><white><permission><br><gray>Alias: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
+    # Format untuk nilai ya (centang) dan tidak (silang) dalam teks hover sub-perintah
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
+
+  # Terjemahan untuk '/sonar reload'
+  reload:
+    # Deskripsi untuk sub-perintah ini
+    description: "Muat ulang semua konfigurasi"
+    # Pesan yang ditampilkan saat seseorang mulai memuat ulang Sonar
+    start: '<prefix>Memuat ulang Sonar...'
+    # Pesan yang ditampilkan saat Sonar selesai memuat ulang
+    finish: '<prefix><green>Berhasil memuat ulang <gray>(<time-taken>ms)'
+
+  # Terjemahan untuk '/sonar verbose'
+  verbose:
+    # Deskripsi untuk sub-perintah ini
+    description: "Aktifkan atau nonaktifkan verbose Sonar"
+    # Pesan yang ditampilkan saat pemain berlangganan verbose Sonar
+    subscribe: '<prefix>Anda sekarang melihat verbose Sonar.'
+    # Pesan yang ditampilkan saat pemain berhenti berlangganan verbose Sonar
+    unsubscribe: '<prefix>Anda tidak lagi melihat verbose Sonar.'
+
+  # Terjemahan untuk '/sonar notify'
+  notify:
+    # Deskripsi untuk sub-perintah ini
+    description: "Aktifkan atau nonaktifkan notifikasi serangan"
+    # Pesan yang ditampilkan saat pemain berlangganan notifikasi serangan Sonar
+    subscribe: '<prefix>Anda sekarang melihat notifikasi serangan Sonar.'
+    # Pesan yang ditampilkan saat pemain berhenti berlangganan notifikasi serangan Sonar
+    unsubscribe: '<prefix>Anda tidak lagi melihat notifikasi serangan Sonar.'
+
+  # Terjemahan untuk '/sonar blacklist'
+  blacklist:
+    # Deskripsi untuk sub-perintah ini
+    description: "Kelola alamat IP yang masuk daftar hitam"
+    # Pesan yang ditampilkan saat seseorang mencoba mengosongkan daftar hitam tetapi kosong
+    empty: '<prefix>Daftar hitam saat ini kosong. Oleh karena itu, tidak ada alamat IP yang dihapus dari daftar hitam.'
+    # Pesan yang ditampilkan saat seseorang mengosongkan daftar hitam
+    clear: '<prefix>Anda berhasil menghapus total <amount> alamat IP dari daftar hitam.'
+    # Pesan yang ditampilkan saat seseorang memeriksa ukuran daftar hitam
+    size: '<prefix>Daftar hitam saat ini berisi <amount> alamat IP.'
+    # Pesan yang ditampilkan saat seseorang menghapus alamat IP dari daftar hitam
+    remove: '<prefix>Berhasil menghapus <ip> dari daftar hitam.'
+    # Pesan yang ditampilkan saat seseorang menambahkan alamat IP ke daftar hitam
+    add: '<prefix>Berhasil menambahkan <ip> ke daftar hitam.'
+    # Pesan yang ditampilkan saat seseorang menambahkan alamat IP ke daftar hitam yang diverifikasi
+    add-warning: '<prefix><red>Peringatan: <white><ip> saat ini di daftar putih. Pertimbangkan untuk menghapus alamat IP dari daftar pemain yang diverifikasi untuk menghindari masalah potensial.'
+    # Pesan yang ditampilkan saat seseorang menambahkan alamat IP ke daftar hitam, tetapi sudah masuk daftar hitam
+    ip-duplicate: '<prefix>Alamat IP yang Anda berikan sudah masuk daftar hitam.'
+    # Pesan yang ditampilkan saat seseorang menghapus alamat IP dari daftar hitam, tetapi tidak masuk daftar hitam
+    ip-not-found: '<prefix>Alamat IP yang Anda berikan tidak masuk daftar hitam.'
+
+  # Translations for '/sonar verified'
+  verified:
+    # Deskripsi untuk sub-perintah ini
+    description: "Kelola alamat IP yang diverifikasi"
+    # Pesan yang ditampilkan saat seseorang mencoba mengosongkan daftar pemain yang diverifikasi tetapi kosong
+    empty: '<prefix>Daftar pemain yang diverifikasi saat ini kosong. Oleh karena itu, tidak ada pemain yang dibatalkan verifikasinya.'
+    # Pesan yang ditampilkan saat seseorang mengosongkan daftar pemain yang diverifikasi
+    clear: '<prefix>Anda berhasil membatalkan verifikasi total <amount> pemain unik.'
+    # Pesan yang ditampilkan saat seseorang memeriksa ukuran daftar pemain yang diverifikasi
+    size: '<prefix>Saat ini ada <amount> pemain unik yang diverifikasi.'
+    # Pesan yang ditampilkan saat seseorang membatalkan verifikasi alamat IP
+    remove: '<prefix>Berhasil membatalkan verifikasi <ip>.'
+    # Pesan yang ditampilkan saat seseorang memverifikasi alamat IP
+    add: '<prefix>Berhasil memverifikasi <ip>.'
+    # Pesan yang ditampilkan saat seseorang mencoba memverifikasi alamat IP/UUID yang sudah diverifikasi
+    already: '<prefix>Alamat IP dan UUID yang Anda berikan sudah diverifikasi.'
+    # Pesan yang ditampilkan saat seseorang membatalkan verifikasi alamat IP, tetapi tidak diverifikasi
+    ip-not-found: '<prefix>Alamat IP yang Anda berikan tidak diverifikasi.'
+    # Pesan yang ditampilkan saat seseorang melihat riwayat verifikasi alamat IP
+    history: '<prefix><yellow>UUID sebelumnya untuk <ip>:'
+    history-entry: ' <gray>▪ <white><uuid>'
+
+  # Terjemahan untuk '/sonar statistics'
+  statistics:
+    # Deskripsi untuk sub-perintah ini
+    description: "Tampilkan statistik sesi server ini"
+    # Pesan informasi yang ditampilkan di atas segalanya saat melihat statistik
+    header: '<prefix>Menampilkan statistik <statistics-type> untuk sesi ini:'
+    # Pesan yang ditampilkan saat pemain mencoba melihat statistik yang tidak dikenal
+    unknown-type: '<prefix><red>Tipe statistik tidak dikenal! Statistik yang tersedia: <gray><statistics>'
+    # Format pesan statistik umum
+    general:
+      - ' <dark_aqua>▪ <gray>Alamat IP yang diverifikasi: <white><verified>'
+      - ' <dark_aqua>▪ <gray>Memverifikasi alamat IP: <white><verifying>'
+      - ' <dark_aqua>▪ <gray>Alamat IP yang masuk daftar hitam: <white><blacklisted>'
+      - ' <dark_aqua>▪ <gray>Antrian login saat ini: <white><queued>'
+      - ' <dark_aqua>▪ <gray>Total join non-unik: <white><total-joins>'
+      - ' <dark_aqua>▪ <gray>Total percobaan verifikasi: <white><total-attempts>'
+      - ' <dark_aqua>▪ <gray>Total verifikasi yang gagal: <white><total-failed>'
+      - ' <dark_aqua>▪ <gray>Waktu aktif server: <white><server-uptime>'
+    # Format pesan statistik CPU
+    cpu:
+      - ' <dark_aqua>▪ <gray>Penggunaan CPU proses saat ini: <white><process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Penggunaan CPU sistem saat ini: <white><system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Penggunaan CPU proses per-core: <white><average-process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Penggunaan CPU sistem per-core: <white><average-system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Total jumlah vCPU: <white><virtual-core-count>'
+    # Format pesan statistik memori
+    memory:
+      - ' <dark_aqua>▪ <gray>Total memori bebas: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>Total memori terpakai: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>Total memori maksimum: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>Total memori dialokasikan: <white><total-memory>'
+    # Format pesan statistik jaringan
+    network:
+      - ' <dark_aqua>▪ <gray>Bandwidth masuk saat ini: <white><incoming-traffic>'
+      - ' <dark_aqua>▪ <gray>Bandwidth keluar saat ini: <white><outgoing-traffic>'
+      - ' <dark_aqua>▪ <gray>Total bandwidth masuk: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Total bandwidth keluar: <white><outgoing-traffic-ttl>'
+
+  # Terjemahan untuk '/sonar dump'
+  dump:
+    # Deskripsi untuk sub-perintah ini
+    description: "Cetak informasi pengembang"
+    # Format informasi yang dikirim ke konsol
+    log: "Dump yang dihasilkan: <dumped-json-data>"
+
+# Terjemahan untuk semua pesan selama proses verifikasi
+verification:
+  # Terjemahan untuk semua pesan debug selama proses verifikasi
+  logs:
+    # Pesan yang dicatat ke konsol setiap kali pemain baru bergabung ke server
+    connection: '<username><ip> (<protocol>) telah terhubung.'
+    # Pesan yang dicatat ke konsol setiap kali pemain gagal verifikasi
+    failed: '<ip> (<protocol>) telah gagal dalam pemeriksaan bot untuk: <reason>'
+    # Pesan yang dicatat ke konsol setiap kali pemain masuk daftar hitam
+    blacklisted: '<ip> (<protocol>) masuk daftar hitam karena terlalu banyak percobaan yang gagal'
+    # Pesan yang dicatat ke konsol setiap kali pemain berhasil diverifikasi
+    successful: '<username> berhasil diverifikasi dalam waktu (<time-taken>s!).'
+
+  # Pesan yang ditampilkan kepada pemain saat mereka seharusnya memasukkan CAPTCHA
+  captcha:
+    # Pesan yang ditampilkan kepada pemain saat mereka harus memasukkan jawaban untuk captcha
+    enter-code: '<prefix><green>Silakan masukkan kode di chat yang ditampilkan di peta.'
+    # Pesan yang ditampilkan kepada pemain saat mereka memasukkan jawaban yang salah di chat
+    incorrect: '<prefix><red>Anda memasukkan kode yang salah. Silakan coba lagi.'
+
+  # Pesan putus yang ditampilkan saat seseorang bergabung sementara captcha belum disiapkan
+  currently-preparing:
+    - '<header>'
+    - <yellow>Data anti-bot Anda belum disiapkan.
+    - <gray>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
+    - '<footer>'
+  # Pesan putus yang ditampilkan saat seseorang bergabung kembali terlalu cepat selama verifikasi
+  too-fast-reconnect:
+    - '<header>'
+    - <gold>Anda terhubung kembali terlalu cepat, coba lagi nanti.
+    - <gray>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
+    - '<footer>'
+  # Pesan putus yang ditampilkan saat seseorang bergabung tetapi sudah dalam proses verifikasi
+  already-verifying:
+    - '<header>'
+    - <red>Alamat IP Anda saat ini sedang diverifikasi.
+    - <red>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
+    - '<footer>'
+  # Pesan putus yang ditampilkan saat seseorang bergabung tetapi sudah antri untuk verifikasi
+  already-queued:
+    - '<header>'
+    - <red>Alamat IP Anda saat ini sedang antri untuk verifikasi.
+    - <red>Silakan tunggu beberapa menit sebelum mencoba verifikasi lagi.
+    - '<footer>'
+  # Pesan putus yang ditampilkan saat seseorang bergabung tetapi sedang masuk daftar hitam sementara
+  blacklisted:
+    - '<header>'
+    - <red>Anda saat ini ditolak untuk masuk ke server.
+    - <red>Silakan tunggu beberapa menit agar bisa bergabung ke server lagi.
+    - <gold>Positif palsu? <gray><support-url>
+    - '<footer>'
+  # Pesan putus yang ditampilkan saat seseorang bergabung dengan username yang tidak valid
+  invalid-username:
+    - '<header>'
+    - <red>Username Anda mengandung karakter yang tidak valid.
+    - '<footer>'
+  # Pesan putus yang ditampilkan saat seseorang bergabung dengan versi yang masuk daftar hitam
+  blacklisted-protocol:
+    - '<header>'
+    - <red>Anda menggunakan versi yang tidak diizinkan di server kami.
+    - <gold>Butuh bantuan masuk? <gray><support-url>
+    - '<footer>'
+  # Pesan putus yang ditampilkan saat seseorang berhasil verifikasi
+  success:
+    - '<header>'
+    - <green>Anda telah berhasil melewati verifikasi.
+    - <white>Anda sekarang dapat bermain di server saat Anda terhubung kembali.
+  # Pesan putus yang ditampilkan saat seseorang gagal verifikasi
+  failed:
+    - '<header>'
+    - <red>Anda telah gagal dalam verifikasi bot.
+    - <gray>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
+    - <gold>Butuh bantuan masuk? <gray><support-url>
+    - '<footer>'
+
+# Terjemahan untuk pesan verbose actionbar Sonar
+verbose:
+  layout:
+    # Tata letak untuk actionbar verbose Sonar
+    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s <white><logins-per-second> <dark_aqua>╺ <gray>Verifikasi <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    # Tata letak untuk actionbar verbose Sonar selama serangan
+    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s <white><logins-per-second> <dark_aqua>╺ <gray>Antrian <white><queued> <dark_aqua>╺ <gray>Verifikasi <white><verifying> <dark_aqua>╺ <gray>Durasi <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+  # Animasi untuk action bar
+  # Alternatif:
+  # - ▙, ▛, ▜, ▟
+  # - ⬈, ⬊, ⬋, ⬉
+  animation:
+    - ◜
+    - ◝
+    - ◞
+    - ◟
+
+# Terjemahan untuk pesan notifikasi serangan Sonar
+notifications:
+  # Tata letak untuk judul notifikasi serangan Sonar
+  title: <yellow><b>Sonar<reset>
+  # Tata letak untuk subjudul notifikasi serangan Sonar
+  subtitle: <gray>Serangan bot terdeteksi
+  # Tata letak untuk notifikasi serangan Sonar di chat
+  chat:
+    - ''
+    - <yellow><b>Sonar<reset>
+    - ''
+    - <gray>Serangan bot terdeteksi.
+    - ' <dark_aqua>▪ <gray>Login per detik: <white><logins-per-second>'
+    - ' <dark_aqua>▪ <gray>Pemain yang diverifikasi: <white><verifying>'
+    - ' <dark_aqua>▪ <gray>Pemain yang antri: <white><queued>'
+    - ''
+    - <gray>Lihat lebih banyak informasi menggunakan <white><click:run_command:'/sonar verbose'><hover:show_text:'(Klik untuk menjalankan)'>/sonar verbose</hover></click><gray> atau <white><click:run_command:'/sonar stats'><hover:show_text:'(Klik untuk menjalankan)'>/sonar stats</hover></click><gray>.
+    - ''
