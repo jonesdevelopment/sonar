@@ -33,8 +33,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_13;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_5;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.transferToOrigin;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
@@ -127,10 +126,12 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
     // Check if the decoded client brand string is too long
     checkState(data.length < Sonar.get().getConfig().getVerification().getBrand().getMaxLength(),
       "client brand contains too much data: " + data.length);
-    // Don't even ask - Minecraft 1.7 simply sends the string, but all other versions send something else
-    // This is pretty much a lazy-fix, but, hey, it works; I'm not complaining.
-    // Read more: https://discord.com/channels/923308209769426994/1116066363887321199/1256929441053933608
-    final String brand = new String(data, StandardCharsets.UTF_8).replaceFirst("\7", "");
+    // https://discord.com/channels/923308209769426994/1116066363887321199/1256929441053933608
+    String brand = new String(data, StandardCharsets.UTF_8);
+    // Remove the invalid character at the beginning of the client brand
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+      brand = brand.substring(1);
+    }
     // Check for illegal client brands
     checkState(!brand.equals("Vanilla"), "illegal client brand: " + brand);
     // Regex pattern for validating client brands
