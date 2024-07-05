@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
+import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.Objects;
@@ -95,6 +96,9 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
+
+    // Make sure to inject into the server's connection handler
+    FallbackBukkitInjector.inject();
   }
 
   @Override
