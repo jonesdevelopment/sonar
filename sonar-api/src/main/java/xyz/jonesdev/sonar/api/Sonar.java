@@ -46,6 +46,9 @@ public interface Sonar {
   @ApiStatus.Internal
   @Nullable Audience audience(final @Nullable UUID uniqueId);
 
+  @ApiStatus.Internal
+  @NotNull Audience sender(final @NotNull Object object);
+
   /**
    * @return The platform the plugin is being run on
    */

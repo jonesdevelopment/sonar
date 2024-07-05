@@ -23,6 +23,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.SonarPlatform;
@@ -36,12 +37,9 @@ import java.util.UUID;
 
 @Getter
 public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
-  public static SonarBukkit INSTANCE;
-
   public SonarBukkit(final @NotNull SonarBukkitPlugin plugin) {
     super(plugin, SonarPlatform.BUKKIT, plugin.getDataFolder(),
       new BukkitLibraryManager(plugin, plugin.getDataFolder().getName()));
-    INSTANCE = this;
   }
 
   /**
@@ -55,6 +53,11 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
       return null;
     }
     return bukkitAudiences.player(uniqueId);
+  }
+
+  @Override
+  public @NotNull Audience sender(final @NotNull Object object) {
+    return bukkitAudiences.sender((CommandSender) object);
   }
 
   /**

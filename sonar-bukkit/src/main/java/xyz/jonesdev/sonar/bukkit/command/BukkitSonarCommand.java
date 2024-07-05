@@ -23,9 +23,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
-import xyz.jonesdev.sonar.bukkit.SonarBukkit;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
     // Create our own invocation source wrapper to handle messages properly
     final InvocationSource invocationSource = new InvocationSource(
       sender instanceof Player ? ((Player) sender).getUniqueId() : null,
-      SonarBukkit.INSTANCE.getBukkitAudiences().sender(sender),
+      Sonar.get().sender(sender),
       sender::hasPermission);
     // Pass the invocation source and command arguments to our command handler
     handle(invocationSource, args);
