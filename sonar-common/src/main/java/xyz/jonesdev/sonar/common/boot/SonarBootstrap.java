@@ -41,6 +41,7 @@ import xyz.jonesdev.sonar.common.service.SonarServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.subcommands.*;
 import xyz.jonesdev.sonar.common.update.UpdateChecker;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.io.File;
 import java.time.Duration;
@@ -68,6 +69,8 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Load all libraries before anything else
     LibraryLoader.loadLibraries(libraryManager, platform);
     this.libraryManager = libraryManager;
+    // Check if Netty is up-to-date
+    ProtocolUtil.checkNettyVersion();
     // Set the Sonar API
     SonarSupplier.set(this);
     // Set the plugin instance

@@ -22,6 +22,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.EncoderException;
+import io.netty.util.Version;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.*;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,23 @@ import java.util.UUID;
 public class ProtocolUtil {
   public static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
   public static final String BRAND_CHANNEL = "minecraft:brand";
+
+  public static void checkNettyVersion() {
+    final Version version = Version.identify().get("netty-common");
+
+    if (version == null) {
+      throw new IllegalStateException("Could not find netty version!");
+    }
+
+    final String[] artifactVersion = version.artifactVersion().split("\\.");
+    final int major = Integer.parseInt(artifactVersion[0]);
+    final int minor = Integer.parseInt(artifactVersion[1]);
+
+    // Enforce Netty >4.1.x
+    if (major < 4 || (major == 4 && minor < 1)) {
+      throw new IllegalStateException("Your Netty version is too old to run Sonar! Please use Netty >4.1.x.");
+    }
+  }
 
   public static int readVarInt(final ByteBuf byteBuf) {
     int read = readVarIntSafely(byteBuf);
