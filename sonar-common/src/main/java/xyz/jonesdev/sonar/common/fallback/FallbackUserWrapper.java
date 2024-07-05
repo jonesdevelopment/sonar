@@ -109,6 +109,14 @@ public final class FallbackUserWrapper implements FallbackUser {
     Sonar.get().getFallback().getConnected().compute(inetAddress, (key, value) -> (byte) 0);
 
     channel.eventLoop().execute(() -> {
+      // This shouldn't happen, but we'd better check for it...
+      if (!channel.isActive() || pipeline.context(handler) == null) {
+        return;
+      }
+
+      // Remove the main pipeline to completely take over the channel
+      pipeline.remove(handler);
+
       // Add better timeout handler to avoid known exploits or issues
       // We also want to timeout bots quickly to avoid flooding
       pipeline.replace(timeout, timeout, new FallbackTimeoutHandler(
@@ -119,11 +127,6 @@ public final class FallbackUserWrapper implements FallbackUser {
       // Replace normal encoder to allow custom packets
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
       pipeline.replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
-
-      // Remove the main pipeline to completely take over the channel
-      if (pipeline.get(handler) != null) {
-        pipeline.remove(handler);
-      }
 
       // Send LoginSuccess packet to make the client think they are joining the server
       write(FallbackPreparer.LOGIN_SUCCESS);
