@@ -289,26 +289,26 @@ public final class VerifiedPlayerController {
   }
 
   /**
-   * @return List of UUIDs associated with one IP address
+   * @return {@link java.util.Collection} of UUIDs associated with an IP address
    */
   public @Unmodifiable Collection<UUID> getUUIDs(final @NotNull String inetAddress) {
     return cache.getOrDefault(inetAddress, Collections.emptyList());
   }
 
   /**
-   * Clear the local cache, and then if the database type is set,
+   * Clear the local cache, and, if the database type is set,
    * remove the table from the database.
    */
-  public void clearAll() {
-    try {
-      cache.clear();
+  public synchronized void clearAll() {
+    cache.clear();
 
-      // Only update the column if the database type is not NONE
-      if (cachedDatabaseType != SonarConfiguration.Database.Type.NONE) {
+    // Delete the entire table from the database, if necessary
+    if (cachedDatabaseType != SonarConfiguration.Database.Type.NONE) {
+      try {
         dao.deleteBuilder().delete();
+      } catch (SQLException exception) {
+        LOGGER.error("Error trying to clear entries: {}", exception);
       }
-    } catch (SQLException exception) {
-      LOGGER.error("Error trying to clear entries: {}", exception);
     }
   }
 
