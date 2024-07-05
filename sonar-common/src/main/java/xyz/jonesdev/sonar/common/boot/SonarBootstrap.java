@@ -55,6 +55,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
   private Notification notificationHandler;
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
+  private final LibraryManager libraryManager;
   private final SonarStatistics statistics;
   private final SonarPlatform platform;
   private final SubcommandRegistry subcommandRegistry;
@@ -66,6 +67,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
                         final @NotNull LibraryManager libraryManager) {
     // Load all libraries before anything else
     LibraryLoader.loadLibraries(libraryManager, platform);
+    this.libraryManager = libraryManager;
     // Set the Sonar API
     SonarSupplier.set(this);
     // Set the plugin instance
@@ -180,7 +182,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
       // Close the old connection first
       verifiedPlayerController.close();
     }
-    verifiedPlayerController = new VerifiedPlayerController();
+    verifiedPlayerController = new VerifiedPlayerController(libraryManager);
   }
 
   public final void shutdown() {

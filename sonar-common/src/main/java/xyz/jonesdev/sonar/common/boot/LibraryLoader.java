@@ -56,27 +56,6 @@ class LibraryLoader {
         .artifactId("ormlite-jdbc")
         .version("6.1")
         .relocate("com{}j256{}ormlite", "xyz{}jonesdev{}sonar{}libs{}ormlite")
-        .build(),
-      // MySQL driver
-      Library.builder()
-        .groupId("com{}mysql")
-        .artifactId("mysql-connector-j")
-        .version("8.4.0")
-        .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
-        .build(),
-      // MariaDB driver
-      Library.builder()
-        .groupId("org{}mariadb{}jdbc")
-        .artifactId("mariadb-java-client")
-        .version("3.4.0")
-        .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
-        .build(),
-      // H2 driver
-      Library.builder()
-        .groupId("com{}h2database")
-        .artifactId("h2")
-        .version("2.1.214")
-        .relocate("org{}h2", "xyz{}jonesdev{}sonar{}libs{}h2")
         .build()
     );
 

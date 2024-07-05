@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.api.config;
 
+import com.alessiodp.libby.Library;
 import com.j256.ormlite.db.DatabaseType;
 import lombok.*;
 import net.kyori.adventure.text.Component;
@@ -165,12 +166,6 @@ public final class SonarConfiguration {
 
     // Database
     database.type = Database.Type.valueOf(generalConfig.getString("database.type").toUpperCase());
-    database.filename = generalConfig.getString("database.filename");
-    database.host = generalConfig.getString("database.host");
-    database.port = generalConfig.getInt("database.port");
-    database.name = generalConfig.getString("database.name");
-    database.username = generalConfig.getString("database.username");
-    database.password = generalConfig.getString("database.password");
     database.maximumAge = clamp(generalConfig.getInt("database.maximum-age"), 1, 365);
 
     // Queue
@@ -487,22 +482,37 @@ public final class SonarConfiguration {
     @Getter
     @RequiredArgsConstructor
     public enum Type {
-      MYSQL("jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter()),
-      MARIADB("jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter()),
-      H2("jdbc:h2:file:%s", new H2DatabaseTypeAdapter()),
-      NONE(null, null);
+      MYSQL("jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter(),
+        Library.builder()
+          .groupId("com{}mysql")
+          .artifactId("mysql-connector-j")
+          .version("8.4.0")
+          .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
+          .build()),
+      MARIADB("jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter(),
+        Library.builder()
+          .groupId("org{}mariadb{}jdbc")
+          .artifactId("mariadb-java-client")
+          .version("3.4.0")
+          .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
+          .build()),
+      H2("jdbc:h2:file:%s", new H2DatabaseTypeAdapter(),
+        Library.builder()
+          .groupId("com{}h2database")
+          .artifactId("h2")
+          .version("2.1.214")
+          .relocate("org{}h2", "xyz{}jonesdev{}sonar{}libs{}h2")
+          .build()),
+      NONE(null, null, null);
 
       private final String connectionString;
       private final DatabaseType databaseType;
+      private final Library databaseDriver;
+      @Setter
+      private boolean downloaded;
     }
 
     private Type type;
-    private String filename;
-    private String host;
-    private int port;
-    private String name;
-    private String username;
-    private String password;
     private int maximumAge;
   }
 
