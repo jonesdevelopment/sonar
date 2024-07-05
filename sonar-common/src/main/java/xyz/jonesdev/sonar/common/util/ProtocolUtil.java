@@ -64,10 +64,12 @@ public class ProtocolUtil {
   public static final String BRAND_CHANNEL = "minecraft:brand";
 
   public static void checkNettyVersion() {
-    final Version version = Version.identify().get("netty-common");
+    final Version version = Version.identify().getOrDefault("netty-all", Version.identify().get("netty-common"));
 
+    // We're pretty much only doing this to avoid incompatibilities on Bukkit,
+    // so we don't really care if the version couldn't be resolved.
     if (version == null) {
-      throw new IllegalStateException("Could not find netty version!");
+      return;
     }
 
     final String[] artifactVersion = version.artifactVersion().split("\\.");
