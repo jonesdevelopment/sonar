@@ -271,14 +271,21 @@ public final class VerifiedPlayerController {
    *
    * @return Estimated size of the local cache
    */
-  public synchronized int estimatedSize() {
-    /*
-     * TODO: Work on this
-     * return MAP.values().stream()
-     *   .mapToInt(Collection::size)
-     *   .sum();
-     */
+  public int estimatedSize() {
     return cache.size();
+  }
+
+  /**
+   * Returns the sum of verified IP addresses
+   * and their respective collection of UUIDs
+   *
+   * @return Exact size of all total verified players
+   */
+  @Deprecated
+  public synchronized int exactSize() {
+    return cache.values().stream()
+      .mapToInt(Collection::size)
+      .sum();
   }
 
   /**
