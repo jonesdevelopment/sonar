@@ -3,11 +3,10 @@ repositories {
 }
 
 dependencies {
-  compileOnly("com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
+  compileOnly(rootProject.libs.simpleyaml) {
     exclude(group = "org.yaml")
   }
-
-  compileOnly("org.jetbrains:annotations:24.0.1")
+  compileOnly(rootProject.libs.annotations)
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11
