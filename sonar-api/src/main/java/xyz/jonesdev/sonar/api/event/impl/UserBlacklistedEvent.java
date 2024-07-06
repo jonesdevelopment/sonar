@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.api.event.impl;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -27,7 +26,6 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 @Getter
 @ToString
-@EqualsAndHashCode
 @RequiredArgsConstructor
 public final class UserBlacklistedEvent implements SonarEvent {
   @ApiStatus.Experimental
