@@ -34,7 +34,7 @@ import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
-import xyz.jonesdev.sonar.common.util.GeyserDetection;
+import xyz.jonesdev.sonar.common.util.GeyserUtil;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -49,7 +49,7 @@ import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 @RequiredArgsConstructor
-public abstract class FallbackPacketHandlerAdapter extends MessageToMessageDecoder<Object> {
+public abstract class FallbackPacketDecoderAdapter extends MessageToMessageDecoder<Object> {
   protected final String encoder, decoder, handler, timeout;
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;
@@ -134,7 +134,7 @@ public abstract class FallbackPacketHandlerAdapter extends MessageToMessageDecod
     }
 
     // Completely skip Geyser connections if configured
-    final boolean geyser = GeyserDetection.isGeyserConnection(channel, socketAddress);
+    final boolean geyser = GeyserUtil.isGeyserConnection(channel, socketAddress);
     if (geyser && !Sonar.get().getConfig().getVerification().isCheckGeyser()) {
       initialLogin(ctx, inboundHandler.getInetAddress(), loginPacket);
       return;

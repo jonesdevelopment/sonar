@@ -22,14 +22,14 @@ import com.velocitypowered.proxy.protocol.packet.HandshakePacket;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginPacket;
 import io.netty.channel.ChannelHandlerContext;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.common.fallback.FallbackPacketHandlerAdapter;
+import xyz.jonesdev.sonar.common.fallback.FallbackPacketDecoderAdapter;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 
 import static com.velocitypowered.proxy.network.Connections.*;
 
-final class FallbackVelocityPacketDecoder extends FallbackPacketHandlerAdapter {
+final class FallbackVelocityPacketDecoder extends FallbackPacketDecoderAdapter {
 
   FallbackVelocityPacketDecoder() {
     super(MINECRAFT_ENCODER, MINECRAFT_DECODER, HANDLER, READ_TIMEOUT);

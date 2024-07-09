@@ -104,10 +104,11 @@ public final class FallbackUserWrapper implements FallbackUser {
     Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(username, this));
 
     // Mark the player as connected by caching them in a map of verifying players
-    Sonar.get().getFallback().getConnected().compute(inetAddress, (key, value) -> (byte) 0);
+    Sonar.get().getFallback().getConnected().compute(inetAddress, (_k, _v) -> (byte) 0);
 
+    // Run this in the channel's event loop to avoid issues
     channel.eventLoop().execute(() -> {
-      // This shouldn't happen, but we'd better check for it...
+      // Make sure the channel is still active
       if (!channel.isActive()) {
         return;
       }

@@ -22,7 +22,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.FallbackPacketHandlerAdapter;
+import xyz.jonesdev.sonar.common.fallback.FallbackPacketDecoderAdapter;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket;
@@ -35,7 +35,7 @@ import java.util.Objects;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
-final class FallbackBukkitPacketDecoder extends FallbackPacketHandlerAdapter {
+final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
 
   FallbackBukkitPacketDecoder() {
     super("encoder", "decoder", "packet_handler", "timeout");
