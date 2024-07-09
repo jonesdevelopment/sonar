@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.common.fallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +46,7 @@ import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 @RequiredArgsConstructor
-public class FallbackPacketHandlerAdapter extends ChannelInboundHandlerAdapter {
+public abstract class FallbackPacketHandlerAdapter extends MessageToMessageDecoder<Object> {
   protected final String encoder, decoder, handler, timeout;
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;

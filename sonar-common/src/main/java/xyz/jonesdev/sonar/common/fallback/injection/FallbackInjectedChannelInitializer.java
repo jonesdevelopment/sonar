@@ -50,10 +50,12 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
   @Override
   protected void initChannel(final Channel channel) throws Exception {
     // Invoke the original method
-    try {
-      INIT_CHANNEL_METHOD.invokeExact(originalChannelInitializer, channel);
-    } catch (Throwable throwable) {
-      throw new ReflectiveOperationException(throwable);
+    if (originalChannelInitializer != null) {
+      try {
+        INIT_CHANNEL_METHOD.invokeExact(originalChannelInitializer, channel);
+      } catch (Throwable throwable) {
+        throw new ReflectiveOperationException(throwable);
+      }
     }
 
     // Inject Sonar's channel handler into the pipeline

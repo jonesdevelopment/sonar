@@ -17,16 +17,22 @@
 
 package xyz.jonesdev.sonar.bukkit.fallback;
 
+import io.netty.channel.*;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.common.fallback.injection.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
-// NMS/OBC stuff mostly taken from
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_HANDLER;
+
+// Check out these links if you want to see some more magic
 // https://github.com/retrooper/packetevents/blob/2.0/spigot/src/main/java/io/github/retrooper/packetevents/util/SpigotReflectionUtil.java
+// https://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol/src/main/java/com/comphenix/tinyprotocol/TinyProtocol.java
 @UtilityClass
 public class FallbackBukkitInjector {
   private final String MODIFIED_PACKAGE_NAME;
@@ -69,7 +75,6 @@ public class FallbackBukkitInjector {
       }
 
       MINECRAFT_SERVER_CONNECTION_INSTANCE = getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(MINECRAFT_SERVER_INSTANCE);
-      System.out.println(MINECRAFT_SERVER_CONNECTION_INSTANCE);
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }
@@ -125,6 +130,57 @@ public class FallbackBukkitInjector {
     return Class.forName(OBC_PACKAGE + clazz);
   }
 
+  // Credits to TinaProtocol for this idea!
+  private final ChannelHandler CLIENT_INITIALIZER = new ChannelInitializer<>() {
+
+    @Override
+    protected void initChannel(final @NotNull Channel channel) throws Exception {
+      // We don't have to call the initialization method, since the channel is already initialized
+      channel.pipeline().addLast(new FallbackInjectedChannelInitializer(null,
+        pipeline -> pipeline.addBefore("decoder", FALLBACK_PACKET_HANDLER,
+          new FallbackBukkitPacketDecoder())));
+    }
+  };
+
+  private final ChannelHandler SERVER_INITIALIZER = new ChannelInboundHandlerAdapter() {
+
+    @Override
+    public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
+      final Channel serverChannel = (Channel) msg;
+      serverChannel.pipeline().addFirst(CLIENT_INITIALIZER);
+      ctx.fireChannelRead(msg);
+    }
+  };
+
   public void inject() {
+    try {
+      for (int i = 0; i < 2; i++) {
+        // We're using a label here, so we can escape the inner loops
+        injection: {
+          final Field field = getFieldAt(SERVER_CONNECTION_CLASS, List.class, i);
+          final List<?> list = (List<?>) field.get(MINECRAFT_SERVER_CONNECTION_INSTANCE);
+
+          // Late-bind could be enabled or this isn't out target field
+          if (list.isEmpty()) {
+            break injection;
+          }
+
+          for (final Object object : list) {
+            // We're only looking for a list of channel futures...
+            if (!(object instanceof ChannelFuture)) {
+              break injection;
+            }
+
+            // Get the future that contains the server connection
+            final Channel serverChannel = ((ChannelFuture) object).channel();
+            // Add our server channel listener
+            serverChannel.pipeline().addFirst(SERVER_INITIALIZER);
+          }
+          return;
+        }
+      }
+    } catch (Exception exception) {
+      throw new ReflectiveOperationException(exception);
+    }
   }
 }
