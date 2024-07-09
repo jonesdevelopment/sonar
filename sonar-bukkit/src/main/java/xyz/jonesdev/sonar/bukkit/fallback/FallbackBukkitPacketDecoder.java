@@ -38,7 +38,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
 
   FallbackBukkitPacketDecoder() {
-    super("encoder", "decoder", "packet_handler", "timeout");
+    super("encoder", "packet_handler");
 
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
   }

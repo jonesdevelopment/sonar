@@ -50,7 +50,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 @RequiredArgsConstructor
 public abstract class FallbackPacketDecoderAdapter extends MessageToMessageDecoder<Object> {
-  protected final String encoder, decoder, handler, timeout;
+  protected final String encoder, handler;
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;
 

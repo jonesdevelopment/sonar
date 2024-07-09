@@ -27,12 +27,13 @@ import xyz.jonesdev.sonar.common.fallback.FallbackPacketDecoderAdapter;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-import static com.velocitypowered.proxy.network.Connections.*;
+import static com.velocitypowered.proxy.network.Connections.HANDLER;
+import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 
 final class FallbackVelocityPacketDecoder extends FallbackPacketDecoderAdapter {
 
   FallbackVelocityPacketDecoder() {
-    super(MINECRAFT_ENCODER, MINECRAFT_DECODER, HANDLER, READ_TIMEOUT);
+    super(MINECRAFT_ENCODER, HANDLER);
   }
 
   @Override

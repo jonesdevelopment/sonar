@@ -34,12 +34,13 @@ import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-import static net.md_5.bungee.netty.PipelineUtils.*;
+import static net.md_5.bungee.netty.PipelineUtils.BOSS_HANDLER;
+import static net.md_5.bungee.netty.PipelineUtils.PACKET_ENCODER;
 
 final class FallbackBungeePacketDecoder extends FallbackPacketDecoderAdapter {
 
   FallbackBungeePacketDecoder() {
-    super(PACKET_ENCODER, PACKET_DECODER, BOSS_HANDLER, TIMEOUT_HANDLER);
+    super(PACKET_ENCODER, BOSS_HANDLER);
   }
 
   private static final MethodHandle CHANNEL_WRAPPER_GETTER;
