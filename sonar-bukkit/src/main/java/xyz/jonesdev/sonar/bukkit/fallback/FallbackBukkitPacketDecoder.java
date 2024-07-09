@@ -90,6 +90,9 @@ final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
           throw new CorruptedFrameException("Could not read packet to end");
         }
 
+        // Useful resources:
+        // https://wiki.vg/Protocol#Handshaking
+        // https://wiki.vg/Protocol#Login
         if (packet instanceof HandshakePacket) {
           final HandshakePacket handshake = (HandshakePacket) packet;
           switch (handshake.getIntent()) {
