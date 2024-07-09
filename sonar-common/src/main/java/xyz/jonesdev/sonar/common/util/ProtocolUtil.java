@@ -138,6 +138,19 @@ public class ProtocolUtil {
     }
   }
 
+  private static final int[] VARINT_EXACT_BYTE_LENGTHS = new int[33];
+
+  static {
+    for (int i = 0; i <= 32; ++i) {
+      VARINT_EXACT_BYTE_LENGTHS[i] = (int) Math.ceil((31d - (i - 1)) / 7d);
+    }
+    VARINT_EXACT_BYTE_LENGTHS[32] = 1;
+  }
+
+  public static int varIntBytes(final int value) {
+    return VARINT_EXACT_BYTE_LENGTHS[Integer.numberOfLeadingZeros(value)];
+  }
+
   public static void writeVarLong(final ByteBuf byteBuf, final long value) {
     // Peel the one and two byte count cases explicitly as they are the most common VarLong sizes
     // that the proxy will write, to improve inlining.
@@ -201,9 +214,8 @@ public class ProtocolUtil {
     }
   }
 
-  public static void readUUID(final @NotNull ByteBuf byteBuf) {
-    byteBuf.readLong(); // least
-    byteBuf.readLong(); // most
+  public static @NotNull UUID readUUID(final @NotNull ByteBuf byteBuf) {
+    return new UUID(byteBuf.readLong(), byteBuf.readLong());
   }
 
   public static byte @NotNull [] readByteArray(final ByteBuf byteBuf) {

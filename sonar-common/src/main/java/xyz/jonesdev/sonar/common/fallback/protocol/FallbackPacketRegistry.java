@@ -26,7 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
@@ -38,6 +40,12 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 // Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/StateRegistry.java
 public enum FallbackPacketRegistry {
+  HANDSHAKE {
+    {
+      serverbound.register(HandshakePacket.class, HandshakePacket::new,
+        map(0x00, MINECRAFT_1_7_2, false));
+    }
+  },
   LOGIN {
     {
       clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
@@ -45,6 +53,8 @@ public enum FallbackPacketRegistry {
       clientbound.register(LoginSuccessPacket.class, LoginSuccessPacket::new,
         map(0x02, MINECRAFT_1_7_2, true));
 
+      serverbound.register(LoginStartPacket.class, LoginStartPacket::new,
+        map(0x00, MINECRAFT_1_7_2, false));
       serverbound.register(LoginAcknowledgedPacket.class, LoginAcknowledgedPacket::new,
         map(0x03, MINECRAFT_1_20_2, false));
     }

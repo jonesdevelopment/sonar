@@ -68,6 +68,10 @@ final class FallbackBungeePacketDecoder extends FallbackPacketHandlerAdapter {
         if (wrappedPacket instanceof Handshake) {
           final Handshake handshake = (Handshake) wrappedPacket;
           handleHandshake(channel, handshake.getHost(), handshake.getProtocolVersion());
+          // We don't care about server pings; remove the handler
+          if (handshake.getRequestedProtocol() != 2) {
+            ctx.channel().pipeline().remove(this);
+          }
         }
         // Intercept any server login packet by the client
         else if (wrappedPacket instanceof LoginRequest) {
@@ -81,8 +85,12 @@ final class FallbackBungeePacketDecoder extends FallbackPacketHandlerAdapter {
             throw new ReflectiveOperationException(throwable);
           }
           final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
-          handleLogin(channel, ctx, msg, loginRequest.getData(), socketAddress);
+          // We've done our job - deject this pipeline
+          ctx.channel().pipeline().remove(this);
+          // Make sure to mark this packet as released
           packetWrapper.trySingleRelease();
+          // Let Sonar process the login packet
+          handleLogin(channel, ctx, () -> ctx.fireChannelRead(msg), loginRequest.getData(), socketAddress);
           return;
         }
       }

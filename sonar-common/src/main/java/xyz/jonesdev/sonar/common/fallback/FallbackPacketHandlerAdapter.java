@@ -29,6 +29,8 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameDecoder;
+import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
@@ -37,11 +39,12 @@ import xyz.jonesdev.sonar.common.util.GeyserDetection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_ENCODER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -86,7 +89,7 @@ public abstract class FallbackPacketHandlerAdapter extends MessageToMessageDecod
    */
   protected final void handleLogin(final @NotNull Channel channel,
                                    final @NotNull ChannelHandlerContext ctx,
-                                   final @NotNull Object loginPacket,
+                                   final @NotNull Runnable loginPacket,
                                    final @NotNull String username,
                                    final @NotNull InetSocketAddress socketAddress) throws Exception {
     // Check if the player has already sent a login packet
@@ -165,6 +168,9 @@ public abstract class FallbackPacketHandlerAdapter extends MessageToMessageDecod
       return;
     }
 
+    // Remove all other pipelines that could still mess up something
+    rewriteProtocol(ctx);
+
     // Queue the connection for further processing
     FALLBACK.getQueue().getPlayers().compute(inboundHandler.getInetAddress(), (_k, _v) -> () -> {
       // Check if the username matches the valid name regex to prevent
@@ -176,10 +182,31 @@ public abstract class FallbackPacketHandlerAdapter extends MessageToMessageDecod
       }
 
       // Create an instance for the Fallback connection
-      final FallbackUser user = new FallbackUserWrapper(channel, inboundHandler.getInetAddress(), protocolVersion, geyser);
+      final FallbackUser user = new FallbackUserWrapper(
+        channel, inboundHandler.getInetAddress(), protocolVersion, geyser);
       // Let the verification handler take over the channel
-      user.hijack(username, offlineUUID, encoder, decoder, timeout, handler);
+      user.hijack(username, offlineUUID);
     });
+  }
+
+  /**
+   * Removes all pipelines and rewrites them using our custom handlers
+   */
+  private static void rewriteProtocol(final @NotNull ChannelHandlerContext ctx) {
+    for (final Map.Entry<String, ChannelHandler> entry : ctx.pipeline()) {
+      if (entry.getKey().equals(FALLBACK_INBOUND_HANDLER)) {
+        continue;
+      }
+      ctx.pipeline().remove(entry.getValue());
+    }
+    // Add our custom pipelines
+    ctx.pipeline()
+      .addLast(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder())
+      .addLast(FALLBACK_TIMEOUT, new FallbackTimeoutHandler(
+        Sonar.get().getConfig().getVerification().getReadTimeout(),
+        Sonar.get().getConfig().getVerification().getWriteTimeout(),
+        TimeUnit.MILLISECONDS))
+      .addLast(FALLBACK_FRAME_ENCODER, FallbackVarInt21FrameEncoder.INSTANCE);
   }
 
   /**
@@ -191,7 +218,7 @@ public abstract class FallbackPacketHandlerAdapter extends MessageToMessageDecod
    */
   protected final void initialLogin(final @NotNull ChannelHandlerContext ctx,
                                     final @NotNull InetAddress inetAddress,
-                                    final @NotNull Object loginPacket) throws Exception {
+                                    final @NotNull Runnable loginPacket) throws Exception {
     // Increment the number of accounts with the same IP
     FALLBACK.getOnline().compute(inetAddress, (k, v) -> v == null ? 1 : v + 1);
 
@@ -208,9 +235,7 @@ public abstract class FallbackPacketHandlerAdapter extends MessageToMessageDecod
     }
 
     // Let the server know about the login packet
-    ctx.fireChannelRead(loginPacket);
-    // Don't listen for further packets
-    ctx.channel().pipeline().remove(this);
+    loginPacket.run();
   }
 
 

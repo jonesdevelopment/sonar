@@ -23,7 +23,7 @@ import lombok.experimental.UtilityClass;
 import net.md_5.bungee.netty.PipelineUtils;
 import sun.misc.Unsafe;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
-import xyz.jonesdev.sonar.common.fallback.injection.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
 

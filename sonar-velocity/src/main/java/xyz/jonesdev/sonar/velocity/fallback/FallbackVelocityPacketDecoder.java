@@ -42,13 +42,20 @@ final class FallbackVelocityPacketDecoder extends FallbackPacketHandlerAdapter {
     // Intercept any handshake packet by the client
     if (msg instanceof HandshakePacket handshake) {
       handleHandshake(ctx.channel(), handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
+      // We don't care about server pings; remove the handler
+      if (handshake.getNextStatus() != 2) {
+        ctx.channel().pipeline().remove(this);
+      }
     }
     // Intercept any server login packet by the client
     else if (msg instanceof ServerLoginPacket serverLogin) {
       // Make sure to use the potentially modified, original IP
       final MinecraftConnection minecraftConnection = (MinecraftConnection) ctx.channel().pipeline().get(HANDLER);
       final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
-      handleLogin(ctx.channel(), ctx, serverLogin, serverLogin.getUsername(), socketAddress);
+      // We've done our job - deject this pipeline
+      ctx.channel().pipeline().remove(this);
+      // Let Sonar process the login packet
+      handleLogin(ctx.channel(), ctx, () -> ctx.fireChannelRead(msg), serverLogin.getUsername(), socketAddress);
       return;
     }
     // Make sure to let the server handle the rest

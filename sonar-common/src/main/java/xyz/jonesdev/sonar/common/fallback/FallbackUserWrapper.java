@@ -83,9 +83,7 @@ public final class FallbackUserWrapper implements FallbackUser {
   }
 
   @Override
-  public void hijack(final @NotNull String username, final @NotNull UUID uuid,
-                     final @NotNull String encoder, final @NotNull String decoder,
-                     final @NotNull String timeout, final @NotNull String handler) {
+  public void hijack(final @NotNull String username, final @NotNull UUID uuid) {
     // The player has joined the verification
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
@@ -110,23 +108,13 @@ public final class FallbackUserWrapper implements FallbackUser {
 
     channel.eventLoop().execute(() -> {
       // This shouldn't happen, but we'd better check for it...
-      if (!channel.isActive() || pipeline.context(handler) == null) {
+      if (!channel.isActive()) {
         return;
       }
 
-      // Remove the main pipeline to completely take over the channel
-      pipeline.remove(handler);
-
-      // Add better timeout handler to avoid known exploits or issues
-      // We also want to timeout bots quickly to avoid flooding
-      pipeline.replace(timeout, timeout, new FallbackTimeoutHandler(
-        Sonar.get().getConfig().getVerification().getReadTimeout(),
-        Sonar.get().getConfig().getVerification().getWriteTimeout(),
-        TimeUnit.MILLISECONDS));
-
       // Replace normal encoder to allow custom packets
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
-      pipeline.replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
+      pipeline.addLast(FALLBACK_PACKET_ENCODER, newEncoder);
 
       // Send LoginSuccess packet to make the client think they are joining the server
       write(FallbackPreparer.LOGIN_SUCCESS);
@@ -136,7 +124,7 @@ public final class FallbackUserWrapper implements FallbackUser {
 
       // Replace normal decoder to allow custom packets
       final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(protocolVersion);
-      pipeline.replace(decoder, FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
+      pipeline.addLast(FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
       // Listen for all incoming packets by setting the packet listener
       fallbackPacketDecoder.setListener(new FallbackLoginSessionHandler(this, username, uuid));
     });

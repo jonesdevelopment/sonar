@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.injection;
+package xyz.jonesdev.sonar.common.fallback.netty;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;

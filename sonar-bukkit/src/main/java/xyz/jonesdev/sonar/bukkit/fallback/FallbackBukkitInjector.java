@@ -23,7 +23,7 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.common.fallback.injection.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -137,7 +137,7 @@ public class FallbackBukkitInjector {
     protected void initChannel(final @NotNull Channel channel) throws Exception {
       // We don't have to call the initialization method, since the channel is already initialized
       channel.pipeline().addLast(new FallbackInjectedChannelInitializer(null,
-        pipeline -> pipeline.addBefore("decoder", FALLBACK_PACKET_HANDLER,
+        pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_HANDLER,
           new FallbackBukkitPacketDecoder())));
     }
   };
