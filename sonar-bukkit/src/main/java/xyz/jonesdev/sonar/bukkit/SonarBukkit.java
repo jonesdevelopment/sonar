@@ -38,8 +38,7 @@ import java.util.UUID;
 @Getter
 public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
   public SonarBukkit(final @NotNull SonarBukkitPlugin plugin) {
-    super(plugin, SonarPlatform.BUKKIT, plugin.getDataFolder(),
-      new BukkitLibraryManager(plugin, plugin.getDataFolder().getName()));
+    super(plugin, SonarPlatform.BUKKIT, plugin.getDataFolder(), new BukkitLibraryManager(plugin));
   }
 
   /**
