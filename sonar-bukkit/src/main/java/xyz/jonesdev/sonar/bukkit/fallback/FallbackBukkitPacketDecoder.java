@@ -97,11 +97,11 @@ final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
           final HandshakePacket handshake = (HandshakePacket) packet;
           switch (handshake.getIntent()) {
             case 1:
-            case 3:
               // We don't care about server pings or transfers; remove the handler
               ctx.channel().pipeline().remove(this);
               break;
             case 2:
+            case 3:
               // Let the actual handler know about the handshake packet
               handleHandshake(ctx.channel(), handshake.getHostname(), handshake.getProtocolVersionId());
               // Be ready for the next packet (which is supposed to be a login packet)

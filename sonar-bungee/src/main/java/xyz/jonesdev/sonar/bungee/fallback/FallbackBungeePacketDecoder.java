@@ -70,7 +70,7 @@ final class FallbackBungeePacketDecoder extends FallbackPacketDecoderAdapter {
           final Handshake handshake = (Handshake) wrappedPacket;
           handleHandshake(channel, handshake.getHost(), handshake.getProtocolVersion());
           // We don't care about server pings; remove the handler
-          if (handshake.getRequestedProtocol() != 2) {
+            if (handshake.getRequestedProtocol() == 1) {
             ctx.channel().pipeline().remove(this);
           }
         }

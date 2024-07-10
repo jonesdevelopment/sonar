@@ -44,7 +44,7 @@ final class FallbackVelocityPacketDecoder extends FallbackPacketDecoderAdapter {
     if (msg instanceof HandshakePacket handshake) {
       handleHandshake(ctx.channel(), handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
       // We don't care about server pings; remove the handler
-      if (handshake.getNextStatus() != 2) {
+      if (handshake.getNextStatus() == 1) {
         ctx.channel().pipeline().remove(this);
       }
     }
