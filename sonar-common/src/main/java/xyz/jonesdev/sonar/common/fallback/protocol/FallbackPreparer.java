@@ -39,7 +39,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FallbackPreparer {
 
   // LoginSuccess
-  public final FallbackPacket LOGIN_SUCCESS = new FallbackPacketSnapshot(new LoginSuccessPacket(new UUID(1L, 1L), "Sonar"));
+  public FallbackPacket loginSuccess;
   // Abilities
   public final FallbackPacket DEFAULT_ABILITIES = new FallbackPacketSnapshot(new PlayerAbilitiesPacket(0x00, 0f, 0f));
   public final FallbackPacket CAPTCHA_ABILITIES = new FallbackPacketSnapshot(new PlayerAbilitiesPacket(0x02, 0f, 0f));
@@ -116,6 +116,10 @@ public class FallbackPreparer {
     // Preload the packet registry to avoid CPU/RAM issues on 1st connection
     Sonar.get().getLogger().info("Preloading all registered packets...");
     FallbackPacketRegistry.values();
+
+    // Prepare LoginSuccess packet
+    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(new UUID(1L, 1L),
+      Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username")));
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,

@@ -191,6 +191,10 @@ verification:
     # თუ თქვენს სერვერს არ სჭირდება პორტი შესასვლელად, შეგიძლიათ დატოვოთ ეს 25565-ზე
     destination-port: 25565
 
+  # Sonar caches most packets it sends to the client, including the LoginSuccess packet.
+  # Which username should Sonar use for the LoginSuccess packet?
+  # The username will not be visible to the player without client modifications
+  cached-username: "Sonar"
   # ჩაიწეროს თუ არა Sonar-მა ახალი ვერიფიკაციის მცდელობები?
   log-connections: true
   # ჩაწეროს თუ არა Sonar-მა ახალი ვერიფიკაციის მცდელობები შეტევის დროს?

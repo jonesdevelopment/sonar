@@ -172,12 +172,12 @@ verification:
     # Maximale Anzahl an Login-Paketen, die der Spieler senden muss, um gekickt zu werden
     max-login-packets: 256
 
-  # Wenn aktiviert, wird der Player zurück zum Ursprungsserver gesendet
+  # Wenn aktiviert, wird der Player zurück zum Ursprungsserver gesendet,
   # falls dieser die der Bot-Verifizierung erfolgreich besteht.
   # Diese Funktion wurde von Mojang in Minecraft Version 1.20.5 eingeführt
   transfer:
     # Sollte Sonar den Spieler auf den Ursprungsserver senden (anstatt ihn zu kicken)?
-    # Damit dies funktioniert, müssen Sie die Funktion in der Konfiguration Ihres Servers aktivieren
+    # Damit dies funktioniert, müssen Sie die Funktion in der Konfiguration Ihres Servers aktivieren.
     # Darüber hinaus möchten Sie möglicherweise die Begrenzung der Anmelderate reduzieren
     # wird von Velocity oder anderen Proxys/Plugins durchgeführt, da dies das verhindern könnte
     # Spieler konnte nicht korrekt übertragen werden.
@@ -190,6 +190,10 @@ verification:
     # Wenn Ihr Server keinen Port zum Herstellen einer Verbindung benötigt, können Sie diesen auf 25565 belassen.
     destination-port: 25565
 
+  # Sonar speichert die meisten Pakete, die es an den Client sendet, einschließlich des LoginSuccess-Pakets.
+  # Welchen Benutzernamen soll Sonar für das LoginSuccess-Paket verwenden?
+  # Der Benutzername ist für den Spieler ohne Änderungen am Client nicht sichtbar
+  cached-username: "Sonar"
   # Soll Sonar neue Überprüfungsversuche protokollieren?
   log-connections: true
   # Soll Sonar neue Überprüfungsversuche während Angriffen protokollieren?

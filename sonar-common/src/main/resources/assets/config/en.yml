@@ -179,7 +179,7 @@ verification:
   # This feature was introduced by Mojang in Minecraft version 1.20.5
   transfer:
     # Should Sonar transfer the player to the origin server (instead of kicking them)?
-    # For this to work, you must enable the feature in your server's configuration
+    # For this to work, you must enable the feature in your server's configuration.
     # Additionally, you might want to reduce the amount of login rate-limiting
     # performed by Velocity or other proxies/plugins, as this might prevent the
     # player from being transferred correctly.
@@ -192,6 +192,10 @@ verification:
     # If your server does not need a port to connect to, you can leave this as 25565.
     destination-port: 25565
 
+  # Sonar caches most packets it sends to the client, including the LoginSuccess packet.
+  # Which username should Sonar use for the LoginSuccess packet?
+  # The username will not be visible to the player without client modifications
+  cached-username: "Sonar"
   # Should Sonar log new verification attempts?
   log-connections: true
   # Should Sonar log new verification attempts during attacks?

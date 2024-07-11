@@ -118,7 +118,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       pipeline.addLast(FALLBACK_PACKET_ENCODER, newEncoder);
 
       // Send LoginSuccess packet to make the client think they are joining the server
-      write(FallbackPreparer.LOGIN_SUCCESS);
+      write(FallbackPreparer.loginSuccess);
 
       // The LoginSuccess packet has been sent, now we can change the registry state
       newEncoder.updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME);

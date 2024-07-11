@@ -143,7 +143,8 @@ verification:
       auto-color: false
       # Sonar 应该一次准备多少个验证码?
       precompute: 500
-      # Sonar 应该给玩家多少时间完成验证码? (该值为毫秒. 1秒等于1000毫秒.)
+      # Sonar 应该给玩家多少时间完成验证码?
+      # (该值为毫秒. 1秒等于1000毫秒.)
       max-duration: 30000
       # 玩家最多能输入多少次错误的验证码?
       max-tries: 3
@@ -185,6 +186,10 @@ verification:
     # 如果服务器地址不包含端口 请保留25565.
     destination-port: 25565
 
+  # Sonar 缓存它发送到客户端的大部分数据包, 包括 LoginSuccess 数据包.
+  # Sonar 应该使用哪个用户名来接收 LoginSuccess 数据包？
+  # 如果不修改客户端, 用户名将不会对玩家可见
+  cached-username: "Sonar"
   # 当 Sonar 尝试验证玩家时 是否在控制台中打印它?
   log-connections: true
   # Sonar 是否应该记录在攻击期间内的验证会话?

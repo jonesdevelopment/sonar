@@ -193,6 +193,10 @@ verification:
     # Pokud váš server nepotřebuje port pro připojení, můžete toto ponechat jako 25565.
     destination-port: 25565
 
+  # Sonar ukládá do mezipaměti většinu paketů, které odesílá klientovi, včetně paketu LoginSuccess.
+  # Které uživatelské jméno má Sonar použít pro paket LoginSuccess?
+  # Uživatelské jméno nebude pro hráče viditelné bez úpravy klienta
+  cached-username: "Sonar"
   # Měl by Sonar posílat nové verifikace?
   log-connections: true
   # Měl by Sonar posílat nové verifikace při útoku?

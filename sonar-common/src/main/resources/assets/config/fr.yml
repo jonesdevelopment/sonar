@@ -192,6 +192,10 @@ verification:
     # Si votre serveur n'a pas besoin d'un port pour se connecter, vous pouvez laisser celui-ci comme 25565.
     destination-port: 25565
 
+  # Sonar met en cache la plupart des paquets qu'il envoie au client, y compris le paquet LoginSuccess.
+  # Quel nom d'utilisateur Sonar doit-il utiliser pour le paquet LoginSuccess ?
+  # Le nom d'utilisateur ne sera pas visible par le joueur sans modification du client
+  cached-username: "Sonar"
   # Sonar devrait-il journaliser les nouvelles tentatives de vérification ?
   log-connections: true
   # Sonar devrait-il journaliser les nouvelles tentatives de vérification pendant les attaques ?

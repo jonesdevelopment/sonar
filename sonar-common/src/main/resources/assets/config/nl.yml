@@ -192,6 +192,10 @@ verification:
     # Als uw server geen poort nodig heeft om verbinding mee te maken, kunt u dit op 25565 laten staan.
     destination-port: 25565
 
+  # Sonar cached de meeste pakketten die het naar de client stuurt, inclusief het LoginSuccess pakket.
+  # Welke gebruikersnaam moet Sonar gebruiken voor het LoginSucces pakket?
+  # De gebruikersnaam zal niet zichtbaar zijn voor de speler zonder client aanpassingen
+  cached-username: "Sonar"
   # Moet Sonar nieuwe verificatiepogingen registreren?
   log-connections: true
   # Moet Sonar nieuwe verificatiepogingen registreren tijdens aanvallen?
