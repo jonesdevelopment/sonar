@@ -194,19 +194,20 @@ public abstract class FallbackPacketDecoderAdapter extends MessageToMessageDecod
    */
   private static void rewriteProtocol(final @NotNull ChannelHandlerContext ctx) {
     for (final Map.Entry<String, ChannelHandler> entry : ctx.pipeline()) {
-      if (entry.getKey().equals(FALLBACK_INBOUND_HANDLER)) {
+      // Don't accidentally remove Sonar's handlers
+      if (entry.getKey().startsWith("sonar")) {
         continue;
       }
       ctx.pipeline().remove(entry.getValue());
     }
     // Add our custom pipelines
     ctx.pipeline()
-      .addLast(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder())
-      .addLast(FALLBACK_TIMEOUT, new FallbackTimeoutHandler(
+      .addFirst(FALLBACK_FRAME_ENCODER, FallbackVarInt21FrameEncoder.INSTANCE)
+      .addFirst(FALLBACK_TIMEOUT, new FallbackTimeoutHandler(
         Sonar.get().getConfig().getVerification().getReadTimeout(),
         Sonar.get().getConfig().getVerification().getWriteTimeout(),
         TimeUnit.MILLISECONDS))
-      .addLast(FALLBACK_FRAME_ENCODER, FallbackVarInt21FrameEncoder.INSTANCE);
+      .addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
   }
 
   /**
