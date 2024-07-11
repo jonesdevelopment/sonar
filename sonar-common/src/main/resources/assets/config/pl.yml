@@ -192,6 +192,10 @@ verification:
     # Jeśli serwer nie potrzebuje portu do połączenia, można pozostawić 25565.
     destination-port: 25565
 
+  # Sonar buforuje większość pakietów, które wysyła do klienta, w tym pakiet LoginSuccess.
+  # Jakiej nazwy użytkownika powinien używać Sonar dla pakietu LoginSuccess?
+  # Nazwa użytkownika nie będzie widoczna dla gracza bez modyfikacji klienta
+  cached-username: "Sonar"
   # Czy Sonar powinien rejestrować połączenia nowych graczy?
   log-connections: true
   # Czy Sonar powinien rejestrować nowe próby połączenia podczas ataku?
