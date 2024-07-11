@@ -195,7 +195,10 @@ public abstract class FallbackPacketDecoderAdapter extends MessageToMessageDecod
   private static void rewriteProtocol(final @NotNull ChannelHandlerContext ctx) {
     for (final Map.Entry<String, ChannelHandler> entry : ctx.pipeline()) {
       // Don't accidentally remove Sonar's handlers
-      if (entry.getKey().startsWith("sonar")) {
+      if (entry.getKey().startsWith("sonar")
+        // Don't remove floodgate's pipelines
+        || entry.getKey().startsWith("geyser")
+        || entry.getKey().startsWith("floodgate")) {
         continue;
       }
       ctx.pipeline().remove(entry.getValue());
