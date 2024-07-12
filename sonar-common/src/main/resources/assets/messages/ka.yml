@@ -13,15 +13,15 @@
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
 
-# ცვლადი ყველა '<prefix>'_სთვის ამ ფაილში.
+# ცვლადი ყველა '<prefix>' სთვის ამ ფაილში.
 prefix: <b><yellow>Sonar</b> <gray>» <white>
-# ცვლადი ყველა '<support-url>'_სთვის ამ ფაილში.
+# ცვლადი ყველა '<support-url>' სთვის ამ ფაილში.
 support-url: https://jonesdev.xyz/discord/
-# ცვლადი ყველა '<header>'_სთვის ამ ფაილში.
+# ცვლადი ყველა '<header>' სთვის ამ ფაილში.
 header:
   - <b><yellow>Sonar</b><reset>
   - ''
-# ცვლადი ყველა '<footer>'_სთვის ამ ფაილში.
+# ცვლადი ყველა '<footer>' სთვის ამ ფაილში.
 footer:
   - <gray>თუ გჯერათ რომ შეცდომა მოხდა, დაუკავშირდით ადმინისტრატორს.
 # გავარდნის მესიჯი რომელიც არის ნაჩვენები როდესაც ვინმე შემოვა, მაგრამ სერვერზე ბევრი მოთამაშეა მისი IP მისამართით
@@ -61,7 +61,7 @@ commands:
     tick: '<green>✔</green>'
     cross: '<red>✗</red>'
 
-  # თარგმანი '/sonar reload'_სთვის
+  # თარგმანი '/sonar reload' სთვის
   reload:
     # აღწერა ამ ქვე-ბრძანებისთვის
     description: "ხელახლა იტვირთება ყველა კონფიკურაცია"
@@ -70,7 +70,7 @@ commands:
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა Sonar_ი დაამთავრებს ხელახლა ჩატვირთვას
     finish: '<prefix><green>ხელახლა ჩატვირთვა წარმატებით მოხერხდა <gray>(<time-taken>ms)'
 
-  # თარგმანი '/sonar verbose'_სთვის
+  # თარგმანი '/sonar verbose' სთვის
   verbose:
     # აღწერა ამ ქვე-ბრძანებისთვის
     description: "ჩართე ან გამორთე Sonar_ის დეტალური ინფორმაციის ჩვენება"
@@ -79,7 +79,7 @@ commands:
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ბრძანებს რომ აღარ დაინახოს დეტალური ინფორმაცია
     unsubscribe: '<prefix>თქვენ ვეღარ იხილავთ Sonar_ის დეტალურ ინფორმაციას.'
 
-  # თარგმანი '/sonar notify'_სთვის
+  # თარგმანი '/sonar notify' სთვის
   notify:
     # აღწერა ამ ქვე-ბრძანებისთვის
     description: "ჩართე ან გამორთე შეტევის ცნობები"
@@ -88,7 +88,7 @@ commands:
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა მოთამაშე ბრძანებს რომ აღარ დაინახოს შეტევების ცნობები
     unsubscribe: '<prefix>თქვენ ვეღარ იხილავთ Sonarს შეტევის ცნობებს.'
 
-  # თარგმანი '/sonar blacklist'_სთვის
+  # თარგმანი '/sonar blacklist' სთვის
   blacklist:
     # აღწერა ამ ქვე-ბრძანებისთვის
     description: "შეცვალე აკრძალული (დაბლოკილი) IP მისამართები"
@@ -109,7 +109,7 @@ commands:
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე მოაშორებს IP მისამართს შავი ნუსხიდან მაგრამ იგი ისედაც არ არის იქ.
     ip-not-found: '<prefix>ეს IP მისამართი ისედაც არ არის შავ ნუსხაში.'
 
-  # თარგმანი '/sonar verified'_სთვის
+  # თარგმანი '/sonar verified' სთვის
   verified:
     # აღწერა ამ ქვე-ბრძანებისთვის
     description: "Manage verified IP მისამართები"
@@ -131,7 +131,7 @@ commands:
     history: '<prefix><yellow>მანამდელი UUIDები <ip>_ის:'
     history-entry: ' <gray>▪ <white><uuid>'
 
-  # თარგმანი '/sonar statistics'_სთვის
+  # თარგმანი '/sonar statistics' სთვის
   statistics:
     # აღწერა ამ ქვე-ბრძანებისთვის
     description: "აჩვენე სერვერის ამჟამინდელი სტატისტიკები"
@@ -169,7 +169,7 @@ commands:
       - ' <dark_aqua>▪ <gray>ჯამში მომდინარე გამოყენებული ქსელის გამოყენება: <white><incoming-traffic-ttl>'
       - ' <dark_aqua>▪ <gray>ჯამში გამდინარე გამოყენებული ქსელის გამოყენება: <white><incoming-traffic-ttl>'
 
-  # თარგმანი '/sonar dump'_სთვის
+  # თარგმანი '/sonar dump' სთვის
   dump:
     # აღწერა ამ ქვე-ბრძანებისთვის
     description: "Print developer information"
