@@ -35,7 +35,6 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_
 // https://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol/src/main/java/com/comphenix/tinyprotocol/TinyProtocol.java
 @UtilityClass
 public class FallbackBukkitInjector {
-  private final String MODIFIED_PACKAGE_NAME;
   private final String LEGACY_NMS_PACKAGE;
   private final String OBC_PACKAGE;
 
@@ -46,20 +45,27 @@ public class FallbackBukkitInjector {
   private final Class<?> CRAFTBUKKIT_SERVER_CLASS;
   private final Class<?> SERVER_CONNECTION_CLASS;
 
-  private Object MINECRAFT_SERVER_INSTANCE;
   private final Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
 
   static {
-    final String bukkitPackage = Bukkit.getServer().getClass().getPackage().getName();
-
-    MODIFIED_PACKAGE_NAME = bukkitPackage.split("\\.")[3];
-    LEGACY_NMS_PACKAGE = "net.minecraft.server." + MODIFIED_PACKAGE_NAME + ".";
-    OBC_PACKAGE = bukkitPackage + ".";
-
     SERVER_VERSION = resolveServerVersion();
     USES_LEGACY_PACKAGING = SERVER_VERSION.compareTo(BukkitServerVersion.MINECRAFT_1_17) < 0;
 
     try {
+      final String bukkitPackage = Bukkit.getServer().getClass().getPackage().getName();
+
+      String modifiedPackageName;
+      if (SERVER_VERSION.compareTo(BukkitServerVersion.MINECRAFT_1_20_5) >= 0) {
+        // Example: org.bukkit.craftbukkit
+        modifiedPackageName = bukkitPackage.split("\\.")[2];
+      } else {
+        // Example: org.bukkit.craftbukkit.v1_16_R3
+        modifiedPackageName = bukkitPackage.split("\\.")[3];
+      }
+
+      LEGACY_NMS_PACKAGE = "net.minecraft.server." + modifiedPackageName + ".";
+      OBC_PACKAGE = bukkitPackage + ".";
+
       OBFUSCATED = isObfuscated();
       // Minecraft classes
       MINECRAFT_SERVER_CLASS = getNMSClass("server.MinecraftServer", "MinecraftServer");
@@ -67,14 +73,15 @@ public class FallbackBukkitInjector {
       // CraftBukkit classes
       CRAFTBUKKIT_SERVER_CLASS = getOBCClass("CraftServer");
 
+      Object minecraftServerInstance;
       try {
         // 1.20.5+
-        MINECRAFT_SERVER_INSTANCE = getFieldAt(MINECRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(null);
+        minecraftServerInstance = getFieldAt(MINECRAFT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(null);
       } catch (Exception exception) {
-        MINECRAFT_SERVER_INSTANCE = getFieldAt(CRAFTBUKKIT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(Bukkit.getServer());
+        minecraftServerInstance = getFieldAt(CRAFTBUKKIT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(Bukkit.getServer());
       }
 
-      MINECRAFT_SERVER_CONNECTION_INSTANCE = getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(MINECRAFT_SERVER_INSTANCE);
+      MINECRAFT_SERVER_CONNECTION_INSTANCE = getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(minecraftServerInstance);
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }
