@@ -33,5 +33,5 @@ lombok = "org.projectlombok:lombok:1.18.34"
 capja = "xyz.jonesdev:capja:1.0.3"
 bungeecord = "net.md_5:bungeecord-proxy:master-SNAPSHOT"
 velocity = "com.velocitypowered:velocity-proxy:3.3.0-SNAPSHOT"
-# We have to use 1.8 for backwards compatibility
-spigot = "org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT"
+# We have to use 1.13.2 for backwards compatibility
+spigot = "org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT"
