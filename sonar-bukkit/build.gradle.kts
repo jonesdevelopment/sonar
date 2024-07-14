@@ -14,6 +14,7 @@ bukkit {
   load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
   softDepend = listOf("Geyser-Spigot", "floodgate", "Protocolize", "ProtocolSupport",
     "ViaVersion", "packetevents", "ProtocolLib", "FastLogin")
+  apiVersion = "1.13" // ignore legacy plugin warning
   foliaSupported = true
 
   commands {
