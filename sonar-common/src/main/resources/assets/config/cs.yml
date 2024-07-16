@@ -175,21 +175,21 @@ verification:
     # Maximální počet login packetů, který musí hřáč poslat aby byl vyhozen
     max-login-packets: 256
 
-  # Je-li povoleno, přehrávač bude přenesen zpět na původní server
-  # po úspěšném absolvování ověření robota.
+  # Je-li povoleno, hráč bude přenesen zpět na původní server
+  # po úspěšném absolvování ověření bota.
   # Tuto funkci představil Mojang ve verzi Minecraft 1.20.5
   transfer:
-    # Měl by Sonar přenést hráče na původní server (místo toho, aby je kopl)?
+    # Měl by Sonar přenést hráče na původní server (místo toho, aby je vyhodil)?
     # Aby to fungovalo, musíte tuto funkci povolit v konfiguraci vašeho serveru
     # Kromě toho možná budete chtít snížit množství omezení rychlosti přihlášení
     # provádí Velocity nebo jiné proxy/pluginy, protože to může zabránit
-    # hráč nebyl převeden správně.
+    # hráči správné přenesení.
     enabled: false
-    # Na který server by měl Sonar přenést přehrávač, když projde ověřením?
+    # Na který server by měl Sonar přenést hráče, když projde ověřením?
     # Zadejte IP serveru, který hráči používají k běžnému připojení k vašemu serveru.
     # Například můžete zadat "mc.hypixel.net" nebo přímou IP jako "1.1.1.1"
     destination-host: "play.my-server.com"
-    # Jaký port by měl Sonar použít při přenosu přehrávače na původní server?
+    # Jaký port by měl Sonar použít při přenosu hráče na původní server?
     # Pokud váš server nepotřebuje port pro připojení, můžete toto ponechat jako 25565.
     destination-port: 25565
 
