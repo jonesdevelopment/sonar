@@ -1,0 +1,288 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Potřebujete pomoc nebo máte otázky? https://jonesdev.xyz/discord
+# Zdrojový kód: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development and Sonar Contributors, licencováno pod GPL-3.0
+#
+
+# Zástupný text pro každý '<prefix>' v tomto konfiguračním souboru
+prefix: <b><yellow>Sonar</b> <gray>» <white>
+# Zástupný text pro každou '<support-url>' v tomto konfiguračním souboru
+support-url: https://jonesdev.xyz/discord/
+# Zástupný text pro každý '<header>' v tomto konfiguračním souboru
+header:
+  - <b><yellow>Sonar</b><reset>
+  - ''
+# Zástupný text pro každý '<footer>' v tomto konfiguračním souboru
+footer:
+  - <gray>Pokud se domníváte, že jde o chybu, kontaktujte administrátora.
+# Zpráva o odpojení, která se zobrazí, když se někdo připojí, ale je příliš mnoho online hráčů s jejich IP adresou
+too-many-online-per-ip:
+  - '<header>'
+  - <red>Je příliš mnoho hráčů online s vaší IP adresou.
+  - '<footer>'
+
+# Překlady pro příkazy
+commands:
+  # Zpráva zobrazená, když se hráč pokusí spustit /sonar bez oprávnění
+  no-permission: '<prefix><red>Nemáte oprávnění k provedení tohoto příkazu.'
+  # Zpráva zobrazená, když někdo použije příkaz nesprávně
+  incorrect-usage: '<prefix><red>Použití: /sonar <subcommand-usage>'
+  # Zpráva zobrazená, když někdo zadá neplatnou IP adresu (Neplatný formát)
+  invalid-ip-address: '<prefix>IP adresa, kterou jste zadali, se zdá být neplatná.'
+  # Zpráva zobrazená, když konzole spustí příkaz, který je pouze pro hráče
+  player-only: '<prefix><red>Tento příkaz můžete provést pouze jako hráč.'
+  # Zpráva zobrazená, když hráč spustí příkaz, který je pouze pro konzoli
+  console-only: '<prefix><red>Z bezpečnostních důvodů můžete tento příkaz provést pouze přes konzoli.'
+  # Zpráva zobrazená, když hráč nemá oprávnění k provedení určitého podpříkazu
+  subcommand-no-permission: '<prefix><red>Nemáte oprávnění k provedení tohoto podpříkazu. <gray>(<permission>)'
+
+  # Překlady pro '/sonar'
+  main:
+    # Informační zpráva, která se zobrazí nad vším při spuštění hlavního příkazu
+    header:
+      - <yellow>Běží <b>Sonar</b> <version> na <platform>.
+      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development a přispěvatelé Sonaru</click>
+      - ''
+      - <gray>Potřebujete pomoc nebo máte nějaké otázky?
+      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Kliknutím otevřete Discord)'>Otevřete ticket na Discordu </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Kliknutím otevřete GitHub)'>nebo otevřete nový problém na GitHubu.
+      - ''
+    # Formátování seznamu podpříkazů zobrazených při spuštění hlavního příkazu
+    subcommands: '<suggest-subcommand><hover:show_text:''<gray>Pouze hráči: </gray><only-players><br><gray>Vyžaduje konzoli: </gray><only-console><br><gray>Oprávnění: </gray><white><permission><br><gray>Aliasy: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
+    # Formátování pro hodnoty ano (zaškrtnutí) a ne (křížek) v textu po najetí myší na podpříkazy
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
+
+  # Překlady pro '/sonar reload'
+  reload:
+    # Popis tohoto podpříkazu
+    description: "Znovu načíst všechny konfigurace"
+    # Zpráva zobrazená, když někdo začne znovu načítat Sonar
+    start: '<prefix>Znovu načítám Sonar...'
+    # Zpráva zobrazená, když Sonar dokončil znovu načítání
+    finish: '<prefix><green>Úspěšně znovu načteno <gray>(<time-taken>ms)'
+
+  # Překlady pro '/sonar verbose'
+  verbose:
+    # Popis tohoto podpříkazu
+    description: "Povolit nebo zakázat podrobný výpis Sonaru"
+    # Zpráva zobrazená, když se hráč přihlásí k odběru podrobného výpisu Sonaru
+    subscribe: '<prefix>Nyní zobrazujete podrobný výpis Sonaru.'
+    # Zpráva zobrazená, když se hráč odhlásí z odběru podrobného výpisu Sonaru
+    unsubscribe: '<prefix>Již nezobrazujete podrobný výpis Sonaru.'
+
+  # Překlady pro '/sonar notify'
+  notify:
+    # Popis tohoto podpříkazu
+    description: "Povolit nebo zakázat oznámení o útocích"
+    # Zpráva zobrazená, když se hráč přihlásí k odběru oznámení o útocích Sonaru
+    subscribe: '<prefix>Nyní zobrazujete oznámení o útocích Sonaru.'
+    # Zpráva zobrazená, když se hráč odhlásí z odběru oznámení o útocích Sonaru
+    unsubscribe: '<prefix>Již nezobrazujete oznámení o útocích Sonaru.'
+
+  # Překlady pro '/sonar blacklist'
+  blacklist:
+    # Popis tohoto podpříkazu
+    description: "Spravovat IP adresy na černé listině"
+    # Zpráva zobrazená, když se někdo pokusí vymazat černou listinu, ale je prázdná
+    empty: '<prefix>Černá listina je momentálně prázdná. Proto nebyly z černé listiny odstraněny žádné IP adresy.'
+    # Zpráva zobrazená, když někdo vymaže černou listinu
+    clear: '<prefix>Úspěšně jste odstranili celkem <amount> IP adres(y) z černé listiny.'
+    # Zpráva zobrazená, když někdo zkontroluje velikost černé listiny
+    size: '<prefix>Černá listina momentálně obsahuje <amount> IP adres(y).'
+    # Zpráva zobrazená, když někdo odstraní IP adresu z černé listiny
+    remove: '<prefix>Úspěšně odstraněno <ip> z černé listiny.'
+    # Zpráva zobrazená, když někdo přidá IP adresu na černou listinu
+    add: '<prefix>Úspěšně přidáno <ip> na černou listinu.'
+    # Zpráva zobrazená, když někdo přidá IP adresu na černou listinu, která je ověřená
+    add-warning: '<prefix><red>Varování: <white><ip> je momentálně na bílé listině. Zvažte odstranění IP adresy ze seznamu ověřených hráčů, abyste se vyhnuli potenciálním problémům.'
+    # Zpráva zobrazená, když někdo přidá IP adresu na černou listinu, ale již je na černé listině
+    ip-duplicate: '<prefix>IP adresa, kterou jste zadali, je již na černé listině.'
+    # Zpráva zobrazená, když někdo odstraní IP adresu z černé listiny, ale není na černé listině
+    ip-not-found: '<prefix>IP adresa, kterou jste zadali, není na černé listině.'
+
+  # Překlady pro '/sonar verified'
+  verified:
+    # Popis tohoto podpříkazu
+    description: "Spravovat ověřené IP adresy"
+    # Zpráva zobrazená, když se někdo pokusí vymazat seznam ověřených hráčů, ale je prázdný
+    empty: '<prefix>Seznam ověřených hráčů je momentálně prázdný. Proto nebyli žádní hráči odebráni z ověření.'
+    # Zpráva zobrazená, když někdo vymaže seznam ověřených hráčů
+    clear: '<prefix>Úspěšně jste odebrali ověření celkem <amount> unikátním hráčům.'
+    # Zpráva zobrazená, když někdo zkontroluje velikost seznamu ověřených hráčů
+    size: '<prefix>Momentálně je ověřeno <amount> unikátních hráčů.'
+    # Zpráva zobrazená, když někdo odebere ověření IP adrese
+    remove: '<prefix>Úspěšně odebráno ověření pro <ip>.'
+    # Zpráva zobrazená, když někdo ověří IP adresu
+    add: '<prefix>Úspěšně ověřeno <ip>.'
+    # Zpráva zobrazená, když se někdo pokusí ověřit IP adresu/UUID, které jsou již ověřeny
+    already: '<prefix>IP adresa a UUID, které jste zadali, jsou již ověřeny.'
+    # Zpráva zobrazená, když někdo odebere ověření IP adrese, ale není ověřena
+    ip-not-found: '<prefix>IP adresa, kterou jste zadali, není ověřena.'
+    # Zpráva zobrazená, když někdo vyhledá historii ověření IP adresy
+    history: '<prefix><yellow>Předchozí UUID pro <ip>:'
+    history-entry: ' <gray>▪ <white><uuid>'
+
+  # Překlady pro '/sonar statistics'
+  statistics:
+    # Popis tohoto podpříkazu
+    description: "Zobrazit statistiky relace tohoto serveru"
+    # Informační zpráva, která se zobrazí nad vším při zobrazení statistik
+    header: '<prefix>Zobrazuji <statistics-type> statistiky pro tuto relaci:'
+    # Zpráva zobrazená, když se hráč pokusí zobrazit neznámou statistiku
+    unknown-type: '<prefix><red>Neznámý typ statistiky! Dostupné statistiky: <gray><statistics>'
+    # Formát zprávy obecných statistik
+    general:
+      - ' <dark_aqua>▪ <gray>Ověřené IP adresy: <white><verified>'
+      - ' <dark_aqua>▪ <gray>Ověřující se IP adresy: <white><verifying>'
+      - ' <dark_aqua>▪ <gray>IP adresy na černé listině: <white><blacklisted>'
+      - ' <dark_aqua>▪ <gray>Aktuálně ve frontě přihlášení: <white><queued>'
+      - ' <dark_aqua>▪ <gray>Celkový počet ne-unikátních připojení: <white><total-joins>'
+      - ' <dark_aqua>▪ <gray>Celkový počet pokusů o ověření: <white><total-attempts>'
+      - ' <dark_aqua>▪ <gray>Celkový počet neúspěšných ověření: <white><total-failed>'
+      - ' <dark_aqua>▪ <gray>Doba provozu serveru: <white><server-uptime>'
+    # Formát zprávy statistik CPU
+    cpu:
+      - ' <dark_aqua>▪ <gray>Využití CPU procesem právě teď: <white><process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Využití CPU systémem právě teď: <white><system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Využití CPU procesem na jádro: <white><average-process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Využití CPU systémem na jádro: <white><average-system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Celkový počet virtuálních CPU: <white><virtual-core-count>'
+    # Formát zprávy statistik paměti
+    memory:
+      - ' <dark_aqua>▪ <gray>Celková volná paměť: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>Celková použitá paměť: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>Celková maximální paměť: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>Celková alokovaná paměť: <white><total-memory>'
+    # Formát zprávy statistik sítě
+    network:
+      - ' <dark_aqua>▪ <gray>Aktuální příchozí využitá šířka pásma: <white><incoming-traffic>'
+      - ' <dark_aqua>▪ <gray>Aktuální odchozí využitá šířka pásma: <white><outgoing-traffic>'
+      - ' <dark_aqua>▪ <gray>Celková příchozí využitá šířka pásma: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Celková odchozí využitá šířka pásma: <white><incoming-traffic-ttl>'
+
+  # Překlady pro '/sonar dump'
+  dump:
+    # Popis tohoto podpříkazu
+    description: "Vypsat informace pro vývojáře"
+    # Formát informací odeslaných do konzole
+    log: "Vygenerovaný výpis: <dumped-json-data>"
+
+# Překlady pro všechny zprávy během procesu ověření
+verification:
+  # Překlady pro všechny ladící zprávy během ověření
+  logs:
+    # Zpráva zaznamenána do konzole, kdykoli se nový hráč připojí k serveru
+    connection: '<username><ip> (<protocol>) se připojil.'
+    # Zpráva zaznamenána do konzole, kdykoli hráč selže při ověření
+    failed: '<ip> (<protocol>) neprošel kontrolou bota z důvodu: <reason>'
+    # Zpráva zaznamenána do konzole, kdykoli je hráč zařazen na černou listinu
+    blacklisted: '<ip> (<protocol>) byl zařazen na černou listinu kvůli příliš mnoha neúspěšným pokusům'
+    # Zpráva zaznamenána do konzole, kdykoli je hráč ověřen
+    successful: '<username> byl úspěšně ověřen (<time-taken>s!).'
+
+  # Zprávy, které se zobrazují hráči, když má zadat CAPTCHA
+  captcha:
+    # Zpráva zobrazená hráči, když má zadat odpověď na captchu
+    enter-code: '<prefix><green>Prosím, zadejte do chatu kód, který je zobrazen na mapě.'
+    # Zpráva zobrazená hráči, když zadá špatnou odpověď do chatu
+    incorrect: '<prefix><red>Zadali jste špatný kód. Zkuste to prosím znovu.'
+
+  # Zpráva o odpojení, která se zobrazí, když se někdo připojí, zatímco captcha ještě není připravena
+  currently-preparing:
+    - '<header>'
+    - <yellow>Vaše anti-bot data ještě nejsou připravena.
+    - <gray>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
+    - '<footer>'
+  # Zpráva o odpojení, která se zobrazí, když se někdo znovu připojí příliš rychle během ověření
+  too-fast-reconnect:
+    - '<header>'
+    - <gold>Připojili jste se příliš rychle, zkuste to později.
+    - <gray>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
+    - '<footer>'
+  # Zpráva o odpojení, která se zobrazí, když se někdo připojí, ale již probíhá jeho ověření
+  already-verifying:
+    - '<header>'
+    - <red>Vaše IP adresa je právě ověřována.
+    - <red>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
+    - '<footer>'
+  # Zpráva o odpojení, která se zobrazí, když se někdo připojí, ale je již ve frontě na ověření
+  already-queued:
+    - '<header>'
+    - <red>Vaše IP adresa je momentálně ve frontě na ověření.
+    - <red>Počkejte prosím několik minut, než se pokusíte znovu ověřit.
+    - '<footer>'
+  # Zpráva o odpojení, která se zobrazí, když se někdo připojí, ale je dočasně na černé listině
+  blacklisted:
+    - '<header>'
+    - <red>Momentálně vám je odepřen vstup na server.
+    - <red>Počkejte prosím několik minut, abyste se mohli znovu připojit k serveru.
+    - <gold>Falešně pozitivní? <gray><support-url>
+    - '<footer>'
+  # Zpráva o odpojení, která se zobrazí, když se někdo připojí s neplatným uživatelským jménem
+  invalid-username:
+    - '<header>'
+    - <red>Vaše uživatelské jméno obsahuje neplatné znaky.
+    - '<footer>'
+  # Zpráva o odpojení, která se zobrazí, když se někdo připojí s verzí na černé listině
+  blacklisted-protocol:
+    - '<header>'
+    - <red>Používáte verzi, která není na našem serveru povolena.
+    - <gold>Potřebujete pomoc s přihlášením? <gray><support-url>
+    - '<footer>'
+  # Zpráva o odpojení, která se zobrazí, když někdo úspěšně projde ověřením
+  success:
+    - '<header>'
+    - <green>Úspěšně jste prošli ověřením.
+    - <white>Nyní se můžete připojit k serveru po opětovném připojení.
+  # Zpráva o odpojení, která se zobrazí, když někdo selže při ověření
+  failed:
+    - '<header>'
+    - <red>Neprošli jste ověřením bota.
+    - <gray>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
+    - <gold>Potřebujete pomoc s přihlášením? <gray><support-url>
+    - '<footer>'
+
+# Překlady pro podrobné zprávy Sonaru v panelu akcí
+verbose:
+  layout:
+    # Rozložení pro podrobné zprávy Sonaru v panelu akcí
+    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Přihlášení/s <white><logins-per-second> <dark_aqua>╺ <gray>Ověřování <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    # Rozložení pro podrobné zprávy Sonaru v panelu akcí během útoku
+    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Přihlášení/s <white><logins-per-second> <dark_aqua>╺ <gray>Fronta <white><queued> <dark_aqua>╺ <gray>Ověřování <white><verifying> <dark_aqua>╺ <gray>Trvání <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+  # Animace pro panel akcí
+  # Alternativy:
+  # - ▙, ▛, ▜, ▟
+  # - ⬈, ⬊, ⬋, ⬉
+  animation:
+    - ◜
+    - ◝
+    - ◞
+    - ◟
+
+# Překlady pro oznámení o útoku Sonaru
+notifications:
+  # Rozložení pro titulek oznámení o útoku Sonaru
+  title: <yellow><b>Sonar<reset>
+  # Rozložení pro podtitulek oznámení o útoku Sonaru
+  subtitle: <gray>Byl detekován útok botů
+  # Rozložení pro oznámení o útoku Sonaru v chatu
+  chat:
+    - ''
+    - <yellow><b>Sonar<reset>
+    - ''
+    - <gray>Byl detekován útok botů.
+    - ' <dark_aqua>▪ <gray>Přihlášení za sekundu: <white><logins-per-second>'
+    - ' <dark_aqua>▪ <gray>Ověřující se hráči: <white><verifying>'
+    - ' <dark_aqua>▪ <gray>Hráči ve frontě: <white><queued>'
+    - ''
+    - <gray>Zobrazit více informací pomocí <white><click:run_command:'/sonar verbose'><hover:show_text:'(Klikněte pro spuštění)'>/sonar verbose</hover></click><gray> nebo <white><click:run_command:'/sonar stats'><hover:show_text:'(Klikněte pro spuštění)'>/sonar stats</hover></click><gray>.
+    - ''
