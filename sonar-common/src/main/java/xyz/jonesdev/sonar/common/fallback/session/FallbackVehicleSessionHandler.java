@@ -57,8 +57,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     this.forceCAPTCHA = forceCAPTCHA;
 
     // Send the necessary packets to mount the player on the vehicle
-    final int entityTypeId = EntityType.BOAT.getId(user.getProtocolVersion());
-    user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, entityTypeId,
+    user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, EntityType.BOAT,
       SPAWN_X_POSITION, DEFAULT_Y_COLLIDE_POSITION, SPAWN_Z_POSITION));
     user.delayedWrite(setPassengers);
     user.getChannel().flush();

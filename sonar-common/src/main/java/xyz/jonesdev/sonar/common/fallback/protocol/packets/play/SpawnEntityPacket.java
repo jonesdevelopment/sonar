@@ -25,6 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 
 import java.util.UUID;
 
@@ -37,7 +38,8 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SpawnEntityPacket implements FallbackPacket {
-  private int entityId, entityType;
+  private int entityId;
+  private EntityType entityType;
   private double x, y, z;
 
   @Override
@@ -51,9 +53,9 @@ public final class SpawnEntityPacket implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      writeVarInt(byteBuf, entityType);
+      writeVarInt(byteBuf, entityType.getId(protocolVersion));
     } else {
-      byteBuf.writeByte(entityType);
+      byteBuf.writeByte(entityType.getId(protocolVersion));
     }
 
     if (v1_9orHigher) {
