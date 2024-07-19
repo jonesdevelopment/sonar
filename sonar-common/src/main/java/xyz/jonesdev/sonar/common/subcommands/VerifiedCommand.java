@@ -79,16 +79,18 @@ public final class VerifiedCommand extends Subcommand {
         final String rawAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
         // Make sure the given IP address is valid
         if (rawAddress == null) return;
+        // An InetAddress starts with /, we need to account for this
+        final String inetAddress = "/" + rawAddress;
 
         // Make sure the player is verified already
-        if (!Sonar.get().getVerifiedPlayerController().has(rawAddress)) {
+        if (!Sonar.get().getVerifiedPlayerController().has(inetAddress)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.ip-not-found"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
           return;
         }
 
-        Sonar.get().getVerifiedPlayerController().remove(rawAddress);
+        Sonar.get().getVerifiedPlayerController().remove(inetAddress);
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.remove"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
@@ -105,6 +107,8 @@ public final class VerifiedCommand extends Subcommand {
         final String rawAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
         // Make sure the given IP address is valid
         if (rawAddress == null) return;
+        // An InetAddress starts with /, we need to account for this
+        final String inetAddress = "/" + rawAddress;
 
         // Try to parse the UUID (from the username, if needed)
         final String rawUUID = invocation.getRawArguments()[3];
@@ -112,7 +116,7 @@ public final class VerifiedCommand extends Subcommand {
           : UUID.nameUUIDFromBytes(("OfflinePlayer:" + rawUUID).getBytes(StandardCharsets.UTF_8));
 
         // Make sure the player is verified already
-        if (Sonar.get().getVerifiedPlayerController().has(rawAddress, uuid)) {
+        if (Sonar.get().getVerifiedPlayerController().has(inetAddress, uuid)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.already"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
@@ -121,7 +125,7 @@ public final class VerifiedCommand extends Subcommand {
 
         // Add verified player to the database
         final long timestamp = System.currentTimeMillis();
-        Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(rawAddress, uuid, timestamp));
+        Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(inetAddress, uuid, timestamp));
 
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.add"),
