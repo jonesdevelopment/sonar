@@ -103,15 +103,15 @@ public final class FallbackUserWrapper implements FallbackUser {
     // Call the VerifyJoinEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(username, this));
 
-    // Mark the player as connected by caching them in a map of verifying players
-    Sonar.get().getFallback().getConnected().compute(inetAddress, (_k, _v) -> (byte) 0);
-
     // Run this in the channel's event loop to avoid issues
     channel.eventLoop().execute(() -> {
       // Make sure the channel is still active
       if (!channel.isActive()) {
         return;
       }
+
+      // Mark the player as connected by caching them in a map of verifying players
+      Sonar.get().getFallback().getConnected().compute(inetAddress, (_k, _v) -> (byte) 0);
 
       // Replace normal encoder to allow custom packets
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
