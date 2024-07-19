@@ -35,11 +35,11 @@ public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
     }
 
     final FallbackVarInt21ByteDecoder reader = new FallbackVarInt21ByteDecoder();
+    final int end = in.forEachByte(reader);
 
-    int end = in.forEachByte(reader);
     if (end == -1) {
-      // We tried to go beyond the end of the buffer. This is probably a good sign that the
-      // buffer was too short to hold a proper varint.
+      // We tried to go beyond the end of the buffer.
+      // This is probably a good sign that the buffer was too short to hold a proper varint.
       if (reader.getResult() == FallbackVarInt21ByteDecoder.DecodeResult.RUN_OF_ZEROES) {
         // Special case where the entire packet is just a run of zeroes. We ignore them all.
         in.clear();
@@ -48,7 +48,7 @@ public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
     }
 
     if (reader.getResult() == FallbackVarInt21ByteDecoder.DecodeResult.RUN_OF_ZEROES) {
-      // this will return to the point where the next varint starts
+      // This will return to the point where the next varint starts
       in.readerIndex(end);
     } else if (reader.getResult() == FallbackVarInt21ByteDecoder.DecodeResult.SUCCESS) {
       final int readVarInt = reader.getReadVarInt();

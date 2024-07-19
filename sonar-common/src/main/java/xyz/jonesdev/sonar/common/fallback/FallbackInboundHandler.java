@@ -65,7 +65,6 @@ public final class FallbackInboundHandler extends ChannelInboundHandlerAdapter {
 
   // We can override the default exceptionCaught method since this handler
   // will run before the connection knows that there has been an error.
-  // Additionally, this will also run after our custom decoder.
   @Override
   public void exceptionCaught(final @NotNull ChannelHandlerContext ctx,
                               final @NotNull Throwable cause) throws Exception {

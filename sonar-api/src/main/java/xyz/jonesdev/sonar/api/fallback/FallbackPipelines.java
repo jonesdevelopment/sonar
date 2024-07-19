@@ -25,5 +25,6 @@ public interface FallbackPipelines {
   String FALLBACK_PACKET_HANDLER = "sonar-packet-handler";
   String FALLBACK_PACKET_ENCODER = "sonar-packet-encoder";
   String FALLBACK_PACKET_DECODER = "sonar-packet-decoder";
+  String FALLBACK_TAIL_EXCEPTIONS = "sonar-exception-tail";
   String FALLBACK_BANDWIDTH = "sonar-bandwidth-counter";
 }
