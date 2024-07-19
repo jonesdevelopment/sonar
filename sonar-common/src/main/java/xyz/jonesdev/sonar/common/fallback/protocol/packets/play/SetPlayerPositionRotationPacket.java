@@ -33,7 +33,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class SetPlayerPositionRotation implements FallbackPacket {
+public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   private double x, y, z;
   private float yaw, pitch;
   private int teleportId;

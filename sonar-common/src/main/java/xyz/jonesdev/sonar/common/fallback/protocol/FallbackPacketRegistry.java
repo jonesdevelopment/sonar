@@ -134,7 +134,7 @@ public enum FallbackPacketRegistry {
         map(0x1A, MINECRAFT_1_19_4, true),
         map(0x1B, MINECRAFT_1_20_2, true),
         map(0x1D, MINECRAFT_1_20_5, true));
-      clientbound.register(SetPlayerPositionRotation.class, SetPlayerPositionRotation::new,
+      clientbound.register(SetPlayerPositionRotationPacket.class, SetPlayerPositionRotationPacket::new,
         map(0x08, MINECRAFT_1_7_2, true),
         map(0x2E, MINECRAFT_1_9, true),
         map(0x2F, MINECRAFT_1_12_1, true),
@@ -454,7 +454,7 @@ public enum FallbackPacketRegistry {
         map(0x0D, MINECRAFT_1_19_4, false),
         map(0x0F, MINECRAFT_1_20_2, false),
         map(0x12, MINECRAFT_1_21, false));
-      serverbound.register(SetPlayerPositionRotation.class, SetPlayerPositionRotation::new,
+      serverbound.register(SetPlayerPositionRotationPacket.class, SetPlayerPositionRotationPacket::new,
         map(0x06, MINECRAFT_1_7_2, false),
         map(0x0D, MINECRAFT_1_9, false),
         map(0x0F, MINECRAFT_1_12, false),

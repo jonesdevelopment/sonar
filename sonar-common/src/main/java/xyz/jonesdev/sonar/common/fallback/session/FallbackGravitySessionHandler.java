@@ -107,10 +107,10 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    if (packet instanceof SetPlayerPositionRotation) {
+    if (packet instanceof SetPlayerPositionRotationPacket) {
       // Make sure the player has teleported before checking for position packets
       if (teleported) {
-        final SetPlayerPositionRotation positionLook = (SetPlayerPositionRotation) packet;
+        final SetPlayerPositionRotationPacket positionLook = (SetPlayerPositionRotationPacket) packet;
         handleMovement(positionLook.getX(), positionLook.getY(), positionLook.getZ(), positionLook.isOnGround());
       }
     } else if (packet instanceof SetPlayerPositionPacket) {

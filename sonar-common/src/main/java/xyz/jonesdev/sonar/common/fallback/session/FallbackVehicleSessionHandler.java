@@ -23,13 +23,11 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PaddleBoatPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PlayerInputPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetPassengersPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SpawnEntityPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 import java.util.UUID;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -58,20 +56,20 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
     // Send the necessary packets to mount the player on the vehicle
     user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, EntityType.BOAT,
-      SPAWN_X_POSITION, DEFAULT_Y_COLLIDE_POSITION, SPAWN_Z_POSITION));
+      SPAWN_X_POSITION, -63.5, SPAWN_Z_POSITION));
     user.delayedWrite(setPassengers);
     user.getChannel().flush();
   }
 
   private final boolean forceCAPTCHA;
-  private boolean receivedPaddle, receivedInput;
+  private int paddlePackets, inputPackets;
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
     if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
       // Make sure the player exits the vehicle before sending the CAPTCHA
       user.delayedWrite(removeEntities);
-      // Either send the player to the CAPTCHA, or finish the verification.
+      // Either send the player to the CAPTCHA or finish the verification.
       final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
       decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
@@ -81,11 +79,31 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     }
   }
 
+  // The entity will die when the y coordinate of it is <64
+  // We can abuse this mechanic and check for position packets when the entity dies
+  private void move(double y) {
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+      y -= 1.62f; // Account for 1.7 bounding box
+    }
+    // Check the Y position of the player
+    checkState(y < -64, "invalid y position");
+    // According to the boat motion, the number of packets sent by the client is 5 (minimum)
+    checkState(inputPackets >= 5, "invalid input packet count " + inputPackets);
+    checkState(paddlePackets >= 5, "invalid paddle packet count " + paddlePackets);
+    // Mark this check as successful
+    markSuccess();
+  }
+
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    if (packet instanceof PaddleBoatPacket) {
-      // Mark the PaddleBoat packet as received
-      receivedPaddle = true;
+    if (packet instanceof SetPlayerPositionRotationPacket) {
+      final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
+      move(posRot.getY());
+    } else if (packet instanceof SetPlayerPositionPacket) {
+      final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
+      move(position.getY());
+    } else if (packet instanceof PaddleBoatPacket) {
+      paddlePackets++;
     } else if (packet instanceof PlayerInputPacket) {
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
@@ -98,19 +116,12 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
         return;
       }
 
-      // Mark this check as success if the player has sent
-      // two PlayerInput and a minimum of one PaddleBoat packets.
-      if (receivedInput && receivedPaddle) {
-        markSuccess();
-      }
-
       // 1.8 and below do not have PaddleBoat packets,
       // so we simply exempt them from the PaddleBoat check.
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
-        receivedPaddle = true;
+        paddlePackets++;
       }
-      // Mark the PlayerInput packet as received
-      receivedInput = true;
+      inputPackets++;
     }
   }
 }

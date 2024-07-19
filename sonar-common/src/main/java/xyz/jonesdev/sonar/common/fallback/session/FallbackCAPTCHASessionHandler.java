@@ -90,7 +90,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
       checkState(tries-- > 0, "failed captcha too often");
       user.write(incorrectCaptcha);
     } else if (packet instanceof SetPlayerPositionPacket
-      || packet instanceof SetPlayerPositionRotation) {
+      || packet instanceof SetPlayerPositionRotationPacket) {
       // A position packet is sent approximately every second
       final long difference = maxDuration - user.getLoginTimer().delay();
       final int index = (int) (difference / 1000D);

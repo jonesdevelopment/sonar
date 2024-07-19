@@ -96,7 +96,7 @@ public class FallbackPreparer {
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
 
   // Captcha position
-  public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotation(
+  public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
     SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false));
 
   // Platform
@@ -143,7 +143,7 @@ public class FallbackPreparer {
     dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + (int) Math.ceil(maxFallDistance);
     defaultSpawnPosition = new FallbackPacketSnapshot(new SetDefaultSpawnPositionPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION));
-    spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotation(
+    spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
       0, -90, TELEPORT_ID, false));
 
