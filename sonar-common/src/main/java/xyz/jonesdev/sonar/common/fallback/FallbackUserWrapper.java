@@ -46,7 +46,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.CONFIG;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 
@@ -205,8 +205,8 @@ public final class FallbackUserWrapper implements FallbackUser {
                                final @NotNull ProtocolVersion protocolVersion,
                                final @NotNull Object msg) {
     if (channel.isActive()) {
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0
-        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_7_2) >= 0) {
+      if (protocolVersion.compareTo(MINECRAFT_1_8) < 0
+        && protocolVersion.compareTo(MINECRAFT_1_7_2) >= 0) {
         channel.eventLoop().execute(() -> {
           channel.config().setAutoRead(false);
           channel.eventLoop().schedule(() -> {
