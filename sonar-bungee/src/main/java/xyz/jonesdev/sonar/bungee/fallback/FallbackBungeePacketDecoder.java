@@ -32,7 +32,6 @@ import xyz.jonesdev.sonar.common.fallback.FallbackPacketDecoderAdapter;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
-import java.util.List;
 
 import static net.md_5.bungee.netty.PipelineUtils.BOSS_HANDLER;
 import static net.md_5.bungee.netty.PipelineUtils.PACKET_ENCODER;
@@ -55,9 +54,7 @@ final class FallbackBungeePacketDecoder extends FallbackPacketDecoderAdapter {
   }
 
   @Override
-  protected void decode(final @NotNull ChannelHandlerContext ctx,
-                        final @NotNull Object msg,
-                        final @NotNull List<Object> out) throws Exception {
+  public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
     // Intercept any packets processed by BungeeCord
     if (msg instanceof PacketWrapper) {
       final PacketWrapper packetWrapper = (PacketWrapper) msg;
@@ -97,6 +94,6 @@ final class FallbackBungeePacketDecoder extends FallbackPacketDecoderAdapter {
       }
     }
     // Make sure to let the server handle the rest
-    out.add(msg);
+    ctx.fireChannelRead(msg);
   }
 }

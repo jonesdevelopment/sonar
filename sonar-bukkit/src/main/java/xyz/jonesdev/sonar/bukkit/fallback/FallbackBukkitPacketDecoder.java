@@ -29,7 +29,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePa
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacket;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 import java.util.Objects;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
@@ -53,9 +52,7 @@ final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
   }
 
   @Override
-  protected void decode(final @NotNull ChannelHandlerContext ctx,
-                        final @NotNull Object msg,
-                        final @NotNull List<Object> out) throws Exception {
+  public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
     if (msg instanceof ByteBuf) {
       final ByteBuf originalByteBuf = (ByteBuf) msg;
       final ByteBuf byteBuf = ctx.alloc().buffer().writeBytes(originalByteBuf);
@@ -118,13 +115,13 @@ final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
           // Let Sonar process the login packet
           handleLogin(ctx.channel(), ctx, () -> {
             byteBuf.readerIndex(originalReaderIndex);
-            out.add(byteBuf.retain());
+            ctx.fireChannelRead(byteBuf.retain());
           }, loginStart.getUsername(), socketAddress);
           return;
         }
 
         byteBuf.readerIndex(originalReaderIndex);
-        out.add(byteBuf.retain());
+        ctx.fireChannelRead(byteBuf.retain());
       } finally {
         byteBuf.release();
       }

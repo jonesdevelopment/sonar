@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.common.fallback.FallbackPacketDecoderAdapter;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 
 import static com.velocitypowered.proxy.network.Connections.HANDLER;
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
@@ -37,9 +36,7 @@ final class FallbackVelocityPacketDecoder extends FallbackPacketDecoderAdapter {
   }
 
   @Override
-  protected void decode(final @NotNull ChannelHandlerContext ctx,
-                        final @NotNull Object msg,
-                        final @NotNull List<Object> out) throws Exception {
+  public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
     // Intercept any handshake packet by the client
     if (msg instanceof HandshakePacket handshake) {
       handleHandshake(ctx.channel(), handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
@@ -60,6 +57,6 @@ final class FallbackVelocityPacketDecoder extends FallbackPacketDecoderAdapter {
       return;
     }
     // Make sure to let the server handle the rest
-    out.add(msg);
+    ctx.fireChannelRead(msg);
   }
 }
