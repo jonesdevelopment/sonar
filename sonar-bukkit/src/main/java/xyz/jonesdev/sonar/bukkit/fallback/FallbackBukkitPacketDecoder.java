@@ -32,6 +32,7 @@ import java.net.InetSocketAddress;
 import java.util.Objects;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
+import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
@@ -93,12 +94,12 @@ final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
         if (packet instanceof HandshakePacket) {
           final HandshakePacket handshake = (HandshakePacket) packet;
           switch (handshake.getIntent()) {
-            case 1:
+            case STATUS:
               // We don't care about server pings or transfers; remove the handler
               ctx.channel().pipeline().remove(this);
               break;
-            case 2:
-            case 3:
+            case LOGIN:
+            case TRANSFER:
               // Let the actual handler know about the handshake packet
               handleHandshake(ctx.channel(), handshake.getHostname(), handshake.getProtocolVersionId());
               // Be ready for the next packet (which is supposed to be a login packet)

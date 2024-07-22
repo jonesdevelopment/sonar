@@ -37,6 +37,11 @@ public final class HandshakePacket implements FallbackPacket {
   private static final String FORGE_TOKEN = "\0FML\0";
   private static final int MAXIMUM_HOSTNAME_LENGTH = 255 + FORGE_TOKEN.length() + 1;
 
+  // https://wiki.vg/Protocol#Handshaking
+  public static final int STATUS = 1;
+  public static final int LOGIN = 2;
+  public static final int TRANSFER = 3;
+
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
