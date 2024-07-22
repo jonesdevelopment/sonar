@@ -110,8 +110,8 @@ public class FallbackBukkitInjector {
 
     for (final BukkitServerVersion serverVersion : BukkitServerVersion.REVERSED_VALUES) {
       if (bukkitVersion.contains(serverVersion.getRelease())) {
-        Sonar.get().getLogger().info("Detected Minecraft {} on Bukkit {}",
-          serverVersion.getRelease(), bukkitVersion);
+        Sonar.get().getLogger().info("Detected Minecraft {} on {} {}",
+          serverVersion.getRelease(), Bukkit.getName(), bukkitVersion);
         return serverVersion;
       }
     }
