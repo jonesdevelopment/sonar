@@ -94,6 +94,10 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
       () -> getConfig().getVerification().getTiming().getDisplayName()));
     metrics.addCustomChart(new SimplePie("captcha",
       () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
+    metrics.addCustomChart(new SimplePie("language",
+      () -> getConfig().getLanguage().getName()));
+    metrics.addCustomChart(new SimplePie("database_type",
+      () -> getConfig().getDatabase().getType().getDisplayName()));
 
     // Register Sonar command
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());

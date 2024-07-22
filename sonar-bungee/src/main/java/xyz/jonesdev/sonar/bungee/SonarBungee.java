@@ -94,6 +94,10 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
       () -> getConfig().getVerification().getTiming().getDisplayName()));
     metrics.addCustomChart(new SimplePie("captcha",
       () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
+    metrics.addCustomChart(new SimplePie("language",
+      () -> getConfig().getLanguage().getName()));
+    metrics.addCustomChart(new SimplePie("database_type",
+      () -> getConfig().getDatabase().getType().getDisplayName()));
 
     // Register Sonar command
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());

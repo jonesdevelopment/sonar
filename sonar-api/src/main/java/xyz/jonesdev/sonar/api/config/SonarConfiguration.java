@@ -49,6 +49,8 @@ public final class SonarConfiguration {
   private final SimpleYamlConfig generalConfig, messagesConfig, webhookConfig;
   @Getter
   private final File languageFile, pluginFolder;
+  @Getter
+  private Language language;
 
   static final LoggerWrapper LOGGER = new LoggerWrapper() {
 
@@ -122,27 +124,27 @@ public final class SonarConfiguration {
     }
 
     // Generate the language file and check what it's set to
-    Language preferredLanguage = getPreferredLanguage();
-    if (preferredLanguage == Language.SYSTEM) {
+    language = getPreferredLanguage();
+    if (language == Language.SYSTEM) {
       try {
         // Try using the system language to determine the language file
         final String property = System.getProperty("user.language", "en");
-        preferredLanguage = Language.fromCode(property);
+        language = Language.fromCode(property);
         // Make sure the user knows that we're using the system language for translations
-        LOGGER.info("Using system language ({}) for translations.", preferredLanguage);
+        LOGGER.info("Using system language ({}) for translations.", language);
       } catch (Exception exception) {
         LOGGER.warn("Could not use system language for translations.");
-        LOGGER.warn("Using default language ({}) for translations.", preferredLanguage);
+        LOGGER.warn("Using default language ({}) for translations.", language);
       }
     } else {
-      LOGGER.info("Using custom language ({}) for translations.", preferredLanguage);
+      LOGGER.info("Using custom language ({}) for translations.", language);
     }
 
     // Load all configurations
     try {
-      generalConfig.load(getAsset("config", preferredLanguage));
-      messagesConfig.load(getAsset("messages", preferredLanguage));
-      webhookConfig.load(getAsset("webhook", preferredLanguage));
+      generalConfig.load(getAsset("config", language));
+      messagesConfig.load(getAsset("messages", language));
+      webhookConfig.load(getAsset("webhook", language));
     } catch (Exception exception) {
       throw new IllegalStateException("Error loading configuration", exception);
     }
@@ -482,29 +484,30 @@ public final class SonarConfiguration {
     @Getter
     @RequiredArgsConstructor
     public enum Type {
-      MYSQL("jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter(),
+      MYSQL("MySQL", "jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter(),
         Library.builder()
           .groupId("com{}mysql")
           .artifactId("mysql-connector-j")
           .version("8.4.0")
           .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
           .build()),
-      MARIADB("jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter(),
+      MARIADB("MariaDB", "jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter(),
         Library.builder()
           .groupId("org{}mariadb{}jdbc")
           .artifactId("mariadb-java-client")
           .version("3.4.0")
           .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
           .build()),
-      H2("jdbc:h2:file:%s", new H2DatabaseTypeAdapter(),
+      H2("H2", "jdbc:h2:file:%s", new H2DatabaseTypeAdapter(),
         Library.builder()
           .groupId("com{}h2database")
           .artifactId("h2")
           .version("2.1.214")
           .relocate("org{}h2", "xyz{}jonesdev{}sonar{}libs{}h2")
           .build()),
-      NONE(null, null, null);
+      NONE("None", null, null, null);
 
+      private final String displayName;
       private final String connectionString;
       private final DatabaseType databaseType;
       private final Library databaseDriver;
