@@ -4,8 +4,6 @@ plugins {
 
 bungee {
   name = rootProject.name
-  description = rootProject.description
-  version = rootProject.version.toString()
   main = "xyz.jonesdev.sonar.bungee.SonarBungeePlugin"
   author = "Jones Development, Sonar Contributors"
   softDepends = setOf("Geyser-BungeeCord", "floodgate", "Protocolize", "ViaVersion", "packetevents", "FastLogin")
