@@ -73,6 +73,12 @@ class LibraryLoader {
           .artifactId("adventure-text-serializer-gson")
           .version("4.17.0")
           .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
+          .build(),
+        Library.builder()
+          .groupId("net{}kyori")
+          .artifactId("adventure-nbt")
+          .version("4.17.0")
+          .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
           .build()
       );
     }

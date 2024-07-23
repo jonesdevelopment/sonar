@@ -16,8 +16,6 @@ adventure-serializer = { module = "net.kyori:adventure-text-serializer-gson", ve
 adventure-nbt = { module = "net.kyori:adventure-nbt", version.ref = "adventure" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
 adventure-platform-bungee = { module = "net.kyori:adventure-platform-bungeecord", version.ref = "adventure-platform" }
-adventure-platform-facet = { module = "net.kyori:adventure-platform-facet", version.ref = "adventure-platform" }
-adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventure-platform" }
 libby-core = { module = "com.alessiodp.libby:libby-core", version.ref = "libby" }
 libby-bungee = { module = "com.alessiodp.libby:libby-bungee", version.ref = "libby" }
 libby-bukkit = { module = "com.alessiodp.libby:libby-bukkit", version.ref = "libby" }

@@ -32,11 +32,11 @@ dependencies {
   implementation(project(":common"))
 
   compileOnly(rootProject.libs.spigot)
+  testCompileOnly(rootProject.libs.spigot)
 
-  implementation(rootProject.libs.adventure.platform.bukkit)
-  implementation(rootProject.libs.adventure.platform.api)
-  implementation(rootProject.libs.adventure.platform.facet)
-  implementation(rootProject.libs.adventure.nbt)
+  implementation(rootProject.libs.adventure.platform.bukkit) {
+    exclude(module = "adventure-nbt")
+  }
   implementation(rootProject.libs.bstats.bukkit)
   implementation(rootProject.libs.libby.bukkit)
 }
