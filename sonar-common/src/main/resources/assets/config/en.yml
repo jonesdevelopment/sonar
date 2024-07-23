@@ -177,6 +177,7 @@ verification:
   # If enabled, the player will be transferred back to the origin server
   # after successfully passing the bot verification.
   # This feature was introduced by Mojang in Minecraft version 1.20.5
+  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
   transfer:
     # Should Sonar transfer the player to the origin server (instead of kicking them)?
     # For this to work, you must enable the feature in your server's configuration.
@@ -185,7 +186,7 @@ verification:
     # player from being transferred correctly.
     enabled: false
     # Which server should Sonar transfer the player to when the verification is passed?
-    # Please enter the server IP that is used by players to normally connect to your server.
+    # Please enter the server IP used by players to normally connect to your server.
     # For example, you can put "mc.hypixel.net" or a direct IP like "1.1.1.1"
     destination-host: "play.my-server.com"
     # Which port should Sonar use when transferring the player to the origin server?

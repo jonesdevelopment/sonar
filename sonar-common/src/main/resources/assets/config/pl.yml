@@ -177,6 +177,7 @@ verification:
   # Jeśli opcja ta jest włączona, gracz zostanie przeniesiony z powrotem
   # na serwer początkowy po pomyślnym przejściu weryfikacji antybotowej.
   # Funkcja ta została wprowadzona przez Mojang w wersji 1.20.5
+  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
   transfer:
     # Czy Sonar powinien przenieść gracza na serwer początkowy (zamiast go wyrzucać)?
     # Aby to zadziałało, musisz włączyć tę funkcję w konfiguracji serwera.
