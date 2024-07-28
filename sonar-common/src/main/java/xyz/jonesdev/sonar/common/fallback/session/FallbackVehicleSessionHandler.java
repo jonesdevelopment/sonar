@@ -38,10 +38,15 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  *   {@link SpawnEntityPacket} and {@link SetPassengersPacket} packets are sent to the client,
  *   therefore, making the player enter a boat.
  *   <br>
+ *   If the user is on Minecraft: Java Edition, the boat is spawned at Y -63.5 since the client
+ *   automatically "kills"/destroys entities when the Y coordinate is lower than -64.
+ *   We can abuse this mechanic to create a simple check that makes sure the player automatically
+ *   exists the vehicle after falling for some ticks.
+ *   <br>
  *   See more: {@link FallbackVehicleSessionHandler}
  * </li>
  * <li>
- *   Then, all we do is listen for incoming {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets.
+ *   Then, we listen for incoming {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets.
  * </li>
  */
 public final class FallbackVehicleSessionHandler extends FallbackSessionHandler {
@@ -56,10 +61,12 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
     // Send the necessary packets to mount the player on the vehicle
     user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, EntityType.BOAT,
-      SPAWN_X_POSITION, -63.5, SPAWN_Z_POSITION));
+      SPAWN_X_POSITION, user.isGeyser() ? DEFAULT_Y_COLLIDE_POSITION : -63.5, SPAWN_Z_POSITION));
     user.delayedWrite(setPassengers);
     user.getChannel().flush();
   }
+
+  private static final int MINIMUM_PACKETS = 3;
 
   private final boolean forceCAPTCHA;
   private int paddlePackets, inputPackets;
@@ -68,7 +75,11 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     // Pass the player to the next best verification handler
     if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
       // Make sure the player exits the vehicle before sending the CAPTCHA
-      user.delayedWrite(removeEntities);
+      // We only need to do this for Geyser players since Java players delete
+      // the entity on the client-side.
+      if (user.isGeyser()) {
+        user.delayedWrite(removeEntities);
+      }
       // Either send the player to the CAPTCHA or finish the verification.
       final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
@@ -87,9 +98,9 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     }
     // Check the Y position of the player
     checkState(y < -64, "invalid y position");
-    // According to the boat motion, the number of packets sent by the client is 5 (minimum)
-    checkState(inputPackets >= 5, "invalid input packet count " + inputPackets);
-    checkState(paddlePackets >= 5, "invalid paddle packet count " + paddlePackets);
+    // According to the boat motion, the number of packets sent by the client is 3 (minimum)
+    checkState(inputPackets >= MINIMUM_PACKETS, "invalid input packet count " + inputPackets);
+    checkState(paddlePackets >= MINIMUM_PACKETS, "invalid paddle packet count " + paddlePackets);
     // Mark this check as successful
     markSuccess();
   }
@@ -97,11 +108,15 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof SetPlayerPositionRotationPacket) {
-      final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
-      move(posRot.getY());
+      if (!user.isGeyser()) {
+        final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
+        move(posRot.getY());
+      }
     } else if (packet instanceof SetPlayerPositionPacket) {
-      final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
-      move(position.getY());
+      if (!user.isGeyser()) {
+        final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
+        move(position.getY());
+      }
     } else if (packet instanceof PaddleBoatPacket) {
       paddlePackets++;
     } else if (packet instanceof PlayerInputPacket) {
@@ -113,6 +128,14 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
       // Only mark this packet as correct if the player is not moving the vehicle
       if (playerInput.isJump() || playerInput.isUnmount()) {
+        return;
+      }
+
+      // Geyser users handle entities differently; exempt them from the extra check
+      if (user.isGeyser()
+        && paddlePackets >= MINIMUM_PACKETS
+        && inputPackets >= MINIMUM_PACKETS) {
+        markSuccess();
         return;
       }
 
