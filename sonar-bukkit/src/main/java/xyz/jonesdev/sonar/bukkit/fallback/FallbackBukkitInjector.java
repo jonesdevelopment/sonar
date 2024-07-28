@@ -145,7 +145,7 @@ public class FallbackBukkitInjector {
       // We don't have to call the initialization method, since the channel is already initialized
       channel.pipeline().addLast(new FallbackInjectedChannelInitializer(null,
         pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_HANDLER,
-          new FallbackBukkitPacketDecoder())));
+          new FallbackBukkitInboundHandler())));
     }
   };
 

@@ -49,7 +49,7 @@ import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 @RequiredArgsConstructor
-public abstract class FallbackPacketDecoderAdapter extends ChannelInboundHandlerAdapter {
+public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandlerAdapter {
   protected final String encoder, handler;
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;

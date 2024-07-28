@@ -41,7 +41,7 @@ public class FallbackBungeeInjector {
       final ChannelInitializer<Channel> originalInitializer = PipelineUtils.SERVER_CHILD;
       final ChannelInitializer<Channel> injectedInitializer = new FallbackInjectedChannelInitializer(
       originalInitializer, pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_PACKET_HANDLER,
-        new FallbackBungeePacketDecoder()));
+        new FallbackBungeeInboundHandler()));
 
       final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
       unsafeField.setAccessible(true);

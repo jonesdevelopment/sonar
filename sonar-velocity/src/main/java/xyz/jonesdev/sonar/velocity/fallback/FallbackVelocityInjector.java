@@ -56,7 +56,7 @@ public class FallbackVelocityInjector {
       final ChannelInitializer<Channel> originalInitializer = connectionManager.serverChannelInitializer.get();
       final ChannelInitializer<Channel> injectedInitializer = new FallbackInjectedChannelInitializer(
         originalInitializer, pipeline -> pipeline.addAfter(MINECRAFT_DECODER, FALLBACK_PACKET_HANDLER,
-        new FallbackVelocityPacketDecoder()));
+        new FallbackVelocityInboundHandler()));
 
       // Replace the original channel initializer
       SERVER_CHANNEL_INITIALIZER_FIELD.set(connectionManager.getServerChannelInitializer(), injectedInitializer);

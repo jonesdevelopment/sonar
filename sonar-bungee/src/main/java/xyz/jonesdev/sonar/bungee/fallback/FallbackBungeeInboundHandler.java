@@ -27,7 +27,7 @@ import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
-import xyz.jonesdev.sonar.common.fallback.FallbackPacketDecoderAdapter;
+import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -36,9 +36,9 @@ import java.net.InetSocketAddress;
 import static net.md_5.bungee.netty.PipelineUtils.BOSS_HANDLER;
 import static net.md_5.bungee.netty.PipelineUtils.PACKET_ENCODER;
 
-final class FallbackBungeePacketDecoder extends FallbackPacketDecoderAdapter {
+final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
 
-  FallbackBungeePacketDecoder() {
+  FallbackBungeeInboundHandler() {
     super(PACKET_ENCODER, BOSS_HANDLER);
   }
 

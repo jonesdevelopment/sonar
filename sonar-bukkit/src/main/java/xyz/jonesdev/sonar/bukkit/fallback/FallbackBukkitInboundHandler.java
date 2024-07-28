@@ -22,7 +22,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.FallbackPacketDecoderAdapter;
+import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket;
@@ -35,9 +35,9 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry
 import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
-final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
+final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
 
-  FallbackBukkitPacketDecoder() {
+  FallbackBukkitInboundHandler() {
     super("encoder", "packet_handler");
 
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
@@ -55,6 +55,7 @@ final class FallbackBukkitPacketDecoder extends FallbackPacketDecoderAdapter {
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
     if (msg instanceof ByteBuf) {
+      // FIXME: actually implement this correctly to fix VV/PE issues
       final ByteBuf originalByteBuf = (ByteBuf) msg;
       final ByteBuf byteBuf = ctx.alloc().buffer().writeBytes(originalByteBuf);
       final int originalReaderIndex = byteBuf.readerIndex();
