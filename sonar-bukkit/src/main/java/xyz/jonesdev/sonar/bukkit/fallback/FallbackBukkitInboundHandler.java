@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -121,9 +122,8 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         handleLogin(ctx.channel(), ctx, () -> {
           byteBuf.readerIndex(originalReaderIndex);
           ctx.fireChannelRead(byteBuf);
+          ctx.channel().pipeline().remove(FallbackPipelines.FALLBACK_INBOUND_HANDLER);
         }, loginStart.getUsername(), socketAddress);
-        // Release the ByteBuf to avoid memory leaks
-        byteBuf.release();
         return;
       }
 
