@@ -78,12 +78,6 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   private void markSuccess() {
     // Pass the player to the next best verification handler
     if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
-      // Make sure the player exits the vehicle before sending the CAPTCHA
-      // We only need to do this for Geyser players since Java players delete
-      // the entity on the client-side.
-      if (user.isGeyser()) {
-        user.delayedWrite(removeEntities);
-      }
       // Either send the player to the CAPTCHA or finish the verification.
       final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
