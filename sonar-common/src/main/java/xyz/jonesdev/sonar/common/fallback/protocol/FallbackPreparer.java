@@ -88,7 +88,6 @@ public class FallbackPreparer {
   // Vehicle
   public FallbackPacket removeEntities;
   public FallbackPacket spawnEntity;
-  public FallbackPacket teleportEntity;
   public static FallbackPacket setPassengers;
   public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1;
 
@@ -97,10 +96,11 @@ public class FallbackPreparer {
   public final int SPAWN_X_POSITION = 16 / 2; // middle of the chunk
   public final int SPAWN_Z_POSITION = 16 / 2; // middle of the chunk
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
+  public final int IN_AIR_Y_POSITION = 1337;
 
   // Captcha position
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
-    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false));
+    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0f, 90f, 0, false));
 
   // Platform
   public BlockType blockType = BlockType.BARRIER;
@@ -188,9 +188,7 @@ public class FallbackPreparer {
     // Prepare packets for the vehicle check
     removeEntities = new FallbackPacketSnapshot(new RemoveEntitiesPacket(VEHICLE_ENTITY_ID));
     spawnEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(
-      VEHICLE_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION));
-    teleportEntity = new FallbackPacketSnapshot(new TeleportEntityPacket(
-      VEHICLE_ENTITY_ID, SPAWN_X_POSITION, -64, SPAWN_Z_POSITION, false));
+      VEHICLE_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     setPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER

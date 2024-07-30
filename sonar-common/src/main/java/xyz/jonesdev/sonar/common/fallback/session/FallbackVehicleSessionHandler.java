@@ -42,7 +42,6 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  *   After 3 {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets,
  *   the boat is teleported to y -64.
  *   <br>
- *   (If the user is on Minecraft: Bedrock Edition, this check is skipped.)
  *   The boat is spawned at Y -63.5 since the client automatically destroys
  *   entities when the Y coordinate is lower than -64.
  *   We can abuse this mechanic to create a simple check that makes sure the player automatically
@@ -71,8 +70,10 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   }
 
   private final boolean forceCAPTCHA;
-  private int paddlePackets, inputPackets;
+  private int paddlePackets, inputPackets, positionPackets;
   private boolean expectMovement;
+
+  private static final int MINIMUM_REQUIRED_PACKETS = 2;
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
@@ -100,9 +101,11 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       y -= 1.62f; // Account for 1.7 bounding box
     }
     // Check the Y position of the player
-    checkState(y < -64, "invalid y position");
-    // Mark this check as successful
-    markSuccess();
+    checkState(y <= IN_AIR_Y_POSITION, "invalid y position");
+    // Mark this check as successful if the player sent a few position packets
+    if (positionPackets++ > MINIMUM_REQUIRED_PACKETS) {
+      markSuccess();
+    }
   }
 
   @Override
@@ -123,8 +126,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
       // Check if the player is sending invalid vehicle speed values
-      checkState(Math.abs(playerInput.getForward()) <= 0.98f, "illegal vehicle speed (f)");
-      checkState(Math.abs(playerInput.getSideways()) <= 0.98f, "illegal vehicle speed (s)");
+      checkState(Math.abs(playerInput.getForward()) <= 0.98, "illegal vehicle speed (f)");
+      checkState(Math.abs(playerInput.getSideways()) <= 0.98, "illegal vehicle speed (s)");
 
       // Only mark this packet as correct if the player is not moving the vehicle
       if (playerInput.isJump() || playerInput.isUnmount()) {
@@ -132,15 +135,13 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       }
 
       // Once the player sent enough packets, go to the next stage
-      if (paddlePackets > 2 && inputPackets > 2) {
-        if (user.isGeyser()) {
-          markSuccess();
-          return;
-        }
+      if (paddlePackets > MINIMUM_REQUIRED_PACKETS && inputPackets > MINIMUM_REQUIRED_PACKETS) {
+        // Teleport the entity to y -64 to and kill the entity
+        // The next y coordinate the player will send is going
+        // to be the vehicle spawn position (y 64 in this case).
+        user.write(removeEntities);
+        // Listen for next movement packet(s)
         expectMovement = true;
-        // Teleport the entity to -64 to make the client kill the entity
-        // and make the player send a position packet at the correct coordinate.
-        user.write(teleportEntity);
         return;
       }
 
