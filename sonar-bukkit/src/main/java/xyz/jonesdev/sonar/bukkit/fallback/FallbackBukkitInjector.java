@@ -25,6 +25,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.bukkit.util.Lazy;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
@@ -36,6 +37,7 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_
 // Check out these links if you want to see some more magic
 // https://github.com/retrooper/packetevents/blob/2.0/spigot/src/main/java/io/github/retrooper/packetevents/util/SpigotReflectionUtil.java
 // https://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol/src/main/java/com/comphenix/tinyprotocol/TinyProtocol.java
+// https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/handlers/BukkitChannelInitializer.java
 @UtilityClass
 public class FallbackBukkitInjector {
   private final String LEGACY_NMS_PACKAGE;
@@ -84,8 +86,8 @@ public class FallbackBukkitInjector {
         minecraftServerInstance = getFieldAt(CRAFTBUKKIT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(Bukkit.getServer());
       }
 
-      Object finalMinecraftServerInstance = minecraftServerInstance;
-      MINECRAFT_SERVER_CONNECTION_INSTANCE = new Lazy<>(() -> getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(finalMinecraftServerInstance));
+      final Object serverInstance = minecraftServerInstance; // final field for lambda
+      MINECRAFT_SERVER_CONNECTION_INSTANCE = new Lazy<>(() -> getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(serverInstance));
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }
@@ -143,59 +145,54 @@ public class FallbackBukkitInjector {
   public void inject() {
     try {
       for (int i = 0; i < 2; i++) {
-        // We're using a label here, so we can escape the inner loops
-        injection: {
-          final Field field = getFieldAt(SERVER_CONNECTION_CLASS, List.class, i);
-          final List<?> list = (List<?>) field.get(MINECRAFT_SERVER_CONNECTION_INSTANCE.getValue());
+        final Field field = getFieldAt(SERVER_CONNECTION_CLASS, List.class, i);
 
-          // Late-bind could be enabled or this isn't out target field
-          if (list.isEmpty()) {
-            break injection;
-          }
-
-          for (final Object object : list) {
-            // We're only looking for a list of channel futures...
-            if (!(object instanceof ChannelFuture)) {
-              break injection;
-            }
-
-            final ChannelFuture channelFuture = (ChannelFuture) object;
-            final List<String> names = channelFuture.channel().pipeline().names();
-
-            ChannelHandler bootstrap = null;
-
-            for (final String name : names) {
-              try {
-                final ChannelHandler handler = channelFuture.channel().pipeline().get(name);
-                // Inline get method
-                final Field childHandlerField = handler.getClass().getDeclaredField("childHandler");
-                childHandlerField.setAccessible(true);
-                final var childHandler = (ChannelInitializer<?>) childHandlerField.get(handler);
-
-                if (childHandler != null) {
-                  bootstrap = handler;
-                }
-                break;
-              } catch (java.lang.ReflectiveOperationException exception) {
-                // Ignore this one
-              }
-            }
-
-            if (bootstrap == null) {
-              bootstrap = channelFuture.channel().pipeline().first();
-            }
-            final Field childHandlerField = bootstrap.getClass().getDeclaredField("childHandler");
-            childHandlerField.setAccessible(true);
-            final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
-
-            childHandlerField.set(bootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
-              pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler())));
-          }
-          return;
+        // Check if the field has the correct generic type;
+        // We need this field to be List<ChannelFuture>
+        if (!field.getGenericType().getTypeName().contains(ChannelFuture.class.getName())) {
+          continue;
         }
+
+        final var list = (List<?>) field.get(MINECRAFT_SERVER_CONNECTION_INSTANCE.getValue());
+
+        for (final Object object : list) {
+          final ChannelFuture channelFuture = (ChannelFuture) object;
+          final List<String> names = channelFuture.channel().pipeline().names();
+
+          ChannelHandler bootstrap = null;
+
+          for (final String name : names) {
+            try {
+              final ChannelHandler handler = channelFuture.channel().pipeline().get(name);
+              // Inline get method
+              final Field childHandlerField = handler.getClass().getDeclaredField("childHandler");
+              childHandlerField.setAccessible(true);
+              final var childHandler = (ChannelInitializer<?>) childHandlerField.get(handler);
+
+              if (childHandler != null) {
+                bootstrap = handler;
+              }
+              break;
+            } catch (Exception exception) {
+              // Ignore this one
+            }
+          }
+
+          if (bootstrap == null) {
+            bootstrap = channelFuture.channel().pipeline().first();
+          }
+
+          final Field childHandlerField = bootstrap.getClass().getDeclaredField("childHandler");
+          childHandlerField.setAccessible(true);
+          final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
+
+          childHandlerField.set(bootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
+            pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler())));
+        }
+        return;
       }
     } catch (Exception exception) {
-      throw new ReflectiveOperationException(exception);
+      Sonar.get().getLogger().error("An error occurred while injecting {}", exception);
     }
   }
 }
