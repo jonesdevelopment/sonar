@@ -105,15 +105,6 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     markSuccess();
   }
 
-  private void markVehicle() {
-    expectMovement = true;
-    // Teleport the entity to -64 to make the client kill the entity
-    // and make the player send a position packet at the correct coordinate.
-    user.delayedWrite(teleportEntity);
-    user.getChannel().flush();
-    System.out.println("teleported entity");
-  }
-
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof SetPlayerPositionRotationPacket) {
@@ -146,7 +137,10 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
           markSuccess();
           return;
         }
-        markVehicle();
+        expectMovement = true;
+        // Teleport the entity to -64 to make the client kill the entity
+        // and make the player send a position packet at the correct coordinate.
+        user.write(teleportEntity);
         return;
       }
 
