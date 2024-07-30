@@ -23,7 +23,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -105,8 +104,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
 
     if (SonarBukkitPlugin.lateBind) {
-      //Bukkit.getScheduler().runTask(getPlugin(), FallbackBukkitInjector::inject);
-      Bukkit.getScheduler().runTask(getPlugin(), FallbackBukkitInjector::inject);
+      getPlugin().getServer().getScheduler().runTask(getPlugin(), FallbackBukkitInjector::inject);
     }
   }
 
