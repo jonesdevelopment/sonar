@@ -18,9 +18,41 @@
 package xyz.jonesdev.sonar.bukkit;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
+
+import java.lang.reflect.Method;
+import java.util.logging.Level;
 
 public final class SonarBukkitPlugin extends JavaPlugin {
   private SonarBukkit bootstrap;
+
+  public static boolean lateBind = false;
+
+  @Override
+  public void onLoad() {
+    lateBind: {
+      try {
+        try {
+          Class.forName("org.bukkit.event.server.ServerLoadEvent");
+          // lateBind is removed in this spigot version.
+          break lateBind;
+        } catch (ClassNotFoundException ignore) {
+        }
+        final Class<?> spigotConfiguration = Class.forName("org.spigotmc.SpigotConfig");
+        final Method initFieldMethod = spigotConfiguration.getDeclaredMethod("lateBind");
+        initFieldMethod.setAccessible(true);
+        initFieldMethod.invoke(null);
+        if ((boolean) spigotConfiguration.getField("lateBind").get(null)) {
+          getLogger().log(Level.WARNING, "Late-bind is enabled on this server.");
+          lateBind = true;
+        }
+      } catch (final java.lang.ReflectiveOperationException ignore) {
+      }
+    }
+    if (!lateBind) {
+      FallbackBukkitInjector.inject();
+    }
+  }
 
   @Override
   public void onEnable() {
