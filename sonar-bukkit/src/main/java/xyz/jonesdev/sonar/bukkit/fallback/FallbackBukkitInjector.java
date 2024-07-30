@@ -17,18 +17,20 @@
 
 package xyz.jonesdev.sonar.bukkit.fallback;
 
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelInitializer;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
-import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_HANDLER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
 
 // Check out these links if you want to see some more magic
 // https://github.com/retrooper/packetevents/blob/2.0/spigot/src/main/java/io/github/retrooper/packetevents/util/SpigotReflectionUtil.java
@@ -110,8 +112,6 @@ public class FallbackBukkitInjector {
 
     for (final BukkitServerVersion serverVersion : BukkitServerVersion.REVERSED_VALUES) {
       if (bukkitVersion.contains(serverVersion.getRelease())) {
-        Sonar.get().getLogger().info("Detected Minecraft {} on {} {}",
-          serverVersion.getRelease(), Bukkit.getName(), bukkitVersion);
         return serverVersion;
       }
     }
@@ -137,28 +137,7 @@ public class FallbackBukkitInjector {
     return Class.forName(OBC_PACKAGE + clazz);
   }
 
-  // Credits to TinaProtocol for this idea!
-  private final ChannelHandler CLIENT_INITIALIZER = new ChannelInitializer<>() {
-
-    @Override
-    protected void initChannel(final @NotNull Channel channel) throws Exception {
-      // We don't have to call the initialization method, since the channel is already initialized
-      channel.pipeline().addLast(new FallbackInjectedChannelInitializer(null,
-        pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_HANDLER,
-          new FallbackBukkitInboundHandler())));
-    }
-  };
-
-  private final ChannelHandler SERVER_INITIALIZER = new ChannelInboundHandlerAdapter() {
-
-    @Override
-    public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
-      final Channel serverChannel = (Channel) msg;
-      serverChannel.pipeline().addFirst(CLIENT_INITIALIZER);
-      ctx.fireChannelRead(msg);
-    }
-  };
-
+  @SuppressWarnings("unchecked")
   public void inject() {
     try {
       for (int i = 0; i < 2; i++) {
@@ -178,10 +157,38 @@ public class FallbackBukkitInjector {
               break injection;
             }
 
-            // Get the future that contains the server connection
-            final Channel serverChannel = ((ChannelFuture) object).channel();
-            // Add our server channel listener
-            serverChannel.pipeline().addFirst(SERVER_INITIALIZER);
+            final ChannelFuture channelFuture = (ChannelFuture) object;
+            final List<String> names = channelFuture.channel().pipeline().names();
+
+            ChannelHandler bootstrap = null;
+
+            for (final String name : names) {
+              try {
+                final ChannelHandler handler = channelFuture.channel().pipeline().get(name);
+                // Inline get method
+                final Field childHandlerField = handler.getClass().getDeclaredField("childHandler");
+                childHandlerField.setAccessible(true);
+                final var childHandler = (ChannelInitializer<?>) childHandlerField.get(handler);
+
+                if (childHandler != null) {
+                  bootstrap = handler;
+                }
+                break;
+              } catch (ReflectiveOperationException exception) {
+                // Ignore this one
+              }
+            }
+
+            if (bootstrap == null) {
+              bootstrap = channelFuture.channel().pipeline().first();
+            }
+
+            final Field childHandlerField = bootstrap.getClass().getDeclaredField("childHandler");
+            childHandlerField.setAccessible(true);
+            final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
+
+            childHandlerField.set(bootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
+              pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler())));
           }
           return;
         }

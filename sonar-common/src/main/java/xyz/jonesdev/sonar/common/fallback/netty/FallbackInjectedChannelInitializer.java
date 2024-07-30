@@ -18,10 +18,14 @@
 package xyz.jonesdev.sonar.common.fallback.netty;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandler;
 
 import java.lang.invoke.MethodHandle;
@@ -44,23 +48,28 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
     }
   }
 
-  private final ChannelInitializer<Channel> originalChannelInitializer;
-  private final Consumer<ChannelPipeline> sonarPipelineInjector;
+  private final @NotNull ChannelInitializer<Channel> originalChannelInitializer;
+  private final @NotNull Consumer<ChannelPipeline> sonarPipelineInjector;
 
   @Override
   protected void initChannel(final Channel channel) throws Exception {
     // Invoke the original method
-    if (originalChannelInitializer != null) {
-      try {
-        INIT_CHANNEL_METHOD.invokeExact(originalChannelInitializer, channel);
-      } catch (Throwable throwable) {
-        throw new ReflectiveOperationException(throwable);
-      }
+    try {
+      INIT_CHANNEL_METHOD.invokeExact(originalChannelInitializer, channel);
+    } catch (Throwable throwable) {
+      throw new ReflectiveOperationException(throwable);
     }
 
     // Inject Sonar's channel handler into the pipeline
     if (channel.isActive()) {
-      channel.pipeline().addFirst(FALLBACK_INBOUND_HANDLER, new FallbackInboundHandler(sonarPipelineInjector));
+      final ChannelHandler inboundHandler = new FallbackInboundHandler(sonarPipelineInjector);
+      // We need to be careful on Bukkit, as the encoder can be different
+      if (Sonar.get().getPlatform() == SonarPlatform.BUKKIT) {
+        final String encoder = channel.pipeline().get("outbound_config") != null ? "outbound_config" : "encoder";
+        channel.pipeline().addBefore(encoder, FALLBACK_INBOUND_HANDLER, inboundHandler);
+      } else {
+        channel.pipeline().addFirst(FALLBACK_INBOUND_HANDLER, inboundHandler);
+      }
     }
   }
 }

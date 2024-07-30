@@ -104,7 +104,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
 
     // Make sure to inject into the server's connection handler
-    FallbackBukkitInjector.inject();
+    getPlugin().getServer().getScheduler().runTask(getPlugin(), FallbackBukkitInjector::inject);
   }
 
   @Override

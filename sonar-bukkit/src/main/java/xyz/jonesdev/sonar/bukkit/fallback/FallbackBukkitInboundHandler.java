@@ -38,8 +38,6 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
 
   FallbackBukkitInboundHandler() {
-    super("encoder", "packet_handler");
-
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
   }
 
@@ -55,78 +53,82 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
     if (msg instanceof ByteBuf) {
-      // FIXME: actually implement this correctly to fix VV/PE issues
-      final ByteBuf originalByteBuf = (ByteBuf) msg;
-      final ByteBuf byteBuf = ctx.alloc().buffer().writeBytes(originalByteBuf);
+      final ByteBuf byteBuf = (ByteBuf) msg;
+
+      // Reset the reader index, so we can read the content
+      // Make sure to store the original reader index
       final int originalReaderIndex = byteBuf.readerIndex();
+      byteBuf.readerIndex(0);
+
+      // Don't continue if the ByteBuf isn't readable or the channel is closed
+      if (!ctx.channel().isActive() || !byteBuf.isReadable()) {
+        byteBuf.release();
+        return;
+      }
+
+      final int packetId = readVarInt(byteBuf);
+      final FallbackPacket packet = registry.createPacket(packetId);
+
+      // Skip the packet if it's not registered within Sonar's packet registry
+      if (packet == null) {
+        // Release the ByteBuf to avoid memory leaks
+        byteBuf.release();
+        return;
+      }
 
       try {
-        // Reset the reader index, so we can read the content
-        byteBuf.readerIndex(0);
-
-        // Don't continue if the ByteBuf isn't readable or the channel is closed
-        if (!ctx.channel().isActive() || !byteBuf.isReadable()) {
-          return;
-        }
-
-        final int packetId = readVarInt(byteBuf);
-        final FallbackPacket packet = registry.createPacket(packetId);
-
-        // Skip the packet if it's not registered within Sonar's packet registry
-        if (packet == null) {
-          return;
-        }
-
-        try {
-          // Try to decode the packet for the given protocol version
-          packet.decode(byteBuf, protocolVersion == null ? DEFAULT_PROTOCOL_VERSION : protocolVersion);
-        } catch (Throwable throwable) {
-          throw new CorruptedFrameException("Failed to decode packet");
-        }
-
-        // Check if the packet still has bytes left after we decoded it
-        if (byteBuf.isReadable()) {
-          throw new CorruptedFrameException("Could not read packet to end");
-        }
-
-        // Useful resources:
-        // https://wiki.vg/Protocol#Handshaking
-        // https://wiki.vg/Protocol#Login
-        if (packet instanceof HandshakePacket) {
-          final HandshakePacket handshake = (HandshakePacket) packet;
-          switch (handshake.getIntent()) {
-            case STATUS:
-              // We don't care about server pings or transfers; remove the handler
-              ctx.channel().pipeline().remove(this);
-              break;
-            case LOGIN:
-            case TRANSFER:
-              // Let the actual handler know about the handshake packet
-              handleHandshake(ctx.channel(), handshake.getHostname(), handshake.getProtocolVersionId());
-              // Be ready for the next packet (which is supposed to be a login packet)
-              updateRegistry(FallbackPacketRegistry.LOGIN, Objects.requireNonNull(protocolVersion));
-              break;
-            default:
-              throw new CorruptedFrameException("Unknown handshake intent " + handshake.getIntent());
-          }
-        } else if (packet instanceof LoginStartPacket) {
-          final LoginStartPacket loginStart = (LoginStartPacket) packet;
-          final InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-          // We've done our job - deject this pipeline
-          ctx.channel().pipeline().remove(this);
-          // Let Sonar process the login packet
-          handleLogin(ctx.channel(), ctx, () -> {
-            byteBuf.readerIndex(originalReaderIndex);
-            ctx.fireChannelRead(byteBuf.retain());
-          }, loginStart.getUsername(), socketAddress);
-          return;
-        }
-
-        byteBuf.readerIndex(originalReaderIndex);
-        ctx.fireChannelRead(byteBuf.retain());
-      } finally {
+        // Try to decode the packet for the given protocol version
+        packet.decode(byteBuf, protocolVersion == null ? DEFAULT_PROTOCOL_VERSION : protocolVersion);
+      } catch (Throwable throwable) {
+        // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
+        throw new CorruptedFrameException("Failed to decode packet");
       }
+
+      // Check if the packet still has bytes left after we decoded it
+      if (byteBuf.isReadable()) {
+        // Release the ByteBuf to avoid memory leaks
+        byteBuf.release();
+        throw new CorruptedFrameException("Could not read packet to end");
+      }
+
+      // Useful resources:
+      // https://wiki.vg/Protocol#Handshaking
+      // https://wiki.vg/Protocol#Login
+      if (packet instanceof HandshakePacket) {
+        final HandshakePacket handshake = (HandshakePacket) packet;
+        switch (handshake.getIntent()) {
+          case STATUS:
+            // We don't care about server pings or transfers; remove the handler
+            ctx.channel().pipeline().remove(this);
+            break;
+          case LOGIN:
+          case TRANSFER:
+            // Let the actual handler know about the handshake packet
+            handleHandshake(ctx.channel(), handshake.getHostname(), handshake.getProtocolVersionId());
+            // Be ready for the next packet (which is supposed to be a login packet)
+            updateRegistry(FallbackPacketRegistry.LOGIN, Objects.requireNonNull(protocolVersion));
+            break;
+          default:
+            throw new CorruptedFrameException("Unknown handshake intent " + handshake.getIntent());
+        }
+      } else if (packet instanceof LoginStartPacket) {
+        final LoginStartPacket loginStart = (LoginStartPacket) packet;
+        final InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+        // We've done our job - deject this pipeline
+        ctx.channel().pipeline().remove(this);
+        // Let Sonar process the login packet
+        handleLogin(ctx.channel(), ctx, () -> {
+          byteBuf.readerIndex(originalReaderIndex);
+          ctx.fireChannelRead(byteBuf);
+        }, loginStart.getUsername(), socketAddress);
+        // Release the ByteBuf to avoid memory leaks
+        byteBuf.release();
+        return;
+      }
+
+      byteBuf.readerIndex(originalReaderIndex);
+      ctx.fireChannelRead(byteBuf);
     }
   }
 }

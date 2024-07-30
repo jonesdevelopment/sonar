@@ -50,7 +50,6 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 @RequiredArgsConstructor
 public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandlerAdapter {
-  protected final String encoder, handler;
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;
 
@@ -265,16 +264,17 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
                                  final @NotNull ProtocolVersion protocolVersion,
                                  final @NotNull FallbackPacket packet) {
     // Remove the main pipeline to completely take over the channel
-    if (channel.pipeline().context(handler) != null) {
-      channel.pipeline().remove(handler);
+    final FallbackInboundHandler inboundHandler = channel.pipeline().get(FallbackInboundHandler.class);
+    if (channel.pipeline().context(inboundHandler.getHandler()) != null) {
+      channel.pipeline().remove(inboundHandler.getHandler());
     }
-    final ChannelHandler currentEncoder = channel.pipeline().get(encoder);
+    final ChannelHandler currentEncoder = channel.pipeline().get(inboundHandler.getEncoder());
     // Close the channel if no decoder exists
     if (currentEncoder != null) {
       // We don't need to update the encoder if it's already present
       if (!(currentEncoder instanceof FallbackPacketEncoder)) {
         final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
-        channel.pipeline().replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
+        channel.pipeline().replace(inboundHandler.getEncoder(), FALLBACK_PACKET_ENCODER, newEncoder);
       }
       closeWith(channel, protocolVersion, packet);
     } else {

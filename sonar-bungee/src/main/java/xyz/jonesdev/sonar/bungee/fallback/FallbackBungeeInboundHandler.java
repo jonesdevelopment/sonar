@@ -33,14 +33,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
 
-import static net.md_5.bungee.netty.PipelineUtils.BOSS_HANDLER;
-import static net.md_5.bungee.netty.PipelineUtils.PACKET_ENCODER;
-
 final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
-
-  FallbackBungeeInboundHandler() {
-    super(PACKET_ENCODER, BOSS_HANDLER);
-  }
 
   private static final MethodHandle CHANNEL_WRAPPER_GETTER;
 

@@ -27,13 +27,8 @@ import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
 import java.net.InetSocketAddress;
 
 import static com.velocitypowered.proxy.network.Connections.HANDLER;
-import static com.velocitypowered.proxy.network.Connections.MINECRAFT_ENCODER;
 
 final class FallbackVelocityInboundHandler extends FallbackInboundHandlerAdapter {
-
-  FallbackVelocityInboundHandler() {
-    super(MINECRAFT_ENCODER, HANDLER);
-  }
 
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
