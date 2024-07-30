@@ -22,7 +22,7 @@ import io.netty.channel.ChannelInitializer;
 import lombok.experimental.UtilityClass;
 import net.md_5.bungee.netty.PipelineUtils;
 import sun.misc.Unsafe;
-import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
@@ -55,7 +55,7 @@ public class FallbackBungeeInjector {
       // Replace the original channel initializer
       unsafe.putObject(base, offset, injectedInitializer);
     } catch (Exception exception) {
-      throw new ReflectiveOperationException(exception);
+      Sonar.get().getLogger().error("An error occurred while injecting {}", exception);
     }
   }
 }

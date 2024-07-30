@@ -25,6 +25,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
@@ -189,7 +190,7 @@ public class FallbackBukkitInjector {
         return;
       }
     } catch (Exception exception) {
-      throw new ReflectiveOperationException(exception);
+      Sonar.get().getLogger().error("An error occurred while injecting {}", exception);
     }
   }
 }
