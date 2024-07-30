@@ -26,6 +26,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
+import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
@@ -86,6 +87,8 @@ public class FallbackPreparer {
 
   // Vehicle
   public FallbackPacket removeEntities;
+  public FallbackPacket spawnEntity;
+  public FallbackPacket teleportEntity;
   public static FallbackPacket setPassengers;
   public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1;
 
@@ -184,6 +187,10 @@ public class FallbackPreparer {
 
     // Prepare packets for the vehicle check
     removeEntities = new FallbackPacketSnapshot(new RemoveEntitiesPacket(VEHICLE_ENTITY_ID));
+    spawnEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(
+      VEHICLE_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION));
+    teleportEntity = new FallbackPacketSnapshot(new TeleportEntityPacket(
+      VEHICLE_ENTITY_ID, SPAWN_X_POSITION, -64, SPAWN_Z_POSITION, false));
     setPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER

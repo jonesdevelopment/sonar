@@ -25,40 +25,25 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 
-import java.util.UUID;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeUUID;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class SpawnEntityPacket implements FallbackPacket {
+public final class TeleportEntityPacket implements FallbackPacket {
   private int entityId;
-  private EntityType entityType;
   private double x, y, z;
+  private boolean onGround;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     writeVarInt(byteBuf, entityId);
 
-    final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_9) >= 0;
-
-    if (v1_9orHigher) {
-      writeUUID(byteBuf, UUID.randomUUID());
-    }
-
-    if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      writeVarInt(byteBuf, entityType.getId(protocolVersion));
-    } else {
-      byteBuf.writeByte(entityType.getId(protocolVersion));
-    }
-
-    if (v1_9orHigher) {
+    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
       byteBuf.writeDouble(x);
       byteBuf.writeDouble(y);
       byteBuf.writeDouble(z);
@@ -68,25 +53,16 @@ public final class SpawnEntityPacket implements FallbackPacket {
       byteBuf.writeInt((int) (z * 32D));
     }
 
-    byteBuf.writeByte(0); // pitch or yaw
-    byteBuf.writeByte(0); // yaw or pitch
+    byteBuf.writeByte(0); // yaw
+    byteBuf.writeByte(0); // pitch
 
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      byteBuf.writeByte(0); // head yaw
-      writeVarInt(byteBuf, 0); // data
-    } else {
-      byteBuf.writeInt(0); // data
-    }
-
-    if (v1_9orHigher) {
-      byteBuf.writeShort(0); // velocity X
-      byteBuf.writeShort(0); // velocity Y
-      byteBuf.writeShort(0); // velocity Z
+    if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+      byteBuf.writeBoolean(onGround);
     }
   }
 
   @Override
-  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     throw new UnsupportedOperationException();
   }
 }

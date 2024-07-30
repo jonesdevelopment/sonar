@@ -34,7 +34,7 @@ public final class PaddleBoatPacket implements FallbackPacket {
   private boolean leftPaddle, rightPaddle;
 
   @Override
-  public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
   }
 
