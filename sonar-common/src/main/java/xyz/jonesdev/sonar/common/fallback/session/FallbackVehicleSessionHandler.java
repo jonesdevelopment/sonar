@@ -117,8 +117,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
       // Check if the player is sending invalid vehicle speed values
-      checkState(Math.abs(playerInput.getForward()) <= 0.98, "illegal vehicle speed (f)");
-      checkState(Math.abs(playerInput.getSideways()) <= 0.98, "illegal vehicle speed (s)");
+      checkState(Math.abs(playerInput.getForward()) <= 0.98f, "illegal vehicle speed (f)");
+      checkState(Math.abs(playerInput.getSideways()) <= 0.98f, "illegal vehicle speed (s)");
 
       // Only mark this packet as correct if the player is not moving the vehicle
       if (playerInput.isJump() || playerInput.isUnmount()) {
