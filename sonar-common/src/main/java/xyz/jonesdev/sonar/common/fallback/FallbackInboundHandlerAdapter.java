@@ -114,12 +114,6 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       return;
     }
 
-    // Check if the player is already queued since we don't want bots to flood the queue
-    if (FALLBACK.getQueue().getPlayers().containsKey(inboundHandler.getInetAddress())) {
-      customDisconnect(channel, protocolVersion, alreadyQueued);
-      return;
-    }
-
     // Check if Fallback is already verifying a player with the same IP address
     if (FALLBACK.getConnected().containsKey(inboundHandler.getInetAddress())) {
       customDisconnect(channel, protocolVersion, alreadyVerifying);
@@ -164,20 +158,29 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     rewriteProtocol(ctx);
 
     // Queue the connection for further processing
-    FALLBACK.getQueue().getPlayers().compute(inboundHandler.getInetAddress(), (_k, _v) -> () -> {
-      // Check if the username matches the valid name regex to prevent
-      // UTF-16 names or other types of exploits
-      if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
-        .matcher(username).matches()) {
-        customDisconnect(channel, protocolVersion, invalidUsername);
-        return;
+    FALLBACK.getQueue().getPlayers().compute(inboundHandler.getInetAddress(), (inetAddress, runnable) -> {
+      // Check if the player is already queued since we don't want bots to flood the queue
+      if (runnable != null) {
+        customDisconnect(channel, protocolVersion, alreadyQueued);
+        // Remove other instances of this IP address from the queue
+        return null;
       }
 
-      // Create an instance for the Fallback connection
-      final FallbackUser user = new FallbackUserWrapper(
-        channel, inboundHandler.getInetAddress(), protocolVersion, offlineUuid, geyser);
-      // Let the verification handler take over the channel
-      user.hijack(username, offlineUuid);
+      return () -> {
+        // Check if the username matches the valid name regex to prevent
+        // UTF-16 names or other types of exploits
+        if (!Sonar.get().getConfig().getVerification().getValidNameRegex()
+          .matcher(username).matches()) {
+          customDisconnect(channel, protocolVersion, invalidUsername);
+          return;
+        }
+
+        // Create an instance for the Fallback connection
+        final FallbackUser user = new FallbackUserWrapper(
+          channel, inboundHandler.getInetAddress(), protocolVersion, offlineUuid, geyser);
+        // Let the verification handler take over the channel
+        user.hijack(username, offlineUuid);
+      };
     });
   }
 
