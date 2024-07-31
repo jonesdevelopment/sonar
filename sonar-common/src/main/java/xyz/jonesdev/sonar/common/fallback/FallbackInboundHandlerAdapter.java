@@ -197,7 +197,8 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       if (entry.getKey().startsWith("sonar")
         // Don't remove floodgate's pipelines
         || entry.getKey().startsWith("geyser")
-        || entry.getKey().startsWith("floodgate")) {
+        || entry.getKey().startsWith("floodgate")
+        || entry.getKey().equals("DefaultChannelPipeline$TailContext#0")) {
         continue;
       }
       ctx.pipeline().remove(entry.getValue());
