@@ -26,10 +26,12 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin;
 import xyz.jonesdev.sonar.bukkit.util.Lazy;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
@@ -51,6 +53,8 @@ public class FallbackBukkitInjector {
   private final Class<?> SERVER_CONNECTION_CLASS;
 
   private final Lazy<Object> MINECRAFT_SERVER_CONNECTION_INSTANCE;
+
+  public boolean lateBind = false;
 
   static {
     SERVER_VERSION = resolveServerVersion();
@@ -88,8 +92,28 @@ public class FallbackBukkitInjector {
 
       final Object serverInstance = minecraftServerInstance; // final field for lambda
       MINECRAFT_SERVER_CONNECTION_INSTANCE = new Lazy<>(() -> getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(serverInstance));
+      checkLateBind();
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
+    }
+  }
+
+  private void checkLateBind() {
+    try {
+      try {
+        Class.forName("org.bukkit.event.server.ServerLoadEvent");
+        // lateBind is removed in this spigot version.
+        return;
+      } catch (ClassNotFoundException ignore) {
+      }
+      final Class<?> spigotConfiguration = Class.forName("org.spigotmc.SpigotConfig");
+      final Method initFieldMethod = spigotConfiguration.getDeclaredMethod("lateBind");
+      initFieldMethod.setAccessible(true);
+      initFieldMethod.invoke(null);
+      if ((boolean) spigotConfiguration.getField("lateBind").get(null)) {
+        lateBind = true;
+      }
+    } catch (final java.lang.ReflectiveOperationException ignore) {
     }
   }
 
@@ -186,8 +210,26 @@ public class FallbackBukkitInjector {
           childHandlerField.setAccessible(true);
           final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
 
-          childHandlerField.set(bootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
-            pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler())));
+          ChannelHandler finalBootstrap = bootstrap;
+          // If plugin not enabled but execute inject, Put an initializer to close the new connection automatically
+          if (!SonarBukkitPlugin.initializeListener.isDone()) {
+            final ChannelInitializer<Channel> initializer = new ChannelInitializer<>() {
+              @Override
+              protected void initChannel(Channel channel) {
+                channel.close();
+              }
+            };
+            childHandlerField.set(finalBootstrap, initializer);
+          }
+          SonarBukkitPlugin.initializeListener.thenAccept(v -> {
+            try {
+              childHandlerField.set(finalBootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
+                pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler()))
+              );
+            } catch (IllegalAccessException e) {
+              throw new ReflectiveOperationException(e);
+            }
+          });
         }
         return;
       }
