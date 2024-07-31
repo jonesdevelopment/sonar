@@ -126,6 +126,13 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       return;
     }
 
+    // Check if the protocol ID of the player is not allowed to enter the server
+    if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
+      .contains(protocolVersion.getProtocol())) {
+      customDisconnect(channel, protocolVersion, protocolBlacklisted);
+      return;
+    }
+
     // Don't continue the verification process if the verification is disabled
     if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
       initialLogin(ctx, inboundHandler.getInetAddress(), loginPacket);
@@ -139,17 +146,10 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       return;
     }
 
-    // Check if the protocol ID of the player is not allowed to enter the server
-    if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
-      .contains(protocolVersion.getProtocol())) {
-      customDisconnect(channel, protocolVersion, protocolBlacklisted);
-      return;
-    }
-
     // Make sure we actually have to verify the player
-    final String offlineUUIDString = "OfflinePlayer:" + username;
-    final UUID offlineUUID = UUID.nameUUIDFromBytes(offlineUUIDString.getBytes(StandardCharsets.UTF_8));
-    if (Sonar.get().getVerifiedPlayerController().has(inboundHandler.getInetAddress().toString(), offlineUUID)) {
+    final String offlineUuidString = "OfflinePlayer:" + username;
+    final UUID offlineUuid = UUID.nameUUIDFromBytes(offlineUuidString.getBytes(StandardCharsets.UTF_8));
+    if (Sonar.get().getVerifiedPlayerController().has(inboundHandler.getInetAddress().toString(), offlineUuid)) {
       initialLogin(ctx, inboundHandler.getInetAddress(), loginPacket);
       return;
     }
@@ -157,13 +157,6 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     // Check if the IP address is currently being rate-limited
     if (!FALLBACK.getRatelimiter().attempt(inboundHandler.getInetAddress())) {
       customDisconnect(channel, protocolVersion, reconnectedTooFast);
-      return;
-    }
-
-    // Check if the protocol ID of the player is allowed to bypass verification
-    if (Sonar.get().getConfig().getVerification().getWhitelistedProtocols()
-      .contains(protocolVersion.getProtocol())) {
-      initialLogin(ctx, inboundHandler.getInetAddress(), loginPacket);
       return;
     }
 
@@ -182,9 +175,9 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
 
       // Create an instance for the Fallback connection
       final FallbackUser user = new FallbackUserWrapper(
-        channel, inboundHandler.getInetAddress(), protocolVersion, geyser);
+        channel, inboundHandler.getInetAddress(), protocolVersion, offlineUuid, geyser);
       // Let the verification handler take over the channel
-      user.hijack(username, offlineUUID);
+      user.hijack(username, offlineUuid);
     });
   }
 

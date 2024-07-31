@@ -24,8 +24,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import java.util.UUID;
-
 import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Gravity.Gamemode.CREATIVE;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
@@ -33,9 +31,8 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 public final class FallbackGravitySessionHandler extends FallbackSessionHandler {
 
   public FallbackGravitySessionHandler(final @NotNull FallbackUser user,
-                                       final @NotNull String username,
-                                       final @NotNull UUID uuid) {
-    super(user, username, uuid);
+                                       final @NotNull String username) {
+    super(user, username);
 
     // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
     this.enableGravityCheck = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isEnabled();
@@ -102,7 +99,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
     // Send the player to the protocol check
     final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
-    decoder.setListener(new FallbackProtocolSessionHandler(user, username, uuid, forceCAPTCHA));
+    decoder.setListener(new FallbackProtocolSessionHandler(user, username, forceCAPTCHA));
   }
 
   @Override

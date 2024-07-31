@@ -25,15 +25,12 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetHeldItemPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
 
-import java.util.UUID;
-
 public final class FallbackProtocolSessionHandler extends FallbackSessionHandler {
 
   public FallbackProtocolSessionHandler(final @NotNull FallbackUser user,
                                         final @NotNull String username,
-                                        final @NotNull UUID uuid,
                                         final boolean forceCAPTCHA) {
-    super(user, username, uuid);
+    super(user, username);
 
     this.forceCAPTCHA = forceCAPTCHA;
 
@@ -81,9 +78,9 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
     final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
     // Pass the player to the next best verification handler
     if (Sonar.get().getFallback().shouldPerformVehicleCheck()) {
-      decoder.setListener(new FallbackVehicleSessionHandler(user, username, uuid, forceCAPTCHA));
+      decoder.setListener(new FallbackVehicleSessionHandler(user, username, forceCAPTCHA));
     } else if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
-      decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
+      decoder.setListener(new FallbackCAPTCHASessionHandler(user, username));
     } else {
       // The player has passed all checks
       finishVerification();
