@@ -57,6 +57,7 @@ public final class FallbackUserWrapper implements FallbackUser {
   private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
+  private final UUID offlineUuid;
   @Setter
   private boolean receivedClientSettings;
   @Setter
@@ -67,11 +68,13 @@ public final class FallbackUserWrapper implements FallbackUser {
   public FallbackUserWrapper(final @NotNull Channel channel,
                              final @NotNull InetAddress inetAddress,
                              final @NotNull ProtocolVersion protocolVersion,
+                             final @NotNull UUID offlineUuid,
                              final boolean geyser) {
     this.channel = channel;
     this.pipeline = channel.pipeline();
     this.inetAddress = inetAddress;
     this.protocolVersion = protocolVersion;
+    this.offlineUuid = offlineUuid;
     this.geyser = geyser;
   }
 
@@ -83,7 +86,7 @@ public final class FallbackUserWrapper implements FallbackUser {
   }
 
   @Override
-  public void hijack(final @NotNull String username, final @NotNull UUID uuid) {
+  public void hijack(final @NotNull String username, final @NotNull UUID offlineUuid) {
     // The player has joined the verification
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
@@ -127,7 +130,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       final FallbackPacketDecoder fallbackPacketDecoder = new FallbackPacketDecoder(protocolVersion);
       pipeline.addLast(FALLBACK_PACKET_DECODER, fallbackPacketDecoder);
       // Listen for all incoming packets by setting the packet listener
-      fallbackPacketDecoder.setListener(new FallbackLoginSessionHandler(this, username, uuid));
+      fallbackPacketDecoder.setListener(new FallbackLoginSessionHandler(this, username));
 
       // Make sure to catch all exceptions during the verification
       pipeline.addLast(FALLBACK_TAIL_EXCEPTIONS, FallbackTailExceptionsHandler.INSTANCE);

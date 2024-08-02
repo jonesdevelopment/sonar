@@ -226,10 +226,8 @@ verification:
   # Combien de fois un joueur doit-il échouer à la vérification pour être placé sur liste noire ?
   # (Réglez cette valeur à 0 pour désactiver la liste noire entièrement)
   blacklist-threshold: 2
-  # Liste des identifiants de protocole qui ne sont pas vérifiés par Sonar (bypass de vérification)
+  # Liste des identifiants de protocole qui ne peuvent pas du tout rejoindre le serveur
   # Vous pouvez trouver la liste complète de tous les identifiants de protocole ici :
   # https://wiki.vg/Protocol_version_numbers
   # Par exemple, Minecraft 1.20 a l'ID 763.
-  whitelisted-protocols: []
-  # Liste des identifiants de protocole qui ne peuvent pas du tout rejoindre le serveur
   blacklisted-protocols: []

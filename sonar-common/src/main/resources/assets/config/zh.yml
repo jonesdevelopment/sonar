@@ -219,9 +219,7 @@ verification:
   blacklist-time: 600000
   # 玩家必须验证失败多少次才会被列入黑名单? (设置为0以完全禁用)
   blacklist-threshold: 2
-  # Sonar 不应该检查哪些协议? (即 跳过检查)
+  # 黑名单中的协议将阻止所有使用该协议的客户端.
   # 您可以在 https://wiki.vg/Protocol_version_numbers 找到所有协议号
   # 例如 Minecraft 1.20 对应的协议号为763.
-  whitelisted-protocols: []
-  # 黑名单中的协议将阻止所有使用该协议的客户端.
   blacklisted-protocols: []

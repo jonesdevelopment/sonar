@@ -227,10 +227,8 @@ verification:
   # Kolikrát musí hráč selhat verifikaci aby byl přídán do černé listiny
   # (Pokuď černou listinu nechcete dejte tuto hodnotu na 0)
   blacklist-threshold: 2
-  # List ID protokolů (verzí), které nebudou kontrolovány Sonarem (bypass verifikace)
+  # List ID protokolů které se nebudou moct připojit vůbec
   # Celý list ID protokolů můžete najít zde
   # https://wiki.vg/Protocol_version_numbers
   # Například, Minecraft 1.20 má ID 763.
-  whitelisted-protocols: []
-  # List ID protokolů které se nebudou moct připojit vůbec
   blacklisted-protocols: []

@@ -224,10 +224,8 @@ verification:
   # Wie oft muss ein Spieler die Überprüfung nicht bestehen, um auf die Schwarze Liste gesetzt zu werden?
   # (Setzen Sie diesen Wert auf 0, um die Schwarze Liste vollständig zu deaktivieren)
   blacklist-threshold: 2
-  # Liste von Protokoll-IDs, die von Sonar nicht überprüft werden (Überprüfungsumgehung)
+  # Liste von Protokoll-IDs, die den Server überhaupt nicht betreten dürfen
   # Die vollständige Liste aller Protokoll-IDs finden Sie hier:
   # https://wiki.vg/Protocol_version_numbers
   # Zum Beispiel hat Minecraft 1.20 die ID 763.
-  whitelisted-protocols: []
-  # Liste von Protokoll-IDs, die den Server überhaupt nicht betreten dürfen
   blacklisted-protocols: []
