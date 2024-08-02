@@ -30,6 +30,7 @@ import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
 import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
+import xyz.jonesdev.sonar.bukkit.listener.BukkitJoinListener;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.Objects;
@@ -105,6 +106,8 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
     if (FallbackBukkitInjector.lateBind) {
       getPlugin().getServer().getScheduler().runTask(getPlugin(), FallbackBukkitInjector::inject);
+    } else {
+      getPlugin().getServer().getPluginManager().registerEvents(new BukkitJoinListener(), getPlugin());
     }
   }
 

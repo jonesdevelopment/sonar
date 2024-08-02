@@ -117,7 +117,7 @@ public class FallbackBukkitInjector {
     }
   }
 
-  private @NotNull Field getFieldAt(final @NotNull Class<?> clazz, final @NotNull Class<?> type, final int index) {
+  public @NotNull Field getFieldAt(final @NotNull Class<?> clazz, final @NotNull Class<?> type, final int index) {
     int currentIndex = 0;
     for (final Field field : clazz.getDeclaredFields()) {
       field.setAccessible(true);
@@ -161,7 +161,7 @@ public class FallbackBukkitInjector {
     return Class.forName(USES_LEGACY_PACKAGING ? LEGACY_NMS_PACKAGE + legacy : "net.minecraft." + modern);
   }
 
-  private @NotNull Class<?> getOBCClass(final String clazz) throws ClassNotFoundException {
+  public @NotNull Class<?> getOBCClass(final String clazz) throws ClassNotFoundException {
     return Class.forName(OBC_PACKAGE + clazz);
   }
 
