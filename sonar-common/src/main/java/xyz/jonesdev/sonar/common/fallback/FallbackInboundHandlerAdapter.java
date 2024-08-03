@@ -17,11 +17,9 @@
 
 package xyz.jonesdev.sonar.common.fallback;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import io.netty.handler.codec.CorruptedFrameException;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,10 +46,12 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.common.fallback.FallbackUserWrapper.closeWith;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
+@AllArgsConstructor
 @RequiredArgsConstructor
 public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandlerAdapter {
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;
+  protected RemovalListener channelRemovalListener = RemovalListener.EMPTY;
 
   protected static final Fallback FALLBACK = Sonar.get().getFallback();
 
@@ -168,7 +168,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     }
 
     // Remove all other pipelines that could still mess up something
-    rewriteProtocol(ctx);
+    rewriteProtocol(ctx, channelRemovalListener);
 
     // Queue the connection for further processing
     FALLBACK.getQueue().getPlayers().compute(inboundHandler.getInetAddress(), (_k, _v) -> () -> {
@@ -191,7 +191,8 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
   /**
    * Removes all pipelines and rewrites them using our custom handlers
    */
-  private static void rewriteProtocol(final @NotNull ChannelHandlerContext ctx) {
+  private static void rewriteProtocol(final @NotNull ChannelHandlerContext ctx,
+                                      final @NotNull RemovalListener removalListener) {
     for (final Map.Entry<String, ChannelHandler> entry : ctx.pipeline()) {
       // Don't accidentally remove Sonar's handlers
       if (entry.getKey().startsWith("sonar")
@@ -202,6 +203,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
         continue;
       }
       ctx.pipeline().remove(entry.getValue());
+      removalListener.accept(ctx.pipeline(), entry.getKey(), entry.getValue());
     }
     // Add our custom pipelines
     ctx.pipeline()
@@ -211,6 +213,13 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
         Sonar.get().getConfig().getVerification().getWriteTimeout(),
         TimeUnit.MILLISECONDS))
       .addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
+  }
+
+  @FunctionalInterface
+  public interface RemovalListener {
+    void accept(final @NotNull ChannelPipeline pipeline, final @NotNull String name, final @NotNull ChannelHandler handler);
+
+    RemovalListener EMPTY = (pipeline, name, handler) -> {};
   }
 
   /**
@@ -265,17 +274,18 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
                                  final @NotNull ProtocolVersion protocolVersion,
                                  final @NotNull FallbackPacket packet) {
     // Remove the main pipeline to completely take over the channel
-    final FallbackInboundHandler inboundHandler = channel.pipeline().get(FallbackInboundHandler.class);
-    if (channel.pipeline().context(inboundHandler.getHandler()) != null) {
-      channel.pipeline().remove(inboundHandler.getHandler());
+    final String handler = Sonar.get().getPlatform().getHandlerFunction().apply(channel.pipeline());
+    if (channel.pipeline().context(handler) != null) {
+      channel.pipeline().remove(handler);
     }
-    final ChannelHandler currentEncoder = channel.pipeline().get(inboundHandler.getEncoder());
+    final String encoder = Sonar.get().getPlatform().getEncoderFunction().apply(channel.pipeline());
+    final ChannelHandler currentEncoder = channel.pipeline().get(encoder);
     // Close the channel if no decoder exists
     if (currentEncoder != null) {
       // We don't need to update the encoder if it's already present
       if (!(currentEncoder instanceof FallbackPacketEncoder)) {
         final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
-        channel.pipeline().replace(inboundHandler.getEncoder(), FALLBACK_PACKET_ENCODER, newEncoder);
+        channel.pipeline().replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
       }
       closeWith(channel, protocolVersion, packet);
     } else {

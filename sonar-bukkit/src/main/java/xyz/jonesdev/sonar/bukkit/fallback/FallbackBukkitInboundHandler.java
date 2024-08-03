@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.bukkit.fallback;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,12 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
 
   FallbackBukkitInboundHandler() {
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
+    channelRemovalListener = ((pipeline, name, handler) -> {
+      final ChannelInactiveListener inactiveListener = (ChannelInactiveListener) pipeline.get(ChannelInactiveListener.NAME);
+      if (inactiveListener != null) {
+        inactiveListener.add(handler);
+      }
+    });
   }
 
   private FallbackPacketRegistry.ProtocolRegistry registry;
@@ -122,7 +129,10 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         handleLogin(ctx.channel(), ctx, () -> {
           byteBuf.readerIndex(originalReaderIndex);
           ctx.fireChannelRead(byteBuf);
-          ctx.channel().pipeline().remove(FallbackPipelines.FALLBACK_INBOUND_HANDLER);
+          final ChannelHandler fallbackInboundHandler = ctx.channel().pipeline().remove(FallbackPipelines.FALLBACK_INBOUND_HANDLER);
+          if (fallbackInboundHandler != null) {
+            channelRemovalListener.accept(ctx.pipeline(), FallbackPipelines.FALLBACK_INBOUND_HANDLER, fallbackInboundHandler);
+          }
         }, loginStart.getUsername(), socketAddress);
         return;
       }

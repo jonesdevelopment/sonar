@@ -224,8 +224,11 @@ public class FallbackBukkitInjector {
           SonarBukkitPlugin.initializeListener.thenAccept(v -> {
             try {
               childHandlerField.set(finalBootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
-                pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler()))
-              );
+                pipeline -> {
+                  pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler());
+                  pipeline.addFirst(ChannelInactiveListener.NAME, new ChannelInactiveListener());
+                }
+              ));
             } catch (IllegalAccessException e) {
               throw new ReflectiveOperationException(e);
             }
