@@ -188,7 +188,6 @@ public class FallbackBukkitInjector {
           for (final String name : names) {
             try {
               final ChannelHandler handler = channelFuture.channel().pipeline().get(name);
-              // Inline get method
               final Field childHandlerField = handler.getClass().getDeclaredField("childHandler");
               childHandlerField.setAccessible(true);
               final var childHandler = (ChannelInitializer<?>) childHandlerField.get(handler);
@@ -198,11 +197,12 @@ public class FallbackBukkitInjector {
               }
               break;
             } catch (Exception exception) {
-              // Ignore this one
+              // Some plugins modify this, so we better skip any exceptions
             }
           }
 
           if (bootstrap == null) {
+            // Default to the first channel future if we couldn't find a childHandler
             bootstrap = channelFuture.channel().pipeline().first();
           }
 
@@ -211,7 +211,8 @@ public class FallbackBukkitInjector {
           final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
 
           ChannelHandler finalBootstrap = bootstrap;
-          // If plugin not enabled but execute inject, Put an initializer to close the new connection automatically
+          // Inject our own channel initializer into the original field
+          // If plugin not fully enabled but execute inject, Put an initializer to close the new connection automatically
           if (!SonarBukkitPlugin.initializeListener.isDone()) {
             final ChannelInitializer<Channel> initializer = new ChannelInitializer<>() {
               @Override

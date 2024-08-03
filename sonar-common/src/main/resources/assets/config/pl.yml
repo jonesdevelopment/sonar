@@ -226,10 +226,8 @@ verification:
   # Jak często gracz ma nie przechodzić weryfikacji, aby znaleźć się na czarnej liście?
   # (Ustaw tę wartość na 0, aby całkowicie wyłączyć czarną listę).
   blacklist-threshold: 2
-  # Lista protokołów (wersji gry), które nie będą sprawdzane przez Sonar
+  # Lista protokołów, które nie mogą w ogóle dołączyć do serwera
   # Pełną listę wszystkich protokołów można znaleźć tutaj:
   # https://wiki.vg/Protocol_version_numbers
   # Na przykład Minecraft 1.20 ma protokół 763.
-  whitelisted-protocols: []
-  # Lista protokołów, które nie mogą w ogóle dołączyć do serwera
   blacklisted-protocols: []

@@ -226,10 +226,8 @@ verification:
   # Hoe vaak moet een speler de verificatie niet doorstaan om op de zwarte lijst te worden geplaatst?
   # (Stel deze waarde in op 0 om de zwarte lijst volledig uit te schakelen)
   blacklist-threshold: 2
-  # Lijst met protocol-ID's die niet door Sonar worden gecontroleerd (verificatie-bypass)
+  # Lijst met protocol-ID's die helemaal geen verbinding kunnen maken met de server
   # De volledige lijst met alle protocol-ID's vindt u hier:
   # https://wiki.vg/Protocol_version_numbers
   # Minecraft 1.20 heeft bijvoorbeeld de ID 763.
-  whitelisted-protocols: []
-  # Lijst met protocol-ID's die helemaal geen verbinding kunnen maken met de server
   blacklisted-protocols: []

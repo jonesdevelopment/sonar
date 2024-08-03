@@ -238,8 +238,6 @@ public final class SonarConfiguration {
     verification.rememberTime = clamp(generalConfig.getInt("verification.remember-time"), 0, 86400000);
     verification.blacklistTime = clamp(generalConfig.getInt("verification.blacklist-time"), 0, 86400000);
     verification.blacklistThreshold = clamp(generalConfig.getInt("verification.blacklist-threshold"), 0, 100);
-    verification.whitelistedProtocols.clear();
-    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols"));
     verification.blacklistedProtocols.clear();
     verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols"));
 
@@ -463,7 +461,6 @@ public final class SonarConfiguration {
     private int rememberTime;
     private int blacklistTime;
     private int blacklistThreshold;
-    private final Collection<Integer> whitelistedProtocols = new HashSet<>(0);
     private final Collection<Integer> blacklistedProtocols = new HashSet<>(0);
 
     private Component tooFastReconnect;

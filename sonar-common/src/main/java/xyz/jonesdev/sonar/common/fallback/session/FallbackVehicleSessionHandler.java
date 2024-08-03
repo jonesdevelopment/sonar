@@ -24,8 +24,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import java.util.UUID;
-
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
@@ -57,9 +55,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
   public FallbackVehicleSessionHandler(final @NotNull FallbackUser user,
                                        final @NotNull String username,
-                                       final @NotNull UUID uuid,
                                        final boolean forceCAPTCHA) {
-    super(user, username, uuid);
+    super(user, username);
 
     this.forceCAPTCHA = forceCAPTCHA;
 
@@ -81,7 +78,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       // Either send the player to the CAPTCHA or finish the verification.
       final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
-      decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
+      decoder.setListener(new FallbackCAPTCHASessionHandler(user, username));
     } else {
       // The player has passed all checks
       finishVerification();
@@ -120,8 +117,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
       // Check if the player is sending invalid vehicle speed values
-      checkState(Math.abs(playerInput.getForward()) <= 0.98, "illegal vehicle speed (f)");
-      checkState(Math.abs(playerInput.getSideways()) <= 0.98, "illegal vehicle speed (s)");
+      checkState(Math.abs(playerInput.getForward()) <= 0.98f, "illegal vehicle speed (f)");
+      checkState(Math.abs(playerInput.getSideways()) <= 0.98f, "illegal vehicle speed (s)");
 
       // Only mark this packet as correct if the player is not moving the vehicle
       if (playerInput.isJump() || playerInput.isUnmount()) {

@@ -30,7 +30,6 @@ import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
@@ -43,7 +42,6 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL_LEGACY;
 public abstract class FallbackSessionHandler implements FallbackPacketListener {
   protected final FallbackUser user;
   protected final String username;
-  protected final UUID uuid;
 
   protected static final Random RANDOM = new Random();
 
@@ -61,11 +59,11 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
 
     // Add verified player to the database
     Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(
-      user.getInetAddress(), uuid, user.getLoginTimer().getStart()));
+      user.getInetAddress(), user.getOfflineUuid(), user.getLoginTimer().getStart()));
 
     // Call the VerifySuccessEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(
-      username, uuid, user, user.getLoginTimer().delay()));
+      username, user.getOfflineUuid(), user, user.getLoginTimer().delay()));
 
     // If enabled, transfer the player back to the origin server.
     // This feature was introduced by Mojang in Minecraft version 1.20.5.
