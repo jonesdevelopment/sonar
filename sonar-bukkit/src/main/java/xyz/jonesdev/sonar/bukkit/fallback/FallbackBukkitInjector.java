@@ -27,10 +27,8 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.ChannelInactiveListener;
 import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
 import xyz.jonesdev.sonar.bukkit.SonarBukkit;
-import xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;

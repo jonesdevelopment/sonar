@@ -22,7 +22,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.ChannelInactiveListener;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;

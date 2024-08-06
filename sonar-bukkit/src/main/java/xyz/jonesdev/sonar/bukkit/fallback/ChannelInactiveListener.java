@@ -1,4 +1,4 @@
-package xyz.jonesdev.sonar.api.fallback;
+package xyz.jonesdev.sonar.bukkit.fallback;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
@@ -17,12 +17,12 @@ public final class ChannelInactiveListener extends ChannelInboundHandlerAdapter 
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-    final ProxyChannelHandlerContext proxy = new ProxyChannelHandlerContext(ctx);
-    for (ChannelInboundHandler handler : handlers) {
+    final ProxiedChannelHandlerContext proxy = new ProxiedChannelHandlerContext(ctx);
+    for (final ChannelInboundHandler handler : handlers) {
       try {
         handler.channelInactive(proxy);
-      } catch (Exception e) {
-        handler.exceptionCaught(proxy, e);
+      } catch (Exception exception) {
+        handler.exceptionCaught(proxy, exception);
       }
     }
     super.channelInactive(ctx);
@@ -35,7 +35,7 @@ public final class ChannelInactiveListener extends ChannelInboundHandlerAdapter 
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  public static final class ProxyChannelHandlerContext implements ChannelHandlerContext {
+  public static final class ProxiedChannelHandlerContext implements ChannelHandlerContext {
     private final ChannelHandlerContext ctx;
 
     // Overwrite to prevent call this method on next handler
