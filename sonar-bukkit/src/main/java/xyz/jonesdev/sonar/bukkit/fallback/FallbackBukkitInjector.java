@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +34,7 @@ import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializ
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
@@ -54,7 +56,8 @@ public class FallbackBukkitInjector {
   private final Class<?> SERVER_CONNECTION_CLASS;
   private final Object SERVER_INSTANCE;
 
-  public boolean lateBind = false;
+  @Getter
+  private boolean lateBind;
 
   static {
     SERVER_VERSION = resolveServerVersion();
@@ -131,6 +134,26 @@ public class FallbackBukkitInjector {
       return getFieldAt(clazz.getSuperclass(), type, index);
     }
     throw new IllegalStateException("Could not find field #" + index + " in " + clazz.getName());
+  }
+
+  public static @NotNull Field findField(final boolean checkSuperClass,
+                                         final @NotNull Class<?> clazz,
+                                         final String... types) throws NoSuchFieldException {
+    for (final Field field : clazz.getDeclaredFields()) {
+      final String fieldTypeName = field.getType().getSimpleName();
+      for (final String type : types) {
+        if (fieldTypeName.equals(type)) {
+          if (!Modifier.isPublic(field.getModifiers())) {
+            field.setAccessible(true);
+          }
+          return field;
+        }
+      }
+    }
+    if (checkSuperClass && clazz != Object.class && clazz.getSuperclass() != null) {
+      return findField(true, clazz.getSuperclass(), types);
+    }
+    throw new NoSuchFieldException(types[0]);
   }
 
   private @NotNull BukkitServerVersion resolveServerVersion() {
