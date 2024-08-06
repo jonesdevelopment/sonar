@@ -38,12 +38,11 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  *   The boat will be spawned at y 1337.
  *   <br>
  *   After 3 {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets,
- *   the boat is teleported to y -64.
+ *   the boat is removed.
  *   <br>
- *   The boat is spawned at Y -63.5 since the client automatically destroys
- *   entities when the Y coordinate is lower than -64.
- *   We can abuse this mechanic to create a simple check that makes sure the player automatically
- *   exists the vehicle after falling for some ticks.
+ *   Now we can check if the player sends the correct position after the entity is removed.
+ *   Please note that we don't tell the client to exit the vehicle, therefore, possibly confusing some bots.
+ *   Removing the boat results in the player exiting the vehicle on vanilla clients.
  *   <br>
  *   See more: {@link FallbackVehicleSessionHandler}
  * </li>
@@ -85,8 +84,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     }
   }
 
-  // The entity will die when the y coordinate of it is <64
-  // We can abuse this mechanic and check for position packets when the entity dies
+  // We can abuse the entity remove mechanic and check for position packets when the entity dies
   private void move(double y) {
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       y -= 1.62f; // Account for 1.7 bounding box
@@ -127,7 +125,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
       // Once the player sent enough packets, go to the next stage
       if (paddlePackets > MINIMUM_REQUIRED_PACKETS && inputPackets > MINIMUM_REQUIRED_PACKETS) {
-        // Teleport the entity to y -64 to and kill the entity
+        // Remove the entity
         // The next y coordinate the player will send is going
         // to be the vehicle spawn position (y 64 in this case).
         user.write(removeEntities);
