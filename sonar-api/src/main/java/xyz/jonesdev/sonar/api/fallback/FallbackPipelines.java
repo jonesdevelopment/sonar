@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.api.fallback;
 
 public interface FallbackPipelines {
+  String FALLBACK_INACTIVE_LISTENER = "sonar-inactive-listener";
   String FALLBACK_INBOUND_HANDLER = "sonar-inbound-handler";
   String FALLBACK_FRAME_DECODER = "sonar-frame-decoder";
   String FALLBACK_FRAME_ENCODER = "sonar-frame-encoder";

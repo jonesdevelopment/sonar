@@ -22,6 +22,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.ChannelInactiveListener;
 import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
@@ -42,7 +43,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
   FallbackBukkitInboundHandler() {
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
     channelRemovalListener = ((pipeline, name, handler) -> {
-      final ChannelInactiveListener inactiveListener = (ChannelInactiveListener) pipeline.get(ChannelInactiveListener.NAME);
+      final ChannelInactiveListener inactiveListener = (ChannelInactiveListener) pipeline.get(FallbackPipelines.FALLBACK_INACTIVE_LISTENER);
       if (inactiveListener != null) {
         inactiveListener.add(handler);
       }

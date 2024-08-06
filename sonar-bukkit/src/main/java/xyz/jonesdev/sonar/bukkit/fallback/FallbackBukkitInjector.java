@@ -26,6 +26,8 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.fallback.ChannelInactiveListener;
+import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
 import xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
@@ -223,7 +225,7 @@ public class FallbackBukkitInjector {
               childHandlerField.set(finalBootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
                 pipeline -> {
                   pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler());
-                  pipeline.addFirst(ChannelInactiveListener.NAME, new ChannelInactiveListener());
+                  pipeline.addFirst(FallbackPipelines.FALLBACK_INACTIVE_LISTENER, new ChannelInactiveListener());
                 }
               ));
             } catch (IllegalAccessException e) {

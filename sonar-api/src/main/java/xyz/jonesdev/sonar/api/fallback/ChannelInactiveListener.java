@@ -1,4 +1,4 @@
-package xyz.jonesdev.sonar.bukkit.fallback;
+package xyz.jonesdev.sonar.api.fallback;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
@@ -7,15 +7,12 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.EventExecutor;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Set;
 
 public final class ChannelInactiveListener extends ChannelInboundHandlerAdapter {
-  public static final @NotNull String NAME = "sonar-inactive-listener";
-
   private final Set<ChannelInboundHandler> handlers = new HashSet<>();
 
   @Override
