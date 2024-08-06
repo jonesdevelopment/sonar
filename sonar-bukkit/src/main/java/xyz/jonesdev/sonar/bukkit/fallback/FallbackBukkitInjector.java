@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin;
-import xyz.jonesdev.sonar.bukkit.util.Lazy;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
@@ -51,8 +50,7 @@ public class FallbackBukkitInjector {
   private final Class<?> MINECRAFT_SERVER_CLASS;
   private final Class<?> CRAFTBUKKIT_SERVER_CLASS;
   private final Class<?> SERVER_CONNECTION_CLASS;
-
-  private final Lazy<Object> MINECRAFT_SERVER_CONNECTION_INSTANCE;
+  private final Object SERVER_INSTANCE;
 
   public boolean lateBind = false;
 
@@ -89,9 +87,7 @@ public class FallbackBukkitInjector {
       } catch (Exception exception) {
         minecraftServerInstance = getFieldAt(CRAFTBUKKIT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(Bukkit.getServer());
       }
-
-      final Object serverInstance = minecraftServerInstance; // final field for lambda
-      MINECRAFT_SERVER_CONNECTION_INSTANCE = new Lazy<>(() -> getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(serverInstance));
+      SERVER_INSTANCE = minecraftServerInstance;
       checkLateBind();
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
@@ -177,7 +173,7 @@ public class FallbackBukkitInjector {
           continue;
         }
 
-        final var list = (List<?>) field.get(MINECRAFT_SERVER_CONNECTION_INSTANCE.getValue());
+        final var list = (List<?>) field.get(getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(SERVER_INSTANCE));
 
         for (final Object object : list) {
           final ChannelFuture channelFuture = (ChannelFuture) object;
