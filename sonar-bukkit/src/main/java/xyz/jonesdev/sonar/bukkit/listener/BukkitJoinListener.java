@@ -24,69 +24,64 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
 import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
-// Credits: https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
+
+// Taken from
+// https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
 public final class BukkitJoinListener implements Listener {
   // ServerGamePacketListenerImpl aka. PlayerConnection
-  private boolean initialized = false;
-  private MethodHandle handleMethod, packetListenerField, managerField, channelField;
+  private static boolean initialized;
 
-  public BukkitJoinListener() {
+  private static MethodHandle handleMethod;
+  private static MethodHandle packetListenerField;
+  private static MethodHandle managerField;
+  private static MethodHandle channelField;
+
+  static {
     try {
-      final Method handleMethod = FallbackBukkitInjector.getOBCClass("entity.CraftPlayer").getDeclaredMethod("getHandle");
-      final Field listenerField = findField(false, handleMethod.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
-      final Field managerField = findField(true, listenerField.getType(), "NetworkManager", "Connection");
+      final Method handleMethod = FallbackBukkitInjector.getOBCClass("entity.CraftPlayer")
+        .getDeclaredMethod("getHandle");
+      final Field listenerField = FallbackBukkitInjector.findField(false, handleMethod.getReturnType(),
+        "PlayerConnection", "ServerGamePacketListenerImpl");
+      final Field managerField = FallbackBukkitInjector.findField(true, listenerField.getType(),
+        "NetworkManager", "Connection");
       final Field channelField = FallbackBukkitInjector.getFieldAt(managerField.getType(), Channel.class, 0);
-      this.handleMethod = MethodHandles.lookup().unreflect(handleMethod);
-      this.packetListenerField = MethodHandles.lookup().unreflectGetter(listenerField);
-      this.managerField = MethodHandles.lookup().unreflectGetter(managerField);
-      this.channelField = MethodHandles.lookup().unreflectGetter(channelField);
+
+      BukkitJoinListener.handleMethod = MethodHandles.lookup().unreflect(handleMethod);
+      packetListenerField = MethodHandles.lookup().unreflectGetter(listenerField);
+      BukkitJoinListener.managerField = MethodHandles.lookup().unreflectGetter(managerField);
+      BukkitJoinListener.channelField = MethodHandles.lookup().unreflectGetter(channelField);
       initialized = true;
-    } catch (java.lang.ReflectiveOperationException exception) {
+    } catch (Exception exception) {
       initialized = false;
     }
   }
 
-  private static Field findField(boolean checkSuperClass, Class<?> clazz, String... types) throws NoSuchFieldException {
-    for (Field field : clazz.getDeclaredFields()) {
-      String fieldTypeName = field.getType().getSimpleName();
-      for (String type : types) {
-        if (fieldTypeName.equals(type)) {
-          if (!Modifier.isPublic(field.getModifiers())) {
-            field.setAccessible(true);
-          }
-          return field;
-        }
-      }
-    }
-    if (checkSuperClass && clazz != Object.class && clazz.getSuperclass() != null) {
-      return findField(true, clazz.getSuperclass(), types);
-    }
-    throw new NoSuchFieldException(types[0]);
-  }
-
-  @EventHandler(priority = EventPriority.MONITOR)
-  public void onPlayerSpawn(final @NotNull PlayerJoinEvent event) {
-    if (!initialized || event.getPlayer().hasMetadata("NPC"))
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void handle(final @NotNull PlayerJoinEvent event) {
+    if (!initialized || event.getPlayer().hasMetadata("NPC")) {
       return;
+    }
+
     try {
       final Object handle = handleMethod.invoke(event.getPlayer());
       final Object listener = packetListenerField.invoke(handle);
       final Object networkManager = managerField.invoke(listener);
       final Channel channel = (Channel) channelField.invoke(networkManager);
-      if (channel != null && channel.isActive() && channel.pipeline().get(FallbackPipelines.FALLBACK_BANDWIDTH) == null) {
-        channel.close(); // Traditional disconnections can be canceled via ServerKickEvent.
+
+      // Close the channel if Sonar's handlers are not found when the PlayerJoinEvent is called
+      if (channel != null && channel.isActive() && channel.pipeline().context(FALLBACK_BANDWIDTH) == null) {
+        channel.close();
       }
-    } catch (final Throwable t) {
-      Sonar.get().getLogger().warn("Failed to get player channel. {}", t);
+    } catch (Throwable throwable) {
+      Sonar.get().getLogger().warn("Failed to the channel for {}: {}", event.getPlayer().getName(), throwable);
     }
   }
 }
