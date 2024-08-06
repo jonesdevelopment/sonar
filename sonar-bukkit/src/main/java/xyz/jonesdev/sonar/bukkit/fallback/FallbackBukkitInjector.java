@@ -21,14 +21,19 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
+import xyz.jonesdev.sonar.bukkit.SonarBukkit;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
@@ -48,8 +53,10 @@ public class FallbackBukkitInjector {
   private final Class<?> MINECRAFT_SERVER_CLASS;
   private final Class<?> CRAFTBUKKIT_SERVER_CLASS;
   private final Class<?> SERVER_CONNECTION_CLASS;
+  private final Object SERVER_INSTANCE;
 
-  private final Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
+  @Getter
+  private boolean lateBindEnabled;
 
   static {
     SERVER_VERSION = resolveServerVersion();
@@ -84,14 +91,38 @@ public class FallbackBukkitInjector {
       } catch (Exception exception) {
         minecraftServerInstance = getFieldAt(CRAFTBUKKIT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(Bukkit.getServer());
       }
+      SERVER_INSTANCE = minecraftServerInstance;
 
-      MINECRAFT_SERVER_CONNECTION_INSTANCE = getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(minecraftServerInstance);
+      checkLateBind();
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
     }
   }
 
-  private @NotNull Field getFieldAt(final @NotNull Class<?> clazz, final @NotNull Class<?> type, final int index) {
+  private void checkLateBind() {
+    try {
+      try {
+        Class.forName("org.bukkit.event.server.ServerLoadEvent");
+        // late-bind does not exist on these versions, ignore this case
+        return;
+      } catch (ClassNotFoundException ignored) {
+      }
+
+      final Class<?> spigotConfiguration = Class.forName("org.spigotmc.SpigotConfig");
+      final Method initFieldMethod = spigotConfiguration.getDeclaredMethod("lateBind");
+      initFieldMethod.setAccessible(true);
+      initFieldMethod.invoke(null);
+
+      if ((boolean) spigotConfiguration.getField("lateBind").get(null)) {
+        lateBindEnabled = true;
+      }
+    } catch (java.lang.ReflectiveOperationException ignore) {
+    }
+  }
+
+  public @NotNull Field getFieldAt(final @NotNull Class<?> clazz,
+                                   final @NotNull Class<?> type,
+                                   final int index) {
     int currentIndex = 0;
     for (final Field field : clazz.getDeclaredFields()) {
       field.setAccessible(true);
@@ -107,6 +138,26 @@ public class FallbackBukkitInjector {
       return getFieldAt(clazz.getSuperclass(), type, index);
     }
     throw new IllegalStateException("Could not find field #" + index + " in " + clazz.getName());
+  }
+
+  public static @NotNull Field findField(final boolean checkSuperClass,
+                                         final @NotNull Class<?> clazz,
+                                         final String @NotNull ... types) throws NoSuchFieldException {
+    for (final Field field : clazz.getDeclaredFields()) {
+      final String fieldTypeName = field.getType().getSimpleName();
+      for (final String type : types) {
+        if (fieldTypeName.equals(type)) {
+          if (!Modifier.isPublic(field.getModifiers())) {
+            field.setAccessible(true);
+          }
+          return field;
+        }
+      }
+    }
+    if (checkSuperClass && clazz != Object.class && clazz.getSuperclass() != null) {
+      return findField(true, clazz.getSuperclass(), types);
+    }
+    throw new NoSuchFieldException(types[0]);
   }
 
   private @NotNull BukkitServerVersion resolveServerVersion() {
@@ -135,7 +186,7 @@ public class FallbackBukkitInjector {
     return Class.forName(USES_LEGACY_PACKAGING ? LEGACY_NMS_PACKAGE + legacy : "net.minecraft." + modern);
   }
 
-  private @NotNull Class<?> getOBCClass(final String clazz) throws ClassNotFoundException {
+  public @NotNull Class<?> getOBCClass(final String clazz) throws ClassNotFoundException {
     return Class.forName(OBC_PACKAGE + clazz);
   }
 
@@ -151,7 +202,7 @@ public class FallbackBukkitInjector {
           continue;
         }
 
-        final var list = (List<?>) field.get(MINECRAFT_SERVER_CONNECTION_INSTANCE);
+        final var list = (List<?>) field.get(getFieldAt(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0).get(SERVER_INSTANCE));
 
         for (final Object object : list) {
           final ChannelFuture channelFuture = (ChannelFuture) object;
@@ -184,9 +235,33 @@ public class FallbackBukkitInjector {
           childHandlerField.setAccessible(true);
           final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
 
+          ChannelHandler finalBootstrap = bootstrap;
+
           // Inject our own channel initializer into the original field
-          childHandlerField.set(bootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
-            pipeline -> pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler())));
+          // If the plugin is not fully enabled but executes the injection,
+          // put an initializer to close the new connection automatically.
+          if (!SonarBukkit.INITIALIZE_LISTENER.isDone()) {
+            final ChannelInitializer<Channel> initializer = new ChannelInitializer<>() {
+              @Override
+              protected void initChannel(Channel channel) {
+                channel.close();
+              }
+            };
+            childHandlerField.set(finalBootstrap, initializer);
+          }
+
+          SonarBukkit.INITIALIZE_LISTENER.thenAccept(v -> {
+            try {
+              childHandlerField.set(finalBootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
+                pipeline -> {
+                  pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler());
+                  pipeline.addFirst(FallbackPipelines.FALLBACK_INACTIVE_LISTENER, new ChannelInactiveListener());
+                }
+              ));
+            } catch (IllegalAccessException exception) {
+              throw new ReflectiveOperationException(exception);
+            }
+          });
         }
         return;
       }
