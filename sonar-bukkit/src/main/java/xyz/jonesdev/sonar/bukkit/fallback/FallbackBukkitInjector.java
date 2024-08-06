@@ -29,6 +29,7 @@ import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.ChannelInactiveListener;
 import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
+import xyz.jonesdev.sonar.bukkit.SonarBukkit;
 import xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
@@ -121,7 +122,9 @@ public class FallbackBukkitInjector {
     }
   }
 
-  public @NotNull Field getFieldAt(final @NotNull Class<?> clazz, final @NotNull Class<?> type, final int index) {
+  public @NotNull Field getFieldAt(final @NotNull Class<?> clazz,
+                                   final @NotNull Class<?> type,
+                                   final int index) {
     int currentIndex = 0;
     for (final Field field : clazz.getDeclaredFields()) {
       field.setAccessible(true);
@@ -141,7 +144,7 @@ public class FallbackBukkitInjector {
 
   public static @NotNull Field findField(final boolean checkSuperClass,
                                          final @NotNull Class<?> clazz,
-                                         final String... types) throws NoSuchFieldException {
+                                         final String @NotNull ... types) throws NoSuchFieldException {
     for (final Field field : clazz.getDeclaredFields()) {
       final String fieldTypeName = field.getType().getSimpleName();
       for (final String type : types) {
@@ -235,9 +238,11 @@ public class FallbackBukkitInjector {
           final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
 
           ChannelHandler finalBootstrap = bootstrap;
+
           // Inject our own channel initializer into the original field
-          // If plugin not fully enabled but execute inject, Put an initializer to close the new connection automatically
-          if (!SonarBukkitPlugin.INITIALIZE_LISTENER.isDone()) {
+          // If the plugin is not fully enabled but executes the injection,
+          // put an initializer to close the new connection automatically.
+          if (!SonarBukkit.INITIALIZE_LISTENER.isDone()) {
             final ChannelInitializer<Channel> initializer = new ChannelInitializer<>() {
               @Override
               protected void initChannel(Channel channel) {
@@ -246,7 +251,8 @@ public class FallbackBukkitInjector {
             };
             childHandlerField.set(finalBootstrap, initializer);
           }
-          SonarBukkitPlugin.INITIALIZE_LISTENER.thenAccept(v -> {
+
+          SonarBukkit.INITIALIZE_LISTENER.thenAccept(v -> {
             try {
               childHandlerField.set(finalBootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
                 pipeline -> {
@@ -254,8 +260,8 @@ public class FallbackBukkitInjector {
                   pipeline.addFirst(FallbackPipelines.FALLBACK_INACTIVE_LISTENER, new ChannelInactiveListener());
                 }
               ));
-            } catch (IllegalAccessException e) {
-              throw new ReflectiveOperationException(e);
+            } catch (IllegalAccessException exception) {
+              throw new ReflectiveOperationException(exception);
             }
           });
         }

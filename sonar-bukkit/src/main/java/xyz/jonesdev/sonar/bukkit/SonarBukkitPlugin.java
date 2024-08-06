@@ -20,15 +20,12 @@ package xyz.jonesdev.sonar.bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
 
-import java.util.concurrent.CompletableFuture;
-
 public final class SonarBukkitPlugin extends JavaPlugin {
   private SonarBukkit bootstrap;
 
-  public static final CompletableFuture<Void> INITIALIZE_LISTENER = new CompletableFuture<>();
-
   @Override
   public void onLoad() {
+    // Inject early if late-bind is disabled
     if (!FallbackBukkitInjector.isLateBindEnabled()) {
       FallbackBukkitInjector.inject();
     }
@@ -38,7 +35,6 @@ public final class SonarBukkitPlugin extends JavaPlugin {
   public void onEnable() {
     bootstrap = new SonarBukkit(this);
     bootstrap.initialize();
-    INITIALIZE_LISTENER.complete(null);
   }
 
   @Override
