@@ -41,6 +41,18 @@ public final class ChannelInactiveListener extends ChannelInboundHandlerAdapter 
   public static final class ProxyChannelHandlerContext implements ChannelHandlerContext {
     private final ChannelHandlerContext ctx;
 
+    // Overwrite to prevent call this method on next handler
+
+    @Override
+    public ChannelHandlerContext fireChannelInactive() {
+      return this;
+    }
+
+    @Override
+    public ChannelHandlerContext fireExceptionCaught(Throwable throwable) {
+      return this;
+    }
+
     @Override
     public Channel channel() {
       return ctx.channel();
@@ -79,16 +91,6 @@ public final class ChannelInactiveListener extends ChannelInboundHandlerAdapter 
     @Override
     public ChannelHandlerContext fireChannelActive() {
       return ctx.fireChannelActive();
-    }
-
-    @Override
-    public ChannelHandlerContext fireChannelInactive() {
-      return this;
-    }
-
-    @Override
-    public ChannelHandlerContext fireExceptionCaught(Throwable throwable) {
-      return null;
     }
 
     @Override
