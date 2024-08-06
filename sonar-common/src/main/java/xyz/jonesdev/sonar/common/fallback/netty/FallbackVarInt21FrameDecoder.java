@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+// Taken from
+// https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java
 public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
 
   @Override
