@@ -211,13 +211,6 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       .addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
   }
 
-  @FunctionalInterface
-  public interface RemovalListener {
-    void accept(final @NotNull ChannelPipeline pipeline, final @NotNull String name, final @NotNull ChannelHandler handler);
-
-    RemovalListener EMPTY = (pipeline, name, handler) -> {};
-  }
-
   /**
    * Executes the maximum accounts per IP limit check before letting the player join
    *
@@ -287,5 +280,14 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     } else {
       channel.close();
     }
+  }
+
+  @FunctionalInterface
+  public interface RemovalListener {
+    void accept(final @NotNull ChannelPipeline pipeline,
+                final @NotNull String name,
+                final @NotNull ChannelHandler handler);
+
+    RemovalListener EMPTY = (pipeline, name, handler) -> {};
   }
 }

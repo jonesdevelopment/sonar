@@ -23,7 +23,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.ChannelInactiveListener;
-import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -34,6 +33,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacke
 import java.net.InetSocketAddress;
 import java.util.Objects;
 
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INACTIVE_LISTENER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INBOUND_HANDLER;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
@@ -42,12 +43,14 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
 
   FallbackBukkitInboundHandler() {
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
-    channelRemovalListener = ((pipeline, name, handler) -> {
-      final ChannelInactiveListener inactiveListener = (ChannelInactiveListener) pipeline.get(FallbackPipelines.FALLBACK_INACTIVE_LISTENER);
+
+    channelRemovalListener = (pipeline, name, handler) -> {
+      final var inactiveListener = (ChannelInactiveListener) pipeline.get(FALLBACK_INACTIVE_LISTENER);
+
       if (inactiveListener != null) {
         inactiveListener.add(handler);
       }
-    });
+    };
   }
 
   private FallbackPacketRegistry.ProtocolRegistry registry;
@@ -130,9 +133,9 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         handleLogin(ctx.channel(), ctx, () -> {
           byteBuf.readerIndex(originalReaderIndex);
           ctx.fireChannelRead(byteBuf);
-          final ChannelHandler fallbackInboundHandler = ctx.channel().pipeline().remove(FallbackPipelines.FALLBACK_INBOUND_HANDLER);
-          if (fallbackInboundHandler != null) {
-            channelRemovalListener.accept(ctx.pipeline(), FallbackPipelines.FALLBACK_INBOUND_HANDLER, fallbackInboundHandler);
+          final ChannelHandler inboundHandler = ctx.channel().pipeline().remove(FALLBACK_INBOUND_HANDLER);
+          if (inboundHandler != null) {
+            channelRemovalListener.accept(ctx.pipeline(), FALLBACK_INBOUND_HANDLER, inboundHandler);
           }
         }, loginStart.getUsername(), socketAddress);
         return;
