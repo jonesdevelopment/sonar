@@ -25,11 +25,11 @@ import java.util.concurrent.CompletableFuture;
 public final class SonarBukkitPlugin extends JavaPlugin {
   private SonarBukkit bootstrap;
 
-  public static final CompletableFuture<Void> initializeListener = new CompletableFuture<>();
+  public static final CompletableFuture<Void> INITIALIZE_LISTENER = new CompletableFuture<>();
 
   @Override
   public void onLoad() {
-    if (!FallbackBukkitInjector.lateBind) {
+    if (!FallbackBukkitInjector.isLateBindEnabled()) {
       FallbackBukkitInjector.inject();
     }
   }
@@ -38,7 +38,7 @@ public final class SonarBukkitPlugin extends JavaPlugin {
   public void onEnable() {
     bootstrap = new SonarBukkit(this);
     bootstrap.initialize();
-    initializeListener.complete(null);
+    INITIALIZE_LISTENER.complete(null);
   }
 
   @Override

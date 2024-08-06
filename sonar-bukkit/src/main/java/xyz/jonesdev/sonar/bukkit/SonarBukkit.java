@@ -104,7 +104,7 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
 
-    if (FallbackBukkitInjector.isLateBind()) {
+    if (FallbackBukkitInjector.isLateBindEnabled()) {
       getPlugin().getServer().getScheduler().runTask(getPlugin(), FallbackBukkitInjector::inject);
     } else {
       getPlugin().getServer().getPluginManager().registerEvents(new BukkitJoinListener(), getPlugin());

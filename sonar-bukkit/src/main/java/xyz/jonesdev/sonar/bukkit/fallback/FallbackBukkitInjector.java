@@ -57,7 +57,7 @@ public class FallbackBukkitInjector {
   private final Object SERVER_INSTANCE;
 
   @Getter
-  private boolean lateBind;
+  private boolean lateBindEnabled;
 
   static {
     SERVER_VERSION = resolveServerVersion();
@@ -93,6 +93,7 @@ public class FallbackBukkitInjector {
         minecraftServerInstance = getFieldAt(CRAFTBUKKIT_SERVER_CLASS, MINECRAFT_SERVER_CLASS, 0).get(Bukkit.getServer());
       }
       SERVER_INSTANCE = minecraftServerInstance;
+
       checkLateBind();
     } catch (Exception exception) {
       throw new ReflectiveOperationException(exception);
@@ -103,18 +104,20 @@ public class FallbackBukkitInjector {
     try {
       try {
         Class.forName("org.bukkit.event.server.ServerLoadEvent");
-        // lateBind is removed in this spigot version.
+        // late-bind does not exist on these versions, ignore this case
         return;
-      } catch (ClassNotFoundException ignore) {
+      } catch (ClassNotFoundException ignored) {
       }
+
       final Class<?> spigotConfiguration = Class.forName("org.spigotmc.SpigotConfig");
       final Method initFieldMethod = spigotConfiguration.getDeclaredMethod("lateBind");
       initFieldMethod.setAccessible(true);
       initFieldMethod.invoke(null);
+
       if ((boolean) spigotConfiguration.getField("lateBind").get(null)) {
-        lateBind = true;
+        lateBindEnabled = true;
       }
-    } catch (final java.lang.ReflectiveOperationException ignore) {
+    } catch (java.lang.ReflectiveOperationException ignore) {
     }
   }
 
@@ -234,7 +237,7 @@ public class FallbackBukkitInjector {
           ChannelHandler finalBootstrap = bootstrap;
           // Inject our own channel initializer into the original field
           // If plugin not fully enabled but execute inject, Put an initializer to close the new connection automatically
-          if (!SonarBukkitPlugin.initializeListener.isDone()) {
+          if (!SonarBukkitPlugin.INITIALIZE_LISTENER.isDone()) {
             final ChannelInitializer<Channel> initializer = new ChannelInitializer<>() {
               @Override
               protected void initChannel(Channel channel) {
@@ -243,7 +246,7 @@ public class FallbackBukkitInjector {
             };
             childHandlerField.set(finalBootstrap, initializer);
           }
-          SonarBukkitPlugin.initializeListener.thenAccept(v -> {
+          SonarBukkitPlugin.INITIALIZE_LISTENER.thenAccept(v -> {
             try {
               childHandlerField.set(finalBootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
                 pipeline -> {
