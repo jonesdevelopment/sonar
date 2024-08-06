@@ -37,11 +37,11 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWID
 // https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
 public final class BukkitJoinListener implements Listener {
   private static MethodHandle handleMethod;
+  // ServerGamePacketListenerImpl aka. PlayerConnection
   private static MethodHandle packetListenerField;
   private static MethodHandle managerField;
   private static MethodHandle channelField;
 
-  // ServerGamePacketListenerImpl aka. PlayerConnection
   private static boolean initialized;
 
   static {
