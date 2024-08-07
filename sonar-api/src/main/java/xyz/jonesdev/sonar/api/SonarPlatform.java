@@ -27,7 +27,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public enum SonarPlatform {
   BUKKIT("Bukkit", 19110,
-    pipeline -> pipeline.get("outbound_config") != null ? "outbound_config" : "encoder",
+    pipeline -> pipeline.context("outbound_config") != null ? "outbound_config" : "encoder",
     pipeline -> "packet_handler"),
   BUNGEE("BungeeCord", 19109,
     pipeline -> "packet-encoder",
