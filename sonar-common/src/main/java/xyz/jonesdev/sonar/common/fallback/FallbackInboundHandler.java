@@ -36,8 +36,6 @@ public final class FallbackInboundHandler extends ChannelInboundHandlerAdapter {
   @Setter
   @Getter
   private InetAddress inetAddress;
-  @Getter
-  private String handler, encoder;
 
   @Override
   public void channelActive(final @NotNull ChannelHandlerContext ctx) throws Exception {
@@ -47,9 +45,6 @@ public final class FallbackInboundHandler extends ChannelInboundHandlerAdapter {
     ctx.fireChannelActive();
     // Add the packet handler pipeline
     sonarPipelineInjector.accept(ctx.pipeline());
-    // Set the handler and encoder pipeline names
-    handler = Sonar.get().getPlatform().getHandlerFunction().apply(ctx.pipeline());
-    encoder = Sonar.get().getPlatform().getEncoderFunction().apply(ctx.pipeline());
   }
 
   @Override
