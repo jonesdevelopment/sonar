@@ -65,7 +65,7 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
       final ChannelHandler inboundHandler = new FallbackInboundHandler(sonarPipelineInjector);
       // We need to be careful on Bukkit, as the encoder can be different
       if (Sonar.get().getPlatform() == SonarPlatform.BUKKIT) {
-        final String encoder = channel.pipeline().get("outbound_config") != null ? "outbound_config" : "encoder";
+        final String encoder = Sonar.get().getPlatform().getHandlerFunction().apply(channel.pipeline());
         channel.pipeline().addBefore(encoder, FALLBACK_INBOUND_HANDLER, inboundHandler);
       } else {
         channel.pipeline().addFirst(FALLBACK_INBOUND_HANDLER, inboundHandler);
