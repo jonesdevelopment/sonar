@@ -131,12 +131,14 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         // Let Sonar process the login packet
         handleLogin(ctx.channel(), ctx, () -> {
           byteBuf.readerIndex(originalReaderIndex);
-          ctx.fireChannelRead(byteBuf);
+          ctx.fireChannelRead(byteBuf.retain());
           final ChannelHandler inboundHandler = ctx.channel().pipeline().remove(FALLBACK_INBOUND_HANDLER);
           if (inboundHandler != null) {
             channelRemovalListener.accept(ctx.pipeline(), FALLBACK_INBOUND_HANDLER, inboundHandler);
           }
         }, loginStart.getUsername(), socketAddress);
+        // Release the ByteBuf to avoid memory leaks
+        byteBuf.release();
         return;
       }
 
