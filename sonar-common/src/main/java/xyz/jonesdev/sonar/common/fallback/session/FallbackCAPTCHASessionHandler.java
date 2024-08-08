@@ -47,7 +47,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
                                        final @NotNull String username) {
     super(user, username);
 
-    // Disconnect the player is there is no CAPTCHA available at the moment
+    // Disconnect the player if there is no CAPTCHA available at the moment
     if (!MAP_INFO_PREPARER.isCaptchaAvailable()) {
       user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
       throw new CorruptedFrameException("No captcha available");
@@ -55,8 +55,8 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
 
     this.tries = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
-    // If the player is on Java, set the 5th slot (ID 4) in the player's hotbar to the map.
-    // If the player is on Bedrock, set the 1st slot (ID 0) in the player's hotbar to the map.
+    // If the player is on Java, set the 5th slot (ID 4) in the player's hotbar to the map
+    // If the player is on Bedrock, set the 1st slot (ID 0) in the player's hotbar to the map
     user.delayedWrite(new SetContainerSlotPacket(user.isGeyser() ? 36 : 40, 1,
       ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetContainerSlotPacket.MAP_NBT));
     // Send random captcha to the player
@@ -67,7 +67,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
     user.delayedWrite(user.isGeyser() ? CAPTCHA_ABILITIES_BEDROCK : CAPTCHA_ABILITIES);
-    // Make sure the player knows what to do
+    // Make sure the player knows that they have to enter the code in chat
     user.delayedWrite(enterCodeMessage);
     // Send all packets in one flush
     user.getChannel().flush();
@@ -78,22 +78,20 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    // Check if the player took too long to enter the captcha
+    // Check if the player took too long to enter the CAPTCHA
     final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
-    checkState(!user.getLoginTimer().elapsed(maxDuration), "took too long to enter captcha");
+    checkState(!user.getLoginTimer().elapsed(maxDuration), "took too long to enter CAPTCHA");
 
-    // Handle incoming chat messages
     if (packet instanceof SystemChatPacket) {
       final SystemChatPacket chat = (SystemChatPacket) packet;
-
-      // Captcha is correct, finish verification
+      // Finish the verification if the player entered the correct code
       if (chat.getMessage().equals(answer)) {
         finishVerification();
         return;
       }
-
-      // Captcha is incorrect, remove one try
-      checkState(tries-- > 0, "failed captcha too often");
+      // Decrement the number of tries left
+      checkState(tries-- > 0, "failed CAPTCHA too often");
+      // Send the player a chat message to let them know that the code they entered is incorrect
       user.write(incorrectCaptcha);
     } else if (packet instanceof SetPlayerPositionPacket
       || packet instanceof SetPlayerPositionRotationPacket) {
