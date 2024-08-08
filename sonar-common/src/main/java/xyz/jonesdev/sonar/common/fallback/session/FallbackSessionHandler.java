@@ -70,7 +70,11 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
     if (transferToOrigin != null
       && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
       // Send the transfer packet to the player and close the channel
-      closeWith(user.getChannel(), user.getProtocolVersion(), transferToOrigin);
+      if (user.isGeyser()) {
+        user.write(transferToOrigin);
+      } else {
+        closeWith(user.getChannel(), user.getProtocolVersion(), transferToOrigin);
+      }
     } else {
       // Disconnect player with the verification success message
       user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());
