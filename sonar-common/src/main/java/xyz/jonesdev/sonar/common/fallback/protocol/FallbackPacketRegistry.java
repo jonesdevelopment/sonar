@@ -26,7 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
@@ -38,6 +40,12 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 // Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/StateRegistry.java
 public enum FallbackPacketRegistry {
+  HANDSHAKE {
+    {
+      serverbound.register(HandshakePacket.class, HandshakePacket::new,
+        map(0x00, MINECRAFT_1_7_2, false));
+    }
+  },
   LOGIN {
     {
       clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
@@ -45,6 +53,8 @@ public enum FallbackPacketRegistry {
       clientbound.register(LoginSuccessPacket.class, LoginSuccessPacket::new,
         map(0x02, MINECRAFT_1_7_2, true));
 
+      serverbound.register(LoginStartPacket.class, LoginStartPacket::new,
+        map(0x00, MINECRAFT_1_7_2, false));
       serverbound.register(LoginAcknowledgedPacket.class, LoginAcknowledgedPacket::new,
         map(0x03, MINECRAFT_1_20_2, false));
     }
@@ -124,7 +134,7 @@ public enum FallbackPacketRegistry {
         map(0x1A, MINECRAFT_1_19_4, true),
         map(0x1B, MINECRAFT_1_20_2, true),
         map(0x1D, MINECRAFT_1_20_5, true));
-      clientbound.register(SetPlayerPositionRotation.class, SetPlayerPositionRotation::new,
+      clientbound.register(SetPlayerPositionRotationPacket.class, SetPlayerPositionRotationPacket::new,
         map(0x08, MINECRAFT_1_7_2, true),
         map(0x2E, MINECRAFT_1_9, true),
         map(0x2F, MINECRAFT_1_12_1, true),
@@ -444,7 +454,7 @@ public enum FallbackPacketRegistry {
         map(0x0D, MINECRAFT_1_19_4, false),
         map(0x0F, MINECRAFT_1_20_2, false),
         map(0x12, MINECRAFT_1_21, false));
-      serverbound.register(SetPlayerPositionRotation.class, SetPlayerPositionRotation::new,
+      serverbound.register(SetPlayerPositionRotationPacket.class, SetPlayerPositionRotationPacket::new,
         map(0x06, MINECRAFT_1_7_2, false),
         map(0x0D, MINECRAFT_1_9, false),
         map(0x0F, MINECRAFT_1_12, false),

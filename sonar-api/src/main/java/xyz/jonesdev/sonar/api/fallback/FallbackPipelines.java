@@ -18,8 +18,14 @@
 package xyz.jonesdev.sonar.api.fallback;
 
 public interface FallbackPipelines {
-  String FALLBACK_HANDLER = "sonar-fallback-handler";
-  String FALLBACK_PACKET_ENCODER = "sonar-fallback-encoder";
-  String FALLBACK_PACKET_DECODER = "sonar-fallback-decoder";
-  String FALLBACK_BANDWIDTH = "sonar-fallback-bandwidth";
+  String FALLBACK_INACTIVE_LISTENER = "sonar-inactive-listener";
+  String FALLBACK_INBOUND_HANDLER = "sonar-inbound-handler";
+  String FALLBACK_FRAME_DECODER = "sonar-frame-decoder";
+  String FALLBACK_FRAME_ENCODER = "sonar-frame-encoder";
+  String FALLBACK_TIMEOUT = "sonar-timeout";
+  String FALLBACK_PACKET_HANDLER = "sonar-packet-handler";
+  String FALLBACK_PACKET_ENCODER = "sonar-packet-encoder";
+  String FALLBACK_PACKET_DECODER = "sonar-packet-decoder";
+  String FALLBACK_TAIL_EXCEPTIONS = "sonar-exception-tail";
+  String FALLBACK_BANDWIDTH = "sonar-bandwidth-counter";
 }

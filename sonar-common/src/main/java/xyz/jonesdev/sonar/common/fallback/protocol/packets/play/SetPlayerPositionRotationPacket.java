@@ -33,7 +33,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class SetPlayerPositionRotation implements FallbackPacket {
+public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   private double x, y, z;
   private float yaw, pitch;
   private int teleportId;
@@ -46,15 +46,10 @@ public final class SetPlayerPositionRotation implements FallbackPacket {
     byteBuf.writeDouble(z);
     byteBuf.writeFloat(yaw);
     byteBuf.writeFloat(pitch);
+    byteBuf.writeBoolean(onGround);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-      byteBuf.writeBoolean(onGround);
-    } else {
-      byteBuf.writeByte(0x00);
-
-      if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
-        writeVarInt(byteBuf, teleportId);
-      }
+    if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
+      writeVarInt(byteBuf, teleportId);
 
       if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0
         && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {

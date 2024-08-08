@@ -23,24 +23,24 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
+import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
+import xyz.jonesdev.sonar.bukkit.listener.BukkitJoinListener;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Getter
 public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
-  public static SonarBukkit INSTANCE;
-
   public SonarBukkit(final @NotNull SonarBukkitPlugin plugin) {
-    super(plugin, SonarPlatform.BUKKIT, plugin.getDataFolder(),
-      new BukkitLibraryManager(plugin, plugin.getDataFolder().getName()));
-    INSTANCE = this;
+    super(plugin, SonarPlatform.BUKKIT, plugin.getDataFolder(), new BukkitLibraryManager(plugin));
   }
 
   /**
@@ -54,6 +54,11 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
       return null;
     }
     return bukkitAudiences.player(uniqueId);
+  }
+
+  @Override
+  public @NotNull Audience sender(final @NotNull Object object) {
+    return bukkitAudiences.sender((CommandSender) object);
   }
 
   /**
@@ -82,6 +87,8 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
 
   private Metrics metrics;
 
+  public static final CompletableFuture<Void> INITIALIZE_LISTENER = new CompletableFuture<>();
+
   @Override
   public void enable() {
     // Initialize bStats.org metrics
@@ -92,9 +99,23 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
       () -> getConfig().getVerification().getTiming().getDisplayName()));
     metrics.addCustomChart(new SimplePie("captcha",
       () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
+    metrics.addCustomChart(new SimplePie("language",
+      () -> getConfig().getLanguage().getName()));
+    metrics.addCustomChart(new SimplePie("database_type",
+      () -> getConfig().getDatabase().getType().getDisplayName()));
 
     // Register Sonar command
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
+
+    // Try to inject into the server
+    if (FallbackBukkitInjector.isLateBindEnabled()) {
+      getPlugin().getServer().getScheduler().runTask(getPlugin(), FallbackBukkitInjector::inject);
+    } else {
+      getPlugin().getServer().getPluginManager().registerEvents(new BukkitJoinListener(), getPlugin());
+    }
+
+    // Let the injector know that the plugin has been enabled
+    INITIALIZE_LISTENER.complete(null);
   }
 
   @Override

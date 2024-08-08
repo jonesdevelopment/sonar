@@ -22,14 +22,9 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PaddleBoatPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PlayerInputPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetPassengersPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SpawnEntityPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import java.util.UUID;
-
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -40,54 +35,83 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  *   {@link SpawnEntityPacket} and {@link SetPassengersPacket} packets are sent to the client,
  *   therefore, making the player enter a boat.
  *   <br>
+ *   The boat will be spawned at y 1337.
+ *   <br>
+ *   After 3 {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets,
+ *   the boat is removed.
+ *   <br>
+ *   Now we can check if the player sends the correct position after the entity is removed.
+ *   Please note that we don't tell the client to exit the vehicle, therefore, possibly confusing some bots.
+ *   Removing the boat results in the player exiting the vehicle on vanilla clients.
+ *   <br>
  *   See more: {@link FallbackVehicleSessionHandler}
  * </li>
  * <li>
- *   Then, all we do is listen for incoming {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets.
+ *   Then, we listen for incoming {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets.
  * </li>
  */
 public final class FallbackVehicleSessionHandler extends FallbackSessionHandler {
 
   public FallbackVehicleSessionHandler(final @NotNull FallbackUser user,
                                        final @NotNull String username,
-                                       final @NotNull UUID uuid,
                                        final boolean forceCAPTCHA) {
-    super(user, username, uuid);
+    super(user, username);
 
     this.forceCAPTCHA = forceCAPTCHA;
 
     // Send the necessary packets to mount the player on the vehicle
-    final int entityTypeId = EntityType.BOAT.getId(user.getProtocolVersion());
-    user.delayedWrite(new SpawnEntityPacket(VEHICLE_ENTITY_ID, entityTypeId,
-      SPAWN_X_POSITION, DEFAULT_Y_COLLIDE_POSITION, SPAWN_Z_POSITION));
+    user.delayedWrite(spawnEntity);
     user.delayedWrite(setPassengers);
     user.getChannel().flush();
   }
 
   private final boolean forceCAPTCHA;
-  private boolean receivedPaddle, receivedInput;
+  private int paddlePackets, inputPackets, positionPackets;
+  private boolean expectMovement;
+
+  private static final int MINIMUM_REQUIRED_PACKETS = 2;
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
     if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
-      // Make sure the player exits the vehicle before sending the CAPTCHA
-      user.delayedWrite(removeEntities);
-      // Either send the player to the CAPTCHA, or finish the verification.
+      // Either send the player to the CAPTCHA or finish the verification.
       final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
-      decoder.setListener(new FallbackCAPTCHASessionHandler(user, username, uuid));
+      decoder.setListener(new FallbackCAPTCHASessionHandler(user, username));
     } else {
       // The player has passed all checks
       finishVerification();
     }
   }
 
+  // We can abuse the entity remove mechanic and check for position packets when the entity dies
+  private void move(double y) {
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+      y -= 1.62f; // Account for 1.7 bounding box
+    }
+    // Check the Y position of the player
+    checkState(y <= IN_AIR_Y_POSITION, "invalid y position");
+    // Mark this check as successful if the player sent a few position packets
+    if (positionPackets++ > MINIMUM_REQUIRED_PACKETS) {
+      markSuccess();
+    }
+  }
+
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    if (packet instanceof PaddleBoatPacket) {
-      // Mark the PaddleBoat packet as received
-      receivedPaddle = true;
-    } else if (packet instanceof PlayerInputPacket) {
+    if (packet instanceof SetPlayerPositionRotationPacket) {
+      if (expectMovement) {
+        final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
+        move(posRot.getY());
+      }
+    } else if (packet instanceof SetPlayerPositionPacket) {
+      if (expectMovement) {
+        final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
+        move(position.getY());
+      }
+    } else if (packet instanceof PaddleBoatPacket) {
+      paddlePackets++;
+    } else if (packet instanceof PlayerInputPacket && !expectMovement) {
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
       // Check if the player is sending invalid vehicle speed values
@@ -99,19 +123,23 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
         return;
       }
 
-      // Mark this check as success if the player has sent
-      // two PlayerInput and a minimum of one PaddleBoat packets.
-      if (receivedInput && receivedPaddle) {
-        markSuccess();
+      // Once the player sent enough packets, go to the next stage
+      if (paddlePackets > MINIMUM_REQUIRED_PACKETS && inputPackets > MINIMUM_REQUIRED_PACKETS) {
+        // Remove the entity
+        // The next y coordinate the player will send is going
+        // to be the vehicle spawn position (y 64 in this case).
+        user.write(removeEntities);
+        // Listen for next movement packet(s)
+        expectMovement = true;
+        return;
       }
 
       // 1.8 and below do not have PaddleBoat packets,
       // so we simply exempt them from the PaddleBoat check.
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
-        receivedPaddle = true;
+        paddlePackets++;
       }
-      // Mark the PlayerInput packet as received
-      receivedInput = true;
+      inputPackets++;
     }
   }
 }

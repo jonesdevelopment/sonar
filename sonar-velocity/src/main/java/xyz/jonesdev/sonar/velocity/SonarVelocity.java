@@ -34,13 +34,10 @@ import java.util.UUID;
 
 @Getter
 public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
-  public static SonarVelocity INSTANCE;
-
   public SonarVelocity(final @NotNull SonarVelocityPlugin plugin) {
     super(plugin, SonarPlatform.VELOCITY, plugin.getDataDirectory().toFile(),
       new VelocityLibraryManager<>(plugin, plugin.getLogger(),
         plugin.getDataDirectory(), plugin.getServer().getPluginManager()));
-    INSTANCE = this;
   }
 
   /**
@@ -52,6 +49,13 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
       return null;
     }
     return getPlugin().getServer().getPlayer(uniqueId).orElse(null);
+  }
+
+  @Override
+  @Deprecated
+  public @NotNull Audience sender(final @NotNull Object object) {
+    // We don't have to do this on Velocity since all command senders are also audiences.
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -90,6 +94,10 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
       () -> getConfig().getVerification().getTiming().getDisplayName()));
     metrics.addCustomChart(new SimplePie("captcha",
       () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
+    metrics.addCustomChart(new SimplePie("language",
+      () -> getConfig().getLanguage().getName()));
+    metrics.addCustomChart(new SimplePie("database_type",
+      () -> getConfig().getDatabase().getType().getDisplayName()));
 
     // Register Sonar command
     getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());

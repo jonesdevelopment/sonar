@@ -176,6 +176,7 @@ verification:
 
   # თუ ჩართულია, მოთამაშე გადავა საწყის სერვერში ვერიფიკაციის წარმატებით გავლის შემდეგ
   # ეს ფუნქცია დაემატა Mojang-ის მიერ Minecraft-ის 1.20.5 ვერსიაში
+  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
   transfer:
     # უნდა გადაიყვანოს თუ არა Sonar-მა მოთამაშე საწყის სერვერზე (მათი გაგდების ნაცვლად)?
     # ამისთვის, თქვენ უნდა ჩართოთ ეს ფუნქცია თქვენი სერვერის კონფიგურაციაში
@@ -191,6 +192,10 @@ verification:
     # თუ თქვენს სერვერს არ სჭირდება პორტი შესასვლელად, შეგიძლიათ დატოვოთ ეს 25565-ზე
     destination-port: 25565
 
+  # Sonar caches most packets it sends to the client, including the LoginSuccess packet.
+  # Which username should Sonar use for the LoginSuccess packet?
+  # The username will not be visible to the player without client modifications
+  cached-username: "Sonar"
   # ჩაიწეროს თუ არა Sonar-მა ახალი ვერიფიკაციის მცდელობები?
   log-connections: true
   # ჩაწეროს თუ არა Sonar-მა ახალი ვერიფიკაციის მცდელობები შეტევის დროს?
@@ -220,10 +225,8 @@ verification:
   # რამდენად ხშირად უნდა გაიაროს მოთამაშემ ვერიფიკაცია წარუმატებლად, რომ ის მოხვდეს შავ სიაში?
   # (დააყენეთ ეს 0 ზე, რომ მთლიანად გათიშოთ შავი სია)
   blacklist-threshold: 2
-  # პროტოკოლის ID-ების სია, რომლებიც არ არის შემოწმებული Sonar-ის მიერ (დამოწმების შემოვლითი გზა)
+  # პროტოკოლის ID-ების სია, რომლებსაც საერთოდ არ შეუძლიათ სერვერზე შემოსვლა
   # თქვენ შეგიძლიათ იპოვოთ ყველა პროტოკოლის ID-ების სრული სია აქ:
   # https://wiki.vg/Protocol_version_numbers
   # მაგალითად, Minecraft 1.20-ს აქვს ID 763.
-  whitelisted-protocols: []
-  # პროტოკოლის ID-ების სია, რომლებსაც საერთოდ არ შეუძლიათ სერვერზე შემოსვლა
   blacklisted-protocols: []

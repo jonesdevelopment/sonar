@@ -6,14 +6,13 @@ plugins {
 
 bukkit {
   name = rootProject.name
-  description = rootProject.description
-  version = rootProject.version.toString()
   main = "xyz.jonesdev.sonar.bukkit.SonarBukkitPlugin"
   authors = listOf("Jones Development", "Sonar Contributors")
   website = "https://jonesdev.xyz/discord/"
   load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
   softDepend = listOf("Geyser-Spigot", "floodgate", "Protocolize", "ProtocolSupport",
     "ViaVersion", "packetevents", "ProtocolLib", "FastLogin")
+  apiVersion = "1.13" // ignore legacy plugin warning
   foliaSupported = true
 
   commands {
@@ -33,11 +32,11 @@ dependencies {
   implementation(project(":common"))
 
   compileOnly(rootProject.libs.spigot)
+  testCompileOnly(rootProject.libs.spigot)
 
-  implementation(rootProject.libs.adventure.platform.bukkit)
-  implementation(rootProject.libs.adventure.platform.api)
-  implementation(rootProject.libs.adventure.platform.facet)
-  implementation(rootProject.libs.adventure.nbt)
+  implementation(rootProject.libs.adventure.platform.bukkit) {
+    exclude(module = "adventure-nbt")
+  }
   implementation(rootProject.libs.bstats.bukkit)
   implementation(rootProject.libs.libby.bukkit)
 }

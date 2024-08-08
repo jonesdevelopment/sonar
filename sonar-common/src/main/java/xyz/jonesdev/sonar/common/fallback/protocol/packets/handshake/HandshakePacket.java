@@ -15,23 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
+package xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake;
 
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readString;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
+
 @Getter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public final class PaddleBoatPacket implements FallbackPacket {
-  private boolean leftPaddle, rightPaddle;
+@ToString(of = {"protocolVersionId", "hostname", "port"})
+public final class HandshakePacket implements FallbackPacket {
+  private int protocolVersionId;
+  private String hostname;
+  private int port;
+  private int intent;
+
+  private static final String FORGE_TOKEN = "\0FML\0";
+  private static final int MAXIMUM_HOSTNAME_LENGTH = 255 + FORGE_TOKEN.length() + 1;
+
+  // https://wiki.vg/Protocol#Handshaking
+  public static final int STATUS = 1;
+  public static final int LOGIN = 2;
+  public static final int TRANSFER = 3;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -39,8 +48,10 @@ public final class PaddleBoatPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    leftPaddle = byteBuf.readBoolean();
-    rightPaddle = byteBuf.readBoolean();
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+    protocolVersionId = readVarInt(byteBuf);
+    hostname = readString(byteBuf, MAXIMUM_HOSTNAME_LENGTH);
+    port = byteBuf.readUnsignedShort();
+    intent = readVarInt(byteBuf);
   }
 }

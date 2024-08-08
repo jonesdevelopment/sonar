@@ -15,6 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*
+ * Copyright 2021 Andrew Steinborn
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies
+ * or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package xyz.jonesdev.sonar.common.util;
 
 import io.netty.buffer.ByteBuf;
@@ -22,6 +43,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.EncoderException;
+import io.netty.util.Version;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.*;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +62,25 @@ import java.util.UUID;
 public class ProtocolUtil {
   public static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
   public static final String BRAND_CHANNEL = "minecraft:brand";
+
+  public static void checkNettyVersion() {
+    final Version version = Version.identify().getOrDefault("netty-all", Version.identify().get("netty-common"));
+
+    // We're pretty much only doing this to avoid incompatibilities on Bukkit,
+    // so we don't really care if the version couldn't be resolved.
+    if (version == null) {
+      return;
+    }
+
+    final String[] artifactVersion = version.artifactVersion().split("\\.");
+    final int major = Integer.parseInt(artifactVersion[0]);
+    final int minor = Integer.parseInt(artifactVersion[1]);
+
+    // Enforce Netty >4.1.x
+    if (major < 4 || (major == 4 && minor < 1)) {
+      throw new IllegalStateException("Your Netty version is too old to run Sonar! Please use Netty >4.1.x.");
+    }
+  }
 
   public static int readVarInt(final ByteBuf byteBuf) {
     int read = readVarIntSafely(byteBuf);
@@ -95,6 +136,19 @@ public class ProtocolUtil {
       byteBuf.writeInt(w);
       byteBuf.writeByte(value >>> 28);
     }
+  }
+
+  private static final int[] VARINT_EXACT_BYTE_LENGTHS = new int[33];
+
+  static {
+    for (int i = 0; i <= 32; ++i) {
+      VARINT_EXACT_BYTE_LENGTHS[i] = (int) Math.ceil((31d - (i - 1)) / 7d);
+    }
+    VARINT_EXACT_BYTE_LENGTHS[32] = 1;
+  }
+
+  public static int varIntBytes(final int value) {
+    return VARINT_EXACT_BYTE_LENGTHS[Integer.numberOfLeadingZeros(value)];
   }
 
   public static void writeVarLong(final ByteBuf byteBuf, final long value) {
@@ -160,9 +214,8 @@ public class ProtocolUtil {
     }
   }
 
-  public static void readUUID(final @NotNull ByteBuf byteBuf) {
-    byteBuf.readLong(); // least
-    byteBuf.readLong(); // most
+  public static @NotNull UUID readUUID(final @NotNull ByteBuf byteBuf) {
+    return new UUID(byteBuf.readLong(), byteBuf.readLong());
   }
 
   public static byte @NotNull [] readByteArray(final ByteBuf byteBuf) {

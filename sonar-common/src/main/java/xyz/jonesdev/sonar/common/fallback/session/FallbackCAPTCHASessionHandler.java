@@ -25,8 +25,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import java.util.UUID;
-
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 /**
@@ -44,8 +42,9 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  */
 public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler {
 
-  public FallbackCAPTCHASessionHandler(final FallbackUser user, final String username, final UUID uuid) {
-    super(user, username, uuid);
+  public FallbackCAPTCHASessionHandler(final @NotNull FallbackUser user,
+                                       final @NotNull String username) {
+    super(user, username);
 
     this.tries = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
@@ -90,7 +89,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
       checkState(tries-- > 0, "failed captcha too often");
       user.write(incorrectCaptcha);
     } else if (packet instanceof SetPlayerPositionPacket
-      || packet instanceof SetPlayerPositionRotation) {
+      || packet instanceof SetPlayerPositionRotationPacket) {
       // A position packet is sent approximately every second
       final long difference = maxDuration - user.getLoginTimer().delay();
       final int index = (int) (difference / 1000D);

@@ -21,7 +21,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-enum Language {
+public enum Language {
   SYSTEM("system"),
   AB("Abkhazian"),
   AA("Afar"),

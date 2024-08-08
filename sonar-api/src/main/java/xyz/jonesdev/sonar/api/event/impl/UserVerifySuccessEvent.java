@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.api.event.impl;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -28,7 +27,6 @@ import java.util.UUID;
 
 @Getter
 @ToString
-@EqualsAndHashCode
 @RequiredArgsConstructor
 public final class UserVerifySuccessEvent implements SonarEvent {
   private final String username;

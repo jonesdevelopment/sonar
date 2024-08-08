@@ -21,6 +21,7 @@ import com.alessiodp.libby.BungeeLibraryManager;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.md_5.bungee.api.CommandSender;
 import org.bstats.bungeecord.Metrics;
 import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
@@ -35,11 +36,8 @@ import java.util.UUID;
 
 @Getter
 public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
-  public static SonarBungee INSTANCE;
-
   public SonarBungee(final @NotNull SonarBungeePlugin plugin) {
     super(plugin, SonarPlatform.BUNGEE, plugin.getDataFolder(), new BungeeLibraryManager(plugin));
-    INSTANCE = this;
   }
 
   /**
@@ -53,6 +51,11 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
       return null;
     }
     return bungeeAudiences.player(uniqueId);
+  }
+
+  @Override
+  public @NotNull Audience sender(final @NotNull Object object) {
+    return bungeeAudiences.sender((CommandSender) object);
   }
 
   /**
@@ -91,6 +94,10 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
       () -> getConfig().getVerification().getTiming().getDisplayName()));
     metrics.addCustomChart(new SimplePie("captcha",
       () -> getConfig().getVerification().getMap().getTiming().getDisplayName()));
+    metrics.addCustomChart(new SimplePie("language",
+      () -> getConfig().getLanguage().getName()));
+    metrics.addCustomChart(new SimplePie("database_type",
+      () -> getConfig().getDatabase().getType().getDisplayName()));
 
     // Register Sonar command
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());

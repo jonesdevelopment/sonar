@@ -4,8 +4,6 @@ plugins {
 
 bungee {
   name = rootProject.name
-  description = rootProject.description
-  version = rootProject.version.toString()
   main = "xyz.jonesdev.sonar.bungee.SonarBungeePlugin"
   author = "Jones Development, Sonar Contributors"
   softDepends = setOf("Geyser-BungeeCord", "floodgate", "Protocolize", "ViaVersion", "packetevents", "FastLogin")
@@ -18,10 +16,9 @@ dependencies {
   compileOnly(rootProject.libs.bungeecord)
   testCompileOnly(rootProject.libs.bungeecord)
 
-  implementation(rootProject.libs.adventure.platform.bungee)
-  implementation(rootProject.libs.adventure.platform.api)
-  implementation(rootProject.libs.adventure.platform.facet)
-  implementation(rootProject.libs.adventure.nbt)
+  implementation(rootProject.libs.adventure.platform.bungee) {
+    exclude(module = "adventure-nbt")
+  }
   implementation(rootProject.libs.bstats.bungee)
   implementation(rootProject.libs.libby.bungee)
 }

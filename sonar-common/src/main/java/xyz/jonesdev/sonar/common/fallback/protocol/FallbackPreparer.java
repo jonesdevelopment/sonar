@@ -26,6 +26,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
+import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
@@ -39,7 +40,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FallbackPreparer {
 
   // LoginSuccess
-  public final FallbackPacket LOGIN_SUCCESS = new FallbackPacketSnapshot(new LoginSuccessPacket(new UUID(1L, 1L), "Sonar"));
+  public FallbackPacket loginSuccess;
   // Abilities
   public final FallbackPacket DEFAULT_ABILITIES = new FallbackPacketSnapshot(new PlayerAbilitiesPacket(0x00, 0f, 0f));
   public final FallbackPacket CAPTCHA_ABILITIES = new FallbackPacketSnapshot(new PlayerAbilitiesPacket(0x02, 0f, 0f));
@@ -86,6 +87,7 @@ public class FallbackPreparer {
 
   // Vehicle
   public FallbackPacket removeEntities;
+  public FallbackPacket spawnEntity;
   public static FallbackPacket setPassengers;
   public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1;
 
@@ -94,10 +96,11 @@ public class FallbackPreparer {
   public final int SPAWN_X_POSITION = 16 / 2; // middle of the chunk
   public final int SPAWN_Z_POSITION = 16 / 2; // middle of the chunk
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
+  public final int IN_AIR_Y_POSITION = 1337;
 
   // Captcha position
-  public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotation(
-    SPAWN_X_POSITION, 1337, SPAWN_Z_POSITION, 0f, 90f, 0, false));
+  public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
+    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0f, 90f, 0, false));
 
   // Platform
   public BlockType blockType = BlockType.BARRIER;
@@ -116,6 +119,10 @@ public class FallbackPreparer {
     // Preload the packet registry to avoid CPU/RAM issues on 1st connection
     Sonar.get().getLogger().info("Preloading all registered packets...");
     FallbackPacketRegistry.values();
+
+    // Prepare LoginSuccess packet
+    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(new UUID(1L, 1L),
+      Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username")));
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
@@ -139,7 +146,7 @@ public class FallbackPreparer {
     dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + (int) Math.ceil(maxFallDistance);
     defaultSpawnPosition = new FallbackPacketSnapshot(new SetDefaultSpawnPositionPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION));
-    spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotation(
+    spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
       0, -90, TELEPORT_ID, false));
 
@@ -180,6 +187,8 @@ public class FallbackPreparer {
 
     // Prepare packets for the vehicle check
     removeEntities = new FallbackPacketSnapshot(new RemoveEntitiesPacket(VEHICLE_ENTITY_ID));
+    spawnEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(
+      VEHICLE_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     setPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER

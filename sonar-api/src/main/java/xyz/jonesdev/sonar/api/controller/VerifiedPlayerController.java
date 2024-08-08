@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.api.controller;
 
+import com.alessiodp.libby.LibraryManager;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
@@ -71,7 +72,7 @@ public final class VerifiedPlayerController {
   @Getter
   private final @NotNull SonarConfiguration.Database.Type cachedDatabaseType;
 
-  public VerifiedPlayerController() {
+  public VerifiedPlayerController(final @NotNull LibraryManager libraryManager) {
     final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
     // Cache selected database type, so we don't need to call Sonar.get() every time
     cachedDatabaseType = database.getType();
@@ -82,22 +83,39 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    database.getType().getDatabaseType().loadDriver();
+    // Make sure to only download the driver once
+    if (!cachedDatabaseType.isDownloaded()) {
+      LOGGER.info("Downloading {} driver version {}",
+        cachedDatabaseType.getDatabaseType().getDatabaseName(),
+        cachedDatabaseType.getDatabaseDriver().getVersion());
+      // Download and load the driver for the current database
+      libraryManager.loadLibrary(cachedDatabaseType.getDatabaseDriver());
+      cachedDatabaseType.setDownloaded(true);
+    }
+    // Make sure to actually register the loader, so we can use it
+    cachedDatabaseType.getDatabaseType().loadDriver();
 
     try {
-      String jdbcURL = String.format(database.getType().getConnectionString(),
-        database.getHost(), database.getPort(), database.getName());
+      final String jdbcURL;
 
       // H2 has a different JDBC URL layout
       // https://www.codejava.net/java-se/jdbc/connect-to-h2-database-examples
       if (cachedDatabaseType == SonarConfiguration.Database.Type.H2) {
         final File file = new File(Sonar.get().getConfig().getPluginFolder(),
-          Sonar.get().getConfig().getDatabase().getFilename());
-        jdbcURL = String.format(database.getType().getConnectionString(), file.getAbsolutePath());
+          Sonar.get().getConfig().getGeneralConfig().getString("database.filename"));
+        jdbcURL = String.format(cachedDatabaseType.getConnectionString(), file.getAbsolutePath());
+      } else {
+        // Normal JDBC URL layout for MySQL/MariaDB/...
+        jdbcURL = String.format(cachedDatabaseType.getConnectionString(),
+          Sonar.get().getConfig().getGeneralConfig().getString("database.host"),
+          Sonar.get().getConfig().getGeneralConfig().getInt("database.port"),
+          Sonar.get().getConfig().getGeneralConfig().getString("database.name"));
       }
 
       connectionSource = new JdbcPooledConnectionSource(jdbcURL,
-        database.getUsername(), database.getPassword(), database.getType().getDatabaseType());
+        Sonar.get().getConfig().getGeneralConfig().getString("database.username"),
+        Sonar.get().getConfig().getGeneralConfig().getString("database.password"),
+        cachedDatabaseType.getDatabaseType());
 
       // Create database table
       try {
@@ -253,37 +271,44 @@ public final class VerifiedPlayerController {
    *
    * @return Estimated size of the local cache
    */
-  public synchronized int estimatedSize() {
-    /*
-     * TODO: Work on this
-     * return MAP.values().stream()
-     *   .mapToInt(Collection::size)
-     *   .sum();
-     */
+  public int estimatedSize() {
     return cache.size();
   }
 
   /**
-   * @return List of UUIDs associated with one IP address
+   * Returns the sum of verified IP addresses
+   * and their respective collection of UUIDs
+   *
+   * @return Exact size of all total verified players
+   */
+  @Deprecated
+  public synchronized int exactSize() {
+    return cache.values().stream()
+      .mapToInt(Collection::size)
+      .sum();
+  }
+
+  /**
+   * @return {@link java.util.Collection} of UUIDs associated with an IP address
    */
   public @Unmodifiable Collection<UUID> getUUIDs(final @NotNull String inetAddress) {
     return cache.getOrDefault(inetAddress, Collections.emptyList());
   }
 
   /**
-   * Clear the local cache, and then if the database type is set,
+   * Clear the local cache, and, if the database type is set,
    * remove the table from the database.
    */
-  public void clearAll() {
-    try {
-      cache.clear();
+  public synchronized void clearAll() {
+    cache.clear();
 
-      // Only update the column if the database type is not NONE
-      if (cachedDatabaseType != SonarConfiguration.Database.Type.NONE) {
+    // Delete the entire table from the database, if necessary
+    if (cachedDatabaseType != SonarConfiguration.Database.Type.NONE) {
+      try {
         dao.deleteBuilder().delete();
+      } catch (SQLException exception) {
+        LOGGER.error("Error trying to clear entries: {}", exception);
       }
-    } catch (SQLException exception) {
-      LOGGER.error("Error trying to clear entries: {}", exception);
     }
   }
 

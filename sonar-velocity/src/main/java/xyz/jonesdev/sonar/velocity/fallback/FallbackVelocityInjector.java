@@ -24,12 +24,12 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
-import xyz.jonesdev.sonar.common.fallback.injection.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
 
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_HANDLER;
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_HANDLER;
 
 @UtilityClass
 public class FallbackVelocityInjector {
@@ -54,12 +54,12 @@ public class FallbackVelocityInjector {
 
       // Make sure to store the original channel initializer
       final ChannelInitializer<Channel> originalInitializer = connectionManager.serverChannelInitializer.get();
-      final ChannelInitializer<Channel> fallbackInitializer = new FallbackInjectedChannelInitializer(
-        originalInitializer, pipeline -> pipeline.addAfter(MINECRAFT_DECODER, FALLBACK_HANDLER,
-        new FallbackVelocityChannelHandler(pipeline.channel())));
+      final ChannelInitializer<Channel> injectedInitializer = new FallbackInjectedChannelInitializer(
+        originalInitializer, pipeline -> pipeline.addAfter(MINECRAFT_DECODER, FALLBACK_PACKET_HANDLER,
+        new FallbackVelocityInboundHandler()));
 
       // Replace the original channel initializer
-      SERVER_CHANNEL_INITIALIZER_FIELD.set(connectionManager.getServerChannelInitializer(), fallbackInitializer);
+      SERVER_CHANNEL_INITIALIZER_FIELD.set(connectionManager.getServerChannelInitializer(), injectedInitializer);
     } catch (Throwable throwable) {
       throw new ReflectiveOperationException(throwable);
     }

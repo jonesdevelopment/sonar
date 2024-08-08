@@ -143,7 +143,8 @@ verification:
       auto-color: false
       # Sonar 应该一次准备多少个验证码?
       precompute: 500
-      # Sonar 应该给玩家多少时间完成验证码? (该值为毫秒. 1秒等于1000毫秒.)
+      # Sonar 应该给玩家多少时间完成验证码?
+      # (该值为毫秒. 1秒等于1000毫秒.)
       max-duration: 30000
       # 玩家最多能输入多少次错误的验证码?
       max-tries: 3
@@ -171,6 +172,7 @@ verification:
 
   # 开启后 玩家将在验证成功后被重定向到指定的服务器
   # 该功能由 Mojang 在 Minecraft 1.20.5 版本中引入
+  # 教程: https://youtu.be/aSWrzQVjGnc?t=71
   transfer:
     # Sonar 是否应该将玩家重定向到指定的服务器而不是踢出玩家?
     # 为此您必须在服务器软件的配置文件中允许接受来自transfer的连接.
@@ -185,6 +187,10 @@ verification:
     # 如果服务器地址不包含端口 请保留25565.
     destination-port: 25565
 
+  # Sonar 缓存它发送到客户端的大部分数据包, 包括 LoginSuccess 数据包.
+  # Sonar 应该使用哪个用户名来接收 LoginSuccess 数据包？
+  # 如果不修改客户端, 用户名将不会对玩家可见
+  cached-username: "Sonar"
   # 当 Sonar 尝试验证玩家时 是否在控制台中打印它?
   log-connections: true
   # Sonar 是否应该记录在攻击期间内的验证会话?
@@ -213,9 +219,7 @@ verification:
   blacklist-time: 600000
   # 玩家必须验证失败多少次才会被列入黑名单? (设置为0以完全禁用)
   blacklist-threshold: 2
-  # Sonar 不应该检查哪些协议? (即 跳过检查)
+  # 黑名单中的协议将阻止所有使用该协议的客户端.
   # 您可以在 https://wiki.vg/Protocol_version_numbers 找到所有协议号
   # 例如 Minecraft 1.20 对应的协议号为763.
-  whitelisted-protocols: []
-  # 黑名单中的协议将阻止所有使用该协议的客户端.
   blacklisted-protocols: []

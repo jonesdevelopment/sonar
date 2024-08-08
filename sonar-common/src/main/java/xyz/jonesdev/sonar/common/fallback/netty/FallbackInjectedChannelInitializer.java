@@ -15,18 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.injection;
+package xyz.jonesdev.sonar.common.fallback.netty;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.SonarPlatform;
+import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandler;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.function.Consumer;
+
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INBOUND_HANDLER;
 
 @RequiredArgsConstructor
 public final class FallbackInjectedChannelInitializer extends ChannelInitializer<Channel> {
@@ -41,8 +48,8 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
     }
   }
 
-  private final ChannelInitializer<Channel> originalChannelInitializer;
-  private final Consumer<ChannelPipeline> sonarPipelineInjector;
+  private final @NotNull ChannelInitializer<Channel> originalChannelInitializer;
+  private final @NotNull Consumer<ChannelPipeline> sonarPipelineInjector;
 
   @Override
   protected void initChannel(final Channel channel) throws Exception {
@@ -55,7 +62,14 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
 
     // Inject Sonar's channel handler into the pipeline
     if (channel.isActive()) {
-      sonarPipelineInjector.accept(channel.pipeline());
+      final ChannelHandler inboundHandler = new FallbackInboundHandler(sonarPipelineInjector);
+      // We need to be careful on Bukkit, as the encoder can be different
+      if (Sonar.get().getPlatform() == SonarPlatform.BUKKIT) {
+        final String encoder = Sonar.get().getPlatform().getEncoderFunction().apply(channel.pipeline());
+        channel.pipeline().addBefore(encoder, FALLBACK_INBOUND_HANDLER, inboundHandler);
+      } else {
+        channel.pipeline().addFirst(FALLBACK_INBOUND_HANDLER, inboundHandler);
+      }
     }
   }
 }

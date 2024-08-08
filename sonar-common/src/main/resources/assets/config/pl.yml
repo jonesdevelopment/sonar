@@ -177,6 +177,7 @@ verification:
   # Jeśli opcja ta jest włączona, gracz zostanie przeniesiony z powrotem
   # na serwer początkowy po pomyślnym przejściu weryfikacji antybotowej.
   # Funkcja ta została wprowadzona przez Mojang w wersji 1.20.5
+  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
   transfer:
     # Czy Sonar powinien przenieść gracza na serwer początkowy (zamiast go wyrzucać)?
     # Aby to zadziałało, musisz włączyć tę funkcję w konfiguracji serwera.
@@ -192,6 +193,10 @@ verification:
     # Jeśli serwer nie potrzebuje portu do połączenia, można pozostawić 25565.
     destination-port: 25565
 
+  # Sonar buforuje większość pakietów, które wysyła do klienta, w tym pakiet LoginSuccess.
+  # Jakiej nazwy użytkownika powinien używać Sonar dla pakietu LoginSuccess?
+  # Nazwa użytkownika nie będzie widoczna dla gracza bez modyfikacji klienta
+  cached-username: "Sonar"
   # Czy Sonar powinien rejestrować połączenia nowych graczy?
   log-connections: true
   # Czy Sonar powinien rejestrować nowe próby połączenia podczas ataku?
@@ -221,10 +226,8 @@ verification:
   # Jak często gracz ma nie przechodzić weryfikacji, aby znaleźć się na czarnej liście?
   # (Ustaw tę wartość na 0, aby całkowicie wyłączyć czarną listę).
   blacklist-threshold: 2
-  # Lista protokołów (wersji gry), które nie będą sprawdzane przez Sonar
+  # Lista protokołów, które nie mogą w ogóle dołączyć do serwera
   # Pełną listę wszystkich protokołów można znaleźć tutaj:
   # https://wiki.vg/Protocol_version_numbers
   # Na przykład Minecraft 1.20 ma protokół 763.
-  whitelisted-protocols: []
-  # Lista protokołów, które nie mogą w ogóle dołączyć do serwera
   blacklisted-protocols: []

@@ -28,7 +28,7 @@ import java.net.InetSocketAddress;
  * Simple utility to determine if someone joins using GeyserMC
  */
 @UtilityClass
-public class GeyserDetection {
+public class GeyserUtil {
   // https://github.com/GeyserMC/Floodgate/blob/master/core/src/main/java/org/geysermc/floodgate/module/CommonModule.java#L206
   private final AttributeKey<Object> PLAYER_ATTRIBUTE = AttributeKey.valueOf("floodgate-player");
 

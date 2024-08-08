@@ -1,7 +1,7 @@
 [versions]
 netty = "4.1.112.Final"
 adventure = "4.17.0"
-adventure-platform = "4.3.3"
+adventure-platform = "4.3.4"
 bstats = "3.0.2"
 libby = "2.0.0-SNAPSHOT"
 
@@ -16,8 +16,6 @@ adventure-serializer = { module = "net.kyori:adventure-text-serializer-gson", ve
 adventure-nbt = { module = "net.kyori:adventure-nbt", version.ref = "adventure" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
 adventure-platform-bungee = { module = "net.kyori:adventure-platform-bungeecord", version.ref = "adventure-platform" }
-adventure-platform-facet = { module = "net.kyori:adventure-platform-facet", version.ref = "adventure-platform" }
-adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventure-platform" }
 libby-core = { module = "com.alessiodp.libby:libby-core", version.ref = "libby" }
 libby-bungee = { module = "com.alessiodp.libby:libby-bungee", version.ref = "libby" }
 libby-bukkit = { module = "com.alessiodp.libby:libby-bukkit", version.ref = "libby" }
@@ -26,10 +24,12 @@ bstats-bungee = { module = "org.bstats:bstats-bungeecord", version.ref = "bstats
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 bstats-velocity = { module = "org.bstats:bstats-velocity", version.ref = "bstats" }
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
+annotations = "org.jetbrains:annotations:24.0.1"
+simpleyaml = "com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4"
 ormlite = "com.j256.ormlite:ormlite-jdbc:6.1"
 lombok = "org.projectlombok:lombok:1.18.34"
 capja = "xyz.jonesdev:capja:1.0.3"
 bungeecord = "net.md_5:bungeecord-proxy:master-SNAPSHOT"
 velocity = "com.velocitypowered:velocity-proxy:3.3.0-SNAPSHOT"
-# We have to use 1.8 for backwards compatibility
+# We have to use 1.8.8 for backwards compatibility
 spigot = "org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT"

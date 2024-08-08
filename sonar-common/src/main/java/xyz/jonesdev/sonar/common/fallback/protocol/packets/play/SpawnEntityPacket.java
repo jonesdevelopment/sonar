@@ -25,6 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 
 import java.util.UUID;
 
@@ -37,23 +38,24 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SpawnEntityPacket implements FallbackPacket {
-  private int entityId, entityType;
+  private int entityId;
+  private EntityType entityType;
   private double x, y, z;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     writeVarInt(byteBuf, entityId);
 
-    final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_8) > 0;
+    final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_9) >= 0;
 
     if (v1_9orHigher) {
       writeUUID(byteBuf, UUID.randomUUID());
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      writeVarInt(byteBuf, entityType);
+      writeVarInt(byteBuf, entityType.getId(protocolVersion));
     } else {
-      byteBuf.writeByte(entityType);
+      byteBuf.writeByte(entityType.getId(protocolVersion));
     }
 
     if (v1_9orHigher) {
@@ -61,9 +63,9 @@ public final class SpawnEntityPacket implements FallbackPacket {
       byteBuf.writeDouble(y);
       byteBuf.writeDouble(z);
     } else {
-      byteBuf.writeInt(floor(x * 32D));
-      byteBuf.writeInt(floor(y * 32D));
-      byteBuf.writeInt(floor(z * 32D));
+      byteBuf.writeInt((int) (x * 32D));
+      byteBuf.writeInt((int) (y * 32D));
+      byteBuf.writeInt((int) (z * 32D));
     }
 
     byteBuf.writeByte(0); // pitch or yaw
@@ -81,11 +83,6 @@ public final class SpawnEntityPacket implements FallbackPacket {
       byteBuf.writeShort(0); // velocity Y
       byteBuf.writeShort(0); // velocity Z
     }
-  }
-
-  private static int floor(final double value) {
-    final int __value = (int) value;
-    return value < (double) __value ? __value - 1 : __value;
   }
 
   @Override

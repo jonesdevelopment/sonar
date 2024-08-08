@@ -17,6 +17,7 @@
 
 package xyz.jonesdev.sonar.api.config;
 
+import com.alessiodp.libby.Library;
 import com.j256.ormlite.db.DatabaseType;
 import lombok.*;
 import net.kyori.adventure.text.Component;
@@ -48,6 +49,8 @@ public final class SonarConfiguration {
   private final SimpleYamlConfig generalConfig, messagesConfig, webhookConfig;
   @Getter
   private final File languageFile, pluginFolder;
+  @Getter
+  private Language language;
 
   static final LoggerWrapper LOGGER = new LoggerWrapper() {
 
@@ -121,27 +124,27 @@ public final class SonarConfiguration {
     }
 
     // Generate the language file and check what it's set to
-    Language preferredLanguage = getPreferredLanguage();
-    if (preferredLanguage == Language.SYSTEM) {
+    language = getPreferredLanguage();
+    if (language == Language.SYSTEM) {
       try {
         // Try using the system language to determine the language file
         final String property = System.getProperty("user.language", "en");
-        preferredLanguage = Language.fromCode(property);
+        language = Language.fromCode(property);
         // Make sure the user knows that we're using the system language for translations
-        LOGGER.info("Using system language ({}) for translations.", preferredLanguage);
+        LOGGER.info("Using system language ({}) for translations.", language);
       } catch (Exception exception) {
         LOGGER.warn("Could not use system language for translations.");
-        LOGGER.warn("Using default language ({}) for translations.", preferredLanguage);
+        LOGGER.warn("Using default language ({}) for translations.", language);
       }
     } else {
-      LOGGER.info("Using custom language ({}) for translations.", preferredLanguage);
+      LOGGER.info("Using custom language ({}) for translations.", language);
     }
 
     // Load all configurations
     try {
-      generalConfig.load(getAsset("config", preferredLanguage));
-      messagesConfig.load(getAsset("messages", preferredLanguage));
-      webhookConfig.load(getAsset("webhook", preferredLanguage));
+      generalConfig.load(getAsset("config", language));
+      messagesConfig.load(getAsset("messages", language));
+      webhookConfig.load(getAsset("webhook", language));
     } catch (Exception exception) {
       throw new IllegalStateException("Error loading configuration", exception);
     }
@@ -165,12 +168,6 @@ public final class SonarConfiguration {
 
     // Database
     database.type = Database.Type.valueOf(generalConfig.getString("database.type").toUpperCase());
-    database.filename = generalConfig.getString("database.filename");
-    database.host = generalConfig.getString("database.host");
-    database.port = generalConfig.getInt("database.port");
-    database.name = generalConfig.getString("database.name");
-    database.username = generalConfig.getString("database.username");
-    database.password = generalConfig.getString("database.password");
     database.maximumAge = clamp(generalConfig.getInt("database.maximum-age"), 1, 365);
 
     // Queue
@@ -241,8 +238,6 @@ public final class SonarConfiguration {
     verification.rememberTime = clamp(generalConfig.getInt("verification.remember-time"), 0, 86400000);
     verification.blacklistTime = clamp(generalConfig.getInt("verification.blacklist-time"), 0, 86400000);
     verification.blacklistThreshold = clamp(generalConfig.getInt("verification.blacklist-threshold"), 0, 100);
-    verification.whitelistedProtocols.clear();
-    verification.whitelistedProtocols.addAll(generalConfig.getIntList("verification.whitelisted-protocols"));
     verification.blacklistedProtocols.clear();
     verification.blacklistedProtocols.addAll(generalConfig.getIntList("verification.blacklisted-protocols"));
 
@@ -466,7 +461,6 @@ public final class SonarConfiguration {
     private int rememberTime;
     private int blacklistTime;
     private int blacklistThreshold;
-    private final Collection<Integer> whitelistedProtocols = new HashSet<>(0);
     private final Collection<Integer> blacklistedProtocols = new HashSet<>(0);
 
     private Component tooFastReconnect;
@@ -487,22 +481,38 @@ public final class SonarConfiguration {
     @Getter
     @RequiredArgsConstructor
     public enum Type {
-      MYSQL("jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter()),
-      MARIADB("jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter()),
-      H2("jdbc:h2:file:%s", new H2DatabaseTypeAdapter()),
-      NONE(null, null);
+      MYSQL("MySQL", "jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter(),
+        Library.builder()
+          .groupId("com{}mysql")
+          .artifactId("mysql-connector-j")
+          .version("8.4.0")
+          .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
+          .build()),
+      MARIADB("MariaDB", "jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter(),
+        Library.builder()
+          .groupId("org{}mariadb{}jdbc")
+          .artifactId("mariadb-java-client")
+          .version("3.4.0")
+          .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
+          .build()),
+      H2("H2", "jdbc:h2:file:%s", new H2DatabaseTypeAdapter(),
+        Library.builder()
+          .groupId("com{}h2database")
+          .artifactId("h2")
+          .version("2.1.214")
+          .relocate("org{}h2", "xyz{}jonesdev{}sonar{}libs{}h2")
+          .build()),
+      NONE("None", null, null, null);
 
+      private final String displayName;
       private final String connectionString;
       private final DatabaseType databaseType;
+      private final Library databaseDriver;
+      @Setter
+      private boolean downloaded;
     }
 
     private Type type;
-    private String filename;
-    private String host;
-    private int port;
-    private String name;
-    private String username;
-    private String password;
     private int maximumAge;
   }
 

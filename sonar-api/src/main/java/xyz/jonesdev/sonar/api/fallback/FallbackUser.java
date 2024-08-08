@@ -44,6 +44,9 @@ public interface FallbackUser {
   @NotNull
   SystemTimer getLoginTimer();
 
+  @NotNull
+  UUID getOfflineUuid();
+
   boolean isReceivedClientSettings();
 
   void setReceivedClientSettings(final boolean receivedClientSettings);
@@ -65,16 +68,10 @@ public interface FallbackUser {
   /**
    * Takes over the channel and begins the verification process
    *
-   * @param username Username of the player
-   * @param uuid     UUID of the player
-   * @param encoder  Name of the encoder pipeline
-   * @param decoder  Name of the decoder pipeline
-   * @param timeout  Name of the read timeout pipeline
-   * @param handler  Name of the main pipeline
+   * @param username    Username of the player
+   * @param offlineUuid UUID of the player
    */
-  void hijack(final @NotNull String username, final @NotNull UUID uuid,
-              final @NotNull String encoder, final @NotNull String decoder,
-              final @NotNull String timeout, final @NotNull String handler);
+  void hijack(final @NotNull String username, final @NotNull UUID offlineUuid);
 
   /**
    * Sends a packet/message to the player

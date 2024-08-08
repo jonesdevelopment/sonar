@@ -177,6 +177,7 @@ verification:
   # Indien ingeschakeld, wordt de speler teruggestuurd naar de oorspronkelijke server
   # nadat u de bot-verificatie met succes heeft doorstaan.
   # Deze functie is geïntroduceerd door Mojang in Minecraft versie 1.20.5
+  # Handleiding: https://youtu.be/aSWrzQVjGnc?t=71
   transfer:
     # Moet Sonar de speler overbrengen naar de oorspronkelijke server (in plaats van hem te schoppen)?
     # Om dit te laten werken, moet u de functie inschakelen in de configuratie van uw server
@@ -192,6 +193,10 @@ verification:
     # Als uw server geen poort nodig heeft om verbinding mee te maken, kunt u dit op 25565 laten staan.
     destination-port: 25565
 
+  # Sonar cached de meeste pakketten die het naar de client stuurt, inclusief het LoginSuccess pakket.
+  # Welke gebruikersnaam moet Sonar gebruiken voor het LoginSucces pakket?
+  # De gebruikersnaam zal niet zichtbaar zijn voor de speler zonder client aanpassingen
+  cached-username: "Sonar"
   # Moet Sonar nieuwe verificatiepogingen registreren?
   log-connections: true
   # Moet Sonar nieuwe verificatiepogingen registreren tijdens aanvallen?
@@ -221,10 +226,8 @@ verification:
   # Hoe vaak moet een speler de verificatie niet doorstaan om op de zwarte lijst te worden geplaatst?
   # (Stel deze waarde in op 0 om de zwarte lijst volledig uit te schakelen)
   blacklist-threshold: 2
-  # Lijst met protocol-ID's die niet door Sonar worden gecontroleerd (verificatie-bypass)
+  # Lijst met protocol-ID's die helemaal geen verbinding kunnen maken met de server
   # De volledige lijst met alle protocol-ID's vindt u hier:
   # https://wiki.vg/Protocol_version_numbers
   # Minecraft 1.20 heeft bijvoorbeeld de ID 763.
-  whitelisted-protocols: []
-  # Lijst met protocol-ID's die helemaal geen verbinding kunnen maken met de server
   blacklisted-protocols: []

@@ -177,21 +177,26 @@ verification:
   # If enabled, the player will be transferred back to the origin server
   # after successfully passing the bot verification.
   # This feature was introduced by Mojang in Minecraft version 1.20.5
+  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
   transfer:
     # Should Sonar transfer the player to the origin server (instead of kicking them)?
-    # For this to work, you must enable the feature in your server's configuration
+    # For this to work, you must enable the feature in your server's configuration.
     # Additionally, you might want to reduce the amount of login rate-limiting
     # performed by Velocity or other proxies/plugins, as this might prevent the
     # player from being transferred correctly.
     enabled: false
     # Which server should Sonar transfer the player to when the verification is passed?
-    # Please enter the server IP that is used by players to normally connect to your server.
+    # Please enter the server IP used by players to normally connect to your server.
     # For example, you can put "mc.hypixel.net" or a direct IP like "1.1.1.1"
     destination-host: "play.my-server.com"
     # Which port should Sonar use when transferring the player to the origin server?
     # If your server does not need a port to connect to, you can leave this as 25565.
     destination-port: 25565
 
+  # Sonar caches most packets it sends to the client, including the LoginSuccess packet.
+  # Which username should Sonar use for the LoginSuccess packet?
+  # The username will not be visible to the player without client modifications
+  cached-username: "Sonar"
   # Should Sonar log new verification attempts?
   log-connections: true
   # Should Sonar log new verification attempts during attacks?
@@ -221,10 +226,8 @@ verification:
   # How often does a player have to fail the verification in order to be blacklisted?
   # (Set this value to 0 to disable the blacklist entirely)
   blacklist-threshold: 2
-  # List of protocol IDs which are not checked by Sonar (verification bypass)
+  # List of protocol IDs which are unable to join the server at all
   # You can find the full list of all protocol IDs here:
   # https://wiki.vg/Protocol_version_numbers
   # For example, Minecraft 1.20 has the ID 763.
-  whitelisted-protocols: []
-  # List of protocol IDs which are unable to join the server at all
   blacklisted-protocols: []

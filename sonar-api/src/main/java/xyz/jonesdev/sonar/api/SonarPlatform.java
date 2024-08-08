@@ -17,19 +17,30 @@
 
 package xyz.jonesdev.sonar.api;
 
+import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
 public enum SonarPlatform {
-  BUKKIT("Bukkit", 19110),
-  BUNGEE("BungeeCord", 19109),
-  VELOCITY("Velocity", 19107);
+  BUKKIT("Bukkit", 19110,
+    pipeline -> pipeline.context("outbound_config") != null ? "outbound_config" : "encoder",
+    pipeline -> "packet_handler"),
+  BUNGEE("BungeeCord", 19109,
+    pipeline -> "packet-encoder",
+    pipeline -> "inbound-boss"),
+  VELOCITY("Velocity", 19107,
+    pipeline -> "minecraft-encoder",
+    pipeline -> "handler");
 
   private final String displayName;
   /**
    * bStats service ID for the respective Sonar platform
    */
   private final int metricsId;
+  private final Function<ChannelPipeline, String> encoderFunction;
+  private final Function<ChannelPipeline, String> handlerFunction;
 }
