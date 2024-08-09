@@ -100,7 +100,7 @@ public class FallbackPreparer {
 
   // Captcha position
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
-    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0f, 90f, 0, false));
+    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, false));
 
   // Platform
   public BlockType blockType = BlockType.BARRIER;
