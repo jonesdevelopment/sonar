@@ -239,7 +239,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
         }
         user.fail("illegal collision; offset: " + collisionOffsetY + " tick: " + movementTick + " y: " + y);
       }
-      // The player has collided with the blocks, go on to the next stag
+      // The player has collided with the blocks, go on to the next stage
       markSuccess(false);
     }
   }
