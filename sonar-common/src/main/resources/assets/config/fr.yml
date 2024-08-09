@@ -80,26 +80,24 @@ verification:
     gravity:
       # Sonar devrait-il vérifier la gravité du client ? (Recommandé)
       enabled: true
-      # Sonar devrait-il vérifier si le joueur entre en collision avec des blocs ? (Recommandé)
-      check-collisions: true
       # Sonar devrait-il faire résoudre un CAPTCHA au joueur s'il échoue à la vérification de la gravité ?
       captcha-on-fail: false
       # Nombre maximum de ticks que le joueur a pour tomber avant de pouvoir toucher la plateforme
       max-movement-ticks: 8
-      # Le mode de jeu du joueur pendant la vérification
-      # Types possibles : SURVIVAL, CREATIVE, ADVENTURE
-      # - SURVIVAL : tous les composants de l'interface utilisateur sont visibles
-      # - CREATIVE : la santé et la faim sont cachées
-      # - ADVENTURE : tous les composants de l'interface utilisateur sont visibles
-      gamemode: ADVENTURE
+
+    # Vérifie si le joueur entre en collision avec les blocs apparus en dessous de lui
+    collision:
+      # Sonar devrait-il vérifier si le joueur entre en collision avec des blocs ? (Recommandé)
+      enabled: true
+      # Quel type de bloc Sonar doit-il utiliser pour la plate-forme de collision ?
+      # Types possibles : STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
+      # Vous ne devriez modifier cela que si vous savez ce que vous faites
+      collision-block-type: TRAPDOOR
 
     # Vérifie si le client envoie les paquets appropriés lorsqu'il monte dans un véhicule
     vehicle:
-      # Types possibles : ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS : Les nouveaux joueurs seront toujours montés dans un véhicule (Recommandé)
-      # - DURING_ATTACK : Les nouveaux joueurs ne seront montés dans un véhicule que pendant une attaque
-      # - NEVER : Les nouveaux joueurs ne seront jamais montés dans un véhicule
-      timing: ALWAYS
+      # Sonar devrait-il vérifier si le joueur entre correctement dans un bateau ?
+      enabled: true
 
     # Fait taper au joueur un code à partir d'une carte virtuelle dans le chat
     map-captcha:
@@ -193,6 +191,12 @@ verification:
     # Si votre serveur n'a pas besoin d'un port pour se connecter, vous pouvez laisser celui-ci comme 25565.
     destination-port: 25565
 
+  # Le mode de jeu du joueur pendant la vérification
+  # Types possibles : SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL : tous les composants de l'interface utilisateur sont visibles
+  # - CREATIVE : la santé et la faim sont cachées
+  # - ADVENTURE : tous les composants de l'interface utilisateur sont visibles
+  gamemode: ADVENTURE
   # Sonar met en cache la plupart des paquets qu'il envoie au client, y compris le paquet LoginSuccess.
   # Quel nom d'utilisateur Sonar doit-il utiliser pour le paquet LoginSuccess ?
   # Le nom d'utilisateur ne sera pas visible par le joueur sans modification du client

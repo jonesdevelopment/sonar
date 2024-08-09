@@ -75,10 +75,6 @@ public final class Fallback {
     return shouldPerform(Sonar.get().getConfig().getVerification().getMap().getTiming());
   }
 
-  public boolean shouldPerformVehicleCheck() {
-    return shouldPerform(Sonar.get().getConfig().getVerification().getVehicle().getTiming());
-  }
-
   private static boolean shouldPerform(final SonarConfiguration.Verification.Timing timing) {
     return timing == SonarConfiguration.Verification.Timing.ALWAYS
       || (timing == SonarConfiguration.Verification.Timing.DURING_ATTACK

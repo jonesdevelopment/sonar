@@ -33,12 +33,12 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPac
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
 
+import java.security.SecureRandom;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class FallbackPreparer {
-
+  private final SecureRandom RANDOM = new SecureRandom();
   // LoginSuccess
   public FallbackPacket loginSuccess;
   // Abilities
@@ -61,7 +61,7 @@ public class FallbackPreparer {
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
   // JoinGame
-  public final int PLAYER_ENTITY_ID = ThreadLocalRandom.current().nextInt(10);
+  public final int PLAYER_ENTITY_ID = RANDOM.nextInt(10);
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
@@ -71,7 +71,7 @@ public class FallbackPreparer {
   // Default Spawn Position
   public FallbackPacket defaultSpawnPosition;
   // Spawn Position
-  public final int TELEPORT_ID = ThreadLocalRandom.current().nextInt();
+  public final int TELEPORT_ID = RANDOM.nextInt();
   public FallbackPacket spawnPosition;
   // Transfer packet
   public static FallbackPacket transferToOrigin;
@@ -89,7 +89,7 @@ public class FallbackPreparer {
   public FallbackPacket removeEntities;
   public FallbackPacket spawnEntity;
   public static FallbackPacket setPassengers;
-  public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1;
+  public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1 + RANDOM.nextInt(10);
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
@@ -98,12 +98,12 @@ public class FallbackPreparer {
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
   public final int IN_AIR_Y_POSITION = 1337;
 
-  // Captcha position
+  // CAPTCHA position
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
-    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0f, 90f, 0, false));
+    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, false));
 
   // Platform
-  public BlockType blockType = BlockType.BARRIER;
+  public BlockType blockType;
   public int maxMovementTick, dynamicSpawnYPosition;
   public double[] preparedCachedYMotions;
   public double maxFallDistance;
@@ -126,7 +126,7 @@ public class FallbackPreparer {
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
-      Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
+      Sonar.get().getConfig().getVerification().getGamemode().getId(),
       0, false, 0,
       true, false, false,
       new String[]{"minecraft:overworld"}, "minecraft:overworld"));
@@ -151,6 +151,8 @@ public class FallbackPreparer {
       0, -90, TELEPORT_ID, false));
 
     // Prepare collision platform positions
+    blockType = BlockType.valueOf(Sonar.get().getConfig().getGeneralConfig().getString(
+      "verification.checks.collision.collision-block-type").toUpperCase());
     final BlockUpdate[] changedBlocks = new BlockUpdate[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 
     int index = 0;

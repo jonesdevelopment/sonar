@@ -80,26 +80,24 @@ verification:
     gravity:
       # Moet Sonar controleren op geldige zwaartekracht van de cliënt? (Aanbevolen)
       enabled: true
-      # Moet Sonar controleren of de speler tegen blokken botst? (Aanbevolen)
-      check-collisions: true
       # Moet Sonar de speler een CAPTCHA laten oplossen als hij niet slaagt voor de zwaartekracht controle?
       captcha-on-fail: false
       # Maximaal aantal ticks dat de speler moet laten vallen om het platform te mogen raken
       max-movement-ticks: 8
-      # De spelmodus van de speler tijdens verificatie
-      # Mogelijke typen: SURVIVAL, CREATIVE, ADVENTURE
-      # - SURVIVAL: alle UI-componenten zijn zichtbaar
-      # - CREATIVE: gezondheid en honger zijn verborgen
-      # - ADVENTURE: alle UI-componenten zijn zichtbaar
-      gamemode: ADVENTURE
+
+    # Controleert of de speler botst met blokken die onder hem zijn gespawned
+    collision:
+      # Moet Sonar controleren of de speler tegen blokken botst? (Aanbevolen)
+      enabled: true
+      # Welk type blok moet Sonar gebruiken voor het platform?
+      # Mogelijke typen: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
+      # Je moet dit alleen bewerken als je weet wat je doet
+      collision-block-type: TRAPDOOR
 
     # Controleert of de klant de juiste pakketten verzendt bij het monteren van een voertuig
     vehicle:
-      # Mogelijke typen: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: Nieuwe spelers worden altijd op een voertuig gemonteerd (Aanbevolen)
-      # - DURING_ATTACK: Nieuwe spelers worden alleen tijdens een aanval op een voertuig gemonteerd
-      # - NEVER: Nieuwe spelers zullen nooit op een voertuig worden gemonteerd
-      timing: ALWAYS
+      # Moet Sonar controleren of de speler goed in een boot stapt?
+      enabled: true
 
     # Laat de speler een code van een virtuele kaart in de chat typen
     map-captcha:
@@ -193,6 +191,12 @@ verification:
     # Als uw server geen poort nodig heeft om verbinding mee te maken, kunt u dit op 25565 laten staan.
     destination-port: 25565
 
+  # De spelmodus van de speler tijdens verificatie
+  # Mogelijke typen: SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL: alle UI-componenten zijn zichtbaar
+  # - CREATIVE: gezondheid en honger zijn verborgen
+  # - ADVENTURE: alle UI-componenten zijn zichtbaar
+  gamemode: ADVENTURE
   # Sonar cached de meeste pakketten die het naar de client stuurt, inclusief het LoginSuccess pakket.
   # Welke gebruikersnaam moet Sonar gebruiken voor het LoginSucces pakket?
   # De gebruikersnaam zal niet zichtbaar zijn voor de speler zonder client aanpassingen

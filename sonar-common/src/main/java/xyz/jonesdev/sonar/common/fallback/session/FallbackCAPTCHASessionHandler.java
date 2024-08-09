@@ -96,14 +96,16 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     } else if (packet instanceof SetPlayerPositionPacket
       || packet instanceof SetPlayerPositionRotationPacket) {
       // A position packet is sent approximately every second
-      final long difference = maxDuration - user.getLoginTimer().delay();
-      final int index = (int) (difference / 1000D);
-      // Make sure we can actually safely get and send the packet
-      if (lastCountdownIndex != index && index >= 0 && xpCountdown.length > index) {
-        // Send the countdown using the experience bar
-        user.write(xpCountdown[index]);
+      if (Sonar.get().getConfig().getVerification().getGamemode().isSurvivalOrAdventure()) {
+        final long difference = maxDuration - user.getLoginTimer().delay();
+        final int index = (int) (difference / 1000D);
+        // Make sure we can actually safely get and send the packet
+        if (lastCountdownIndex != index && index >= 0 && xpCountdown.length > index) {
+          // Send the countdown using the experience bar
+          user.write(xpCountdown[index]);
+        }
+        lastCountdownIndex = index;
       }
-      lastCountdownIndex = index;
       // Send a KeepAlive packet every few seconds
       if (keepAliveStreak++ > 20) {
         keepAliveStreak = 0;

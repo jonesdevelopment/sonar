@@ -27,12 +27,111 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
 public enum BlockType {
-  STONE(protocolVersion -> 1, 1D),
+  STONE(protocolVersion -> 1, 1),
+  // Useful resources:
+  // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
+  // - https://pokechu22.github.io/Burger/
+  // - https://github.com/ViaVersion/Mappings/tree/main/mappings
+  ENCHANTMENT_TABLE(protocolVersion -> {
+    switch (protocolVersion) {
+      case MINECRAFT_1_7_2:
+      case MINECRAFT_1_7_6:
+      default:
+        // 1.7.2-1.12.2
+        return 116;
+      case MINECRAFT_1_13:
+      case MINECRAFT_1_13_1:
+        return 4612;
+      case MINECRAFT_1_13_2:
+      case MINECRAFT_1_14:
+      case MINECRAFT_1_14_1:
+      case MINECRAFT_1_14_2:
+      case MINECRAFT_1_14_3:
+        return 4613;
+      case MINECRAFT_1_14_4:
+      case MINECRAFT_1_15:
+      case MINECRAFT_1_15_1:
+      case MINECRAFT_1_15_2:
+      case MINECRAFT_1_16:
+        return 5116;
+      case MINECRAFT_1_16_1:
+        return 5132;
+      case MINECRAFT_1_16_2:
+      case MINECRAFT_1_16_3:
+      case MINECRAFT_1_16_4:
+        return 5136;
+      case MINECRAFT_1_17:
+      case MINECRAFT_1_17_1:
+      case MINECRAFT_1_18:
+      case MINECRAFT_1_18_2:
+        return 5333;
+      case MINECRAFT_1_19:
+      case MINECRAFT_1_19_1:
+        return 5719;
+      case MINECRAFT_1_19_3:
+        return 7159;
+      case MINECRAFT_1_19_4:
+        return 7385;
+      case MINECRAFT_1_20:
+      case MINECRAFT_1_20_2:
+      case MINECRAFT_1_20_3:
+      case MINECRAFT_1_20_5:
+      case MINECRAFT_1_21:
+        return 7389;
+    }
+  }, 0.75f),
+  TRAPDOOR(protocolVersion -> {
+    switch (protocolVersion) {
+      case MINECRAFT_1_7_2:
+      case MINECRAFT_1_7_6:
+        // We have to use wooden trapdoors for 1.7 since 1.7 doesn't have iron trapdoors
+        return 96;
+      default:
+        // 1.8-1.12.2
+        return 167;
+      case MINECRAFT_1_13:
+      case MINECRAFT_1_13_1:
+        return 6509;
+      case MINECRAFT_1_13_2:
+      case MINECRAFT_1_14:
+      case MINECRAFT_1_14_1:
+      case MINECRAFT_1_14_2:
+      case MINECRAFT_1_14_3:
+        return 6510;
+      case MINECRAFT_1_14_4:
+      case MINECRAFT_1_15:
+      case MINECRAFT_1_15_1:
+      case MINECRAFT_1_15_2:
+      case MINECRAFT_1_16:
+        return 7016;
+      case MINECRAFT_1_16_1:
+        return 7552;
+      case MINECRAFT_1_16_2:
+      case MINECRAFT_1_16_3:
+      case MINECRAFT_1_16_4:
+        return 7556;
+      case MINECRAFT_1_17:
+      case MINECRAFT_1_17_1:
+      case MINECRAFT_1_18:
+      case MINECRAFT_1_18_2:
+        return 7802;
+      case MINECRAFT_1_19:
+      case MINECRAFT_1_19_1:
+        return 8293;
+      case MINECRAFT_1_19_3:
+        return 9937;
+      case MINECRAFT_1_19_4:
+        return 10269;
+      case MINECRAFT_1_20:
+        return 10273;
+      case MINECRAFT_1_20_2:
+      case MINECRAFT_1_20_3:
+      case MINECRAFT_1_20_5:
+      case MINECRAFT_1_21:
+        return 10414;
+    }
+  }, 0.1875),
   BARRIER(protocolVersion -> {
-    // Useful resources:
-    // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
-    // - https://pokechu22.github.io/Burger/1.20.4.html
-    // - https://github.com/ViaVersion/Mappings/tree/main/mappings
     switch (protocolVersion) {
       case MINECRAFT_1_7_2:
       case MINECRAFT_1_7_6:
@@ -82,7 +181,7 @@ public enum BlockType {
       case MINECRAFT_1_21:
         return 10366;
     }
-  }, 1D);
+  }, 1);
 
   private final Function<ProtocolVersion, Integer> idFunction;
   // TODO: Implement per-version block heights?

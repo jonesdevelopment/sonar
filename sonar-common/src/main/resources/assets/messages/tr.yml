@@ -191,12 +191,12 @@ verification:
 
   # CAPTCHA'yı girmeleri gerektiğinde oyuncuya gösterilen mesajlar
   captcha:
-    # Captcha'nın cevabını girmeleri gerektiğinde oyuncuya gösterilen mesaj
+    # CAPTCHA'nın cevabını girmeleri gerektiğinde oyuncuya gösterilen mesaj
     enter-code: '<prefix><green>Haritada gösterilen kodu lütfen sohbete girin.'
     # Message that is shown to the player when they enter the wrong answer in chat
     incorrect: '<prefix><red>Yanlış kodu girdiniz. Lütfen tekrar deneyin.'
 
-  # Captcha henüz hazırlanmamışken birisi katıldığında gösterilen bağlantıyı kesme mesajı
+  # CAPTCHA henüz hazırlanmamışken birisi katıldığında gösterilen bağlantıyı kesme mesajı
   currently-preparing:
     - '<header>'
     - <yellow>Anti-bot verileriniz henüz hazır değil.
