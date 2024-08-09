@@ -190,7 +190,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       if (enableGravityCheck) {
         // Ensure that the player is above the collision platform
         checkState(y > DEFAULT_Y_COLLIDE_POSITION,
-          "fell through blocks: y: " + y + " deltaY: " + deltaY + " tick: " + movementTick);
+          "fell through blocks; y: " + y + " deltaY: " + deltaY + " tick: " + movementTick);
 
         // Predict the player's current motion based on the last motion
         // https://minecraft.wiki/w/Entity#Motion_of_entities
@@ -221,7 +221,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
           markSuccess(true);
           return;
         }
-        user.fail("illegal collision tick: " + movementTick);
+        user.fail("illegal collision tick; tick: " + movementTick);
       }
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
       double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockType.getBlockHeight()) - y;
@@ -231,8 +231,15 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
         collisionOffsetY += 1.62f;
       }
       // Make sure the player is actually colliding with the blocks and not only spoofing ground
-      checkState(collisionOffsetY > -0.03, "illegal collision: " + collisionOffsetY);
-      // The player has collided with the blocks, go on to the next stage
+      if (collisionOffsetY < -0.03) {
+        // Do not throw an exception if the user configured to display the CAPTCHA instead
+        if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+          markSuccess(true);
+          return;
+        }
+        user.fail("illegal collision; offset: " + collisionOffsetY + " tick: " + movementTick + " y: " + y);
+      }
+      // The player has collided with the blocks, go on to the next stag
       markSuccess(false);
     }
   }
