@@ -33,12 +33,12 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPac
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
 
+import java.security.SecureRandom;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class FallbackPreparer {
-
+  private final SecureRandom RANDOM = new SecureRandom();
   // LoginSuccess
   public FallbackPacket loginSuccess;
   // Abilities
@@ -61,7 +61,7 @@ public class FallbackPreparer {
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
   // JoinGame
-  public final int PLAYER_ENTITY_ID = ThreadLocalRandom.current().nextInt(10);
+  public final int PLAYER_ENTITY_ID = RANDOM.nextInt(10);
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
@@ -71,7 +71,7 @@ public class FallbackPreparer {
   // Default Spawn Position
   public FallbackPacket defaultSpawnPosition;
   // Spawn Position
-  public final int TELEPORT_ID = ThreadLocalRandom.current().nextInt();
+  public final int TELEPORT_ID = RANDOM.nextInt();
   public FallbackPacket spawnPosition;
   // Transfer packet
   public static FallbackPacket transferToOrigin;
@@ -89,7 +89,7 @@ public class FallbackPreparer {
   public FallbackPacket removeEntities;
   public FallbackPacket spawnEntity;
   public static FallbackPacket setPassengers;
-  public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1;
+  public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1 + RANDOM.nextInt(10);
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
