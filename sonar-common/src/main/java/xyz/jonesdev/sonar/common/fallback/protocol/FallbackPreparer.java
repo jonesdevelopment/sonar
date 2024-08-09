@@ -98,7 +98,7 @@ public class FallbackPreparer {
   public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
   public final int IN_AIR_Y_POSITION = 1337;
 
-  // Captcha position
+  // CAPTCHA position
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
     SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, false));
 
