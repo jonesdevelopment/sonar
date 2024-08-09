@@ -188,6 +188,10 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       movementTick++;
 
       if (enableGravityCheck) {
+        // Ensure that the player is above the collision platform
+        checkState(y > DEFAULT_Y_COLLIDE_POSITION,
+          "fell through blocks: y: " + y + " deltaY: " + deltaY + " tick: " + movementTick);
+
         // Predict the player's current motion based on the last motion
         // https://minecraft.wiki/w/Entity#Motion_of_entities
         final double predicted = (lastDeltaY - 0.08) * 0.98f;
