@@ -94,11 +94,8 @@ verification:
 
     # Überprüft, ob der Spieler beim Einsteigen in ein Boot die richtigen Pakete sendet
     vehicle:
-      # Mögliche Typen: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: Neue Spieler werden immer auf einem Fahrzeug montiert (Empfohlen)
-      # - DURING_ATTACK: Neue Spieler werden nur während eines Angriffs auf ein Fahrzeug gesetzt
-      # - NEVER: Neue Spieler werden niemals in ein Fahrzeug eingebaut
-      timing: ALWAYS
+      # Sollte Sonar prüfen, ob der Spieler richtig in ein Fahrzeug einsteigt?
+      enabled: true
 
     # Lässt den Spieler einen Code von einer virtuellen Karte im Chat eingeben
     map-captcha:

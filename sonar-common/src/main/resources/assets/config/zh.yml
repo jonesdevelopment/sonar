@@ -94,11 +94,8 @@ verification:
 
     # 检查客户端坐在实体上时是否发送了正确的数据包
     vehicle:
-      # 可用类型: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: 始终应用该检查
-      # - DURING_ATTACK: 仅在疑似遭受攻击时应用该检查
-      # - NEVER: 永远不应用该检查
-      timing: ALWAYS
+      # 声纳是否应该检查玩家是否正确进入船只?
+      enabled: true
 
     # 地图验证码
     map-captcha:

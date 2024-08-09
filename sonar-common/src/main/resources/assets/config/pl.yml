@@ -96,11 +96,8 @@ verification:
 
     # Sprawdza, czy gracz wysyła odpowiednie pakiety podczas umieszczania na pojeździe.
     vehicle:
-      # Dostępne rodzaje: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: Nowi gracze będą zawsze umieszczani na pojeździe (zalecane).
-      # - DURING_ATTACK: Nowi gracze będą umieszczani na pojeździe tylko podczas ataku.
-      # - NEVER: Nowi gracze nigdy nie zostaną umieszczeni na pojeździe.
-      timing: ALWAYS
+      # Czy Sonar powinien sprawdzać, czy gracz prawidłowo wsiada do łodzi?
+      enabled: true
 
     # Zmuszenie gracza do wpisania kodu z wirtualnej mapy na czacie (CAPTCHA).
     map-captcha:

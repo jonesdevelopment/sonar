@@ -96,11 +96,8 @@ verification:
 
     # Controleert of de klant de juiste pakketten verzendt bij het monteren van een voertuig
     vehicle:
-      # Mogelijke typen: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: Nieuwe spelers worden altijd op een voertuig gemonteerd (Aanbevolen)
-      # - DURING_ATTACK: Nieuwe spelers worden alleen tijdens een aanval op een voertuig gemonteerd
-      # - NEVER: Nieuwe spelers zullen nooit op een voertuig worden gemonteerd
-      timing: ALWAYS
+      # Moet Sonar controleren of de speler goed in een boot stapt?
+      enabled: true
 
     # Laat de speler een code van een virtuele kaart in de chat typen
     map-captcha:

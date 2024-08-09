@@ -96,11 +96,8 @@ verification:
 
     # Vérifie si le client envoie les paquets appropriés lorsqu'il monte dans un véhicule
     vehicle:
-      # Types possibles : ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS : Les nouveaux joueurs seront toujours montés dans un véhicule (Recommandé)
-      # - DURING_ATTACK : Les nouveaux joueurs ne seront montés dans un véhicule que pendant une attaque
-      # - NEVER : Les nouveaux joueurs ne seront jamais montés dans un véhicule
-      timing: ALWAYS
+      # Sonar devrait-il vérifier si le joueur entre correctement dans un bateau ?
+      enabled: true
 
     # Fait taper au joueur un code à partir d'une carte virtuelle dans le chat
     map-captcha:

@@ -97,11 +97,8 @@ verification:
 
     # Kontroluje, zda klient odesílá správné pakety při montáži vozidla
     vehicle:
-      # Typy: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: Noví hráči budou vždy namontováni na vozidle (Doporučeno)
-      # - DURING_ATTACK: Noví hráči budou namontováni na vozidlo pouze během útoku
-      # - NEVER: Noví hráči nebudou nikdy namontováni na vozidlo
-      timing: ALWAYS
+      # Měl by sonar kontrolovat, zda hráč správně vstoupil na loď?
+      enabled: true
 
     # Nechá hráče verifikovat pomocí kódu na mapě ve hře
     map-captcha:
