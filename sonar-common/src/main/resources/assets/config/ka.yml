@@ -80,18 +80,19 @@ verification:
     gravity:
       # უნდა შეამოწმოს თუ არა Sonar-მა მოთამაშის (ან ბოტის) გრავიტაცია? (რეკომენდებულია)
       enabled: true
-      # უნდა შეამოწმოს თუ არა Sonar-მა, ეტაკება თუ არა მოთამაშე ბლოკებს?
-      check-collisions: true
       # უნდა აიძულოს თუ არა Sonar-მა მოთამაშეს შეასრულოს CAPTCHA, თუ ისინი ვერ შეასრულებენ სიმძიმის შემოწმებას?
       captcha-on-fail: false
       # ტიკების მაქსიმალური რაოდენობა რომელითაც მოთამაშე უნდა დაეცეს, რათა პლატფორმაზე დაცემა შეეძლოს. (20 ტიკი = 1 წამი)
       max-movement-ticks: 8
-      # მოთამაშის თამაშის რეჟიმი გადამოწმების დროს
-      # შესაძლო ტიპები: SURVIVAL, CREATIVE, ADVENTURE
-      # - SURVIVAL: ყველა UI კომპონენტი ჩანს
-      # - CREATIVE: სიცოცხლის და საჭმლის მაჩვენებლები იშლება
-      # - ADVENTURE: ყველა UI კომპონენტი ჩანს
-      gamemode: ADVENTURE
+
+    # Checks if the player is colliding with blocks spawned below them
+    collision:
+      # უნდა შეამოწმოს თუ არა Sonar-მა, ეტაკება თუ არა მოთამაშე ბლოკებს? (რეკომენდებულია)
+      enabled: true
+      # Which type of block should Sonar use for the collision platform?
+      # შესაძლო ტიპები: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
+      # თქვენ უნდა შეცვალოთ ეს მხოლოდ იმ შემთხვევაში, თუ იცით, რას აკეთებთ
+      collision-block-type: TRAPDOOR
 
     # ამოწმებს, აგზავნის თუ არა კლიენტი შესაბამის პაკეტებს სატრანსპორტო საშუალებაზე დაჯდომის დროს
     vehicle:
@@ -192,6 +193,12 @@ verification:
     # თუ თქვენს სერვერს არ სჭირდება პორტი შესასვლელად, შეგიძლიათ დატოვოთ ეს 25565-ზე
     destination-port: 25565
 
+  # მოთამაშის თამაშის რეჟიმი გადამოწმების დროს
+  # შესაძლო ტიპები: SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL: ყველა UI კომპონენტი ჩანს
+  # - CREATIVE: სიცოცხლის და საჭმლის მაჩვენებლები იშლება
+  # - ADVENTURE: ყველა UI კომპონენტი ჩანს
+  gamemode: ADVENTURE
   # Sonar caches most packets it sends to the client, including the LoginSuccess packet.
   # Which username should Sonar use for the LoginSuccess packet?
   # The username will not be visible to the player without client modifications

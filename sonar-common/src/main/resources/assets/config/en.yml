@@ -80,18 +80,19 @@ verification:
     gravity:
       # Should Sonar check for valid client gravity? (Recommended)
       enabled: true
-      # Should Sonar check if the player collides with blocks? (Recommended)
-      check-collisions: true
       # Should Sonar make the player solve a CAPTCHA if they fail the gravity check?
       captcha-on-fail: false
       # Maximum number of ticks the player has to fall to be allowed to hit the platform
       max-movement-ticks: 8
-      # The gamemode of the player during verification
-      # Possible types: SURVIVAL, CREATIVE, ADVENTURE
-      # - SURVIVAL: all UI components are visible
-      # - CREATIVE: health and hunger are hidden
-      # - ADVENTURE: all UI components are visible
-      gamemode: ADVENTURE
+
+    # Checks if the player is colliding with blocks spawned below them
+    collision:
+      # Should Sonar check if the player collides with blocks? (Recommended)
+      enabled: true
+      # Which type of block should Sonar use for the collision platform?
+      # Possible types: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
+      # You should only edit this if you know what you're doing
+      collision-block-type: TRAPDOOR
 
     # Checks if the client sends proper packets when mounting a vehicle
     vehicle:
@@ -193,6 +194,12 @@ verification:
     # If your server does not need a port to connect to, you can leave this as 25565.
     destination-port: 25565
 
+  # The gamemode of the player during verification
+  # Possible types: SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL: all UI components are visible
+  # - CREATIVE: health and hunger are hidden
+  # - ADVENTURE: all UI components are visible
+  gamemode: ADVENTURE
   # Sonar caches most packets it sends to the client, including the LoginSuccess packet.
   # Which username should Sonar use for the LoginSuccess packet?
   # The username will not be visible to the player without client modifications

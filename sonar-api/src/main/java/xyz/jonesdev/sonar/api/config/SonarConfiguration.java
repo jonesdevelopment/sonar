@@ -186,10 +186,9 @@ public final class SonarConfiguration {
     }
 
     verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled");
-    verification.gravity.checkCollisions = generalConfig.getBoolean("verification.checks.gravity.check-collisions");
+    verification.gravity.checkCollisions = generalConfig.getBoolean("verification.checks.collision.enabled");
     verification.gravity.captchaOnFail = generalConfig.getBoolean("verification.checks.gravity.captcha-on-fail");
     verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks"), 2, 100);
-    verification.gravity.gamemode = Verification.Gravity.Gamemode.valueOf(generalConfig.getString("verification.checks.gravity.gamemode"));
 
     verification.vehicle.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.vehicle.timing"));
 
@@ -224,6 +223,7 @@ public final class SonarConfiguration {
     verification.brand.validRegex = Pattern.compile(generalConfig.getString("verification.checks.client-brand.valid-regex"));
     verification.brand.maxLength = generalConfig.getInt("verification.checks.client-brand.max-length");
 
+    verification.gamemode = Verification.Gamemode.valueOf(generalConfig.getString("verification.gamemode"));
     verification.validNameRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-name-regex"));
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
     verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets"), 128, 8192);
@@ -419,20 +419,7 @@ public final class SonarConfiguration {
       private boolean enabled;
       private boolean checkCollisions;
       private boolean captchaOnFail;
-      private Gamemode gamemode;
       private int maxMovementTicks;
-
-      @Getter
-      @RequiredArgsConstructor
-      public enum Gamemode {
-        SURVIVAL(0),
-        CREATIVE(1),
-        ADVENTURE(2),
-        // Keep this for backwards compatibility
-        SPECTATOR(2);
-
-        private final int id;
-      }
     }
 
     @Getter
@@ -445,6 +432,23 @@ public final class SonarConfiguration {
       private boolean enabled;
       private int maxLength;
       private Pattern validRegex;
+    }
+
+    private Gamemode gamemode;
+
+    @Getter
+    @RequiredArgsConstructor
+    public enum Gamemode {
+      NOT_SET(-1),
+      SURVIVAL(0),
+      CREATIVE(1),
+      ADVENTURE(2);
+
+      private final int id;
+
+      public boolean isSurvivalOrAdventure() {
+        return this == SURVIVAL || this == ADVENTURE;
+      }
     }
 
     private boolean checkGeyser;

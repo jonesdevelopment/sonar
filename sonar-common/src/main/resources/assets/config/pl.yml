@@ -80,18 +80,19 @@ verification:
     gravity:
       # Czy Sonar powinien sprawdzać poprawność grawitacji gracza? (Zalecane)
       enabled: true
-      # Czy Sonar powinien sprawdzać, czy gracz zderza się z blokami? (Zalecane)
-      check-collisions: true
       # Czy Sonar powinien zmusić gracza do rozwiązania CAPTCHA, jeśli nie uda mu się przejść testu grawitacji?
       captcha-on-fail: false
       # Maksymalna liczba tików, po których gracz musi spaść, aby móc uderzyć w platformę.
       max-movement-ticks: 8
-      # Tryb gry gracza (gamemode) podczas weryfikacji
-      # Dostępne rodzaje: SURVIVAL, CREATIVE, ADVENTURE
-      # - SURVIVAL: Wszystkie komponenty interfejsu są widoczne
-      # - CREATIVE: pasek życia i głodu jest ukryty
-      # - ADVENTURE: wszystkie komponenty interfejsu są widoczne
-      gamemode: ADVENTURE
+
+    # Sprawdza, czy gracz zderza się z blokami, które pojawiły się pod nim
+    collision:
+      # Czy Sonar powinien sprawdzać, czy gracz zderza się z blokami? (Zalecane)
+      enabled: true
+      # Jakiego typu bloku powinien użyć Sonar dla platformy kolizyjnej?
+      # Możliwe rodzaje: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
+      # Powinieneś to edytować tylko wtedy, gdy wiesz, co robisz
+      collision-block-type: TRAPDOOR
 
     # Sprawdza, czy gracz wysyła odpowiednie pakiety podczas umieszczania na pojeździe.
     vehicle:
@@ -193,6 +194,12 @@ verification:
     # Jeśli serwer nie potrzebuje portu do połączenia, można pozostawić 25565.
     destination-port: 25565
 
+  # Tryb gry gracza (gamemode) podczas weryfikacji
+  # Dostępne rodzaje: SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL: Wszystkie komponenty interfejsu są widoczne
+  # - CREATIVE: pasek życia i głodu jest ukryty
+  # - ADVENTURE: wszystkie komponenty interfejsu są widoczne
+  gamemode: ADVENTURE
   # Sonar buforuje większość pakietów, które wysyła do klienta, w tym pakiet LoginSuccess.
   # Jakiej nazwy użytkownika powinien używać Sonar dla pakietu LoginSuccess?
   # Nazwa użytkownika nie będzie widoczna dla gracza bez modyfikacji klienta

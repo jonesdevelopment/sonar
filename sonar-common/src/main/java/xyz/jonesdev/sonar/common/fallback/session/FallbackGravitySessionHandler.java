@@ -24,7 +24,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Gravity.Gamemode.CREATIVE;
+import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Gamemode.CREATIVE;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -43,7 +43,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     user.delayedWrite(joinGame);
     // Then, write the ClientAbilities packet to the buffer
     // This is only necessary if the player is in creative mode
-    if (Sonar.get().getConfig().getVerification().getGravity().getGamemode() == CREATIVE) {
+    if (Sonar.get().getConfig().getVerification().getGamemode() == CREATIVE) {
       user.delayedWrite(DEFAULT_ABILITIES);
     }
     // Write the PositionLook packet to the buffer

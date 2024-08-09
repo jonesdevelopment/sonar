@@ -103,7 +103,7 @@ public class FallbackPreparer {
     SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, false));
 
   // Platform
-  public BlockType blockType = BlockType.BARRIER;
+  public BlockType blockType;
   public int maxMovementTick, dynamicSpawnYPosition;
   public double[] preparedCachedYMotions;
   public double maxFallDistance;
@@ -126,7 +126,7 @@ public class FallbackPreparer {
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
-      Sonar.get().getConfig().getVerification().getGravity().getGamemode().getId(),
+      Sonar.get().getConfig().getVerification().getGamemode().getId(),
       0, false, 0,
       true, false, false,
       new String[]{"minecraft:overworld"}, "minecraft:overworld"));
@@ -151,6 +151,8 @@ public class FallbackPreparer {
       0, -90, TELEPORT_ID, false));
 
     // Prepare collision platform positions
+    blockType = BlockType.valueOf(Sonar.get().getConfig().getGeneralConfig().getString(
+      "verification.checks.collision.collision-block-type").toUpperCase());
     final BlockUpdate[] changedBlocks = new BlockUpdate[BLOCKS_PER_ROW * BLOCKS_PER_ROW];
 
     int index = 0;

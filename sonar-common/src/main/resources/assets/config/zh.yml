@@ -15,7 +15,7 @@
 
 # 未归类的设置
 general:
-  # Sonar 是否应该自动检查新的更新？
+  # Sonar 是否应该自动检查新的更新?
   # Sonar 使用 GitHub API 检查当前版本是否过时
   check-for-updates: true
   # Sonar 应该在控制台中打印玩家的 IP 地址吗?
@@ -78,18 +78,19 @@ verification:
     gravity:
       # Sonar 是否应该检查玩家的下落移动? (推荐启用)
       enabled: true
-      # Sonar 是否应该生成方块平台以检查玩家下落与方块之间的碰撞? (推荐启用)
-      check-collisions: true
       # 当玩家验证失败时 是否向他们发送验证码?
       captcha-on-fail: false
       # 玩家跌落在平台上多少tick后才能被算作站在平台上?
       max-movement-ticks: 8
-      # 玩家在虚拟服务器中的游戏模式
-      # 可用类型: SURVIVAL, CREATIVE, ADVENTURE
-      # - SURVIVAL: 生存模式, 所有UI可见
-      # - CREATIVE: 创造模式, 隐藏血量和饱食度
-      # - ADVENTURE: 冒险模式, 所有UI可见
-      gamemode: ADVENTURE
+
+    # 检查玩家是否与下方生成的方块发生碰撞
+    collision:
+      # Sonar 是否应该生成方块平台以检查玩家下落与方块之间的碰撞? (推荐启用)
+      enabled: true
+      # Sonar 应该使用哪种类型的块作为碰撞平台?
+      # 可用类型: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
+      # 只有当您知道您在做什么时, 才应该编辑它.
+      collision-block-type: TRAPDOOR
 
     # 检查客户端坐在实体上时是否发送了正确的数据包
     vehicle:
@@ -187,8 +188,14 @@ verification:
     # 如果服务器地址不包含端口 请保留25565.
     destination-port: 25565
 
+  # 玩家在虚拟服务器中的游戏模式
+  # 可用类型: SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL: 生存模式, 所有UI可见
+  # - CREATIVE: 创造模式, 隐藏血量和饱食度
+  # - ADVENTURE: 冒险模式, 所有UI可见
+  gamemode: ADVENTURE
   # Sonar 缓存它发送到客户端的大部分数据包, 包括 LoginSuccess 数据包.
-  # Sonar 应该使用哪个用户名来接收 LoginSuccess 数据包？
+  # Sonar 应该使用哪个用户名来接收 LoginSuccess 数据包?
   # 如果不修改客户端, 用户名将不会对玩家可见
   cached-username: "Sonar"
   # 当 Sonar 尝试验证玩家时 是否在控制台中打印它?
