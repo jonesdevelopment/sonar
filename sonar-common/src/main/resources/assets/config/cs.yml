@@ -81,26 +81,24 @@ verification:
     gravity:
       # Měl by Sonar zkoušet pro gravitaci hráče (Doporučováno)
       enabled: true
-      # Měl by Sonar zkoušet jestli se hráč dotýka bloku? (Doporučováno)
-      check-collisions: true
       # Měl by Sonar přimět hráče, aby vyřešil CAPTCHA, pokud neuspějí při kontrole gravitace?
       captcha-on-fail: false
       # Maximální počet ticků, který má hráč padat aby byl puštěn na verifikační platformu
       max-movement-ticks: 8
-      # Gamemode hráče při verifikaci
-      # Typy: SURVIVAL, CREATIVE, ADVENTURE
-      # - SURVIVAL: všechny komponenty UI jsou zobrazeny
-      # - CREATIVE: životy a hunger neni zobrazen
-      # - ADVENTURE: všechny komponenty UI jsou zobrazeny
-      gamemode: ADVENTURE
+
+    # Kontroluje, zda hráč naráží do bloků, které se vytvořily pod ním
+    collision:
+      # Měl by Sonar zkoušet jestli se hráč dotýka bloku? (Doporučováno)
+      enabled: true
+      # Jaký typ bloku by měl Sonar použít pro kolizní platformu?
+      # Typy: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
+      # Toto byste měli upravovat, pouze pokud víte, co děláte
+      collision-block-type: TRAPDOOR
 
     # Kontroluje, zda klient odesílá správné pakety při montáži vozidla
     vehicle:
-      # Typy: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: Noví hráči budou vždy namontováni na vozidle (Doporučeno)
-      # - DURING_ATTACK: Noví hráči budou namontováni na vozidlo pouze během útoku
-      # - NEVER: Noví hráči nebudou nikdy namontováni na vozidlo
-      timing: ALWAYS
+      # Měl by sonar kontrolovat, zda hráč správně vstoupil na loď?
+      enabled: true
 
     # Nechá hráče verifikovat pomocí kódu na mapě ve hře
     map-captcha:
@@ -194,6 +192,12 @@ verification:
     # Pokud váš server nepotřebuje port pro připojení, můžete toto ponechat jako 25565.
     destination-port: 25565
 
+  # Gamemode hráče při verifikaci
+  # Typy: SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL: všechny komponenty UI jsou zobrazeny
+  # - CREATIVE: životy a hunger neni zobrazen
+  # - ADVENTURE: všechny komponenty UI jsou zobrazeny
+  gamemode: ADVENTURE
   # Sonar ukládá do mezipaměti většinu paketů, které odesílá klientovi, včetně paketu LoginSuccess.
   # Které uživatelské jméno má Sonar použít pro paket LoginSuccess?
   # Uživatelské jméno nebude pro hráče viditelné bez úpravy klienta

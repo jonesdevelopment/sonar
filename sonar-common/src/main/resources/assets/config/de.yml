@@ -78,26 +78,24 @@ verification:
     gravity:
       # Soll Sonar auf gültige Client-Gravitation prüfen? (Empfohlen)
       enabled: true
-      # Soll Sonar prüfen, ob der Spieler mit Blöcken kollidiert? (Empfohlen)
-      check-collisions: true
       # Soll Sonar den Spieler dazu bringen, ein CAPTCHA zu lösen, wenn er die Schwerkraftprüfung nicht besteht?
       captcha-on-fail: false
       # Maximale Anzahl an Ticks, die der Spieler fallen muss, um die Plattform erreichen zu dürfen
       max-movement-ticks: 8
-      # Der Spielmodus des Spielers während der Überprüfung
-      # Mögliche Typen: SURVIVAL, CREATIVE, ADVENTURE
-      # - SURVIVAL: alle UI-Komponenten sind sichtbar
-      # - CREATIVE: Gesundheit und Hunger sind versteckt
-      # - ADVENTURE: alle UI-Komponenten sind sichtbar
-      gamemode: ADVENTURE
+
+    # Prüft, ob der Spieler mit Blöcken kollidiert, die unter ihm gespawnt sind
+    collision:
+      # Soll Sonar prüfen, ob der Spieler mit Blöcken kollidiert? (Empfohlen)
+      enabled: true
+      # Welche Art von Block sollte Sonar für die Kollisionsplattform verwenden?
+      # Mögliche Typen: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
+      # Sie sollten dies nur bearbeiten, wenn Sie wissen, was Sie tun
+      collision-block-type: TRAPDOOR
 
     # Überprüft, ob der Spieler beim Einsteigen in ein Boot die richtigen Pakete sendet
     vehicle:
-      # Mögliche Typen: ALWAYS, DURING_ATTACK, NEVER
-      # - ALWAYS: Neue Spieler werden immer auf einem Fahrzeug montiert (Empfohlen)
-      # - DURING_ATTACK: Neue Spieler werden nur während eines Angriffs auf ein Fahrzeug gesetzt
-      # - NEVER: Neue Spieler werden niemals in ein Fahrzeug eingebaut
-      timing: ALWAYS
+      # Sollte Sonar prüfen, ob der Spieler richtig in ein Fahrzeug einsteigt?
+      enabled: true
 
     # Lässt den Spieler einen Code von einer virtuellen Karte im Chat eingeben
     map-captcha:
@@ -191,6 +189,12 @@ verification:
     # Wenn Ihr Server keinen Port zum Herstellen einer Verbindung benötigt, können Sie diesen auf 25565 belassen.
     destination-port: 25565
 
+  # Der Spielmodus des Spielers während der Überprüfung
+  # Mögliche Typen: SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL: alle UI-Komponenten sind sichtbar
+  # - CREATIVE: Gesundheit und Hunger sind versteckt
+  # - ADVENTURE: alle UI-Komponenten sind sichtbar
+  gamemode: ADVENTURE
   # Sonar speichert die meisten Pakete, die es an den Client sendet, einschließlich des LoginSuccess-Pakets.
   # Welchen Benutzernamen soll Sonar für das LoginSuccess-Paket verwenden?
   # Der Benutzername ist für den Spieler ohne Änderungen am Client nicht sichtbar
