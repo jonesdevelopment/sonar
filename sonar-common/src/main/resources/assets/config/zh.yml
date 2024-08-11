@@ -96,6 +96,8 @@ verification:
     vehicle:
       # 声纳是否应该检查玩家是否正确进入船只?
       enabled: true
+      # 客户端发送的最小数据包数量
+      minimum-packets: 2
 
     # 地图验证码
     map-captcha:

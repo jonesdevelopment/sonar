@@ -69,8 +69,6 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   private int paddlePackets, inputPackets, positionPackets;
   private boolean expectMovement;
 
-  private static final int MINIMUM_REQUIRED_PACKETS = 2;
-
   private void markSuccess() {
     // Pass the player to the next best verification handler
     if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
@@ -92,7 +90,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     // Check the Y position of the player
     checkState(y <= IN_AIR_Y_POSITION, "invalid y position");
     // Mark this check as successful if the player sent a few position packets
-    if (positionPackets++ > MINIMUM_REQUIRED_PACKETS) {
+    if (positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
       markSuccess();
     }
   }
@@ -124,7 +122,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       }
 
       // Once the player sent enough packets, go to the next stage
-      if (paddlePackets > MINIMUM_REQUIRED_PACKETS && inputPackets > MINIMUM_REQUIRED_PACKETS) {
+      final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
+      if (paddlePackets > minimumPackets && inputPackets > minimumPackets) {
         // Remove the entity
         // The next y coordinate the player will send is going
         // to be the vehicle spawn position (y 64 in this case).

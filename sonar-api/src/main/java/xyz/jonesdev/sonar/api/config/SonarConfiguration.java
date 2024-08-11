@@ -191,6 +191,7 @@ public final class SonarConfiguration {
     verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks"), 2, 100);
 
     verification.vehicle.enabled = generalConfig.getBoolean("verification.checks.vehicle.enabled");
+    verification.vehicle.minimumPackets = clamp(generalConfig.getInt("verification.checks.vehicle.minimum-packets"), 0, 20);
 
     verification.map.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.map-captcha.timing"));
     verification.map.scratches = generalConfig.getBoolean("verification.checks.map-captcha.effects.scratches");
@@ -425,6 +426,7 @@ public final class SonarConfiguration {
     @Getter
     public static final class Vehicle {
       private boolean enabled;
+      private int minimumPackets;
     }
 
     @Getter

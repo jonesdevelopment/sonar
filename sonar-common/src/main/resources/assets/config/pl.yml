@@ -98,6 +98,8 @@ verification:
     vehicle:
       # Czy Sonar powinien sprawdzać, czy gracz prawidłowo wsiada do łodzi?
       enabled: true
+      # Minimalna liczba pakietów wysłanych przez klienta
+      minimum-packets: 2
 
     # Zmuszenie gracza do wpisania kodu z wirtualnej mapy na czacie (CAPTCHA).
     map-captcha:

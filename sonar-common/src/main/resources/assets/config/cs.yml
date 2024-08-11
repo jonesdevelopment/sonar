@@ -99,6 +99,8 @@ verification:
     vehicle:
       # Měl by sonar kontrolovat, zda hráč správně vstoupil na loď?
       enabled: true
+      # Minimální počet paketů odeslaných klientem
+      minimum-packets: 2
 
     # Nechá hráče verifikovat pomocí kódu na mapě ve hře
     map-captcha:

@@ -98,6 +98,8 @@ verification:
     vehicle:
       # Sonar devrait-il vérifier si le joueur entre correctement dans un bateau ?
       enabled: true
+      # Nombre minimum de paquets envoyés par le client
+      minimum-packets: 2
 
     # Fait taper au joueur un code à partir d'une carte virtuelle dans le chat
     map-captcha:

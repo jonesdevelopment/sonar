@@ -98,6 +98,8 @@ verification:
     vehicle:
       # Moet Sonar controleren of de speler goed in een boot stapt?
       enabled: true
+      # Minimaal aantal pakketten verzonden door de cliënt
+      minimum-packets: 2
 
     # Laat de speler een code van een virtuele kaart in de chat typen
     map-captcha:

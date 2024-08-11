@@ -98,6 +98,8 @@ verification:
     vehicle:
       # Should Sonar check if the player properly enters a boat?
       enabled: true
+      # Minimum number of packets sent by the client
+      minimum-packets: 2
 
     # დააწერინეთ მოთამაშეს კოდი ჩატში, რომელიც იქნება ნაჩვენები ვირტუალურ მაპზე, რომელიც ხელში ეჭირებათ
     map-captcha:
