@@ -66,7 +66,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   }
 
   private final boolean forceCAPTCHA;
-  private int paddlePackets, inputPackets, positionPackets;
+  private int paddlePackets, inputPackets, positionPackets, rotationPackets;
   private boolean expectMovement;
 
   private void markSuccess() {
@@ -107,6 +107,22 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
         final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
         move(position.getY());
       }
+    } else if (packet instanceof SetPlayerRotationPacket) {
+      if (!expectMovement) {
+        // Once the player sent enough packets, go to the next stage
+        final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
+        if (paddlePackets > minimumPackets
+          && inputPackets > minimumPackets
+          && rotationPackets > minimumPackets) {
+          // Remove the entity
+          // The next y coordinate the player will send is going
+          // to be the vehicle spawn position (y 64 in this case).
+          user.write(removeEntities);
+          // Listen for next movement packet(s)
+          expectMovement = true;
+        }
+        rotationPackets++;
+      }
     } else if (packet instanceof PaddleBoatPacket) {
       paddlePackets++;
     } else if (packet instanceof PlayerInputPacket && !expectMovement) {
@@ -118,18 +134,6 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
       // Only mark this packet as correct if the player is not moving the vehicle
       if (playerInput.isJump() || playerInput.isUnmount()) {
-        return;
-      }
-
-      // Once the player sent enough packets, go to the next stage
-      final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
-      if (paddlePackets > minimumPackets && inputPackets > minimumPackets) {
-        // Remove the entity
-        // The next y coordinate the player will send is going
-        // to be the vehicle spawn position (y 64 in this case).
-        user.write(removeEntities);
-        // Listen for next movement packet(s)
-        expectMovement = true;
         return;
       }
 
