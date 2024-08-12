@@ -14,7 +14,7 @@ allprojects {
   }
 
   apply(plugin = "java")
-  apply(plugin = "io.github.goooler.shadow")
+  apply(plugin = "com.gradleup.shadow")
 
   dependencies {
     compileOnly(rootProject.libs.lombok)
