@@ -45,7 +45,7 @@ class LibraryLoader {
         .build(),
       // Caffeine
       Library.builder()
-        .groupId("com.github.ben-manes.caffeine")
+        .groupId("com{}github{}ben-manes{}caffeine")
         .artifactId("caffeine")
         .version("3.1.8")
         .relocate("com{}github{}benmanes{}caffeine", "xyz{}jonesdev{}sonar{}libs{}caffeine")
