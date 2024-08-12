@@ -40,7 +40,7 @@ class LibraryLoader {
       Library.builder()
         .groupId("com{}google{}code{}gson")
         .artifactId("gson")
-        .version("2.10.1")
+        .version("2.11.0")
         .relocate("com{}google{}gson", "xyz{}jonesdev{}sonar{}libs{}gson")
         .build(),
       // Caffeine

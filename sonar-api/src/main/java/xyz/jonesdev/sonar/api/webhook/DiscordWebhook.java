@@ -56,8 +56,7 @@ public final class DiscordWebhook {
           outputStream.write(serializedContent.getBytes(StandardCharsets.UTF_8));
         }
 
-        // Warn the user if the connection might've not been successful
-        // I don't know why Discord doesn't respond with OK, but I guess this should be fine
+        // Discord replies with HTTP_NO_CONTENT (204) if the request is successful
         final int code = urlConnection.getResponseCode();
         if (code != HTTP_NO_CONTENT) {
           Sonar.get().getLogger().warn("Unexpected Discord webhook response code {}", code);
