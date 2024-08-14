@@ -138,13 +138,13 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
     checkState(!brand.equals("Vanilla"), "illegal client brand: " + brand);
     // Regex pattern for validating client brands
     final Pattern pattern = Sonar.get().getConfig().getVerification().getBrand().getValidRegex();
-    checkState(pattern.matcher(brand).matches(), "client brand does not match pattern");
+    checkState(pattern.matcher(brand).matches(), "client brand does not match pattern: " + brand);
   }
 
   protected final void validateClientLocale(final @NotNull String locale) {
     // Check the client locale by performing a simple regex check
     // that disallows non-ascii characters by default.
     final Pattern pattern = Sonar.get().getConfig().getVerification().getValidLocaleRegex();
-    checkState(pattern.matcher(locale).matches(), "client locale does not match pattern");
+    checkState(pattern.matcher(locale).matches(), "client locale does not match pattern: " + locale);
   }
 }
