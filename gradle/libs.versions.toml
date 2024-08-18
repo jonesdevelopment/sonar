@@ -4,10 +4,13 @@ adventure = "4.17.0"
 adventure-platform = "4.3.4"
 bstats = "3.0.2"
 libby = "2.0.0-SNAPSHOT"
+pluginyml = "0.6.0"
 
 [plugins]
 indra-git = "net.kyori.indra.git:3.1.3"
 shadow = "com.gradleup.shadow:8.3.0"
+pluginyml-bungee = { id = "net.minecrell.plugin-yml.bungee", version.ref = "pluginyml" }
+pluginyml-bukkit = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
 
 [libraries]
 netty = { module = "io.netty:netty-all", version.ref = "netty" }

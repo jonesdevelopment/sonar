@@ -1,7 +1,7 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
-  id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply true
+  alias(libs.plugins.pluginyml.bukkit) apply true
 }
 
 bukkit {

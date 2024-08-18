@@ -1,5 +1,5 @@
 plugins {
-  id("net.minecrell.plugin-yml.bungee") version "0.6.0" apply true
+  alias(libs.plugins.pluginyml.bungee) apply true
 }
 
 bungee {
