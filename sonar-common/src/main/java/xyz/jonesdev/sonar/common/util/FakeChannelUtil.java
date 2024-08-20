@@ -18,24 +18,20 @@
 package xyz.jonesdev.sonar.common.util;
 
 import io.netty.channel.Channel;
-import io.netty.util.AttributeKey;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetSocketAddress;
-
+// https://github.com/retrooper/packetevents/blob/2.0/api/src/main/java/com/github/retrooper/packetevents/util/FakeChannelUtil.java
 @UtilityClass
-public class GeyserUtil {
-  // https://github.com/GeyserMC/Floodgate/blob/master/core/src/main/java/org/geysermc/floodgate/module/CommonModule.java#L206
-  private final AttributeKey<Object> PLAYER_ATTRIBUTE = AttributeKey.valueOf("floodgate-player");
+public class FakeChannelUtil {
 
   /**
    * @param channel Channel of the player
-   * @return Whether the player is on GeyserMC or not
+   * @return Whether the channel is spoofed/faked
    */
-  public boolean isGeyserConnection(final @NotNull Channel channel,
-                                    final @NotNull InetSocketAddress originalAddress) {
-    return originalAddress.getPort() == 0 // check for floodgate on the server
-      || channel.attr(PLAYER_ATTRIBUTE).get() != null; // check for standalone Geyser proxy connection
+  public boolean isFakePlayer(final @NotNull Channel channel) {
+    final String simpleClassName = channel.getClass().getSimpleName();
+    // Player spoof plugins use fake channels (e.g., Spoof Engine uses "FakeChannel")
+    return "FakeChannel".equals(simpleClassName) || "SpoofedChannel".equals(simpleClassName);
   }
 }

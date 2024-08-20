@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
+import xyz.jonesdev.sonar.common.util.FakeChannelUtil;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -36,11 +37,11 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWID
 // Taken from
 // https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
 public final class BukkitJoinListener implements Listener {
-  private static MethodHandle handleMethod;
+  private static MethodHandle _handleMethod;
   // ServerGamePacketListenerImpl aka. PlayerConnection
-  private static MethodHandle packetListenerField;
-  private static MethodHandle managerField;
-  private static MethodHandle channelField;
+  private static MethodHandle _listenerField;
+  private static MethodHandle _networkManagerField;
+  private static MethodHandle _channelField;
 
   private static boolean initialized;
 
@@ -50,14 +51,14 @@ public final class BukkitJoinListener implements Listener {
         .getDeclaredMethod("getHandle");
       final Field listenerField = FallbackBukkitInjector.findField(false, handleMethod.getReturnType(),
         "PlayerConnection", "ServerGamePacketListenerImpl");
-      final Field managerField = FallbackBukkitInjector.findField(true, listenerField.getType(),
+      final Field networkManagerField = FallbackBukkitInjector.findField(true, listenerField.getType(),
         "NetworkManager", "Connection");
-      final Field channelField = FallbackBukkitInjector.getFieldAt(managerField.getType(), Channel.class, 0);
+      final Field channelField = FallbackBukkitInjector.getFieldAt(networkManagerField.getType(), Channel.class, 0);
 
-      BukkitJoinListener.handleMethod = MethodHandles.lookup().unreflect(handleMethod);
-      packetListenerField = MethodHandles.lookup().unreflectGetter(listenerField);
-      BukkitJoinListener.managerField = MethodHandles.lookup().unreflectGetter(managerField);
-      BukkitJoinListener.channelField = MethodHandles.lookup().unreflectGetter(channelField);
+      _handleMethod = MethodHandles.lookup().unreflect(handleMethod);
+      _listenerField = MethodHandles.lookup().unreflectGetter(listenerField);
+      _networkManagerField = MethodHandles.lookup().unreflectGetter(networkManagerField);
+      _channelField = MethodHandles.lookup().unreflectGetter(channelField);
       initialized = true;
     } catch (Exception exception) {
       initialized = false;
@@ -66,22 +67,33 @@ public final class BukkitJoinListener implements Listener {
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void handle(final @NotNull PlayerJoinEvent event) {
+    // Make sure the player is not an NPC
     if (!initialized || event.getPlayer().hasMetadata("NPC")) {
       return;
     }
 
     try {
-      final Object handle = handleMethod.invoke(event.getPlayer());
-      final Object listener = packetListenerField.invoke(handle);
-      final Object networkManager = managerField.invoke(listener);
-      final Channel channel = (Channel) channelField.invoke(networkManager);
+      final Object handle = _handleMethod.invoke(event.getPlayer());
+      final Object listener = _listenerField.invoke(handle);
+      final Object networkManager = _networkManagerField.invoke(listener);
+      final Channel channel = (Channel) _channelField.invoke(networkManager);
+
+      // Don't continue if the channel isn't found or if the channel is inactive
+      if (channel == null || !channel.isActive()) {
+        return;
+      }
+
+      // Make sure the player is not a fake player
+      if (FakeChannelUtil.isFakePlayer(channel)) {
+        return;
+      }
 
       // Close the channel if Sonar's handlers are not found when the PlayerJoinEvent is called
-      if (channel != null && channel.isActive() && channel.pipeline().context(FALLBACK_BANDWIDTH) == null) {
+      if (channel.pipeline().context(FALLBACK_BANDWIDTH) == null) {
         channel.close();
       }
     } catch (Throwable throwable) {
-      Sonar.get().getLogger().warn("Failed to the channel for {}: {}", event.getPlayer().getName(), throwable);
+      Sonar.get().getLogger().warn("Couldn't find {}: {}", event.getPlayer().getName(), throwable);
     }
   }
 }

@@ -27,6 +27,7 @@ import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandler;
+import xyz.jonesdev.sonar.common.util.FakeChannelUtil;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -60,8 +61,9 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
       throw new ReflectiveOperationException(throwable);
     }
 
-    // Inject Sonar's channel handler into the pipeline
-    if (channel.isActive()) {
+    // Inject Sonar's channel handler into the pipeline;
+    // Also make sure the player is not a fake player to avoid compatibility issues
+    if (channel.isActive() && !FakeChannelUtil.isFakePlayer(channel)) {
       final ChannelHandler inboundHandler = new FallbackInboundHandler(sonarPipelineInjector);
       // We need to be careful on Bukkit, as the encoder can be different
       if (Sonar.get().getPlatform() == SonarPlatform.BUKKIT) {
