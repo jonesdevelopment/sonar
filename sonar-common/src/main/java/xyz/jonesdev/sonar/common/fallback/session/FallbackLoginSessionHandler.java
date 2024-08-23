@@ -94,7 +94,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
     updateEncoderDecoderState(FallbackPacketRegistry.GAME);
     // Pass the player to the next verification handler
     final FallbackGravitySessionHandler gravitySessionHandler = new FallbackGravitySessionHandler(user, username);
-    final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
+    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
     decoder.setListener(gravitySessionHandler);
   }
 
@@ -148,7 +148,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
   }
 
   private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
-    final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
+    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
     final var encoder = (FallbackPacketEncoder) user.getPipeline().get(FallbackPacketEncoder.class);
     // Update the packet registry state in the encoder and decoder pipelines
     decoder.updateRegistry(registry);

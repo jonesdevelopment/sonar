@@ -73,7 +73,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     // Pass the player to the next best verification handler
     if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
       // Either send the player to the CAPTCHA or finish the verification.
-      final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
+      final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
       decoder.setListener(new FallbackCAPTCHASessionHandler(user, username));
     } else {
