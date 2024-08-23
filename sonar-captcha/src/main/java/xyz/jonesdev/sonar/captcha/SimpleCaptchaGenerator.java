@@ -54,7 +54,7 @@ public final class SimpleCaptchaGenerator implements CaptchaGenerator {
   static {
     for (int i = 0; i < FONT_NAMES.length; i++) {
       FONTS[i] = loadFont(String.format("/assets/fonts/%s.ttf",
-        FONT_NAMES[new Random().nextInt(FONT_NAMES.length)]), FONT_SIZE);
+        FONT_NAMES[new Random().nextInt(FONT_NAMES.length)]));
     }
   }
 
@@ -86,7 +86,7 @@ public final class SimpleCaptchaGenerator implements CaptchaGenerator {
                               final char @NotNull [] answer) {
     // Apply the gradient
     final Color color0 = Color.getHSBColor(random.nextFloat(), 1, 1);
-    final Color color1 = Color.getHSBColor(random.nextFloat(), 1, 0.5f);
+    final Color color1 = Color.getHSBColor(random.nextFloat(), 1, 1);
     final Paint gradient = new GradientPaint(0, 0, color0, width, height, color1);
     graphics.setPaint(gradient);
 
@@ -120,13 +120,13 @@ public final class SimpleCaptchaGenerator implements CaptchaGenerator {
     }
   }
 
-  private static Font loadFont(final @NotNull String path, final int fontSize) {
+  private static Font loadFont(final @NotNull String path) {
     try {
       // Load the font from the TTF file
       final Font customFont = Font.createFont(Font.TRUETYPE_FONT,
         Objects.requireNonNull(SimpleCaptchaGenerator.class.getResourceAsStream(path)));
       // Set the font size and style
-      return customFont.deriveFont(Font.PLAIN, fontSize);
+      return customFont.deriveFont(Font.PLAIN, FONT_SIZE);
     } catch (Exception exception) {
       throw new IllegalStateException(exception);
     }
