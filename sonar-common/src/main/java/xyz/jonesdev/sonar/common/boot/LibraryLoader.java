@@ -56,6 +56,13 @@ class LibraryLoader {
         .artifactId("ormlite-jdbc")
         .version("6.1")
         .relocate("com{}j256{}ormlite", "xyz{}jonesdev{}sonar{}libs{}ormlite")
+        .build(),
+      // JHLabs image filters
+      Library.builder()
+        .groupId("com{}jhlabs")
+        .artifactId("filters")
+        .version("2.0.235-1")
+        .relocate("com{}jhlabs", "xyz{}jonesdev{}sonar{}libs{}jhlabs")
         .build()
     );
 

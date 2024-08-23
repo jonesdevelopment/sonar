@@ -108,9 +108,6 @@ public class FallbackPreparer {
   public double[] preparedCachedYMotions;
   public double maxFallDistance;
 
-  // CAPTCHA
-  public final CaptchaPreparer MAP_INFO_PREPARER = new CaptchaPreparer();
-
   // XP packets
   public FallbackPacket[] xpCountdown;
 
@@ -214,7 +211,7 @@ public class FallbackPreparer {
       }
 
       // Prepare CAPTCHA answers
-      MAP_INFO_PREPARER.prepare();
+      CaptchaPreparer.prepare();
     } else {
       // Throw away if not needed
       enterCodeMessage = null;

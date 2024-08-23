@@ -26,12 +26,12 @@ libby-velocity = { module = "com.alessiodp.libby:libby-velocity", version.ref = 
 bstats-bungee = { module = "org.bstats:bstats-bungeecord", version.ref = "bstats" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 bstats-velocity = { module = "org.bstats:bstats-velocity", version.ref = "bstats" }
+imagefilters = "com.jhlabs:filters:2.0.235-1"
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
 annotations = "org.jetbrains:annotations:24.1.0"
 simpleyaml = "com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4"
 ormlite = "com.j256.ormlite:ormlite-jdbc:6.1"
 lombok = "org.projectlombok:lombok:1.18.34"
-capja = "xyz.jonesdev:capja:1.0.3"
 bungeecord = "net.md_5:bungeecord-proxy:master-SNAPSHOT"
 velocity = "com.velocitypowered:velocity-proxy:3.3.0-SNAPSHOT"
 # We have to use 1.8.8 for backwards compatibility

@@ -1,7 +1,9 @@
 dependencies {
   compileOnly(project(":api"))
-  implementation(project(":captcha"))
-  compileOnly(rootProject.libs.adventure.nbt)
+  compileOnly(rootProject.libs.imagefilters)
+
+  testCompileOnly(project(":api"))
+  testCompileOnly(rootProject.libs.imagefilters)
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11
