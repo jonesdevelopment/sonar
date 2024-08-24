@@ -51,7 +51,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final NoiseOverlayFilter NOISE = new NoiseOverlayFilter(1, 20);
   private static final FBMFilter FBM = new FBMFilter();
   private static final Random RANDOM = new Random();
-  private static final Color[] COLORS = new Color[3];
+  private static final Color[] COLORS = new Color[4];
   private static final float[] COLOR_FRACTIONS = new float[COLORS.length];
 
   static {
@@ -100,7 +100,8 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private void applyRandomColorGradient(final @NotNull Graphics2D graphics) {
     // Randomize the colors for the gradient effect
     for (int i = 0; i < COLORS.length; i++) {
-      COLORS[i] = Color.getHSBColor(RANDOM.nextFloat(), 1, 1);
+      final float random = 0.9f + RANDOM.nextFloat() * 0.1f;
+      COLORS[i] = Color.getHSBColor(RANDOM.nextFloat(), random, random);
     }
 
     // Apply the random gradient effect
@@ -132,7 +133,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     for (final GlyphVector glyph : glyphs) {
       final AffineTransform transformation = AffineTransform.getTranslateInstance(beginX, beginY);
       // Shear the glyph by a random amount
-      final double shearXY = Math.sin(beginX + beginY) / 8;
+      final double shearXY = Math.sin(beginX + beginY) / 6;
       transformation.shear(shearXY, shearXY);
       // Scale the glyph to perfectly fit the image
       transformation.scale(scalingXY, scalingXY);
@@ -141,7 +142,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
       graphics.fill(transformedShape);
       // Make sure the next glyph isn't drawn at the same position
       beginX += glyph.getVisualBounds().getWidth() * scalingXY + 2;
-      beginY += Math.sin(beginX / 3) * 6;
+      beginY += -10 + RANDOM.nextFloat() * 20;
     }
   }
 }
