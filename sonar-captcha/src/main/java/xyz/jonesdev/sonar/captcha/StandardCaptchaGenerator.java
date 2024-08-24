@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
 import xyz.jonesdev.sonar.captcha.filters.CircleInverseFilter;
 import xyz.jonesdev.sonar.captcha.filters.CurvesOverlayFilter;
+import xyz.jonesdev.sonar.captcha.filters.NoiseOverlayFilter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -47,6 +48,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final CurvesOverlayFilter CURVES = new CurvesOverlayFilter(3);
   private static final CircleInverseFilter CIRCLES = new CircleInverseFilter(
     1, 30, 10);
+  private static final NoiseOverlayFilter NOISE = new NoiseOverlayFilter(1, 20);
   private static final FBMFilter FBM = new FBMFilter();
   private static final Random RANDOM = new Random();
   private static final Color[] COLORS = new Color[3];
@@ -75,6 +77,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     applyRandomColorGradient(graphics);
     drawCharacters(graphics, answer);
     CURVES.transform(image, graphics);
+    NOISE.transform(image);
     //CIRCLES.transform(image); // TODO: check if the text is still easy to read after this
     // Make sure to dispose the graphics instance
     graphics.dispose();
