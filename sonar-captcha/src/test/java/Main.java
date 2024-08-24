@@ -16,7 +16,7 @@
  */
 
 import lombok.experimental.UtilityClass;
-import xyz.jonesdev.sonar.captcha.SimpleCaptchaGenerator;
+import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -28,7 +28,7 @@ import java.util.Random;
 public class Main {
   public void main(final String... args) throws IOException {
     final Random random = new Random(System.nanoTime());
-    final SimpleCaptchaGenerator simpleCaptchaGenerator = new SimpleCaptchaGenerator(128, 128, random);
+    final StandardCaptchaGenerator standardCaptchaGenerator = new StandardCaptchaGenerator(128, 128, random);
 
     final long start = System.currentTimeMillis();
     final char[] dictionary = {'a', 'b', 'c', 'd', 'e', 'f'/*, 'g'*/, 'h'/*, 'i'*/, 'j',
@@ -41,7 +41,7 @@ public class Main {
       for (int j = 0; j < answer.length; j++) {
         answer[j] = dictionary[random.nextInt(dictionary.length)];
       }
-      final BufferedImage bufferedImage = simpleCaptchaGenerator.createImage(answer);
+      final BufferedImage bufferedImage = standardCaptchaGenerator.createImage(answer);
 
       // Save image
       ImageIO.write(bufferedImage, "png", new File(i + ".png"));

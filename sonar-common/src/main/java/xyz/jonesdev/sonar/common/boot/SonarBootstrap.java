@@ -36,7 +36,7 @@ import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
-import xyz.jonesdev.sonar.captcha.SimpleCaptchaGenerator;
+import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.service.SonarServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
@@ -154,9 +154,9 @@ public abstract class SonarBootstrap<T> implements Sonar {
       getFallback().setCaptchaGenerator(null);
     } else {
       if (getFallback().getCaptchaGenerator() == null
-        || getFallback().getCaptchaGenerator() instanceof SimpleCaptchaGenerator) {
+        || getFallback().getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
         final Random random = new Random(System.nanoTime());
-        getFallback().setCaptchaGenerator(new SimpleCaptchaGenerator(128, 128, random));
+        getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(128, 128, random));
       } else {
         getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
       }

@@ -31,31 +31,21 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import static java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
+import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.FONTS;
+import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.FONT_SIZE;
 
 @Getter
 @RequiredArgsConstructor
-public final class SimpleCaptchaGenerator implements CaptchaGenerator {
+public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final CurvesOverlayFilter CURVES = new CurvesOverlayFilter(3);
   private static final FBMFilter FBM = new FBMFilter();
 
   static {
     FBM.setAmount(0.6f);
     FBM.setScale(15);
-  }
-
-  private static final String[] FONT_NAMES = {"RUBBERSTAMP", "DSnetStamped"};
-  private static final Font[] FONTS = new Font[FONT_NAMES.length];
-  private static final int FONT_SIZE = 60;
-
-  static {
-    for (int i = 0; i < FONT_NAMES.length; i++) {
-      FONTS[i] = loadFont(String.format("/assets/fonts/%s.ttf",
-        FONT_NAMES[new Random().nextInt(FONT_NAMES.length)]));
-    }
   }
 
   private final int width, height;
@@ -113,18 +103,6 @@ public final class SimpleCaptchaGenerator implements CaptchaGenerator {
       // Make sure the next character isn't drawn at the same position
       beginX += glyph.getVisualBounds().getWidth() + 2;
       beginY += Math.sin(beginX / 3) * 6;
-    }
-  }
-
-  private static Font loadFont(final @NotNull String path) {
-    try {
-      // Load the font from the TTF file
-      final Font customFont = Font.createFont(Font.TRUETYPE_FONT,
-        Objects.requireNonNull(SimpleCaptchaGenerator.class.getResourceAsStream(path)));
-      // Set the font size and style
-      return customFont.deriveFont(Font.PLAIN, FONT_SIZE);
-    } catch (Exception exception) {
-      throw new IllegalStateException(exception);
     }
   }
 }
