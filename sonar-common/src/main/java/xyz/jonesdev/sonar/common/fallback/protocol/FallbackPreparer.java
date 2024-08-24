@@ -195,7 +195,7 @@ public class FallbackPreparer {
       // Prepare CAPTCHA messages
       enterCodeMessage = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
         MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("verification.captcha.enter-code"),
+          Sonar.get().getConfig().getMessagesConfig().getString("verification.captcha.enter"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())))));
       incorrectCaptcha = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
         MiniMessage.miniMessage().deserialize(

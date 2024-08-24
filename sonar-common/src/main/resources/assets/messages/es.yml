@@ -66,67 +66,67 @@ commands:
     # Descripción para este subcomando
     description: "Recargar todas las configuraciones"
     # Message shown when someone starts reloading Sonar
-    start: <prefix>Recargando Sonar...
+    start: '<prefix>Recargando Sonar...'
     # Message shown when Sonar has finished reloading
-    finish: <prefix><green>Recargado con éxito <gray>(<time-taken>ms)
+    finish: '<prefix><green>Recargado con éxito <gray>(<time-taken>ms)'
 
   # Translations for '/sonar verbose'
   verbose:
     # Descripción para este subcomando
     description: "Activar o desactivar detallado (verbose)"
     # Message shown when a player subscribes to Sonar verbose
-    subscribe: <prefix>Ahora estás viendo Sonar detallado (verbose).
+    subscribe: '<prefix>Ahora estás viendo Sonar detallado (verbose).'
     # Message shown when a player unsubscribes from Sonar verbose
-    unsubscribe: <prefix>Ya no estás viendo Sonar detallado (verbose).
+    unsubscribe: '<prefix>Ya no estás viendo Sonar detallado (verbose).'
 
   # Translations for '/sonar notify'
   notify:
     # Descripción para este subcomando
     description: "Activar o desactivar las notificaciones de ataques"
     # Message shown when a player subscribes to Sonar attack notifications
-    subscribe: <prefix>Ahora estás viendo las notificaciones de ataques de Sonar.
+    subscribe: '<prefix>Ahora estás viendo las notificaciones de ataques de Sonar.'
     # Message shown when a player unsubscribes from Sonar attack notifications
-    unsubscribe: <prefix>Ya no ves las notificaciones de ataques de Sonar.
+    unsubscribe: '<prefix>Ya no ves las notificaciones de ataques de Sonar.'
 
   # Translations for '/sonar blacklist'
   blacklist:
     # Descripción para este subcomando
     description: "Gestionar las direcciones IP de la lista negra"
     # Message shown when someone tries clearing the blacklist but is empty
-    empty: <prefix>La lista negra está actualmente vacía. Por lo tanto, no se eliminó ninguna dirección IP de la lista negra.
+    empty: '<prefix>La lista negra está actualmente vacía. Por lo tanto, no se eliminó ninguna dirección IP de la lista negra.'
     # Message shown when someone clears the blacklist
-    clear: <prefix>Eliminaste con éxito un total de <amount> direcciones IP de la lista negra.
+    clear: '<prefix>Eliminaste con éxito un total de <amount> direcciones IP de la lista negra.'
     # Message shown when someone checks the size of the blacklist
-    size: <prefix>La lista negra actualmente contiene <amount> direccion(es) IP.
+    size: '<prefix>La lista negra actualmente contiene <amount> direccion(es) IP.'
     # Message shown when someone removes an IP address from the blacklist
-    remove: <prefix>Se eliminó con éxito <ip> de la lista negra.
+    remove: '<prefix>Se eliminó con éxito <ip> de la lista negra.'
     # Message shown when someone adds an IP address to the blacklist
-    add: <prefix>Añadida con éxito <ip> a la lista negra.
+    add: '<prefix>Añadida con éxito <ip> a la lista negra.'
     # Message shown when someone adds an IP address to the blacklist that is verified
     add-warning: '<prefix><red>Advertencia: <white><ip> Actualmente está en la lista blanca. Considere eliminar la dirección IP de la lista de jugadores verificados para evitar posibles problemas.'
     # Message shown when someone adds an IP address to the blacklist, but it is already blacklisted
-    ip-duplicate: <prefix>La dirección IP que proporcionó ya está en la lista negra.
+    ip-duplicate: '<prefix>La dirección IP que proporcionó ya está en la lista negra.'
     # Message shown when someone removes an IP address from the blacklist, but it is not blacklisted
-    ip-not-found: <prefix>La dirección IP que proporcionó no está en la lista negra.
+    ip-not-found: '<prefix>La dirección IP que proporcionó no está en la lista negra.'
 
   # Translations for '/sonar verified'
   verified:
     # Descripción para este subcomando
     description: "Gestionar direcciones IP verificadas"
     # Message shown when someone tries clearing the list of verified players but is empty
-    empty: <prefix>La lista de jugadores verificados está actualmente vacía. Por lo tanto, ningún jugador ha sido verificado.
+    empty: '<prefix>La lista de jugadores verificados está actualmente vacía. Por lo tanto, ningún jugador ha sido verificado.'
     # Message shown when someone clears the list of verified players
-    clear: <prefix>Eliminaste de la lista de verificados exitosamente un total de <amount> jugador(es) único(s).
+    clear: '<prefix>Eliminaste de la lista de verificados exitosamente un total de <amount> jugador(es) único(s).'
     # Message shown when someone checks the size of the list of verified players
-    size: <prefix>Actualmente hay <amount> jugador(es) único(s) verificado(s).
+    size: '<prefix>Actualmente hay <amount> jugador(es) único(s) verificado(s).'
     # Message shown when someone un-verifies an IP address
-    remove: <prefix>Eliminaste de la lista de verificados la IP <ip>.
+    remove: '<prefix>Eliminaste de la lista de verificados la IP <ip>.'
     # Message shown when someone verifies an IP address
-    add: <prefix>Verificaste con éxito la IP <ip>.
+    add: '<prefix>Verificaste con éxito la IP <ip>.'
     # Message shown when someone tries to verify an IP address/UUID that are already verified
-    already: <prefix>La dirección IP y el UUID que proporcionó ya están verificados.
+    already: '<prefix>La dirección IP y el UUID que proporcionó ya están verificados.'
     # Message shown when someone un-verifies an IP address, but it is not verified
-    ip-not-found: <prefix>La dirección IP que proporcionó no está verificada.
+    ip-not-found: '<prefix>La dirección IP que proporcionó no está verificada.'
     # Message shown when someone looks up the verification history of an IP address
     history: '<prefix><yellow>UUIDs anteriores para <ip>:'
     history-entry: ' <gray>▪ <white><uuid>'
@@ -181,20 +181,20 @@ verification:
   # Translations for all debug messages during the verification
   logs:
     # Message logged to console whenever a new player joins the server
-    connection: <username><ip> (<protocol>) se ha conectado.
+    connection: '<username><ip> (<protocol>) se ha conectado.'
     # Message logged to console whenever a player fails verification
     failed: '<ip> (<protocol>) no ha pasado la verificación de bot por: <reason>'
     # Message logged to console whenever a player is blacklisted
-    blacklisted: <ip> (<protocol>) fue incluido en la lista negra por demasiados intentos fallidos.
+    blacklisted: '<ip> (<protocol>) fue incluido en la lista negra por demasiados intentos fallidos.'
     # Message logged to console whenever a player is verified
-    successful: <username> ha sido verificado exitosamente. (<time-taken>s!).
+    successful: '<username> ha sido verificado exitosamente. (<time-taken>s!).'
 
   # Messages that are shown to the player when they are supposed to enter the CAPTCHA
   captcha:
     # Message shown to the player when they have to enter the answer to the captcha
-    enter-code: <prefix><green>Por favor ingresa en el chat el código que se muestra en el mapa.
+    enter: '<prefix><green>Por favor, introduce en el chat el texto que se muestra en el mapa.'
     # Message shown to the player when they enter the wrong answer in chat
-    incorrect: <prefix><red>Ha ingresado el código incorrecto. Inténtalo de nuevo.
+    incorrect: '<prefix><red>¡Has introducido una respuesta incorrecta! Por favor, inténtalo de nuevo.'
 
   # Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet
   currently-preparing:

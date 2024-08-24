@@ -192,64 +192,64 @@ verification:
   # CAPTCHA'yı girmeleri gerektiğinde oyuncuya gösterilen mesajlar
   captcha:
     # CAPTCHA'nın cevabını girmeleri gerektiğinde oyuncuya gösterilen mesaj
-    enter-code: '<prefix><green>Haritada gösterilen kodu lütfen sohbete girin.'
+    enter: '<prefix><green>Lütfen haritada görüntülenen sohbet metnini girin.'
     # Message that is shown to the player when they enter the wrong answer in chat
-    incorrect: '<prefix><red>Yanlış kodu girdiniz. Lütfen tekrar deneyin.'
+    incorrect: '<prefix><red>Yanlış bir cevap girdiniz! Lütfen tekrar deneyin.'
 
   # CAPTCHA henüz hazırlanmamışken birisi katıldığında gösterilen bağlantıyı kesme mesajı
   currently-preparing:
-    - '<header>'
+    - <header>
     - <yellow>Anti-bot verileriniz henüz hazır değil.
     - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
-    - '<footer>'
+    - <footer>
   # Doğrulama sırasında birisi çok hızlı bir şekilde yeniden katıldığında gösterilen bağlantıyı kesme mesajı
   too-fast-reconnect:
-    - '<header>'
+    - <header>
     - <gold>Çok hızlı yeniden bağlandın.
     - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
-    - '<footer>'
+    - <footer>
   # Birisi katıldığında ancak zaten doğrulama yaparken gösterilen bağlantıyı kesme mesajı
   already-verifying:
-    - '<header>'
+    - <header>
     - <red>IP adresiniz şu anda doğrulanıyorç
     - <red>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
-    - '<footer>'
+    - <footer>
   # Birisi katıldığında gösterilen ancak doğrulama için zaten sıraya alınmış olduğunda gösterilen bağlantıyı kesme mesajı
   already-queued:
-    - '<header>'
+    - <header>
     - <red>IP adresiniz şu an doğrulanma sırasında.
     - <red>Tekrar doğrulamayı denemeden önce lütfen birkaç dakika bekleyin.
-    - '<footer>'
+    - <footer>
   # Birisi katıldığında ancak geçici olarak kara listeye alındığında gösterilen bağlantıyı kesme mesajı
   blacklisted:
-    - '<header>'
+    - <header>
     - <red>Şu anda sunucuya girişiniz engellenmiştir.
     - <red>Sunucuya tekrar katılabilmek için lütfen birkaç dakika bekleyin.
     - <gold>Bunun bir hata olduğunu mu düşünüyorsunuz? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Birisi geçersiz bir kullanıcı adıyla katıldığında gösterilen bağlantıyı kesme mesajı
   invalid-username:
-    - '<header>'
+    - <header>
     - <red>Kullanıcı adınız geçersiz karakterler içeriyor.
-    - '<footer>'
+    - <footer>
   # Birisi kara listeye alınmış bir sürümle katıldığında gösterilen bağlantıyı kes mesajı
   blacklisted-protocol:
-    - '<header>'
+    - <header>
     - <red>Sunucumuzda izin verilmeyen bir sürüm ile giriş yapmaya çalışıyorsun.
     - <gold>Giriş yapma hakkında yardıma mı ihtiyacın var? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Birisi başarıyla doğrulama yaptığında gösterilen bağlantıyı kesme mesajı
   success:
-    - '<header>'
+    - <header>
     - <green>Doğrulamayı başarıyla geçtin.
     - <white>Yeniden bağlandığınızda artık sunucuda oynayabilirsiniz.
   # Birisi doğrulamayı başaramadığında gösterilen bağlantıyı kesme mesajı
   failed:
-    - '<header>'
+    - <header>
     - <red>Doğrulamayı geçemediniz.
     - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
     - <gold>Giriş yapma hakkında yardıma mı ihtiyacın var? <gray><support-url>
-    - '<footer>'
+    - <footer>
 
 # Sonar'ın actionbar verbose mesajları için çeviriler
 verbose:

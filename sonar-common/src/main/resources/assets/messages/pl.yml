@@ -184,20 +184,20 @@ verification:
   # Translations for all debug messages during the verification
   logs:
     # Message logged to console whenever a new player joins the server
-    connection: <username><ip> (<protocol>) połączył się.
+    connection: '<username><ip> (<protocol>) połączył się.'
     # Message logged to console whenever a player fails verification
     failed: '<ip> (<protocol>) nie powiodło się sprawdzenie bota dla: <reason>'
     # Message logged to console whenever a player is blacklisted
-    blacklisted: <ip> (<protocol>) został umieszczony na czarnej liście z powodu zbyt wielu nieudanych prób
+    blacklisted: '<ip> (<protocol>) został umieszczony na czarnej liście z powodu zbyt wielu nieudanych prób'
     # Message logged to console whenever a player is verified
-    successful: <username> został pomyślnie zweryfikowany (<time-taken>s!).
+    successful: '<username> został pomyślnie zweryfikowany (<time-taken>s!).'
 
   # Messages that are shown to the player when they are supposed to enter the CAPTCHA
   captcha:
     # Message shown to the player when they have to enter the answer to the captcha
-    enter-code: <prefix><green>Wprowadź na czacie kod wyświetlany na mapie.
+    enter: '<prefix><green>Wprowadź na czacie tekst wyświetlany na mapie.'
     # Message shown to the player when they enter the wrong answer in chat
-    incorrect: <prefix><red>Wprowadzono nieprawidłowy kod. Spróbuj ponownie.
+    incorrect: '<prefix><red>Wprowadzono nieprawidłowy kod. Spróbuj ponownie.'
 
   # Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet
   currently-preparing:

@@ -192,64 +192,64 @@ verification:
   # Zprávy, které se zobrazují hráči, když má zadat CAPTCHA
   captcha:
     # Zpráva zobrazená hráči, když má zadat odpověď na captchu
-    enter-code: '<prefix><green>Prosím, zadejte do chatu kód, který je zobrazen na mapě.'
+    enter: '<prefix><green>Prosím, zadejte text do chatu, který se zobrazí na mapě.'
     # Zpráva zobrazená hráči, když zadá špatnou odpověď do chatu
-    incorrect: '<prefix><red>Zadali jste špatný kód. Zkuste to prosím znovu.'
+    incorrect: '<prefix><red>Zadali jste špatnou odpověď! Zkuste to prosím znovu.'
 
   # Zpráva o odpojení, která se zobrazí, když se někdo připojí, zatímco captcha ještě není připravena
   currently-preparing:
-    - '<header>'
+    - <header>
     - <yellow>Vaše anti-bot data ještě nejsou připravena.
     - <gray>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
-    - '<footer>'
+    - <footer>
   # Zpráva o odpojení, která se zobrazí, když se někdo znovu připojí příliš rychle během ověření
   too-fast-reconnect:
-    - '<header>'
+    - <header>
     - <gold>Připojili jste se příliš rychle, zkuste to později.
     - <gray>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
-    - '<footer>'
+    - <footer>
   # Zpráva o odpojení, která se zobrazí, když se někdo připojí, ale již probíhá jeho ověření
   already-verifying:
-    - '<header>'
+    - <header>
     - <red>Vaše IP adresa je právě ověřována.
     - <red>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
-    - '<footer>'
+    - <footer>
   # Zpráva o odpojení, která se zobrazí, když se někdo připojí, ale je již ve frontě na ověření
   already-queued:
-    - '<header>'
+    - <header>
     - <red>Vaše IP adresa je momentálně ve frontě na ověření.
     - <red>Počkejte prosím několik minut, než se pokusíte znovu ověřit.
-    - '<footer>'
+    - <footer>
   # Zpráva o odpojení, která se zobrazí, když se někdo připojí, ale je dočasně na černé listině
   blacklisted:
-    - '<header>'
+    - <header>
     - <red>Momentálně vám je odepřen vstup na server.
     - <red>Počkejte prosím několik minut, abyste se mohli znovu připojit k serveru.
     - <gold>Falešně pozitivní? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Zpráva o odpojení, která se zobrazí, když se někdo připojí s neplatným uživatelským jménem
   invalid-username:
-    - '<header>'
+    - <header>
     - <red>Vaše uživatelské jméno obsahuje neplatné znaky.
-    - '<footer>'
+    - <footer>
   # Zpráva o odpojení, která se zobrazí, když se někdo připojí s verzí na černé listině
   blacklisted-protocol:
-    - '<header>'
+    - <header>
     - <red>Používáte verzi, která není na našem serveru povolena.
     - <gold>Potřebujete pomoc s přihlášením? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Zpráva o odpojení, která se zobrazí, když někdo úspěšně projde ověřením
   success:
-    - '<header>'
+    - <header>
     - <green>Úspěšně jste prošli ověřením.
     - <white>Nyní se můžete připojit k serveru po opětovném připojení.
   # Zpráva o odpojení, která se zobrazí, když někdo selže při ověření
   failed:
-    - '<header>'
+    - <header>
     - <red>Neprošli jste ověřením bota.
     - <gray>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
     - <gold>Potřebujete pomoc s přihlášením? <gray><support-url>
-    - '<footer>'
+    - <footer>
 
 # Překlady pro podrobné zprávy Sonaru v panelu akcí
 verbose:

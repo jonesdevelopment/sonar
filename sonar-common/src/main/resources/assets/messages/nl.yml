@@ -191,65 +191,65 @@ verification:
 
   # Berichten die aan de speler worden getoond wanneer hij of zij de CAPTCHA moet invoeren
   captcha:
-    # Bericht dat aan de speler wordt getoond wanneer hij het antwoord op de captcha moet invoeren
-    enter-code: '<prefix><green>Voer de code in de chat in die wordt weergegeven op de kaart.'
+    # Bericht dat aan de speler wordt getoond wanneer hij het antwoord op de CAPTCHA moet invoeren
+    enter: '<prefix><green>Voer in de chat de tekst in die op de kaart wordt weergegeven.'
     # Bericht dat aan de speler wordt getoond wanneer hij of zij het verkeerde antwoord invoert in de chat
-    incorrect: '<prefix><red>U heeft de verkeerde code ingevoerd. Probeer het opnieuw.'
+    incorrect: '<prefix><red>Je hebt een verkeerd antwoord ingevoerd! Probeer het opnieuw.'
 
   # Verbindingsbericht dat wordt getoond als iemand zich aansluit terwijl de captcha nog niet is voorbereid
   currently-preparing:
-    - '<header>'
+    - <header>
     - <yellow>Uw anti-bot gegevens zijn nog niet voorbereid.
     - <gray>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
-    - '<footer>'
+    - <footer>
   # Verbindingsbericht dat wordt weergegeven wanneer iemand tijdens de verificatie te snel opnieuw deelneemt
   too-fast-reconnect:
-    - '<header>'
+    - <header>
     - <gold>Je hebt te snel opnieuw verbinding gemaakt. Probeer het later opnieuw.
     - <gray>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
-    - '<footer>'
+    - <footer>
   # Verbindingsbericht dat wordt weergegeven wanneer iemand zich aanmeldt, maar zich al aan het verifiëren is
   already-verifying:
-    - '<header>'
+    - <header>
     - <red>Uw IP-adres wordt momenteel geverifieerd.
     - <red>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
-    - '<footer>'
+    - <footer>
   # Verbindingsbericht dat wordt weergegeven wanneer iemand zich aanmeldt, maar al in de wachtrij staat voor verificatie
   already-queued:
-    - '<header>'
+    - <header>
     - <red>Uw IP-adres staat momenteel in de wachtrij voor verificatie.
     - <red>Wacht een paar minuten voordat u opnieuw probeert te verifiëren.
-    - '<footer>'
+    - <footer>
   # Verbindingsbericht dat wordt weergegeven wanneer iemand lid wordt, maar tijdelijk op de zwarte lijst staat
   blacklisted:
-    - '<header>'
+    - <header>
     - <red>Momenteel wordt u de toegang tot de server ontzegd.
     - <red>Wacht een paar minuten voordat u weer verbinding kunt maken met de server.
     - <gold>Vals positief? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Verbindingsbericht dat wordt weergegeven wanneer iemand zich aanmeldt met een ongeldige gebruikersnaam
   invalid-username:
-    - '<header>'
+    - <header>
     - <red>Uw gebruikersnaam bevat ongeldige tekens.
-    - '<footer>'
+    - <footer>
   # Verbindingsbericht dat wordt weergegeven wanneer iemand zich aanmeldt met een versie op de zwarte lijst
   blacklisted-protocol:
-    - '<header>'
+    - <header>
     - <red>U gebruikt een versie die niet is toegestaan op onze server.
     - <gold>Hulp nodig bij het inloggen? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Verbindingsbericht dat wordt weergegeven wanneer iemand succesvol verifieert
   success:
-    - '<header>'
+    - <header>
     - <green>U heeft de verificatie succesvol doorlopen.
     - <white>Wanneer u opnieuw verbinding maakt, kunt u nu op de server spelen.
   # Verbindingsbericht dat wordt weergegeven wanneer iemand de verificatie mislukt
   failed:
-    - '<header>'
+    - <header>
     - <red>De bot-verificatie is mislukt.
     - <gray>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
     - <gold>Hulp nodig bij het inloggen? <gray><support-url>
-    - '<footer>'
+    - <footer>
 
 # Vertalingen voor Sonar's actiebalk uitgebreide berichten
 verbose:

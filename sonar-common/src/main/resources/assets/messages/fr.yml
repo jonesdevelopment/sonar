@@ -192,64 +192,64 @@ verification:
   # Messages affichés au joueur lorsqu'il doit entrer le CAPTCHA
   captcha:
     # Message affiché au joueur lorsqu'il doit entrer la réponse au CAPTCHA
-    enter-code: '<prefix><green>Veuillez entrer le code affiché sur la carte.'
+    enter: '<prefix><green>Veuillez saisir le texte en chat qui s''affiche sur la carte.'
     # Message affiché au joueur lorsqu'il entre la mauvaise réponse dans le chat
-    incorrect: '<prefix><red>Vous avez entré le mauvais code. Veuillez réessayer.'
+    incorrect: '<prefix><red>Vous avez saisi une mauvaise réponse ! Veuillez réessayer.'
 
   # Message de déconnexion affiché lorsque quelqu'un rejoint alors que le CAPTCHA n'a pas été préparé
   currently-preparing:
-    - '<header>'
+    - <header>
     - <yellow>Vos données anti-bot n'ont pas encore été préparées.
     - <gray>Veuillez patienter quelques secondes avant d'essayer de vous vérifier à nouveau.
-    - '<footer>'
+    - <footer>
   # Message de déconnexion affiché lorsque quelqu'un se reconnecte trop rapidement pendant la vérification
   too-fast-reconnect:
-    - '<header>'
+    - <header>
     - <gold>Vous avez rejoint trop rapidement, réessayez plus tard.
     - <gray>Veuillez patienter quelques secondes avant d'essayer de vous vérifier à nouveau.
-    - '<footer>'
+    - <footer>
   # Message de déconnexion affiché lorsque quelqu'un rejoint mais est déjà en vérification
   already-verifying:
-    - '<header>'
+    - <header>
     - <red>Votre adresse IP est actuellement en cours de vérification.
     - <red>Veuillez patienter quelques secondes avant d'essayer de vous vérifier à nouveau.
-    - '<footer>'
+    - <footer>
   # Message de déconnexion affiché lorsque quelqu'un rejoint mais est déjà en attente de vérification
   already-queued:
-    - '<header>'
+    - <header>
     - <red>Votre adresse IP est actuellement en attente de vérification.
     - <red>Veuillez patienter quelques minutes avant d'essayer de vous vérifier à nouveau.
-    - '<footer>'
+    - <footer>
   # Message de déconnexion affiché lorsque quelqu'un rejoint mais est temporairement mis sur liste noire
   blacklisted:
-    - '<header>'
+    - <header>
     - <red>Vous êtes actuellement interdit d'entrer sur le serveur.
     - <red>Veuillez patienter quelques minutes pour pouvoir rejoindre le serveur à nouveau.
     - <gold>Erreur ? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Message de déconnexion affiché lorsque quelqu'un rejoint avec un nom d'utilisateur non valide
   invalid-username:
-    - '<header>'
+    - <header>
     - <red>Votre nom d'utilisateur contient des caractères non valides.
-    - '<footer>'
+    - <footer>
   # Message de déconnexion affiché lorsque quelqu'un rejoint avec une version sur liste noire
   blacklisted-protocol:
-    - '<header>'
+    - <header>
     - <red>Vous utilisez une version non autorisée sur notre serveur.
     - <gold>Besoin d'aide pour vous connecter ? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Message de déconnexion affiché lorsque quelqu'un réussit la vérification
   success:
-    - '<header>'
+    - <header>
     - <green>Vous avez réussi la vérification.
     - <white>Vous pouvez maintenant jouer sur le serveur lorsque vous vous reconnectez.
   # Message de déconnexion affiché lorsque quelqu'un échoue à la vérification
   failed:
-    - '<header>'
+    - <header>
     - <red>Vous avez échoué à la vérification du bot.
     - <gray>Veuillez patienter quelques secondes avant d'essayer de vous vérifier à nouveau.
     - <gold>Besoin d'aide pour vous connecter ? <gray><support-url>
-    - '<footer>'
+    - <footer>
 
 # Translations for Sonar's actionbar verbose messages
 verbose:
