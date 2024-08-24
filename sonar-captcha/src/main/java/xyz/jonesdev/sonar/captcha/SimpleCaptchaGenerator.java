@@ -63,26 +63,21 @@ public final class SimpleCaptchaGenerator implements CaptchaGenerator {
 
   @Override
   public @NotNull BufferedImage createImage(final char[] answer) {
-    // Make sure we have a background image generated
     final BufferedImage image = new BufferedImage(width, height, TYPE_3BYTE_BGR);
-    // Fill the entire background image with a noise texture
+    // Fill the entire image with a noise texture
     FBM.filter(image, image);
     // Get the background image and create a new foreground image
     final Graphics2D graphics = image.createGraphics();
-    final FontRenderContext ctx = graphics.getFontRenderContext();
-    // Change some rendering hints for anti aliasing
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    // Draw characters
-    drawCharacters(graphics, ctx, answer);
-    // Draw curves
+    // Draw characters and other effects on the image
+    drawCharacters(graphics, answer);
     CURVES.transform(image, graphics);
-    // Make sure to dispose the graphics after using it
+    // Make sure to dispose the graphics instance
     graphics.dispose();
     return image;
   }
 
   private void drawCharacters(final @NotNull Graphics2D graphics,
-                              final @NotNull FontRenderContext ctx,
                               final char @NotNull [] answer) {
     // Apply the gradient
     final Color color0 = Color.getHSBColor(random.nextFloat(), 1, 1);
@@ -90,6 +85,7 @@ public final class SimpleCaptchaGenerator implements CaptchaGenerator {
     final Paint gradient = new GradientPaint(0, 0, color0, width, height, color1);
     graphics.setPaint(gradient);
 
+    final FontRenderContext ctx = graphics.getFontRenderContext();
     final List<GlyphVector> glyphs = new ArrayList<>(answer.length);
 
     for (final char character : answer) {
