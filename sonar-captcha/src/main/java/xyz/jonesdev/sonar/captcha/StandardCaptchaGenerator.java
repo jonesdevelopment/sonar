@@ -69,7 +69,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
 
   private void drawCharacters(final @NotNull Graphics2D graphics,
                               final char @NotNull [] answer) {
-    // Apply the gradient
+    // Apply a random gradient color effect
     final Color color0 = Color.getHSBColor(random.nextFloat(), 1, 1);
     final Color color1 = Color.getHSBColor(random.nextFloat(), 1, 1);
     final Paint gradient = new GradientPaint(0, 0, color0, width, height, color1);
@@ -85,7 +85,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
       glyphs.add(glyph);
     }
 
-    // Calculate first X position
+    // Calculate first X and Y positions
     final double totalWidth = glyphs.stream()
       .mapToDouble(glyph -> glyph.getLogicalBounds().getWidth() - 1)
       .sum();
@@ -100,7 +100,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
       // Draw the glyph to the buffered image
       final Shape transformedShape = transformation.createTransformedShape(glyph.getOutline());
       graphics.fill(transformedShape);
-      // Make sure the next character isn't drawn at the same position
+      // Make sure the next glyph isn't drawn at the same position
       beginX += glyph.getVisualBounds().getWidth() + 2;
       beginY += Math.sin(beginX / 3) * 6;
     }
