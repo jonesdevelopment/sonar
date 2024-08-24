@@ -36,7 +36,7 @@ public final class CurvesOverlayFilter {
   public void transform(final @NotNull BufferedImage image,
                         final @NotNull Graphics2D graphics) {
     // Randomize the stroke width
-    graphics.setStroke(new BasicStroke(0.5f + RANDOM.nextFloat()));
+    graphics.setStroke(new BasicStroke(1 + RANDOM.nextFloat()));
 
     final int halfWidth = image.getWidth() / 2;
 

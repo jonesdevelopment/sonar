@@ -26,7 +26,7 @@ import java.util.Objects;
 
 @UtilityClass
 class StandardTTFFontProvider {
-  private static final String[] FONT_NAMES = {"RUBBERSTAMP", "DSnetStamped"};
+  private static final String[] FONT_NAMES = {"Kingthings_Trypewriter_2"};
   static final Font[] FONTS = new Font[FONT_NAMES.length];
   static final int FONT_SIZE = 60;
 

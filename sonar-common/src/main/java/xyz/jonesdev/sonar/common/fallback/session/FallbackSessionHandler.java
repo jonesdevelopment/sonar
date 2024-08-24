@@ -23,6 +23,8 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientInformationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PluginMessagePacket;
@@ -67,9 +69,12 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
     // This feature was introduced by Mojang in Minecraft version 1.20.5.
     if (transferToOrigin != null
       && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
-      // Send the transfer packet to the player and close the channel
+      // Send the transfer packet to the player (and close the channel if on Java Edition)
       if (user.isGeyser()) {
         user.write(transferToOrigin);
+        // Make sure we cannot receive any more packets from the player
+        user.getPipeline().remove(FallbackPacketDecoder.class);
+        user.getPipeline().remove(FallbackPacketEncoder.class);
       } else {
         closeWith(user.getChannel(), user.getProtocolVersion(), transferToOrigin);
       }

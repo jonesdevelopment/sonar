@@ -46,7 +46,7 @@ import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.FONT_SIZE;
 public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final CurvesOverlayFilter CURVES = new CurvesOverlayFilter(3);
   private static final CircleInverseFilter CIRCLES = new CircleInverseFilter(
-    2, 15, 15);
+    1, 30, 10);
   private static final FBMFilter FBM = new FBMFilter();
   private static final Random RANDOM = new Random();
   private static final Color[] COLORS = new Color[3];
@@ -74,8 +74,8 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     // Draw characters and other effects on the image
     applyRandomColorGradient(graphics);
     drawCharacters(graphics, answer);
-    //CIRCLES.transform(image); // TODO: check if the text is still easy to read after this
     CURVES.transform(image, graphics);
+    //CIRCLES.transform(image); // TODO: check if the text is still easy to read after this
     // Make sure to dispose the graphics instance
     graphics.dispose();
     return image;
@@ -127,7 +127,8 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     for (final GlyphVector glyph : glyphs) {
       final AffineTransform transformation = AffineTransform.getTranslateInstance(beginX, beginY);
       // Rotate the glyph by a random amount
-      transformation.rotate(Math.toRadians(-5 + RANDOM.nextInt(10)));
+      final double shearXY = Math.sin(beginX + beginY) / 8;
+      transformation.shear(shearXY, shearXY);
       // Draw the glyph to the buffered image
       final Shape transformedShape = transformation.createTransformedShape(glyph.getOutline());
       graphics.fill(transformedShape);
