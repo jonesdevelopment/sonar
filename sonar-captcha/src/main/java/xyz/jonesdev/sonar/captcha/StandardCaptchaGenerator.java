@@ -29,8 +29,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Random;
 
 import static java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
@@ -76,17 +75,16 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     graphics.setPaint(gradient);
 
     final FontRenderContext ctx = graphics.getFontRenderContext();
-    final List<GlyphVector> glyphs = new ArrayList<>(answer.length);
+    final GlyphVector[] glyphs = new GlyphVector[answer.length];
 
-    for (final char character : answer) {
-      // Create a glyph vector for the character
+    for (int i = 0; i < answer.length; i++) {
+      // Create a glyph vector for the character with a random font
       final Font font = FONTS[random.nextInt(FONTS.length)];
-      final GlyphVector glyph = font.createGlyphVector(ctx, String.valueOf(character));
-      glyphs.add(glyph);
+      glyphs[i] = font.createGlyphVector(ctx, String.valueOf(answer[i]));
     }
 
     // Calculate first X and Y positions
-    final double totalWidth = glyphs.stream()
+    final double totalWidth = Arrays.stream(glyphs)
       .mapToDouble(glyph -> glyph.getLogicalBounds().getWidth() - 1)
       .sum();
     double beginX = Math.max(Math.min(width / 2D - totalWidth / 2D, totalWidth), 0);
