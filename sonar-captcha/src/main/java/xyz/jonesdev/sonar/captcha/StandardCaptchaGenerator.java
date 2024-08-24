@@ -40,7 +40,7 @@ import java.util.Random;
 
 import static java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
 import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.FONTS;
-import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.FONT_SIZE;
+import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.STANDARD_FONT_SIZE;
 
 @Getter
 @RequiredArgsConstructor
@@ -119,24 +119,28 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
       glyphs[i] = font.createGlyphVector(ctx, String.valueOf(answer[i]));
     }
 
+    final double scalingXY = 5 - Math.min(answer.length, 5) * 0.65;
+
     // Calculate first X and Y positions
     final double totalWidth = Arrays.stream(glyphs)
-      .mapToDouble(glyph -> glyph.getLogicalBounds().getWidth() - 1)
+      .mapToDouble(glyph -> glyph.getLogicalBounds().getWidth() * scalingXY - 1)
       .sum();
     double beginX = Math.max(Math.min(width / 2D - totalWidth / 2D, totalWidth), 0);
-    double beginY = (height + FONT_SIZE / 2D) / 2D;
+    double beginY = (height + STANDARD_FONT_SIZE / 2D) / 2D + scalingXY;
 
     // Draw each glyph one by one
     for (final GlyphVector glyph : glyphs) {
       final AffineTransform transformation = AffineTransform.getTranslateInstance(beginX, beginY);
-      // Rotate the glyph by a random amount
+      // Shear the glyph by a random amount
       final double shearXY = Math.sin(beginX + beginY) / 8;
       transformation.shear(shearXY, shearXY);
+      // Scale the glyph to perfectly fit the image
+      transformation.scale(scalingXY, scalingXY);
       // Draw the glyph to the buffered image
       final Shape transformedShape = transformation.createTransformedShape(glyph.getOutline());
       graphics.fill(transformedShape);
       // Make sure the next glyph isn't drawn at the same position
-      beginX += glyph.getVisualBounds().getWidth() + 2;
+      beginX += glyph.getVisualBounds().getWidth() * scalingXY + 2;
       beginY += Math.sin(beginX / 3) * 6;
     }
   }

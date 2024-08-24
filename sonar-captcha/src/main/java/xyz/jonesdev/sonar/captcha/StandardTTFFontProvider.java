@@ -28,7 +28,7 @@ import java.util.Objects;
 class StandardTTFFontProvider {
   private static final String[] FONT_NAMES = {"Kingthings_Trypewriter_2"};
   static final Font[] FONTS = new Font[FONT_NAMES.length];
-  static final int FONT_SIZE = 60;
+  static final int STANDARD_FONT_SIZE = 25;
 
   static {
     for (int i = 0; i < FONT_NAMES.length; i++) {
@@ -41,7 +41,7 @@ class StandardTTFFontProvider {
       // Load the font from the TTF file
       final Font customFont = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(inputStream));
       // Set the font size and style
-      return customFont.deriveFont(Font.PLAIN, FONT_SIZE);
+      return customFont.deriveFont(Font.PLAIN, STANDARD_FONT_SIZE);
     } catch (Exception exception) {
       throw new IllegalStateException(exception);
     }
