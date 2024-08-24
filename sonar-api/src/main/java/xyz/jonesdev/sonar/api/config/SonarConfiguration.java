@@ -198,6 +198,16 @@ public final class SonarConfiguration {
     verification.map.maxDuration = clamp(generalConfig.getInt("verification.checks.map-captcha.max-duration"), 5000, 360000);
     verification.map.maxTries = generalConfig.getInt("verification.checks.map-captcha.max-tries");
     verification.map.alphabet = generalConfig.getString("verification.checks.map-captcha.alphabet");
+    verification.map.backgroundImage = null;
+
+    final String backgroundPath = generalConfig.getString("verification.checks.map-captcha.background");
+    if (!backgroundPath.isEmpty()) {
+      try (final InputStream inputStream = new FileInputStream(backgroundPath)) {
+        verification.map.backgroundImage = inputStream;
+      } catch (IOException exception) {
+        Sonar.get().getLogger().error("Could not find background image", exception);
+      }
+    }
 
     verification.brand.enabled = generalConfig.getBoolean("verification.checks.client-brand.enabled");
     verification.brand.validRegex = Pattern.compile(generalConfig.getString("verification.checks.client-brand.valid-regex"));
@@ -376,6 +386,7 @@ public final class SonarConfiguration {
       private int maxDuration;
       private int maxTries;
       private String alphabet;
+      private InputStream backgroundImage;
     }
 
     @Getter

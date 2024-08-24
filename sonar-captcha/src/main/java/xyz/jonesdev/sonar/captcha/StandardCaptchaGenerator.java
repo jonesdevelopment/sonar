@@ -21,14 +21,18 @@ import com.jhlabs.image.FBMFilter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
 import xyz.jonesdev.sonar.captcha.filters.CurvesOverlayFilter;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -55,14 +59,13 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   }
 
   private final int width, height;
-  private final Random random;
+  private final @Nullable InputStream background;
+  private final Random random = new Random(System.nanoTime());
+  private BufferedImage backgroundImage;
 
   @Override
   public @NotNull BufferedImage createImage(final char[] answer) {
-    final BufferedImage image = new BufferedImage(width, height, TYPE_3BYTE_BGR);
-    // Fill the entire image with a noise texture
-    FBM.filter(image, image);
-    // Get the background image and create a new foreground image
+    final BufferedImage image = createBackgroundImage();
     final Graphics2D graphics = image.createGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     // Draw characters and other effects on the image
@@ -72,6 +75,19 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     // Make sure to dispose the graphics instance
     graphics.dispose();
     return image;
+  }
+
+  private @NotNull BufferedImage createBackgroundImage() {
+    if (background == null) {
+      final BufferedImage image = new BufferedImage(width, height, TYPE_3BYTE_BGR);
+      // Fill the entire image with a noise texture
+      return FBM.filter(image, image);
+    }
+    try {
+      return backgroundImage == null ? backgroundImage = ImageIO.read(background) : backgroundImage;
+    } catch (IOException exception) {
+      throw new IllegalStateException("Could not read background image", exception);
+    }
   }
 
   private void applyRandomColorGradient(final @NotNull Graphics2D graphics) {

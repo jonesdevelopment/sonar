@@ -110,6 +110,10 @@ verification:
       # - DURING_ATTACK: Noví hráči dostanou map captchu jenom při útoku
       # - NEVER: Noví hráči nikdy nedostanou map CAPTCHU (Doporučeno)
       timing: NEVER
+      # Cesta k obrázku na pozadí, který Sonar používá pro CAPTCHA
+      # Pokud není obrázek nalezen, bude jako výchozí pozadí použit šum
+      # Zde můžete jednoduše zadat název souboru, pokud je soubor v adresáři pluginu
+      background: ''
       # Kolik odpovědí by měl Sonar předgenerovat?
       # Tento úkol běží souběžně v pozadí
       precompute: 500

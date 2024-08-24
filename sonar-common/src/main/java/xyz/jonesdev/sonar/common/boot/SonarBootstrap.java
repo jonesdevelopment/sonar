@@ -46,7 +46,6 @@ import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.Random;
 
 @Getter
 @RequiredArgsConstructor
@@ -152,14 +151,12 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Update the CAPTCHA generator if necessary
     if (getConfig().getVerification().getMap().getTiming() == SonarConfiguration.Verification.Timing.NEVER) {
       getFallback().setCaptchaGenerator(null);
+    } else if (getFallback().getCaptchaGenerator() == null
+      || getFallback().getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
+      getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(128, 128,
+        Sonar.get().getConfig().getVerification().getMap().getBackgroundImage()));
     } else {
-      if (getFallback().getCaptchaGenerator() == null
-        || getFallback().getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
-        final Random random = new Random(System.nanoTime());
-        getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(128, 128, random));
-      } else {
-        getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
-      }
+      getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
     }
 
     // Prepare cached packets

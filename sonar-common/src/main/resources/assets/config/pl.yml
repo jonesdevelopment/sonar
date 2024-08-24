@@ -109,6 +109,10 @@ verification:
       # - DURING_ATTACK: Nowi gracze otrzymają weryfikacje CAPTCHA tylko podczas ataku.
       # - NEVER: Nowi gracze nigdy nie otrzymają weryfikacji CAPTCHA (zalecane)
       timing: NEVER
+      # Ścieżka do obrazu tła używanego przez Sonar dla CAPTCHA
+      # Jeśli obraz nie zostanie znaleziony, jako domyślne tło zostanie użyty szum
+      # Możesz umieścić nazwę pliku tutaj, jeśli plik znajduje się w katalogu pluginu
+      background: ''
       # Ile możliwych odpowiedzi powinien przygotować Sonar?
       # Zadanie to wykonywane jest asynchronicznie w tle
       precompute: 500

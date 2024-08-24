@@ -109,6 +109,10 @@ verification:
       # - DURING_ATTACK : Les nouveaux joueurs ne recevront un CAPTCHA que pendant une attaque
       # - NEVER : Les nouveaux joueurs ne recevront jamais de CAPTCHA (Recommandé)
       timing: NEVER
+      # Chemin vers l'image d'arrière-plan que Sonar utilise pour le CAPTCHA
+      # Si l'image n'est pas trouvée, un bruit sera utilisé comme arrière-plan par défaut
+      # Vous pouvez simplement mettre le nom du fichier ici si le fichier est dans le répertoire du plugin
+      background: ''
       # Combien de réponses Sonar devrait-il préparer ?
       # Cette tâche se déroule de manière asynchrone en arrière-plan
       precompute: 500
