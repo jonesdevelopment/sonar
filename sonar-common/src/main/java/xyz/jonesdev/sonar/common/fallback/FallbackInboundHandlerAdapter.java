@@ -27,8 +27,6 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameDecoder;
-import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
@@ -201,14 +199,11 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       ctx.pipeline().remove(entry.getValue());
       removalListener.accept(ctx.pipeline(), entry.getKey(), entry.getValue());
     }
-    // Add our custom pipelines
-    ctx.pipeline()
-      .addFirst(FALLBACK_FRAME_ENCODER, FallbackVarInt21FrameEncoder.INSTANCE)
-      .addFirst(FALLBACK_TIMEOUT, new FallbackTimeoutHandler(
-        Sonar.get().getConfig().getVerification().getReadTimeout(),
-        Sonar.get().getConfig().getVerification().getWriteTimeout(),
-        TimeUnit.MILLISECONDS))
-      .addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
+    // Add our read/write timeout handler
+    ctx.pipeline().addFirst(FALLBACK_TIMEOUT, new FallbackTimeoutHandler(
+      Sonar.get().getConfig().getVerification().getReadTimeout(),
+      Sonar.get().getConfig().getVerification().getWriteTimeout(),
+      TimeUnit.MILLISECONDS));
   }
 
   /**

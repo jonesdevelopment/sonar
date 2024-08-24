@@ -30,7 +30,7 @@ public final class FallbackTimeoutHandler extends IdleStateHandler {
   }
 
   @Override
-  protected void channelIdle(final ChannelHandlerContext ctx,
+  protected void channelIdle(final @NotNull ChannelHandlerContext ctx,
                              final @NotNull IdleStateEvent idleStateEvent) throws Exception {
     // The netty (default) ReadTimeoutHandler would normally just throw an Exception
     // The default ReadTimeoutHandler does only check for the boolean 'closed' and
