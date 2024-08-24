@@ -249,7 +249,7 @@ public final class VerifiedPlayerController {
       }
 
       try {
-        dao.create(player);
+        dao.createIfNotExists(player);
       } catch (SQLException exception) {
         LOGGER.error("Error trying to add entry: {}", exception);
       }
