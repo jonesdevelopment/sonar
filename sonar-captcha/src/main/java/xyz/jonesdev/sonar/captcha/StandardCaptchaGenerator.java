@@ -41,10 +41,17 @@ import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.FONT_SIZE;
 public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final CurvesOverlayFilter CURVES = new CurvesOverlayFilter(3);
   private static final FBMFilter FBM = new FBMFilter();
+  private static final Color[] COLORS = new Color[3];
+  private static final float[] COLOR_FRACTIONS = new float[COLORS.length];
 
   static {
     FBM.setAmount(0.6f);
     FBM.setScale(15);
+
+    // Create fractions based on the number of colors
+    for (int i = 0; i < COLOR_FRACTIONS.length; i++) {
+      COLOR_FRACTIONS[i] = (float) i / (COLOR_FRACTIONS.length - 1);
+    }
   }
 
   private final int width, height;
@@ -59,6 +66,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     final Graphics2D graphics = image.createGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     // Draw characters and other effects on the image
+    applyRandomColorGradient(graphics);
     drawCharacters(graphics, answer);
     CURVES.transform(image, graphics);
     // Make sure to dispose the graphics instance
@@ -66,14 +74,19 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     return image;
   }
 
+  private void applyRandomColorGradient(final @NotNull Graphics2D graphics) {
+    // Randomize the colors for the gradient effect
+    for (int i = 0; i < COLORS.length; i++) {
+      COLORS[i] = Color.getHSBColor(random.nextFloat(), 1, 1);
+    }
+
+    // Apply the random gradient effect
+    graphics.setPaint(new LinearGradientPaint(0, 0, width, height,
+      COLOR_FRACTIONS, COLORS, MultipleGradientPaint.CycleMethod.REFLECT));
+  }
+
   private void drawCharacters(final @NotNull Graphics2D graphics,
                               final char @NotNull [] answer) {
-    // Apply a random gradient color effect
-    final Color color0 = Color.getHSBColor(random.nextFloat(), 1, 1);
-    final Color color1 = Color.getHSBColor(random.nextFloat(), 1, 1);
-    final Paint gradient = new GradientPaint(0, 0, color0, width, height, color1);
-    graphics.setPaint(gradient);
-
     final FontRenderContext ctx = graphics.getFontRenderContext();
     final GlyphVector[] glyphs = new GlyphVector[answer.length];
 
