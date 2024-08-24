@@ -48,13 +48,11 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
   protected void checkState(final boolean state, final String failReason) {
     // Fails the verification if the condition is not met
     if (!state) {
-      // Let the API know that the user has failed the verification
       user.fail(failReason);
     }
   }
 
   protected final void finishVerification() {
-    // Increment number of total successful verifications
     GlobalSonarStatistics.totalSuccessfulVerifications++;
 
     // Add verified player to the database

@@ -45,6 +45,7 @@ import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.FONT_SIZE;
 public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final CurvesOverlayFilter CURVES = new CurvesOverlayFilter(3);
   private static final FBMFilter FBM = new FBMFilter();
+  private static final Random RANDOM = new Random();
   private static final Color[] COLORS = new Color[3];
   private static final float[] COLOR_FRACTIONS = new float[COLORS.length];
 
@@ -60,7 +61,6 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
 
   private final int width, height;
   private final @Nullable InputStream background;
-  private final Random random = new Random(System.nanoTime());
   private BufferedImage backgroundImage;
 
   @Override
@@ -93,7 +93,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private void applyRandomColorGradient(final @NotNull Graphics2D graphics) {
     // Randomize the colors for the gradient effect
     for (int i = 0; i < COLORS.length; i++) {
-      COLORS[i] = Color.getHSBColor(random.nextFloat(), 1, 1);
+      COLORS[i] = Color.getHSBColor(RANDOM.nextFloat(), 1, 1);
     }
 
     // Apply the random gradient effect
@@ -108,7 +108,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
 
     for (int i = 0; i < answer.length; i++) {
       // Create a glyph vector for the character with a random font
-      final Font font = FONTS[random.nextInt(FONTS.length)];
+      final Font font = FONTS[RANDOM.nextInt(FONTS.length)];
       glyphs[i] = font.createGlyphVector(ctx, String.valueOf(answer[i]));
     }
 
@@ -123,7 +123,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     for (final GlyphVector glyph : glyphs) {
       final AffineTransform transformation = AffineTransform.getTranslateInstance(beginX, beginY);
       // Rotate the glyph by a random amount
-      transformation.rotate(Math.toRadians(-5 + random.nextInt(10)));
+      transformation.rotate(Math.toRadians(-5 + RANDOM.nextInt(10)));
       // Draw the glyph to the buffered image
       final Shape transformedShape = transformation.createTransformedShape(glyph.getOutline());
       graphics.fill(transformedShape);
