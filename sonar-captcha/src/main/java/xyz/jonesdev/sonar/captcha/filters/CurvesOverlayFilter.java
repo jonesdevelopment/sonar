@@ -35,7 +35,10 @@ public final class CurvesOverlayFilter {
 
   public void transform(final @NotNull BufferedImage bufferedImage,
                         final @NotNull Graphics2D graphics) {
-    final float halfWidth = bufferedImage.getWidth() / 2f;
+    // Randomize the stroke width
+    graphics.setStroke(new BasicStroke(0.5f + RANDOM.nextFloat()));
+
+    final int halfWidth = bufferedImage.getWidth() / 2;
 
     for (int i = 0; i < amount; ++i) {
       final float randomX = bufferedImage.getWidth() * RANDOM.nextFloat();
@@ -52,8 +55,6 @@ public final class CurvesOverlayFilter {
       final float ctrlY1 = randomY - cos / 2;
       final float ctrlX2 = randomX - sin / 2;
       final float ctrlY2 = randomY + cos / 2;
-      // Randomize the stroke width
-      graphics.setStroke(new BasicStroke(0.5f + RANDOM.nextFloat()));
       // Draw a cubic curve instead of a straight line
       graphics.draw(new CubicCurve2D.Float(x1, y1, ctrlX1, ctrlY1, ctrlX2, ctrlY2, x2, y2));
     }
