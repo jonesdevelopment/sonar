@@ -62,7 +62,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
       ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetContainerSlotPacket.MAP_NBT));
     // Send random captcha to the player
     final MapCaptchaInfo captcha = CaptchaPreparer.getRandomCaptcha();
-    this.answer = captcha.getAnswer();
+    this.answer = captcha.getAnswer().toLowerCase();
     captcha.delayedWrite(user);
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
