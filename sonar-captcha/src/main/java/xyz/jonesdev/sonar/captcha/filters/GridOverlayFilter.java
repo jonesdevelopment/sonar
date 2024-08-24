@@ -32,17 +32,17 @@ public final class GridOverlayFilter {
 
   private static final Random RANDOM = new Random();
 
-  public void transform(final @NotNull BufferedImage bufferedImage,
+  public void transform(final @NotNull BufferedImage image,
                         final @NotNull Graphics2D graphics) {
-    final int spacingX = bufferedImage.getWidth() / amount + lineWidth;
-    final int spacingY = bufferedImage.getHeight() / amount + lineWidth;
+    final int spacingX = image.getWidth() / amount + lineWidth;
+    final int spacingY = image.getHeight() / amount + lineWidth;
     int currentX = spacingX / 2;
     int currentY = spacingY / 2;
 
     for (int i = 0; i < amount; i++) {
       graphics.setStroke(new BasicStroke(lineWidth * 0.5f + lineWidth * RANDOM.nextFloat()));
-      graphics.drawLine(currentX, 0, currentX + RANDOM.nextInt(randomOffset), bufferedImage.getHeight());
-      graphics.drawLine(0, currentY, bufferedImage.getWidth(), currentY + RANDOM.nextInt(randomOffset));
+      graphics.drawLine(currentX, 0, currentX + RANDOM.nextInt(randomOffset), image.getHeight());
+      graphics.drawLine(0, currentY, image.getWidth(), currentY + RANDOM.nextInt(randomOffset));
 
       currentX += spacingX + lineWidth;
       currentY += spacingY + lineWidth;

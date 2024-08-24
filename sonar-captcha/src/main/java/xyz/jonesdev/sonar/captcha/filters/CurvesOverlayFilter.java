@@ -33,16 +33,16 @@ public final class CurvesOverlayFilter {
 
   private static final Random RANDOM = new Random();
 
-  public void transform(final @NotNull BufferedImage bufferedImage,
+  public void transform(final @NotNull BufferedImage image,
                         final @NotNull Graphics2D graphics) {
     // Randomize the stroke width
     graphics.setStroke(new BasicStroke(0.5f + RANDOM.nextFloat()));
 
-    final int halfWidth = bufferedImage.getWidth() / 2;
+    final int halfWidth = image.getWidth() / 2;
 
     for (int i = 0; i < amount; ++i) {
-      final float randomX = bufferedImage.getWidth() * RANDOM.nextFloat();
-      final float randomY = bufferedImage.getHeight() * RANDOM.nextFloat();
+      final float randomX = image.getWidth() * RANDOM.nextFloat();
+      final float randomY = image.getHeight() * RANDOM.nextFloat();
       final float amplitude = 6.2831855f * (RANDOM.nextFloat() - 0.5f);
       final float sin = (float) Math.sin(amplitude) * halfWidth;
       final float cos = (float) Math.cos(amplitude) * halfWidth;
