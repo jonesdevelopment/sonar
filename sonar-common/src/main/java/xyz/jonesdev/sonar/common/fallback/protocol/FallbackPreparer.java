@@ -207,7 +207,7 @@ public class FallbackPreparer {
 
       for (int i = 0; i < xpCountdown.length; i++) {
         final float bar = (float) i / xpCountdown.length;
-        xpCountdown[i] = new FallbackPacketSnapshot(new SetExperiencePacket(bar, i, i));
+        xpCountdown[i] = new FallbackPacketSnapshot(new SetExperiencePacket(bar, i, 0));
       }
 
       // Prepare CAPTCHA answers
