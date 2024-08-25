@@ -27,7 +27,7 @@ import java.util.Random;
 @UtilityClass
 public class Main {
   public void main(final String... args) throws IOException {
-    final Random random = new Random(System.nanoTime());
+    final Random random = new Random();
     final StandardCaptchaGenerator standardCaptchaGenerator = new StandardCaptchaGenerator(128, 128, null);
 
     final long start = System.currentTimeMillis();
@@ -35,7 +35,7 @@ public class Main {
       'k', 'm', 'n', 'o', 'p'/*, 'q'*/, 'r', 's', 't', 'u'/*, 'v', 'w'*/, 'x', 'y', 'z'};
 
     // Generate image
-    final int amount = 1;
+    final int amount = 100;
     for (int i = 0; i < amount; i++) {
       final char[] answer = new char[3 + random.nextInt(2)];
       for (int j = 0; j < answer.length; j++) {

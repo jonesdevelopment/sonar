@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
-import xyz.jonesdev.sonar.captcha.filters.CircleInverseFilter;
 import xyz.jonesdev.sonar.captcha.filters.CurvesOverlayFilter;
 import xyz.jonesdev.sonar.captcha.filters.NoiseOverlayFilter;
 
@@ -46,8 +45,7 @@ import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.STANDARD_FONT_S
 @RequiredArgsConstructor
 public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final CurvesOverlayFilter CURVES = new CurvesOverlayFilter(3);
-  private static final CircleInverseFilter CIRCLES = new CircleInverseFilter(
-    1, 30, 10);
+  //private static final CircleInverseFilter CIRCLES = new CircleInverseFilter(1, 30, 10);
   private static final NoiseOverlayFilter NOISE = new NoiseOverlayFilter(1, 20);
   private static final FBMFilter FBM = new FBMFilter();
   private static final Random RANDOM = new Random();
@@ -140,9 +138,24 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
       // Draw the glyph to the buffered image
       final Shape transformedShape = transformation.createTransformedShape(glyph.getOutline());
       graphics.fill(transformedShape);
+      // Draw a random outline around the glyph
+      if (RANDOM.nextFloat() < 0.25f) {
+        createGlyphOutline(graphics, transformedShape);
+      }
       // Make sure the next glyph isn't drawn at the same position
       beginX += glyph.getVisualBounds().getWidth() * scalingXY + 2;
       beginY += -10 + RANDOM.nextFloat() * 20;
     }
+  }
+
+  private void createGlyphOutline(final @NotNull Graphics2D graphics, final @NotNull Shape shape) {
+    final float txy = 1.25f + RANDOM.nextFloat();
+    final float width = 1 + RANDOM.nextFloat();
+
+    // Create a randomly translated and stroked shape based on the original glyph shape
+    final AffineTransform translation = AffineTransform.getTranslateInstance(txy, txy);
+    final Shape strokedShape = new BasicStroke(width).createStrokedShape(shape);
+
+    graphics.fill(translation.createTransformedShape(strokedShape));
   }
 }
