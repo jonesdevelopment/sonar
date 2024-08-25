@@ -35,7 +35,7 @@ public class Main {
       'k', 'm', 'n', 'o', 'p'/*, 'q'*/, 'r', 's', 't', 'u'/*, 'v', 'w'*/, 'x', 'y', 'z'};
 
     // Generate image
-    final int amount = 100;
+    final int amount = 1;
     for (int i = 0; i < amount; i++) {
       final char[] answer = new char[3 + random.nextInt(2)];
       for (int j = 0; j < answer.length; j++) {
