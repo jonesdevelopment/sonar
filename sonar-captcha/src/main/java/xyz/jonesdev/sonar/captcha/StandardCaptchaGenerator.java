@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.captcha;
 
 import com.jhlabs.image.FBMFilter;
+import com.jhlabs.image.SmearFilter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +48,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final CurvesOverlayFilter CURVES = new CurvesOverlayFilter(3);
   //private static final CircleInverseFilter CIRCLES = new CircleInverseFilter(1, 30, 10);
   private static final NoiseOverlayFilter NOISE = new NoiseOverlayFilter(1, 20);
+  private static final SmearFilter SMEAR = new SmearFilter();
   private static final FBMFilter FBM = new FBMFilter();
   private static final Random RANDOM = new Random();
   private static final Color[] COLORS = new Color[4];
@@ -55,6 +57,11 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   static {
     FBM.setAmount(0.6f);
     FBM.setScale(15);
+
+    SMEAR.setShape(SmearFilter.SQUARES);
+    SMEAR.setDensity(0.1f);
+    SMEAR.setDistance(0);
+    SMEAR.setMix(0.35f);
 
     // Create fractions based on the number of colors
     for (int i = 0; i < COLOR_FRACTIONS.length; i++) {
@@ -76,6 +83,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     drawCharacters(graphics, answer);
     CURVES.transform(image, graphics);
     NOISE.transform(image);
+    //SMEAR.filter(image, image);
     //CIRCLES.transform(image); // TODO: check if the text is still easy to read after this
     // Make sure to dispose the graphics instance
     graphics.dispose();
