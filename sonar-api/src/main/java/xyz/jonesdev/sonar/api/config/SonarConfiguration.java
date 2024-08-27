@@ -491,7 +491,7 @@ public final class SonarConfiguration {
         Library.builder()
           .groupId("com{}mysql")
           .artifactId("mysql-connector-j")
-          .version("8.4.0")
+          .version("9.0.0")
           .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
           .build()),
       MARIADB("MariaDB", "jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter(),
