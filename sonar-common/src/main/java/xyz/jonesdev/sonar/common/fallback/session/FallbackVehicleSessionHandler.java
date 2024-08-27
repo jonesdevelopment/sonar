@@ -129,8 +129,11 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
       // Check if the player is sending invalid vehicle speed values
-      checkState(Math.abs(playerInput.getForward()) <= 0.98f, "illegal vehicle speed (f)");
-      checkState(Math.abs(playerInput.getSideways()) <= 0.98f, "illegal vehicle speed (s)");
+      final float forward = Math.abs(playerInput.getForward());
+      final float sideways = Math.abs(playerInput.getSideways());
+      final float maxVehicleSpeed = user.isGeyser() ? 1 : 0.98f;
+      checkState(forward <= maxVehicleSpeed, "illegal speed (f): " + forward);
+      checkState(sideways <= maxVehicleSpeed, "illegal speed (s): " + sideways);
 
       // Only mark this packet as correct if the player is not moving the vehicle
       if (playerInput.isJump() || playerInput.isUnmount()) {
