@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 @UtilityClass
 public class CaptchaPreparer {
   private final ExecutorService PREPARATION_SERVICE = Executors.newSingleThreadExecutor();
-  private final Random RANDOM = new Random(System.nanoTime());
+  private final Random RANDOM = new Random();
 
   private MapCaptchaInfo[] cached;
   private int preparedAmount;
