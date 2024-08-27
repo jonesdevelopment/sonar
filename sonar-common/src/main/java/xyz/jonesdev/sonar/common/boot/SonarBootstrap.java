@@ -70,7 +70,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Load all libraries before anything else
     LibraryLoader.loadLibraries(libraryManager, platform);
     this.libraryManager = libraryManager;
-    // Check if Netty is up-to-date
+    // Check if Netty is up to date
     ProtocolUtil.checkNettyVersion();
     // Set the Sonar API
     SonarSupplier.set(this);
@@ -82,8 +82,8 @@ public abstract class SonarBootstrap<T> implements Sonar {
     this.verboseHandler = new Verbose();
     this.notificationHandler = new Notification();
     this.config = new SonarConfiguration(dataDirectory);
-    this.subcommandRegistry = new SubcommandRegistry();
     // Register all subcommands
+    this.subcommandRegistry = new SubcommandRegistry();
     this.subcommandRegistry.register(
       new BlacklistCommand(),
       new VerifiedCommand(),
