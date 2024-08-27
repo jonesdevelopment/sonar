@@ -505,7 +505,7 @@ public final class SonarConfiguration {
         Library.builder()
           .groupId("com{}h2database")
           .artifactId("h2")
-          .version("2.1.214")
+          .version("2.2.220")
           .relocate("org{}h2", "xyz{}jonesdev{}sonar{}libs{}h2")
           .build()),
       NONE("None", null, null, null);
