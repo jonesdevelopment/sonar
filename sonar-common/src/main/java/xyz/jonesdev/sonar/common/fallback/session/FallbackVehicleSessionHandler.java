@@ -83,7 +83,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   }
 
   // We can abuse the entity remove mechanic and check for position packets when the entity dies
-  private void move(double y) {
+  private void handleMovement(double y) {
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
       y -= 1.62f; // Account for 1.7 bounding box
     }
@@ -95,33 +95,37 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     }
   }
 
+  private void handleRotation() {
+    // Once the player sent enough packets, go to the next stage
+    final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
+    if (paddlePackets > minimumPackets
+      && inputPackets > minimumPackets
+      && rotationPackets > minimumPackets) {
+      // Remove the entity
+      // The next y coordinate the player will send is going
+      // to be the vehicle spawn position (y 64 in this case).
+      user.write(removeEntities);
+      // Listen for next movement packet(s)
+      expectMovement = true;
+    }
+    rotationPackets++;
+  }
+
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof SetPlayerPositionRotationPacket) {
       if (expectMovement) {
         final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
-        move(posRot.getY());
+        handleMovement(posRot.getY());
       }
     } else if (packet instanceof SetPlayerPositionPacket) {
       if (expectMovement) {
         final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
-        move(position.getY());
+        handleMovement(position.getY());
       }
     } else if (packet instanceof SetPlayerRotationPacket) {
-      if (!expectMovement) {
-        // Once the player sent enough packets, go to the next stage
-        final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
-        if (paddlePackets > minimumPackets
-          && inputPackets > minimumPackets
-          && rotationPackets > minimumPackets) {
-          // Remove the entity
-          // The next y coordinate the player will send is going
-          // to be the vehicle spawn position (y 64 in this case).
-          user.write(removeEntities);
-          // Listen for next movement packet(s)
-          expectMovement = true;
-        }
-        rotationPackets++;
+      if (!expectMovement && !user.isGeyser()) {
+        handleRotation();
       }
     } else if (packet instanceof PaddleBoatPacket) {
       paddlePackets++;
@@ -138,6 +142,12 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       // Only mark this packet as correct if the player is not moving the vehicle
       if (playerInput.isJump() || playerInput.isUnmount()) {
         return;
+      }
+
+      // Bedrock users do not send SetPlayerPositionRotation and SetPlayerRotation packets
+      // Don't ask me why; Microsoft is doing some *fascinating* things with Bedrock...
+      if (user.isGeyser()) {
+        handleRotation();
       }
 
       // 1.8 and below do not have PaddleBoat packets,
