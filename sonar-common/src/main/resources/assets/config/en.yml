@@ -109,41 +109,11 @@ verification:
       # - DURING_ATTACK: New players will only receive a CAPTCHA during an attack
       # - NEVER: New players will never receive a CAPTCHA (Recommended)
       timing: NEVER
-      # Options for the effects on the image shown to the player
-      # You should only edit this if you know what you're doing
-      effects:
-        # Adds random lines to the image
-        scratches: true
-        # Applies a ripple filter (wavy effect)
-        ripple: true
-        # Applies a bump filter (sharpened text)
-        bump: true
-        # Distortion filter
-        distortion:
-          # Should Sonar apply a distortion filter?
-          enabled: true
-          # What shape should Sonar use for the distortion filter?
-          # Possible types: 0, 1, 2, 3
-          # - 0: Crosses
-          # - 1: Lines
-          # - 2: Circles
-          # - 3: Squares
-          shape: 2
-          # Distance between distorted pixels/objects
-          distance: 5
-          # Density of the distorted pixels/objects
-          density: 0.1
-          # Amount of blending between the colors of objects
-          mix: 0.15
       # Path to the background image Sonar uses for the CAPTCHA
       # If the image isn't found, a noise will be used as the default background
       # You can put the name of the file here if the file is in the plugin directory
       background: ''
-      # Should Sonar automatically detect the background color?
-      # This is done to create a contrast between the background image and the text
-      # If this is disabled, Sonar will use a random gradient for the colors
-      auto-color: false
-      # How many answers should Sonar prepare?
+      # How many CAPTCHA answers should Sonar prepare?
       # This task happens asynchronously in the background
       precompute: 500
       # How long should Sonar wait until the player fails the CAPTCHA?
@@ -151,9 +121,10 @@ verification:
       max-duration: 30000
       # How many times must a player fail the CAPTCHA before failing the verification?
       max-tries: 3
-      # Characters (letters and numbers) that are allowed to appear in the answer to the CAPTCHA
-      # It is not recommended to add numbers or letters that might look like one another
-      dictionary: '1235689'
+      # Characters (letters/numbers) that are allowed to appear in the answer to the CAPTCHA
+      # It is not recommended to add numbers or letters that might look like one another.
+      # You should only edit this if you know what you're doing
+      alphabet: 'abcdefhjkmnoprstuxyz'
 
     # Checks if the players are sending a valid client brand to the server
     client-brand:

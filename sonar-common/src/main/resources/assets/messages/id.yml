@@ -191,65 +191,65 @@ verification:
 
   # Pesan yang ditampilkan kepada pemain saat mereka seharusnya memasukkan CAPTCHA
   captcha:
-    # Pesan yang ditampilkan kepada pemain saat mereka harus memasukkan jawaban untuk captcha
-    enter-code: '<prefix><green>Silakan masukkan kode di chat yang ditampilkan di peta.'
+    # Pesan yang ditampilkan kepada pemain saat mereka harus memasukkan jawaban untuk CAPTCHA
+    enter: '<prefix><green>Masukkan teks dalam obrolan yang ditampilkan di peta.'
     # Pesan yang ditampilkan kepada pemain saat mereka memasukkan jawaban yang salah di chat
-    incorrect: '<prefix><red>Anda memasukkan kode yang salah. Silakan coba lagi.'
+    incorrect: '<prefix><red>Anda telah memasukkan jawaban yang salah! Silakan coba lagi.'
 
   # Pesan putus yang ditampilkan saat seseorang bergabung sementara captcha belum disiapkan
   currently-preparing:
-    - '<header>'
+    - <header>
     - <yellow>Data anti-bot Anda belum disiapkan.
     - <gray>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
-    - '<footer>'
+    - <footer>
   # Pesan putus yang ditampilkan saat seseorang bergabung kembali terlalu cepat selama verifikasi
   too-fast-reconnect:
-    - '<header>'
+    - <header>
     - <gold>Anda terhubung kembali terlalu cepat, coba lagi nanti.
     - <gray>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
-    - '<footer>'
+    - <footer>
   # Pesan putus yang ditampilkan saat seseorang bergabung tetapi sudah dalam proses verifikasi
   already-verifying:
-    - '<header>'
+    - <header>
     - <red>Alamat IP Anda saat ini sedang diverifikasi.
     - <red>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
-    - '<footer>'
+    - <footer>
   # Pesan putus yang ditampilkan saat seseorang bergabung tetapi sudah antri untuk verifikasi
   already-queued:
-    - '<header>'
+    - <header>
     - <red>Alamat IP Anda saat ini sedang antri untuk verifikasi.
     - <red>Silakan tunggu beberapa menit sebelum mencoba verifikasi lagi.
-    - '<footer>'
+    - <footer>
   # Pesan putus yang ditampilkan saat seseorang bergabung tetapi sedang masuk daftar hitam sementara
   blacklisted:
-    - '<header>'
+    - <header>
     - <red>Anda saat ini ditolak untuk masuk ke server.
     - <red>Silakan tunggu beberapa menit agar bisa bergabung ke server lagi.
     - <gold>Positif palsu? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Pesan putus yang ditampilkan saat seseorang bergabung dengan username yang tidak valid
   invalid-username:
-    - '<header>'
+    - <header>
     - <red>Username Anda mengandung karakter yang tidak valid.
-    - '<footer>'
+    - <footer>
   # Pesan putus yang ditampilkan saat seseorang bergabung dengan versi yang masuk daftar hitam
   blacklisted-protocol:
-    - '<header>'
+    - <header>
     - <red>Anda menggunakan versi yang tidak diizinkan di server kami.
     - <gold>Butuh bantuan masuk? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Pesan putus yang ditampilkan saat seseorang berhasil verifikasi
   success:
-    - '<header>'
+    - <header>
     - <green>Anda telah berhasil melewati verifikasi.
     - <white>Anda sekarang dapat bermain di server saat Anda terhubung kembali.
   # Pesan putus yang ditampilkan saat seseorang gagal verifikasi
   failed:
-    - '<header>'
+    - <header>
     - <red>Anda telah gagal dalam verifikasi bot.
     - <gray>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
     - <gold>Butuh bantuan masuk? <gray><support-url>
-    - '<footer>'
+    - <footer>
 
 # Terjemahan untuk pesan verbose actionbar Sonar
 verbose:

@@ -191,65 +191,65 @@ verification:
 
   # Messages that are shown to the player when they are supposed to enter the CAPTCHA
   captcha:
-    # Message shown to the player when they have to enter the answer to the captcha
-    enter-code: '<prefix><green>Please enter the code in chat that is displayed on the map.'
+    # Message shown to the player when they have to enter the answer to the CAPTCHA
+    enter: '<prefix><green>Please enter the text in chat that is displayed on the map.'
     # Message shown to the player when they enter the wrong answer in chat
-    incorrect: '<prefix><red>You have entered the wrong code. Please try again.'
+    incorrect: '<prefix><red>You have entered a wrong answer! Please try again.'
 
   # Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet
   currently-preparing:
-    - '<header>'
+    - <header>
     - <yellow>Your anti-bot data has not been prepared yet.
     - <gray>Please wait a few seconds before trying to verify again.
-    - '<footer>'
+    - <footer>
   # Disconnect message that is shown when someone rejoins too fast during verification
   too-fast-reconnect:
-    - '<header>'
+    - <header>
     - <gold>You reconnected too fast, try again later.
     - <gray>Please wait a few seconds before trying to verify again.
-    - '<footer>'
+    - <footer>
   # Disconnect message that is shown when someone joins but is already verifying
   already-verifying:
-    - '<header>'
+    - <header>
     - <red>Your IP address is currently being verified.
     - <red>Please wait a few seconds before trying to verify again.
-    - '<footer>'
+    - <footer>
   # Disconnect message that is shown when someone joins but is already queued for verification
   already-queued:
-    - '<header>'
+    - <header>
     - <red>Your IP address is currently queued for verification.
     - <red>Please wait a few minutes before trying to verify again.
-    - '<footer>'
+    - <footer>
   # Disconnect message that is shown when someone joins but is temporarily blacklisted
   blacklisted:
-    - '<header>'
+    - <header>
     - <red>You are currently denied from entering the server.
     - <red>Please wait a few minutes to be able to join the server again.
     - <gold>False positive? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Disconnect message that is shown when someone joins with an invalid username
   invalid-username:
-    - '<header>'
+    - <header>
     - <red>Your username contains invalid characters.
-    - '<footer>'
+    - <footer>
   # Disconnect message that is shown when someone joins with a blacklisted version
   blacklisted-protocol:
-    - '<header>'
+    - <header>
     - <red>You are using a version that is not allowed on our server.
     - <gold>Need help logging in? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Disconnect message that is shown when someone verifies successfully
   success:
-    - '<header>'
+    - <header>
     - <green>You have successfully passed the verification.
     - <white>You are now able to play on the server when you reconnect.
   # Disconnect message that is shown when someone fails verification
   failed:
-    - '<header>'
+    - <header>
     - <red>You have failed the bot verification.
     - <gray>Please wait a few seconds before trying to verify again.
     - <gold>Need help logging in? <gray><support-url>
-    - '<footer>'
+    - <footer>
 
 # Translations for Sonar's actionbar verbose messages
 verbose:

@@ -109,40 +109,10 @@ verification:
       # - DURING_ATTACK: Nowi gracze otrzymają weryfikacje CAPTCHA tylko podczas ataku.
       # - NEVER: Nowi gracze nigdy nie otrzymają weryfikacji CAPTCHA (zalecane)
       timing: NEVER
-      # Opcje efektów na mapie wyświetlanej graczowi
-      # Powinieneś to edytować tylko wtedy, gdy wiesz, co robisz
-      effects:
-        # Dodawanie losowych linii do obrazu
-        scratches: true
-        # Stosuje efekt falowania
-        ripple: true
-        # Stosuje filtr nierówności (wyostrzony tekst)
-        bump: true
-        # Filtr zniekształceń
-        distortion:
-          # Czy Sonar powinien stosować filtr zniekształceń?
-          enabled: true
-          # Jakiego kształtu filtra zniekształceń powinien używać Sonar?
-          # Dostępne rodzaje: 0, 1, 2, 3
-          # - 0: Krzyże
-          # - 1: Linie
-          # - 2: Kółka
-          # - 3: Kwadraty
-          shape: 2
-          # Odległość między zniekształconymi pikselami/obiektami
-          distance: 5
-          # Gęstość zniekształconych pikseli/obiektów
-          density: 0.1
-          # Stopień mieszania się kolorów obiektów
-          mix: 0.15
       # Ścieżka do obrazu tła używanego przez Sonar dla CAPTCHA
       # Jeśli obraz nie zostanie znaleziony, jako domyślne tło zostanie użyty szum
       # Możesz umieścić nazwę pliku tutaj, jeśli plik znajduje się w katalogu pluginu
       background: ''
-      # Czy Sonar powinien automatycznie wykrywać kolor tła?
-      # Ma to na celu stworzenie kontrastu między obrazem tła a tekstem
-      # Jeśli ta opcja jest wyłączona, Sonar użyje losowego gradientu dla kolorów
-      auto-color: false
       # Ile możliwych odpowiedzi powinien przygotować Sonar?
       # Zadanie to wykonywane jest asynchronicznie w tle
       precompute: 500
@@ -153,7 +123,7 @@ verification:
       max-tries: 3
       # Znaki (litery i cyfry), które mogą pojawić się w CAPTCHA
       # Nie zaleca się dodawania cyfr lub liter, które mogą być do siebie podobne
-      dictionary: '1235689'
+      alphabet: 'abcdefhjkmnoprstuxyz'
 
     # Sprawdza, czy gracz wysyła prawidłowy client brand do serwera.
     client-brand:

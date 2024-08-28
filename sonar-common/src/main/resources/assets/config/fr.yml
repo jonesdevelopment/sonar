@@ -109,40 +109,10 @@ verification:
       # - DURING_ATTACK : Les nouveaux joueurs ne recevront un CAPTCHA que pendant une attaque
       # - NEVER : Les nouveaux joueurs ne recevront jamais de CAPTCHA (Recommandé)
       timing: NEVER
-      # Options pour les effets sur l'image montrée au joueur
-      # Vous ne devriez modifier cela que si vous savez ce que vous faites
-      effects:
-        # Ajoute des lignes aléatoires à l'image
-        scratches: true
-        # Applique un filtre d'ondulation (effet ondulé)
-        ripple: true
-        # Applique un filtre de bosse (texte accentué)
-        bump: true
-        # Filtre de distorsion
-        distortion:
-          # Sonar devrait-il appliquer un filtre de distorsion ?
-          enabled: true
-          # Quelle forme Sonar devrait-il utiliser pour le filtre de distorsion ?
-          # Types possibles : 0, 1, 2, 3
-          # - 0 : Croix
-          # - 1 : Lignes
-          # - 2 : Cercles
-          # - 3 : Carrés
-          shape: 2
-          # Distance entre les pixels/objets déformés
-          distance: 5
-          # Densité des pixels/objets déformés
-          density: 0.1
-          # Quantité de mélange entre les couleurs des objets
-          mix: 0.15
       # Chemin vers l'image d'arrière-plan que Sonar utilise pour le CAPTCHA
       # Si l'image n'est pas trouvée, un bruit sera utilisé comme arrière-plan par défaut
       # Vous pouvez simplement mettre le nom du fichier ici si le fichier est dans le répertoire du plugin
       background: ''
-      # Sonar devrait-il détecter automatiquement la couleur de fond ?
-      # Cela est fait pour créer un contraste entre l'image d'arrière-plan et le texte
-      # Si cela est désactivé, Sonar utilisera un dégradé aléatoire pour les couleurs
-      auto-color: false
       # Combien de réponses Sonar devrait-il préparer ?
       # Cette tâche se déroule de manière asynchrone en arrière-plan
       precompute: 500
@@ -153,7 +123,7 @@ verification:
       max-tries: 3
       # Caractères (lettres et chiffres) autorisés à apparaître dans la réponse au CAPTCHA
       # Il n'est pas recommandé d'ajouter des chiffres ou des lettres qui pourraient se ressembler
-      dictionary: '1235689'
+      alphabet: 'abcdefhjkmnoprstuxyz'
 
     # Vérifie si le joueur envoie une marque client valide au serveur
     client-brand:

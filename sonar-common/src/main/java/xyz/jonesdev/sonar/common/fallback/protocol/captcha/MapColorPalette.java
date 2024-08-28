@@ -26,10 +26,10 @@ import java.awt.image.BufferedImage;
 public class MapColorPalette {
   // https://minecraft.wiki/w/Map_item_format#Full_color_tables
   public static final int[] COLOR_MAP = {
-    -16777216,
-    -16777216,
-    -16777216,
-    -16777216,
+    -1,
+    -1,
+    -1,
+    -1,
     -10912473,
     -9594576,
     -8408520,

@@ -108,9 +108,6 @@ public class FallbackPreparer {
   public double[] preparedCachedYMotions;
   public double maxFallDistance;
 
-  // CAPTCHA
-  public final CaptchaPreparer MAP_INFO_PREPARER = new CaptchaPreparer();
-
   // XP packets
   public FallbackPacket[] xpCountdown;
 
@@ -198,7 +195,7 @@ public class FallbackPreparer {
       // Prepare CAPTCHA messages
       enterCodeMessage = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
         MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("verification.captcha.enter-code"),
+          Sonar.get().getConfig().getMessagesConfig().getString("verification.captcha.enter"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())))));
       incorrectCaptcha = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
         MiniMessage.miniMessage().deserialize(
@@ -210,11 +207,11 @@ public class FallbackPreparer {
 
       for (int i = 0; i < xpCountdown.length; i++) {
         final float bar = (float) i / xpCountdown.length;
-        xpCountdown[i] = new FallbackPacketSnapshot(new SetExperiencePacket(bar, i, i));
+        xpCountdown[i] = new FallbackPacketSnapshot(new SetExperiencePacket(bar, i, 0));
       }
 
       // Prepare CAPTCHA answers
-      MAP_INFO_PREPARER.prepare();
+      CaptchaPreparer.prepare();
     } else {
       // Throw away if not needed
       enterCodeMessage = null;

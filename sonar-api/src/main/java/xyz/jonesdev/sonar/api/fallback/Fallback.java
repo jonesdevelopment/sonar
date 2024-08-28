@@ -25,6 +25,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.net.InetAddress;
@@ -45,6 +46,8 @@ public final class Fallback {
   private Cache<InetAddress, Byte> blacklist;
   @Setter
   private long blacklistTime;
+  @Setter
+  private CaptchaGenerator captchaGenerator;
 
   private final @NotNull FallbackQueue queue = new FallbackQueue();
   private final @NotNull FallbackRatelimiter ratelimiter = new FallbackRatelimiter();

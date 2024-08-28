@@ -109,40 +109,10 @@ verification:
       # - DURING_ATTACK: Nieuwe spelers ontvangen alleen een CAPTCHA tijdens een aanval
       # - NEVER: Nieuwe spelers zullen nooit een CAPTCHA ontvangen (Aanbevolen)
       timing: NEVER
-      # Opties voor de effecten op de afbeelding die aan de speler wordt getoond
-      # Je moet dit alleen bewerken als je weet wat je doet
-      effects:
-        # Voegt willekeurige lijnen toe aan de afbeelding
-        scratches: true
-        # Past een ripple-filter toe (golfeffect)
-        ripple: true
-        # Past een bump-filter toe (verscherpte tekst)
-        bump: true
-        # Vervormingsfilter
-        distortion:
-          # Moet Sonar een vervormingsfilter toepassen?
-          enabled: true
-          # Welke vorm moet Sonar gebruiken voor het vervormingsfilter?
-          # Mogelijke typen: 0, 1, 2, 3
-          # - 0: Kruisen
-          # - 1: Lijnen
-          # - 2: Cirkels
-          # - 3: Vierkantjes
-          shape: 2
-          # Afstand tussen vervormde pixels/objecten
-          distance: 5
-          # Dichtheid van de vervormde pixels/objecten
-          density: 0.1
-          # Hoeveelheid overvloeiing tussen de kleuren van objecten
-          mix: 0.15
       # Pad naar de achtergrondafbeelding die Sonar gebruikt voor de CAPTCHA
       # Als de afbeelding niet wordt gevonden, wordt er een ruis gebruikt als standaardachtergrond
       # U kunt eenvoudig de naam van het bestand hier plaatsen als het bestand zich in de plugin map bevindt
       background: ''
-      # Moet Sonar automatisch de achtergrondkleur detecteren?
-      # Dit wordt gedaan om een contrast te creëren tussen de achtergrondafbeelding en de tekst
-      # Als dit is uitgeschakeld, gebruikt Sonar een willekeurig verloop voor de kleuren
-      auto-color: false
       # Hoeveel antwoorden moet Sonar voorbereiden?
       # Deze taak gebeurt asynchroon op de achtergrond
       precompute: 500
@@ -153,7 +123,7 @@ verification:
       max-tries: 3
       # Tekens (letters en cijfers) die mogen voorkomen in het antwoord op de CAPTCHA
       # Het wordt niet aanbevolen om cijfers of letters toe te voegen die op elkaar lijken
-      dictionary: '1235689'
+      alphabet: 'abcdefhjkmnoprstuxyz'
 
     # Controleert of de speler een geldig Minecraft-klantmerk naar de server verzendt
     client-brand:

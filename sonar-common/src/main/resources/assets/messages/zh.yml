@@ -192,64 +192,64 @@ verification:
   # 当验证中的玩家需要解决验证码时显示的消息
   captcha:
     # 玩家需要输入验证码答案时显示的消息
-    enter-code: '<prefix><green>请在聊天框中发送地图上的验证码.'
+    enter: '<prefix><green>请输入地图上显示的聊天文本.'
     # 当玩家输入错误的验证码时显示的消息
-    incorrect: '<prefix><red>您输入了错误的验证码. 请再试一次'
+    incorrect: '<prefix><red>您输入了错误的答案! 请重试.'
 
   # 当验证码还在准备的时候显示的踢出消息
   currently-preparing:
-    - '<header>'
+    - <header>
     - <yellow>反机器人还在准备所需的数据
     - <gray>请稍后重新加入服务器
-    - '<footer>'
+    - <footer>
   # 当玩家需要验证时重新连接速度太快时显示的踢出消息
   too-fast-reconnect:
-    - '<header>'
+    - <header>
     - <gold>您的重新连接速度过快
     - <gray>请稍后重新加入服务器
-    - '<footer>'
+    - <footer>
   # 当玩家尝试加入但它的 IP 已经有另一位玩家在验证时显示的踢出消息
   already-verifying:
-    - '<header>'
+    - <header>
     - <red>有另一位个连接正在使用您当前的 IP 地址进行验证
     - <red>请稍后重新加入服务器
-    - '<footer>'
+    - <footer>
   # 已经在排队等待验证的人加入时显示的踢出消息
   already-queued:
-    - '<header>'
+    - <header>
     - <red>您的 IP 地址当前正在排队等待验证
     - <red>请稍后重新加入服务器
-    - '<footer>'
+    - <footer>
   # 当玩家尝试加入但暂时被列入黑名单时显示的踢出消息
   blacklisted:
-    - '<header>'
+    - <header>
     - <red>您已被临时禁止加入服务器
     - <red>请等待几分钟后重新加入服务器
     - <gold>您认为您不应该被禁止? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # 当玩家尝试加入 但他们的用户名包含不允许的字符时显示的踢出消息
   invalid-username:
-    - '<header>'
+    - <header>
     - <red>您的用户名包含无效的字符. 请更改您的用户名 然后再试.
-    - '<footer>'
+    - <footer>
   # 当玩家使用列入黑名单的版本加入时显示的踢出消息
   blacklisted-protocol:
-    - '<header>'
+    - <header>
     - <red>您当前所使用的协议/客户端版本已被服务器禁止
     - <gold>需要帮助以便您能登录服务器? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # 当玩家验证成功时显示的踢出消息
   success:
-    - '<header>'
+    - <header>
     - <green>您已成功通过验证
     - <white>请重新连接以加入服务器
   # 当玩家未能通过验证时显示的消息
   failed:
-    - '<header>'
+    - <header>
     - <red>无法验证您是否是机器人
     - <gray>请等待几秒后重新加入服务器以重新验证
     - <gold>需要帮助以便您能登录服务器? <gray><support-url>
-    - '<footer>'
+    - <footer>
 
 # 状态栏详细信息
 verbose:

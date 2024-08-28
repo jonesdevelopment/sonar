@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
@@ -48,7 +49,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     super(user, username);
 
     // Disconnect the player if there is no CAPTCHA available at the moment
-    if (!MAP_INFO_PREPARER.isCaptchaAvailable()) {
+    if (!CaptchaPreparer.isCaptchaAvailable()) {
       user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
       throw new CorruptedFrameException("No captcha available");
     }
@@ -60,8 +61,8 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     user.delayedWrite(new SetContainerSlotPacket(user.isGeyser() ? 36 : 40, 1,
       ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetContainerSlotPacket.MAP_NBT));
     // Send random captcha to the player
-    final MapCaptchaInfo captcha = MAP_INFO_PREPARER.getRandomCaptcha();
-    this.answer = captcha.getAnswer();
+    final MapCaptchaInfo captcha = CaptchaPreparer.getRandomCaptcha();
+    this.answer = captcha.getAnswer().toLowerCase();
     captcha.delayedWrite(user);
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
@@ -85,7 +86,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     if (packet instanceof SystemChatPacket) {
       final SystemChatPacket chat = (SystemChatPacket) packet;
       // Finish the verification if the player entered the correct code
-      if (chat.getMessage().equals(answer)) {
+      if (chat.getMessage().toLowerCase().equals(answer)) {
         finishVerification();
         return;
       }

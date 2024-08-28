@@ -193,64 +193,64 @@ verification:
   # Nachrichten, die dem Spieler angezeigt werden, wenn er den CAPTCHA eingeben soll
   captcha:
     # Nachricht, die dem Spieler angezeigt wird, wenn er den CAPTCHA-Code im Chat eingeben muss
-    enter-code: '<prefix><green>Bitte gib den Code im Chat ein, der auf der Karte angezeigt wird.'
+    enter: '<prefix><green>Bitte gib den Text im Chat ein, der auf der Karte angezeigt wird.'
     # Nachricht, die dem Spieler angezeigt wird, wenn er den falschen Code im Chat eingibt
-    incorrect: '<prefix><red>Du hast den falschen Code eingegeben. Bitte versuche es erneut.'
+    incorrect: '<prefix><red>Du hast eine falsche Antwort eingegeben! Bitte versuche es erneut.'
 
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, während der CAPTCHA noch nicht vorbereitet wurde
   currently-preparing:
-    - '<header>'
+    - <header>
     - <yellow>Deine Anti-Bot-Daten wurden noch nicht vorbereitet.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - '<footer>'
+    - <footer>
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand zu schnell während der Verifizierung erneut beitritt
   too-fast-reconnect:
-    - '<header>'
+    - <header>
     - <gold>Du hast zu schnell erneut eine Verbindung hergestellt, versuche es später noch einmal.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - '<footer>'
+    - <footer>
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber bereits verifiziert wird
   already-verifying:
-    - '<header>'
+    - <header>
     - <red>Deine IP-Adresse wird derzeit verifiziert.
     - <red>Bitte warte einige Sekunden bevor du es erneut versuchst.
-    - '<footer>'
+    - <footer>
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber bereits in der Warteschlange für die Verifizierung ist
   already-queued:
-    - '<header>'
+    - <header>
     - <red>Deine IP-Adresse befindet sich derzeit in der Warteschlange für die Verifizierung.
     - <red>Bitte warte einige Minuten, bevor du es erneut versuchst.
-    - '<footer>'
+    - <footer>
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber vorübergehend auf der Blacklist steht
   blacklisted:
-    - '<header>'
+    - <header>
     - <red>Du bist derzeit vom Betreten des Servers ausgeschlossen.
     - <red>Bitte warte einige Minuten, um den Server wieder betreten zu können.
     - <gold>Falschmeldung? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Nachricht, die angezeigt wird, wenn jemand mit einem ungültigen Benutzernamen beitritt
   invalid-username:
-    - '<header>'
+    - <header>
     - <red>Dein Benutzername enthält ungültige Zeichen.
-    - '<footer>'
+    - <footer>
   # Nachricht, die angezeigt wird, wenn jemand mit einer auf der Blacklist stehenden Version beitritt
   blacklisted-protocol:
-    - '<header>'
+    - <header>
     - <red>Du verwendest eine Version, die auf unserem Server nicht erlaubt ist.
     - <gold>Brauchst du Hilfe beim Einloggen? <gray><support-url>
-    - '<footer>'
+    - <footer>
   # Nachricht, die angezeigt wird, wenn jemand die Verifizierung erfolgreich abschließt
   success:
-    - '<header>'
+    - <header>
     - <green>Du hast die Verifizierung erfolgreich bestanden.
     - <white>Verbinde dich erneut um auf dem Server zu joinen.
   # Nachricht, die angezeigt wird, wenn jemand die Verifizierung nicht besteht
   failed:
-    - '<header>'
+    - <header>
     - <red>Du hast die Bot-Verifizierung nicht bestanden.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
     - <gold>Brauchst du Hilfe beim Einloggen? <gray><support-url>
-    - '<footer>'
+    - <footer>
 
 # Übersetzungen für Sonars ausführliche Aktionsleisten-Nachrichten
 verbose:

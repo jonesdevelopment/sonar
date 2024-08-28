@@ -107,40 +107,10 @@ verification:
       # - DURING_ATTACK: Neue Spieler erhalten nur während eines Angriffs ein CAPTCHA
       # - NEVER: Neue Spieler erhalten nie ein CAPTCHA (Empfohlen)
       timing: NEVER
-      # Optionen für die Effekte auf dem angezeigten Bild
-      # Sie sollten dies nur bearbeiten, wenn Sie wissen, was Sie tun
-      effects:
-        # Fügt dem Bild zufällige Linien hinzu
-        scratches: true
-        # Wendet einen Ripple-Filter an (Welleneffekt)
-        ripple: true
-        # Wendet einen Bump-Filter an (geschärfter Text)
-        bump: true
-        # Verzerrungsfilter
-        distortion:
-          # Sollte Sonar einen Verzerrungsfilter anwenden?
-          enabled: true
-          # Welche Form sollte Sonar für den Verzerrungsfilter verwenden?
-          # Mögliche Typen: 0, 1, 2, 3
-          # - 0: Kreuze
-          # - 1: Linien
-          # - 2: Kreise
-          # - 3: Quadrate
-          shape: 2
-          # Abstand zwischen verzerrten Pixeln/Objekten
-          distance: 5
-          # Dichte der verzerrten Pixel/Objekte
-          density: 0.1
-          # Ausmaß der Vermischung zwischen den Farben von Objekten
-          mix: 0.15
       # Pfad zum Hintergrundbild, das Sonar für das CAPTCHA verwendet
       # Wenn das Bild nicht gefunden wird, wird ein Rauschen als Standardhintergrund verwendet
       # Sie können hier einfach den Namen der Datei eingeben, wenn sich die Datei im Plugin-Verzeichnis befindet
       background: ''
-      # Sollte Sonar die Hintergrundfarbe automatisch erkennen?
-      # Dies geschieht, um einen Kontrast zwischen dem Hintergrundbild und dem Text zu erzeugen
-      # Wenn dies deaktiviert ist, verwendet Sonar einen zufälligen Farbverlauf für die Farben
-      auto-color: false
       # Wie viele Antworten soll Sonar vorbereiten?
       # Dieser Vorgang erfolgt asynchron im Hintergrund
       precompute: 500
@@ -151,7 +121,7 @@ verification:
       max-tries: 3
       # Zeichen (Buchstaben und Zahlen), die im Antwort-CAPTCHA erscheinen dürfen
       # Es wird nicht empfohlen, Zahlen oder Buchstaben hinzuzufügen, die einander ähneln könnten
-      dictionary: '1235689'
+      alphabet: 'abcdefhjkmnoprstuxyz'
 
     # Überprüft, ob die Spieler eine gültige Client-Marke an den Server senden
     client-brand:

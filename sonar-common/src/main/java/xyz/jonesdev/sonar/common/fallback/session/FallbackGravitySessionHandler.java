@@ -98,7 +98,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     }
 
     // Send the player to the protocol check
-    final var decoder = (FallbackPacketDecoder) user.getPipeline().get(FallbackPacketDecoder.class);
+    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
     decoder.setListener(new FallbackProtocolSessionHandler(user, username, forceCAPTCHA));
   }
 
