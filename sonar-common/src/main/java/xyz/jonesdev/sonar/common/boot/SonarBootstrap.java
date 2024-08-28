@@ -36,7 +36,6 @@ import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
 import xyz.jonesdev.sonar.api.verbose.Verbose;
-import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.service.SonarServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
@@ -146,17 +145,6 @@ public abstract class SonarBootstrap<T> implements Sonar {
     if (verifiedPlayerController != null
       && verifiedPlayerController.getCachedDatabaseType() != getConfig().getDatabase().getType()) {
       getLogger().warn("Reloading after changing the database type is not recommended as it may cause data loss.");
-    }
-
-    // Update the CAPTCHA generator if necessary
-    if (getConfig().getVerification().getMap().getTiming() == SonarConfiguration.Verification.Timing.NEVER) {
-      getFallback().setCaptchaGenerator(null);
-    } else if (getFallback().getCaptchaGenerator() == null
-      || getFallback().getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
-      getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(128, 128,
-        Sonar.get().getConfig().getVerification().getMap().getBackgroundImage()));
-    } else {
-      getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
     }
 
     // Prepare cached packets

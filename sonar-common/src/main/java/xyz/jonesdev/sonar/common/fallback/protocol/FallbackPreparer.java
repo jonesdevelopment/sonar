@@ -22,6 +22,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
@@ -210,6 +211,15 @@ public class FallbackPreparer {
         xpCountdown[i] = new FallbackPacketSnapshot(new SetExperiencePacket(bar, i, 0));
       }
 
+      // Update the CAPTCHA generator if necessary
+      if (Sonar.get().getFallback().getCaptchaGenerator() == null
+        || Sonar.get().getFallback().getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
+        Sonar.get().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(128, 128,
+          Sonar.get().getConfig().getVerification().getMap().getBackgroundImage()));
+      } else {
+        Sonar.get().getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
+      }
+
       // Prepare CAPTCHA answers
       CaptchaPreparer.prepare();
     } else {
@@ -217,6 +227,7 @@ public class FallbackPreparer {
       enterCodeMessage = null;
       incorrectCaptcha = null;
       xpCountdown = null;
+      Sonar.get().getFallback().setCaptchaGenerator(null);
     }
   }
 }
