@@ -92,8 +92,8 @@ public final class FallbackUserWrapper implements FallbackUser {
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
     if (Sonar.get().getConfig().getVerification().isLogConnections()
-      && Sonar.get().getAttackTracker().getCurrentAttack() == null
-      || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+      && (Sonar.get().getAttackTracker().getCurrentAttack() == null
+      || Sonar.get().getConfig().getVerification().isLogDuringAttack())) {
       Sonar.get().getFallback().getLogger().info(
         Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.connection")
           .replace("<username>", username)
