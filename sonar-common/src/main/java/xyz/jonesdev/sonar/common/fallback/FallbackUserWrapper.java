@@ -165,11 +165,15 @@ public final class FallbackUserWrapper implements FallbackUser {
       if (blacklistThreshold <= 0) break blacklist;
 
       // Use 1 as the default amount of fails since we haven't cached anything yet
-      final int fails = Sonar.get().getFallback().getRatelimiter().getFailCountCache().get(inetAddress, ignored -> 1);
+      final int fails = Sonar.get().getFallback().getFailCountCache().get(inetAddress, ignored -> 1);
       // Now we simply need to check if the threshold is reached
       if (fails < blacklistThreshold) {
         // Make sure we increment the number of fails
-        Sonar.get().getFallback().getRatelimiter().incrementFails(inetAddress, fails);
+        if (fails > 0) {
+          // Make sure to remove the old values from the cache
+          Sonar.get().getFallback().getFailCountCache().invalidate(inetAddress);
+        }
+        Sonar.get().getFallback().getFailCountCache().put(inetAddress, fails + 1);
         break blacklist;
       }
 
@@ -188,7 +192,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       }
 
       // Invalidate the cached entry to ensure memory safety
-      Sonar.get().getFallback().getRatelimiter().getFailCountCache().invalidate(inetAddress);
+      Sonar.get().getFallback().getFailCountCache().invalidate(inetAddress);
     }
 
     // Throw an exception to avoid further code execution

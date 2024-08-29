@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
+import xyz.jonesdev.sonar.api.fallback.ratelimit.FallbackRatelimiter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.net.InetAddress;
@@ -50,7 +51,10 @@ public final class Fallback {
   private CaptchaGenerator captchaGenerator;
 
   private final @NotNull FallbackQueue queue = new FallbackQueue();
-  private final @NotNull FallbackRatelimiter ratelimiter = new FallbackRatelimiter();
+  @Setter
+  private FallbackRatelimiter<InetAddress> ratelimiter;
+  @Setter
+  private Cache<InetAddress, Integer> failCountCache;
 
   private final LoggerWrapper logger = new LoggerWrapper() {
 

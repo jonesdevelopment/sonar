@@ -32,6 +32,8 @@ import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
+import xyz.jonesdev.sonar.api.fallback.ratelimit.CaffeineCacheRatelimiter;
+import xyz.jonesdev.sonar.api.fallback.ratelimit.NoopCacheRatelimiter;
 import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.api.verbose.Notification;
@@ -45,6 +47,7 @@ import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @RequiredArgsConstructor
@@ -152,11 +155,10 @@ public abstract class SonarBootstrap<T> implements Sonar {
     FallbackPreparer.prepare();
 
     // Update ratelimiter caches
-    getFallback().getRatelimiter().setAttemptCache(Caffeine.newBuilder()
-      .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getReconnectDelay()))
-      .ticker(Ticker.systemTicker())
-      .build());
-    getFallback().getRatelimiter().setFailCountCache(Caffeine.newBuilder()
+    getFallback().setRatelimiter(getConfig().getVerification().getReconnectDelay() > 0L
+      ? new CaffeineCacheRatelimiter(getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS)
+      : NoopCacheRatelimiter.INSTANCE);
+    getFallback().setFailCountCache(Caffeine.newBuilder()
       .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getRememberTime()))
       .ticker(Ticker.systemTicker())
       .build());

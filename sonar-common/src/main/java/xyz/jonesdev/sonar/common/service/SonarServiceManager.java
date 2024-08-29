@@ -46,7 +46,7 @@ public final class SonarServiceManager {
       // Make sure to clean up the cached statistics
       // since we don't want to display wrong values.
       Sonar.get().getStatistics().cleanUpCache();
-      Sonar.get().getFallback().getRatelimiter().getFailCountCache().cleanUp();
+      Sonar.get().getFallback().getFailCountCache().cleanUp();
       Sonar.get().getFallback().getBlacklist().cleanUp();
       // Update the attack tracker
       Sonar.get().getAttackTracker().checkIfUnderAttack();
