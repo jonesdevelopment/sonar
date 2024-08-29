@@ -89,20 +89,16 @@ public final class FallbackUserWrapper implements FallbackUser {
 
   @Override
   public void hijack(final @NotNull String username, final @NotNull UUID offlineUuid) {
-    // The player has joined the verification
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
-    if (Sonar.get().getConfig().getVerification().isLogConnections()) {
-      // Only log the processing message if the server isn't under attack.
-      // We let the user override this through the configuration.
-      if (Sonar.get().getAttackTracker().getCurrentAttack() == null
-        || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
-        Sonar.get().getFallback().getLogger().info(
-          Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.connection")
-            .replace("<username>", username)
-            .replace("<ip>", Sonar.get().getConfig().formatAddress(inetAddress))
-            .replace("<protocol>", String.valueOf(protocolVersion.getProtocol())));
-      }
+    if (Sonar.get().getConfig().getVerification().isLogConnections()
+      && Sonar.get().getAttackTracker().getCurrentAttack() == null
+      || Sonar.get().getConfig().getVerification().isLogDuringAttack()) {
+      Sonar.get().getFallback().getLogger().info(
+        Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.connection")
+          .replace("<username>", username)
+          .replace("<ip>", Sonar.get().getConfig().formatAddress(inetAddress))
+          .replace("<protocol>", String.valueOf(protocolVersion.getProtocol())));
     }
 
     // Call the VerifyJoinEvent for external API usage
@@ -143,10 +139,10 @@ public final class FallbackUserWrapper implements FallbackUser {
 
   @Override
   public void fail(final @NotNull String reason) {
+    GlobalSonarStatistics.totalFailedVerifications++;
+
     disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
 
-    // Only log the failed message if the server isn't currently under attack.
-    // However, we let the user override this through the configuration.
     final boolean shouldLog = Sonar.get().getAttackTracker().getCurrentAttack() == null
       || Sonar.get().getConfig().getVerification().isLogDuringAttack();
 
@@ -157,9 +153,6 @@ public final class FallbackUserWrapper implements FallbackUser {
           .replace("<protocol>", String.valueOf(getProtocolVersion().getProtocol()))
           .replace("<reason>", reason));
     }
-
-    // Increment number of total failed verifications
-    GlobalSonarStatistics.totalFailedVerifications++;
 
     // Call the VerifyFailedEvent for external API usage
     Sonar.get().getEventManager().publish(new UserVerifyFailedEvent(this, reason));
@@ -180,11 +173,10 @@ public final class FallbackUserWrapper implements FallbackUser {
         break blacklist;
       }
 
+      GlobalSonarStatistics.totalBlacklistedPlayers++;
+
       // Call the BotBlacklistedEvent for external API usage
       Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
-
-      // Increment number of total blacklisted players
-      GlobalSonarStatistics.totalBlacklistedPlayers++;
 
       Sonar.get().getFallback().getBlacklist().put(getInetAddress(), (byte) 0);
 
@@ -200,7 +192,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     }
 
     // Throw an exception to avoid further code execution
-    throw new CorruptedFrameException();
+    throw new CorruptedFrameException("Failed the bot verification");
   }
 
   /**
@@ -211,18 +203,16 @@ public final class FallbackUserWrapper implements FallbackUser {
   public static void closeWith(final @NotNull Channel channel,
                                final @NotNull ProtocolVersion protocolVersion,
                                final @NotNull Object msg) {
-    if (channel.isActive()) {
-      if (protocolVersion.compareTo(MINECRAFT_1_8) < 0
-        && protocolVersion.compareTo(MINECRAFT_1_7_2) >= 0) {
-        channel.eventLoop().execute(() -> {
-          channel.config().setAutoRead(false);
-          channel.eventLoop().schedule(() -> {
-            channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
-          }, 250L, TimeUnit.MILLISECONDS);
-        });
-      } else {
-        channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
-      }
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0
+      && protocolVersion.compareTo(MINECRAFT_1_7_2) >= 0) {
+      channel.eventLoop().execute(() -> {
+        channel.config().setAutoRead(false);
+        channel.eventLoop().schedule(() -> {
+          channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+        }, 250L, TimeUnit.MILLISECONDS);
+      });
+    } else {
+      channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
     }
   }
 }

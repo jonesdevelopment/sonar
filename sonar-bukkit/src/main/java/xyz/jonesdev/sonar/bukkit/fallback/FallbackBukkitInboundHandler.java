@@ -32,7 +32,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacke
 import java.net.InetSocketAddress;
 import java.util.Objects;
 
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INACTIVE_LISTENER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INBOUND_HANDLER;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.*;
@@ -44,7 +43,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
 
     channelRemovalListener = (pipeline, name, handler) -> {
-      final var inactiveListener = (ChannelInactiveListener) pipeline.get(FALLBACK_INACTIVE_LISTENER);
+      final ChannelInactiveListener inactiveListener = pipeline.get(ChannelInactiveListener.class);
 
       if (inactiveListener != null) {
         inactiveListener.add(handler);

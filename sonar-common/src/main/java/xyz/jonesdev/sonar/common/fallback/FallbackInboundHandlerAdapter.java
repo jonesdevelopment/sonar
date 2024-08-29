@@ -235,7 +235,6 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     loginPacket.run();
   }
 
-
   /**
    * Disconnect the player before verification (during login)
    * by replacing the encoder before running the method.
@@ -247,10 +246,12 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
   private void customDisconnect(final @NotNull Channel channel,
                                 final @NotNull ProtocolVersion protocolVersion,
                                 final @NotNull FallbackPacket packet) {
-    if (channel.eventLoop().inEventLoop()) {
-      _customDisconnect(channel, protocolVersion, packet);
-    } else {
-      channel.eventLoop().execute(() -> _customDisconnect(channel, protocolVersion, packet));
+    if (channel.isActive()) {
+      if (channel.eventLoop().inEventLoop()) {
+        _customDisconnect(channel, protocolVersion, packet);
+      } else {
+        channel.eventLoop().execute(() -> _customDisconnect(channel, protocolVersion, packet));
+      }
     }
   }
 

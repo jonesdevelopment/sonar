@@ -41,9 +41,11 @@ public final class FallbackRatelimiter {
    * @return Whether the player is allowed to verify
    */
   public boolean attempt(final @NotNull InetAddress inetAddress) {
-    final long expectedTimestamp = System.currentTimeMillis() + timeout;
+    // Don't check the player if the timeout is too low
+    if (timeout <= 0L) return true;
     // Check if the time since the last join has not exceeded the timeout
-    // The idea for this check was Taken from Velocity
+    // The idea for the design of this check was taken from Velocity
+    final long expectedTimestamp = System.currentTimeMillis() + timeout;
     final long last = attemptCache.get(inetAddress, result -> expectedTimestamp);
     return expectedTimestamp == last;
   }

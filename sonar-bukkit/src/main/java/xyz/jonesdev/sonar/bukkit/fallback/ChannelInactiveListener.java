@@ -7,6 +7,7 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.EventExecutor;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.SocketAddress;
 import java.util.HashSet;
@@ -16,7 +17,7 @@ public final class ChannelInactiveListener extends ChannelInboundHandlerAdapter 
   private final Set<ChannelInboundHandler> handlers = new HashSet<>();
 
   @Override
-  public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+  public void channelInactive(final @NotNull ChannelHandlerContext ctx) throws Exception {
     final ProxiedChannelHandlerContext proxy = new ProxiedChannelHandlerContext(ctx);
     for (final ChannelInboundHandler handler : handlers) {
       try {
@@ -28,9 +29,9 @@ public final class ChannelInactiveListener extends ChannelInboundHandlerAdapter 
     super.channelInactive(ctx);
   }
 
-  public void add(ChannelHandler handler) {
-    if (handler instanceof ChannelInboundHandler) {
-      handlers.add((ChannelInboundHandler) handler);
+  public void add(final @NotNull ChannelHandler channelHandler) {
+    if (channelHandler instanceof ChannelInboundHandler) {
+      handlers.add((ChannelInboundHandler) channelHandler);
     }
   }
 

@@ -27,8 +27,6 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.ReflectiveOperationException;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.FallbackPipelines;
-import xyz.jonesdev.sonar.bukkit.SonarBukkit;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
@@ -36,7 +34,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
+import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INACTIVE_LISTENER;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
+import static xyz.jonesdev.sonar.bukkit.SonarBukkit.INITIALIZE_LISTENER;
 
 // Check out these links if you want to see some more magic
 // https://github.com/retrooper/packetevents/blob/2.0/spigot/src/main/java/io/github/retrooper/packetevents/util/SpigotReflectionUtil.java
@@ -235,27 +235,27 @@ public class FallbackBukkitInjector {
           childHandlerField.setAccessible(true);
           final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
 
-          ChannelHandler finalBootstrap = bootstrap;
-
           // Inject our own channel initializer into the original field
           // If the plugin is not fully enabled but executes the injection,
           // put an initializer to close the new connection automatically.
-          if (!SonarBukkit.INITIALIZE_LISTENER.isDone()) {
+          if (!INITIALIZE_LISTENER.isDone()) {
             final ChannelInitializer<Channel> initializer = new ChannelInitializer<>() {
               @Override
               protected void initChannel(Channel channel) {
                 channel.close();
               }
             };
-            childHandlerField.set(finalBootstrap, initializer);
+            childHandlerField.set(bootstrap, initializer);
           }
 
-          SonarBukkit.INITIALIZE_LISTENER.thenAccept(v -> {
+          final ChannelHandler _bootstrap = bootstrap;
+
+          INITIALIZE_LISTENER.thenAccept(__ -> {
             try {
-              childHandlerField.set(finalBootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
+              childHandlerField.set(_bootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
                 pipeline -> {
                   pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler());
-                  pipeline.addFirst(FallbackPipelines.FALLBACK_INACTIVE_LISTENER, new ChannelInactiveListener());
+                  pipeline.addFirst(FALLBACK_INACTIVE_LISTENER, new ChannelInactiveListener());
                 }
               ));
             } catch (IllegalAccessException exception) {
