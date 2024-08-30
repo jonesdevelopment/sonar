@@ -118,7 +118,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     }
 
     // Check if the player failed the verification too many times
-    final int score = Sonar.get().getFallback().getBlacklist().get(hostAddress, __ -> 0);
+    final int score = Sonar.get().getFallback().getBlacklist().asMap().getOrDefault(hostAddress, 0);
     final int limit = Sonar.get().getConfig().getVerification().getBlacklistThreshold();
     if (score >= limit) {
       customDisconnect(channel, protocolVersion, blacklisted);
