@@ -182,7 +182,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       // Call the BotBlacklistedEvent for external API usage
       Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
 
-      Sonar.get().getFallback().getBlacklist().put(getInetAddress(), (byte) 0);
+      Sonar.get().getFallback().getBlacklist().put(getInetAddress().getHostAddress(), (byte) 0);
 
       if (shouldLog) {
         Sonar.get().getFallback().getLogger().info(

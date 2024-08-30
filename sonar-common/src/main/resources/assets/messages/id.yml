@@ -181,7 +181,7 @@ verification:
   # Terjemahan untuk semua pesan debug selama proses verifikasi
   logs:
     # Pesan yang dicatat ke konsol setiap kali pemain baru bergabung ke server
-    connection: '<username><ip> (<protocol>) telah terhubung.'
+    connection: '<username>/<ip> (<protocol>) telah terhubung.'
     # Pesan yang dicatat ke konsol setiap kali pemain gagal verifikasi
     failed: '<ip> (<protocol>) telah gagal dalam pemeriksaan bot untuk: <reason>'
     # Pesan yang dicatat ke konsol setiap kali pemain masuk daftar hitam

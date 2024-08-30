@@ -181,7 +181,7 @@ verification:
   # Doğrulama sırasında tüm hata ayıklama mesajları için çeviriler
   logs:
     # Sunucuya yeni bir oyuncu katıldığında konsola kaydedilen mesaj
-    connection: '<username><ip> (<protocol>) sunucuya bağlandı.'
+    connection: '<username>/<ip> (<protocol>) sunucuya bağlandı.'
     # Bir oyuncu doğrulamada başarısız olduğunda konsola kaydedilen mesaj
     failed: '<ip> (<protocol>) bot korumasında başarısız oldu: <reason>'
     # Bir oyuncu kara listeye alındığında konsola kaydedilen mesaj

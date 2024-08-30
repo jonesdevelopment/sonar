@@ -181,7 +181,7 @@ verification:
   # Traductions pour tous les messages de débogage pendant la vérification
   logs:
     # Message enregistré dans la console chaque fois qu'un nouveau joueur rejoint le serveur
-    connection: "<username><ip> (<protocol>) s'est connecté."
+    connection: "<username>/<ip> (<protocol>) s'est connecté."
     # Message enregistré dans la console chaque fois qu'un joueur échoue à la vérification
     failed: '<ip> (<protocol>) a échoué au test du bot pour : <reason>'
     # Message enregistré dans la console chaque fois qu'un joueur est sur liste noire

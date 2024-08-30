@@ -184,7 +184,7 @@ verification:
   # Translations for all debug messages during the verification
   logs:
     # Message logged to console whenever a new player joins the server
-    connection: '<username><ip> (<protocol>) połączył się.'
+    connection: '<username>/<ip> (<protocol>) połączył się.'
     # Message logged to console whenever a player fails verification
     failed: '<ip> (<protocol>) nie powiodło się sprawdzenie bota dla: <reason>'
     # Message logged to console whenever a player is blacklisted

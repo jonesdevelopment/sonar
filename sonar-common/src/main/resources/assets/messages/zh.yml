@@ -181,7 +181,7 @@ verification:
   # 验证过程中向控制台打印的调试信息
   logs:
     # 当玩家进入服务器并验证时显示的消息
-    connection: '<username><ip> (<protocol>) 连接到了服务器.'
+    connection: '<username>/<ip> (<protocol>) 连接到了服务器.'
     # 当玩家未通过检查时打印的消息
     failed: '<ip> (<protocol>) 由于原因 <reason> 无法通过检查.'
     # 当玩家被自动列入黑名单时打印的消息

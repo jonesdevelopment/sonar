@@ -317,8 +317,8 @@ public final class SonarConfiguration {
     return output;
   }
 
-  public String formatAddress(final InetAddress inetAddress) {
-    return logPlayerAddresses ? inetAddress.toString() : "/<ip address withheld>";
+  public @NotNull String formatAddress(final @NotNull InetAddress inetAddress) {
+    return logPlayerAddresses ? inetAddress.getHostAddress() : "<ip address withheld>";
   }
 
   @Getter

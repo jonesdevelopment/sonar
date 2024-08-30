@@ -181,7 +181,7 @@ verification:
   # Vertalingen voor alle debug-berichten tijdens de verificatie
   logs:
     # Bericht dat in de console wordt geregistreerd wanneer een nieuwe speler zich bij de server voegt
-    connection: '<username><ip> (<protocol>) heeft verbinding gemaakt.'
+    connection: '<username>/<ip> (<protocol>) heeft verbinding gemaakt.'
     # Bericht dat in de console wordt geregistreerd wanneer de verificatie van een speler mislukt
     failed: '<ip> (<protocol>) heeft de bot-controle niet doorstaan vanwege: <reason>'
     # Bericht dat op de console wordt geregistreerd wanneer een speler op de zwarte lijst staat

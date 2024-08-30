@@ -181,7 +181,7 @@ verification:
   # Translations for all debug messages during the verification
   logs:
     # Message logged to console whenever a new player joins the server
-    connection: '<username><ip> (<protocol>) se ha conectado.'
+    connection: '<username>/<ip> (<protocol>) se ha conectado.'
     # Message logged to console whenever a player fails verification
     failed: '<ip> (<protocol>) no ha pasado la verificación de bot por: <reason>'
     # Message logged to console whenever a player is blacklisted

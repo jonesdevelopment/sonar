@@ -181,7 +181,7 @@ verification:
   # Překlady pro všechny ladící zprávy během ověření
   logs:
     # Zpráva zaznamenána do konzole, kdykoli se nový hráč připojí k serveru
-    connection: '<username><ip> (<protocol>) se připojil.'
+    connection: '<username>/<ip> (<protocol>) se připojil.'
     # Zpráva zaznamenána do konzole, kdykoli hráč selže při ověření
     failed: '<ip> (<protocol>) neprošel kontrolou bota z důvodu: <reason>'
     # Zpráva zaznamenána do konzole, kdykoli je hráč zařazen na černou listinu

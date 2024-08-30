@@ -182,7 +182,7 @@ verification:
   # Übersetzungen für alle Debug-Nachrichten während der Überprüfung
   logs:
     # Nachricht, die im Protokoll angezeigt wird, wenn ein neuer Spieler den Server betretet
-    connection: '<username><ip> (<protocol>) hat sich verbunden.'
+    connection: '<username>/<ip> (<protocol>) hat sich verbunden.'
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler die Verifizierung nicht besteht
     failed: '<ip> (<protocol>) hat den Bot-Check nicht bestanden wegen: <reason>'
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler aufgrund zu vieler fehlgeschlagener Versuche auf die Blacklist gesetzt wird

@@ -105,9 +105,10 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     this.username = username;
     final FallbackInboundHandler inboundHandler = channel.pipeline().get(FallbackInboundHandler.class);
     Objects.requireNonNull(inboundHandler).setInetAddress(socketAddress.getAddress());
+    final String hostAddress = socketAddress.getAddress().getHostAddress();
 
-    // Check the blacklist here since we cannot let the player "ghost join"
-    if (FALLBACK.getBlacklist().asMap().containsKey(inboundHandler.getInetAddress())) {
+    // Check if the player is blocked from entering the server
+    if (FALLBACK.getBlacklist().asMap().containsKey(hostAddress)) {
       customDisconnect(channel, protocolVersion, blacklisted);
       return;
     }
@@ -141,7 +142,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     // Make sure we actually have to verify the player
     final String offlineUuidString = "OfflinePlayer:" + username;
     final UUID offlineUuid = UUID.nameUUIDFromBytes(offlineUuidString.getBytes(StandardCharsets.UTF_8));
-    if (Sonar.get().getVerifiedPlayerController().has(inboundHandler.getInetAddress().toString(), offlineUuid)) {
+    if (Sonar.get().getVerifiedPlayerController().has(hostAddress, offlineUuid)) {
       initialLogin(ctx, inboundHandler.getInetAddress(), loginPacket);
       return;
     }
