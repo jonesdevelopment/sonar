@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.varIntBytes;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
-// Taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintLengthEncoder.java
 @ChannelHandler.Sharable
 public final class FallbackVarInt21FrameEncoder extends MessageToByteEncoder<ByteBuf> {

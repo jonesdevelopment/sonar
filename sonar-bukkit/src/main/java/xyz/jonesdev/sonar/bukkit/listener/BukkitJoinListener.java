@@ -34,7 +34,6 @@ import java.lang.reflect.Method;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
 
-// Taken from
 // https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
 public final class BukkitJoinListener implements Listener {
   private static MethodHandle _handleMethod;

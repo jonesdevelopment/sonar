@@ -43,7 +43,6 @@ public final class ComponentHolder {
     this.serializedComponent = GsonComponentSerializer.gson().serialize(component);
   }
 
-  // Mostly taken from
   // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
   private BinaryTag serialize(final JsonElement json) {
     if (json instanceof JsonPrimitive) {

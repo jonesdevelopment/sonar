@@ -56,7 +56,6 @@ import java.util.BitSet;
 import java.util.EnumSet;
 import java.util.UUID;
 
-// Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
 public class ProtocolUtil {
@@ -285,7 +284,6 @@ public class ProtocolUtil {
     }
   }
 
-  // Taken from
   // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/ByteMessage.java#L276
   public <E extends Enum<E>> void writeEnumSet(final ByteBuf byteBuf,
                                                final EnumSet<E> enumset,
@@ -315,7 +313,6 @@ public class ProtocolUtil {
     }
   }
 
-  // Taken from
   // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/ByteMessage.java#L219
   public static void writeNamelessCompoundTag(final @NotNull ByteBuf byteBuf, final @NotNull BinaryTag binaryTag) {
     try (final ByteBufOutputStream output = new ByteBufOutputStream(byteBuf)) {

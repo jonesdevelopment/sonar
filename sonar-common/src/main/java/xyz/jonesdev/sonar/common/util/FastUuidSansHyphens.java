@@ -46,7 +46,6 @@ import java.util.UUID;
  * SOFTWARE.
  */
 
-// Taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/api/src/main/java/com/velocitypowered/api/util/FastUuidSansHyphens.java
 /**
  * This is a modified FastUUID implementation. The primary difference is that it does not dash its

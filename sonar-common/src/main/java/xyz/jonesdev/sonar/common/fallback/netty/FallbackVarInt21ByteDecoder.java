@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.common.fallback.netty;
 import io.netty.util.ByteProcessor;
 import lombok.Getter;
 
-// Taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/VarintByteDecoder.java
 @Getter
 final class FallbackVarInt21ByteDecoder implements ByteProcessor {

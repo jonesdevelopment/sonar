@@ -42,7 +42,6 @@ public final class SonarVersion {
     this.formatted = version + " (" + gitCommit + ")";
   }
 
-  // Taken from
   // https://github.com/PaperMC/Velocity/pull/1336/
   private static @NotNull Manifest getManifest() {
     final String classLocation = "/" + Sonar.class.getName().replace(".", "/") + ".class";

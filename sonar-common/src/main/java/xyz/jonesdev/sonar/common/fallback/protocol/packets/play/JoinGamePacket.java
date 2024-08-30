@@ -29,7 +29,6 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
-// Mostly taken from
 // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/packets/play/PacketJoinGame.java
 @Data
 @NoArgsConstructor

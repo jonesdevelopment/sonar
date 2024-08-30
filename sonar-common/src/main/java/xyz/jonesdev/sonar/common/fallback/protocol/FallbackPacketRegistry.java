@@ -37,7 +37,6 @@ import java.util.function.Supplier;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 
-// Mostly taken from
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/StateRegistry.java
 public enum FallbackPacketRegistry {
   HANDSHAKE {
