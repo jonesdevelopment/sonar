@@ -15,11 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback.ratelimit;
+package xyz.jonesdev.sonar.common.fallback.ratelimit;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.ratelimit.Ratelimiter;
 
 import java.net.InetAddress;
 

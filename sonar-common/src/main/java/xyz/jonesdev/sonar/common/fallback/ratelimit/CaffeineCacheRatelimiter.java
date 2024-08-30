@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback.ratelimit;
+package xyz.jonesdev.sonar.common.fallback.ratelimit;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -23,6 +23,7 @@ import com.github.benmanes.caffeine.cache.Ticker;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.ratelimit.Ratelimiter;
 
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
