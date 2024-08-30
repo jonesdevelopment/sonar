@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.common.fallback.netty;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import lombok.RequiredArgsConstructor;
@@ -64,10 +63,10 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
     // Inject Sonar's channel handler into the pipeline;
     // Also make sure the player is not a fake player to avoid compatibility issues
     if (channel.isActive() && !FakeChannelUtil.isFakePlayer(channel)) {
-      final ChannelHandler inboundHandler = new FallbackInboundHandler(sonarPipelineInjector);
+      final FallbackInboundHandler inboundHandler = new FallbackInboundHandler(sonarPipelineInjector);
       // We need to be careful on Bukkit, as the encoder can be different
       if (Sonar.get().getPlatform() == SonarPlatform.BUKKIT) {
-        final String encoder = Sonar.get().getPlatform().getEncoderFunction().apply(channel.pipeline());
+        final String encoder = Sonar.get().getPlatform().getEncoder().apply(channel.pipeline());
         channel.pipeline().addBefore(encoder, FALLBACK_INBOUND_HANDLER, inboundHandler);
       } else {
         channel.pipeline().addFirst(FALLBACK_INBOUND_HANDLER, inboundHandler);

@@ -26,21 +26,15 @@ import java.util.function.Function;
 @Getter
 @RequiredArgsConstructor
 public enum SonarPlatform {
-  BUKKIT("Bukkit", 19110,
-    pipeline -> pipeline.context("outbound_config") != null ? "outbound_config" : "encoder",
-    pipeline -> "packet_handler"),
-  BUNGEE("BungeeCord", 19109,
-    pipeline -> "packet-encoder",
-    pipeline -> "inbound-boss"),
-  VELOCITY("Velocity", 19107,
-    pipeline -> "minecraft-encoder",
-    pipeline -> "handler");
+  BUKKIT("Bukkit", 19110, "packet_handler",
+    pipeline -> pipeline.context("outbound_config") != null ? "outbound_config" : "encoder"),
+  BUNGEE("BungeeCord", 19109, "inbound-boss",
+    pipeline -> "packet-encoder"),
+  VELOCITY("Velocity", 19107, "handler",
+    pipeline -> "minecraft-encoder");
 
   private final String displayName;
-  /**
-   * bStats service ID for the respective Sonar platform
-   */
   private final int metricsId;
-  private final Function<ChannelPipeline, String> encoderFunction;
-  private final Function<ChannelPipeline, String> handlerFunction;
+  private final String connectionHandler;
+  private final Function<ChannelPipeline, String> encoder;
 }

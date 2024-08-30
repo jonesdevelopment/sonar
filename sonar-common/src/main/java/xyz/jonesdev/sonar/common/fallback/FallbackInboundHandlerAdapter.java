@@ -258,16 +258,16 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
   private void _customDisconnect(final @NotNull Channel channel,
                                  final @NotNull ProtocolVersion protocolVersion,
                                  final @NotNull FallbackPacket packet) {
-    // Remove the main pipeline to completely take over the channel
-    final String handler = Sonar.get().getPlatform().getHandlerFunction().apply(channel.pipeline());
+    // Remove the connection handler pipeline to completely take over the channel
+    final String handler = Sonar.get().getPlatform().getConnectionHandler();
     if (channel.pipeline().context(handler) != null) {
       channel.pipeline().remove(handler);
     }
-    final String encoder = Sonar.get().getPlatform().getEncoderFunction().apply(channel.pipeline());
+    final String encoder = Sonar.get().getPlatform().getEncoder().apply(channel.pipeline());
     final ChannelHandler currentEncoder = channel.pipeline().get(encoder);
-    // Close the channel if no decoder exists
+    // Close the channel if no encoder exists
     if (currentEncoder != null) {
-      // We don't need to update the encoder if it's already present
+      // We don't need to update the encoder if it has already been replaced by Sonar
       if (!(currentEncoder instanceof FallbackPacketEncoder)) {
         final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
         channel.pipeline().replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);

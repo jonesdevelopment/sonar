@@ -239,13 +239,13 @@ public class FallbackBukkitInjector {
           // If the plugin is not fully enabled but executes the injection,
           // put an initializer to close the new connection automatically.
           if (!INITIALIZE_LISTENER.isDone()) {
-            final ChannelInitializer<Channel> initializer = new ChannelInitializer<>() {
+            childHandlerField.set(bootstrap, new ChannelInitializer<>() {
+
               @Override
-              protected void initChannel(Channel channel) {
+              protected void initChannel(final @NotNull Channel channel) {
                 channel.close();
               }
-            };
-            childHandlerField.set(bootstrap, initializer);
+            });
           }
 
           final ChannelHandler _bootstrap = bootstrap;
