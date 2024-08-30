@@ -37,16 +37,16 @@ final class FallbackVelocityInboundHandler extends FallbackInboundHandlerAdapter
       handleHandshake(ctx.channel(), handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
       // We don't care about server pings; remove the handler
       if (handshake.getNextStatus() == 1) {
-        ctx.channel().pipeline().remove(this);
+        ctx.pipeline().remove(this);
       }
     }
     // Intercept any server login packet by the client
     else if (msg instanceof ServerLoginPacket serverLogin) {
       // Make sure to use the potentially modified, original IP
-      final MinecraftConnection minecraftConnection = (MinecraftConnection) ctx.channel().pipeline().get(HANDLER);
+      final MinecraftConnection minecraftConnection = (MinecraftConnection) ctx.pipeline().get(HANDLER);
       final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
       // We've done our job - deject this pipeline
-      ctx.channel().pipeline().remove(this);
+      ctx.pipeline().remove(this);
       // Let Sonar process the login packet
       handleLogin(ctx.channel(), ctx, () -> ctx.fireChannelRead(msg), serverLogin.getUsername(), socketAddress);
       return;

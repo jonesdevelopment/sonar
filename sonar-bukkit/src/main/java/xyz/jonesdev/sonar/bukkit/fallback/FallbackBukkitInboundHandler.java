@@ -110,7 +110,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         switch (handshake.getIntent()) {
           case STATUS:
             // We don't care about server pings or transfers; remove the handler
-            ctx.channel().pipeline().remove(this);
+            ctx.pipeline().remove(this);
             break;
           case LOGIN:
           case TRANSFER:
@@ -126,12 +126,12 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         final LoginStartPacket loginStart = (LoginStartPacket) packet;
         final InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         // We've done our job - deject this pipeline
-        ctx.channel().pipeline().remove(this);
+        ctx.pipeline().remove(this);
         // Let Sonar process the login packet
         handleLogin(ctx.channel(), ctx, () -> {
           byteBuf.readerIndex(originalReaderIndex);
           ctx.fireChannelRead(byteBuf.retain());
-          final ChannelHandler inboundHandler = ctx.channel().pipeline().remove(FALLBACK_INBOUND_HANDLER);
+          final ChannelHandler inboundHandler = ctx.pipeline().remove(FALLBACK_INBOUND_HANDLER);
           if (inboundHandler != null) {
             channelRemovalListener.accept(ctx.pipeline(), FALLBACK_INBOUND_HANDLER, inboundHandler);
           }

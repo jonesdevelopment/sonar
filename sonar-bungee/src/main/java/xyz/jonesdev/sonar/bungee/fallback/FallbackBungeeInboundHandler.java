@@ -61,7 +61,7 @@ final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
           handleHandshake(channel, handshake.getHost(), handshake.getProtocolVersion());
           // We don't care about server pings; remove the handler
             if (handshake.getRequestedProtocol() == 1) {
-            ctx.channel().pipeline().remove(this);
+            ctx.pipeline().remove(this);
           }
         }
         // Intercept any server login packet by the client
@@ -77,7 +77,7 @@ final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
           }
           final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
           // We've done our job - deject this pipeline
-          ctx.channel().pipeline().remove(this);
+          ctx.pipeline().remove(this);
           // Make sure to mark this packet as released
           packetWrapper.trySingleRelease();
           // Let Sonar process the login packet
