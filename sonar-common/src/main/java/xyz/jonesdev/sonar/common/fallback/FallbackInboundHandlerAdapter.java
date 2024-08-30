@@ -107,12 +107,6 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     Objects.requireNonNull(inboundHandler).setInetAddress(socketAddress.getAddress());
     final String hostAddress = socketAddress.getAddress().getHostAddress();
 
-    // Check if the player is blocked from entering the server
-    if (FALLBACK.getBlacklist().asMap().containsKey(hostAddress)) {
-      customDisconnect(channel, protocolVersion, blacklisted);
-      return;
-    }
-
     // Check if Fallback is already verifying a player with the same IP address
     if (FALLBACK.getConnected().containsKey(inboundHandler.getInetAddress())) {
       customDisconnect(channel, protocolVersion, alreadyVerifying);
@@ -123,6 +117,12 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols()
       .contains(protocolVersion.getProtocol())) {
       customDisconnect(channel, protocolVersion, protocolBlacklisted);
+      return;
+    }
+
+    // Check if the player is blocked from entering the server
+    if (FALLBACK.getBlacklist().asMap().containsKey(hostAddress)) {
+      customDisconnect(channel, protocolVersion, blacklisted);
       return;
     }
 
