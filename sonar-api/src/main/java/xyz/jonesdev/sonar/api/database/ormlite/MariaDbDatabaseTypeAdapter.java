@@ -15,11 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.fallback.ratelimit;
+package xyz.jonesdev.sonar.api.database.ormlite;
 
+import com.j256.ormlite.jdbc.db.MariaDbDatabaseType;
 import org.jetbrains.annotations.NotNull;
 
-@FunctionalInterface
-public interface FallbackRatelimiter<T> {
-  boolean attempt(final @NotNull T t);
+public final class MariaDbDatabaseTypeAdapter extends MariaDbDatabaseType {
+
+  // We need to override the default driver class name
+  // to use the custom relocated MariaDB driver
+  @Override
+  protected String @NotNull [] getDriverClassNames() {
+    return new String[]{"xyz.jonesdev.sonar.libs.mariadb.jdbc.Driver"};
+  }
 }

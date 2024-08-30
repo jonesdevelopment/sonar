@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.attack;
+package xyz.jonesdev.sonar.api.tracker;
 
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
@@ -27,12 +27,13 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.util.Optional;
 
-import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
+import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AttackTracker {
   public static final AttackTracker INSTANCE = new AttackTracker();
+
   private @Nullable AttackStatistics currentAttack;
   private int attackThreshold;
 
@@ -68,7 +69,7 @@ public final class AttackTracker {
         currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().estimatedSize();
         currentAttack.failedVerifications = Sonar.get().getStatistics().getTotalFailedVerifications();
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
-        Sonar.get().getNotificationHandler().observe();
+        Sonar.get().getChatNotificationHandler().handleNotification();
       } else {
         // Reset attack timer if we're still under attack
         currentAttack.timer.reset();
@@ -143,11 +144,9 @@ public final class AttackTracker {
 
         // Reset the attack status
         currentAttack = null;
-        // Reset threshold
         attackThreshold = 0;
       }
     } else {
-      // Reset threshold
       attackThreshold = 0;
     }
   }

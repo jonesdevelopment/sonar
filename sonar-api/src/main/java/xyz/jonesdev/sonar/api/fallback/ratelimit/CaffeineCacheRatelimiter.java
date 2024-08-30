@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 // Idea taken from Velocity
 @Setter
 @RequiredArgsConstructor
-public final class CaffeineCacheRatelimiter implements FallbackRatelimiter<InetAddress> {
+public final class CaffeineCacheRatelimiter implements Ratelimiter<InetAddress> {
   private Cache<InetAddress, Long> expiringCache;
   private long timeout;
 

@@ -31,17 +31,17 @@ import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.SonarSupplier;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandRegistry;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
-import xyz.jonesdev.sonar.api.controller.VerifiedPlayerController;
+import xyz.jonesdev.sonar.api.database.controller.VerifiedPlayerController;
 import xyz.jonesdev.sonar.api.fallback.ratelimit.CaffeineCacheRatelimiter;
 import xyz.jonesdev.sonar.api.fallback.ratelimit.NoopCacheRatelimiter;
+import xyz.jonesdev.sonar.api.notification.ActionBarNotificationHandler;
+import xyz.jonesdev.sonar.api.notification.ChatNotificationHandler;
 import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
-import xyz.jonesdev.sonar.api.verbose.Notification;
-import xyz.jonesdev.sonar.api.verbose.Verbose;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.service.SonarServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
-import xyz.jonesdev.sonar.common.subcommands.*;
+import xyz.jonesdev.sonar.common.subcommand.*;
 import xyz.jonesdev.sonar.common.update.UpdateChecker;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
@@ -54,9 +54,9 @@ import java.util.concurrent.TimeUnit;
 public abstract class SonarBootstrap<T> implements Sonar {
   private T plugin;
   @Setter
-  private Verbose verboseHandler;
+  private ActionBarNotificationHandler actionBarNotificationHandler;
   @Setter
-  private Notification notificationHandler;
+  private ChatNotificationHandler chatNotificationHandler;
   private SonarConfiguration config;
   private VerifiedPlayerController verifiedPlayerController;
   private final LibraryManager libraryManager;
@@ -81,8 +81,8 @@ public abstract class SonarBootstrap<T> implements Sonar {
     this.platform = platform;
     // Load the rest of the components
     this.statistics = new GlobalSonarStatistics();
-    this.verboseHandler = new Verbose();
-    this.notificationHandler = new Notification();
+    this.actionBarNotificationHandler = new ActionBarNotificationHandler();
+    this.chatNotificationHandler = new ChatNotificationHandler();
     this.config = new SonarConfiguration(dataDirectory);
     // Register all subcommands
     this.subcommandRegistry = new SubcommandRegistry();

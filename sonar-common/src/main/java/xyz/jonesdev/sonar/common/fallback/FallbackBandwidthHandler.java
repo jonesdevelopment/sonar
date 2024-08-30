@@ -26,8 +26,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import static xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics.INCOMING;
-import static xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics.OUTGOING;
+import static xyz.jonesdev.sonar.common.statistics.BandwidthStatistics.INCOMING;
+import static xyz.jonesdev.sonar.common.statistics.BandwidthStatistics.OUTGOING;
 
 @ChannelHandler.Sharable
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

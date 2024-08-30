@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommands;
+package xyz.jonesdev.sonar.common.subcommand;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -34,8 +34,8 @@ public final class VerboseCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
-    if (Sonar.get().getVerboseHandler().isSubscribed(invocation.getSource().getUuid())) {
-      Sonar.get().getVerboseHandler().unsubscribe(invocation.getSource().getUuid());
+    if (Sonar.get().getActionBarNotificationHandler().isSubscribed(invocation.getSource().getUuid())) {
+      Sonar.get().getActionBarNotificationHandler().unsubscribe(invocation.getSource().getUuid());
       // Reset ActionBar component when unsubscribing
       invocation.getSource().getAudience().sendActionBar(Component.empty());
       invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
@@ -44,7 +44,7 @@ public final class VerboseCommand extends Subcommand {
       return;
     }
 
-    Sonar.get().getVerboseHandler().subscribe(invocation.getSource().getUuid());
+    Sonar.get().getActionBarNotificationHandler().subscribe(invocation.getSource().getUuid());
     invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
       Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.subscribe"),
       Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.verbose;
+package xyz.jonesdev.sonar.api.notification;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +25,10 @@ import java.util.UUID;
 import java.util.Vector;
 
 @Getter
-public abstract class Observable {
+public abstract class NotificationHandler {
   protected final @NotNull Collection<UUID> subscribers = new Vector<>(0);
 
-  public abstract void observe();
+  public abstract void handleNotification();
 
   /**
    * @param uuid UUID of the player

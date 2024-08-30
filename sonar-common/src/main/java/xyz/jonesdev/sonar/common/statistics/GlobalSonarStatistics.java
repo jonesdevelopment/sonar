@@ -80,42 +80,42 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @Override
   public long getCurrentIncomingBandwidth() {
-    return CachedBandwidthStatistics.INCOMING.getCurr();
+    return BandwidthStatistics.INCOMING.getCurr();
   }
 
   @Override
   public long getCurrentOutgoingBandwidth() {
-    return CachedBandwidthStatistics.OUTGOING.getCurr();
+    return BandwidthStatistics.OUTGOING.getCurr();
   }
 
   @Override
   public long getTotalIncomingBandwidth() {
-    return CachedBandwidthStatistics.INCOMING.getTtl();
+    return BandwidthStatistics.INCOMING.getTtl();
   }
 
   @Override
   public long getTotalOutgoingBandwidth() {
-    return CachedBandwidthStatistics.OUTGOING.getTtl();
+    return BandwidthStatistics.OUTGOING.getTtl();
   }
 
   @Override
   public String getCurrentIncomingBandwidthFormatted() {
-    return CachedBandwidthStatistics.INCOMING.getCachedSecond();
+    return BandwidthStatistics.INCOMING.getCachedSecond();
   }
 
   @Override
   public String getCurrentOutgoingBandwidthFormatted() {
-    return CachedBandwidthStatistics.OUTGOING.getCachedSecond();
+    return BandwidthStatistics.OUTGOING.getCachedSecond();
   }
 
   @Override
   public String getTotalIncomingBandwidthFormatted() {
-    return CachedBandwidthStatistics.INCOMING.getCachedTtl();
+    return BandwidthStatistics.INCOMING.getCachedTtl();
   }
 
   @Override
   public String getTotalOutgoingBandwidthFormatted() {
-    return CachedBandwidthStatistics.OUTGOING.getCachedTtl();
+    return BandwidthStatistics.OUTGOING.getCachedTtl();
   }
 
   @Override

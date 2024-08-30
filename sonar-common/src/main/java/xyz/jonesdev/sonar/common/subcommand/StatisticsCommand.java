@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommands;
+package xyz.jonesdev.sonar.common.subcommand;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -26,10 +26,10 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
+import xyz.jonesdev.sonar.common.statistics.BandwidthStatistics;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
+import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
 
 @SubcommandInfo(
   name = "statistics",
@@ -109,10 +109,10 @@ public final class StatisticsCommand extends Subcommand {
       case "network": {
         placeholders = new TagResolver.Single[]{
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("incoming-traffic", CachedBandwidthStatistics.INCOMING.getCachedSecond()),
-          Placeholder.unparsed("outgoing-traffic", CachedBandwidthStatistics.OUTGOING.getCachedSecond()),
-          Placeholder.unparsed("incoming-traffic-ttl", CachedBandwidthStatistics.INCOMING.getCachedTtl()),
-          Placeholder.unparsed("outgoing-traffic-ttl", CachedBandwidthStatistics.OUTGOING.getCachedTtl())
+          Placeholder.unparsed("incoming-traffic", BandwidthStatistics.INCOMING.getCachedSecond()),
+          Placeholder.unparsed("outgoing-traffic", BandwidthStatistics.OUTGOING.getCachedSecond()),
+          Placeholder.unparsed("incoming-traffic-ttl", BandwidthStatistics.INCOMING.getCachedTtl()),
+          Placeholder.unparsed("outgoing-traffic-ttl", BandwidthStatistics.OUTGOING.getCachedTtl())
         };
         break;
       }

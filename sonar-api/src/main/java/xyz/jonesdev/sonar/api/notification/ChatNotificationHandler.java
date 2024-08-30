@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.verbose;
+package xyz.jonesdev.sonar.api.notification;
 
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
@@ -29,13 +29,13 @@ import java.util.List;
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
+import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
 
 @Getter
-public final class Notification extends Observable {
+public final class ChatNotificationHandler extends NotificationHandler {
 
   @Override
-  public void observe() {
+  public void handleNotification() {
     // Don't prepare component if there are no subscribers
     if (subscribers.isEmpty()) {
       return;
@@ -74,7 +74,7 @@ public final class Notification extends Observable {
     }
 
     // Send the title and chat messages to all online players
-    for (final UUID subscriber : Sonar.get().getNotificationHandler().getSubscribers()) {
+    for (final UUID subscriber : Sonar.get().getChatNotificationHandler().getSubscribers()) {
       final Audience audience = Sonar.get().audience(subscriber);
       if (audience == null) continue;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.ormlite;
+package xyz.jonesdev.sonar.api.database.ormlite;
 
 import com.j256.ormlite.jdbc.db.H2DatabaseType;
 import org.jetbrains.annotations.NotNull;

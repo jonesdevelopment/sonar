@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.subcommands;
+package xyz.jonesdev.sonar.common.subcommand;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,7 +32,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
+import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
 
 // This command is only used to display helpful information to help
 // the Sonar contributors to fix issues more quickly

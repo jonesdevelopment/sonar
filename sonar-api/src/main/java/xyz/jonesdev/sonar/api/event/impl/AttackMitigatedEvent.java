@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.api.event.impl;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
+import xyz.jonesdev.sonar.api.tracker.AttackTracker;
 
 @Getter
 @ToString

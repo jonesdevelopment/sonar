@@ -196,8 +196,7 @@ public class FallbackBukkitInjector {
       for (int i = 0; i < 2; i++) {
         final Field field = getFieldAt(SERVER_CONNECTION_CLASS, List.class, i);
 
-        // Check if the field has the correct generic type;
-        // We need this field to be List<ChannelFuture>
+        // Check if the field has the correct generic type; We need this field to be List<ChannelFuture>
         if (!field.getGenericType().getTypeName().contains(ChannelFuture.class.getName())) {
           continue;
         }
@@ -235,9 +234,11 @@ public class FallbackBukkitInjector {
           childHandlerField.setAccessible(true);
           final var originalInitializer = (ChannelInitializer<Channel>) childHandlerField.get(bootstrap);
 
-          // Inject our own channel initializer into the original field
-          // If the plugin is not fully enabled but executes the injection,
-          // put an initializer to close the new connection automatically.
+          /*
+           * Inject our own channel initializer into the original field
+           * If the plugin is not fully enabled but executes the injection,
+           * put an initializer to close the new connection automatically.
+           */
           if (!INITIALIZE_LISTENER.isDone()) {
             childHandlerField.set(bootstrap, new ChannelInitializer<>() {
 

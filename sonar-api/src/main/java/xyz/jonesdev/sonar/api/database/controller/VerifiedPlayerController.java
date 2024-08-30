@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.controller;
+package xyz.jonesdev.sonar.api.database.controller;
 
 import com.alessiodp.libby.LibraryManager;
 import com.j256.ormlite.dao.Dao;
@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.database.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
-import xyz.jonesdev.sonar.api.model.VerifiedPlayer;
 
 import java.io.File;
 import java.sql.SQLException;

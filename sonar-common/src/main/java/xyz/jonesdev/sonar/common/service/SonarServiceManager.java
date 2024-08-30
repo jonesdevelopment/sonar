@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.common.service;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.common.statistics.CachedBandwidthStatistics;
+import xyz.jonesdev.sonar.common.statistics.BandwidthStatistics;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -51,13 +51,13 @@ public final class SonarServiceManager {
       // Update the attack tracker
       Sonar.get().getAttackTracker().checkIfUnderAttack();
       // Update the action bar verbose
-      Sonar.get().getVerboseHandler().observe();
+      Sonar.get().getActionBarNotificationHandler().handleNotification();
     }, 0L, 250L, TimeUnit.MILLISECONDS);
 
     FALLBACK_QUEUE.scheduleAtFixedRate(() -> Sonar.get().getFallback().getQueue().poll(),
       1L, 1L, TimeUnit.SECONDS);
 
-    STATISTICS.scheduleAtFixedRate(CachedBandwidthStatistics::reset,
+    STATISTICS.scheduleAtFixedRate(BandwidthStatistics::reset,
       0L, 1L, TimeUnit.SECONDS);
   }
 

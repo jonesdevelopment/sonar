@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.jvm;
+package xyz.jonesdev.sonar.api.profiler;
 
 import com.sun.management.OperatingSystemMXBean;
 import lombok.experimental.UtilityClass;
@@ -24,7 +24,7 @@ import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 
 @UtilityClass
-public class JVMProcessInformation {
+public class SimpleProcessProfiler {
   private final Runtime RUNTIME = Runtime.getRuntime();
   private final OperatingSystemMXBean MX = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
   private final char[] MEMORY_UNITS = {'K', 'M', 'G', 'T', 'P', 'E'};

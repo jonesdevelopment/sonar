@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.verbose;
+package xyz.jonesdev.sonar.api.notification;
 
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
@@ -23,21 +23,21 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.attack.AttackTracker;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
+import xyz.jonesdev.sonar.api.tracker.AttackTracker;
 
 import java.util.UUID;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
-import static xyz.jonesdev.sonar.api.jvm.JVMProcessInformation.*;
+import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
 import static xyz.jonesdev.sonar.api.timer.SystemTimer.DATE_FORMATTER;
 
 @Getter
-public final class Verbose extends Observable {
+public final class ActionBarNotificationHandler extends NotificationHandler {
   private int animationIndex;
 
   @Override
-  public void observe() {
+  public void handleNotification() {
     // Don't prepare component if there are no subscribers
     if (subscribers.isEmpty()) {
       return;

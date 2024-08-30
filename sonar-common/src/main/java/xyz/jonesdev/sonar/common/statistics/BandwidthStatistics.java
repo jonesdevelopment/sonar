@@ -19,13 +19,13 @@ package xyz.jonesdev.sonar.common.statistics;
 
 import lombok.Getter;
 import lombok.Setter;
-import xyz.jonesdev.sonar.api.jvm.JVMProcessInformation;
+import xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler;
 
 /**
  * This counts all incoming and outgoing traffic.
  */
 @Getter
-public enum CachedBandwidthStatistics {
+public enum BandwidthStatistics {
   INCOMING,
   OUTGOING;
 
@@ -54,8 +54,8 @@ public enum CachedBandwidthStatistics {
 
   private void cacheAndReset() {
     ttl += curr; // increment total
-    cachedSecond = JVMProcessInformation.formatMemory(curr);
-    cachedTtl = JVMProcessInformation.formatMemory(ttl);
+    cachedSecond = SimpleProcessProfiler.formatMemory(curr);
+    cachedTtl = SimpleProcessProfiler.formatMemory(ttl);
     curr = 0L; // reset current
   }
 }

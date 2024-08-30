@@ -25,7 +25,7 @@ import java.net.InetAddress;
 
 // Idea taken from Velocity
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NoopCacheRatelimiter implements FallbackRatelimiter<InetAddress> {
+public final class NoopCacheRatelimiter implements Ratelimiter<InetAddress> {
   public static final NoopCacheRatelimiter INSTANCE = new NoopCacheRatelimiter();
 
   @Override

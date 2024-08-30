@@ -61,11 +61,13 @@ public final class SonarEventManager {
    * Registers one (or more) event listeners
    *
    * @param listeners One (or more) listeners to register
-   * @see #unregisterListener(SonarEventListener...) Unregister an event listener
+   * @see #unregisterListener(SonarEventListener[]) Unregister an event listener
    */
   @SuppressWarnings("unused") // External API usage
-  public synchronized void registerListener(final @NotNull SonarEventListener... listeners) {
-    EVENT_LISTENERS.addAll(Arrays.asList(listeners));
+  public void registerListener(final @NotNull SonarEventListener... listeners) {
+    synchronized (EVENT_LISTENERS) {
+      EVENT_LISTENERS.addAll(Arrays.asList(listeners));
+    }
   }
 
   /**
@@ -73,10 +75,12 @@ public final class SonarEventManager {
    *
    * @param listeners One (or more) listeners to unregister
    * @apiNote This does not have any effect if the given listeners are not registered
-   * @see #registerListener(SonarEventListener...) Register an event listener
+   * @see #registerListener(SonarEventListener[]) Register an event listener
    */
   @SuppressWarnings("unused") // External API usage
-  public synchronized void unregisterListener(final @NotNull SonarEventListener... listeners) {
-    EVENT_LISTENERS.removeAll(Arrays.asList(listeners));
+  public void unregisterListener(final @NotNull SonarEventListener... listeners) {
+    synchronized (EVENT_LISTENERS) {
+      EVENT_LISTENERS.removeAll(Arrays.asList(listeners));
+    }
   }
 }

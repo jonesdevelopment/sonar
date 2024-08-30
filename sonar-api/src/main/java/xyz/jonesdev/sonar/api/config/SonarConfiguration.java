@@ -27,10 +27,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
+import xyz.jonesdev.sonar.api.database.ormlite.H2DatabaseTypeAdapter;
+import xyz.jonesdev.sonar.api.database.ormlite.MariaDbDatabaseTypeAdapter;
+import xyz.jonesdev.sonar.api.database.ormlite.MysqlDatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
-import xyz.jonesdev.sonar.api.ormlite.H2DatabaseTypeAdapter;
-import xyz.jonesdev.sonar.api.ormlite.MariaDbDatabaseTypeAdapter;
-import xyz.jonesdev.sonar.api.ormlite.MysqlDatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.io.File;
