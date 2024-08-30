@@ -44,7 +44,7 @@ public final class Fallback {
   private final ConcurrentMap<InetAddress, Byte> connected = new ConcurrentHashMap<>(128);
   // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
   @Setter
-  private Cache<String, Byte> blacklist;
+  private Cache<String, Integer> blacklist;
   @Setter
   private long blacklistTime;
   @Setter
@@ -53,8 +53,6 @@ public final class Fallback {
   private final @NotNull FallbackQueue queue = new FallbackQueue();
   @Setter
   private Ratelimiter<InetAddress> ratelimiter;
-  @Setter
-  private Cache<InetAddress, Integer> failCountCache;
 
   private final LoggerWrapper logger = new LoggerWrapper() {
 

@@ -62,7 +62,7 @@ public final class BlacklistCommand extends Subcommand {
         }
 
         // Blacklist the given IP address
-        Sonar.get().getFallback().getBlacklist().put(rawAddress, (byte) 0);
+        Sonar.get().getFallback().getBlacklist().put(rawAddress, 1337 /* arbitrarily high number */);
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.add"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),

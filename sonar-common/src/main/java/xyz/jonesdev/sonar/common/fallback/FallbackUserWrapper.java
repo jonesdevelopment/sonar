@@ -160,20 +160,15 @@ public final class FallbackUserWrapper implements FallbackUser {
     // Use a label, so we can easily add more code beneath this method in the future
     blacklist: {
       // Check if the player has too many failed attempts
-      final int blacklistThreshold = Sonar.get().getConfig().getVerification().getBlacklistThreshold();
+      final int limit = Sonar.get().getConfig().getVerification().getBlacklistThreshold();
       // The user is allowed to disable the blacklist entirely by setting the threshold to 0
-      if (blacklistThreshold <= 0) break blacklist;
+      if (limit <= 0) break blacklist;
 
-      // Use 1 as the default amount of fails since we haven't cached anything yet
-      final int fails = Sonar.get().getFallback().getFailCountCache().get(inetAddress, ignored -> 1);
-      // Now we simply need to check if the threshold is reached
-      if (fails < blacklistThreshold) {
-        // Make sure we increment the number of fails
-        if (fails > 0) {
-          // Make sure to remove the old values from the cache
-          Sonar.get().getFallback().getFailCountCache().invalidate(inetAddress);
-        }
-        Sonar.get().getFallback().getFailCountCache().put(inetAddress, fails + 1);
+      final String hostAddress = inetAddress.getHostAddress();
+      final int score = Sonar.get().getFallback().getBlacklist().get(hostAddress, __ -> 0);
+
+      if (score < limit) {
+        Sonar.get().getFallback().getBlacklist().put(hostAddress, score + 1);
         break blacklist;
       }
 
@@ -182,17 +177,12 @@ public final class FallbackUserWrapper implements FallbackUser {
       // Call the BotBlacklistedEvent for external API usage
       Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
 
-      Sonar.get().getFallback().getBlacklist().put(getInetAddress().getHostAddress(), (byte) 0);
-
       if (shouldLog) {
         Sonar.get().getFallback().getLogger().info(
           Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.blacklisted")
             .replace("<ip>", Sonar.get().getConfig().formatAddress(getInetAddress()))
             .replace("<protocol>", String.valueOf(getProtocolVersion().getProtocol())));
       }
-
-      // Invalidate the cached entry to ensure memory safety
-      Sonar.get().getFallback().getFailCountCache().invalidate(inetAddress);
     }
 
     // Throw an exception to avoid further code execution

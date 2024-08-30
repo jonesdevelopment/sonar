@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.fallback.Fallback;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -50,8 +49,6 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;
   protected RemovalListener channelRemovalListener = RemovalListener.EMPTY;
-
-  protected static final Fallback FALLBACK = Sonar.get().getFallback();
 
   /**
    * Validates and handles incoming handshake packets
@@ -108,7 +105,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     final String hostAddress = socketAddress.getAddress().getHostAddress();
 
     // Check if Fallback is already verifying a player with the same IP address
-    if (FALLBACK.getConnected().containsKey(inboundHandler.getInetAddress())) {
+    if (Sonar.get().getFallback().getConnected().containsKey(inboundHandler.getInetAddress())) {
       customDisconnect(channel, protocolVersion, alreadyVerifying);
       return;
     }
@@ -120,8 +117,10 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       return;
     }
 
-    // Check if the player is blocked from entering the server
-    if (FALLBACK.getBlacklist().asMap().containsKey(hostAddress)) {
+    // Check if the player failed the verification too many times
+    final int score = Sonar.get().getFallback().getBlacklist().get(hostAddress, __ -> 0);
+    final int limit = Sonar.get().getConfig().getVerification().getBlacklistThreshold();
+    if (score >= limit) {
       customDisconnect(channel, protocolVersion, blacklisted);
       return;
     }
@@ -148,7 +147,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     }
 
     // Check if the IP address is currently being rate-limited
-    if (!FALLBACK.getRatelimiter().attempt(inboundHandler.getInetAddress())) {
+    if (!Sonar.get().getFallback().getRatelimiter().attempt(inboundHandler.getInetAddress())) {
       customDisconnect(channel, protocolVersion, reconnectedTooFast);
       return;
     }
@@ -157,7 +156,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     rewriteProtocol(ctx, channelRemovalListener);
 
     // Queue the connection for further processing
-    FALLBACK.getQueue().getPlayers().compute(inboundHandler.getInetAddress(), (inetAddress, runnable) -> {
+    Sonar.get().getFallback().getQueue().getPlayers().compute(inboundHandler.getInetAddress(), (inetAddress, runnable) -> {
       // Check if the player is already queued since we don't want bots to flood the queue
       if (runnable != null) {
         customDisconnect(channel, protocolVersion, alreadyQueued);
@@ -218,14 +217,14 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
                                     final @NotNull InetAddress inetAddress,
                                     final @NotNull Runnable loginPacket) throws Exception {
     // Increment the number of accounts with the same IP
-    FALLBACK.getOnline().compute(inetAddress, (k, v) -> v == null ? 1 : v + 1);
+    Sonar.get().getFallback().getOnline().compute(inetAddress, (k, v) -> v == null ? 1 : v + 1);
 
     final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
     // Skip the maximum online per IP check if it's disabled in the configuration
     if (maxOnlinePerIp > 0) {
       // Check if the number of online players using the same IP address as
       // the connecting player is greater than the configured amount
-      final int onlinePerIp = FALLBACK.getOnline().getOrDefault(inetAddress, 0);
+      final int onlinePerIp = Sonar.get().getFallback().getOnline().getOrDefault(inetAddress, 0);
       if (onlinePerIp >= maxOnlinePerIp) {
         customDisconnect(ctx.channel(), protocolVersion, tooManyOnlinePerIP);
         return;

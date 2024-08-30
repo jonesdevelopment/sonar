@@ -154,14 +154,10 @@ public abstract class SonarBootstrap<T> implements Sonar {
     getLogger().info("Taking cached snapshots of all packets...");
     FallbackPreparer.prepare();
 
-    // Update ratelimiter caches
+    // Update ratelimiter cache
     getFallback().setRatelimiter(getConfig().getVerification().getReconnectDelay() > 0L
       ? new CaffeineCacheRatelimiter(getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS)
       : NoopCacheRatelimiter.INSTANCE);
-    getFallback().setFailCountCache(Caffeine.newBuilder()
-      .expireAfterWrite(Duration.ofMillis(getConfig().getVerification().getRememberTime()))
-      .ticker(Ticker.systemTicker())
-      .build());
 
     // Update blacklist cache
     final long blacklistTime = getConfig().getVerification().getBlacklistTime();
