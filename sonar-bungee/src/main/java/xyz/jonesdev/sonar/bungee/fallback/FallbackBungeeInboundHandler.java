@@ -33,6 +33,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
 
+import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.STATUS;
+
 final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
 
   private static final MethodHandle CHANNEL_WRAPPER_GETTER;
@@ -58,10 +60,11 @@ final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
         // Intercept any handshake packet by the client
         if (wrappedPacket instanceof Handshake) {
           final Handshake handshake = (Handshake) wrappedPacket;
-          handleHandshake(channel, handshake.getHost(), handshake.getProtocolVersion());
           // We don't care about server pings; remove the handler
-            if (handshake.getRequestedProtocol() == 1) {
+          if (handshake.getRequestedProtocol() == STATUS) {
             ctx.pipeline().remove(this);
+          } else {
+            handleHandshake(channel, handshake.getHost(), handshake.getProtocolVersion());
           }
         }
         // Intercept any server login packet by the client
