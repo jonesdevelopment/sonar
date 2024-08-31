@@ -166,11 +166,12 @@ public final class FallbackUserWrapper implements FallbackUser {
 
       final String hostAddress = inetAddress.getHostAddress();
       final int score = Sonar.get().getFallback().getBlacklist().get(hostAddress, __ -> 0);
+      final int newScore = score + 1;
 
-      if (score < limit) {
-        Sonar.get().getFallback().getBlacklist().put(hostAddress, score + 1);
-        break blacklist;
-      }
+      Sonar.get().getFallback().getBlacklist().put(hostAddress, newScore);
+
+      // The player hasn't been blacklisted yet, so skip this iteration
+      if (newScore < limit) break blacklist;
 
       GlobalSonarStatistics.totalBlacklistedPlayers++;
 
