@@ -94,14 +94,14 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
       } catch (Throwable throwable) {
         // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
-        throw DEBUG ? new DecoderException("Failed to decode packet") : QuietDecoderException.INSTANCE;
+        throw DEBUG ? new DecoderException(throwable) : QuietDecoderException.INSTANCE;
       }
 
       // Check if the packet still has bytes left after we decoded it
       if (byteBuf.isReadable()) {
         // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
-        throw QuietDecoderException.INSTANCE;
+        throw DEBUG ? new DecoderException("Could not read packet to end") : QuietDecoderException.INSTANCE;
       }
 
       // Useful resources:
@@ -122,7 +122,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
             updateRegistry(FallbackPacketRegistry.LOGIN, Objects.requireNonNull(protocolVersion));
             break;
           default:
-            throw QuietDecoderException.INSTANCE;
+            throw DEBUG ? new DecoderException("Bad intent " + handshake.getIntent()) : QuietDecoderException.INSTANCE;
         }
       } else if (packet instanceof LoginStartPacket) {
         final LoginStartPacket loginStart = (LoginStartPacket) packet;
