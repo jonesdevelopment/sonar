@@ -15,24 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api;
+package xyz.jonesdev.sonar.api.exception;
 
-import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.exception.AlreadyInitializedException;
 
-@UtilityClass
-public class SonarSupplier {
-  private Sonar _sonar;
-
-  public void set(final @NotNull Sonar instance) {
-    if (_sonar != null) {
-      throw new AlreadyInitializedException("Sonar is already initialized");
-    }
-    _sonar = instance;
+public final class AlreadyInitializedException extends RuntimeException {
+  public AlreadyInitializedException(final @NotNull String message) {
+    super(message);
   }
 
-  public @NotNull Sonar get() {
-    return _sonar;
+  public Throwable fillInStackTrace() {
+    return this;
   }
 }
