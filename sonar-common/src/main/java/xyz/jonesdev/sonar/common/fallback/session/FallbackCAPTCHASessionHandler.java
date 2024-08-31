@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.common.fallback.session;
 
-import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
@@ -26,6 +25,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -51,7 +51,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     // Disconnect the player if there is no CAPTCHA available at the moment
     if (!CaptchaPreparer.isCaptchaAvailable()) {
       user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
-      throw new CorruptedFrameException("No captcha available");
+      throw QuietDecoderException.INSTANCE;
     }
 
     this.tries = Sonar.get().getConfig().getVerification().getMap().getMaxTries();

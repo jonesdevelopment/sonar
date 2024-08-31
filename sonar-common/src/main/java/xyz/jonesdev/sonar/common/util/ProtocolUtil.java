@@ -41,12 +41,13 @@ package xyz.jonesdev.sonar.common.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.util.Version;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.*;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -59,6 +60,7 @@ import java.util.UUID;
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
 public class ProtocolUtil {
+  public static final boolean DEBUG = Boolean.getBoolean("sonar.debug-traces");
   public static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
   public static final String BRAND_CHANNEL = "minecraft:brand";
 
@@ -84,7 +86,7 @@ public class ProtocolUtil {
   public static int readVarInt(final ByteBuf byteBuf) {
     int read = readVarIntSafely(byteBuf);
     if (read == Integer.MIN_VALUE) {
-      throw new CorruptedFrameException("Corrupt VarInt");
+      throw DEBUG ? new DecoderException("Bad VarInt") : QuietDecoderException.INSTANCE;
     }
     return read;
   }
@@ -223,33 +225,33 @@ public class ProtocolUtil {
 
   public static byte @NotNull [] readByteArray(final ByteBuf byteBuf, final int cap) {
     int length = readVarInt(byteBuf);
-    checkFrame(length >= 0, "Got a negative-length array");
-    checkFrame(length <= cap, "Bad array size");
-    checkFrame(byteBuf.isReadable(length), "Trying to read an array that is too long");
+    checkState(length >= 0, "Got a negative-length array");
+    checkState(length <= cap, "Bad array size");
+    checkState(byteBuf.isReadable(length), "Trying to read an array that is too long");
     byte[] array = new byte[length];
     byteBuf.readBytes(array);
     return array;
   }
 
-  public static @NotNull String readString(final ByteBuf byteBuf) throws CorruptedFrameException {
+  public static @NotNull String readString(final ByteBuf byteBuf) throws DecoderException {
     return readString(byteBuf, Short.MAX_VALUE);
   }
 
   public static @NotNull String readString(final ByteBuf byteBuf,
-                                           final int cap) throws CorruptedFrameException {
+                                           final int cap) throws DecoderException {
     final int length = readVarInt(byteBuf);
     return readString(byteBuf, cap, length);
   }
 
   public static @NotNull String readString(final @NotNull ByteBuf byteBuf,
                                            final int cap,
-                                           final int length) throws CorruptedFrameException {
-    checkFrame(length >= 0, "Got a negative-length string");
-    checkFrame(length <= cap * 3, "Bad string size");
-    checkFrame(byteBuf.isReadable(length), "Tried to read a too-long string");
+                                           final int length) throws DecoderException {
+    checkState(length >= 0, "Got a negative-length string");
+    checkState(length <= cap * 3, "Bad string size");
+    checkState(byteBuf.isReadable(length), "Tried to read a too-long string");
     final String str = byteBuf.toString(byteBuf.readerIndex(), length, StandardCharsets.UTF_8);
     byteBuf.readerIndex(byteBuf.readerIndex() + length);
-    checkFrame(str.length() <= cap, "Got a too-long string");
+    checkState(str.length() <= cap, "Got a too-long string");
     return str;
   }
 
@@ -272,7 +274,7 @@ public class ProtocolUtil {
   }
 
   public static void writeArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
-    checkFrame(bytes.length < Short.MAX_VALUE, "Too long array");
+    checkState(bytes.length < Short.MAX_VALUE, "Too long array");
     writeVarInt(byteBuf, bytes.length);
     byteBuf.writeBytes(bytes);
   }
@@ -361,9 +363,9 @@ public class ProtocolUtil {
     return ((high & 0xFF) << 15) | low;
   }
 
-  private void checkFrame(final boolean expression, final String message) {
+  private void checkState(final boolean expression, final String message) {
     if (!expression) {
-      throw new CorruptedFrameException(message);
+      throw DEBUG ? new DecoderException(message) : QuietDecoderException.INSTANCE;
     }
   }
 }

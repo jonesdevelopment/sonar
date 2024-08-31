@@ -15,7 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api;
+package xyz.jonesdev.sonar.api.exception;
 
-final class AlreadyInitializedException extends RuntimeException {
+import xyz.jonesdev.sonar.api.Sonar;
+
+public final class ReflectiveOperationException extends RuntimeException {
+  public ReflectiveOperationException(final Throwable throwable) {
+    super(throwable);
+
+    Sonar.get().getLogger().error("A reflective operation resulted in error:");
+    throwable.printStackTrace(System.err);
+  }
 }

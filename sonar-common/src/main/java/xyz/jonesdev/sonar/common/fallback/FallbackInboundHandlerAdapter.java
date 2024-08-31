@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.common.fallback;
 
 import io.netty.channel.*;
-import io.netty.handler.codec.CorruptedFrameException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +29,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.util.GeyserUtil;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -61,11 +61,11 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
                                        final int protocol) throws Exception {
     // Check if the hostname is invalid
     if (hostname.isEmpty()) {
-      throw new CorruptedFrameException("Hostname is empty");
+      throw QuietDecoderException.INSTANCE;
     }
     // Check if the player has already sent a handshake packet
     if (protocolVersion != null) {
-      throw new CorruptedFrameException("Already sent handshake");
+      throw QuietDecoderException.INSTANCE;
     }
     // Store the protocol version
     protocolVersion = ProtocolVersion.fromId(protocol);
@@ -88,13 +88,13 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
                                    final @NotNull InetSocketAddress socketAddress) throws Exception {
     // Check if the player has already sent a login packet
     if (this.username != null) {
-      throw new CorruptedFrameException("Already sent login");
+      throw QuietDecoderException.INSTANCE;
     }
     // Connections from unknown protocol versions will be discarded
     // as this is the safest way of handling unwanted connections
     if (protocolVersion.isUnknown()) {
       // Sonar does not support snapshots or Minecraft versions older than 1.7.2
-      throw new CorruptedFrameException("Unknown protocol version");
+      throw QuietDecoderException.INSTANCE;
     }
     // Increase joins per second for the action bar verbose
     GlobalSonarStatistics.countLogin();

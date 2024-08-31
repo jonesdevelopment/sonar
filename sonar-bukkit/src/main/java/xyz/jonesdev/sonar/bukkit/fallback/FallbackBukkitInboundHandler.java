@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.bukkit.fallback;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.DecoderException;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacket;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.net.InetSocketAddress;
 import java.util.Objects;
@@ -35,6 +36,7 @@ import java.util.Objects;
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INBOUND_HANDLER;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
@@ -92,14 +94,14 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
       } catch (Throwable throwable) {
         // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
-        throw new CorruptedFrameException("Failed to decode packet");
+        throw DEBUG ? new DecoderException("Failed to decode packet") : QuietDecoderException.INSTANCE;
       }
 
       // Check if the packet still has bytes left after we decoded it
       if (byteBuf.isReadable()) {
         // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
-        throw new CorruptedFrameException("Could not read packet to end");
+        throw QuietDecoderException.INSTANCE;
       }
 
       // Useful resources:
@@ -120,7 +122,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
             updateRegistry(FallbackPacketRegistry.LOGIN, Objects.requireNonNull(protocolVersion));
             break;
           default:
-            throw new CorruptedFrameException("Unknown handshake intent " + handshake.getIntent());
+            throw QuietDecoderException.INSTANCE;
         }
       } else if (packet instanceof LoginStartPacket) {
         final LoginStartPacket loginStart = (LoginStartPacket) packet;

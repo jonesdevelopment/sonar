@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.common.fallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.CorruptedFrameException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -42,6 +41,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.DisconnectPacket;
 import xyz.jonesdev.sonar.common.fallback.session.FallbackLoginSessionHandler;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -186,7 +186,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     }
 
     // Throw an exception to avoid further code execution
-    throw new CorruptedFrameException("Failed the bot verification");
+    throw QuietDecoderException.INSTANCE;
   }
 
   /**

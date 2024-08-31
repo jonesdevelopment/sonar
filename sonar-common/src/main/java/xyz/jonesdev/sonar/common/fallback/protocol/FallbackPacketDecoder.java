@@ -20,15 +20,17 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.DecoderException;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
@@ -76,12 +78,12 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
           // Try to decode the packet for the given protocol version
           packet.decode(byteBuf, protocolVersion);
         } catch (Throwable throwable) {
-          throw new CorruptedFrameException("Failed to decode packet");
+          throw DEBUG ? new DecoderException(throwable) : QuietDecoderException.INSTANCE;
         }
 
         // Check if the packet still has bytes left after we decoded it
         if (byteBuf.isReadable()) {
-          throw new CorruptedFrameException("Could not read packet to end");
+          throw DEBUG ? new DecoderException("Could not read packet to end") : QuietDecoderException.INSTANCE;
         }
 
         // Let our verification handler process the packet
@@ -102,12 +104,12 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
                                final @NotNull FallbackPacket packet) throws Exception {
     final int expectedMaxLen = packet.expectedMaxLength(byteBuf, protocolVersion);
     if (expectedMaxLen != -1 && byteBuf.readableBytes() > expectedMaxLen) {
-      throw new CorruptedFrameException("Packet too large");
+      throw DEBUG ? new DecoderException("Packet too large") : QuietDecoderException.INSTANCE;
     }
 
     final int expectedMinLen = packet.expectedMinLength(byteBuf, protocolVersion);
     if (expectedMinLen != -1 && byteBuf.readableBytes() < expectedMinLen) {
-      throw new CorruptedFrameException("Packet too small");
+      throw DEBUG ? new DecoderException("Packet too small") : QuietDecoderException.INSTANCE;
     }
   }
 }
