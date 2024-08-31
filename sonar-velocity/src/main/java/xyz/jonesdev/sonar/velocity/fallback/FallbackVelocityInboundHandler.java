@@ -27,6 +27,7 @@ import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
 import java.net.InetSocketAddress;
 
 import static com.velocitypowered.proxy.network.Connections.HANDLER;
+import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.STATUS;
 
 final class FallbackVelocityInboundHandler extends FallbackInboundHandlerAdapter {
 
@@ -34,10 +35,11 @@ final class FallbackVelocityInboundHandler extends FallbackInboundHandlerAdapter
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
     // Intercept any handshake packet by the client
     if (msg instanceof HandshakePacket handshake) {
-      handleHandshake(ctx.channel(), handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
       // We don't care about server pings; remove the handler
-      if (handshake.getNextStatus() == 1) {
+      if (handshake.getNextStatus() == STATUS) {
         ctx.pipeline().remove(this);
+      } else {
+        handleHandshake(ctx.channel(), handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
       }
     }
     // Intercept any server login packet by the client
