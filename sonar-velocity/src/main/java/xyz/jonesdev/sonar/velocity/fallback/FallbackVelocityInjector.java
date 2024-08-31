@@ -23,7 +23,7 @@ import com.velocitypowered.proxy.network.ServerChannelInitializerHolder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import lombok.experimental.UtilityClass;
-import xyz.jonesdev.sonar.api.ReflectiveOperationException;
+import xyz.jonesdev.sonar.api.exception.ReflectiveOperationException;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;

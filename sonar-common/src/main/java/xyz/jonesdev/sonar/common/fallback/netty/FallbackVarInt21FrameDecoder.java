@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.common.fallback.netty;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.CorruptedFrameException;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
 
       if (readVarInt < 0) {
         in.clear();
-        throw new CorruptedFrameException("Invalid VarInt length " + readVarInt);
+        throw QuietDecoderException.INSTANCE;
       } else if (readVarInt == 0) {
         // Skip over the empty packet(s) and ignore it
         in.readerIndex(end + 1);
@@ -70,7 +70,7 @@ public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
       }
     } else if (reader.getResult() == FallbackVarInt21ByteDecoder.DecodeResult.TOO_BIG) {
       in.clear();
-      throw new CorruptedFrameException("Too big VarInt " + reader.getReadVarInt());
+      throw QuietDecoderException.INSTANCE;
     }
   }
 }
