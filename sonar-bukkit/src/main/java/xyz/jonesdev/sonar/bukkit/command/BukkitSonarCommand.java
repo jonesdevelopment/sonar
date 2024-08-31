@@ -45,7 +45,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
       sender::hasPermission);
     // Pass the invocation source and command arguments to our command handler
     handle(invocationSource, args);
-    return true; // Valid
+    return true;
   }
 
   @Override

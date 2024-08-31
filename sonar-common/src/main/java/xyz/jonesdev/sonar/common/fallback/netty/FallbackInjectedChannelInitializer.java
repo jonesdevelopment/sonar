@@ -62,7 +62,7 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
 
     // Inject Sonar's channel handler into the pipeline;
     // Also make sure the player is not a fake player to avoid compatibility issues
-    if (channel.isActive() && !FakeChannelUtil.isFakePlayer(channel)) {
+    if (channel.isActive() && !FakeChannelUtil.isFakeChannel(channel)) {
       final FallbackInboundHandler inboundHandler = new FallbackInboundHandler(sonarPipelineInjector);
       // We need to be careful on Bukkit, as the encoder can be different
       if (Sonar.get().getPlatform() == SonarPlatform.BUKKIT) {

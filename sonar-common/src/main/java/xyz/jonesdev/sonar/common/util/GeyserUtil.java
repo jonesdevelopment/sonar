@@ -29,13 +29,12 @@ public class GeyserUtil {
   // https://github.com/GeyserMC/Floodgate/blob/master/core/src/main/java/org/geysermc/floodgate/module/CommonModule.java#L206
   private final AttributeKey<Object> PLAYER_ATTRIBUTE = AttributeKey.valueOf("floodgate-player");
 
-  /**
-   * @param channel Channel of the player
-   * @return Whether the player is on GeyserMC or not
-   */
-  public boolean isGeyserConnection(final @NotNull Channel channel,
-                                    final @NotNull InetSocketAddress originalAddress) {
-    return originalAddress.getPort() == 0 // check for floodgate on the server
-      || channel.attr(PLAYER_ATTRIBUTE).get() != null; // check for standalone Geyser proxy connection
+  public boolean isGeyserConnection(final @NotNull Channel channel, final @NotNull InetSocketAddress originalAddress) {
+    /*
+     * This method performs two checks:
+     * 1. It checks if the player is joining through Floodgate, which is installed on the server.
+     * 2. It checks if the player is joining through a Floodgate proxy hosted externally.
+     */
+    return originalAddress.getPort() == 0 || channel.attr(PLAYER_ATTRIBUTE).get() != null;
   }
 }

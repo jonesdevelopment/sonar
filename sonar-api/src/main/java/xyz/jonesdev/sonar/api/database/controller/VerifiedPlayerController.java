@@ -74,10 +74,8 @@ public final class VerifiedPlayerController {
 
   public VerifiedPlayerController(final @NotNull LibraryManager libraryManager) {
     final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
-    // Cache selected database type, so we don't need to call Sonar.get() every time
     cachedDatabaseType = database.getType();
 
-    // Don't establish a database connection if the type is NONE
     if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
       LOGGER.warn("Configure a database to save verified players.");
       return;
@@ -92,7 +90,6 @@ public final class VerifiedPlayerController {
       libraryManager.loadLibrary(cachedDatabaseType.getDatabaseDriver());
       cachedDatabaseType.setDownloaded(true);
     }
-    // Make sure to actually register the loader, so we can use it
     cachedDatabaseType.getDatabaseType().loadDriver();
 
     try {
@@ -120,10 +117,12 @@ public final class VerifiedPlayerController {
       // Create database table
       try {
         TableUtils.createTableIfNotExists(connectionSource, VerifiedPlayer.class);
-      } catch (SQLException exception) {
-        // Duplicate index
-        // I know this isn't the best method of handling it,
-        // but I don't know how else I could address this issue.
+      } catch (SQLException ignored) {
+        /*
+         * This is caused by a duplicate index;
+         * I know this isn't the best method of handling it,
+         * but I don't know how else I could address this issue.
+         */
       }
 
       dao = DaoManager.createDao(connectionSource, VerifiedPlayer.class);

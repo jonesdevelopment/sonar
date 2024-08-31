@@ -67,8 +67,11 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
     if (msg instanceof ByteBuf) {
       final ByteBuf byteBuf = (ByteBuf) msg;
 
-      // Reset the reader index, so we can read the content
-      // Make sure to store the original reader index
+      /*
+       * Reset the reader index, so we can read the content;
+       * We also have to make sure to store the original reader index.
+       * We do this to 'spoof' the packet state - we want to read it without the server knowing.
+       */
       final int originalReaderIndex = byteBuf.readerIndex();
       byteBuf.readerIndex(0);
 
@@ -83,7 +86,6 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
 
       // Skip the packet if it's not registered within Sonar's packet registry
       if (packet == null) {
-        // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
         return;
       }
@@ -92,21 +94,21 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         // Try to decode the packet for the given protocol version
         packet.decode(byteBuf, protocolVersion == null ? DEFAULT_PROTOCOL_VERSION : protocolVersion);
       } catch (Throwable throwable) {
-        // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
         throw DEBUG ? new DecoderException(throwable) : QuietDecoderException.INSTANCE;
       }
 
       // Check if the packet still has bytes left after we decoded it
       if (byteBuf.isReadable()) {
-        // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
         throw DEBUG ? new DecoderException("Could not read packet to end") : QuietDecoderException.INSTANCE;
       }
 
-      // Useful resources:
-      // https://wiki.vg/Protocol#Handshaking
-      // https://wiki.vg/Protocol#Login
+      /*
+       * Useful resources:
+       * https://wiki.vg/Protocol#Handshaking
+       * https://wiki.vg/Protocol#Login
+       */
       if (packet instanceof HandshakePacket) {
         final HandshakePacket handshake = (HandshakePacket) packet;
         switch (handshake.getIntent()) {
@@ -138,7 +140,6 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
             channelRemovalListener.accept(ctx.pipeline(), FALLBACK_INBOUND_HANDLER, inboundHandler);
           }
         }, loginStart.getUsername(), socketAddress);
-        // Release the ByteBuf to avoid memory leaks
         byteBuf.release();
         return;
       }
