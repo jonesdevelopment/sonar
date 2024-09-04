@@ -153,6 +153,9 @@ verification:
     # დამატებით, შეიძლება გინდოდეთ შეამციროთ შესვლის სიხშირის ლიმიტი
     # რომელსაც ახორციელებს Velocity ან სხვა პროქსიები/პლაგინები, რადგან ეს შეიძლება ხელს უშლიდეს
     # მოთამაშის სწორად გადაყვანას
+    # If your server allows Bedrock players to join via Geyser, make sure to set up
+    # TransferTool for Geyser, so Bedrock players are redirected to the correct server.
+    # https://github.com/onebeastchris/TransferTool
     enabled: false
     # რომელ სერვერზე უნდა გადაიყვანოს Sonar-მა მოთამაშე ვერიფიკაციის გავლის შემდეგ?
     # გთხოვთ, შეიყვანოთ სერვერის IP მისამართი, რომლითაც მოთამაშეები ჩვეულებრივ უერთდებიან თქვენს სერვერს

@@ -155,6 +155,9 @@ verification:
     # Additionally, you might want to reduce the amount of login rate-limiting
     # performed by Velocity or other proxies/plugins, as this might prevent the
     # player from being transferred correctly.
+    # If your server allows Bedrock players to join via Geyser, make sure to set up
+    # TransferTool for Geyser, so Bedrock players are redirected to the correct server.
+    # https://github.com/onebeastchris/TransferTool
     enabled: false
     # Which server should Sonar transfer the player to when the verification is passed?
     # Please enter the server IP used by players to normally connect to your server.
