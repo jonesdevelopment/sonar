@@ -35,12 +35,9 @@ public final class SonarEventManager {
   private static final Collection<SonarEventListener> EVENT_LISTENERS = new Vector<>(0);
   private static final ExecutorService EVENT_SERVICE = Executors.newSingleThreadExecutor();
 
-  /**
-   * Publishes the given event to all listeners
-   */
   @ApiStatus.Internal
   public void publish(final @NotNull SonarEvent event) {
-    // Don't post a task if there are no listeners
+    // Don't post an event if there are no listeners
     if (EVENT_LISTENERS.isEmpty()) {
       return;
     }

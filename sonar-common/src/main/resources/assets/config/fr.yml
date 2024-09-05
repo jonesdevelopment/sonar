@@ -154,6 +154,9 @@ verification:
     # De plus, vous voudrez peut-être réduire la quantité de limitation de débit de connexion
     # effectuée par Velocity ou d'autres proxys/plugins, car cela pourrait empêcher le
     # joueur d'être transféré correctement.
+    # Si votre serveur permet aux joueurs de Bedrock de s'inscrire via Geyser, assurez-vous de configurer
+    # TransferTool pour Geyser, afin que les joueurs Bedrock soient redirigés vers le bon serveur.
+    # https://github.com/onebeastchris/TransferTool
     enabled: false
     # Quel serveur Sonar devrait-il utiliser pour transférer le joueur une fois la vérification réussie ?
     # Veuillez entrer l'adresse IP du serveur que les joueurs utilisent normalement pour se connecter à votre serveur.

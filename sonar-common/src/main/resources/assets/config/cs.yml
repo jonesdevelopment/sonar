@@ -155,6 +155,9 @@ verification:
     # Kromě toho možná budete chtít snížit množství omezení rychlosti přihlášení
     # provádí Velocity nebo jiné proxy/pluginy, protože to může zabránit
     # hráči správné přenesení.
+    # Pokud váš server umožňuje hráčům Bedrocku připojit se přes Geyser, nezapomeňte nastavit.
+    # TransferTool pro Geyser, aby byli hráči Bedrocku přesměrováni na správný server.
+    # https://github.com/onebeastchris/TransferTool
     enabled: false
     # Na který server by měl Sonar přenést hráče, když projde ověřením?
     # Zadejte IP serveru, který hráči používají k běžnému připojení k vašemu serveru.

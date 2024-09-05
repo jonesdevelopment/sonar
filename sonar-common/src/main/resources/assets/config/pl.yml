@@ -154,6 +154,9 @@ verification:
     # Dodatkowo, możesz chcieć zmniejszyć limitowanie prędkości logowania (ratelimit).
     # wykonywane przez Velocity lub inne silniki/pluginy, ponieważ
     # może to uniemożliwić prawidłowe przeniesienie gracza.
+    # Jeśli twój serwer pozwala graczom Bedrock na dołączenie przez Geyser, upewnij się, że skonfigurowałeś
+    # TransferTool dla Geyser, aby gracze Bedrock byli przekierowywani na właściwy serwer.
+    # https://github.com/onebeastchris/TransferTool
     enabled: false
     # Na który serwer Sonar powinien przenieść gracza po pomyślnym przejściu weryfikacji?
     # Wprowadź adres IP serwera, który jest używany przez graczy do normalnego łączenia się z serwerem.

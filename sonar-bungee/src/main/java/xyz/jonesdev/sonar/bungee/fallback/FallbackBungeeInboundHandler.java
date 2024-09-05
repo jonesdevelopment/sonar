@@ -50,11 +50,10 @@ final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
 
   @Override
   public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
-    // Intercept any packets processed by BungeeCord
     if (msg instanceof PacketWrapper) {
       final PacketWrapper packetWrapper = (PacketWrapper) msg;
       final DefinedPacket wrappedPacket = packetWrapper.packet;
-      // Don't handle any invalid packets
+      // Skip any unknown or invalid packets
       if (wrappedPacket != null) {
         final Channel channel = ctx.channel();
         // Intercept any handshake packet by the client
@@ -89,7 +88,6 @@ final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
         }
       }
     }
-    // Make sure to let the server handle the rest
     ctx.fireChannelRead(msg);
   }
 }

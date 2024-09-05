@@ -108,8 +108,8 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
 
   @Override
   public void disable() {
+    // Make sure to properly stop the metrics
     if (metrics != null) {
-      // Make sure to properly shutdown bStats metrics
       metrics.shutdown();
     }
   }

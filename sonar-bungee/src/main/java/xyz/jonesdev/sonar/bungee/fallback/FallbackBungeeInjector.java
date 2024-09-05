@@ -47,12 +47,10 @@ public class FallbackBungeeInjector {
       unsafeField.setAccessible(true);
       final Unsafe unsafe = (Unsafe) unsafeField.get(null);
 
-      // Get the base object (the object containing the field)
       final Object base = unsafe.staticFieldBase(childField);
-      // Get the offset of the static field within its class
       final long offset = unsafe.staticFieldOffset(childField);
 
-      // Replace the original channel initializer
+      // Replace the original channel initializer with our new injected initializer
       unsafe.putObject(base, offset, injectedInitializer);
     } catch (Exception exception) {
       Sonar.get().getLogger().error("An error occurred while injecting {}", exception);

@@ -152,6 +152,9 @@ verification:
     # Darüber hinaus möchten Sie möglicherweise die Begrenzung der Anmelderate reduzieren
     # wird von Velocity oder anderen Proxys/Plugins durchgeführt, da dies das verhindern könnte
     # Spieler konnte nicht korrekt übertragen werden.
+    # Wenn Ihr Server es erlaubt, dass Bedrock-Spieler über Geyser beitreten können, stellen Sie sicher, dass Sie das
+    # TransferTool für Geyser einrichten, damit Bedrock-Spieler auf den richtigen Server umgeleitet werden.
+    # https://github.com/onebeastchris/TransferTool
     enabled: false
     # Auf welchen Server soll Sonar den Spieler übertragen, wenn die Verifizierung bestanden wurde?
     # Bitte geben Sie die Server-IP ein, die von Spielern verwendet wird, um sich zu verbinden.

@@ -148,6 +148,9 @@ verification:
     # 为此您必须在服务器软件的配置文件中允许接受来自transfer的连接.
     # 此外 您可能希望减少 Velocity 或其它服务器软件/插件的登录速率限制
     # 因为这可能会阻止玩家快速地重新连接到服务器
+    # 如果你的服务器允许 Bedrock 玩家通过间歇泉加入, 请确保为间歇泉设置了
+    # 传输工具 TransferTool, 以便将 Bedrock 玩家重定向到正确的服务器.
+    # https://github.com/onebeastchris/TransferTool
     enabled: false
     # 当玩家通过验证后, Sonar 应该将玩家转移到哪个服务器
     # 请输入玩家正常连接服务器时使用的服务器IP或域名

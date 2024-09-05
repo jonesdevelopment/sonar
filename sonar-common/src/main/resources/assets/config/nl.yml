@@ -154,6 +154,9 @@ verification:
     # Bovendien wilt u mogelijk de beperking van de inlegsnelheid verminderen
     # uitgevoerd door Velocity van andere proxy's/plugins, omdat dit de
     # speler wordt niet correct weergegeven.
+    # Als je server toestaat dat Bedrock spelers meedoen via Geyser, zorg er dan voor dat je
+    # TransferTool voor Geyser, zodat Bedrock spelers worden doorgestuurd naar de juiste server.
+    # https://github.com/onebeastchris/TransferTool
     enabled: false
     # Naar welke server moet Sonar de speler overbrengen wanneer de verificatie is geslaagd?
     # Voer het server-IP in dat door spelers wordt gebruikt om normaal verbinding te maken met uw server.

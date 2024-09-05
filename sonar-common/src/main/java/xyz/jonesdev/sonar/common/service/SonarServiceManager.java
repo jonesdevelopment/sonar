@@ -43,13 +43,12 @@ public final class SonarServiceManager {
 
   public void start() {
     VERBOSE.scheduleAtFixedRate(() -> {
-      // Make sure to clean up the cached statistics
-      // since we don't want to display wrong values.
+      // Make sure to clean up the cached statistics since we don't want to display wrong values
       Sonar.get().getStatistics().cleanUpCache();
       Sonar.get().getFallback().getBlacklist().cleanUp();
       // Update the attack tracker
       Sonar.get().getAttackTracker().checkIfUnderAttack();
-      // Update the action bar verbose
+      // Publish the action bar notifications
       Sonar.get().getActionBarNotificationHandler().handleNotification();
     }, 0L, 250L, TimeUnit.MILLISECONDS);
 

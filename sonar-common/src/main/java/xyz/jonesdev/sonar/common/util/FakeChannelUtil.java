@@ -26,10 +26,12 @@ import org.jetbrains.annotations.NotNull;
 public class FakeChannelUtil {
 
   /**
-   * @param channel Channel of the player
-   * @return Whether the channel is spoofed/faked
+   * Checks if the provided channel is a fake channel, typically used by player spoofing plugins.
+   *
+   * @param channel The channel to be checked.
+   * @return true if the channel is identified as a fake channel
    */
-  public boolean isFakePlayer(final @NotNull Channel channel) {
+  public boolean isFakeChannel(final @NotNull Channel channel) {
     final String simpleClassName = channel.getClass().getSimpleName();
     // Player spoof plugins use fake channels (e.g., Spoof Engine uses "FakeChannel")
     return "FakeChannel".equals(simpleClassName) || "SpoofedChannel".equals(simpleClassName);

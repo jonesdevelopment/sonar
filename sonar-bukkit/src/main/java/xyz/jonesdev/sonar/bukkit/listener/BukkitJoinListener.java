@@ -83,7 +83,7 @@ public final class BukkitJoinListener implements Listener {
       }
 
       // Make sure the player is not a fake player
-      if (FakeChannelUtil.isFakePlayer(channel)) {
+      if (FakeChannelUtil.isFakeChannel(channel)) {
         return;
       }
 
