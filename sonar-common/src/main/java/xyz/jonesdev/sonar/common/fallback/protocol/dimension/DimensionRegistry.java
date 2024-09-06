@@ -30,36 +30,30 @@ import java.util.Objects;
 
 @UtilityClass
 public final class DimensionRegistry {
+  public final CompoundBinaryTag CODEC_1_16;
+  public final CompoundBinaryTag CODEC_1_16_2;
+  public final CompoundBinaryTag CODEC_1_18_2;
+  public final CompoundBinaryTag CODEC_1_19;
+  public final CompoundBinaryTag CODEC_1_19_1;
+  public final CompoundBinaryTag CODEC_1_19_4;
+  public final CompoundBinaryTag CODEC_1_20;
+  public final CompoundBinaryTag CODEC_1_21;
+
   public final DimensionInfo DEFAULT_DIMENSION_1_16;
   public final DimensionInfo DEFAULT_DIMENSION_1_18_2;
 
-  public final @NotNull CompoundBinaryTag CODEC_1_16;
-  public final @NotNull CompoundBinaryTag CODEC_1_18_2;
-  public final @NotNull CompoundBinaryTag CODEC_1_19;
-  public final @NotNull CompoundBinaryTag CODEC_1_19_1;
-  public final @NotNull CompoundBinaryTag CODEC_1_19_4;
-  public final @NotNull CompoundBinaryTag CODEC_1_20;
-  public final @NotNull CompoundBinaryTag CODEC_1_21;
-  public final @NotNull CompoundBinaryTag OLD_CODEC;
-
   static {
     CODEC_1_16 = getCodec("codec_1_16.nbt");
+    CODEC_1_16_2 = getCodec("codec_1_16_2.nbt");
     CODEC_1_18_2 = getCodec("codec_1_18_2.nbt");
     CODEC_1_19 = getCodec("codec_1_19.nbt");
     CODEC_1_19_1 = getCodec("codec_1_19_1.nbt");
     CODEC_1_19_4 = getCodec("codec_1_19_4.nbt");
     CODEC_1_20 = getCodec("codec_1_20.nbt");
     CODEC_1_21 = getCodec("codec_1_21.nbt");
-    OLD_CODEC = getCodec("codec_old.nbt");
 
-    DEFAULT_DIMENSION_1_16 = getDimension(CODEC_1_16);
+    DEFAULT_DIMENSION_1_16 = getDimension(CODEC_1_16_2);
     DEFAULT_DIMENSION_1_18_2 = getDimension(CODEC_1_18_2);
-  }
-
-  private static @NotNull DimensionInfo getDimension(final @NotNull CompoundBinaryTag tag) {
-    final ListBinaryTag dimensions = tag.getCompound("minecraft:dimension_type").getList("value");
-    final BinaryTag elementTag = ((CompoundBinaryTag) dimensions.get(0)).get("element");
-    return new DimensionInfo("minecraft:overworld", 0, (CompoundBinaryTag) elementTag);
   }
 
   private @NotNull CompoundBinaryTag getCodec(final @NotNull String fileName) {
@@ -69,5 +63,11 @@ public final class DimensionRegistry {
       Sonar.get().getLogger().error("Could not load mappings for {}: {}", fileName, throwable);
       throw new IllegalStateException(throwable);
     }
+  }
+
+  private static @NotNull DimensionInfo getDimension(final @NotNull CompoundBinaryTag tag) {
+    final ListBinaryTag dimensions = tag.getCompound("minecraft:dimension_type").getList("value");
+    final BinaryTag elementTag = ((CompoundBinaryTag) dimensions.get(0)).get("element");
+    return new DimensionInfo("minecraft:overworld", 0, (CompoundBinaryTag) elementTag);
   }
 }

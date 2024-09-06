@@ -104,7 +104,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
-      writeCompoundTag(byteBuf, OLD_CODEC);
+      writeCompoundTag(byteBuf, CODEC_1_16);
       writeString(byteBuf, DEFAULT_DIMENSION_1_16.getIdentifier());
       writeString(byteBuf, levelName);
       byteBuf.writeLong(partialHashedSeed);
@@ -122,7 +122,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
-      writeCompoundTag(byteBuf, CODEC_1_16);
+      writeCompoundTag(byteBuf, CODEC_1_16_2);
       writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_16.getTag());
       writeString(byteBuf, levelName);
       byteBuf.writeLong(partialHashedSeed);
