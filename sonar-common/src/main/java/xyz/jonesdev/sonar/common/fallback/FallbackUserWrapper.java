@@ -34,7 +34,7 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackTailExceptionsHandler;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameDecoder;
-import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameEncoder;
+import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarIntLengthEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
@@ -116,7 +116,7 @@ public final class FallbackUserWrapper implements FallbackUser {
 
       // Replace normal encoder to allow custom packets
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
-      pipeline.addFirst(FALLBACK_FRAME_ENCODER, FallbackVarInt21FrameEncoder.INSTANCE);
+      pipeline.addFirst(FALLBACK_FRAME_ENCODER, FallbackVarIntLengthEncoder.INSTANCE);
       pipeline.addLast(FALLBACK_PACKET_ENCODER, newEncoder);
 
       // Send LoginSuccess packet to make the client think they are joining the server
