@@ -138,9 +138,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex pour valider la locale client lors de la vérification
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Le ping qu'un joueur doit avoir pour dépasser le délai d'attente
-    # (Cette valeur représente le temps en millisecondes : 1 seconde = 1000 millisecondes)
-    max-ping: 10000
     # Nombre maximal de paquets de connexion que le joueur doit envoyer pour être expulsé
     max-login-packets: 256
 

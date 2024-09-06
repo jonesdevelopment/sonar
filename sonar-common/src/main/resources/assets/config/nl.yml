@@ -138,9 +138,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex voor het valideren van de landinstelling van de client tijdens verificatie
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Ping moet een speler hebben om een time-out te krijgen
-    # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
-    max-ping: 10000
     # Maximaal aantal loginpakketten dat de speler moet verzenden om te worden geschopt
     max-login-packets: 256
 

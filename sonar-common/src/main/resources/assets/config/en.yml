@@ -139,9 +139,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex for validating client locale during verification
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Ping a player has to have to timeout
-    # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
-    max-ping: 10000
     # Maximum number of login packets the player has to send in order to be kicked
     max-login-packets: 256
 

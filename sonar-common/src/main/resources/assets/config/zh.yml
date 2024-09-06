@@ -135,8 +135,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # 用于检查客户端语言(例如 zh_CN)的正则表达式
     valid-locale-regex: ^[a-zA-Z_]+$
-    # 玩家必须在多少毫秒内回复Ping?
-    max-ping: 10000
     # 玩家最多能发送多少个数据包用于登录?
     max-login-packets: 256
 

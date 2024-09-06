@@ -138,9 +138,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex do sprawdzania ustawień regionalnych klienta podczas weryfikacji
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Maksymalny ping gracza, zanim zostanie wyrzucony z serwera.
-    # (Wartość ta reprezentuje czas w milisekundach: 1 sekunda = 1000 milisekund)
-    max-ping: 10000
     # Liczba pakietów logowania, które gracz musi wysłać, aby zostać wyrzuconym.
     max-login-packets: 256
 

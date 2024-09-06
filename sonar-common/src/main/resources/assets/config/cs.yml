@@ -139,9 +139,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex pro validaci "client locale" při verifikaci
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Maximální odezva hráče aby byl odpojen
-    # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
-    max-ping: 10000
     # Maximální počet login packetů, který musí hřáč poslat aby byl vyhozen
     max-login-packets: 256
 
