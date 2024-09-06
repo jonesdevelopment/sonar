@@ -10,6 +10,7 @@
 #
 # Need help or have questions? https://jonesdev.xyz/discord
 # Source code: https://github.com/jonesdevelopment/sonar
+# Documentation: https://docs.jonesdev.xyz/administration/configuring-sonar
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
 
@@ -62,7 +63,7 @@ database:
 # Every new login request will be queued to avoid spam join attacks
 # The queue is updated every 1 second (20 ticks)
 queue:
-  # Maximum number of concurrent queue polls per 1 second
+  # Number of concurrent queue polls per 1 second
   max-polls: 30
 
 # Every new player that joins for the first time will be sent to
@@ -82,7 +83,7 @@ verification:
       enabled: true
       # Should Sonar make the player solve a CAPTCHA if they fail the gravity check?
       captcha-on-fail: false
-      # Maximum number of ticks the player has to fall to be allowed to hit the platform
+      # The number of ticks the player has to fall to be allowed to hit the platform
       max-movement-ticks: 8
 
     # Checks if the player is colliding with blocks spawned below them
@@ -110,8 +111,8 @@ verification:
       # - NEVER: New players will never receive a CAPTCHA (Recommended)
       timing: NEVER
       # Path to the background image Sonar uses for the CAPTCHA
-      # If the image isn't found, a noise will be used as the default background
-      # You can put the name of the file here if the file is in the plugin directory
+      # If the image isn't found, a noise will be used as the default background.
+      # You can put the name of the file here if the file is in Sonar's plugin directory
       background: ''
       # How many CAPTCHA answers should Sonar prepare?
       # This task happens asynchronously in the background
@@ -139,7 +140,7 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex for validating client locale during verification
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Maximum number of login packets the player has to send in order to be kicked
+    # The number of login packets the player has to send in order to be kicked
     max-login-packets: 256
 
   # If enabled, the player will be transferred back to the origin server

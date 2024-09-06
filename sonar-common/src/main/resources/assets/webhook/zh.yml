@@ -10,7 +10,7 @@
 #
 # 需要帮助吗? https://jonesdev.xyz/discord
 # 源代码: https://github.com/jonesdevelopment/sonar
-# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+# Copyright Jones Development and Sonar Contributors, 以 GPL-3.0 许可
 #
 
 # 当遭到机器人攻击时也可以将webhook消息发送到Discord服务器中.
