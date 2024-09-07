@@ -84,7 +84,7 @@ verification:
       # Czy Sonar powinien zmusić gracza do rozwiązania CAPTCHA, jeśli nie uda mu się przejść testu grawitacji?
       captcha-on-fail: false
       # Maksymalna liczba tików, po których gracz musi spaść, aby móc uderzyć w platformę.
-      max-movement-ticks: 8
+      max-movement-ticks: 10
 
     # Sprawdza, czy gracz zderza się z blokami, które pojawiły się pod nim
     collision:

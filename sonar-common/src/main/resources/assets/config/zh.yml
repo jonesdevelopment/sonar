@@ -82,7 +82,7 @@ verification:
       # 当玩家验证失败时 是否向他们发送验证码?
       captcha-on-fail: false
       # 玩家跌落在平台上多少tick后才能被算作站在平台上?
-      max-movement-ticks: 8
+      max-movement-ticks: 10
 
     # 检查玩家是否与下方生成的方块发生碰撞
     collision:

@@ -84,7 +84,7 @@ verification:
       # უნდა აიძულოს თუ არა Sonar-მა მოთამაშეს შეასრულოს CAPTCHA, თუ ისინი ვერ შეასრულებენ სიმძიმის შემოწმებას?
       captcha-on-fail: false
       # ტიკების მაქსიმალური რაოდენობა რომელითაც მოთამაშე უნდა დაეცეს, რათა პლატფორმაზე დაცემა შეეძლოს. (20 ტიკი = 1 წამი)
-      max-movement-ticks: 8
+      max-movement-ticks: 10
 
     # Checks if the player is colliding with blocks spawned below them
     collision:

@@ -93,7 +93,7 @@ public class FallbackPreparer {
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
   public final int SPAWN_X_POSITION = 16 / 2; // middle of the chunk
   public final int SPAWN_Z_POSITION = 16 / 2; // middle of the chunk
-  public final int DEFAULT_Y_COLLIDE_POSITION = 255; // 255 is the maximum Y position allowed
+  public final int DEFAULT_Y_COLLIDE_POSITION = 155 + RANDOM.nextInt(101); // 255 is the maximum Y position
   public final int IN_AIR_Y_POSITION = 1337;
 
   // CAPTCHA position
@@ -103,7 +103,6 @@ public class FallbackPreparer {
   // Platform
   public BlockType blockType;
   public int maxMovementTick, dynamicSpawnYPosition;
-  public double[] preparedCachedYMotions;
   public double maxFallDistance;
 
   // XP packets
@@ -126,15 +125,14 @@ public class FallbackPreparer {
       true, false, false,
       new String[]{"minecraft:overworld"}, "minecraft:overworld"));
 
-    // Prepare cached motions for the gravity check
-    maxFallDistance = 0;
+    // Prepare the gravity check
     maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
-    preparedCachedYMotions = new double[maxMovementTick + 8];
+    maxFallDistance = 0;
 
-    for (int i = 0; i < preparedCachedYMotions.length; i++) {
-      final double gravity = -((Math.pow(0.98, i) - 1) * 3.92);
-      preparedCachedYMotions[i] = gravity;
-      maxFallDistance += gravity;
+    double motionY = -0.08 * 0.98f;
+    for (int i = 0; i < maxMovementTick; i++) {
+      motionY = (motionY - 0.08) * 0.98f;
+      maxFallDistance += Math.abs(motionY);
     }
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
