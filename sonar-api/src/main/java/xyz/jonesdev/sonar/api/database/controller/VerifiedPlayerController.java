@@ -90,7 +90,6 @@ public final class VerifiedPlayerController {
       libraryManager.loadLibrary(cachedDatabaseType.getDatabaseDriver());
       cachedDatabaseType.setDownloaded(true);
     }
-    cachedDatabaseType.getDatabaseType().loadDriver();
 
     try {
       final String jdbcURL;
