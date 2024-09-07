@@ -20,30 +20,30 @@ package xyz.jonesdev.sonar.common.fallback.netty;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.varIntBytes;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintLengthEncoder.java
 @ChannelHandler.Sharable
-public final class FallbackVarInt21FrameEncoder extends MessageToByteEncoder<ByteBuf> {
-  public static final FallbackVarInt21FrameEncoder INSTANCE = new FallbackVarInt21FrameEncoder();
+public final class FallbackVarIntLengthEncoder extends MessageToMessageEncoder<ByteBuf> {
+  public static final FallbackVarIntLengthEncoder INSTANCE = new FallbackVarIntLengthEncoder();
 
   @Override
   protected void encode(final @NotNull ChannelHandlerContext ctx,
-                        final @NotNull ByteBuf msg,
-                        final @NotNull ByteBuf out) throws Exception {
-    writeVarInt(out, msg.readableBytes());
-    out.writeBytes(msg);
-  }
+                        final @NotNull ByteBuf byteBuf,
+                        final @NotNull List<Object> out) throws Exception {
+    final int length = byteBuf.readableBytes();
+    final int varIntLength = varIntBytes(length);
 
-  @Override
-  protected ByteBuf allocateBuffer(final @NotNull ChannelHandlerContext ctx,
-                                   final @NotNull ByteBuf msg,
-                                   final boolean preferDirect) throws Exception {
-    final int anticipatedRequiredCapacity = varIntBytes(msg.readableBytes()) + msg.readableBytes();
-    return ctx.alloc().buffer(anticipatedRequiredCapacity);
+    final ByteBuf lenBuf = ctx.alloc().buffer(varIntLength);
+
+    writeVarInt(lenBuf, length);
+    out.add(lenBuf);
+    out.add(byteBuf.retain());
   }
 }

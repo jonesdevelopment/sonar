@@ -52,8 +52,8 @@ public enum BlockType {
       case MINECRAFT_1_15:
       case MINECRAFT_1_15_1:
       case MINECRAFT_1_15_2:
-      case MINECRAFT_1_16:
         return 5116;
+      case MINECRAFT_1_16:
       case MINECRAFT_1_16_1:
         return 5132;
       case MINECRAFT_1_16_2:
@@ -102,8 +102,8 @@ public enum BlockType {
       case MINECRAFT_1_15:
       case MINECRAFT_1_15_1:
       case MINECRAFT_1_15_2:
-      case MINECRAFT_1_16:
         return 7016;
+      case MINECRAFT_1_16:
       case MINECRAFT_1_16_1:
         return 7552;
       case MINECRAFT_1_16_2:

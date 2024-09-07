@@ -52,10 +52,6 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_19_3) >= 0) {
       user.delayedWrite(defaultSpawnPosition);
     }
-    // Write the PlayerInfo packet to the buffer
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_16_4) >= 0) {
-      user.delayedWrite(PLAYER_INFO);
-    }
     // 1.20.3+ introduced game events
     // Make sure the client knows that we're sending chunks next
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_3) >= 0) {

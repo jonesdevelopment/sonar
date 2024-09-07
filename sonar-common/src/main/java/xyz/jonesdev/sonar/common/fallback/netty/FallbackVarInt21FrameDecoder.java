@@ -20,57 +20,105 @@ package xyz.jonesdev.sonar.common.fallback.netty;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.DecoderException;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.List;
 
+import static io.netty.util.ByteProcessor.FIND_NON_NUL;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
+
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java
 public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
 
   @Override
-  protected void decode(final @NotNull ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
+  protected void decode(final @NotNull ChannelHandlerContext ctx,
+                        final @NotNull ByteBuf byteBuf,
+                        final @NotNull List<Object> out) throws Exception {
     if (!ctx.channel().isActive()) {
-      in.clear();
+      byteBuf.clear();
       return;
     }
 
-    final FallbackVarInt21ByteDecoder reader = new FallbackVarInt21ByteDecoder();
-    final int end = in.forEachByte(reader);
-
-    if (end == -1) {
-      // We tried to go beyond the end of the buffer.
-      // This is probably a good sign that the buffer was too short to hold a proper varint.
-      if (reader.getResult() == FallbackVarInt21ByteDecoder.DecodeResult.RUN_OF_ZEROES) {
-        // Special case where the entire packet is just a run of zeroes. We ignore them all.
-        in.clear();
-      }
+    // Skip any runs of 0x00 we might find
+    final int packetStart = byteBuf.forEachByte(FIND_NON_NUL);
+    if (packetStart == -1) {
       return;
     }
+    byteBuf.readerIndex(packetStart);
 
-    if (reader.getResult() == FallbackVarInt21ByteDecoder.DecodeResult.RUN_OF_ZEROES) {
-      // This will return to the point where the next varint starts
-      in.readerIndex(end);
-    } else if (reader.getResult() == FallbackVarInt21ByteDecoder.DecodeResult.SUCCESS) {
-      final int readVarInt = reader.getReadVarInt();
-      final int bytesRead = reader.getBytesRead();
+    // Try to read the length of the packet
+    byteBuf.markReaderIndex();
+    final int preIndex = byteBuf.readerIndex();
+    final int length = readRawVarInt21(byteBuf);
+    if (preIndex == byteBuf.readerIndex()) {
+      return;
+    }
+    if (length < 0) {
+      throw DEBUG ? new DecoderException("Bad VarInt length") : QuietDecoderException.INSTANCE;
+    }
 
-      if (readVarInt < 0) {
-        in.clear();
-        throw QuietDecoderException.INSTANCE;
-      } else if (readVarInt == 0) {
-        // Skip over the empty packet(s) and ignore it
-        in.readerIndex(end + 1);
+    // note that zero-length packets are ignored
+    if (length > 0) {
+      if (byteBuf.readableBytes() < length) {
+        byteBuf.resetReaderIndex();
       } else {
-        int minimumRead = bytesRead + readVarInt;
-        if (in.isReadable(minimumRead)) {
-          out.add(in.retainedSlice(end + 1, readVarInt));
-          in.skipBytes(minimumRead);
-        }
+        out.add(byteBuf.readRetainedSlice(length));
       }
-    } else if (reader.getResult() == FallbackVarInt21ByteDecoder.DecodeResult.TOO_BIG) {
-      in.clear();
-      throw QuietDecoderException.INSTANCE;
     }
+  }
+
+  private static int readRawVarInt21(final @NotNull ByteBuf byteBuf) {
+    if (byteBuf.readableBytes() < 4) {
+      return readRawVarIntSmallBuffer(byteBuf);
+    }
+
+    // take the last three bytes and check if any of them have the high bit set
+    final int wholeOrMore = byteBuf.getIntLE(byteBuf.readerIndex());
+    final int atStop = ~wholeOrMore & 0x808080;
+    if (atStop == 0) {
+      throw DEBUG ? new DecoderException("VarInt too big") : QuietDecoderException.INSTANCE;
+    }
+
+    final int bitsToKeep = Integer.numberOfTrailingZeros(atStop) + 1;
+    byteBuf.skipBytes(bitsToKeep >> 3);
+
+    // https://github.com/netty/netty/pull/14050#issuecomment-2107750734
+    int preservedBytes = wholeOrMore & (atStop ^ (atStop - 1));
+
+    // https://github.com/netty/netty/pull/14050#discussion_r1597896639
+    preservedBytes = (preservedBytes & 0x007F007F) | ((preservedBytes & 0x00007F00) >> 1);
+    preservedBytes = (preservedBytes & 0x00003FFF) | ((preservedBytes & 0x3FFF0000) >> 2);
+    return preservedBytes;
+  }
+
+  private static int readRawVarIntSmallBuffer(final @NotNull ByteBuf byteBuf) {
+    if (!byteBuf.isReadable()) {
+      return 0;
+    }
+    byteBuf.markReaderIndex();
+
+    byte tmp = byteBuf.readByte();
+    if (tmp >= 0) {
+      return tmp;
+    }
+    int result = tmp & 0x7F;
+    if (!byteBuf.isReadable()) {
+      byteBuf.resetReaderIndex();
+      return 0;
+    }
+    if ((tmp = byteBuf.readByte()) >= 0) {
+      return result | tmp << 7;
+    }
+    result |= (tmp & 0x7F) << 7;
+    if (!byteBuf.isReadable()) {
+      byteBuf.resetReaderIndex();
+      return 0;
+    }
+    if ((tmp = byteBuf.readByte()) >= 0) {
+      return result | tmp << 14;
+    }
+    return result | (tmp & 0x7F) << 14;
   }
 }

@@ -10,7 +10,8 @@
 #
 # Potrzebujesz pomocy lub masz pytania? https://jonesdev.xyz/discord
 # Source code: https://github.com/jonesdevelopment/sonar
-# Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
+# Dokumentacja: https://docs.jonesdev.xyz/administration/configuring-sonar
+# Copyright Jones Development and Sonar Contributors, na licencji GPL-3.0
 #
 
 # Ustawienia ogólne Sonar
@@ -138,9 +139,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex do sprawdzania ustawień regionalnych klienta podczas weryfikacji
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Maksymalny ping gracza, zanim zostanie wyrzucony z serwera.
-    # (Wartość ta reprezentuje czas w milisekundach: 1 sekunda = 1000 milisekund)
-    max-ping: 10000
     # Liczba pakietów logowania, które gracz musi wysłać, aby zostać wyrzuconym.
     max-login-packets: 256
 

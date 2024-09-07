@@ -63,6 +63,18 @@ public class ProtocolUtil {
   public static final boolean DEBUG = Boolean.getBoolean("sonar.debug-traces");
   public static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
   public static final String BRAND_CHANNEL = "minecraft:brand";
+  private static final int[] VAR_INT_LENGTHS = new int[65];
+
+  static {
+    for (int i = 0; i <= 32; ++i) {
+      VAR_INT_LENGTHS[i] = (int) Math.ceil((31d - (i - 1)) / 7d);
+    }
+    VAR_INT_LENGTHS[32] = 1;
+  }
+
+  public static int varIntBytes(final int value) {
+    return VAR_INT_LENGTHS[Integer.numberOfLeadingZeros(value)];
+  }
 
   public static void checkNettyVersion() {
     final Version version = Version.identify().getOrDefault("netty-all", Version.identify().get("netty-common"));
@@ -83,25 +95,29 @@ public class ProtocolUtil {
     }
   }
 
-  public static int readVarInt(final ByteBuf byteBuf) {
-    int read = readVarIntSafely(byteBuf);
-    if (read == Integer.MIN_VALUE) {
-      throw DEBUG ? new DecoderException("Bad VarInt") : QuietDecoderException.INSTANCE;
+  public static int readVarInt(final @NotNull ByteBuf byteBuf) {
+    final int readable = byteBuf.readableBytes();
+    if (readable == 0) {
+      throw DEBUG ? new DecoderException("Empty buffer") : QuietDecoderException.INSTANCE;
     }
-    return read;
-  }
 
-  public static int readVarIntSafely(final @NotNull ByteBuf byteBuf) {
-    int i = 0;
-    int maxRead = Math.min(5, byteBuf.readableBytes());
-    for (int j = 0; j < maxRead; j++) {
-      int k = byteBuf.readByte();
+    // We can read at least one byte, and this should be a common case
+    int k = byteBuf.readByte();
+    if ((k & 0x80) != 128) {
+      return k;
+    }
+
+    // In case decoding one byte was not enough, use a loop to decode up to the next 4 bytes
+    final int maxRead = Math.min(5, readable);
+    int i = k & 0x7F;
+    for (int j = 1; j < maxRead; j++) {
+      k = byteBuf.readByte();
       i |= (k & 0x7F) << j * 7;
       if ((k & 0x80) != 128) {
         return i;
       }
     }
-    return Integer.MIN_VALUE;
+    throw DEBUG ? new DecoderException("Bad VarInt") : QuietDecoderException.INSTANCE;
   }
 
   public static void writeVarInt(final ByteBuf byteBuf, final int value) {
@@ -137,19 +153,6 @@ public class ProtocolUtil {
       byteBuf.writeInt(w);
       byteBuf.writeByte(value >>> 28);
     }
-  }
-
-  private static final int[] VARINT_EXACT_BYTE_LENGTHS = new int[33];
-
-  static {
-    for (int i = 0; i <= 32; ++i) {
-      VARINT_EXACT_BYTE_LENGTHS[i] = (int) Math.ceil((31d - (i - 1)) / 7d);
-    }
-    VARINT_EXACT_BYTE_LENGTHS[32] = 1;
-  }
-
-  public static int varIntBytes(final int value) {
-    return VARINT_EXACT_BYTE_LENGTHS[Integer.numberOfLeadingZeros(value)];
   }
 
   public static void writeVarLong(final ByteBuf byteBuf, final long value) {

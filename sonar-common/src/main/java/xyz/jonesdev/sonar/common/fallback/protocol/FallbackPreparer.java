@@ -66,9 +66,6 @@ public class FallbackPreparer {
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
-  // Player Info
-  public final FallbackPacket PLAYER_INFO = new FallbackPacketSnapshot(new PlayerInfoPacket(
-    "", new UUID(1L, 1L), 2));
   // Default Spawn Position
   public FallbackPacket defaultSpawnPosition;
   // Spawn Position
@@ -119,13 +116,13 @@ public class FallbackPreparer {
     FallbackPacketRegistry.values();
 
     // Prepare LoginSuccess packet
-    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(new UUID(1L, 1L),
+    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(UUID.randomUUID(),
       Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username")));
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
       Sonar.get().getConfig().getVerification().getGamemode().getId(),
-      0, false, 0,
+      RANDOM.nextLong(), false, 0,
       true, false, false,
       new String[]{"minecraft:overworld"}, "minecraft:overworld"));
 

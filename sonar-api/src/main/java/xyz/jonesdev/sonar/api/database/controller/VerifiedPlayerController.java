@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.api.database.controller;
 import com.alessiodp.libby.LibraryManager;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
+import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -81,7 +81,7 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    // Make sure to only download the driver once
+    // Make sure to only download the driver once per database type
     if (!cachedDatabaseType.isDownloaded()) {
       LOGGER.info("Downloading {} driver version {}",
         cachedDatabaseType.getDatabaseType().getDatabaseName(),
@@ -90,7 +90,6 @@ public final class VerifiedPlayerController {
       libraryManager.loadLibrary(cachedDatabaseType.getDatabaseDriver());
       cachedDatabaseType.setDownloaded(true);
     }
-    cachedDatabaseType.getDatabaseType().loadDriver();
 
     try {
       final String jdbcURL;
@@ -109,7 +108,7 @@ public final class VerifiedPlayerController {
           Sonar.get().getConfig().getGeneralConfig().getString("database.name"));
       }
 
-      connectionSource = new JdbcPooledConnectionSource(jdbcURL,
+      connectionSource = new JdbcConnectionSource(jdbcURL,
         Sonar.get().getConfig().getGeneralConfig().getString("database.username"),
         Sonar.get().getConfig().getGeneralConfig().getString("database.password"),
         cachedDatabaseType.getDatabaseType());
@@ -171,7 +170,7 @@ public final class VerifiedPlayerController {
       .lt("timestamp", new Timestamp(timestamp))
       .query();
 
-    if (oldEntries != null) {
+    if (oldEntries != null && !oldEntries.isEmpty()) {
       for (final VerifiedPlayer player : oldEntries) {
         dao.delete(player);
       }
