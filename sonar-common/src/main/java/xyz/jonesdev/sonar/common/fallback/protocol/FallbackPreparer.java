@@ -66,9 +66,6 @@ public class FallbackPreparer {
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
-  // Player Info
-  public final FallbackPacket PLAYER_INFO = new FallbackPacketSnapshot(new PlayerInfoPacket(
-    "", new UUID(1L, 1L), 2));
   // Default Spawn Position
   public FallbackPacket defaultSpawnPosition;
   // Spawn Position
