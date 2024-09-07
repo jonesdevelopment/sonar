@@ -154,6 +154,9 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       // so we simply exempt them from the PaddleBoat check.
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
         paddlePackets++;
+      } else {
+        checkState(paddlePackets >= inputPackets,
+          "illegal packet order; i/p " + inputPackets + "/" + paddlePackets);
       }
       inputPackets++;
     }
