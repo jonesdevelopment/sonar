@@ -55,17 +55,14 @@ public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
     if (preIndex == byteBuf.readerIndex()) {
       return;
     }
-    if (length < 0) {
-      throw DEBUG ? new DecoderException("Bad VarInt length") : QuietDecoderException.INSTANCE;
+    if (length <= 0) {
+      throw DEBUG ? new DecoderException("Bad VarInt length: " + length) : QuietDecoderException.INSTANCE;
     }
 
-    // note that zero-length packets are ignored
-    if (length > 0) {
-      if (byteBuf.readableBytes() < length) {
-        byteBuf.resetReaderIndex();
-      } else {
-        out.add(byteBuf.readRetainedSlice(length));
-      }
+    if (byteBuf.readableBytes() < length) {
+      byteBuf.resetReaderIndex();
+    } else {
+      out.add(byteBuf.readRetainedSlice(length));
     }
   }
 
