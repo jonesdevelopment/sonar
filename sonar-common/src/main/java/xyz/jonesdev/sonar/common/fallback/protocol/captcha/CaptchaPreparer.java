@@ -54,15 +54,14 @@ public class CaptchaPreparer {
     // Prepare everything asynchronously
     PREPARATION_SERVICE.execute(() -> {
       for (preparedAmount = 0; preparedAmount < precomputeAmount;) {
-        // Generate CAPTCHA answer
+        // Generate CAPTCHA
         final char[] answer = new char[3 + RANDOM.nextInt(2)];
         for (int j = 0; j < answer.length; j++) {
           answer[j] = alphabet[RANDOM.nextInt(alphabet.length)];
         }
         final BufferedImage image = Sonar.get().getFallback().getCaptchaGenerator().createImage(answer);
         // Convert and cache converted Minecraft map bytes
-        final int[] buffer = MapColorPalette.getBufferFromImage(image);
-        cached[preparedAmount++] = new MapCaptchaInfo(new String(answer), buffer);
+        cached[preparedAmount++] = new MapCaptchaInfo(new String(answer), MapColorPalette.imageToBuffer(image));
       }
 
       Sonar.get().getLogger().info("Finished preparing {} CAPTCHA answers ({}s)!", preparedAmount, timer);
