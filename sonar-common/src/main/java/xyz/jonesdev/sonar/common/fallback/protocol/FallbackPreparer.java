@@ -34,12 +34,12 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPac
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
 
-import java.security.SecureRandom;
+import java.util.Random;
 import java.util.UUID;
 
 @UtilityClass
 public class FallbackPreparer {
-  private final SecureRandom RANDOM = new SecureRandom();
+  private final Random RANDOM = new Random();
   // LoginSuccess
   public FallbackPacket loginSuccess;
   // Abilities
@@ -127,7 +127,7 @@ public class FallbackPreparer {
 
     // Prepare the gravity check
     maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
-    maxFallDistance = 0;
+    maxFallDistance = 1;
 
     double motionY = -0.08 * 0.98f;
     for (int i = 0; i < maxMovementTick; i++) {

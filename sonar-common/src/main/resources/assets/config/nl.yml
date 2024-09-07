@@ -84,7 +84,7 @@ verification:
       # Moet Sonar de speler een CAPTCHA laten oplossen als hij niet slaagt voor de zwaartekracht controle?
       captcha-on-fail: false
       # Maximaal aantal ticks dat de speler moet laten vallen om het platform te mogen raken
-      max-movement-ticks: 10
+      max-movement-ticks: 8
 
     # Controleert of de speler botst met blokken die onder hem zijn gespawned
     collision:

@@ -84,7 +84,7 @@ verification:
       # Sonar devrait-il faire résoudre un CAPTCHA au joueur s'il échoue à la vérification de la gravité ?
       captcha-on-fail: false
       # Nombre maximum de ticks que le joueur a pour tomber avant de pouvoir toucher la plateforme
-      max-movement-ticks: 10
+      max-movement-ticks: 8
 
     # Vérifie si le joueur entre en collision avec les blocs apparus en dessous de lui
     collision:

@@ -85,7 +85,7 @@ verification:
       # Měl by Sonar přimět hráče, aby vyřešil CAPTCHA, pokud neuspějí při kontrole gravitace?
       captcha-on-fail: false
       # Maximální počet ticků, který má hráč padat aby byl puštěn na verifikační platformu
-      max-movement-ticks: 10
+      max-movement-ticks: 8
 
     # Kontroluje, zda hráč naráží do bloků, které se vytvořily pod ním
     collision:
