@@ -116,13 +116,13 @@ public class FallbackPreparer {
     FallbackPacketRegistry.values();
 
     // Prepare LoginSuccess packet
-    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(new UUID(1L, 1L),
+    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(UUID.randomUUID(),
       Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username")));
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
       Sonar.get().getConfig().getVerification().getGamemode().getId(),
-      0, false, 0,
+      RANDOM.nextLong(), false, 0,
       true, false, false,
       new String[]{"minecraft:overworld"}, "minecraft:overworld"));
 
