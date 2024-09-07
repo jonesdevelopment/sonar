@@ -170,7 +170,7 @@ public final class VerifiedPlayerController {
       .lt("timestamp", new Timestamp(timestamp))
       .query();
 
-    if (oldEntries != null) {
+    if (oldEntries != null && !oldEntries.isEmpty()) {
       for (final VerifiedPlayer player : oldEntries) {
         dao.delete(player);
       }
