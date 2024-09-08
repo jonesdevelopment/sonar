@@ -162,7 +162,7 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
     // Log/debug position if enabled in the configuration
     if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-      Sonar.get().getFallback().getLogger().info("{}: {}/{}/{}, ly={}/dy={}, {}",
+      Sonar.get().getLogger().info("{}: {}/{}/{}, ly={}/dy={}, {}",
         username, x, y, z, lastY, deltaY, isOnGround);
     }
 

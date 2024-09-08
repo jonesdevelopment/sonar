@@ -83,7 +83,7 @@ public abstract class FallbackSessionHandler implements FallbackPacketListener {
       user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());
     }
 
-    Sonar.get().getFallback().getLogger().info(
+    Sonar.get().getLogger().info(
       Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.successful")
         .replace("<username>", username)
         .replace("<time-taken>", user.getLoginTimer().toString()));

@@ -94,7 +94,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     if (Sonar.get().getConfig().getVerification().isLogConnections()
       && (Sonar.get().getAttackTracker().getCurrentAttack() == null
       || Sonar.get().getConfig().getVerification().isLogDuringAttack())) {
-      Sonar.get().getFallback().getLogger().info(
+      Sonar.get().getLogger().info(
         Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.connection")
           .replace("<username>", username)
           .replace("<ip>", Sonar.get().getConfig().formatAddress(inetAddress))
@@ -147,7 +147,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       || Sonar.get().getConfig().getVerification().isLogDuringAttack();
 
     if (shouldLog) {
-      Sonar.get().getFallback().getLogger().info(
+      Sonar.get().getLogger().info(
         Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.failed")
           .replace("<ip>", Sonar.get().getConfig().formatAddress(getInetAddress()))
           .replace("<protocol>", String.valueOf(getProtocolVersion().getProtocol()))
@@ -179,7 +179,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       Sonar.get().getEventManager().publish(new UserBlacklistedEvent(this));
 
       if (shouldLog) {
-        Sonar.get().getFallback().getLogger().info(
+        Sonar.get().getLogger().info(
           Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.blacklisted")
             .replace("<ip>", Sonar.get().getConfig().formatAddress(getInetAddress()))
             .replace("<protocol>", String.valueOf(getProtocolVersion().getProtocol())));

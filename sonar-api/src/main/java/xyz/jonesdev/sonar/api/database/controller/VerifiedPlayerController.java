@@ -32,7 +32,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.model.VerifiedPlayer;
-import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -47,24 +46,6 @@ import java.util.concurrent.Executors;
 public final class VerifiedPlayerController {
   private static final ExecutorService DB_UPDATE_SERVICE = Executors.newSingleThreadExecutor();
 
-  private static final LoggerWrapper LOGGER = new LoggerWrapper() {
-
-    @Override
-    public void info(final String message, final Object... args) {
-      Sonar.get().getLogger().info("[database] " + message, args);
-    }
-
-    @Override
-    public void warn(final String message, final Object... args) {
-      Sonar.get().getLogger().warn("[database] " + message, args);
-    }
-
-    @Override
-    public void error(final String message, final Object... args) {
-      Sonar.get().getLogger().error("[database] " + message, args);
-    }
-  };
-
   private final Map<String, Collection<UUID>> cache = new ConcurrentHashMap<>(128);
   private @Nullable ConnectionSource connectionSource;
   private Dao<VerifiedPlayer, Integer> dao;
@@ -77,13 +58,13 @@ public final class VerifiedPlayerController {
     cachedDatabaseType = database.getType();
 
     if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
-      LOGGER.warn("Configure a database to save verified players.");
+      Sonar.get().getLogger().warn("Configure a database to save verified players.");
       return;
     }
 
     // Make sure to only load the driver once per database type
     if (!cachedDatabaseType.isLoaded()) {
-      LOGGER.info("Loading {} driver version {}",
+      Sonar.get().getLogger().info("Loading {} driver version {}",
         cachedDatabaseType.getDatabaseType().getDatabaseName(),
         cachedDatabaseType.getDatabaseDriver().getVersion());
       libraryManager.loadLibrary(cachedDatabaseType.getDatabaseDriver());
@@ -135,11 +116,11 @@ public final class VerifiedPlayerController {
           // Add all entries from the database to the cache
           dao.queryForAll().forEach(this::_add);
         } catch (SQLException exception) {
-          LOGGER.error("Error initializing database: {}", exception);
+          Sonar.get().getLogger().error("Error initializing database: {}", exception);
         }
       });
     } catch (SQLException exception) {
-      LOGGER.error("Error setting up database: {}", exception);
+      Sonar.get().getLogger().error("Error setting up database: {}", exception);
     }
   }
 
@@ -152,7 +133,7 @@ public final class VerifiedPlayerController {
       try {
         connectionSource.close();
       } catch (Exception exception) {
-        LOGGER.error("Error closing database: {}", exception);
+        Sonar.get().getLogger().error("Error closing database: {}", exception);
       }
     }
   }
@@ -173,7 +154,7 @@ public final class VerifiedPlayerController {
       for (final VerifiedPlayer player : oldEntries) {
         dao.delete(player);
       }
-      LOGGER.info("Removed {} database entries older than {} days.",
+      Sonar.get().getLogger().info("Removed {} database entries older than {} days.",
         oldEntries.size(), maximumAge);
     }
   }
@@ -210,7 +191,7 @@ public final class VerifiedPlayerController {
           }
         }
       } catch (SQLException exception) {
-        LOGGER.error("Error trying to remove entry: {}", exception);
+        Sonar.get().getLogger().error("Error trying to remove entry: {}", exception);
       }
     });
   }
@@ -248,7 +229,7 @@ public final class VerifiedPlayerController {
       try {
         dao.createIfNotExists(player);
       } catch (SQLException exception) {
-        LOGGER.error("Error trying to add entry: {}", exception);
+        Sonar.get().getLogger().error("Error trying to add entry: {}", exception);
       }
     });
   }
@@ -304,7 +285,7 @@ public final class VerifiedPlayerController {
       try {
         dao.deleteBuilder().delete();
       } catch (SQLException exception) {
-        LOGGER.error("Error trying to clear entries: {}", exception);
+        Sonar.get().getLogger().error("Error trying to clear entries: {}", exception);
       }
     }
   }

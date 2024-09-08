@@ -22,7 +22,6 @@ import com.google.gson.JsonParser;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -37,24 +36,6 @@ import java.util.concurrent.Executors;
 public class UpdateChecker {
   private final ExecutorService ASYNC_EXECUTOR = Executors.newSingleThreadExecutor();
 
-  private final LoggerWrapper LOGGER = new LoggerWrapper() {
-
-    @Override
-    public void info(final String message, final Object... args) {
-      Sonar.get().getLogger().info("[update-checker] " + message, args);
-    }
-
-    @Override
-    public void warn(final String message, final Object... args) {
-      Sonar.get().getLogger().warn("[update-checker] " + message, args);
-    }
-
-    @Override
-    public void error(final String message, final Object... args) {
-      Sonar.get().getLogger().error("[update-checker] " + message, args);
-    }
-  };
-
   public void checkForUpdates() {
     ASYNC_EXECUTOR.execute(() -> {
       try {
@@ -66,17 +47,17 @@ public class UpdateChecker {
         final int convertedCurrentVersion = convertVersion(Sonar.get().getVersion().getVersion());
 
         if (convertedCurrentVersion < convertedLatestVersion) {
-          LOGGER.warn("A new version of Sonar is available: {}", latestStableRelease);
-          LOGGER.warn("Please make sure to update to the latest version to ensure stability and security:");
-          LOGGER.warn("https://github.com/jonesdevelopment/sonar/releases/tag/{}", latestStableRelease);
+          Sonar.get().getLogger().warn("A new version of Sonar is available: {}", latestStableRelease);
+          Sonar.get().getLogger().warn("Please make sure to update to the latest version to ensure stability and security:");
+          Sonar.get().getLogger().warn("https://github.com/jonesdevelopment/sonar/releases/tag/{}", latestStableRelease);
         } else if (convertedCurrentVersion > convertedLatestVersion || !Sonar.get().getVersion().getGitBranch().equals("main")) {
-          LOGGER.warn("You are currently using an unreleased version of Sonar!");
-          LOGGER.warn("The contributors of Sonar are not responsible for any damage done by using an unstable version");
+          Sonar.get().getLogger().warn("You are currently using an unreleased version of Sonar!");
+          Sonar.get().getLogger().warn("The contributors of Sonar are not responsible for any damage done by using an unstable version");
         } else {
-          LOGGER.info("You are currently using the latest stable release of Sonar!");
+          Sonar.get().getLogger().info("You are currently using the latest stable release of Sonar!");
         }
       } catch (Throwable throwable) {
-        LOGGER.warn("Unable to retrieve version information: {}", throwable);
+        Sonar.get().getLogger().warn("Unable to retrieve version information: {}", throwable);
       }
     });
   }
