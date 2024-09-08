@@ -489,7 +489,7 @@ public final class SonarConfiguration {
       private final DatabaseType databaseType;
       private final Library databaseDriver;
       @Setter
-      private boolean downloaded;
+      private boolean loaded;
     }
 
     private Type type;

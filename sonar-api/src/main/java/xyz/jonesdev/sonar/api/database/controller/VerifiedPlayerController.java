@@ -81,14 +81,13 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    // Make sure to only download the driver once per database type
-    if (!cachedDatabaseType.isDownloaded()) {
-      LOGGER.info("Downloading {} driver version {}",
+    // Make sure to only load the driver once per database type
+    if (!cachedDatabaseType.isLoaded()) {
+      LOGGER.info("Loading {} driver version {}",
         cachedDatabaseType.getDatabaseType().getDatabaseName(),
         cachedDatabaseType.getDatabaseDriver().getVersion());
-      // Download and load the driver for the current database
       libraryManager.loadLibrary(cachedDatabaseType.getDatabaseDriver());
-      cachedDatabaseType.setDownloaded(true);
+      cachedDatabaseType.setLoaded(true);
     }
 
     try {
