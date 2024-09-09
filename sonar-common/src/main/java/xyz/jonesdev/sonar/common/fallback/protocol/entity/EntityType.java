@@ -81,6 +81,56 @@ public enum EntityType {
       case MINECRAFT_1_21:
         return 10;
     }
+  }),
+  MINECART(protocolVersion -> {
+    switch (protocolVersion) {
+      // 1.13-1.13.2
+      case MINECRAFT_1_13:
+      case MINECRAFT_1_13_1:
+      case MINECRAFT_1_13_2:
+        return 39;
+      // 1.14-1.14.4
+      case MINECRAFT_1_14:
+      case MINECRAFT_1_14_1:
+      case MINECRAFT_1_14_2:
+      case MINECRAFT_1_14_3:
+      case MINECRAFT_1_14_4:
+        return 41;
+      // 1.16-1.16.4
+      case MINECRAFT_1_16:
+      case MINECRAFT_1_16_1:
+      case MINECRAFT_1_16_2:
+      case MINECRAFT_1_16_3:
+      case MINECRAFT_1_16_4:
+        return 45;
+      // 1.17-1.18.2
+      case MINECRAFT_1_17:
+      case MINECRAFT_1_17_1:
+      case MINECRAFT_1_18:
+      case MINECRAFT_1_18_2:
+        return 50;
+     // 1.19-1.19.1
+      case MINECRAFT_1_19:
+      case MINECRAFT_1_19_1:
+        return 53;
+      // 1.19.3
+      case MINECRAFT_1_19_3:
+        return 54;
+       // 1.19.4-1.20.2
+      case MINECRAFT_1_19_4:
+      case MINECRAFT_1_20:
+      case MINECRAFT_1_20_2:
+        return 64;
+      // 1.20.3
+      case MINECRAFT_1_20_3:
+        return 65;
+      // 1.20.5-1.21
+      case MINECRAFT_1_20_5:
+        return 69;
+      // 1.7-1.12.2 & 1.15-1.15.2
+      default:
+        return 42;
+    }
   });
 
   private final Function<ProtocolVersion, Integer> function;
