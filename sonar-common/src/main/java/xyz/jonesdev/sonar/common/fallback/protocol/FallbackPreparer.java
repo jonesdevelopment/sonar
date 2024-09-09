@@ -62,7 +62,7 @@ public class FallbackPreparer {
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
   // JoinGame
-  public final int PLAYER_ENTITY_ID = RANDOM.nextInt(50);
+  public static final int PLAYER_ENTITY_ID = RANDOM.nextInt(50);
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
