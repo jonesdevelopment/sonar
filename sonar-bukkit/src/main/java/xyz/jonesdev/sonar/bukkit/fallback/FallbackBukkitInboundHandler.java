@@ -22,6 +22,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -110,6 +111,12 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
        * https://wiki.vg/Protocol#Login
        */
       if (packet instanceof HandshakePacket) {
+        // Check if we need to rate-limit the connection for sending too many handshake packets
+        final InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+        if (!Sonar.get().getFallback().getHandshakeRatelimiter().attempt(socketAddress.getAddress())) {
+          ctx.close();
+          return;
+        }
         final HandshakePacket handshake = (HandshakePacket) packet;
         switch (handshake.getIntent()) {
           case STATUS:

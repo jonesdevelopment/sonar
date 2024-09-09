@@ -51,7 +51,7 @@ public final class Fallback {
 
   private final @NotNull FallbackQueue queue = new FallbackQueue();
   @Setter
-  private Ratelimiter<InetAddress> ratelimiter;
+  private Ratelimiter<InetAddress> ratelimiter, handshakeRatelimiter;
 
   public boolean shouldVerifyNewPlayers() {
     return shouldPerform(Sonar.get().getConfig().getVerification().getTiming());

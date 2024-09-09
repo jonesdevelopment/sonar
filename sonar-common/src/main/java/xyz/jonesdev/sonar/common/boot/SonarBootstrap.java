@@ -38,6 +38,7 @@ import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.ratelimit.CaffeineCacheRatelimiter;
+import xyz.jonesdev.sonar.common.fallback.ratelimit.CaffeineHitCountCacheRatelimiter;
 import xyz.jonesdev.sonar.common.fallback.ratelimit.NoopCacheRatelimiter;
 import xyz.jonesdev.sonar.common.service.SonarServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
@@ -158,6 +159,9 @@ public abstract class SonarBootstrap<T> implements Sonar {
     getFallback().setRatelimiter(getConfig().getVerification().getReconnectDelay() > 0L
       ? new CaffeineCacheRatelimiter(getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS)
       : NoopCacheRatelimiter.INSTANCE);
+    // TODO: make configurable
+    getFallback().setHandshakeRatelimiter(new CaffeineHitCountCacheRatelimiter(
+      5, 1000L, TimeUnit.MILLISECONDS));
 
     // Update blacklist cache
     final long blacklistTime = getConfig().getVerification().getBlacklistTime();
