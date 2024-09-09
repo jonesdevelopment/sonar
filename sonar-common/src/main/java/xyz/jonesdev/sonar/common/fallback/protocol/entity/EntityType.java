@@ -84,11 +84,6 @@ public enum EntityType {
   }),
   MINECART(protocolVersion -> {
     switch (protocolVersion) {
-      // 1.13-1.13.2
-      case MINECRAFT_1_13:
-      case MINECRAFT_1_13_1:
-      case MINECRAFT_1_13_2:
-        return 39;
       // 1.14-1.14.4
       case MINECRAFT_1_14:
       case MINECRAFT_1_14_1:
@@ -128,9 +123,9 @@ public enum EntityType {
       case MINECRAFT_1_20_5:
       case MINECRAFT_1_21:
         return 69;
-      // 1.7-1.12.2 & 1.15-1.15.2
+      // 1.7-1.13.2 & 1.15-1.15.2
       default:
-        return 42;
+        return 10;
     }
   });
 
