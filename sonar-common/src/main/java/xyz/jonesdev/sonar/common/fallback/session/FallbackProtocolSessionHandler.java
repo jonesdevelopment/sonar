@@ -22,13 +22,13 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.AnimationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.EntityAnimationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetHeldItemPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.PLAYER_ENTITY_ID;
 
 public final class FallbackProtocolSessionHandler extends FallbackSessionHandler {
 
@@ -86,8 +86,7 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
    */
   private void sendArmAnimation() {
     waitingSwingArm = true;
-    user.write(new EntityAnimationPacket(
-      FallbackPreparer.PLAYER_ENTITY_ID, EntityAnimationPacket.Type.SWING_MAIN_ARM));
+    user.write(new EntityAnimationPacket(PLAYER_ENTITY_ID, EntityAnimationPacket.Type.SWING_MAIN_ARM));
   }
 
   private void markSuccess() {
@@ -169,7 +168,7 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
         // Check that the 1.7 client is responding to the correct entity id and animation type.
         if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
           // Check entity id is player itself and if the player is sending the correct animation type
-          if (animationPacket.getEntityId() == FallbackPreparer.PLAYER_ENTITY_ID
+          if (animationPacket.getEntityId() == PLAYER_ENTITY_ID
             && animationPacket.getType() == AnimationPacket.LegacyAnimationType.SWING_ARM) {
             markSuccess();
             waitingSwingArm = false;
