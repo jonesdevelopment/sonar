@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.common.fallback.session;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
-import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
@@ -28,6 +27,9 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.AnimationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.EntityAnimationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetHeldItemPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
+
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_7_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 public final class FallbackProtocolSessionHandler extends FallbackSessionHandler {
 
@@ -143,7 +145,7 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
         // Check if the slot ID matches the expected slot ID
         // This can false flag if a player spams these packets, which is why we don't fail for this
         && slotId == expectedSlotId) {
-        if (user.isGeyser() || user.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_7_2) {
+        if (user.isGeyser() || user.getProtocolVersion() == MINECRAFT_1_7_2) {
           markSuccess();
         } else {
           sendArmAnimation();
@@ -153,17 +155,17 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
       currentClientSlotId = slotId;
     } else if (packet instanceof AnimationPacket) {
       final AnimationPacket animationPacket = (AnimationPacket) packet;
-      // Make sure we are waiting client's animation packet. And client swing with the main hand.
+      // Make sure we are waiting client's animation packet
       if (waitingSwingArm && animationPacket.getHand() == AnimationPacket.Hand.MAIN_HAND) {
         // Check that the 1.7 client is responding to the correct entity id and animation type.
-        if (user.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
-          if (animationPacket.getEntityId() == FallbackPreparer.PLAYER_ENTITY_ID // Check entity id is player itself;
-            && animationPacket.getType() == AnimationPacket.LegacyAnimationType.SWING_ARM // Check player is swing arm.
-          ) {
+        if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+          // Check entity id is player itself and if the player is sending the correct animation type
+          if (animationPacket.getEntityId() == FallbackPreparer.PLAYER_ENTITY_ID
+            && animationPacket.getType() == AnimationPacket.LegacyAnimationType.SWING_ARM) {
             markSuccess();
             waitingSwingArm = false;
           }
-        } else { // 1.8+ removed these fields.
+        } else {
           markSuccess();
           waitingSwingArm = false;
         }

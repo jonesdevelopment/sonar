@@ -24,7 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.util.ProtocolUtil;
+
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @Setter
@@ -35,17 +36,16 @@ public final class EntityAnimationPacket implements FallbackPacket {
   private Type type;
 
   @Override
-  public void encode(ByteBuf byteBuf, ProtocolVersion protocolVersion) throws Exception {
-    ProtocolUtil.writeVarInt(byteBuf, entityId);
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
+    writeVarInt(byteBuf, entityId);
     byteBuf.writeByte(type.ordinal());
   }
 
   @Override
-  public void decode(ByteBuf byteBuf, ProtocolVersion protocolVersion) throws Exception {
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     throw new UnsupportedOperationException();
   }
 
-  @SuppressWarnings("SpellCheckingInspection")
   public enum Type {
     SWING_MAIN_ARM,
     HURT,

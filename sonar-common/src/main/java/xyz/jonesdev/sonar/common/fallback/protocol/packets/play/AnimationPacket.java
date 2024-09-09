@@ -22,31 +22,34 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
+
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public final class AnimationPacket implements FallbackPacket {
-  private Hand hand = Hand.MAIN_HAND;
   private int entityId = -1;
+  private Hand hand = Hand.MAIN_HAND;
   private LegacyAnimationType type = LegacyAnimationType.SWING_ARM;
 
   @Override
-  public void encode(ByteBuf byteBuf, ProtocolVersion protocolVersion) throws Exception {
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void decode(ByteBuf byteBuf, ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
-      this.entityId = byteBuf.readInt();
-      this.type = LegacyAnimationType.getById(byteBuf.readByte());
+  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+      entityId = byteBuf.readInt();
+      type = LegacyAnimationType.getById(byteBuf.readByte());
     } else {
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) > 0) { // Only 1.9+ has offhand
+      if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) { // Only 1.9+ has offhand
         hand = Hand.values()[ProtocolUtil.readVarInt(byteBuf)];
       } else {
         hand = Hand.MAIN_HAND;
