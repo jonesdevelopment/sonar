@@ -25,10 +25,10 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 public enum EntityType {
+  // Useful resources:
+  // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
+  // - https://pokechu22.github.io/Burger/1.20.4.html
   BOAT(protocolVersion -> {
-    // Useful resources:
-    // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
-    // - https://pokechu22.github.io/Burger/1.20.4.html
     switch (protocolVersion) {
       // 1.14-1.14.4
       case MINECRAFT_1_14:
