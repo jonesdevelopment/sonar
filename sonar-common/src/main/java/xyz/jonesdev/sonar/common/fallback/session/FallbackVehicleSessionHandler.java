@@ -97,7 +97,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     checkState(y <= IN_AIR_Y_POSITION, "invalid y position");
     // Mark this check as successful if the player sent a few position packets
     if (positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
-      if (user.isGeyser() || inMinecart) {
+      // Exempt minecart check for 1.7-1.8
+      if (user.isGeyser() || user.getProtocolVersion().compareTo(MINECRAFT_1_8) <= 0 || inMinecart) {
         markSuccess();
       } else {
         spawnMinecart();
