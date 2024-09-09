@@ -356,7 +356,7 @@ public enum FallbackPacketRegistry {
         map(0x51, MINECRAFT_1_20_3, true),
         map(0x53, MINECRAFT_1_20_5, true));
       clientbound.register(EntityAnimationPacket.class, EntityAnimationPacket::new,
-        map(0x0B, MINECRAFT_1_7_6, true),
+        map(0x0B, MINECRAFT_1_7_2, true),
         map(0x06, MINECRAFT_1_9, true),
         map(0x05, MINECRAFT_1_16, true),
         map(0x06, MINECRAFT_1_17, true),

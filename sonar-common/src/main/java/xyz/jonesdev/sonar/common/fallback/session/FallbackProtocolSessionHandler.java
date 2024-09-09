@@ -28,7 +28,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.EntityAnimationP
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetHeldItemPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_7_2;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 public final class FallbackProtocolSessionHandler extends FallbackSessionHandler {
@@ -131,7 +130,7 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
         waitingSlotConfirm = false;
         expectedSlotId = -1;
         // The player did not send duplicate packets, so they pass this check
-        if (user.isGeyser() || user.getProtocolVersion() == MINECRAFT_1_7_2) {
+        if (user.isGeyser()) {
           markSuccess();
         } else {
           sendArmAnimation();
