@@ -34,11 +34,6 @@ public enum BlockType {
   // - https://github.com/ViaVersion/Mappings/tree/main/mappings
   ENCHANTMENT_TABLE(protocolVersion -> {
     switch (protocolVersion) {
-      case MINECRAFT_1_7_2:
-      case MINECRAFT_1_7_6:
-      default:
-        // 1.7.2-1.12.2
-        return 116;
       case MINECRAFT_1_13:
       case MINECRAFT_1_13_1:
         return 4612;
@@ -78,6 +73,9 @@ public enum BlockType {
       case MINECRAFT_1_20_5:
       case MINECRAFT_1_21:
         return 7389;
+      // 1.7.2-1.12.2
+      default:
+        return 116;
     }
   }, 0.75f),
   TRAPDOOR(protocolVersion -> {
@@ -86,9 +84,6 @@ public enum BlockType {
       case MINECRAFT_1_7_6:
         // We have to use wooden trapdoors for 1.7 since 1.7 doesn't have iron trapdoors
         return 96;
-      default:
-        // 1.8-1.12.2
-        return 167;
       case MINECRAFT_1_13:
       case MINECRAFT_1_13_1:
         return 6509;
@@ -129,6 +124,9 @@ public enum BlockType {
       case MINECRAFT_1_20_5:
       case MINECRAFT_1_21:
         return 10414;
+      // 1.8-1.12.2
+      default:
+        return 167;
     }
   }, 0.1875),
   BARRIER(protocolVersion -> {
@@ -137,9 +135,6 @@ public enum BlockType {
       case MINECRAFT_1_7_6:
         // We have to use glass for 1.7 since 1.7 doesn't have barrier blocks
         return 20;
-      default:
-        // 1.8-1.12.2
-        return 166;
       case MINECRAFT_1_13:
       case MINECRAFT_1_13_1:
         return 6493;
@@ -180,6 +175,9 @@ public enum BlockType {
       case MINECRAFT_1_20_5:
       case MINECRAFT_1_21:
         return 10366;
+      // 1.8-1.12.2
+      default:
+        return 166;
     }
   }, 1);
 

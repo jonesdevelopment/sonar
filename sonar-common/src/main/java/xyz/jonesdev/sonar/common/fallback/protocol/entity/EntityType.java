@@ -30,30 +30,14 @@ public enum EntityType {
     // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
     // - https://pokechu22.github.io/Burger/1.20.4.html
     switch (protocolVersion) {
-      default:
-      case MINECRAFT_1_7_2:
-      case MINECRAFT_1_7_6:
-      case MINECRAFT_1_8:
-      case MINECRAFT_1_9:
-      case MINECRAFT_1_9_1:
-      case MINECRAFT_1_9_2:
-      case MINECRAFT_1_9_4:
-      case MINECRAFT_1_10:
-      case MINECRAFT_1_11:
-      case MINECRAFT_1_11_1:
-      case MINECRAFT_1_12:
-      case MINECRAFT_1_12_1:
-      case MINECRAFT_1_12_2:
-      case MINECRAFT_1_13:
-      case MINECRAFT_1_13_1:
-      case MINECRAFT_1_13_2:
-        return 1;
+      // 1.14-1.14.4
       case MINECRAFT_1_14:
       case MINECRAFT_1_14_1:
       case MINECRAFT_1_14_2:
       case MINECRAFT_1_14_3:
       case MINECRAFT_1_14_4:
         return 5;
+      // 1.15-1.16.4
       case MINECRAFT_1_15:
       case MINECRAFT_1_15_1:
       case MINECRAFT_1_15_2:
@@ -63,23 +47,30 @@ public enum EntityType {
       case MINECRAFT_1_16_3:
       case MINECRAFT_1_16_4:
         return 6;
+      // 1.17-1.18.2
       case MINECRAFT_1_17:
       case MINECRAFT_1_17_1:
       case MINECRAFT_1_18:
       case MINECRAFT_1_18_2:
         return 7;
+      // 1.19-1.19.3
       case MINECRAFT_1_19:
       case MINECRAFT_1_19_1:
       case MINECRAFT_1_19_3:
         return 8;
+      // 1.19.4-1.20.3
       case MINECRAFT_1_19_4:
       case MINECRAFT_1_20:
       case MINECRAFT_1_20_2:
       case MINECRAFT_1_20_3:
         return 9;
+      // 1.20.5-1.21
       case MINECRAFT_1_20_5:
       case MINECRAFT_1_21:
         return 10;
+      // 1.7-1.13.2
+      default:
+        return 1;
     }
   }),
   MINECART(protocolVersion -> {
@@ -91,6 +82,7 @@ public enum EntityType {
       case MINECRAFT_1_14_3:
       case MINECRAFT_1_14_4:
         return 41;
+      // 1.15-1.15.2
       case MINECRAFT_1_15:
       case MINECRAFT_1_15_1:
       case MINECRAFT_1_15_2:
@@ -108,14 +100,14 @@ public enum EntityType {
       case MINECRAFT_1_18:
       case MINECRAFT_1_18_2:
         return 50;
-     // 1.19-1.19.1
+      // 1.19-1.19.1
       case MINECRAFT_1_19:
       case MINECRAFT_1_19_1:
         return 53;
       // 1.19.3
       case MINECRAFT_1_19_3:
         return 54;
-       // 1.19.4-1.20.2
+      // 1.19.4-1.20.2
       case MINECRAFT_1_19_4:
       case MINECRAFT_1_20:
       case MINECRAFT_1_20_2:

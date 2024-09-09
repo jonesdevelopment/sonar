@@ -32,9 +32,6 @@ public enum ItemType {
     // - https://pokechu22.github.io/Burger/1.20.4.html
     // - https://github.com/ViaVersion/Mappings/tree/main/mappings
     switch (protocolVersion) {
-      default:
-        // 1.7-1.12.2
-        return 358;
       case MINECRAFT_1_13:
       case MINECRAFT_1_13_1:
         return 608;
@@ -75,6 +72,9 @@ public enum ItemType {
       case MINECRAFT_1_20_5:
       case MINECRAFT_1_21:
         return 982;
+      default:
+        // 1.7-1.12.2
+        return 358;
     }
   });
 
