@@ -45,7 +45,7 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
   }
 
   private final boolean forceCAPTCHA;
-  private boolean waitingSwingArm;
+  private boolean waitingSwingArm, waitingSlotConfirm;
   private short expectedTransactionId;
   private int currentClientSlotId, expectedSlotId = -1;
 
@@ -127,9 +127,20 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
       // https://wiki.vg/Bedrock_Protocol#Player_Hotbar
       if (user.isGeyser()) {
         markSuccess();
+      } else if (waitingSlotConfirm) {
+        waitingSlotConfirm = false;
+        expectedSlotId = -1;
+        // The player did not send duplicate packets, so they pass this check
+        if (user.isGeyser() || user.getProtocolVersion() == MINECRAFT_1_7_2) {
+          markSuccess();
+        } else {
+          sendArmAnimation();
+        }
       } else {
         sendSetHeldItem();
       }
+
+      expectedTransactionId = 0;
     } else if (packet instanceof SetHeldItemPacket) {
       final SetHeldItemPacket heldItemPacket = (SetHeldItemPacket) packet;
 
@@ -144,12 +155,11 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
       if (expectedSlotId != -1
         // Check if the slot ID matches the expected slot ID
         // This can false flag if a player spams these packets, which is why we don't fail for this
-        && slotId == expectedSlotId) {
-        if (user.isGeyser() || user.getProtocolVersion() == MINECRAFT_1_7_2) {
-          markSuccess();
-        } else {
-          sendArmAnimation();
-        }
+        && slotId == expectedSlotId
+        // Make sure we actually want to send a transaction at this point in time
+        && !waitingSlotConfirm) {
+        sendTransaction();
+        waitingSlotConfirm = true;
       }
 
       currentClientSlotId = slotId;
