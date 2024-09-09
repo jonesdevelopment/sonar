@@ -151,10 +151,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
         removeEntitiesPacket = removeMinecartEntities;
         inMinecart = true;
       }
-      return;
-    }
-
-    if (packet instanceof SetPlayerPositionRotationPacket) {
+    } else if (packet instanceof SetPlayerPositionRotationPacket) {
       if (expectMovement) {
         final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
         handleMovement(posRot.getY());
