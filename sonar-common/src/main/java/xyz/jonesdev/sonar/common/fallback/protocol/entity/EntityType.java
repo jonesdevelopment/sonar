@@ -126,6 +126,7 @@ public enum EntityType {
         return 65;
       // 1.20.5-1.21
       case MINECRAFT_1_20_5:
+      case MINECRAFT_1_21:
         return 69;
       // 1.7-1.12.2 & 1.15-1.15.2
       default:
