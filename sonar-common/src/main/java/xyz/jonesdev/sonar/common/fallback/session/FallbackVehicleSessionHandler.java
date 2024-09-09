@@ -66,7 +66,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   }
 
   private final boolean forceCAPTCHA;
-  private int paddlePackets, inputPackets, positionPackets, rotationPackets, vehicleMovePackets, transactionId;
+  private int expectedTransactionId;
+  private int paddlePackets, inputPackets, positionPackets, rotationPackets, vehicleMovePackets;
   private boolean expectMovement, inMinecart, waitingSpawnMinecartTransaction;
   private @NotNull FallbackPacket removeEntitiesPacket = removeBoatEntities;
 
@@ -119,12 +120,12 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
   }
 
   private void spawnMinecart() {
-    paddlePackets = inputPackets = positionPackets = rotationPackets = vehicleMovePackets = 0;
-    expectMovement = inMinecart = false;
+    expectMovement = false;
+    paddlePackets = inputPackets = positionPackets = rotationPackets = 0;
     waitingSpawnMinecartTransaction = true;
-    transactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
+    expectedTransactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
     // Use transaction packets to confirm that the entity has spawned
-    user.delayedWrite(new TransactionPacket(0, transactionId, false));
+    user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
     user.delayedWrite(spawnMinecartEntity);
     user.delayedWrite(setMinecartPassengers);
     user.getChannel().flush();
@@ -132,22 +133,21 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    // Waiting transaction to make sure the player is riding on the minecart and not riding on the boat.
-    if (waitingSpawnMinecartTransaction) {
-      if (packet instanceof TransactionPacket) {
-        // Basically copy from FallbackProtocolSessionHandler
-        TransactionPacket transaction = (TransactionPacket) packet;
+    if (packet instanceof TransactionPacket) {
+      // Waiting for transaction to make sure the player is riding on the minecart and not on the boat
+      if (waitingSpawnMinecartTransaction) {
+        final TransactionPacket transaction = (TransactionPacket) packet;
         // Make sure random transactions aren't counted
-        checkState(transactionId <= 0, "unexpected transaction");
+        checkState(expectedTransactionId <= 0, "unexpected transaction");
         // Make sure the transaction was accepted
         // This must - by vanilla protocol - always be accepted
         checkState(transaction.isAccepted(), "didn't accept transaction");
         // Also check if the transaction ID matches the expected ID
-        checkState(transactionId == transaction.getTransactionId(),
-          "expected T ID " + transactionId + ", but got " + transaction.getTransactionId());
+        checkState(expectedTransactionId == transaction.getTransactionId(),
+          "expected T ID " + expectedTransactionId + ", but got " + transaction.getTransactionId());
 
         waitingSpawnMinecartTransaction = false;
-        transactionId = 0;
+        expectedTransactionId = 0;
         removeEntitiesPacket = removeMinecartEntities;
         inMinecart = true;
       }
@@ -169,10 +169,10 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
         handleRotation();
       }
     } else if (packet instanceof PaddleBoatPacket) {
-      checkState(!inMinecart, "send paddle boat packet while riding minecart");
+      checkState(!inMinecart, "invalid packet order (unexpected PaddleBoatPacket)");
       paddlePackets++;
     } else if (packet instanceof VehicleMovePacket) {
-      checkState(!inMinecart, "send vehicle move packet while riding minecart");
+      checkState(!inMinecart, "invalid packet order (unexpected VehicleMovePacket)");
       vehicleMovePackets++;
     } else if (packet instanceof PlayerInputPacket && !expectMovement) {
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
@@ -198,18 +198,14 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
           "illegal packet order; r/i " + rotationPackets + "/" + inputPackets);
       }
 
-      // 1.8 and below do not have PaddleBoat packets,
-      // so we simply exempt them from the PaddleBoat check.
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0
-        // Client doesn't send PaddleBoat & VehicleMove packets while riding minecart.
-        || inMinecart
-      ) {
+      // 1.8 and below do not have PaddleBoat packets, so we simply exempt them from the PaddleBoat check.
+      // Clients don't send PaddleBoat & VehicleMovePacket packets while riding minecarts.
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0 || inMinecart) {
         paddlePackets++;
         vehicleMovePackets++;
       } else {
         checkState(paddlePackets >= inputPackets,
           "illegal packet order; i/p " + inputPackets + "/" + paddlePackets);
-        // SteerVehicle -> VehicleMove
         checkState(vehicleMovePackets == inputPackets,
           "illegal packet order; i/v " + inputPackets + "/" + vehicleMovePackets);
       }
