@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
@@ -32,7 +33,7 @@ public final class VehicleMovePacket implements FallbackPacket {
   private float yaw, pitch;
 
   @Override
-  public void encode(ByteBuf byteBuf, ProtocolVersion protocolVersion) throws Exception {
+  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeDouble(x);
     byteBuf.writeDouble(y);
     byteBuf.writeDouble(z);
@@ -41,7 +42,7 @@ public final class VehicleMovePacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(ByteBuf byteBuf, ProtocolVersion protocolVersion) throws Exception {
+  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
     z = byteBuf.readDouble();
