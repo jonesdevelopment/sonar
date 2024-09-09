@@ -83,11 +83,6 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     }
   }
 
-  private void reset() {
-    paddlePackets = inputPackets = positionPackets = rotationPackets = vehicleMovePackets = 0;
-    expectMovement = inMinecart = false;
-  }
-
   // We can abuse the entity remove mechanic and check for position packets when the entity dies
   private void handleMovement(double y) {
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
@@ -121,6 +116,18 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       expectMovement = true;
     }
     rotationPackets++;
+  }
+
+  private void spawnMinecart() {
+    paddlePackets = inputPackets = positionPackets = rotationPackets = vehicleMovePackets = 0;
+    expectMovement = inMinecart = false;
+    waitingSpawnMinecartTransaction = true;
+    transactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
+    // Use transaction packets to confirm that the entity has spawned
+    user.delayedWrite(new TransactionPacket(0, transactionId, false));
+    user.delayedWrite(spawnMinecartEntity);
+    user.delayedWrite(setMinecartPassengers);
+    user.getChannel().flush();
   }
 
   @Override
@@ -208,15 +215,5 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       }
       inputPackets++;
     }
-  }
-
-  public void spawnMinecart() {
-    waitingSpawnMinecartTransaction = true;
-    transactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
-    user.delayedWrite(new TransactionPacket(0, transactionId, false));
-    user.delayedWrite(spawnMinecartEntity);
-    user.delayedWrite(setMinecartPassengers);
-    reset();
-    user.getChannel().flush();
   }
 }

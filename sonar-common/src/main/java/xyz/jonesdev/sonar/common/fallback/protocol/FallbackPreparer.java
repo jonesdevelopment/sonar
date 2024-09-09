@@ -62,7 +62,7 @@ public class FallbackPreparer {
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
   // JoinGame
-  public final int PLAYER_ENTITY_ID = RANDOM.nextInt(10);
+  public final int PLAYER_ENTITY_ID = RANDOM.nextInt(50);
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
@@ -88,10 +88,10 @@ public class FallbackPreparer {
   public FallbackPacket removeMinecartEntities;
   public FallbackPacket spawnBoatEntity;
   public FallbackPacket spawnMinecartEntity;
-  public static FallbackPacket setBoatPassengers;
-  public static FallbackPacket setMinecartPassengers;
-  public static final int VEHICLE_BOAT_ENTITY_ID = PLAYER_ENTITY_ID + 1 + RANDOM.nextInt(10);
-  public static final int VEHICLE_MINECART_ENTITY_ID = VEHICLE_BOAT_ENTITY_ID + 1 + RANDOM.nextInt(10);
+  public FallbackPacket setBoatPassengers;
+  public FallbackPacket setMinecartPassengers;
+  public final int VEHICLE_BOAT_ENTITY_ID = PLAYER_ENTITY_ID + 1 + RANDOM.nextInt(10);
+  public final int VEHICLE_MINECART_ENTITY_ID = VEHICLE_BOAT_ENTITY_ID + 1 + RANDOM.nextInt(10);
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
