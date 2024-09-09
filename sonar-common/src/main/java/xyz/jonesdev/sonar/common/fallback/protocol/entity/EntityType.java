@@ -91,6 +91,10 @@ public enum EntityType {
       case MINECRAFT_1_14_3:
       case MINECRAFT_1_14_4:
         return 41;
+      case MINECRAFT_1_15:
+      case MINECRAFT_1_15_1:
+      case MINECRAFT_1_15_2:
+        return 42;
       // 1.16-1.16.4
       case MINECRAFT_1_16:
       case MINECRAFT_1_16_1:
@@ -123,7 +127,7 @@ public enum EntityType {
       case MINECRAFT_1_20_5:
       case MINECRAFT_1_21:
         return 69;
-      // 1.7-1.13.2 & 1.15-1.15.2
+      // 1.7-1.13.2
       default:
         return 10;
     }
