@@ -48,12 +48,11 @@ public final class AnimationPacket implements FallbackPacket {
     if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
       entityId = byteBuf.readInt();
       type = LegacyAnimationType.getById(byteBuf.readByte());
+    } else if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
+      // Only 1.9+ clients have an offhand
+      hand = Hand.values()[ProtocolUtil.readVarInt(byteBuf)];
     } else {
-      if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) { // Only 1.9+ has offhand
-        hand = Hand.values()[ProtocolUtil.readVarInt(byteBuf)];
-      } else {
-        hand = Hand.MAIN_HAND;
-      }
+      hand = Hand.MAIN_HAND;
     }
   }
 
