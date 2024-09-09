@@ -53,8 +53,6 @@ public final class AnimationPacket implements FallbackPacket {
     } else if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
       // Only 1.9+ clients have an offhand
       hand = readVarInt(byteBuf);
-    } else {
-      hand = MAIN_HAND;
     }
   }
 
