@@ -25,9 +25,9 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 @Getter
 @Setter
@@ -35,8 +35,10 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 @AllArgsConstructor
 public final class AnimationPacket implements FallbackPacket {
   private int entityId = -1;
-  private Hand hand = Hand.MAIN_HAND;
+  private int hand = MAIN_HAND;
   private LegacyAnimationType type = LegacyAnimationType.SWING_ARM;
+
+  public static final int MAIN_HAND = 0;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
@@ -50,15 +52,10 @@ public final class AnimationPacket implements FallbackPacket {
       type = LegacyAnimationType.getById(byteBuf.readByte());
     } else if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
       // Only 1.9+ clients have an offhand
-      hand = Hand.values()[ProtocolUtil.readVarInt(byteBuf)];
+      hand = readVarInt(byteBuf);
     } else {
-      hand = Hand.MAIN_HAND;
+      hand = MAIN_HAND;
     }
-  }
-
-  public enum Hand {
-    MAIN_HAND,
-    OFF_HAND
   }
 
   @Getter

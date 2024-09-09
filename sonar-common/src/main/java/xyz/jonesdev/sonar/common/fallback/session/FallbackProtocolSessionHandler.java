@@ -162,9 +162,11 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
 
       currentClientSlotId = slotId;
     } else if (packet instanceof AnimationPacket) {
-      final AnimationPacket animationPacket = (AnimationPacket) packet;
-      // Make sure we are waiting client's animation packet
-      if (waitingSwingArm && animationPacket.getHand() == AnimationPacket.Hand.MAIN_HAND) {
+      // Make sure we are awaiting an AnimationPacket packet
+      if (waitingSwingArm) {
+        final AnimationPacket animationPacket = (AnimationPacket) packet;
+        checkState(animationPacket.getHand() == AnimationPacket.MAIN_HAND,
+          "invalid hand " + animationPacket.getHand());
         // Check that the 1.7 client is responding to the correct entity id and animation type.
         if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
           // Check entity id is player itself and if the player is sending the correct animation type
