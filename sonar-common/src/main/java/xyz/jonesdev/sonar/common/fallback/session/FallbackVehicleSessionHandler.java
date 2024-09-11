@@ -35,7 +35,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
  *   {@link SpawnEntityPacket} and {@link SetPassengersPacket} packets are sent to the client,
  *   therefore, making the player enter a boat.
  *   <br>
- *   The boat will be spawned at y 1337.
+ *   The boat will be spawned at a very high altitude.
  *   <br>
  *   After 3 {@link PlayerInputPacket} and {@link PaddleBoatPacket} packets,
  *   the boat is removed.
@@ -90,7 +90,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       y -= 1.62f; // Account for 1.7 bounding box
     }
     // Check the Y position of the player
-    checkState(y <= IN_AIR_Y_POSITION, "invalid y position");
+    checkState(y <= IN_AIR_Y_POSITION, "invalid y position: " + y);
     // Mark this check as successful if the player sent a few position packets
     if (positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
       if (user.isGeyser() || inMinecart) {
@@ -169,6 +169,9 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
       paddlePackets++;
     } else if (packet instanceof VehicleMovePacket) {
       checkState(!inMinecart, "invalid packet order (unexpected VehicleMovePacket)");
+      final VehicleMovePacket vehicleMove = (VehicleMovePacket) packet;
+      // Check the Y position of the vehicle
+      checkState(vehicleMove.getY() <= IN_AIR_Y_POSITION, "invalid y position: " + vehicleMove.getY());
       vehicleMovePackets++;
     } else if (packet instanceof PlayerInputPacket && !expectMovement) {
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
