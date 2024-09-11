@@ -168,8 +168,8 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
     // The player is not allowed to move away from the collision platform.
     // This should not happen unless the max movement tick is configured to a high number.
-    checkState(Math.abs(x - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (x)");
-    checkState(Math.abs(z - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (z)");
+    checkState(Math.abs(Math.abs(x) - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (x)");
+    checkState(Math.abs(Math.abs(z) - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (z)");
 
     if (!isOnGround) {
       // The deltaY is 0 whenever the player sends their first position packet.
