@@ -62,7 +62,7 @@ public class FallbackPreparer {
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
   // JoinGame
-  public final int PLAYER_ENTITY_ID = RANDOM.nextInt(10);
+  public static final int PLAYER_ENTITY_ID = RANDOM.nextInt(50);
   public FallbackPacket joinGame;
   // Update Section Blocks
   public FallbackPacket updateSectionBlocks;
@@ -84,10 +84,14 @@ public class FallbackPreparer {
   public FallbackPacket tooManyOnlinePerIP;
 
   // Vehicle
-  public FallbackPacket removeEntities;
-  public FallbackPacket spawnEntity;
-  public static FallbackPacket setPassengers;
-  public static final int VEHICLE_ENTITY_ID = PLAYER_ENTITY_ID + 1 + RANDOM.nextInt(10);
+  public FallbackPacket removeBoatEntities;
+  public FallbackPacket removeMinecartEntities;
+  public FallbackPacket spawnBoatEntity;
+  public FallbackPacket spawnMinecartEntity;
+  public FallbackPacket setBoatPassengers;
+  public FallbackPacket setMinecartPassengers;
+  public final int VEHICLE_BOAT_ENTITY_ID = PLAYER_ENTITY_ID + 1 + RANDOM.nextInt(10);
+  public final int VEHICLE_MINECART_ENTITY_ID = VEHICLE_BOAT_ENTITY_ID + 1 + RANDOM.nextInt(10);
 
   // Collisions
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (protocol maximum)
@@ -181,10 +185,14 @@ public class FallbackPreparer {
     }
 
     // Prepare packets for the vehicle check
-    removeEntities = new FallbackPacketSnapshot(new RemoveEntitiesPacket(VEHICLE_ENTITY_ID));
-    spawnEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(
-      VEHICLE_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
-    setPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
+    removeBoatEntities = new FallbackPacketSnapshot(new RemoveEntitiesPacket(VEHICLE_BOAT_ENTITY_ID));
+    removeMinecartEntities = new FallbackPacketSnapshot(new RemoveEntitiesPacket(VEHICLE_MINECART_ENTITY_ID));
+    spawnBoatEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(
+      VEHICLE_BOAT_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
+    spawnMinecartEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(
+      VEHICLE_MINECART_ENTITY_ID, EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
+    setBoatPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_BOAT_ENTITY_ID, PLAYER_ENTITY_ID));
+    setMinecartPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_MINECART_ENTITY_ID, PLAYER_ENTITY_ID));
 
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
       || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {

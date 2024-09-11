@@ -26,20 +26,20 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
 public enum ItemType {
+  // Useful resources:
+  // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
+  // - https://pokechu22.github.io/Burger/1.20.4.html
+  // - https://github.com/ViaVersion/Mappings/tree/main/mappings
   FILLED_MAP(protocolVersion -> {
-    // Useful resources:
-    // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
-    // - https://pokechu22.github.io/Burger/1.20.4.html
-    // - https://github.com/ViaVersion/Mappings/tree/main/mappings
     switch (protocolVersion) {
-      default:
-        // 1.7-1.12.2
-        return 358;
+      // 1.13-1.13.1
       case MINECRAFT_1_13:
       case MINECRAFT_1_13_1:
         return 608;
+      // 1.13.2
       case MINECRAFT_1_13_2:
         return 613;
+      // 1.14-1.15.2
       case MINECRAFT_1_14:
       case MINECRAFT_1_14_1:
       case MINECRAFT_1_14_2:
@@ -49,38 +49,49 @@ public enum ItemType {
       case MINECRAFT_1_15_1:
       case MINECRAFT_1_15_2:
         return 671;
+      // 1.16-1.16.4
       case MINECRAFT_1_16:
       case MINECRAFT_1_16_1:
       case MINECRAFT_1_16_2:
       case MINECRAFT_1_16_3:
       case MINECRAFT_1_16_4:
         return 733;
+      // 1.17-1.18.2
       case MINECRAFT_1_17:
       case MINECRAFT_1_17_1:
       case MINECRAFT_1_18:
       case MINECRAFT_1_18_2:
         return 847;
+      // 1.19-1.19.1
       case MINECRAFT_1_19:
       case MINECRAFT_1_19_1:
         return 886;
+      // 1.19.3
       case MINECRAFT_1_19_3:
         return 914;
+      // 1.19.4
       case MINECRAFT_1_19_4:
         return 937;
+      // 1.20-1.20.2
       case MINECRAFT_1_20:
       case MINECRAFT_1_20_2:
         return 941;
+      // 1.20.3
       case MINECRAFT_1_20_3:
         return 979;
+      // 1.20.5-1.21
       case MINECRAFT_1_20_5:
       case MINECRAFT_1_21:
         return 982;
+      default:
+        // 1.7-1.12.2
+        return 358;
     }
   });
 
-  private final Function<ProtocolVersion, Integer> function;
+  private final Function<ProtocolVersion, Integer> idFunction;
 
   public int getId(final @NotNull ProtocolVersion protocolVersion) {
-    return function.apply(protocolVersion);
+    return idFunction.apply(protocolVersion);
   }
 }

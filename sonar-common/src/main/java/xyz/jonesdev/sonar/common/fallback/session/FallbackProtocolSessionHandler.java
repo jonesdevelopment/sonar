@@ -22,8 +22,13 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.AnimationPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.EntityAnimationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetHeldItemPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
+
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.PLAYER_ENTITY_ID;
 
 public final class FallbackProtocolSessionHandler extends FallbackSessionHandler {
 
@@ -39,6 +44,7 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
   }
 
   private final boolean forceCAPTCHA;
+  private boolean waitingSwingArm, waitingSlotConfirm;
   private short expectedTransactionId;
   private int currentClientSlotId, expectedSlotId = -1;
 
@@ -50,7 +56,7 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
    */
   private void sendTransaction() {
     // Send a Transaction (Ping) packet with a random ID
-    expectedTransactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
+    expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
     user.write(new TransactionPacket(0, expectedTransactionId, false));
   }
 
@@ -70,6 +76,17 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
     user.delayedWrite(heldItemPacket);
     user.delayedWrite(heldItemPacket);
     user.getChannel().flush();
+  }
+
+  /**
+   * Uses EntityAnimation packets to check for the excepted Animation (SwingArm) from the client.
+   * <br>
+   * <a href="https://wiki.vg/Protocol#Entity_Animation">Wiki.vg - EntityAnimation</a>
+   * <a href="https://wiki.vg/Protocol#Swing_Arm">Wiki.vg - SwingArm</a>
+   */
+  private void sendArmAnimation() {
+    waitingSwingArm = true;
+    user.write(new EntityAnimationPacket(PLAYER_ENTITY_ID, EntityAnimationPacket.Type.SWING_MAIN_ARM));
   }
 
   private void markSuccess() {
@@ -108,9 +125,20 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
       // https://wiki.vg/Bedrock_Protocol#Player_Hotbar
       if (user.isGeyser()) {
         markSuccess();
+      } else if (waitingSlotConfirm) {
+        waitingSlotConfirm = false;
+        expectedSlotId = -1;
+        // The player did not send duplicate packets, so they pass this check
+        if (user.isGeyser()) {
+          markSuccess();
+        } else {
+          sendArmAnimation();
+        }
       } else {
         sendSetHeldItem();
       }
+
+      expectedTransactionId = 0;
     } else if (packet instanceof SetHeldItemPacket) {
       final SetHeldItemPacket heldItemPacket = (SetHeldItemPacket) packet;
 
@@ -125,11 +153,33 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
       if (expectedSlotId != -1
         // Check if the slot ID matches the expected slot ID
         // This can false flag if a player spams these packets, which is why we don't fail for this
-        && slotId == expectedSlotId) {
-        markSuccess();
+        && slotId == expectedSlotId
+        // Make sure we actually want to send a transaction at this point in time
+        && !waitingSlotConfirm) {
+        sendTransaction();
+        waitingSlotConfirm = true;
       }
 
       currentClientSlotId = slotId;
+    } else if (packet instanceof AnimationPacket) {
+      // Make sure we are awaiting an AnimationPacket packet
+      if (waitingSwingArm) {
+        final AnimationPacket animationPacket = (AnimationPacket) packet;
+        checkState(animationPacket.getHand() == AnimationPacket.MAIN_HAND,
+          "invalid hand " + animationPacket.getHand());
+        // Check that the 1.7 client is responding to the correct entity id and animation type.
+        if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+          // Check entity id is player itself and if the player is sending the correct animation type
+          if (animationPacket.getEntityId() == PLAYER_ENTITY_ID
+            && animationPacket.getType() == AnimationPacket.LegacyAnimationType.SWING_ARM) {
+            markSuccess();
+            waitingSwingArm = false;
+          }
+        } else {
+          markSuccess();
+          waitingSwingArm = false;
+        }
+      }
     }
   }
 }

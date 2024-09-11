@@ -59,15 +59,17 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
 
     this.forceCAPTCHA = forceCAPTCHA;
 
-    // Send the necessary packets to mount the player on the vehicle
-    user.delayedWrite(spawnEntity);
-    user.delayedWrite(setPassengers);
+    // Send the necessary packets to mount the player on the boat vehicle
+    user.delayedWrite(spawnBoatEntity);
+    user.delayedWrite(setBoatPassengers);
     user.getChannel().flush();
   }
 
   private final boolean forceCAPTCHA;
-  private int paddlePackets, inputPackets, positionPackets, rotationPackets;
-  private boolean expectMovement;
+  private int expectedTransactionId;
+  private int paddlePackets, inputPackets, positionPackets, rotationPackets, vehicleMovePackets;
+  private boolean expectMovement, inMinecart, waitingSpawnMinecartTransaction;
+  private @NotNull FallbackPacket removeEntitiesPacket = removeBoatEntities;
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
@@ -91,7 +93,11 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     checkState(y <= IN_AIR_Y_POSITION, "invalid y position");
     // Mark this check as successful if the player sent a few position packets
     if (positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
-      markSuccess();
+      if (user.isGeyser() || inMinecart) {
+        markSuccess();
+      } else {
+        spawnMinecart();
+      }
     }
   }
 
@@ -100,20 +106,51 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
     if (paddlePackets > minimumPackets
       && inputPackets > minimumPackets
-      && rotationPackets > minimumPackets) {
+      && rotationPackets > minimumPackets
+      && vehicleMovePackets > minimumPackets) {
       // Remove the entity
       // The next y coordinate the player will send is going
       // to be the vehicle spawn position (y 64 in this case).
-      user.write(removeEntities);
+      user.write(removeEntitiesPacket);
       // Listen for next movement packet(s)
       expectMovement = true;
     }
     rotationPackets++;
   }
 
+  private void spawnMinecart() {
+    expectMovement = false;
+    paddlePackets = inputPackets = positionPackets = rotationPackets = 0;
+    waitingSpawnMinecartTransaction = true;
+    expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
+    // Use transaction packets to confirm that the entity has spawned
+    user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
+    user.delayedWrite(spawnMinecartEntity);
+    user.delayedWrite(setMinecartPassengers);
+    user.getChannel().flush();
+  }
+
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    if (packet instanceof SetPlayerPositionRotationPacket) {
+    if (packet instanceof TransactionPacket) {
+      // Waiting for transaction to make sure the player is riding on the minecart and not on the boat
+      if (waitingSpawnMinecartTransaction) {
+        final TransactionPacket transaction = (TransactionPacket) packet;
+        // Make sure random transactions aren't counted
+        checkState(expectedTransactionId <= 0, "unexpected transaction");
+        // Make sure the transaction was accepted
+        // This must - by vanilla protocol - always be accepted
+        checkState(transaction.isAccepted(), "didn't accept transaction");
+        // Also check if the transaction ID matches the expected ID
+        checkState(expectedTransactionId == transaction.getTransactionId(),
+          "expected T ID " + expectedTransactionId + ", but got " + transaction.getTransactionId());
+
+        waitingSpawnMinecartTransaction = false;
+        expectedTransactionId = 0;
+        removeEntitiesPacket = removeMinecartEntities;
+        inMinecart = true;
+      }
+    } else if (packet instanceof SetPlayerPositionRotationPacket) {
       if (expectMovement) {
         final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
         handleMovement(posRot.getY());
@@ -128,7 +165,11 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
         handleRotation();
       }
     } else if (packet instanceof PaddleBoatPacket) {
+      checkState(!inMinecart, "invalid packet order (unexpected PaddleBoatPacket)");
       paddlePackets++;
+    } else if (packet instanceof VehicleMovePacket) {
+      checkState(!inMinecart, "invalid packet order (unexpected VehicleMovePacket)");
+      vehicleMovePackets++;
     } else if (packet instanceof PlayerInputPacket && !expectMovement) {
       final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
@@ -153,13 +194,16 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
           "illegal packet order; r/i " + rotationPackets + "/" + inputPackets);
       }
 
-      // 1.8 and below do not have PaddleBoat packets,
-      // so we simply exempt them from the PaddleBoat check.
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
+      // 1.8 and below do not have PaddleBoat packets, so we simply exempt them from the PaddleBoat check.
+      // Clients don't send PaddleBoat & VehicleMovePacket packets while riding minecarts.
+      if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0 || inMinecart) {
         paddlePackets++;
+        vehicleMovePackets++;
       } else {
         checkState(paddlePackets >= inputPackets,
           "illegal packet order; i/p " + inputPackets + "/" + paddlePackets);
+        checkState(vehicleMovePackets == inputPackets,
+          "illegal packet order; i/v " + inputPackets + "/" + vehicleMovePackets);
       }
       inputPackets++;
     }
