@@ -138,6 +138,8 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
         final TransactionPacket transaction = (TransactionPacket) packet;
         // Make sure random transactions aren't counted
         checkState(expectedTransactionId <= 0, "unexpected transaction");
+        // Make sure the window ID is valid
+        checkState(transaction.getWindowId() == 0, "wrong window ID " + transaction.getWindowId());
         // Make sure the transaction was accepted
         // This must - by vanilla protocol - always be accepted
         checkState(transaction.isAccepted(), "didn't accept transaction");
