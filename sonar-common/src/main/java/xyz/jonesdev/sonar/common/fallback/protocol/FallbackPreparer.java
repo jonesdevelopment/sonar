@@ -55,7 +55,7 @@ public class FallbackPreparer {
   public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
   public final FallbackPacket[] REGISTRY_SYNC_1_21 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21);
   // Keep Alive
-  public final FallbackPacket CAPTCHA_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(-1337L));
+  public final FallbackPacket CAPTCHA_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(RANDOM.nextInt()));
   // Game Event (1.20.3+)
   public final FallbackPacket START_WRITING_CHUNKS = new FallbackPacketSnapshot(new GameEventPacket(13, 0));
   // Chat
@@ -98,7 +98,7 @@ public class FallbackPreparer {
   public final int SPAWN_X_POSITION = 16 / 2; // middle of the chunk
   public final int SPAWN_Z_POSITION = 16 / 2; // middle of the chunk
   public final int DEFAULT_Y_COLLIDE_POSITION = 155 + RANDOM.nextInt(101); // 255 is the maximum Y position
-  public final int IN_AIR_Y_POSITION = 1337;
+  public final int IN_AIR_Y_POSITION = 1337 + RANDOM.nextInt(1000);
 
   // CAPTCHA position
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
