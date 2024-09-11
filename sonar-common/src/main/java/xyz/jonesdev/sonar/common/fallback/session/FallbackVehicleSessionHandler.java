@@ -123,7 +123,7 @@ public final class FallbackVehicleSessionHandler extends FallbackSessionHandler 
     expectMovement = false;
     paddlePackets = inputPackets = positionPackets = rotationPackets = 0;
     waitingSpawnMinecartTransaction = true;
-    expectedTransactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
+    expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
     // Use transaction packets to confirm that the entity has spawned
     user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
     user.delayedWrite(spawnMinecartEntity);

@@ -56,7 +56,7 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
    */
   private void sendTransaction() {
     // Send a Transaction (Ping) packet with a random ID
-    expectedTransactionId = (short) -(RANDOM.nextInt(Short.MAX_VALUE));
+    expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
     user.write(new TransactionPacket(0, expectedTransactionId, false));
   }
 

@@ -190,8 +190,7 @@ public class FallbackPreparer {
     spawnBoatEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(
       VEHICLE_BOAT_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     spawnMinecartEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(
-      VEHICLE_MINECART_ENTITY_ID, EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION
-    ));
+      VEHICLE_MINECART_ENTITY_ID, EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     setBoatPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_BOAT_ENTITY_ID, PLAYER_ENTITY_ID));
     setMinecartPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_MINECART_ENTITY_ID, PLAYER_ENTITY_ID));
 
