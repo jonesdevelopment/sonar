@@ -40,12 +40,12 @@ public enum BlockType {
         return 4612;
       // 1.13.2-1.14.3
       case MINECRAFT_1_13_2:
+        return 4613;
+      // 1.14.4-1.15.2
       case MINECRAFT_1_14:
       case MINECRAFT_1_14_1:
       case MINECRAFT_1_14_2:
       case MINECRAFT_1_14_3:
-        return 4613;
-      // 1.14.4-1.15.2
       case MINECRAFT_1_14_4:
       case MINECRAFT_1_15:
       case MINECRAFT_1_15_1:
@@ -101,12 +101,12 @@ public enum BlockType {
         return 6509;
       // 1.13.2-1.14.3
       case MINECRAFT_1_13_2:
+        return 6510;
+      // 1.14.4-1.15.2
       case MINECRAFT_1_14:
       case MINECRAFT_1_14_1:
       case MINECRAFT_1_14_2:
       case MINECRAFT_1_14_3:
-        return 6510;
-      // 1.14.4-1.15.2
       case MINECRAFT_1_14_4:
       case MINECRAFT_1_15:
       case MINECRAFT_1_15_1:
