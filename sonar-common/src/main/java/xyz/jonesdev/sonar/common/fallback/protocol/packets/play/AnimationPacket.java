@@ -18,10 +18,7 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
@@ -33,6 +30,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(of = {"entityId", "hand"})
 public final class AnimationPacket implements FallbackPacket {
   private int entityId = -1;
   private int hand = MAIN_HAND;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.session;
+package xyz.jonesdev.sonar.common.fallback.verification;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -28,22 +28,18 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetHeldItemPacke
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.CACHED_HELD_ITEM_RESET;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.PLAYER_ENTITY_ID;
 
-public final class FallbackProtocolSessionHandler extends FallbackSessionHandler {
+public final class FallbackProtocolHandler extends FallbackVerificationHandler {
 
-  public FallbackProtocolSessionHandler(final @NotNull FallbackUser user,
-                                        final @NotNull String username,
-                                        final boolean forceCAPTCHA) {
-    super(user, username);
-
-    this.forceCAPTCHA = forceCAPTCHA;
+  public FallbackProtocolHandler(final @NotNull FallbackUser user) {
+    super(user);
 
     // Immediately send the player the transaction packet
     sendTransaction();
   }
 
-  private final boolean forceCAPTCHA;
   private boolean waitingSwingArm, waitingSlotConfirm;
   private short expectedTransactionId;
   private int currentClientSlotId, expectedSlotId = -1;
@@ -69,6 +65,9 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
     // Move the player's slot by 4 (slot limit divided by 2),
     // and then modulo it by the slot limit (8) to ensure that we don't send invalid slot IDs.
     expectedSlotId = (currentClientSlotId + 4) % 8;
+    // Reset the player's slot to 4, so we don't get false positives if the client changes the slot
+    // This doesn't *really* work for 1.7-1.8 clients, but it's better to still send a packet if they're de-sync
+    user.delayedWrite(CACHED_HELD_ITEM_RESET);
     // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
     // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
     // We can take advantage of this by sending two packets with the same content to check for a valid response.
@@ -95,9 +94,9 @@ public final class FallbackProtocolSessionHandler extends FallbackSessionHandler
     final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
     // Pass the player to the next best verification handler
     if (Sonar.get().getConfig().getVerification().getVehicle().isEnabled()) {
-      decoder.setListener(new FallbackVehicleSessionHandler(user, username, forceCAPTCHA));
-    } else if (forceCAPTCHA || Sonar.get().getFallback().shouldPerformCaptcha()) {
-      decoder.setListener(new FallbackCAPTCHASessionHandler(user, username));
+      decoder.setListener(new FallbackVehicleHandler(user));
+    } else if (user.isForceCaptcha() || Sonar.get().getFallback().shouldPerformCaptcha()) {
+      decoder.setListener(new FallbackCaptchaHandler(user));
     } else {
       // The player has passed all checks
       finishVerification();

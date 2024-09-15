@@ -36,7 +36,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   private double x, y, z;
   private float yaw, pitch;
-  private int teleportId;
+  private int teleportId, relativeMask;
   private boolean onGround;
 
   @Override
@@ -46,7 +46,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
     byteBuf.writeDouble(z);
     byteBuf.writeFloat(yaw);
     byteBuf.writeFloat(pitch);
-    byteBuf.writeBoolean(onGround);
+    byteBuf.writeByte(relativeMask);
 
     if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
       writeVarInt(byteBuf, teleportId);
@@ -63,7 +63,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
     if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-      y = byteBuf.readDouble(); // Account 1.7 bounding box
+      y = byteBuf.readDouble(); // Account for 1.7 bounding box
     }
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();

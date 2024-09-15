@@ -90,10 +90,6 @@ verification:
     collision:
       # Moet Sonar controleren of de speler tegen blokken botst? (Aanbevolen)
       enabled: true
-      # Welk type blok moet Sonar gebruiken voor het platform?
-      # Mogelijke typen: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
-      # Je moet dit alleen bewerken als je weet wat je doet
-      collision-block-type: TRAPDOOR
 
     # Controleert of de klant de juiste pakketten verzendt bij het monteren van een voertuig
     vehicle:
@@ -139,8 +135,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex voor het valideren van de landinstelling van de client tijdens verificatie
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Maximaal aantal loginpakketten dat de speler moet verzenden om te worden geschopt
-    max-login-packets: 256
 
   # Indien ingeschakeld, wordt de speler teruggestuurd naar de oorspronkelijke server
   # nadat u de bot-verificatie met succes heeft doorstaan.

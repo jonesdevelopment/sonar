@@ -197,7 +197,6 @@ public final class SonarConfiguration {
     verification.gamemode = Verification.Gamemode.valueOf(generalConfig.getString("verification.gamemode"));
     verification.validNameRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-name-regex"));
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
-    verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets"), 128, 8192);
 
     verification.checkGeyser = generalConfig.getBoolean("verification.check-geyser-players");
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
@@ -415,7 +414,6 @@ public final class SonarConfiguration {
     private Pattern validNameRegex;
     private Pattern validLocaleRegex;
 
-    private int maxLoginPackets;
     private int readTimeout;
     private int writeTimeout;
     private int reconnectDelay;

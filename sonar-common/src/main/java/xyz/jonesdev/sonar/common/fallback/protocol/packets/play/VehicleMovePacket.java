@@ -21,11 +21,13 @@ import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class VehicleMovePacket implements FallbackPacket {

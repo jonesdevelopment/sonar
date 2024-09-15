@@ -88,10 +88,6 @@ verification:
     collision:
       # Soll Sonar prüfen, ob der Spieler mit Blöcken kollidiert? (Empfohlen)
       enabled: true
-      # Welche Art von Block sollte Sonar für die Kollisionsplattform verwenden?
-      # Mögliche Typen: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
-      # Sie sollten dies nur bearbeiten, wenn Sie wissen, was Sie tun
-      collision-block-type: TRAPDOOR
 
     # Überprüft, ob der Spieler beim Einsteigen in ein Boot die richtigen Pakete sendet
     vehicle:
@@ -137,8 +133,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex zur Validierung der Client-Spracheinstellung während der Überprüfung
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Maximale Anzahl an Login-Paketen, die der Spieler senden muss, um gekickt zu werden
-    max-login-packets: 256
 
   # Wenn aktiviert, wird der Player zurück zum Ursprungsserver gesendet,
   # falls dieser die der Bot-Verifizierung erfolgreich besteht.

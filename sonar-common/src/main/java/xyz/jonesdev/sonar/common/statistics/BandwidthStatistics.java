@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler;
 
+// TODO: maybe recode this?
 /**
  * This counts all incoming and outgoing traffic.
  */

@@ -26,7 +26,6 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.net.InetAddress;
-import java.util.UUID;
 
 public interface FallbackUser {
   @NotNull
@@ -45,15 +44,14 @@ public interface FallbackUser {
   SystemTimer getLoginTimer();
 
   @NotNull
-  UUID getOfflineUuid();
+  String getFingerprint();
 
-  boolean isReceivedClientSettings();
+  @NotNull
+  String getUsername();
 
-  void setReceivedClientSettings(final boolean receivedClientSettings);
+  boolean isForceCaptcha();
 
-  boolean isReceivedPluginMessage();
-
-  void setReceivedPluginMessage(final boolean receivedPluginMessage);
+  void setForceCaptcha(final boolean isForceCaptcha);
 
   boolean isGeyser();
 
@@ -64,14 +62,6 @@ public interface FallbackUser {
    * @param reason      Disconnect message component
    */
   void disconnect(final @NotNull Component reason);
-
-  /**
-   * Takes over the channel and begins the verification process
-   *
-   * @param username    Username of the player
-   * @param offlineUuid UUID of the player
-   */
-  void hijack(final @NotNull String username, final @NotNull UUID offlineUuid);
 
   /**
    * Sends a packet/message to the player
@@ -97,16 +87,4 @@ public interface FallbackUser {
       ReferenceCountUtil.release(msg);
     }
   }
-
-  /**
-   * Disconnects the player who failed the verification
-   * and caches them in FAILED_VERIFICATIONS.
-   * If the player fails the verification twice,
-   * the player will be temporarily denied from verifying.
-   *
-   * @param reason Reason for failing the verification
-   * @apiNote The {@link xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent}
-   * will not be thrown if no reason is given
-   */
-  void fail(final @NotNull String reason);
 }

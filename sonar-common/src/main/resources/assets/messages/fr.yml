@@ -100,8 +100,6 @@ commands:
     size: '<prefix>La liste noire contient actuellement <amount> adresse(s) IP.'
     # Message affiché lorsque quelqu'un ajoute une adresse IP à la liste noire
     add: '<prefix>Adresse IP <ip> ajoutée avec succès à la liste noire.'
-    # Message affiché lorsque quelqu'un ajoute une adresse IP à la liste noire qui est vérifiée
-    add-warning: "<prefix><red>Avertissement : <white><ip> est actuellement sur liste blanche. Considérez la suppression de l'adresse IP de la liste des joueurs vérifiés pour éviter des problèmes potentiels."
     # Message affiché lorsque quelqu'un supprime une adresse IP de la liste noire
     remove: '<prefix>Adresse IP <ip> supprimée avec succès de la liste noire.'
     # Message affiché lorsque quelqu'un ajoute une adresse IP à la liste noire, mais qu'elle est déjà en liste noire
@@ -183,9 +181,9 @@ verification:
     # Message enregistré dans la console chaque fois qu'un nouveau joueur rejoint le serveur
     connection: "<username>/<ip> (<protocol>) s'est connecté."
     # Message enregistré dans la console chaque fois qu'un joueur échoue à la vérification
-    failed: '<ip> (<protocol>) a échoué au test du bot pour : <reason>'
+    failed: '<username>/<ip> (<protocol>) a échoué au test du bot pour : <reason>'
     # Message enregistré dans la console chaque fois qu'un joueur est sur liste noire
-    blacklisted: '<ip> (<protocol>) a été mis sur liste noire pour trop de tentatives échouées'
+    blacklisted: '<username>/<ip> (<protocol>) a été mis sur liste noire pour trop de tentatives échouées'
     # Message enregistré dans la console chaque fois qu'un joueur est vérifié
     successful: '<username> a été vérifié avec succès (<time-taken>s !).'
 

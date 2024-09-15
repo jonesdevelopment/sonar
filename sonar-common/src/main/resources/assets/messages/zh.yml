@@ -100,8 +100,6 @@ commands:
     size: '<prefix>黑名单中目前有 <amount> 个 IP 地址.'
     # 当手动将一个 IP 地址添加到黑名单时显示的消息
     add: '<prefix>成功将 IP 地址 <ip> 列入黑名单.'
-    # 当尝试将白名单中的 IP 地址添加到黑名单中时显示的警告消息
-    add-warning: '<prefix><red>警告: <white>IP 地址 <ip> 在白名单中. 添加到黑名单则意味着它将被同时从白名单中移除.'
     # 当尝试从黑名单中移除一个 IP 地址时显示的消息
     remove: '<prefix>成功将 IP 地址 <ip> 移出黑名单.'
     # 当尝试向黑名单添加一个已经在黑名单中的 IP 地址时显示的消息
@@ -183,9 +181,9 @@ verification:
     # 当玩家进入服务器并验证时显示的消息
     connection: '<username>/<ip> (<protocol>) 连接到了服务器.'
     # 当玩家未通过检查时打印的消息
-    failed: '<ip> (<protocol>) 由于原因 <reason> 无法通过检查.'
+    failed: '<username>/<ip> (<protocol>) 由于原因 <reason> 无法通过检查.'
     # 当玩家被自动列入黑名单时打印的消息
-    blacklisted: '<ip> (<protocol>) 因太多次无法完成验证而被列入黑名单.'
+    blacklisted: '<username>/<ip> (<protocol>) 因太多次无法完成验证而被列入黑名单.'
     # 当玩家完成验证时打印的消息
     successful: '<username> 成功通过了验证 (耗时 <time-taken> 秒!).'
 

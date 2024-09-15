@@ -105,8 +105,6 @@ commands:
     remove: <prefix>Pomyślnie usunięto <ip> z czarnej listy.
     # Message shown when someone adds an IP address to the blacklist
     add: <prefix>Pomyślnie dodano <ip> do czarnej listy.
-    # Message shown when someone adds an IP address to the blacklist that is verified
-    add-warning: '<prefix><red>Ostrzeżenie: <white><ip> znajduje się obecnie na białej liście. Rozważ usunięcie adresu IP z listy zweryfikowanych graczy, aby uniknąć potencjalnych problemów.'
     # Message shown when someone adds an IP address to the blacklist, but it is already blacklisted
     ip-duplicate: <prefix>Podany adres IP znajduje się już na czarnej liście.
     # Message shown when someone removes an IP address from the blacklist, but it is not blacklisted
@@ -186,9 +184,9 @@ verification:
     # Message logged to console whenever a new player joins the server
     connection: '<username>/<ip> (<protocol>) połączył się.'
     # Message logged to console whenever a player fails verification
-    failed: '<ip> (<protocol>) nie powiodło się sprawdzenie bota dla: <reason>'
+    failed: '<username>/<ip> (<protocol>) nie powiodło się sprawdzenie bota dla: <reason>'
     # Message logged to console whenever a player is blacklisted
-    blacklisted: '<ip> (<protocol>) został umieszczony na czarnej liście z powodu zbyt wielu nieudanych prób'
+    blacklisted: '<username>/<ip> (<protocol>) został umieszczony na czarnej liście z powodu zbyt wielu nieudanych prób'
     # Message logged to console whenever a player is verified
     successful: '<username> został pomyślnie zweryfikowany (<time-taken>s!).'
 

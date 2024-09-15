@@ -23,10 +23,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.nbt.IntBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
@@ -36,16 +36,13 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SetContainerSlotPacket implements FallbackPacket {
-  private int slot, count, itemId;
+  private int windowId, slot, count;
+  private ItemType itemType;
   private CompoundBinaryTag compoundBinaryTag;
-
-  public static final CompoundBinaryTag MAP_NBT = CompoundBinaryTag.builder()
-    .put("map", IntBinaryTag.intBinaryTag(0)) // map type
-    .build();
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    byteBuf.writeByte(0); // windowId
+    byteBuf.writeByte(windowId);
 
     if (protocolVersion.compareTo(MINECRAFT_1_17_1) >= 0) {
       writeVarInt(byteBuf, 0);
@@ -62,9 +59,9 @@ public final class SetContainerSlotPacket implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_13_2) < 0) {
-      byteBuf.writeShort(itemId);
+      byteBuf.writeShort(itemType.getId(protocolVersion));
     } else {
-      writeVarInt(byteBuf, itemId);
+      writeVarInt(byteBuf, itemType.getId(protocolVersion));
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
@@ -86,7 +83,7 @@ public final class SetContainerSlotPacket implements FallbackPacket {
         writeCompoundTag(byteBuf, compoundBinaryTag);
       } else if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
         writeNamelessCompoundTag(byteBuf, compoundBinaryTag);
-      } else { // 1.20.5
+      } else { // 1.20.5+
         // TODO: find a way to improve this
         // component
         writeVarInt(byteBuf, 1); // component count to add

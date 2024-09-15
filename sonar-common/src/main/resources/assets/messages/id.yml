@@ -102,8 +102,6 @@ commands:
     remove: '<prefix>Berhasil menghapus <ip> dari daftar hitam.'
     # Pesan yang ditampilkan saat seseorang menambahkan alamat IP ke daftar hitam
     add: '<prefix>Berhasil menambahkan <ip> ke daftar hitam.'
-    # Pesan yang ditampilkan saat seseorang menambahkan alamat IP ke daftar hitam yang diverifikasi
-    add-warning: '<prefix><red>Peringatan: <white><ip> saat ini di daftar putih. Pertimbangkan untuk menghapus alamat IP dari daftar pemain yang diverifikasi untuk menghindari masalah potensial.'
     # Pesan yang ditampilkan saat seseorang menambahkan alamat IP ke daftar hitam, tetapi sudah masuk daftar hitam
     ip-duplicate: '<prefix>Alamat IP yang Anda berikan sudah masuk daftar hitam.'
     # Pesan yang ditampilkan saat seseorang menghapus alamat IP dari daftar hitam, tetapi tidak masuk daftar hitam
@@ -183,9 +181,9 @@ verification:
     # Pesan yang dicatat ke konsol setiap kali pemain baru bergabung ke server
     connection: '<username>/<ip> (<protocol>) telah terhubung.'
     # Pesan yang dicatat ke konsol setiap kali pemain gagal verifikasi
-    failed: '<ip> (<protocol>) telah gagal dalam pemeriksaan bot untuk: <reason>'
+    failed: '<username>/<ip> (<protocol>) telah gagal dalam pemeriksaan bot untuk: <reason>'
     # Pesan yang dicatat ke konsol setiap kali pemain masuk daftar hitam
-    blacklisted: '<ip> (<protocol>) masuk daftar hitam karena terlalu banyak percobaan yang gagal'
+    blacklisted: '<username>/<ip> (<protocol>) masuk daftar hitam karena terlalu banyak percobaan yang gagal'
     # Pesan yang dicatat ke konsol setiap kali pemain berhasil diverifikasi
     successful: '<username> berhasil diverifikasi dalam waktu (<time-taken>s!).'
 

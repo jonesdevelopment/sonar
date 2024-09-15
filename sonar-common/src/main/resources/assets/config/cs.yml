@@ -91,10 +91,6 @@ verification:
     collision:
       # Měl by Sonar zkoušet jestli se hráč dotýka bloku? (Doporučováno)
       enabled: true
-      # Jaký typ bloku by měl Sonar použít pro kolizní platformu?
-      # Typy: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
-      # Toto byste měli upravovat, pouze pokud víte, co děláte
-      collision-block-type: TRAPDOOR
 
     # Kontroluje, zda klient odesílá správné pakety při montáži vozidla
     vehicle:
@@ -140,8 +136,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex pro validaci "client locale" při verifikaci
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Maximální počet login packetů, který musí hřáč poslat aby byl vyhozen
-    max-login-packets: 256
 
   # Je-li povoleno, hráč bude přenesen zpět na původní server
   # po úspěšném absolvování ověření bota.

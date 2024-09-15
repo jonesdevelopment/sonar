@@ -30,6 +30,7 @@ import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.maxTotalPacketsSent;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
@@ -38,6 +39,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private FallbackPacketRegistry.ProtocolRegistry registry;
   @Setter
   private FallbackPacketListener listener;
+  private int totalPacketsSent;
 
   public FallbackPacketDecoder(final @NotNull ProtocolVersion protocolVersion) {
     this.protocolVersion = protocolVersion;
@@ -60,6 +62,11 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
         // memory leaks or other potential exploits.
         if (!ctx.channel().isActive() || !byteBuf.isReadable()) {
           return;
+        }
+
+        // Don't allow the player to spam packets to overload netty
+        if (++totalPacketsSent > maxTotalPacketsSent) {
+          throw DEBUG ? new DecoderException("Sent too many packets") : QuietDecoderException.INSTANCE;
         }
 
         // Read the packet ID and then create the packet from it
@@ -102,14 +109,14 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
   private void checkPacketSize(final @NotNull ByteBuf byteBuf,
                                final @NotNull FallbackPacket packet) throws Exception {
+    final int packetSize = byteBuf.readableBytes();
     final int expectedMaxLen = packet.expectedMaxLength(byteBuf, protocolVersion);
-    if (expectedMaxLen != -1 && byteBuf.readableBytes() > expectedMaxLen) {
-      throw DEBUG ? new DecoderException("Packet too large") : QuietDecoderException.INSTANCE;
+    if (expectedMaxLen != -1 && packetSize > expectedMaxLen) {
+      throw DEBUG ? new DecoderException("Packet too large: " + packetSize) : QuietDecoderException.INSTANCE;
     }
-
     final int expectedMinLen = packet.expectedMinLength(byteBuf, protocolVersion);
-    if (expectedMinLen != -1 && byteBuf.readableBytes() < expectedMinLen) {
-      throw DEBUG ? new DecoderException("Packet too small") : QuietDecoderException.INSTANCE;
+    if (expectedMinLen != -1 && packetSize < expectedMinLen) {
+      throw DEBUG ? new DecoderException("Packet too small: " + packetSize) : QuietDecoderException.INSTANCE;
     }
   }
 }

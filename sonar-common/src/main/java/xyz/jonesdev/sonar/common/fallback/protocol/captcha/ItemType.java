@@ -23,7 +23,9 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.util.function.Function;
 
-@SuppressWarnings("unused")
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
+
+// TODO: load mappings from a separate file
 @RequiredArgsConstructor
 public enum ItemType {
   // Useful resources:
@@ -31,62 +33,40 @@ public enum ItemType {
   // - https://pokechu22.github.io/Burger/1.20.4.html
   // - https://github.com/ViaVersion/Mappings/tree/main/mappings
   FILLED_MAP(protocolVersion -> {
-    switch (protocolVersion) {
-      // 1.13-1.13.1
-      case MINECRAFT_1_13:
-      case MINECRAFT_1_13_1:
-        return 608;
-      // 1.13.2
-      case MINECRAFT_1_13_2:
-        return 613;
-      // 1.14-1.15.2
-      case MINECRAFT_1_14:
-      case MINECRAFT_1_14_1:
-      case MINECRAFT_1_14_2:
-      case MINECRAFT_1_14_3:
-      case MINECRAFT_1_14_4:
-      case MINECRAFT_1_15:
-      case MINECRAFT_1_15_1:
-      case MINECRAFT_1_15_2:
-        return 671;
-      // 1.16-1.16.4
-      case MINECRAFT_1_16:
-      case MINECRAFT_1_16_1:
-      case MINECRAFT_1_16_2:
-      case MINECRAFT_1_16_3:
-      case MINECRAFT_1_16_4:
-        return 733;
-      // 1.17-1.18.2
-      case MINECRAFT_1_17:
-      case MINECRAFT_1_17_1:
-      case MINECRAFT_1_18:
-      case MINECRAFT_1_18_2:
-        return 847;
-      // 1.19-1.19.1
-      case MINECRAFT_1_19:
-      case MINECRAFT_1_19_1:
-        return 886;
-      // 1.19.3
-      case MINECRAFT_1_19_3:
-        return 914;
-      // 1.19.4
-      case MINECRAFT_1_19_4:
-        return 937;
-      // 1.20-1.20.2
-      case MINECRAFT_1_20:
-      case MINECRAFT_1_20_2:
-        return 941;
-      // 1.20.3
-      case MINECRAFT_1_20_3:
-        return 979;
-      // 1.20.5-1.21
-      case MINECRAFT_1_20_5:
-      case MINECRAFT_1_21:
-        return 982;
-      default:
-        // 1.7-1.12.2
-        return 358;
+    if (protocolVersion.compareTo(MINECRAFT_1_12_2) <= 0) {
+      return 358;
     }
+    if (protocolVersion.compareTo(MINECRAFT_1_13_1) <= 0) {
+      return 608;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_13_2) <= 0) {
+      return 613;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
+      return 671;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_16_4) <= 0) {
+      return 733;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_18_2) <= 0) {
+      return 847;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_1) <= 0) {
+      return 886;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+      return 914;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_4) <= 0) {
+      return 937;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_20_2) <= 0) {
+      return 941;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_20_3) <= 0) {
+      return 979;
+    }
+    return 982;
   });
 
   private final Function<ProtocolVersion, Integer> idFunction;

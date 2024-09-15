@@ -102,8 +102,6 @@ commands:
     remove: '<prefix>Successfully removed <ip> from the blacklist.'
     # Message shown when someone adds an IP address to the blacklist
     add: '<prefix>Successfully added <ip> to the blacklist.'
-    # Message shown when someone adds an IP address to the blacklist that is verified
-    add-warning: '<prefix><red>Warning: <white><ip> is currently whitelisted. Consider removing the IP address from the list of verified players to avoid potential issues.'
     # Message shown when someone adds an IP address to the blacklist, but it is already blacklisted
     ip-duplicate: '<prefix>The IP address you provided is already blacklisted.'
     # Message shown when someone removes an IP address from the blacklist, but it is not blacklisted
@@ -183,9 +181,9 @@ verification:
     # Message logged to console whenever a new player joins the server
     connection: '<username>/<ip> (<protocol>) has connected.'
     # Message logged to console whenever a player fails verification
-    failed: '<ip> (<protocol>) has failed the bot check for: <reason>'
+    failed: '<username>/<ip> (<protocol>) has failed the bot check for: <reason>'
     # Message logged to console whenever a player is blacklisted
-    blacklisted: '<ip> (<protocol>) was blacklisted for too many failed attempts'
+    blacklisted: '<username>/<ip> (<protocol>) was blacklisted for too many failed attempts'
     # Message logged to console whenever a player is verified
     successful: '<username> has been verified successfully (<time-taken>s!).'
 

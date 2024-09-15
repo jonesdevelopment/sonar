@@ -100,8 +100,6 @@ commands:
     size: '<prefix>Kara liste şu anda <amount> IP adres(ler)i içeriyor.'
     # Birisi bir IP adresini kara listeye eklediğinde gösterilen mesaj
     add: '<prefix>Başarıyla <ip> kara listeye eklendi.'
-    # Birisi doğrulanmış olarak işaretlenmiş bir IP adresini kara listeye eklediğinde gösterilen mesaj
-    add-warning: '<prefix><red>Uyarı: <white><ip> şu anda beyaz listede. Potansiyel sorunları önlemek için IP adresini doğrulanmış oyuncular listesinden kaldırmayı düşünün.'
     # Birisi bir IP adresini kara listeden çıkardığında gösterilen mesaj
     remove: '<prefix>Başarıyla <ip> kara listeden çıkarıldı.'
     # Birisi bir IP adresini kara listeye eklemeye çalıştığında ama zaten kara listede olduğunda gösterilen mesaj
@@ -183,9 +181,9 @@ verification:
     # Sunucuya yeni bir oyuncu katıldığında konsola kaydedilen mesaj
     connection: '<username>/<ip> (<protocol>) sunucuya bağlandı.'
     # Bir oyuncu doğrulamada başarısız olduğunda konsola kaydedilen mesaj
-    failed: '<ip> (<protocol>) bot korumasında başarısız oldu: <reason>'
+    failed: '<username>/<ip> (<protocol>) bot korumasında başarısız oldu: <reason>'
     # Bir oyuncu kara listeye alındığında konsola kaydedilen mesaj
-    blacklisted: '<ip> (<protocol>) çok fazla doğrulama denemesinden dolayı kara listeye alındı'
+    blacklisted: '<username>/<ip> (<protocol>) çok fazla doğrulama denemesinden dolayı kara listeye alındı'
     # Bir oyuncu doğrulandığında konsola kaydedilen mesaj
     successful: '<username> başarıyla doğrulandı! (<time-taken>s).'
 

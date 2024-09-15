@@ -101,8 +101,6 @@ commands:
     size: '<prefix>Die Blacklist enthält derzeit <amount> IP-Adresse(n).'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse zur Blacklist hinzufügt
     add: '<prefix>Erfolgreich <ip> zur Blacklist hinzugefügt.'
-    # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse zur Blacklist hinzufügt, die verifiziert ist
-    add-warning: '<prefix><red>Warnung: <white><ip> ist derzeit auf der Whitelist. Erwäge, die IP-Adresse aus der Liste der verifizierten Spieler zu entfernen, um potenzielle Probleme zu vermeiden.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse von der Blacklist entfernt
     remove: '<prefix>Erfolgreich <ip> von der Blacklist entfernt.'
     # Nachricht, die angezeigt wird, wenn jemand eine IP-Adresse zur Blacklist hinzufügt, die bereits auf der Blacklist steht
@@ -184,9 +182,9 @@ verification:
     # Nachricht, die im Protokoll angezeigt wird, wenn ein neuer Spieler den Server betretet
     connection: '<username>/<ip> (<protocol>) hat sich verbunden.'
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler die Verifizierung nicht besteht
-    failed: '<ip> (<protocol>) hat den Bot-Check nicht bestanden wegen: <reason>'
+    failed: '<username>/<ip> (<protocol>) hat den Bot-Check nicht bestanden wegen: <reason>'
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler aufgrund zu vieler fehlgeschlagener Versuche auf die Blacklist gesetzt wird
-    blacklisted: '<ip> (<protocol>) wurde aufgrund zu vieler fehlgeschlagener Versuche auf die Blacklist gesetzt'
+    blacklisted: '<username>/<ip> (<protocol>) wurde aufgrund zu vieler fehlgeschlagener Versuche auf die Blacklist gesetzt'
     # Nachricht, die im Protokoll angezeigt wird, wenn ein Spieler erfolgreich verifiziert wurde
     successful: '<username> wurde erfolgreich verifiziert (<time-taken>s!).'
 

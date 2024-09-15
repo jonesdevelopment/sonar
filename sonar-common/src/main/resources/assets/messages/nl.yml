@@ -100,8 +100,6 @@ commands:
     size: '<prefix>De zwarte lijst bevat momenteel <amount> IP-adres(sen).'
     # Bericht dat wordt getoond wanneer iemand een IP-adres aan de zwarte lijst toevoegt
     add: '<prefix><ip> is succesvol toegevoegd aan de zwarte lijst.'
-    # Bericht dat wordt getoond wanneer iemand een IP-adres toevoegt aan de zwarte lijst die is geverifieerd
-    add-warning: '<prefix><red>Attentie: <white><ip> staat momenteel op de witte lijst. Overwegen het verwijderen van het IP-adres uit de lijst met geverifieerde spelers om potentieel te voorkomen problemen.'
     # Bericht dat verschijnt wanneer iemand een IP-adres van de zwarte lijst verwijdert
     remove: '<prefix><ip> is met succes verwijderd van de zwarte lijst.'
     # Bericht dat wordt weergegeven wanneer iemand een IP-adres aan de zwarte lijst toevoegt, maar dit al op de zwarte lijst staat
@@ -183,9 +181,9 @@ verification:
     # Bericht dat in de console wordt geregistreerd wanneer een nieuwe speler zich bij de server voegt
     connection: '<username>/<ip> (<protocol>) heeft verbinding gemaakt.'
     # Bericht dat in de console wordt geregistreerd wanneer de verificatie van een speler mislukt
-    failed: '<ip> (<protocol>) heeft de bot-controle niet doorstaan vanwege: <reason>'
+    failed: '<username>/<ip> (<protocol>) heeft de bot-controle niet doorstaan vanwege: <reason>'
     # Bericht dat op de console wordt geregistreerd wanneer een speler op de zwarte lijst staat
-    blacklisted: '<ip> (<protocol>) stond op de zwarte lijst vanwege te veel mislukte pogingen'
+    blacklisted: '<username>/<ip> (<protocol>) stond op de zwarte lijst vanwege te veel mislukte pogingen'
     # Bericht dat op de console wordt geregistreerd wanneer een speler is geverifieerd
     successful: '<username> is succesvol geverifieerd (<time-taken>s!).'
 

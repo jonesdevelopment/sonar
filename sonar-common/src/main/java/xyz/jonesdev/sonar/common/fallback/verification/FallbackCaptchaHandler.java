@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.session;
+package xyz.jonesdev.sonar.common.fallback.verification;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -24,29 +24,18 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetContainerSlotPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetPlayerPositionPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetPlayerPositionRotationPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SystemChatPacket;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
-/**
- * Flow for this session handler
- *
- * <li>
- *   {@link SetContainerSlotPacket} and {@link MapDataPacket} packets are sent to the client,
- *   therefore, setting the player's item to a map with a code on it (CAPTCHA).
- *   <br>
- *   See more: {@link FallbackCAPTCHASessionHandler}, {@link MapCaptchaInfo}
- * </li>
- * <li>
- *   Then, we wait for the player to enter the {@link FallbackCAPTCHASessionHandler#answer} in chat.
- * </li>
- */
-public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler {
+public final class FallbackCaptchaHandler extends FallbackVerificationHandler {
 
-  public FallbackCAPTCHASessionHandler(final @NotNull FallbackUser user,
-                                       final @NotNull String username) {
-    super(user, username);
+  public FallbackCaptchaHandler(final @NotNull FallbackUser user) {
+    super(user);
 
     // Disconnect the player if there is no CAPTCHA available at the moment
     if (!CaptchaPreparer.isCaptchaAvailable()) {
@@ -58,8 +47,8 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
 
     // If the player is on Java, set the 5th slot (ID 4) in the player's hotbar to the map
     // If the player is on Bedrock, set the 1st slot (ID 0) in the player's hotbar to the map
-    user.delayedWrite(new SetContainerSlotPacket(user.isGeyser() ? 36 : 40, 1,
-      ItemType.FILLED_MAP.getId(user.getProtocolVersion()), SetContainerSlotPacket.MAP_NBT));
+    final int slotId = user.isGeyser() ? 36 : 40;
+    user.delayedWrite(new SetContainerSlotPacket(0, slotId, 1, ItemType.FILLED_MAP, MAP_ITEM_NBT));
     // Send random captcha to the player
     final MapCaptchaInfo captcha = CaptchaPreparer.getRandomCaptcha();
     this.answer = captcha.getAnswer().toLowerCase();
@@ -67,7 +56,7 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
     // Teleport the player to the position above the platform
     user.delayedWrite(CAPTCHA_POSITION);
     // Make sure the player cannot move
-    user.delayedWrite(user.isGeyser() ? CAPTCHA_ABILITIES_BEDROCK : CAPTCHA_ABILITIES);
+    user.delayedWrite(user.isGeyser() ? NO_MOVE_ABILITIES_BEDROCK : NO_MOVE_ABILITIES);
     // Make sure the player knows that they have to enter the code in chat
     user.delayedWrite(enterCodeMessage);
     // Send all packets in one flush
@@ -100,9 +89,8 @@ public final class FallbackCAPTCHASessionHandler extends FallbackSessionHandler 
       if (Sonar.get().getConfig().getVerification().getGamemode().isSurvivalOrAdventure()) {
         final long difference = maxDuration - user.getLoginTimer().delay();
         final int index = (int) (difference / 1000D);
-        // Make sure we can actually safely get and send the packet
+        // Make sure we can safely get and send the packet
         if (lastCountdownIndex != index && index >= 0 && xpCountdown.length > index) {
-          // Send the countdown using the experience bar
           user.write(xpCountdown[index]);
         }
         lastCountdownIndex = index;

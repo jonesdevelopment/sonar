@@ -40,7 +40,9 @@ public final class Fallback {
   // Map of all players connected to the server in general
   private final ConcurrentMap<InetAddress, Integer> online = new ConcurrentHashMap<>(128);
   // Map of all connected IP addresses (used for fast checking)
-  private final ConcurrentMap<InetAddress, Byte> connected = new ConcurrentHashMap<>(128);
+  // TODO: Is there a way to improve this?
+  //  (E.g. no map needed without concurrency issues)
+  private final ConcurrentMap<InetAddress, Byte> connected = new ConcurrentHashMap<>(256);
   // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
   @Setter
   private Cache<String, Integer> blacklist;

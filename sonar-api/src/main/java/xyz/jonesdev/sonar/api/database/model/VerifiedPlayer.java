@@ -25,34 +25,23 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetAddress;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 @Getter
 @ToString
+@DatabaseTable(tableName = "sonar_fingerprints")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DatabaseTable(tableName = "sonar_verified_players")
 public final class VerifiedPlayer {
   @SuppressWarnings("unused")
   @DatabaseField(generatedId = true)
   private int id;
 
   @DatabaseField(
-    columnName = "ip_address",
+    columnName = "fingerprint",
     canBeNull = false,
-    uniqueIndexName = "ip_address_player_uuid_idx",
-    width = 16
+    width = 48
   )
-  private String inetAddress;
-
-  @DatabaseField(
-    columnName = "player_uuid",
-    canBeNull = false,
-    uniqueIndexName = "ip_address_player_uuid_idx",
-    width = 36
-  )
-  private UUID playerUuid;
+  private String fingerprint;
 
   @DatabaseField(
     columnName = "timestamp",
@@ -60,17 +49,9 @@ public final class VerifiedPlayer {
   )
   private Timestamp timestamp;
 
-  public VerifiedPlayer(final @NotNull InetAddress inetAddress,
-                        final @NotNull UUID playerUuid,
+  public VerifiedPlayer(final @NotNull String fingerprint,
                         final long timestamp) {
-    this(inetAddress.getHostAddress(), playerUuid, timestamp);
-  }
-
-  public VerifiedPlayer(final @NotNull String inetAddress,
-                        final @NotNull UUID playerUuid,
-                        final long timestamp) {
-    this.inetAddress = inetAddress;
-    this.playerUuid = playerUuid;
+    this.fingerprint = fingerprint;
     this.timestamp = new Timestamp(timestamp);
   }
 }
