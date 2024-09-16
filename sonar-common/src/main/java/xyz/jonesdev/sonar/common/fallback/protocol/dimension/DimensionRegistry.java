@@ -39,7 +39,7 @@ public final class DimensionRegistry {
   public final CompoundBinaryTag CODEC_1_20;
   public final CompoundBinaryTag CODEC_1_21;
 
-  public final DimensionInfo DEFAULT_DIMENSION_1_16;
+  public final DimensionInfo DEFAULT_DIMENSION_1_16_2;
   public final DimensionInfo DEFAULT_DIMENSION_1_18_2;
 
   static {
@@ -52,7 +52,7 @@ public final class DimensionRegistry {
     CODEC_1_20 = getCodec("codec_1_20.nbt");
     CODEC_1_21 = getCodec("codec_1_21.nbt");
 
-    DEFAULT_DIMENSION_1_16 = getDimension(CODEC_1_16_2);
+    DEFAULT_DIMENSION_1_16_2 = getDimension(CODEC_1_16_2);
     DEFAULT_DIMENSION_1_18_2 = getDimension(CODEC_1_18_2);
   }
 

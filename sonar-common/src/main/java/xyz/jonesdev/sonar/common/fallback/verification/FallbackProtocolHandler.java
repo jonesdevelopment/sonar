@@ -28,7 +28,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetHeldItemPacke
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.CACHED_HELD_ITEM_RESET;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.CACHED_HELD_ITEM_SLOT;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.PLAYER_ENTITY_ID;
 
 public final class FallbackProtocolHandler extends FallbackVerificationHandler {
@@ -65,9 +65,8 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
     // Move the player's slot by 4 (slot limit divided by 2),
     // and then modulo it by the slot limit (8) to ensure that we don't send invalid slot IDs.
     expectedSlotId = (currentClientSlotId + 4) % 8;
-    // Reset the player's slot to 4, so we don't get false positives if the client changes the slot
-    // This doesn't *really* work for 1.7-1.8 clients, but it's better to still send a packet if they're de-sync
-    user.delayedWrite(CACHED_HELD_ITEM_RESET);
+    // Send a HeldItemChange packet to the player to see if the player responds
+    user.delayedWrite(CACHED_HELD_ITEM_SLOT);
     // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
     // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
     // We can take advantage of this by sending two packets with the same content to check for a valid response.

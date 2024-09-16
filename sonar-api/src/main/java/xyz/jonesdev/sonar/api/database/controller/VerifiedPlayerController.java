@@ -99,7 +99,6 @@ public final class VerifiedPlayerController {
       try {
         TableUtils.createTableIfNotExists(connectionSource, VerifiedPlayer.class);
       } catch (SQLException ignored) {
-        ignored.printStackTrace();
         /*
          * This is caused by a duplicate index;
          * I know this isn't the best method of handling it,
