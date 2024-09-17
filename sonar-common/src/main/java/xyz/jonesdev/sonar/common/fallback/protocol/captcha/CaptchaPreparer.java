@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
 
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.event.impl.CaptchaGenerationEndEvent;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 import java.awt.image.BufferedImage;
@@ -65,6 +66,7 @@ public class CaptchaPreparer {
       }
 
       Sonar.get().getLogger().info("Finished preparing {} CAPTCHA answers ({}s)!", preparedAmount, timer);
+      Sonar.get().getEventManager().publish(new CaptchaGenerationEndEvent(timer, preparedAmount));
     });
   }
 

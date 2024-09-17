@@ -24,6 +24,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
+import xyz.jonesdev.sonar.api.event.impl.CaptchaGenerationStartEvent;
 import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
@@ -211,9 +212,13 @@ public class FallbackPreparer {
       }
 
       // Update the CAPTCHA generator if necessary
-      if (Sonar.get().getFallback().getCaptchaGenerator() == null
-        || Sonar.get().getFallback().getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
-        Sonar.get().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(128, 128,
+      final CaptchaGenerationStartEvent generationStartEvent = new CaptchaGenerationStartEvent(
+        Sonar.get().getFallback().getCaptchaGenerator());
+      Sonar.get().getEventManager().publish(generationStartEvent);
+
+      if (generationStartEvent.getCaptchaGenerator() == null
+        || generationStartEvent.getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
+        Sonar.get().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(
           Sonar.get().getConfig().getVerification().getMap().getBackgroundImage()));
       } else {
         Sonar.get().getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");

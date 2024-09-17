@@ -69,7 +69,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     }
   }
 
-  private final int width, height;
+  private final int width = 128, height = 128;
   private final @Nullable File background;
   private @Nullable BufferedImage backgroundImage;
 
