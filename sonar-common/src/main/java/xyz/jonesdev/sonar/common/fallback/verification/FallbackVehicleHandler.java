@@ -164,9 +164,10 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     } else if (packet instanceof VehicleMovePacket) {
       checkState(!inMinecart, "invalid packet order (unexpected VehicleMovePacket)");
       final VehicleMovePacket vehicleMove = (VehicleMovePacket) packet;
-      // Check the Y position of the vehicle
-      checkState(vehicleMove.getY() <= IN_AIR_Y_POSITION, "invalid y position: " + vehicleMove.getY());
       if (!user.isGeyser()) {
+        // Check the Y position of the vehicle
+        checkState(vehicleMove.getY() <= IN_AIR_Y_POSITION,
+          "invalid vehicle y position: " + vehicleMove.getY());
         // Predict the Y motion of the minecart
         final double lastMinecartMotion = minecartMotion;
         final double lastMinecartY = minecartY;
