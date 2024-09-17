@@ -234,8 +234,8 @@ public class FallbackPreparer {
       Sonar.get().getFallback().setCaptchaGenerator(null);
     }
 
-    maxTotalPacketsSent = maxMovementTick
-      + (xpCountdown == null ? 0 : xpCountdown.length) * 3
+    maxTotalPacketsSent = maxMovementTick + 2
+      + (xpCountdown == null ? 0 : xpCountdown.length) * 20 + 5
       + Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets() * 4
       + Sonar.get().getConfig().getVerification().getMap().getMaxTries()
       + 150 /* some arbitrary leeway */;
