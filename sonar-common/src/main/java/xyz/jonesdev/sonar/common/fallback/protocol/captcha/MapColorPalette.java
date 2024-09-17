@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 
@@ -185,7 +184,6 @@ public class MapColorPalette {
     final Object data = new byte[raster.getNumBands()];
     int yoff = 0, off;
 
-    System.out.println(rgbToNearestMinecraft(new Color(255, 255, 255, 255).getRGB()));
     for (int y = 0; y < raster.getHeight(); y++, yoff += raster.getWidth()) {
       off = yoff;
       for (int x = 0; x < raster.getWidth(); x++) {
