@@ -183,10 +183,11 @@ public final class SonarConfiguration {
 
     final String backgroundPath = generalConfig.getString("verification.checks.map-captcha.background");
     if (!backgroundPath.isEmpty()) {
-      try (final InputStream inputStream = new FileInputStream(backgroundPath)) {
-        verification.map.backgroundImage = inputStream;
-      } catch (IOException exception) {
-        Sonar.get().getLogger().error("Could not find background image", exception);
+      final File backgroundFile = new File(pluginFolder, backgroundPath);
+      if (backgroundFile.exists()) {
+        verification.map.backgroundImage = backgroundFile;
+      } else {
+        Sonar.get().getLogger().error("Could not find background image {}", backgroundFile.getAbsolutePath());
       }
     }
 
@@ -366,7 +367,7 @@ public final class SonarConfiguration {
       private int maxDuration;
       private int maxTries;
       private String alphabet;
-      private InputStream backgroundImage;
+      private File backgroundImage;
     }
 
     @Getter

@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 
@@ -184,6 +185,7 @@ public class MapColorPalette {
     final Object data = new byte[raster.getNumBands()];
     int yoff = 0, off;
 
+    System.out.println(rgbToNearestMinecraft(new Color(255, 255, 255, 255).getRGB()));
     for (int y = 0; y < raster.getHeight(); y++, yoff += raster.getWidth()) {
       off = yoff;
       for (int x = 0; x < raster.getWidth(); x++) {
@@ -204,16 +206,21 @@ public class MapColorPalette {
         closestIndex = index;
       }
     }
+    // Fix transparent colors by setting them to white
+    // TODO: implement better color tables (mappings?)
+    if (closestIndex > -1 && closestIndex < 3) {
+      closestIndex = 34;
+    }
     return closestIndex;
   }
 
-  private int calculateColorDistance(final int argb0, final int argb1) {
-    final int red0 = (argb0 >> 16) & 0xFF;
-    final int green0 = (argb0 >> 8) & 0xFF;
-    final int blue0 = argb0 & 0xFF;
-    final int red1 = (argb1 >> 16) & 0xFF;
-    final int green1 = (argb1 >> 8) & 0xFF;
-    final int blue1 = argb1 & 0xFF;
+  private int calculateColorDistance(final int rgb0, final int rgb1) {
+    final int red0 = (rgb0 >> 16) & 0xFF;
+    final int green0 = (rgb0 >> 8) & 0xFF;
+    final int blue0 = rgb0 & 0xFF;
+    final int red1 = (rgb1 >> 16) & 0xFF;
+    final int green1 = (rgb1 >> 8) & 0xFF;
+    final int blue1 = rgb1 & 0xFF;
     // Color distance metric (e.g. squared Euclidean distance)
     return (red0 - red1) * (red0 - red1)
       + (green0 - green1) * (green0 - green1)
