@@ -210,7 +210,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0 || inMinecart) {
           paddlePackets++;
           vehicleMovePackets++;
-        } else {
+        } else if (!user.isGeyser()) {
           checkState(paddlePackets >= inputPackets,
             "illegal packet order; i/p " + inputPackets + "/" + paddlePackets);
           checkState(vehicleMovePackets >= inputPackets,
