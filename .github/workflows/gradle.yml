@@ -38,7 +38,7 @@ jobs:
           # Artifact name
           name: Sonar
           # A file, directory or wildcard pattern that describes what to upload
-          path: build/libs/Sonar-Bukkit.jar
+          path: sonar-bukkit/build/libs/Sonar-Bukkit.jar
           if-no-files-found: error
 
     - name: Upload BungeeCord Build
@@ -47,7 +47,7 @@ jobs:
           # Artifact name
           name: Sonar
           # A file, directory or wildcard pattern that describes what to upload
-          path: build/libs/Sonar-Bungee.jar
+          path: sonar-bungee/build/libs/Sonar-Bungee.jar
           if-no-files-found: error
 
     - name: Upload Velocity Build
@@ -56,5 +56,5 @@ jobs:
           # Artifact name
           name: Sonar
           # A file, directory or wildcard pattern that describes what to upload
-          path: build/libs/Sonar-Velocity.jar
+          path: sonar-velocity/build/libs/Sonar-Velocity.jar
           if-no-files-found: error
