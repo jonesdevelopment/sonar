@@ -23,8 +23,6 @@ import lombok.RequiredArgsConstructor;
 import xyz.jonesdev.sonar.api.Sonar;
 
 import java.net.InetAddress;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -37,22 +35,19 @@ public final class FallbackLoginQueue {
   private static final int THREAD_POOL_SIZE = Math.min(0x7fff, Runtime.getRuntime().availableProcessors() * 2);
   private static final ExecutorService QUEUE_EXECUTOR = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
-  private final ConcurrentMap<InetAddress, Runnable> players = new ConcurrentHashMap<>(
-    256, 0.75f, Runtime.getRuntime().availableProcessors());
+  private final ConcurrentMap<InetAddress, Runnable> players = new ConcurrentHashMap<>(512);
 
   public void poll() {
-    final int maxQueuePolls = Sonar.get().getConfig().getQueue().getMaxQueuePolls();
-    int index = 0;
-
-    // Iterate through the map and process up to maxQueuePolls entries
+    final int maxQueuePolls = Math.min(players.size(), Sonar.get().getConfig().getQueue().getMaxQueuePolls());
+    // No need to initiate an executor service task if nobody is currently queued
+    if (maxQueuePolls <= 0) return;
     // We need to be cautious here since we don't want any concurrency issues
-    final Iterator<Map.Entry<InetAddress, Runnable>> iterator = players.entrySet().iterator();
-    while (iterator.hasNext() && index++ < maxQueuePolls) {
-      // Run the cached runnable
-      final Map.Entry<InetAddress, Runnable> entry = iterator.next();
-      QUEUE_EXECUTOR.execute(entry.getValue());
-      // Remove runnable from the map
-      iterator.remove();
-    }
+    QUEUE_EXECUTOR.execute(() -> {
+      final var iterator = players.entrySet().iterator();
+      for (int index = 0; index < maxQueuePolls && iterator.hasNext(); index++) {
+        iterator.next().getValue().run();
+        iterator.remove();
+      }
+    });
   }
 }
