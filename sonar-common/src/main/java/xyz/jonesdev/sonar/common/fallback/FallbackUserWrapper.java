@@ -99,7 +99,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       }
 
       // Mark the player as connected by caching them in a map of verifying players
-      Sonar.get().getFallback().getConnected().compute(inetAddress, (__, v) -> (byte) 0);
+      Sonar.get().getFallback().getConnected().compute(inetAddress, (__, v) -> true);
 
       // Replace normal encoder to allow custom packets
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
