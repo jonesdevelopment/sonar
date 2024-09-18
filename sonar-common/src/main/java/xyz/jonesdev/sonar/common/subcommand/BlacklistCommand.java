@@ -44,7 +44,6 @@ public final class BlacklistCommand extends Subcommand {
         // Make sure the given IP address is valid
         if (rawAddress == null) return;
 
-        // Make sure the IP is not blacklisted already
         if (Sonar.get().getFallback().getBlacklist().asMap().containsKey(rawAddress)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.ip-duplicate"),
@@ -53,15 +52,6 @@ public final class BlacklistCommand extends Subcommand {
           return;
         }
 
-        // Display a warning if the IP is verified but being added to the blacklist
-        if (Sonar.get().getVerifiedPlayerController().has(rawAddress)) {
-          invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.add-warning"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-            Placeholder.unparsed("ip", rawAddress)));
-        }
-
-        // Blacklist the given IP address
         Sonar.get().getFallback().getBlacklist().put(rawAddress, 1337 /* arbitrarily high number */);
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.add"),
@@ -80,7 +70,6 @@ public final class BlacklistCommand extends Subcommand {
         // Make sure the given IP address is valid
         if (rawAddress == null) return;
 
-        // Make sure the IP is blacklisted
         if (!Sonar.get().getFallback().getBlacklist().asMap().containsKey(rawAddress)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.ip-not-found"),
@@ -88,7 +77,6 @@ public final class BlacklistCommand extends Subcommand {
           return;
         }
 
-        // Invalidate the cache entry of the blacklisted IP address
         Sonar.get().getFallback().getBlacklist().invalidate(rawAddress);
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.remove"),
@@ -107,7 +95,6 @@ public final class BlacklistCommand extends Subcommand {
           return;
         }
 
-        // Invalidate all cache entries
         Sonar.get().getFallback().getBlacklist().invalidateAll();
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.clear"),

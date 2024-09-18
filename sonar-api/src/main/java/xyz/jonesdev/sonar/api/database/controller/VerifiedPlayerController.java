@@ -28,44 +28,27 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-import org.jetbrains.annotations.Unmodifiable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.model.VerifiedPlayer;
-import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class VerifiedPlayerController {
   private static final ExecutorService DB_UPDATE_SERVICE = Executors.newSingleThreadExecutor();
 
-  private static final LoggerWrapper LOGGER = new LoggerWrapper() {
-
-    @Override
-    public void info(final String message, final Object... args) {
-      Sonar.get().getLogger().info("[database] " + message, args);
-    }
-
-    @Override
-    public void warn(final String message, final Object... args) {
-      Sonar.get().getLogger().warn("[database] " + message, args);
-    }
-
-    @Override
-    public void error(final String message, final Object... args) {
-      Sonar.get().getLogger().error("[database] " + message, args);
-    }
-  };
-
-  private final Map<String, Collection<UUID>> cache = new ConcurrentHashMap<>(128);
+  @Getter
+  private final Set<String> cache = Collections.synchronizedSet(new HashSet<>());
   private @Nullable ConnectionSource connectionSource;
   private Dao<VerifiedPlayer, Integer> dao;
   private QueryBuilder<VerifiedPlayer, Integer> queryBuilder;
@@ -77,18 +60,17 @@ public final class VerifiedPlayerController {
     cachedDatabaseType = database.getType();
 
     if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
-      LOGGER.warn("Configure a database to save verified players.");
+      Sonar.get().getLogger().warn("Configure a database to save verified players.");
       return;
     }
 
-    // Make sure to only download the driver once per database type
-    if (!cachedDatabaseType.isDownloaded()) {
-      LOGGER.info("Downloading {} driver version {}",
+    // Make sure to only load the driver once per database type
+    if (!cachedDatabaseType.isLoaded()) {
+      Sonar.get().getLogger().info("Loading {} driver version {}",
         cachedDatabaseType.getDatabaseType().getDatabaseName(),
         cachedDatabaseType.getDatabaseDriver().getVersion());
-      // Download and load the driver for the current database
       libraryManager.loadLibrary(cachedDatabaseType.getDatabaseDriver());
-      cachedDatabaseType.setDownloaded(true);
+      cachedDatabaseType.setLoaded(true);
     }
 
     try {
@@ -134,13 +116,13 @@ public final class VerifiedPlayerController {
           // Make sure to clear all outdated entries first
           clearOld(database.getMaximumAge());
           // Add all entries from the database to the cache
-          dao.queryForAll().forEach(this::_add);
+          dao.queryForAll().forEach(verifiedPlayer -> cache.add(verifiedPlayer.getFingerprint()));
         } catch (SQLException exception) {
-          LOGGER.error("Error initializing database: {}", exception);
+          exception.printStackTrace(System.err);
         }
       });
     } catch (SQLException exception) {
-      LOGGER.error("Error setting up database: {}", exception);
+      exception.printStackTrace(System.err);
     }
   }
 
@@ -153,7 +135,7 @@ public final class VerifiedPlayerController {
       try {
         connectionSource.close();
       } catch (Exception exception) {
-        LOGGER.error("Error closing database: {}", exception);
+        exception.printStackTrace(System.err);
       }
     }
   }
@@ -174,7 +156,7 @@ public final class VerifiedPlayerController {
       for (final VerifiedPlayer player : oldEntries) {
         dao.delete(player);
       }
-      LOGGER.info("Removed {} database entries older than {} days.",
+      Sonar.get().getLogger().info("Removed {} database entries older than {} days.",
         oldEntries.size(), maximumAge);
     }
   }
@@ -183,10 +165,10 @@ public final class VerifiedPlayerController {
    * First, remove the player from the local cache and then,
    * secondly, asynchronously add the player to the database.
    *
-   * @param inetAddress InetAddress of the VerifiedPlayer model
+   * @param fingerprint Fingerprint of the verified player
    */
-  public void remove(final @NotNull String inetAddress) {
-    _remove(inetAddress);
+  public void remove(final @NotNull String fingerprint) {
+    cache.remove(fingerprint);
 
     // Don't try to update the column if the database type is NONE
     if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
@@ -202,7 +184,7 @@ public final class VerifiedPlayerController {
 
       try {
         final List<VerifiedPlayer> verifiedPlayer = queryBuilder.where()
-          .eq("ip_address", inetAddress)
+          .eq("fingerprint", fingerprint)
           .query();
 
         if (verifiedPlayer != null) {
@@ -211,18 +193,9 @@ public final class VerifiedPlayerController {
           }
         }
       } catch (SQLException exception) {
-        LOGGER.error("Error trying to remove entry: {}", exception);
+        exception.printStackTrace(System.err);
       }
     });
-  }
-
-  /**
-   * Locally remove the object from the cache
-   *
-   * @param inetAddress IP address of the player
-   */
-  private void _remove(final @NotNull String inetAddress) {
-    cache.remove(inetAddress);
   }
 
   /**
@@ -232,7 +205,7 @@ public final class VerifiedPlayerController {
    * @param player VerifiedPlayer model
    */
   public void add(final @NotNull VerifiedPlayer player) {
-    _add(player);
+    cache.add(player.getFingerprint());
 
     // Don't try to update the column if the database type is NONE
     if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
@@ -249,19 +222,9 @@ public final class VerifiedPlayerController {
       try {
         dao.createIfNotExists(player);
       } catch (SQLException exception) {
-        LOGGER.error("Error trying to add entry: {}", exception);
+        exception.printStackTrace(System.err);
       }
     });
-  }
-
-  /**
-   * Locally cache the object
-   *
-   * @param player VerifiedPlayer model
-   */
-  private void _add(final @NotNull VerifiedPlayer player) {
-    cache.computeIfAbsent(player.getInetAddress(), v -> new ArrayList<>())
-      .add(player.getPlayerUuid());
   }
 
   /**
@@ -271,26 +234,6 @@ public final class VerifiedPlayerController {
    */
   public int estimatedSize() {
     return cache.size();
-  }
-
-  /**
-   * Returns the sum of verified IP addresses
-   * and their respective collection of UUIDs
-   *
-   * @return Exact size of all total verified players
-   */
-  @Deprecated
-  public synchronized int exactSize() {
-    return cache.values().stream()
-      .mapToInt(Collection::size)
-      .sum();
-  }
-
-  /**
-   * @return {@link java.util.Collection} of UUIDs associated with an IP address
-   */
-  public @Unmodifiable Collection<UUID> getUUIDs(final @NotNull String inetAddress) {
-    return cache.getOrDefault(inetAddress, Collections.emptyList());
   }
 
   /**
@@ -305,29 +248,8 @@ public final class VerifiedPlayerController {
       try {
         dao.deleteBuilder().delete();
       } catch (SQLException exception) {
-        LOGGER.error("Error trying to clear entries: {}", exception);
+        exception.printStackTrace(System.err);
       }
     }
-  }
-
-  /**
-   * @param inetAddress IP address
-   * @param uuid        UUID associated to the IP
-   * @return Whether the local cache contains the IP and UUID
-   */
-  public boolean has(final @NotNull String inetAddress, final @NotNull UUID uuid) {
-    final Collection<UUID> got = cache.get(inetAddress);
-    if (got != null) {
-      return got.contains(uuid);
-    }
-    return false;
-  }
-
-  /**
-   * @param inetAddress IP address
-   * @return Whether the local cache contains the IP
-   */
-  public boolean has(final @NotNull String inetAddress) {
-    return cache.containsKey(inetAddress);
   }
 }

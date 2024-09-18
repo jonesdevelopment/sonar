@@ -25,110 +25,72 @@ import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.database.model.VerifiedPlayer;
-
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import xyz.jonesdev.sonar.api.fingerprint.FingerprintingUtil;
 
 @SubcommandInfo(
   name = "verified",
-  arguments = {"add", "remove", "clear", "size", "history"}
+  arguments = {"add", "remove", "clear", "size"}
 )
 public final class VerifiedCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull CommandInvocation invocation) {
     switch (invocation.getRawArguments()[1].toLowerCase()) {
-      case "history": {
-        if (invocation.getRawArguments().length <= 2) {
-          incorrectUsage(invocation.getSource(), "verified history <IP address>");
-          return;
-        }
-
-        // TODO: Remove duplicate code
-        final String rawAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
-        // Make sure the given IP address is valid
-        if (rawAddress == null) return;
-
-        // Make sure the IP is verified already
-        if (!Sonar.get().getVerifiedPlayerController().has(rawAddress)) {
-          invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.ip-not-found"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
-          return;
-        }
-
-        invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.history"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("ip", rawAddress)));
-
-        for (final UUID uuid : Sonar.get().getVerifiedPlayerController().getUUIDs(rawAddress)) {
-          invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.history-entry"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-            Placeholder.unparsed("uuid", uuid.toString())));
-        }
-        break;
-      }
-
       case "remove": {
-        if (invocation.getRawArguments().length <= 2) {
-          incorrectUsage(invocation.getSource(), "verified remove <IP address>");
+        if (invocation.getRawArguments().length <= 3) {
+          incorrectUsage(invocation.getSource(), "verified remove <IP address> <username>");
           return;
         }
 
-        // TODO: Remove duplicate code
-        final String rawAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
+        final String hostAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
         // Make sure the given IP address is valid
-        if (rawAddress == null) return;
+        if (hostAddress == null) return;
 
-        // Make sure the player is verified already
-        if (!Sonar.get().getVerifiedPlayerController().has(rawAddress)) {
+        final String username = invocation.getRawArguments()[3];
+        final String fingerprint = FingerprintingUtil.getFingerprint(username, hostAddress);
+
+        if (!Sonar.get().getVerifiedPlayerController().getCache().contains(fingerprint)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.ip-not-found"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
           return;
         }
 
-        Sonar.get().getVerifiedPlayerController().remove(rawAddress);
+        Sonar.get().getVerifiedPlayerController().remove(fingerprint);
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.remove"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("ip", rawAddress)));
+          Placeholder.unparsed("ip", hostAddress),
+          Placeholder.unparsed("username", username)));
         break;
       }
 
       case "add": {
         if (invocation.getRawArguments().length <= 3) {
-          incorrectUsage(invocation.getSource(), "verified add <IP address> <UUID/username>");
+          incorrectUsage(invocation.getSource(), "verified add <IP address> <username>");
           return;
         }
 
-        final String rawAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
+        final String hostAddress = validateIP(invocation.getSource(), invocation.getRawArguments()[2]);
         // Make sure the given IP address is valid
-        if (rawAddress == null) return;
+        if (hostAddress == null) return;
 
-        // Try to parse the UUID (from the username, if needed)
-        final String rawUUID = invocation.getRawArguments()[3];
-        final UUID uuid = rawUUID.length() == 36 ? UUID.fromString(rawUUID)
-          : UUID.nameUUIDFromBytes(("OfflinePlayer:" + rawUUID).getBytes(StandardCharsets.UTF_8));
+        final String username = invocation.getRawArguments()[3];
+        final String fingerprint = FingerprintingUtil.getFingerprint(username, hostAddress);
 
-        // Make sure the player is verified already
-        if (Sonar.get().getVerifiedPlayerController().has(rawAddress, uuid)) {
+        if (Sonar.get().getVerifiedPlayerController().getCache().contains(fingerprint)) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
             Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.already"),
             Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
           return;
         }
 
-        // Add verified player to the database
-        final long timestamp = System.currentTimeMillis();
-        Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(rawAddress, uuid, timestamp));
-
+        Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(fingerprint, System.currentTimeMillis()));
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.add"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("ip", rawAddress)));
+          Placeholder.unparsed("ip", hostAddress),
+          Placeholder.unparsed("username", username)));
         break;
       }
 
@@ -142,7 +104,6 @@ public final class VerifiedCommand extends Subcommand {
           return;
         }
 
-        // Invalidate all cache entries
         Sonar.get().getVerifiedPlayerController().clearAll();
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.clear"),

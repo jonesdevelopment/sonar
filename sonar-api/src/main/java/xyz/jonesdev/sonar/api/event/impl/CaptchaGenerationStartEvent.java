@@ -17,17 +17,15 @@
 
 package xyz.jonesdev.sonar.api.event.impl;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
-import xyz.jonesdev.sonar.api.timer.SystemTimer;
+import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
 
 @Getter
-@ToString
-@RequiredArgsConstructor
-public final class UserVerifySuccessEvent implements SonarEvent {
-  private final FallbackUser user;
-  private final SystemTimer loginTimer;
+@Setter
+@AllArgsConstructor
+public final class CaptchaGenerationStartEvent implements SonarEvent {
+  private CaptchaGenerator captchaGenerator;
 }

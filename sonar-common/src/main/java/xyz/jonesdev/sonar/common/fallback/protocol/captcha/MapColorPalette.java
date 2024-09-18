@@ -204,16 +204,21 @@ public class MapColorPalette {
         closestIndex = index;
       }
     }
+    // Fix transparent colors by setting them to white
+    // TODO: implement better color tables (mappings?)
+    if (closestIndex > -1 && closestIndex < 3) {
+      closestIndex = 34;
+    }
     return closestIndex;
   }
 
-  private int calculateColorDistance(final int argb0, final int argb1) {
-    final int red0 = (argb0 >> 16) & 0xFF;
-    final int green0 = (argb0 >> 8) & 0xFF;
-    final int blue0 = argb0 & 0xFF;
-    final int red1 = (argb1 >> 16) & 0xFF;
-    final int green1 = (argb1 >> 8) & 0xFF;
-    final int blue1 = argb1 & 0xFF;
+  private int calculateColorDistance(final int rgb0, final int rgb1) {
+    final int red0 = (rgb0 >> 16) & 0xFF;
+    final int green0 = (rgb0 >> 8) & 0xFF;
+    final int blue0 = rgb0 & 0xFF;
+    final int red1 = (rgb1 >> 16) & 0xFF;
+    final int green1 = (rgb1 >> 8) & 0xFF;
+    final int blue1 = rgb1 & 0xFF;
     // Color distance metric (e.g. squared Euclidean distance)
     return (red0 - red1) * (red0 - red1)
       + (green0 - green1) * (green0 - green1)

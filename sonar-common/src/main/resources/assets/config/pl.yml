@@ -90,10 +90,6 @@ verification:
     collision:
       # Czy Sonar powinien sprawdzać, czy gracz zderza się z blokami? (Zalecane)
       enabled: true
-      # Jakiego typu bloku powinien użyć Sonar dla platformy kolizyjnej?
-      # Możliwe rodzaje: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
-      # Powinieneś to edytować tylko wtedy, gdy wiesz, co robisz
-      collision-block-type: TRAPDOOR
 
     # Sprawdza, czy gracz wysyła odpowiednie pakiety podczas umieszczania na pojeździe.
     vehicle:
@@ -139,8 +135,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex do sprawdzania ustawień regionalnych klienta podczas weryfikacji
     valid-locale-regex: ^[a-zA-Z_]+$
-    # Liczba pakietów logowania, które gracz musi wysłać, aby zostać wyrzuconym.
-    max-login-packets: 256
 
   # Jeśli opcja ta jest włączona, gracz zostanie przeniesiony z powrotem
   # na serwer początkowy po pomyślnym przejściu weryfikacji antybotowej.

@@ -15,9 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.session;
+package xyz.jonesdev.sonar.common.fallback.verification;
 
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
@@ -29,39 +30,19 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientInformatio
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.KeepAlivePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.PluginMessagePacket;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL_LEGACY;
 
-/**
- * Flow for this session handler
- *
- * <li>
- *   A {@link KeepAlivePacket} packet is sent to the client*
- *   <br>
- *   See more: {@link FallbackLoginSessionHandler#initialize18()}
- * </li>
- * <li>
- *   After the KeepAlive packet is validated, the client enters the configuration phase.**
- * </li>
- * <li>
- *   Then, the session handler is set to the {@link FallbackGravitySessionHandler}.
- *   <br>
- *   See more: {@link FallbackLoginSessionHandler#markSuccess()}
- * </li>
- * <br>
- * * The KeepAlive check is skipped on 1.7, as KeepAlive packets don't exist during the LOGIN state.
- * <br>
- * ** The internals of the configuration phase were not mentioned.
- * Find out more about the client configuration and registry synchronization:
- * {@link #synchronizeClientRegistry()}, {@link #updateEncoderDecoderState(FallbackPacketRegistry)}
- */
-public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
+public class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
-  public FallbackLoginSessionHandler(final @NotNull FallbackUser user,
-                                     final @NotNull String username) {
-    super(user, username);
+  public FallbackPreJoinHandler(final @NotNull FallbackUser user) {
+    super(user);
 
     // Start initializing the actual join process for pre-1.20.2 clients
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
@@ -70,11 +51,12 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
         user.getChannel().eventLoop().schedule(this::markSuccess, 100L, TimeUnit.MILLISECONDS);
       } else {
-        initialize18();
+        sendKeepAlive();
       }
     }
   }
 
+  protected boolean receivedClientInfo, receivedClientBrand;
   private boolean acknowledgedLogin;
   private int expectedKeepAliveId;
 
@@ -83,31 +65,35 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
    * is active and legitimate, thereby preventing bot connections that
    * could flood the server with login attempts and other unwanted traffic.
    */
-  private void initialize18() {
+  private void sendKeepAlive() {
     // Send a KeepAlive packet with a random ID
     expectedKeepAliveId = RANDOM.nextInt();
     user.write(new KeepAlivePacket(expectedKeepAliveId));
   }
 
-  private void markSuccess() {
-    // Make sure we can actually switch over to the next check
-    updateEncoderDecoderState(FallbackPacketRegistry.GAME);
-    // Pass the player to the next verification handler
-    final FallbackGravitySessionHandler gravitySessionHandler = new FallbackGravitySessionHandler(user, username);
-    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
-    decoder.setListener(gravitySessionHandler);
-  }
-
   private void markAcknowledged() {
     acknowledgedLogin = true;
-
+    // Update state, so we're able to send/receive configuration packets
+    updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
     synchronizeClientRegistry();
     // Write the FinishConfiguration packet to the buffer
     user.delayedWrite(FINISH_CONFIGURATION);
     // Send all packets in one flush
     user.getChannel().flush();
-    // Set decoder state to actually catch all packets
-    updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
+  }
+
+  protected final void checkClientInformation() {
+    checkState(receivedClientInfo, "didn't send client settings");
+    // Don't check Geyser players for plugin messages as they don't have them
+    if (!user.isGeyser()) {
+      checkState(receivedClientBrand, "didn't send plugin message");
+    }
+  }
+
+  private void markSuccess() {
+    // Pass the player to the next verification handler
+    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
+    decoder.setListener(new FallbackGravityHandler(user, this));
   }
 
   @Override
@@ -125,8 +111,7 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       // while the player is in the "Downloading terrain" screen.
       expectedKeepAliveId = 0;
 
-      // Spawn the player in the virtual world if the client does not need
-      // any configuration (pre-1.20.2).
+      // Immediately verify the player if they do not need any configuration (pre-1.20.2)
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
         markSuccess();
       }
@@ -135,21 +120,52 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       checkState(!acknowledgedLogin, "sent duplicate login ack");
       markAcknowledged();
     } else if (packet instanceof FinishConfigurationPacket) {
+      checkClientInformation();
+      // Update the encoder and decoder state because we're currently in the CONFIG state
+      updateEncoderDecoderState(FallbackPacketRegistry.GAME);
       markSuccess();
-    }
-    // Make sure to catch all ClientSettings and PluginMessage packets during the configuration phase.
-    else if (packet instanceof ClientInformationPacket) {
-      // Let the session handler itself know about this packet
-      checkClientInformation((ClientInformationPacket) packet);
+    } else if (packet instanceof ClientInformationPacket) {
+      final ClientInformationPacket clientInformation = (ClientInformationPacket) packet;
+
+      // Ensure that the client locale is correct
+      validateClientLocale(clientInformation.getLocale());
+      // Check if the player sent an unused bit flag in the skin section
+      // TODO: check if this causes issues with cosmetics in pvp clients
+      checkState((clientInformation.getSkinParts() & 0x80) == 0,
+        "sent unused bit flag: " + clientInformation.getSkinParts());
+
+      receivedClientInfo = true;
     } else if (packet instanceof PluginMessagePacket) {
-      // Let the session handler itself know about this packet
-      checkPluginMessage((PluginMessagePacket) packet);
+      final PluginMessagePacket pluginMessage = (PluginMessagePacket) packet;
+
+      final boolean usingModernChannel = pluginMessage.getChannel().equals(BRAND_CHANNEL);
+      final boolean usingLegacyChannel = pluginMessage.getChannel().equals(BRAND_CHANNEL_LEGACY);
+
+      // Skip this payload if it does not contain client brand information
+      if (!usingModernChannel && !usingLegacyChannel) {
+        return;
+      }
+
+      // Make sure the player isn't sending the client brand multiple times
+      checkState(!receivedClientBrand, "sent duplicate plugin message");
+      // Check if the channel is correct - 1.13 uses the new namespace
+      // system ('minecraft:' + channel) and anything below 1.13 uses
+      // the legacy namespace system ('MC|' + channel).
+      checkState(usingLegacyChannel || user.getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0,
+        "illegal PluginMessage channel: " + pluginMessage.getChannel());
+
+      // Validate the client branding using a regex to filter unwanted characters.
+      if (Sonar.get().getConfig().getVerification().getBrand().isEnabled()) {
+        validateClientBrand(pluginMessage.getData());
+      }
+
+      receivedClientBrand = true;
     }
   }
 
   private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
     final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
-    final var encoder = (FallbackPacketEncoder) user.getPipeline().get(FallbackPacketEncoder.class);
+    final var encoder = user.getPipeline().get(FallbackPacketEncoder.class);
     // Update the packet registry state in the encoder and decoder pipelines
     decoder.updateRegistry(registry);
     encoder.updateRegistry(registry);
@@ -167,5 +183,31 @@ public final class FallbackLoginSessionHandler extends FallbackSessionHandler {
       // Write the old RegistrySync packet to the buffer
       user.delayedWrite(REGISTRY_SYNC_LEGACY);
     }
+  }
+
+  private void validateClientBrand(final byte @NotNull [] data) {
+    // Check if the client brand is too short. It has to have at least 2 bytes.
+    checkState(data.length > 1, "client brand is too short");
+    // Check if the decoded client brand string is too long
+    checkState(data.length < Sonar.get().getConfig().getVerification().getBrand().getMaxLength(),
+      "client brand contains too much data: " + data.length);
+    // https://discord.com/channels/923308209769426994/1116066363887321199/1256929441053933608
+    String brand = new String(data, StandardCharsets.UTF_8);
+    // Remove the invalid character at the beginning of the client brand
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+      brand = brand.substring(1);
+    }
+    // Check for illegal client brands
+    checkState(!brand.equals("Vanilla"), "illegal client brand: " + brand);
+    // Regex pattern for validating client brands
+    final Pattern pattern = Sonar.get().getConfig().getVerification().getBrand().getValidRegex();
+    checkState(pattern.matcher(brand).matches(), "client brand does not match pattern: " + brand);
+  }
+
+  private void validateClientLocale(final @NotNull String locale) {
+    // Check the client locale by performing a simple regex check
+    // that disallows non-ascii characters by default.
+    final Pattern pattern = Sonar.get().getConfig().getVerification().getValidLocaleRegex();
+    checkState(pattern.matcher(locale).matches(), "client locale does not match pattern: " + locale);
   }
 }

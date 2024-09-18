@@ -21,38 +21,39 @@ import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.jetbrains.annotations.NotNull;
+import lombok.Setter;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
-@ToString
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public final class PlayerInputPacket implements FallbackPacket {
-  private float sideways, forward;
-  private boolean jump, unmount;
+public final class EntityAnimationPacket implements FallbackPacket {
+  private int entityId;
+  private Type type;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
+    writeVarInt(byteBuf, entityId);
+    byteBuf.writeByte(type.ordinal());
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    sideways = byteBuf.readFloat();
-    forward = byteBuf.readFloat();
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
+    throw new UnsupportedOperationException();
+  }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-      jump = byteBuf.readBoolean();
-      unmount = byteBuf.readBoolean();
-    } else {
-      final byte flags = byteBuf.readByte();
-      jump = (flags & 0x01) != 0;
-      unmount = (flags & 0x02) != 0;
-    }
+  public enum Type {
+    SWING_MAIN_ARM,
+    HURT,
+    WAKE_UP,
+    // 1.9+?
+    SWING_OFF_HAND, // Eat food on 1.7
+    CRITICAL_HIT,
+    MAGIC_CRITICAL_HIT
+    // unknown (102), crouch (104), uncrouch(105) only exist on 1.7 and unused here
   }
 }

@@ -102,8 +102,6 @@ commands:
     remove: '<prefix>Úspěšně odstraněno <ip> z černé listiny.'
     # Zpráva zobrazená, když někdo přidá IP adresu na černou listinu
     add: '<prefix>Úspěšně přidáno <ip> na černou listinu.'
-    # Zpráva zobrazená, když někdo přidá IP adresu na černou listinu, která je ověřená
-    add-warning: '<prefix><red>Varování: <white><ip> je momentálně na bílé listině. Zvažte odstranění IP adresy ze seznamu ověřených hráčů, abyste se vyhnuli potenciálním problémům.'
     # Zpráva zobrazená, když někdo přidá IP adresu na černou listinu, ale již je na černé listině
     ip-duplicate: '<prefix>IP adresa, kterou jste zadali, je již na černé listině.'
     # Zpráva zobrazená, když někdo odstraní IP adresu z černé listiny, ale není na černé listině
@@ -183,9 +181,9 @@ verification:
     # Zpráva zaznamenána do konzole, kdykoli se nový hráč připojí k serveru
     connection: '<username>/<ip> (<protocol>) se připojil.'
     # Zpráva zaznamenána do konzole, kdykoli hráč selže při ověření
-    failed: '<ip> (<protocol>) neprošel kontrolou bota z důvodu: <reason>'
+    failed: '<username>/<ip> (<protocol>) neprošel kontrolou bota z důvodu: <reason>'
     # Zpráva zaznamenána do konzole, kdykoli je hráč zařazen na černou listinu
-    blacklisted: '<ip> (<protocol>) byl zařazen na černou listinu kvůli příliš mnoha neúspěšným pokusům'
+    blacklisted: '<username>/<ip> (<protocol>) byl zařazen na černou listinu kvůli příliš mnoha neúspěšným pokusům'
     # Zpráva zaznamenána do konzole, kdykoli je hráč ověřen
     successful: '<username> byl úspěšně ověřen (<time-taken>s!).'
 

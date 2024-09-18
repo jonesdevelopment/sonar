@@ -15,19 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.api.event.impl;
+package xyz.jonesdev.sonar.api.fingerprint;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
-import xyz.jonesdev.sonar.api.timer.SystemTimer;
+import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
-@Getter
-@ToString
-@RequiredArgsConstructor
-public final class UserVerifySuccessEvent implements SonarEvent {
-  private final FallbackUser user;
-  private final SystemTimer loginTimer;
+@UtilityClass
+public class FingerprintingUtil {
+
+  /**
+   * Returns a hex string representing a hash of the username and IP address
+   */
+  public @NotNull String getFingerprint(final @NotNull String username,
+                                        final @NotNull String hostAddress) {
+    final int hash0 = username.hashCode();
+    final int hash1 = hostAddress.hashCode();
+    final int combined = hash0 + hash1;
+    return Integer.toHexString(hash0 >> 4)
+      + Integer.toHexString(combined << 2)
+      + Integer.toHexString(hash1 >> 4);
+  }
 }

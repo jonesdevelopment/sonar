@@ -25,12 +25,12 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public final class BlockUpdate {
   private final @NotNull BlockPosition position;
-  private final BlockType type;
+  private final BlockType blockType;
   private final int legacyBlockState, blockState;
 
-  public BlockUpdate(final @NotNull BlockPosition position, final BlockType type) {
+  public BlockUpdate(final @NotNull BlockPosition position, final BlockType blockType) {
     this.position = position;
-    this.type = type;
+    this.blockType = blockType;
     final int x = position.getX() - (position.getChunkX() << 4);
     final int y = position.getY();
     final int z = position.getZ() - (position.getChunkZ() << 4);

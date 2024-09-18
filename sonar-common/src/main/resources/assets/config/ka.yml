@@ -90,10 +90,6 @@ verification:
     collision:
       # უნდა შეამოწმოს თუ არა Sonar-მა, ეტაკება თუ არა მოთამაშე ბლოკებს? (რეკომენდებულია)
       enabled: true
-      # Which type of block should Sonar use for the collision platform?
-      # შესაძლო ტიპები: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
-      # თქვენ უნდა შეცვალოთ ეს მხოლოდ იმ შემთხვევაში, თუ იცით, რას აკეთებთ
-      collision-block-type: TRAPDOOR
 
     # ამოწმებს, აგზავნის თუ არა კლიენტი შესაბამის პაკეტებს სატრანსპორტო საშუალებაზე დაჯდომის დროს
     vehicle:
@@ -139,8 +135,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # Regex-ი კლიენტის ადგილის დასადასტურებლად ვერიფიკაციის დროს
     valid-locale-regex: ^[a-zA-Z_]+$
-    # მაქსიმალური რაოდენობა შესვლის (LOGIN) პაკეტების, რომელიც მოთამაშემ უნდა გააგზავნოს სანამ გავარდება სერვერიდან
-    max-login-packets: 256
 
   # თუ ჩართულია, მოთამაშე გადავა საწყის სერვერში ვერიფიკაციის წარმატებით გავლის შემდეგ
   # ეს ფუნქცია დაემატა Mojang-ის მიერ Minecraft-ის 1.20.5 ვერსიაში

@@ -52,6 +52,10 @@ public final class LoginSuccessPacket implements FallbackPacket {
       writeString(byteBuf, FastUuidSansHyphens.toString(uuid));
     }
 
+    // Cap the length of the username to 16 characters
+    if (username.length() > 16) {
+      username = username.substring(0, 16);
+    }
     writeString(byteBuf, username);
 
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {

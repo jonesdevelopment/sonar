@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.session;
+package xyz.jonesdev.sonar.common.fallback.verification;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -28,17 +28,19 @@ import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Game
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
-public final class FallbackGravitySessionHandler extends FallbackSessionHandler {
+public final class FallbackGravityHandler extends FallbackVerificationHandler {
 
-  public FallbackGravitySessionHandler(final @NotNull FallbackUser user,
-                                       final @NotNull String username) {
-    super(user, username);
+  public FallbackGravityHandler(final @NotNull FallbackUser user,
+                                final @NotNull FallbackPreJoinHandler preJoinHandler) {
+    super(user);
 
+    this.preJoinHandler = preJoinHandler;
+    // Bedrock users start falling immediately
+    this.canFall = user.isGeyser();
     // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
     this.enableGravityCheck = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isEnabled();
-    this.enableCollisionsCheck = Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
+    this.enableCollisionsCheck = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
 
-    // FIXME: 1.18.2-1.19.3 weird loading world issue
     // First, write the JoinGame packet to the buffer
     user.delayedWrite(joinGame);
     // Then, write the ClientAbilities packet to the buffer
@@ -46,11 +48,17 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     if (Sonar.get().getConfig().getVerification().getGamemode() == CREATIVE) {
       user.delayedWrite(DEFAULT_ABILITIES);
     }
-    // Write the PositionLook packet to the buffer
-    user.delayedWrite(spawnPosition);
     // Write the DefaultSpawnPosition packet to the buffer
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_19_3) >= 0) {
       user.delayedWrite(defaultSpawnPosition);
+    }
+    // Teleport the player to the position where we're starting to check them
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+      user.delayedWrite(spawnPosition);
+      user.delayedWrite(fallStartPosition);
+    } else {
+      // 1.7.2-1.7.10 clients do not have relative teleports
+      user.delayedWrite(fallStartPositionLegacy);
     }
     // 1.20.3+ introduced game events
     // Make sure the client knows that we're sending chunks next
@@ -60,42 +68,37 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
     // Teleport player into an empty world by sending an empty chunk packet
     user.delayedWrite(EMPTY_CHUNK_DATA);
     // Spawn the invisible platform below the player
-    if (this.enableCollisionsCheck) {
-      user.delayedWrite(updateSectionBlocks);
+    if (enableCollisionsCheck) {
+      final int index = RANDOM.nextInt(BLOCKS_PACKETS.length);
+      blockHeight = POSSIBLE_BLOCK_TYPES[index].getBlockHeight();
+      user.delayedWrite(BLOCKS_PACKETS[index]);
     }
     // Send all packets at once
     user.getChannel().flush();
 
     // 1.8 and below don't have TeleportConfirm packets, which is why we're skipping that check.
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
-      markTeleported();
+      // Enable the movement checks
+      teleported = true;
     }
   }
 
+  private final FallbackPreJoinHandler preJoinHandler;
   private final boolean enableGravityCheck, enableCollisionsCheck;
-  private boolean teleported, checkMovement;
-  private double y, deltaY;
-  private int movementTick;
+  private boolean teleported, canFall, checkMovement;
+  private double y, deltaY, blockHeight;
+  private int movementTick, expectedTeleportId = FIRST_TELEPORT_ID;
 
-  private void markTeleported() {
-    // Activate the movement checks
-    teleported = true;
-  }
-
-  private void markSuccess(final boolean forceCAPTCHA) {
+  private void markSuccess() {
     // Force-stop the movement checks
     teleported = false;
-
-    // Check if the player sent all necessary packets
-    checkState(user.isReceivedClientSettings(), "didn't send client settings");
-    // Don't check Geyser players for plugin messages
-    if (!user.isGeyser()) {
-      checkState(user.isReceivedPluginMessage(), "didn't send plugin message");
+    // Exempt pre-1.20.2 since they've already passed that check in the configuration phase
+    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
+      preJoinHandler.checkClientInformation();
     }
-
-    // Send the player to the protocol check
+    // Send the player to the next verification handler
     final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
-    decoder.setListener(new FallbackProtocolSessionHandler(user, username, forceCAPTCHA));
+    decoder.setListener(new FallbackProtocolHandler(user));
   }
 
   @Override
@@ -119,38 +122,34 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
       checkState(!teleported, "duplicate teleport confirm");
       // Check if the teleport ID matches the expected ID
       final int teleportId = teleportConfirm.getTeleportId();
-      checkState(teleportId == TELEPORT_ID,
-        "expected TP ID " + TELEPORT_ID + ", but got " + teleportId);
+      checkState(teleportId == expectedTeleportId,
+        "expected TP ID " + expectedTeleportId + ", but got " + teleportId);
 
-      markTeleported();
-    }
-    // Make sure to catch all ClientSettings and PluginMessage packets during the play phase.
-    else if (packet instanceof ClientInformationPacket) {
-      // Let the session handler itself know about this packet
-      checkClientInformation((ClientInformationPacket) packet);
-    } else if (packet instanceof PluginMessagePacket) {
-      // Let the session handler itself know about this packet
-      checkPluginMessage((PluginMessagePacket) packet);
+      // The first teleport ID is not useful for us in this context, skip it
+      if (expectedTeleportId == FIRST_TELEPORT_ID) {
+        expectedTeleportId = SECOND_TELEPORT_ID;
+      } else {
+        // Enable the movement checks
+        teleported = true;
+      }
+    } else if (packet instanceof ClientInformationPacket
+      || packet instanceof PluginMessagePacket) {
+      // Pass these packets back to the login handler
+      preJoinHandler.handle(packet);
     }
   }
 
   private void handleMovement(final double x, final double y, final double z, final boolean isOnGround) {
-    // Check if the client hasn't moved before sending the first movement packet
     if (!checkMovement) {
       // No need to continue checking if the gravity and collision checks are disabled
-      // Continue with the next stage of the verification
       if (!enableGravityCheck && !enableCollisionsCheck) {
-        markSuccess(false);
+        markSuccess();
         return;
       }
 
-      if (x == SPAWN_X_POSITION && z == SPAWN_Z_POSITION) {
-        // Now, once we verified the X and Z position, we can safely check for gravity
-        checkMovement = true;
-        movementTick = 0;
-        // Synchronize the Y coordinate
-        this.y = dynamicSpawnYPosition;
-      }
+      // Synchronize the Y coordinate
+      this.y = dynamicSpawnYPosition;
+      checkMovement = true;
       return;
     }
 
@@ -162,81 +161,91 @@ public final class FallbackGravitySessionHandler extends FallbackSessionHandler 
 
     // Log/debug position if enabled in the configuration
     if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-      Sonar.get().getFallback().getLogger().info("{}: {}/{}/{}, ly={}/dy={}, {}",
-        username, x, y, z, lastY, deltaY, isOnGround);
+      Sonar.get().getLogger().info("{}: {}/{}/{} ly={}, dy={}, h={}, g={}",
+        user.getUsername(), x, y, z, lastY, deltaY, blockHeight, isOnGround);
     }
+
+    // Ensure that the player's Y coordinate is above the collision platform
+    checkState(y >= DEFAULT_Y_COLLIDE_POSITION,
+      "fell through blocks: " + y + "/" + deltaY + "/" + movementTick);
 
     // The player is not allowed to move away from the collision platform.
     // This should not happen unless the max movement tick is configured to a high number.
-    checkState(Math.abs(x - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (x)");
-    checkState(Math.abs(z - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "moved too far (z)");
+    checkState(Math.abs(Math.abs(x) - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "illegal x offset: " + x);
+    checkState(Math.abs(Math.abs(z) - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "illegal z offset: " + z);
 
     if (!isOnGround) {
       // The deltaY is 0 whenever the player sends their first position packet.
-      // We have to account for this or the player will fail the verification.
+      // We have to account for this or the player will falsely fail the verification.
       if (deltaY == 0) {
-        // Reset the movement tick as a safety measure
-        movementTick = 0;
+        checkState(movementTick == 0, "illegal y motion: " + movementTick);
+        // 1.7 clients immediately start falling after this packet
+        if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+          movementTick++;
+        }
+        // We've received the first position packet; the player will now start falling
+        canFall = true;
         return;
       }
+
+      // Make sure we're actually expecting the player to fall at this point in time
+      checkState(canFall, "unexpected y motion: " + deltaY);
 
       // The movement tick should not be ignored when gravity check is disabled.
       movementTick++;
 
       if (enableGravityCheck) {
-        // Ensure that the player is above the collision platform
-        checkState(y > DEFAULT_Y_COLLIDE_POSITION,
-          "fell through blocks; y: " + y + " deltaY: " + deltaY + " tick: " + movementTick);
-
         // Predict the player's current motion based on the last motion
         // https://minecraft.wiki/w/Entity#Motion_of_entities
         final double predicted = (lastDeltaY - 0.08) * 0.98f;
         final double difference = Math.abs(deltaY - predicted);
 
-        // Check if the difference between the predicted motion and
-        // the actual motion is greater than our minimum threshold.
+        // Check if the difference between the predicted and actual motion is too large
         if (difference > 1e-7) {
           // Do not throw an exception if the user configured to display the CAPTCHA instead
           if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-            markSuccess(true);
+            user.setForceCaptcha(true);
+            markSuccess();
             return;
           }
-          user.fail("incorrect gravity; predicted: " + predicted + " deltaY: " + deltaY + " y: " + y);
+          fail("incorrect gravity: " + predicted + "/ " + deltaY + "/" + y);
         }
 
         // The player is obeying gravity, go on to the next stage if the collision check is disabled.
-        if (movementTick == maxMovementTick && !enableCollisionsCheck) {
-          markSuccess(false);
+        if (!enableCollisionsCheck && movementTick == maxMovementTick) {
+          markSuccess();
         }
       }
     } else if (enableCollisionsCheck) {
       // Make sure the player has actually moved before reaching the platform
-      if (movementTick < maxMovementTick) {
+      if (enableGravityCheck && movementTick < maxMovementTick) {
         // Do not throw an exception if the user configured to display the CAPTCHA instead
         if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-          markSuccess(true);
+          user.setForceCaptcha(true);
+          markSuccess();
           return;
         }
-        user.fail("illegal collision tick; tick: " + movementTick);
+        fail("illegal collision tick: " + movementTick + "/" + blockHeight);
       }
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-      double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockType.getBlockHeight()) - y;
+      double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockHeight) - y;
       // 1.7 sends the head position instead of the AABB minY
       // This little hack accounts for the offset of approximately 1.62
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
         collisionOffsetY += 1.62f;
       }
       // Make sure the player is actually colliding with the blocks and not only spoofing ground
-      if (collisionOffsetY < -0.03) {
+      if (collisionOffsetY < -3e-2) {
         // Do not throw an exception if the user configured to display the CAPTCHA instead
         if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-          markSuccess(true);
+          user.setForceCaptcha(true);
+          markSuccess();
           return;
         }
-        user.fail("illegal collision; offset: " + collisionOffsetY + " tick: " + movementTick + " y: " + y);
+        fail("illegal collision: " + collisionOffsetY + "/" + y + "/" + movementTick + "/" + blockHeight);
       }
       // The player has collided with the blocks, go on to the next stage
-      markSuccess(false);
+      markSuccess();
     }
   }
 }

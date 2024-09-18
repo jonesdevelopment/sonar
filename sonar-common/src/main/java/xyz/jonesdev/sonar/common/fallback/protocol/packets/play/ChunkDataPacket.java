@@ -36,7 +36,7 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class ChunkDataPacket implements FallbackPacket {
-  private int x, z;
+  private int sectionX, sectionZ;
 
   private static final byte[] SECTION_BYTES = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
   private static final byte[] LIGHT_BYTES = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
@@ -67,8 +67,8 @@ public final class ChunkDataPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    byteBuf.writeInt(x);
-    byteBuf.writeInt(z);
+    byteBuf.writeInt(sectionX);
+    byteBuf.writeInt(sectionZ);
 
     if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
       if (protocolVersion.compareTo(MINECRAFT_1_17_1) <= 0) {
@@ -113,13 +113,13 @@ public final class ChunkDataPacket implements FallbackPacket {
 
     if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
       if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-        writeArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
+        writeByteArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
       } else {
         byteBuf.writeInt(0); // compressed size
         byteBuf.writeBytes(LEGACY_FILLER_BYTES_17); // 1.7
       }
     } else if (protocolVersion.compareTo(MINECRAFT_1_15) < 0) {
-      writeArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
+      writeByteArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
     } else if (protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
       writeVarInt(byteBuf, 0); // 1.15 - 1.17.1
     } else {

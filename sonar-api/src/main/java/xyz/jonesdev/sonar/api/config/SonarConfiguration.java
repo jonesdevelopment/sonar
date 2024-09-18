@@ -30,7 +30,6 @@ import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.database.ormlite.H2DatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.database.ormlite.MariaDbDatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.database.ormlite.MysqlDatabaseTypeAdapter;
-import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.io.File;
@@ -52,24 +51,6 @@ public final class SonarConfiguration {
   @Getter
   private Language language;
 
-  static final LoggerWrapper LOGGER = new LoggerWrapper() {
-
-    @Override
-    public void info(final String message, final Object... args) {
-      Sonar.get().getLogger().info("[config] " + message, args);
-    }
-
-    @Override
-    public void warn(final String message, final Object... args) {
-      Sonar.get().getLogger().warn("[config] " + message, args);
-    }
-
-    @Override
-    public void error(final String message, final Object... args) {
-      Sonar.get().getLogger().error("[config] " + message, args);
-    }
-  };
-
   public SonarConfiguration(final @NotNull File pluginFolder) {
     this.pluginFolder = pluginFolder;
     this.messagesConfig = new SimpleYamlConfig(new File(pluginFolder, "messages.yml"));
@@ -85,14 +66,14 @@ public final class SonarConfiguration {
       final URL defaultLanguageFile = Sonar.class.getResource("/assets/language.properties");
       // Make sure the file actually exists before trying to copy it
       if (defaultLanguageFile == null) {
-        LOGGER.error("Cannot check for custom language (is the file missing?)");
+        Sonar.get().getLogger().error("Cannot check for custom language (is the file missing?)");
         return DEFAULT_FALLBACK_LANGUAGE;
       }
       // Copy the file to the plugin data directory
       try (final InputStream inputStream = defaultLanguageFile.openStream()) {
         Files.copy(inputStream, languageFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
       } catch (IOException exception) {
-        LOGGER.error("Error copying file: {}", exception);
+        Sonar.get().getLogger().error("Error copying file: {}", exception);
         return DEFAULT_FALLBACK_LANGUAGE;
       }
     }
@@ -106,13 +87,13 @@ public final class SonarConfiguration {
         // Try parsing the property as a language
         return Language.fromCode(property);
       } catch (Throwable throwable) {
-        LOGGER.error("Could not find requested language: {}", throwable);
-        LOGGER.error("You can view a full list of valid language codes here:");
-        LOGGER.error("https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes");
-        LOGGER.error("If a translation does not exist yet, Sonar will use English (en).");
+        Sonar.get().getLogger().error("Could not find requested language: {}", throwable);
+        Sonar.get().getLogger().error("You can view a full list of valid language codes here:");
+        Sonar.get().getLogger().error("https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes");
+        Sonar.get().getLogger().error("If a translation does not exist yet, Sonar will use English (en).");
       }
     } catch (IOException exception) {
-      LOGGER.error("Error reading language file: {}", exception);
+      Sonar.get().getLogger().error("Error reading language file: {}", exception);
     }
     return DEFAULT_FALLBACK_LANGUAGE;
   }
@@ -131,13 +112,13 @@ public final class SonarConfiguration {
         final String property = System.getProperty("user.language", "en");
         language = Language.fromCode(property);
         // Make sure the user knows that we're using the system language for translations
-        LOGGER.info("Using system language ({}) for translations.", language);
+        Sonar.get().getLogger().info("Using system language ({}) for translations.", language);
       } catch (Exception exception) {
-        LOGGER.warn("Could not use system language for translations.");
-        LOGGER.warn("Using default language ({}) for translations.", language);
+        Sonar.get().getLogger().warn("Could not use system language for translations.");
+        Sonar.get().getLogger().warn("Using default language ({}) for translations.", language);
       }
     } else {
-      LOGGER.info("Using custom language ({}) for translations.", language);
+      Sonar.get().getLogger().info("Using custom language ({}) for translations.", language);
     }
 
     // Load all configurations
@@ -177,12 +158,12 @@ public final class SonarConfiguration {
     verification.timing = Verification.Timing.valueOf(generalConfig.getString("verification.timing"));
     // Warn the user if the verification timing is set to NEVER
     if (verification.timing == Verification.Timing.NEVER) {
-      LOGGER.warn(" ");
-      LOGGER.warn("You have set the verification timing to 'NEVER'.");
-      LOGGER.warn("Sonar will NOT perform the bot verification at all, therefore making it useless.");
-      LOGGER.warn("It is highly suggested to set this option to either 'DURING_ATTACK' or 'ALWAYS'.");
-      LOGGER.warn("Please only edit this option if you really know what you are doing.");
-      LOGGER.warn(" ");
+      Sonar.get().getLogger().warn(" ");
+      Sonar.get().getLogger().warn("You have set the verification timing to 'NEVER'.");
+      Sonar.get().getLogger().warn("Sonar will NOT perform the bot verification at all, therefore making it useless.");
+      Sonar.get().getLogger().warn("It is highly suggested to set this option to either 'DURING_ATTACK' or 'ALWAYS'.");
+      Sonar.get().getLogger().warn("Please only edit this option if you really know what you are doing.");
+      Sonar.get().getLogger().warn(" ");
     }
 
     verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled");
@@ -202,10 +183,11 @@ public final class SonarConfiguration {
 
     final String backgroundPath = generalConfig.getString("verification.checks.map-captcha.background");
     if (!backgroundPath.isEmpty()) {
-      try (final InputStream inputStream = new FileInputStream(backgroundPath)) {
-        verification.map.backgroundImage = inputStream;
-      } catch (IOException exception) {
-        Sonar.get().getLogger().error("Could not find background image", exception);
+      final File backgroundFile = new File(pluginFolder, backgroundPath);
+      if (backgroundFile.exists()) {
+        verification.map.backgroundImage = backgroundFile;
+      } else {
+        Sonar.get().getLogger().error("Could not find background image {}", backgroundFile.getAbsolutePath());
       }
     }
 
@@ -216,7 +198,6 @@ public final class SonarConfiguration {
     verification.gamemode = Verification.Gamemode.valueOf(generalConfig.getString("verification.gamemode"));
     verification.validNameRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-name-regex"));
     verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
-    verification.maxLoginPackets = clamp(generalConfig.getInt("verification.checks.max-login-packets"), 128, 8192);
 
     verification.checkGeyser = generalConfig.getBoolean("verification.check-geyser-players");
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
@@ -303,7 +284,7 @@ public final class SonarConfiguration {
     final String resourceName = url + "/" + language.getCode() + ".yml";
     URL result = Sonar.class.getResource("/assets/" + resourceName);
     if (result == null) {
-      LOGGER.warn("Could not find " + resourceName + "! Using en.yml!");
+      Sonar.get().getLogger().warn("Could not find " + resourceName + "! Using en.yml!");
       result = Objects.requireNonNull(Sonar.class.getResource("/assets/" + url + "/en.yml"));
     }
     return result;
@@ -386,7 +367,7 @@ public final class SonarConfiguration {
       private int maxDuration;
       private int maxTries;
       private String alphabet;
-      private InputStream backgroundImage;
+      private File backgroundImage;
     }
 
     @Getter
@@ -434,7 +415,6 @@ public final class SonarConfiguration {
     private Pattern validNameRegex;
     private Pattern validLocaleRegex;
 
-    private int maxLoginPackets;
     private int readTimeout;
     private int writeTimeout;
     private int reconnectDelay;
@@ -489,7 +469,7 @@ public final class SonarConfiguration {
       private final DatabaseType databaseType;
       private final Library databaseDriver;
       @Setter
-      private boolean downloaded;
+      private boolean loaded;
     }
 
     private Type type;

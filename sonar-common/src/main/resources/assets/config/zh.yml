@@ -88,10 +88,6 @@ verification:
     collision:
       # Sonar 是否应该生成方块平台以检查玩家下落与方块之间的碰撞? (推荐启用)
       enabled: true
-      # Sonar 应该使用哪种类型的块作为碰撞平台?
-      # 可用类型: STONE, BARRIER, TRAPDOOR, ENCHANTMENT_TABLE
-      # 只有当您知道您在做什么时, 才应该编辑它.
-      collision-block-type: TRAPDOOR
 
     # 检查客户端坐在实体上时是否发送了正确的数据包
     vehicle:
@@ -136,8 +132,6 @@ verification:
     valid-name-regex: ^[a-zA-Z0-9_]+$
     # 用于检查客户端语言(例如 zh_CN)的正则表达式
     valid-locale-regex: ^[a-zA-Z_]+$
-    # 玩家最多能发送多少个数据包用于登录?
-    max-login-packets: 256
 
   # 开启后 玩家将在验证成功后被重定向到指定的服务器
   # 该功能由 Mojang 在 Minecraft 1.20.5 版本中引入

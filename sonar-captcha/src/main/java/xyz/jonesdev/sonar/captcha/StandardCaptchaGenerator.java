@@ -33,8 +33,8 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -69,9 +69,9 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     }
   }
 
-  private final int width, height;
-  private final @Nullable InputStream background;
-  private BufferedImage backgroundImage;
+  private final int width = 128, height = 128;
+  private final @Nullable File background;
+  private @Nullable BufferedImage backgroundImage;
 
   @Override
   public @NotNull BufferedImage createImage(final char[] answer) {
@@ -91,16 +91,22 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   }
 
   private @NotNull BufferedImage createBackgroundImage() {
+    // Create a new image buffer with a 3-byte color spectrum
+    final BufferedImage image = new BufferedImage(width, height, TYPE_3BYTE_BGR);
     if (background == null) {
-      final BufferedImage image = new BufferedImage(width, height, TYPE_3BYTE_BGR);
       // Fill the entire image with a noise texture
       return FBM.filter(image, image);
     }
-    try {
-      return backgroundImage == null ? backgroundImage = ImageIO.read(background) : backgroundImage;
-    } catch (IOException exception) {
-      throw new IllegalStateException("Could not read background image", exception);
+    // Try to load the image from a file if it doesn't exist yet
+    if (backgroundImage == null) {
+      try {
+        backgroundImage = ImageIO.read(background);
+      } catch (IOException exception) {
+        throw new IllegalStateException("Could not read background image", exception);
+      }
     }
+    image.createGraphics().drawImage(backgroundImage, 0, 0, Color.WHITE, null);
+    return image;
   }
 
   private void applyRandomColorGradient(final @NotNull Graphics2D graphics) {

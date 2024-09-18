@@ -27,32 +27,46 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public final class PlayerInputPacket implements FallbackPacket {
-  private float sideways, forward;
-  private boolean jump, unmount;
+public final class TeleportEntityPacket implements FallbackPacket {
+  private int entityId;
+  private double x, y, z;
+  private boolean onGround;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    throw new UnsupportedOperationException();
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+      writeVarInt(byteBuf, entityId);
+    } else {
+      byteBuf.writeInt(entityId);
+    }
+
+    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
+      byteBuf.writeDouble(x);
+      byteBuf.writeDouble(y);
+      byteBuf.writeDouble(z);
+    } else {
+      byteBuf.writeInt((int) (x * 32D));
+      byteBuf.writeInt((int) (y * 32D));
+      byteBuf.writeInt((int) (z * 32D));
+    }
+
+    byteBuf.writeByte(0); // pitch or yaw
+    byteBuf.writeByte(0); // yaw or pitch
+
+    if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+      byteBuf.writeBoolean(onGround);
+    }
   }
 
   @Override
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    sideways = byteBuf.readFloat();
-    forward = byteBuf.readFloat();
-
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-      jump = byteBuf.readBoolean();
-      unmount = byteBuf.readBoolean();
-    } else {
-      final byte flags = byteBuf.readByte();
-      jump = (flags & 0x01) != 0;
-      unmount = (flags & 0x02) != 0;
-    }
+    throw new UnsupportedOperationException();
   }
 }

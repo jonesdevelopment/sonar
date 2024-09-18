@@ -43,7 +43,7 @@ public final class JoinGamePacket implements FallbackPacket {
   private boolean showRespawnScreen;
   private boolean limitedCrafting;
   private String[] levelNames;
-  private String levelName;
+  private String levelType;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
@@ -51,7 +51,7 @@ public final class JoinGamePacket implements FallbackPacket {
 
     if (protocolVersion.inBetween(MINECRAFT_1_7_2, MINECRAFT_1_7_6)) {
       byteBuf.writeByte(gamemode == 3 ? 1 : gamemode);
-      byteBuf.writeByte(DEFAULT_DIMENSION_1_16.getId());
+      byteBuf.writeByte(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeByte(0); // difficulty
       byteBuf.writeByte(0); // max players
       writeString(byteBuf, "flat"); // level type
@@ -60,7 +60,7 @@ public final class JoinGamePacket implements FallbackPacket {
 
     if (protocolVersion.inBetween(MINECRAFT_1_8, MINECRAFT_1_9)) {
       byteBuf.writeByte(gamemode);
-      byteBuf.writeByte(DEFAULT_DIMENSION_1_16.getId());
+      byteBuf.writeByte(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeByte(0); // difficulty
       byteBuf.writeByte(0); // max players
       writeString(byteBuf, "flat"); // level type
@@ -70,7 +70,7 @@ public final class JoinGamePacket implements FallbackPacket {
 
     if (protocolVersion.inBetween(MINECRAFT_1_9_1, MINECRAFT_1_13_2)) {
       byteBuf.writeByte(gamemode);
-      byteBuf.writeInt(DEFAULT_DIMENSION_1_16.getId());
+      byteBuf.writeInt(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeByte(0); // difficulty
       byteBuf.writeByte(0); // max players
       writeString(byteBuf, "flat"); // level type
@@ -80,7 +80,7 @@ public final class JoinGamePacket implements FallbackPacket {
 
     if (protocolVersion.inBetween(MINECRAFT_1_14, MINECRAFT_1_14_4)) {
       byteBuf.writeByte(gamemode);
-      byteBuf.writeInt(DEFAULT_DIMENSION_1_16.getId());
+      byteBuf.writeInt(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeByte(0); // max players
       writeString(byteBuf, "flat"); // level type
       writeVarInt(byteBuf, viewDistance);
@@ -90,7 +90,7 @@ public final class JoinGamePacket implements FallbackPacket {
 
     if (protocolVersion.inBetween(MINECRAFT_1_15, MINECRAFT_1_15_2)) {
       byteBuf.writeByte(gamemode);
-      byteBuf.writeInt(DEFAULT_DIMENSION_1_16.getId());
+      byteBuf.writeInt(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeLong(partialHashedSeed);
       byteBuf.writeByte(0); // max players
       writeString(byteBuf, "flat"); // level type
@@ -105,8 +105,8 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
       writeCompoundTag(byteBuf, CODEC_1_16);
-      writeString(byteBuf, DEFAULT_DIMENSION_1_16.getIdentifier());
-      writeString(byteBuf, levelName);
+      writeString(byteBuf, DEFAULT_DIMENSION_1_16_2.getIdentifier());
+      writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       byteBuf.writeByte(0); // max players
       writeVarInt(byteBuf, viewDistance);
@@ -123,8 +123,8 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
       writeCompoundTag(byteBuf, CODEC_1_16_2);
-      writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_16.getTag());
-      writeString(byteBuf, levelName);
+      writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_16_2.getTag());
+      writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
@@ -144,10 +144,10 @@ public final class JoinGamePacket implements FallbackPacket {
         writeCompoundTag(byteBuf, CODEC_1_18_2);
         writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_18_2.getTag());
       } else {
-        writeCompoundTag(byteBuf, CODEC_1_16);
-        writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_16.getTag());
+        writeCompoundTag(byteBuf, CODEC_1_16_2);
+        writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_16_2.getTag());
       }
-      writeString(byteBuf, levelName);
+      writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
@@ -173,8 +173,8 @@ public final class JoinGamePacket implements FallbackPacket {
       } else {
         writeCompoundTag(byteBuf, CODEC_1_19);
       }
-      writeString(byteBuf, levelName); // world type
-      writeString(byteBuf, levelName);
+      writeString(byteBuf, levelType); // world type
+      writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
@@ -193,8 +193,8 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
       writeCompoundTag(byteBuf, CODEC_1_20);
-      writeString(byteBuf, levelName); // world type
-      writeString(byteBuf, levelName);
+      writeString(byteBuf, levelType); // world type
+      writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
@@ -217,8 +217,8 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
       byteBuf.writeBoolean(false); // limited crafting
-      writeString(byteBuf, levelName);
-      writeString(byteBuf, levelName);
+      writeString(byteBuf, levelType);
+      writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
@@ -240,7 +240,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(false); // limited crafting
       // It depends on the dimension data we send in RegistryData. If we only send one dimension. It should be 0.
       writeVarInt(byteBuf, 0);
-      writeString(byteBuf, levelName);
+      writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode

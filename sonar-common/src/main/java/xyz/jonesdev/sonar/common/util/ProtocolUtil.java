@@ -41,21 +41,25 @@ package xyz.jonesdev.sonar.common.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.util.Version;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.*;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.EnumSet;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_7_2;
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
@@ -74,25 +78,6 @@ public class ProtocolUtil {
 
   public static int varIntBytes(final int value) {
     return VAR_INT_LENGTHS[Integer.numberOfLeadingZeros(value)];
-  }
-
-  public static void checkNettyVersion() {
-    final Version version = Version.identify().getOrDefault("netty-all", Version.identify().get("netty-common"));
-
-    // We're pretty much only doing this to avoid incompatibilities on Bukkit,
-    // so we don't really care if the version couldn't be resolved.
-    if (version == null) {
-      return;
-    }
-
-    final String[] artifactVersion = version.artifactVersion().split("\\.");
-    final int major = Integer.parseInt(artifactVersion[0]);
-    final int minor = Integer.parseInt(artifactVersion[1]);
-
-    // Enforce Netty >4.1.x
-    if (major < 4 || (major == 4 && minor < 1)) {
-      throw new IllegalStateException("Your Netty version is too old to run Sonar! Please use Netty >4.1.x.");
-    }
   }
 
   public static int readVarInt(final @NotNull ByteBuf byteBuf) {
@@ -218,6 +203,41 @@ public class ProtocolUtil {
     }
   }
 
+  public static void checkNettyVersion() {
+    final Version version = Version.identify().getOrDefault("netty-all", Version.identify().get("netty-common"));
+
+    // We're pretty much only doing this to avoid incompatibilities on Bukkit,
+    // so we don't really care if the version couldn't be resolved.
+    if (version == null) {
+      return;
+    }
+
+    final String[] artifactVersion = version.artifactVersion().split("\\.");
+    final int major = Integer.parseInt(artifactVersion[0]);
+    final int minor = Integer.parseInt(artifactVersion[1]);
+
+    // Enforce Netty >4.1.x
+    if (major < 4 || (major == 4 && minor < 1)) {
+      throw new IllegalStateException("Your Netty version is too old to run Sonar! Please use Netty >4.1.x.");
+    }
+  }
+
+  public static void closeWith(final @NotNull Channel channel,
+                               final @NotNull ProtocolVersion protocolVersion,
+                               final @NotNull Object msg) {
+    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0
+      && protocolVersion.compareTo(MINECRAFT_1_7_2) >= 0) {
+      channel.eventLoop().execute(() -> {
+        channel.config().setAutoRead(false);
+        channel.eventLoop().schedule(() -> {
+          channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+        }, 250L, TimeUnit.MILLISECONDS);
+      });
+    } else {
+      channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+    }
+  }
+
   public static @NotNull UUID readUUID(final @NotNull ByteBuf byteBuf) {
     return new UUID(byteBuf.readLong(), byteBuf.readLong());
   }
@@ -227,28 +247,23 @@ public class ProtocolUtil {
   }
 
   public static byte @NotNull [] readByteArray(final ByteBuf byteBuf, final int cap) {
-    int length = readVarInt(byteBuf);
+    final int length = readVarInt(byteBuf);
     checkState(length >= 0, "Got a negative-length array");
     checkState(length <= cap, "Bad array size");
     checkState(byteBuf.isReadable(length), "Trying to read an array that is too long");
-    byte[] array = new byte[length];
+    final byte[] array = new byte[length];
     byteBuf.readBytes(array);
     return array;
   }
 
-  public static @NotNull String readString(final ByteBuf byteBuf) throws DecoderException {
-    return readString(byteBuf, Short.MAX_VALUE);
-  }
-
-  public static @NotNull String readString(final ByteBuf byteBuf,
-                                           final int cap) throws DecoderException {
+  public static @NotNull String readString(final ByteBuf byteBuf, final int cap) throws DecoderException {
     final int length = readVarInt(byteBuf);
     return readString(byteBuf, cap, length);
   }
 
-  public static @NotNull String readString(final @NotNull ByteBuf byteBuf,
-                                           final int cap,
-                                           final int length) throws DecoderException {
+  private static @NotNull String readString(final @NotNull ByteBuf byteBuf,
+                                            final int cap,
+                                            final int length) throws DecoderException {
     checkState(length >= 0, "Got a negative-length string");
     checkState(length <= cap * 3, "Bad string size");
     checkState(byteBuf.isReadable(length), "Tried to read a too-long string");
@@ -276,7 +291,7 @@ public class ProtocolUtil {
     byteBuf.writeInt((int) uuid.getLeastSignificantBits());
   }
 
-  public static void writeArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
+  public static void writeByteArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
     checkState(bytes.length < Short.MAX_VALUE, "Too long array");
     writeVarInt(byteBuf, bytes.length);
     byteBuf.writeBytes(bytes);
@@ -287,27 +302,6 @@ public class ProtocolUtil {
     for (final String s : stringArray) {
       writeString(byteBuf, s);
     }
-  }
-
-  // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/ByteMessage.java#L276
-  public <E extends Enum<E>> void writeEnumSet(final ByteBuf byteBuf,
-                                               final EnumSet<E> enumset,
-                                               final @NotNull Class<E> oclass) {
-    final E[] enums = oclass.getEnumConstants();
-    final BitSet bits = new BitSet(enums.length);
-
-    for (int i = 0; i < enums.length; ++i) {
-      bits.set(i, enumset.contains(enums[i]));
-    }
-
-    writeFixedBitSet(byteBuf, bits, enums.length);
-  }
-
-  private static void writeFixedBitSet(final ByteBuf byteBuf, final @NotNull BitSet bits, final int size) {
-    if (bits.length() > size) {
-      throw new StackOverflowError("BitSet too large (expected " + size + " got " + bits.size() + ")");
-    }
-    byteBuf.writeBytes(Arrays.copyOf(bits.toByteArray(), (size + 8) >> 3));
   }
 
   public static void writeCompoundTag(final @NotNull ByteBuf byteBuf, final @NotNull CompoundBinaryTag compoundTag) {

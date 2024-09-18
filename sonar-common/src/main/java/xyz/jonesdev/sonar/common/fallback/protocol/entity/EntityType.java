@@ -23,64 +23,64 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.util.function.Function;
 
+import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
+
+// TODO: load mappings from a separate file
 @RequiredArgsConstructor
 public enum EntityType {
+  // Useful resources:
+  // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
+  // - https://pokechu22.github.io/Burger/1.20.4.html
   BOAT(protocolVersion -> {
-    // Useful resources:
-    // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
-    // - https://pokechu22.github.io/Burger/1.20.4.html
-    switch (protocolVersion) {
-      default:
-      case MINECRAFT_1_7_2:
-      case MINECRAFT_1_7_6:
-      case MINECRAFT_1_8:
-      case MINECRAFT_1_9:
-      case MINECRAFT_1_9_1:
-      case MINECRAFT_1_9_2:
-      case MINECRAFT_1_9_4:
-      case MINECRAFT_1_10:
-      case MINECRAFT_1_11:
-      case MINECRAFT_1_11_1:
-      case MINECRAFT_1_12:
-      case MINECRAFT_1_12_1:
-      case MINECRAFT_1_12_2:
-      case MINECRAFT_1_13:
-      case MINECRAFT_1_13_1:
-      case MINECRAFT_1_13_2:
-        return 1;
-      case MINECRAFT_1_14:
-      case MINECRAFT_1_14_1:
-      case MINECRAFT_1_14_2:
-      case MINECRAFT_1_14_3:
-      case MINECRAFT_1_14_4:
-        return 5;
-      case MINECRAFT_1_15:
-      case MINECRAFT_1_15_1:
-      case MINECRAFT_1_15_2:
-      case MINECRAFT_1_16:
-      case MINECRAFT_1_16_1:
-      case MINECRAFT_1_16_2:
-      case MINECRAFT_1_16_3:
-      case MINECRAFT_1_16_4:
-        return 6;
-      case MINECRAFT_1_17:
-      case MINECRAFT_1_17_1:
-      case MINECRAFT_1_18:
-      case MINECRAFT_1_18_2:
-        return 7;
-      case MINECRAFT_1_19:
-      case MINECRAFT_1_19_1:
-      case MINECRAFT_1_19_3:
-        return 8;
-      case MINECRAFT_1_19_4:
-      case MINECRAFT_1_20:
-      case MINECRAFT_1_20_2:
-      case MINECRAFT_1_20_3:
-        return 9;
-      case MINECRAFT_1_20_5:
-      case MINECRAFT_1_21:
-        return 10;
+    if (protocolVersion.compareTo(MINECRAFT_1_13_2) <= 0) {
+      return 1;
     }
+    if (protocolVersion.compareTo(MINECRAFT_1_14_4) <= 0) {
+      return 5;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_16_4) <= 0) {
+      return 6;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_18_2) <= 0) {
+      return 7;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+      return 8;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_20_3) <= 0) {
+      return 9;
+    }
+    return 10;
+  }),
+  MINECART(protocolVersion -> {
+    if (protocolVersion.compareTo(MINECRAFT_1_13_2) <= 0) {
+      return 10;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_14_4) <= 0) {
+      return 41;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
+      return 42;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_16_4) <= 0) {
+      return 45;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_18_2) <= 0) {
+      return 50;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_1) <= 0) {
+      return 53;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+      return 54;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_20_2) <= 0) {
+      return 64;
+    }
+    if (protocolVersion.compareTo(MINECRAFT_1_20_3) <= 0) {
+      return 65;
+    }
+    return 69;
   });
 
   private final Function<ProtocolVersion, Integer> function;
