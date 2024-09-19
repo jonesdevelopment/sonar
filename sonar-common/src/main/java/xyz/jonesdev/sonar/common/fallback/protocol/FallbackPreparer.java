@@ -125,7 +125,7 @@ public class FallbackPreparer {
     // Prepare the gravity check
     maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
 
-    double motionY = 0, fallDistance = 1;
+    double motionY = 0, fallDistance = 0;
 
     for (int i = 0; i < maxMovementTick; i++) {
       motionY = (motionY - 0.1) * 0.98f;

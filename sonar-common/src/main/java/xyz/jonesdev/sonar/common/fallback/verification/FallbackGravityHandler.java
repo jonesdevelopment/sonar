@@ -229,11 +229,6 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       }
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
       double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockHeight) - y;
-      // 1.7 sends the head position instead of the AABB minY
-      // This little hack accounts for the offset of approximately 1.62
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-        collisionOffsetY += 1.62f;
-      }
       // Make sure the player is actually colliding with the blocks and not only spoofing ground
       if (collisionOffsetY < -3e-2) {
         // Do not throw an exception if the user configured to display the CAPTCHA instead
