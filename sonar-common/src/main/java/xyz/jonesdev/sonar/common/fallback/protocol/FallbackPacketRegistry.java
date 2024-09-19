@@ -64,11 +64,11 @@ public enum FallbackPacketRegistry {
         map(0x01, MINECRAFT_1_20_2, true),
         map(0x02, MINECRAFT_1_20_5, true));
       clientbound.register(FinishConfigurationPacket.class, FinishConfigurationPacket::new,
-        map(0x02, MINECRAFT_1_20_2, false),
-        map(0x03, MINECRAFT_1_20_5, false));
+        map(0x02, MINECRAFT_1_20_2, true),
+        map(0x03, MINECRAFT_1_20_5, true));
       clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
-        map(0x03, MINECRAFT_1_20_2, false),
-        map(0x04, MINECRAFT_1_20_5, false));
+        map(0x03, MINECRAFT_1_20_2, true),
+        map(0x04, MINECRAFT_1_20_5, true));
       clientbound.register(RegistryDataPacket.class, RegistryDataPacket::new,
         map(0x05, MINECRAFT_1_20_2, true),
         map(0x07, MINECRAFT_1_20_5, true));
@@ -104,20 +104,20 @@ public enum FallbackPacketRegistry {
         map(0x29, MINECRAFT_1_20_2, true),
         map(0x2B, MINECRAFT_1_20_5, true));
       clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
-        map(0x00, MINECRAFT_1_7_2, false),
-        map(0x1F, MINECRAFT_1_9, false),
-        map(0x21, MINECRAFT_1_13, false),
-        map(0x20, MINECRAFT_1_14, false),
-        map(0x21, MINECRAFT_1_15, false),
-        map(0x20, MINECRAFT_1_16, false),
-        map(0x1F, MINECRAFT_1_16_2, false),
-        map(0x21, MINECRAFT_1_17, false),
-        map(0x1E, MINECRAFT_1_19, false),
-        map(0x20, MINECRAFT_1_19_1, false),
-        map(0x1F, MINECRAFT_1_19_3, false),
-        map(0x23, MINECRAFT_1_19_4, false),
-        map(0x24, MINECRAFT_1_20_2, false),
-        map(0x26, MINECRAFT_1_20_5, false));
+        map(0x00, MINECRAFT_1_7_2, true),
+        map(0x1F, MINECRAFT_1_9, true),
+        map(0x21, MINECRAFT_1_13, true),
+        map(0x20, MINECRAFT_1_14, true),
+        map(0x21, MINECRAFT_1_15, true),
+        map(0x20, MINECRAFT_1_16, true),
+        map(0x1F, MINECRAFT_1_16_2, true),
+        map(0x21, MINECRAFT_1_17, true),
+        map(0x1E, MINECRAFT_1_19, true),
+        map(0x20, MINECRAFT_1_19_1, true),
+        map(0x1F, MINECRAFT_1_19_3, true),
+        map(0x23, MINECRAFT_1_19_4, true),
+        map(0x24, MINECRAFT_1_20_2, true),
+        map(0x26, MINECRAFT_1_20_5, true));
       clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
         map(0x40, MINECRAFT_1_7_2, true),
         map(0x1A, MINECRAFT_1_9, true),
@@ -214,19 +214,19 @@ public enum FallbackPacketRegistry {
         map(0x5D, MINECRAFT_1_20_3, true),
         map(0x5F, MINECRAFT_1_20_5, true));
       clientbound.register(VehicleMovePacket.class, VehicleMovePacket::new,
-        map(0x29, MINECRAFT_1_9, false),
-        map(0x2B, MINECRAFT_1_13, false),
-        map(0x2C, MINECRAFT_1_14, false),
-        map(0x2D, MINECRAFT_1_15, false),
-        map(0x2C, MINECRAFT_1_16, false),
-        map(0x2B, MINECRAFT_1_16_2, false),
-        map(0x2C, MINECRAFT_1_17, false),
-        map(0x29, MINECRAFT_1_19, false),
-        map(0x2B, MINECRAFT_1_19_1, false),
-        map(0x2A, MINECRAFT_1_19_3, false),
-        map(0x2E, MINECRAFT_1_19_4, false),
-        map(0x2F, MINECRAFT_1_20_2, false),
-        map(0x31, MINECRAFT_1_20_5, false));
+        map(0x29, MINECRAFT_1_9, true),
+        map(0x2B, MINECRAFT_1_13, true),
+        map(0x2C, MINECRAFT_1_14, true),
+        map(0x2D, MINECRAFT_1_15, true),
+        map(0x2C, MINECRAFT_1_16, true),
+        map(0x2B, MINECRAFT_1_16_2, true),
+        map(0x2C, MINECRAFT_1_17, true),
+        map(0x29, MINECRAFT_1_19, true),
+        map(0x2B, MINECRAFT_1_19_1, true),
+        map(0x2A, MINECRAFT_1_19_3, true),
+        map(0x2E, MINECRAFT_1_19_4, true),
+        map(0x2F, MINECRAFT_1_20_2, true),
+        map(0x31, MINECRAFT_1_20_5, true));
       clientbound.register(SpawnEntityPacket.class, SpawnEntityPacket::new,
         map(0x0E, MINECRAFT_1_7_2, true),
         map(0x00, MINECRAFT_1_9, true),
@@ -320,19 +320,19 @@ public enum FallbackPacketRegistry {
         map(0x5A, MINECRAFT_1_20_3, true),
         map(0x5C, MINECRAFT_1_20_5, true));
       clientbound.register(SystemChatPacket.class, SystemChatPacket::new,
-        map(0x02, MINECRAFT_1_7_2, false),
-        map(0x0F, MINECRAFT_1_9, false),
-        map(0x0E, MINECRAFT_1_13, false),
-        map(0x0F, MINECRAFT_1_15, false),
-        map(0x0E, MINECRAFT_1_16, false),
-        map(0x0F, MINECRAFT_1_17, false),
-        map(0x5F, MINECRAFT_1_19, false),
-        map(0x62, MINECRAFT_1_19_1, false),
-        map(0x60, MINECRAFT_1_19_3, false),
-        map(0x64, MINECRAFT_1_19_4, false),
-        map(0x67, MINECRAFT_1_20_2, false),
-        map(0x69, MINECRAFT_1_20_3, false),
-        map(0x6C, MINECRAFT_1_20_5, false));
+        map(0x02, MINECRAFT_1_7_2, true),
+        map(0x0F, MINECRAFT_1_9, true),
+        map(0x0E, MINECRAFT_1_13, true),
+        map(0x0F, MINECRAFT_1_15, true),
+        map(0x0E, MINECRAFT_1_16, true),
+        map(0x0F, MINECRAFT_1_17, true),
+        map(0x5F, MINECRAFT_1_19, true),
+        map(0x62, MINECRAFT_1_19_1, true),
+        map(0x60, MINECRAFT_1_19_3, true),
+        map(0x64, MINECRAFT_1_19_4, true),
+        map(0x67, MINECRAFT_1_20_2, true),
+        map(0x69, MINECRAFT_1_20_3, true),
+        map(0x6C, MINECRAFT_1_20_5, true));
       clientbound.register(GameEventPacket.class, GameEventPacket::new,
         map(0x20, MINECRAFT_1_20_3, true),
         map(0x22, MINECRAFT_1_20_5, true));
@@ -636,7 +636,7 @@ public enum FallbackPacketRegistry {
         final PacketMapping next = (i + 1 < mappings.length) ? mappings[i + 1] : current;
 
         final ProtocolVersion from = current.protocolVersion;
-        final ProtocolVersion to = getProtocolVersion(current, next);
+        final ProtocolVersion to = current == next ? LATEST_VERSION : next.protocolVersion;
 
         for (final ProtocolVersion protocol : EnumSet.range(from, to)) {
           if (protocol == to && next != current) {
@@ -645,7 +645,7 @@ public enum FallbackPacketRegistry {
 
           final ProtocolRegistry registry = versions.get(protocol);
           if (registry == null) {
-            throw new IllegalArgumentException("Unknown protocol version " + from);
+            throw new IllegalArgumentException("Unknown protocol version " + protocol);
           }
 
           if (registry.packetIdToSupplier.containsKey(current.id)) {
@@ -666,12 +666,6 @@ public enum FallbackPacketRegistry {
         }
       }
     }
-
-    @NotNull
-    private static ProtocolVersion getProtocolVersion(final @NotNull PacketMapping current,
-                                                      final @NotNull PacketMapping next) {
-      return current == next ? LATEST_VERSION : next.protocolVersion;
-    }
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -682,20 +676,16 @@ public enum FallbackPacketRegistry {
     private final Map<Class<? extends FallbackPacket>, Integer> packetClassToId =
       new HashMap<>(16, 0.5f);
 
-    public FallbackPacket createPacket(final int id) {
-      final Supplier<? extends FallbackPacket> supplier = packetIdToSupplier.get(id);
-
-      if (supplier == null) {
-        return null;
-      }
-      return supplier.get();
+    public FallbackPacket createPacket(final int packetId) {
+      final var supplier = packetIdToSupplier.get(packetId);
+      return supplier == null ? null : supplier.get();
     }
 
     public int getPacketId(final @NotNull FallbackPacket packet) {
       final int id = packetClassToId.getOrDefault(packet.getClass(), Integer.MIN_VALUE);
 
       if (id == Integer.MIN_VALUE) {
-        throw new IllegalArgumentException("Could not find packet");
+        throw new IllegalArgumentException("Could not find packet ID for " + packet);
       }
       return id;
     }
