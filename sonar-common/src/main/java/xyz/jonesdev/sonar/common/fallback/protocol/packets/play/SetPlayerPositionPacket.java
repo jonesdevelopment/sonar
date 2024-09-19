@@ -46,7 +46,8 @@ public final class SetPlayerPositionPacket implements FallbackPacket {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
     if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-      y = byteBuf.readDouble(); // Account 1.7 bounding box
+      // 1.7.2-1.7.10 send the minimum bounding box Y coordinate
+      byteBuf.readDouble();
     }
     z = byteBuf.readDouble();
     onGround = byteBuf.readBoolean();

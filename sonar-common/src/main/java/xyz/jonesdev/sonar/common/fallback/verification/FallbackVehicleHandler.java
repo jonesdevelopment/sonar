@@ -24,7 +24,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
@@ -58,20 +57,20 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   }
 
   // We can abuse the entity remove mechanic and check for position packets when the entity dies
-  private void handleMovement(double y, final boolean onGround) {
+  private void handleMovement(final double y, final boolean onGround) {
     // The player cannot be on the ground if the Y position is less than 0
     checkState(!onGround || !inVoid || waitingRemoveMinecart, "invalid ground state: " + y);
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-      y -= 1.62f; // Account for 1.7 bounding box
-    }
     // Check the Y position of the player
     final double minimumY = inVoid ? IN_VOID_Y_POSITION : IN_AIR_Y_POSITION;
     checkState(y <= minimumY, "illegal y position: " + y + "/" + minimumY);
-    // Mark this check as successful if the player sent a few position packets
-    if (positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
-      if (user.isGeyser() || inMinecart || inVoid) {
+
+    if (!waitingRemoveMinecart && !waitingSpawnMinecart
+      && positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
+      if (user.isGeyser() || inVoid) {
+        // Mark this check as successful if the player sent a few position packets
         markSuccess();
-      } else {
+      } else if (!inMinecart) {
+        // Continue checking the player by using Minecarts
         spawnMinecart();
       }
     }

@@ -106,14 +106,14 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     if (packet instanceof SetPlayerPositionRotationPacket) {
       // Make sure the player has teleported before checking for position packets
       if (teleported) {
-        final SetPlayerPositionRotationPacket positionLook = (SetPlayerPositionRotationPacket) packet;
-        handleMovement(positionLook.getX(), positionLook.getY(), positionLook.getZ(), positionLook.isOnGround());
+        final SetPlayerPositionRotationPacket position = (SetPlayerPositionRotationPacket) packet;
+        handleMovement(position.getX(), position.getY(), position.getZ(), position.isOnGround(), true);
       }
     } else if (packet instanceof SetPlayerPositionPacket) {
       // Make sure the player has teleported before checking for position packets
       if (teleported) {
         final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
-        handleMovement(position.getX(), position.getY(), position.getZ(), position.isOnGround());
+        handleMovement(position.getX(), position.getY(), position.getZ(), position.isOnGround(), false);
       }
     } else if (packet instanceof ConfirmTeleportationPacket) {
       final ConfirmTeleportationPacket teleportConfirm = (ConfirmTeleportationPacket) packet;
@@ -139,13 +139,20 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     }
   }
 
-  private void handleMovement(final double x, final double y, final double z, final boolean isOnGround) {
+  private void handleMovement(final double x, final double y, final double z,
+                              final boolean onGround, final boolean rotated) {
     if (!checkMovement) {
       // No need to continue checking if the gravity and collision checks are disabled
       if (!enableGravityCheck && !enableCollisionsCheck) {
         markSuccess();
         return;
       }
+
+      // Check if the packet has characteristics of a packet after a teleport
+      checkState(rotated, "illegal movement packet order");
+      checkState(!onGround, "illegal ground state on teleport");
+      checkState(x == SPAWN_X_POSITION, "invalid x: " + x);
+      checkState(z == SPAWN_Z_POSITION, "invalid z: " + z);
 
       // Synchronize the Y coordinate
       this.y = dynamicSpawnYPosition;
@@ -161,8 +168,8 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
 
     // Log/debug position if enabled in the configuration
     if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-      Sonar.get().getLogger().info("{}: {}/{}/{} ly={}, dy={}, h={}, g={}",
-        user.getUsername(), x, y, z, lastY, deltaY, blockHeight, isOnGround);
+      Sonar.get().getLogger().info("{}: {}/{}/{} ly={}, dy={}, h={}, g={}, r={}",
+        user.getUsername(), x, y, z, lastY, deltaY, blockHeight, onGround, rotated);
     }
 
     // Ensure that the player's Y coordinate is above the collision platform
@@ -174,10 +181,11 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     checkState(Math.abs(Math.abs(x) - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "illegal x offset: " + x);
     checkState(Math.abs(Math.abs(z) - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "illegal z offset: " + z);
 
-    if (!isOnGround) {
+    if (!onGround) {
       // The deltaY is 0 whenever the player sends their first position packet.
       // We have to account for this or the player will falsely fail the verification.
       if (deltaY == 0) {
+        checkState(rotated, "illegal movement packet order: " + deltaY);
         checkState(movementTick == 0, "illegal y motion: " + movementTick);
         // 1.7 clients immediately start falling after this packet
         if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
@@ -202,13 +210,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
 
         // Check if the difference between the predicted and actual motion is too large
         if (difference > 1e-7) {
-          // Do not throw an exception if the user configured to display the CAPTCHA instead
-          if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-            user.setForceCaptcha(true);
-            markSuccess();
-            return;
-          }
-          fail("incorrect gravity: " + predicted + "/ " + deltaY + "/" + y);
+          failOrShowCaptcha("incorrect gravity: " + predicted + "/ " + deltaY + "/" + y);
         }
 
         // The player is obeying gravity, go on to the next stage if the collision check is disabled.
@@ -218,34 +220,27 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       }
     } else if (enableCollisionsCheck) {
       // Make sure the player has actually moved before reaching the platform
-      if (enableGravityCheck && movementTick < maxMovementTick) {
-        // Do not throw an exception if the user configured to display the CAPTCHA instead
-        if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-          user.setForceCaptcha(true);
-          markSuccess();
-          return;
-        }
-        fail("illegal collision tick: " + movementTick + "/" + blockHeight);
+      if (enableGravityCheck && ++movementTick < maxMovementTick) {
+        failOrShowCaptcha("illegal collision tick: " + movementTick + "/" + blockHeight);
       }
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-      double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockHeight) - y;
-      // 1.7 sends the head position instead of the AABB minY
-      // This little hack accounts for the offset of approximately 1.62
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-        collisionOffsetY += 1.62f;
-      }
+      final double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockHeight) - y;
       // Make sure the player is actually colliding with the blocks and not only spoofing ground
-      if (collisionOffsetY < -3e-2) {
-        // Do not throw an exception if the user configured to display the CAPTCHA instead
-        if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-          user.setForceCaptcha(true);
-          markSuccess();
-          return;
-        }
-        fail("illegal collision: " + collisionOffsetY + "/" + y + "/" + movementTick + "/" + blockHeight);
+      if (collisionOffsetY != 0) {
+        failOrShowCaptcha("illegal collision: " + collisionOffsetY + "/" + y + "/" + blockHeight);
       }
       // The player has collided with the blocks, go on to the next stage
       markSuccess();
     }
+  }
+
+  private void failOrShowCaptcha(final String debug) {
+    // Do not throw an exception if the user configured to display the CAPTCHA instead
+    if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+      user.setForceCaptcha(true);
+      markSuccess();
+      return;
+    }
+    fail(debug);
   }
 }
