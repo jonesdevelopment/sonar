@@ -63,11 +63,14 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     // Check the Y position of the player
     final double minimumY = inVoid ? IN_VOID_Y_POSITION : IN_AIR_Y_POSITION;
     checkState(y <= minimumY, "illegal y position: " + y + "/" + minimumY);
-    // Mark this check as successful if the player sent a few position packets
-    if (positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
+
+    if (!waitingRemoveMinecart && !waitingSpawnMinecart
+      && positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
       if (user.isGeyser() || inVoid) {
+        // Mark this check as successful if the player sent a few position packets
         markSuccess();
-      } else if (!waitingSpawnMinecart && !inMinecart) {
+      } else if (!inMinecart) {
+        // Continue checking the player by using Minecarts
         spawnMinecart();
       }
     }

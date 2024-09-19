@@ -41,6 +41,8 @@ public final class SpawnEntityPacket implements FallbackPacket {
   private int entityId;
   private EntityType entityType;
   private double x, y, z;
+  private int data;
+  private double velocityX, velocityY, velocityZ;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
@@ -73,15 +75,15 @@ public final class SpawnEntityPacket implements FallbackPacket {
 
     if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
       byteBuf.writeByte(0); // head yaw
-      writeVarInt(byteBuf, 0); // data
+      writeVarInt(byteBuf, data); // data
     } else {
-      byteBuf.writeInt(0); // data
+      byteBuf.writeInt(data); // data
     }
 
-    if (v1_9orHigher) {
-      byteBuf.writeShort(0); // velocity X
-      byteBuf.writeShort(0); // velocity Y
-      byteBuf.writeShort(0); // velocity Z
+    if (v1_9orHigher || data > 0) {
+      byteBuf.writeShort((int) (velocityX * 8000D));
+      byteBuf.writeShort((int) (velocityY * 8000D));
+      byteBuf.writeShort((int) (velocityZ * 8000D));
     }
   }
 
