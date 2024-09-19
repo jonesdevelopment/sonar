@@ -210,13 +210,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
 
         // Check if the difference between the predicted and actual motion is too large
         if (difference > 1e-7) {
-          // Do not throw an exception if the user configured to display the CAPTCHA instead
-          if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-            user.setForceCaptcha(true);
-            markSuccess();
-            return;
-          }
-          fail("incorrect gravity: " + predicted + "/ " + deltaY + "/" + y);
+          failOrShowCaptcha("incorrect gravity: " + predicted + "/ " + deltaY + "/" + y);
         }
 
         // The player is obeying gravity, go on to the next stage if the collision check is disabled.
@@ -226,29 +220,27 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       }
     } else if (enableCollisionsCheck) {
       // Make sure the player has actually moved before reaching the platform
-      if (enableGravityCheck && movementTick < maxMovementTick) {
-        // Do not throw an exception if the user configured to display the CAPTCHA instead
-        if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-          user.setForceCaptcha(true);
-          markSuccess();
-          return;
-        }
-        fail("illegal collision tick: " + movementTick + "/" + blockHeight);
+      if (enableGravityCheck && ++movementTick < maxMovementTick) {
+        failOrShowCaptcha("illegal collision tick: " + movementTick + "/" + blockHeight);
       }
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-      double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockHeight) - y;
+      final double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockHeight) - y;
       // Make sure the player is actually colliding with the blocks and not only spoofing ground
-      if (collisionOffsetY < -3e-2) {
-        // Do not throw an exception if the user configured to display the CAPTCHA instead
-        if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-          user.setForceCaptcha(true);
-          markSuccess();
-          return;
-        }
-        fail("illegal collision: " + collisionOffsetY + "/" + y + "/" + movementTick + "/" + blockHeight);
+      if (collisionOffsetY != 0) {
+        failOrShowCaptcha("illegal collision: " + collisionOffsetY + "/" + y + "/" + blockHeight);
       }
       // The player has collided with the blocks, go on to the next stage
       markSuccess();
     }
+  }
+
+  private void failOrShowCaptcha(final String debug) {
+    // Do not throw an exception if the user configured to display the CAPTCHA instead
+    if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+      user.setForceCaptcha(true);
+      markSuccess();
+      return;
+    }
+    fail(debug);
   }
 }
