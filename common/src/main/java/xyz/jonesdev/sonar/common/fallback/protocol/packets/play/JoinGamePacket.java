@@ -37,12 +37,17 @@ public final class JoinGamePacket implements FallbackPacket {
   private int entityId;
   private int gamemode;
   private long partialHashedSeed;
-  private boolean isHardcore;
   private int viewDistance;
+  private int simulationDistance;
+  private boolean isHardcore;
   private boolean reducedDebugInfo;
   private boolean showRespawnScreen;
+  private boolean isDebug;
+  private boolean isFlat;
   private boolean limitedCrafting;
+  private boolean secureProfile;
   private String[] levelNames;
+  private String worldType;
   private String levelType;
 
   @Override
@@ -54,7 +59,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeByte(0); // difficulty
       byteBuf.writeByte(0); // max players
-      writeString(byteBuf, "flat"); // level type
+      writeString(byteBuf, levelType);
       return;
     }
 
@@ -63,7 +68,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeByte(0); // difficulty
       byteBuf.writeByte(0); // max players
-      writeString(byteBuf, "flat"); // level type
+      writeString(byteBuf, levelType);
       byteBuf.writeBoolean(reducedDebugInfo);
       return;
     }
@@ -73,7 +78,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeInt(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeByte(0); // difficulty
       byteBuf.writeByte(0); // max players
-      writeString(byteBuf, "flat"); // level type
+      writeString(byteBuf, levelType);
       byteBuf.writeBoolean(reducedDebugInfo);
       return;
     }
@@ -82,7 +87,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(gamemode);
       byteBuf.writeInt(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeByte(0); // max players
-      writeString(byteBuf, "flat"); // level type
+      writeString(byteBuf, levelType);
       writeVarInt(byteBuf, viewDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       return;
@@ -93,7 +98,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeInt(DEFAULT_DIMENSION_1_16_2.getId());
       byteBuf.writeLong(partialHashedSeed);
       byteBuf.writeByte(0); // max players
-      writeString(byteBuf, "flat"); // level type
+      writeString(byteBuf, levelType);
       writeVarInt(byteBuf, viewDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
@@ -112,8 +117,8 @@ public final class JoinGamePacket implements FallbackPacket {
       writeVarInt(byteBuf, viewDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(false); // debug type
-      byteBuf.writeBoolean(false); // flat
+      byteBuf.writeBoolean(isDebug);
+      byteBuf.writeBoolean(isFlat);
       return;
     }
 
@@ -130,8 +135,8 @@ public final class JoinGamePacket implements FallbackPacket {
       writeVarInt(byteBuf, viewDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(false); // debug type
-      byteBuf.writeBoolean(false); // flat
+      byteBuf.writeBoolean(isDebug);
+      byteBuf.writeBoolean(isFlat);
       return;
     }
 
@@ -151,11 +156,11 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeLong(partialHashedSeed);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
-      writeVarInt(byteBuf, viewDistance); // simulation distance
+      writeVarInt(byteBuf, simulationDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(false); // debug type
-      byteBuf.writeBoolean(false); // flat
+      byteBuf.writeBoolean(isDebug);
+      byteBuf.writeBoolean(isFlat);
       return;
     }
 
@@ -173,16 +178,16 @@ public final class JoinGamePacket implements FallbackPacket {
       } else {
         writeCompoundTag(byteBuf, CODEC_1_19);
       }
-      writeString(byteBuf, levelType); // world type
+      writeString(byteBuf, worldType);
       writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
-      writeVarInt(byteBuf, viewDistance); // simulation distance
+      writeVarInt(byteBuf, simulationDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(false); // debug type
-      byteBuf.writeBoolean(false); // flat
+      byteBuf.writeBoolean(isDebug);
+      byteBuf.writeBoolean(isFlat);
       byteBuf.writeBoolean(false); // no last death location
       return;
     }
@@ -193,16 +198,16 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
       writeCompoundTag(byteBuf, CODEC_1_20);
-      writeString(byteBuf, levelType); // world type
+      writeString(byteBuf, worldType);
       writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
-      writeVarInt(byteBuf, viewDistance); // simulation distance
+      writeVarInt(byteBuf, simulationDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(false); // debug type
-      byteBuf.writeBoolean(false); // flat
+      byteBuf.writeBoolean(isDebug);
+      byteBuf.writeBoolean(isFlat);
       byteBuf.writeBoolean(false); // no last death location
       writeVarInt(byteBuf, 0);
       return;
@@ -213,17 +218,17 @@ public final class JoinGamePacket implements FallbackPacket {
       writeStringArray(byteBuf, levelNames);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
-      writeVarInt(byteBuf, viewDistance); // simulation distance
+      writeVarInt(byteBuf, simulationDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(false); // limited crafting
-      writeString(byteBuf, levelType);
+      byteBuf.writeBoolean(limitedCrafting);
+      writeString(byteBuf, worldType);
       writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
-      byteBuf.writeBoolean(false); // debug type
-      byteBuf.writeBoolean(false); // flat
+      byteBuf.writeBoolean(isDebug);
+      byteBuf.writeBoolean(isFlat);
       byteBuf.writeBoolean(false); // no last death location
       writeVarInt(byteBuf, 0);
       return;
@@ -234,21 +239,21 @@ public final class JoinGamePacket implements FallbackPacket {
       writeStringArray(byteBuf, levelNames);
       writeVarInt(byteBuf, 0); // max players
       writeVarInt(byteBuf, viewDistance);
-      writeVarInt(byteBuf, viewDistance); // simulation distance
+      writeVarInt(byteBuf, simulationDistance);
       byteBuf.writeBoolean(reducedDebugInfo);
       byteBuf.writeBoolean(showRespawnScreen);
-      byteBuf.writeBoolean(false); // limited crafting
+      byteBuf.writeBoolean(limitedCrafting);
       // It depends on the dimension data we send in RegistryData. If we only send one dimension. It should be 0.
       writeVarInt(byteBuf, 0);
       writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
-      byteBuf.writeBoolean(false); // debug type
-      byteBuf.writeBoolean(false); // flat
+      byteBuf.writeBoolean(isDebug);
+      byteBuf.writeBoolean(isFlat);
       byteBuf.writeBoolean(false); // no last death location
       writeVarInt(byteBuf, 0); // pearl cooldown
-      byteBuf.writeBoolean(false); // secure profile
+      byteBuf.writeBoolean(secureProfile);
     }
   }
 

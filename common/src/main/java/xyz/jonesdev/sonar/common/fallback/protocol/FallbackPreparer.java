@@ -117,10 +117,10 @@ public class FallbackPreparer {
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
-      Sonar.get().getConfig().getVerification().getGamemode().getId(),
-      RANDOM.nextLong(), false, 0,
-      true, false, false,
-      new String[]{"minecraft:overworld"}, "minecraft:overworld"));
+      Sonar.get().getConfig().getVerification().getGamemode().getId(), RANDOM.nextLong(),
+      0, 0, false, true, false,
+      false, false, false, true,
+      new String[]{"minecraft:overworld"}, "minecraft:overworld", "flat"));
 
     // Prepare the gravity check
     maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
