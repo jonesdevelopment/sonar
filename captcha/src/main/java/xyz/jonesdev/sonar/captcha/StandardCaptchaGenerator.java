@@ -74,7 +74,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private @Nullable BufferedImage backgroundImage;
 
   @Override
-  public @NotNull BufferedImage createImage(final char[] answer) {
+  public @NotNull BufferedImage createImage(final char @NotNull [] answer) {
     final BufferedImage image = createBackgroundImage();
     final Graphics2D graphics = image.createGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

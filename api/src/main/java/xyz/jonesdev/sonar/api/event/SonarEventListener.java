@@ -17,13 +17,13 @@
 
 package xyz.jonesdev.sonar.api.event;
 
+import org.jetbrains.annotations.NotNull;
+
 @FunctionalInterface
 public interface SonarEventListener {
 
   /**
-   * Handles the publishing of an event
-   *
-   * @param event [Cancellable] Sonar event
+   * Handles the publishing of an event through Sonar's API
    */
-  void handle(final SonarEvent event);
+  void handle(final @NotNull SonarEvent event);
 }

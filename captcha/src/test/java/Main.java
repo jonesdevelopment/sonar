@@ -28,7 +28,7 @@ import java.util.Random;
 public class Main {
   public void main(final String... args) throws IOException {
     final Random random = new Random();
-    final StandardCaptchaGenerator standardCaptchaGenerator = new StandardCaptchaGenerator(128, 128, null);
+    final StandardCaptchaGenerator standardCaptchaGenerator = new StandardCaptchaGenerator(null);
 
     final long start = System.currentTimeMillis();
     final char[] dictionary = {'a', 'b', 'c', 'd', 'e', 'f'/*, 'g'*/, 'h'/*, 'i'*/, 'j',

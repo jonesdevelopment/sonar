@@ -17,9 +17,15 @@
 
 package xyz.jonesdev.sonar.api.fallback.captcha;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.image.BufferedImage;
 
 @FunctionalInterface
 public interface CaptchaGenerator {
-  BufferedImage createImage(final char[] answer);
+
+  /**
+   * Generates a {@link java.awt.image.BufferedImage} that shows the answer to the CAPTCHA
+   */
+  @NotNull BufferedImage createImage(final char @NotNull [] answer);
 }

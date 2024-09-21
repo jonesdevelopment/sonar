@@ -9,5 +9,11 @@ dependencies {
   compileOnly(rootProject.libs.annotations)
 }
 
+tasks {
+  shadowJar {
+    archiveFileName = "sonar-api-${rootProject.version}.jar"
+  }
+}
+
 java.sourceCompatibility = JavaVersion.VERSION_11
 java.targetCompatibility = JavaVersion.VERSION_11

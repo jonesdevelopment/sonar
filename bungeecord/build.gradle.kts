@@ -26,6 +26,8 @@ dependencies {
 tasks {
   shadowJar {
     relocate("net.kyori", "xyz.jonesdev.sonar.libs.kyori")
+
+    archiveFileName = "Sonar-Bungee.jar" // Hardcode a shortened version of the name
   }
 }
 
