@@ -100,7 +100,11 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
       () -> getConfig().getDatabase().getType().getDisplayName()));
 
     // Register Sonar command
-    getPlugin().getServer().getCommandManager().register("sonar", new VelocitySonarCommand());
+    getPlugin().getServer().getCommandManager().register(
+      getPlugin().getServer().getCommandManager().metaBuilder("sonar")
+        .plugin(getPlugin())
+        .build(),
+      new VelocitySonarCommand());
 
     // Make sure to inject into the server's connection handler
     FallbackVelocityInjector.inject(getPlugin().getServer());
