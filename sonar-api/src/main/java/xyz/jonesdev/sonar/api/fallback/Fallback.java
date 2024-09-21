@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
@@ -37,21 +36,15 @@ import java.util.concurrent.ConcurrentMap;
 public final class Fallback {
   public static final Fallback INSTANCE = new Fallback();
 
-  // Map of all players connected to the server in general
   private final ConcurrentMap<InetAddress, Integer> online = new ConcurrentHashMap<>(128);
-  // Map of all connected IP addresses (used for fast checking)
-  // TODO: Is there a way to improve this?
-  //  (E.g. no map needed without concurrency issues)
-  private final ConcurrentMap<InetAddress, Byte> connected = new ConcurrentHashMap<>(256);
-  // Cache of all blacklisted IP addresses to ensure each entry can expire after the given time
+  private final ConcurrentMap<InetAddress, Boolean> connected = new ConcurrentHashMap<>(256);
+  private final FallbackLoginQueue queue = new FallbackLoginQueue();
   @Setter
   private Cache<String, Integer> blacklist;
   @Setter
   private long blacklistTime;
   @Setter
   private CaptchaGenerator captchaGenerator;
-
-  private final @NotNull FallbackQueue queue = new FallbackQueue();
   @Setter
   private Ratelimiter<InetAddress> ratelimiter;
 

@@ -96,10 +96,9 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
         // Let our verification handler process the packet
         if (listener != null) {
           listener.handle(packet);
+          // Make sure to let the timeout handler know about this packet
+          ctx.fireChannelRead(packet);
         }
-
-        // Fire channel read to avoid timeout
-        ctx.fireChannelRead(packet);
       } finally {
         // Release the ByteBuf to avoid memory leaks
         byteBuf.release();

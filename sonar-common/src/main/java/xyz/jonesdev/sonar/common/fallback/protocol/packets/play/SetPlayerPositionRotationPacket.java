@@ -42,7 +42,8 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     byteBuf.writeDouble(x);
-    byteBuf.writeDouble(y);
+    // Account for the minimum Y bounding box issue on 1.7.2-1.7.10
+    byteBuf.writeDouble(protocolVersion.compareTo(MINECRAFT_1_8) >= 0 ? y : y + 1.62f);
     byteBuf.writeDouble(z);
     byteBuf.writeFloat(yaw);
     byteBuf.writeFloat(pitch);
@@ -63,7 +64,8 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
     if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
-      y = byteBuf.readDouble(); // Account for 1.7 bounding box
+      // 1.7.2-1.7.10 send the minimum bounding box Y coordinate
+      byteBuf.readDouble();
     }
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();
