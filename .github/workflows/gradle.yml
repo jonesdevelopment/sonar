@@ -40,5 +40,8 @@ jobs:
           # Artifact name
           name: Sonar
           # A file, directory or wildcard pattern that describes what to upload
-          path: sonar-*/build/libs/Sonar-*.jar
+          path: |
+            sonar-bukkit/build/libs/Sonar-Bukkit.jar
+            sonar-bungee/build/libs/Sonar-Bungee.jar
+            sonar-velocity/build/libs/Sonar-Velocity.jar
           if-no-files-found: error
