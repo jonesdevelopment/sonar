@@ -20,7 +20,7 @@ package xyz.jonesdev.sonar.common.service;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.common.statistics.BandwidthStatistics;
+import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,7 +44,7 @@ public final class SonarServiceManager {
   public void start() {
     VERBOSE.scheduleAtFixedRate(() -> {
       // Make sure to clean up the cached statistics since we don't want to display wrong values
-      Sonar.get().getStatistics().cleanUpCache();
+      GlobalSonarStatistics.cleanUpCaches();
       Sonar.get().getFallback().getBlacklist().cleanUp();
       // Update the attack tracker
       Sonar.get().getAttackTracker().checkIfUnderAttack();
@@ -55,7 +55,7 @@ public final class SonarServiceManager {
     FALLBACK_QUEUE.scheduleAtFixedRate(() -> Sonar.get().getFallback().getQueue().poll(),
       1L, 1L, TimeUnit.SECONDS);
 
-    STATISTICS.scheduleAtFixedRate(BandwidthStatistics::reset,
+    STATISTICS.scheduleAtFixedRate(GlobalSonarStatistics::hitEverySecond,
       0L, 1L, TimeUnit.SECONDS);
   }
 

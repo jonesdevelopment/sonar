@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
@@ -32,7 +32,10 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacke
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
@@ -603,30 +606,28 @@ public enum FallbackPacketRegistry {
     return (direction == Direction.SERVERBOUND ? serverbound : clientbound).getProtocolRegistry(version);
   }
 
-  public static class PacketRegistry {
-    private final Map<ProtocolVersion, ProtocolRegistry> versions;
+  public static final class PacketRegistry {
+    private final Map<ProtocolVersion, ProtocolRegistry> registries = new EnumMap<>(ProtocolVersion.class);
 
     PacketRegistry() {
-      final Map<ProtocolVersion, ProtocolRegistry> mutableVersions = new EnumMap<>(ProtocolVersion.class);
-      for (final ProtocolVersion version : ProtocolVersion.values()) {
-        if (!version.isUnknown()) {
-          mutableVersions.put(version, new ProtocolRegistry(version));
+      for (final ProtocolVersion protocolVersion : ProtocolVersion.values()) {
+        if (!protocolVersion.isUnknown()) {
+          registries.put(protocolVersion, new ProtocolRegistry(protocolVersion));
         }
       }
-      this.versions = Collections.unmodifiableMap(mutableVersions);
     }
 
-    ProtocolRegistry getProtocolRegistry(final ProtocolVersion version) {
-      final ProtocolRegistry registry = versions.get(version);
+    private @NotNull ProtocolRegistry getProtocolRegistry(final @NotNull ProtocolVersion protocolVersion) {
+      final ProtocolRegistry registry = registries.get(protocolVersion);
       if (registry == null) {
-        throw new IllegalArgumentException("Could not find data for protocol version " + version);
+        throw new IllegalArgumentException("Could not find data for protocol version " + protocolVersion);
       }
       return registry;
     }
 
-    <P extends FallbackPacket> void register(final Class<P> clazz,
-                                             final Supplier<P> packetSupplier,
-                                             final PacketMapping @NotNull ... mappings) {
+    private <T extends FallbackPacket> void register(final @NotNull Class<T> clazz,
+                                                     final @NotNull Supplier<T> supplier,
+                                                     final PacketMapping @NotNull ... mappings) {
       if (mappings.length == 0) {
         throw new IllegalArgumentException("At least one mapping must be provided.");
       }
@@ -638,19 +639,19 @@ public enum FallbackPacketRegistry {
         final ProtocolVersion from = current.protocolVersion;
         final ProtocolVersion to = current == next ? LATEST_VERSION : next.protocolVersion;
 
-        for (final ProtocolVersion protocol : EnumSet.range(from, to)) {
-          if (protocol == to && next != current) {
+        for (final ProtocolVersion protocolVersion : EnumSet.range(from, to)) {
+          if (protocolVersion == to && next != current) {
             break;
           }
 
-          final ProtocolRegistry registry = versions.get(protocol);
+          final ProtocolRegistry registry = registries.get(protocolVersion);
           if (registry == null) {
-            throw new IllegalArgumentException("Unknown protocol version " + protocol);
+            throw new IllegalArgumentException("Unknown protocol version " + protocolVersion);
           }
 
-          if (registry.packetIdToSupplier.containsKey(current.id)) {
+          if (registry.packetIdToSupplier.containsKey(current.packetId)) {
             throw new IllegalArgumentException("Can not register class " + clazz.getSimpleName()
-              + " with id " + current.id + " for " + registry.protocolVersion
+              + " with id " + current.packetId + " for " + registry.protocolVersion
               + " because another packet is already registered");
           }
 
@@ -660,9 +661,9 @@ public enum FallbackPacketRegistry {
           }
 
           if (!current.encodeOnly) {
-            registry.packetIdToSupplier.put(current.id, packetSupplier);
+            registry.packetIdToSupplier.put(current.packetId, supplier);
           }
-          registry.packetClassToId.put(clazz, current.id);
+          registry.packetClassToId.put(clazz, current.packetId);
         }
       }
     }
@@ -681,34 +682,33 @@ public enum FallbackPacketRegistry {
       return supplier == null ? null : supplier.get();
     }
 
-    public int getPacketId(final @NotNull FallbackPacket packet) {
-      final int id = packetClassToId.getOrDefault(packet.getClass(), Integer.MIN_VALUE);
-
-      if (id == Integer.MIN_VALUE) {
-        throw new IllegalArgumentException("Could not find packet ID for " + packet);
+    public int getPacketId(final @NotNull Class<? extends FallbackPacket> clazz) {
+      final int packetId = packetClassToId.getOrDefault(clazz, -1);
+      if (packetId == -1) {
+        throw new IllegalArgumentException("Could not find packet ID for " + clazz.getSimpleName());
       }
-      return id;
+      return packetId;
     }
   }
 
-  @Data
+  @ToString
   public static final class PacketMapping {
-    private final int id;
+    private final int packetId;
     private final ProtocolVersion protocolVersion;
     private final boolean encodeOnly;
 
-    PacketMapping(final int id,
+    PacketMapping(final int packetId,
                   final ProtocolVersion protocolVersion,
                   final boolean encodeOnly) {
-      this.id = id;
+      this.packetId = packetId;
       this.protocolVersion = protocolVersion;
       this.encodeOnly = encodeOnly;
     }
   }
 
-  private static @NotNull PacketMapping map(final int id,
+  private static @NotNull PacketMapping map(final int packetId,
                                             final ProtocolVersion protocolVersion,
                                             final boolean encodeOnly) {
-    return new PacketMapping(id, protocolVersion, encodeOnly);
+    return new PacketMapping(packetId, protocolVersion, encodeOnly);
   }
 }

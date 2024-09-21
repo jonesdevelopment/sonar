@@ -50,7 +50,7 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
                         final ByteBuf out) throws Exception {
     final FallbackPacket originalPacket = packet instanceof FallbackPacketSnapshot
       ? ((FallbackPacketSnapshot) packet).getOriginalPacket() : packet;
-    final int packetId = protocolRegistry.getPacketId(originalPacket);
+    final int packetId = protocolRegistry.getPacketId(originalPacket.getClass());
     writeVarInt(out, packetId);
     packet.encode(out, protocolVersion);
   }

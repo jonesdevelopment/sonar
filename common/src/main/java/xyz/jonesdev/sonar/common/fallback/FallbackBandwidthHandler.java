@@ -25,9 +25,7 @@ import io.netty.channel.ChannelPromise;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-
-import static xyz.jonesdev.sonar.common.statistics.BandwidthStatistics.INCOMING;
-import static xyz.jonesdev.sonar.common.statistics.BandwidthStatistics.OUTGOING;
+import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 @ChannelHandler.Sharable
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -35,27 +33,22 @@ public final class FallbackBandwidthHandler extends ChannelDuplexHandler {
   public static final ChannelHandler INSTANCE = new FallbackBandwidthHandler();
 
   @Override
-  public void channelRead(final @NotNull ChannelHandlerContext ctx,
-                          final @NotNull Object msg) throws Exception {
-    // We can only get the size of a message if it's a ByteBuf
+  public void channelRead(final ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
     if (msg instanceof ByteBuf) {
       // Increment the incoming traffic by the number of readable bytes
-      INCOMING.increment(((ByteBuf) msg).readableBytes());
+      final int readableBytes = ((ByteBuf) msg).readableBytes();
+      GlobalSonarStatistics.perSecondIncomingTraffic += readableBytes;
     }
-    // Make sure to let the server handle the rest
     ctx.fireChannelRead(msg);
   }
 
   @Override
-  public void write(final @NotNull ChannelHandlerContext ctx,
-                    final @NotNull Object msg,
-                    final ChannelPromise promise) throws Exception {
-    // We can only get the size of a message if it's a ByteBuf
+  public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
     if (msg instanceof ByteBuf) {
       // Increment the outgoing traffic by the number of readable bytes
-      OUTGOING.increment(((ByteBuf) msg).readableBytes());
+      final int readableBytes = ((ByteBuf) msg).readableBytes();
+      GlobalSonarStatistics.perSecondOutgoingTraffic += readableBytes;
     }
-    // Make sure to let the server handle the rest
     ctx.write(msg, promise);
   }
 }

@@ -39,7 +39,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL_LEGACY;
 
-public class FallbackPreJoinHandler extends FallbackVerificationHandler {
+public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
   public FallbackPreJoinHandler(final @NotNull FallbackUser user) {
     super(user);
@@ -56,8 +56,7 @@ public class FallbackPreJoinHandler extends FallbackVerificationHandler {
     }
   }
 
-  protected boolean receivedClientInfo, receivedClientBrand;
-  private boolean acknowledgedLogin;
+  private boolean receivedClientInfo, receivedClientBrand, acknowledgedLogin;
   private int expectedKeepAliveId;
 
   /**
@@ -82,18 +81,18 @@ public class FallbackPreJoinHandler extends FallbackVerificationHandler {
     user.getChannel().flush();
   }
 
-  protected final void checkClientInformation() {
+  private void markSuccess() {
+    // Pass the player to the next verification handler
+    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
+    decoder.setListener(new FallbackGravityHandler(user, this));
+  }
+
+  void validateClientInformation() {
     checkState(receivedClientInfo, "didn't send client settings");
     // Don't check Geyser players for plugin messages as they don't have them
     if (!user.isGeyser()) {
       checkState(receivedClientBrand, "didn't send plugin message");
     }
-  }
-
-  private void markSuccess() {
-    // Pass the player to the next verification handler
-    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
-    decoder.setListener(new FallbackGravityHandler(user, this));
   }
 
   @Override
@@ -120,7 +119,7 @@ public class FallbackPreJoinHandler extends FallbackVerificationHandler {
       checkState(!acknowledgedLogin, "sent duplicate login ack");
       markAcknowledged();
     } else if (packet instanceof FinishConfigurationPacket) {
-      checkClientInformation();
+      validateClientInformation();
       // Update the encoder and decoder state because we're currently in the CONFIG state
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);
       markSuccess();
@@ -164,11 +163,9 @@ public class FallbackPreJoinHandler extends FallbackVerificationHandler {
   }
 
   private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
-    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
-    final var encoder = user.getPipeline().get(FallbackPacketEncoder.class);
     // Update the packet registry state in the encoder and decoder pipelines
-    decoder.updateRegistry(registry);
-    encoder.updateRegistry(registry);
+    user.getPipeline().get(FallbackPacketDecoder.class).updateRegistry(registry);
+    user.getPipeline().get(FallbackPacketEncoder.class).updateRegistry(registry);
   }
 
   private void synchronizeClientRegistry() {

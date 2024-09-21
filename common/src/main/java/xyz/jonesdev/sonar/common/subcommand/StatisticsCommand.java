@@ -26,7 +26,6 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
-import xyz.jonesdev.sonar.common.statistics.BandwidthStatistics;
 
 import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
 import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
@@ -109,10 +108,10 @@ public final class StatisticsCommand extends Subcommand {
       case "network": {
         placeholders = new TagResolver.Single[]{
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("incoming-traffic", BandwidthStatistics.INCOMING.getCachedSecond()),
-          Placeholder.unparsed("outgoing-traffic", BandwidthStatistics.OUTGOING.getCachedSecond()),
-          Placeholder.unparsed("incoming-traffic-ttl", BandwidthStatistics.INCOMING.getCachedTtl()),
-          Placeholder.unparsed("outgoing-traffic-ttl", BandwidthStatistics.OUTGOING.getCachedTtl())
+          Placeholder.unparsed("incoming-traffic", Sonar.get().getStatistics().getPerSecondIncomingBandwidthFormatted()),
+          Placeholder.unparsed("outgoing-traffic", Sonar.get().getStatistics().getPerSecondOutgoingBandwidthFormatted()),
+          Placeholder.unparsed("incoming-traffic-ttl", formatMemory(Sonar.get().getStatistics().getTotalIncomingBandwidth())),
+          Placeholder.unparsed("outgoing-traffic-ttl", formatMemory(Sonar.get().getStatistics().getTotalOutgoingBandwidth())),
         };
         break;
       }

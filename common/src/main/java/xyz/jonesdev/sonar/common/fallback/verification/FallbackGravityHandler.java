@@ -94,7 +94,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     teleported = false;
     // Exempt pre-1.20.2 since they've already passed that check in the configuration phase
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
-      preJoinHandler.checkClientInformation();
+      preJoinHandler.validateClientInformation();
     }
     // Send the player to the next verification handler
     final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);

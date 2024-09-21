@@ -19,8 +19,10 @@ package xyz.jonesdev.sonar.common.statistics;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler;
 import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 
 import java.time.Duration;
@@ -29,10 +31,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class GlobalSonarStatistics implements SonarStatistics {
   private static final Cache<Integer, Byte> LOGINS_PER_SECOND = Caffeine.newBuilder()
     .expireAfterWrite(Duration.ofSeconds(1))
+    .ticker(Ticker.systemTicker())
     .build();
 
   private static final Cache<Integer, Byte> CONNECTIONS_PER_SECOND = Caffeine.newBuilder()
     .expireAfterWrite(Duration.ofSeconds(1))
+    .ticker(Ticker.systemTicker())
     .build();
 
   private static final AtomicInteger ACTION_COUNTER = new AtomicInteger(Integer.MIN_VALUE);
@@ -58,14 +62,25 @@ public final class GlobalSonarStatistics implements SonarStatistics {
   public static int totalFailedVerifications;
   public static int totalAttemptedVerifications;
   public static long totalBlacklistedPlayers;
+  public static long totalIncomingTraffic;
+  public static long totalOutgoingTraffic;
+  public static long perSecondIncomingTraffic;
+  public static long perSecondOutgoingTraffic;
+  private static String perSecondIncomingTrafficFormatted;
+  private static String perSecondOutgoingTrafficFormatted;
 
-  /**
-   * Called every time the action bar updates to ensure fresh values
-   */
-  @Override
-  public void cleanUpCache() {
+  public static void cleanUpCaches() {
     LOGINS_PER_SECOND.cleanUp();
     CONNECTIONS_PER_SECOND.cleanUp();
+  }
+
+  public static void hitEverySecond() {
+    totalIncomingTraffic += perSecondIncomingTraffic;
+    totalOutgoingTraffic += perSecondOutgoingTraffic;
+    perSecondIncomingTrafficFormatted = SimpleProcessProfiler.formatMemory(perSecondIncomingTraffic);
+    perSecondOutgoingTrafficFormatted = SimpleProcessProfiler.formatMemory(perSecondOutgoingTraffic);
+    perSecondIncomingTraffic = 0L;
+    perSecondOutgoingTraffic = 0L;
   }
 
   @Override
@@ -80,42 +95,32 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @Override
   public long getCurrentIncomingBandwidth() {
-    return BandwidthStatistics.INCOMING.getCurr();
+    return perSecondIncomingTraffic;
   }
 
   @Override
   public long getCurrentOutgoingBandwidth() {
-    return BandwidthStatistics.OUTGOING.getCurr();
+    return perSecondOutgoingTraffic;
   }
 
   @Override
   public long getTotalIncomingBandwidth() {
-    return BandwidthStatistics.INCOMING.getTtl();
+    return totalIncomingTraffic;
   }
 
   @Override
   public long getTotalOutgoingBandwidth() {
-    return BandwidthStatistics.OUTGOING.getTtl();
+    return totalOutgoingTraffic;
   }
 
   @Override
-  public String getCurrentIncomingBandwidthFormatted() {
-    return BandwidthStatistics.INCOMING.getCachedSecond();
+  public String getPerSecondIncomingBandwidthFormatted() {
+    return perSecondIncomingTrafficFormatted;
   }
 
   @Override
-  public String getCurrentOutgoingBandwidthFormatted() {
-    return BandwidthStatistics.OUTGOING.getCachedSecond();
-  }
-
-  @Override
-  public String getTotalIncomingBandwidthFormatted() {
-    return BandwidthStatistics.INCOMING.getCachedTtl();
-  }
-
-  @Override
-  public String getTotalOutgoingBandwidthFormatted() {
-    return BandwidthStatistics.OUTGOING.getCachedTtl();
+  public String getPerSecondOutgoingBandwidthFormatted() {
+    return perSecondOutgoingTrafficFormatted;
   }
 
   @Override
