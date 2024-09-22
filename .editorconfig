@@ -7,7 +7,7 @@ indent_size = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[{*.java,*.kt}]
+[*.java]
 ij_java_wrap_long_lines = true
 
 [{*.md,*.yml}]
