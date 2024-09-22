@@ -98,13 +98,6 @@ public abstract class SonarBootstrap<T> implements Sonar {
   }
 
   public final void initialize() {
-    // Check if the branch is not the main branch to warn about unstable versions
-    if (!getVersion().getGitBranch().equals("main")) {
-      getLogger().warn("You are currently using an unofficial experimental branch.");
-      getLogger().warn("It is highly recommended to use the latest stable release of Sonar:");
-      getLogger().warn("https://github.com/jonesdevelopment/sonar/releases");
-    }
-
     getLogger().info("Successfully booted in {}s!", launchTimer);
     getLogger().info("Initializing shared components...");
 
