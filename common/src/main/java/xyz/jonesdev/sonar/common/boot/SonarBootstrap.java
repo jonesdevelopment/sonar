@@ -39,10 +39,9 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.ratelimit.CaffeineCacheRatelimiter;
 import xyz.jonesdev.sonar.common.fallback.ratelimit.NoopCacheRatelimiter;
-import xyz.jonesdev.sonar.common.service.SonarServiceManager;
+import xyz.jonesdev.sonar.common.service.ScheduledServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.subcommand.*;
-import xyz.jonesdev.sonar.common.update.UpdateChecker;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.io.File;
@@ -121,7 +120,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
       // Start threads
       getLogger().info("Starting all managed threads...");
-      SonarServiceManager.start();
+      ScheduledServiceManager.start();
 
       // Done
       getLogger().info("Done ({}s)!", launchTimer);
@@ -129,12 +128,6 @@ public abstract class SonarBootstrap<T> implements Sonar {
       // An error has occurred
       getLogger().error("An error has occurred while launching Sonar: {}", throwable);
       throwable.printStackTrace(System.err);
-      return; // Do not check for updates if the launch failed
-    }
-
-    // Check if a new version has been released if enabled in the configuration
-    if (Sonar.get().getConfig().getGeneralConfig().getBoolean("general.check-for-updates")) {
-      UpdateChecker.checkForUpdates();
     }
   }
 
@@ -190,7 +183,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
     // Initialize the shutdown process
     getLogger().info("Starting shutdown process...");
     // Interrupt threads
-    SonarServiceManager.stop();
+    ScheduledServiceManager.stop();
     // Close database connection if present
     if (verifiedPlayerController != null) {
       verifiedPlayerController.close();

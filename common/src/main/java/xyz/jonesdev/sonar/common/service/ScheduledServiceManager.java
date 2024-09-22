@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.service;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.update.UpdateChecker;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.util.concurrent.Executors;
@@ -27,10 +28,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
-public final class SonarServiceManager {
+public final class ScheduledServiceManager {
   private final ScheduledExecutorService VERBOSE = createScheduledExecutor("sonar-verbose-thread");
   private final ScheduledExecutorService FALLBACK_QUEUE = createScheduledExecutor("sonar-queue-thread");
   private final ScheduledExecutorService STATISTICS = createScheduledExecutor("sonar-statistics-thread");
+  private final ScheduledExecutorService UPDATE_NOTIFIER = createScheduledExecutor("sonar-update-notifier");
 
   private @NotNull ScheduledExecutorService createScheduledExecutor(final String threadName) {
     return Executors.newSingleThreadScheduledExecutor(runnable -> {
@@ -57,11 +59,18 @@ public final class SonarServiceManager {
 
     STATISTICS.scheduleAtFixedRate(GlobalSonarStatistics::hitEverySecond,
       0L, 1L, TimeUnit.SECONDS);
+
+    // This config setting only updates when the server is restarted
+    if (Sonar.get().getConfig().getGeneralConfig().getBoolean("general.check-for-updates")) {
+      UPDATE_NOTIFIER.scheduleAtFixedRate(UpdateChecker::checkForUpdates,
+        0L, 2L, TimeUnit.HOURS);
+    }
   }
 
   public void stop() {
     VERBOSE.shutdown();
     FALLBACK_QUEUE.shutdown();
     STATISTICS.shutdown();
+    UPDATE_NOTIFIER.shutdown();
   }
 }

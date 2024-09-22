@@ -26,6 +26,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
+import xyz.jonesdev.sonar.api.update.UpdateChecker;
 
 import java.util.*;
 
@@ -66,11 +67,18 @@ public interface SonarCommand {
       // Invoke subcommand
       command.invoke(source, args);
     }, () -> {
+      final UpdateChecker.CheckResult checkResult = UpdateChecker.getLastCheckResult();
+      Component version = Component.text(Sonar.get().getVersion().getFormatted());
+      if (checkResult.getConfigKey() != null) {
+        version = version.append(MiniMessage.miniMessage().deserialize(
+          Sonar.get().getConfig().getMessagesConfig().getString("commands.main." + checkResult.getConfigKey())));
+      }
+
       // Print standard help message
       source.sendMessage(MiniMessage.miniMessage().deserialize(
         String.join("<newline>",
           Sonar.get().getConfig().getMessagesConfig().getStringList("commands.main.header")),
-        Placeholder.unparsed("version", Sonar.get().getVersion().getFormatted()),
+        Placeholder.component("version", version),
         Placeholder.unparsed("platform", Sonar.get().getPlatform().getDisplayName()),
         Placeholder.unparsed("copyright-year", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))));
 
@@ -94,7 +102,7 @@ public interface SonarCommand {
     });
   }
 
-  static void prepareCachedMessages() {
+  static void prepareCachedTabSuggestions() {
     // Don't re-cache tab suggestions
     if (!TAB_SUGGESTIONS.isEmpty()) return;
     // Cache tab suggestions

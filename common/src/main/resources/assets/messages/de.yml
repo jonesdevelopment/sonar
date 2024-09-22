@@ -61,6 +61,10 @@ commands:
     # Formatierung für Ja- (cross) und Nein- (tick) Werte in den Unterbefehlen hover Text
     tick: '<green>✔</green>'
     cross: '<red>✗</red>'
+    # Formatierung der Versionsinformationen
+    outdated-version: ' <red><click:open_url:''https://github.com/jonesdevelopment/sonar/releases/latest''><hover:show_text:''(Klicken Sie hier, um die neueste Version von Sonar herunterzuladen)''>(Veraltet)</hover></click></red>'
+    unstable-version: ' <gold>(Instabil)</gold>'
+    api-error: ' <dark_red><hover:show_text:''Prüfen Sie die Serverprotokolle für weitere Informationen''>(API-Fehler)</hover></dark_red>'
 
   # Übersetzungen für '/sonar reload'
   reload:

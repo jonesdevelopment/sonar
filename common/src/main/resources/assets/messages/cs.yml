@@ -60,6 +60,10 @@ commands:
     # Formátování pro hodnoty ano (zaškrtnutí) a ne (křížek) v textu po najetí myší na podpříkazy
     tick: '<green>✔</green>'
     cross: '<red>✗</red>'
+    # Formatting for the version information
+    outdated-version: ' <red><click:open_url:''https://github.com/jonesdevelopment/sonar/releases/latest''><hover:show_text:''(Kliknutím stáhnete nejnovější verzi aplikace Sonar)''>(Zastaralé)</hover></click></red>'
+    unstable-version: ' <gold>(Nestabilní)</gold>'
+    api-error: ' <dark_red><hover:show_text:''Další informace naleznete v protokolech serveru''>(Chyba API)</hover></dark_red>'
 
   # Překlady pro '/sonar reload'
   reload:

@@ -15,10 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.update;
+package xyz.jonesdev.sonar.api.update;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -35,6 +37,8 @@ import java.util.concurrent.Executors;
 @UtilityClass
 public class UpdateChecker {
   private final ExecutorService ASYNC_EXECUTOR = Executors.newSingleThreadExecutor();
+  @Getter
+  private CheckResult lastCheckResult = CheckResult.UNRESOLVED;
 
   public void checkForUpdates() {
     ASYNC_EXECUTOR.execute(() -> {
@@ -49,15 +53,19 @@ public class UpdateChecker {
         if (convertedCurrentVersion < convertedLatestVersion) {
           Sonar.get().getLogger().warn("A new version of Sonar is available: {}", latestStableRelease);
           Sonar.get().getLogger().warn("Please make sure to update to the latest version to ensure stability and security:");
-          Sonar.get().getLogger().warn("https://github.com/jonesdevelopment/sonar/releases/tag/{}", latestStableRelease);
+          Sonar.get().getLogger().warn("https://github.com/jonesdevelopment/sonar/releases/latest");
+          lastCheckResult = CheckResult.OUTDATED_VERSION;
         } else if (convertedCurrentVersion > convertedLatestVersion || !Sonar.get().getVersion().getGitBranch().equals("main")) {
           Sonar.get().getLogger().warn("You are currently using an unreleased version of Sonar!");
           Sonar.get().getLogger().warn("The contributors of Sonar are not responsible for any damage done by using an unstable version");
-        } else {
+          lastCheckResult = CheckResult.UNSTABLE_VERSION;
+        } else if (lastCheckResult != CheckResult.LATEST_VERSION) {
           Sonar.get().getLogger().info("You are currently using the latest stable release of Sonar!");
+          lastCheckResult = CheckResult.LATEST_VERSION;
         }
       } catch (Throwable throwable) {
         Sonar.get().getLogger().warn("Unable to retrieve version information: {}", throwable);
+        lastCheckResult = CheckResult.API_ERROR;
       }
     });
   }
@@ -98,5 +106,17 @@ public class UpdateChecker {
     final int convertedMinor = Integer.parseInt(convertedParts[1]) * 10000; // multiply by weight
     final int patch = Integer.parseInt(convertedParts[2]);
     return convertedMajor + convertedMinor + patch; // sum the converted version parts
+  }
+
+  @Getter
+  @RequiredArgsConstructor
+  public enum CheckResult {
+    API_ERROR("api-error"),
+    OUTDATED_VERSION("outdated-version"),
+    UNSTABLE_VERSION("unstable-version"),
+    LATEST_VERSION(null),
+    UNRESOLVED(null);
+
+    private final String configKey;
   }
 }
