@@ -245,7 +245,7 @@ public final class SonarConfiguration {
     noPermission = MiniMessage.miniMessage().deserialize(messagesConfig.getString("commands.no-permission"),
       Placeholder.component("prefix", prefix));
 
-    SonarCommand.prepareCachedMessages();
+    SonarCommand.prepareCachedTabSuggestions();
 
     supportUrl = messagesConfig.getString("support-url");
     header = MiniMessage.miniMessage().deserialize(

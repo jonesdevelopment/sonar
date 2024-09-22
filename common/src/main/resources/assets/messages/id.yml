@@ -60,6 +60,10 @@ commands:
     # Format untuk nilai ya (centang) dan tidak (silang) dalam teks hover sub-perintah
     tick: '<green>✔</green>'
     cross: '<red>✗</red>'
+    # Formatting for the version information
+    outdated-version: ' <red><click:open_url:''https://github.com/jonesdevelopment/sonar/releases/latest''><hover:show_text:''(Click to download the latest version of Sonar)''>(Outdated)</hover></click></red>'
+    unstable-version: ' <gold>(Unstable)</gold>'
+    api-error: ' <dark_red><hover:show_text:''Check the server logs for more information''>(API error)</hover></dark_red>'
 
   # Terjemahan untuk '/sonar reload'
   reload:

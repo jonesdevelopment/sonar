@@ -60,6 +60,10 @@ commands:
     # Opmaak voor ja- (tick) en nee- (cross) waarden in de hover-tekst van de subcommands
     tick: '<green>✔</green>'
     cross: '<red>✗</red>'
+    # Opmaak voor de versie-informatie
+    outdated-version: ' <red><click:open_url:''https://github.com/jonesdevelopment/sonar/releases/latest''><hover:show_text:''(Klik om de nieuwste versie van Sonar te downloaden)''>(Verouderd)</hover></click></red>'
+    unstable-version: ' <gold>(Instabiel)</gold>'
+    api-error: ' <dark_red><hover:show_text:''Controleer de serverlogboeken voor meer informatie''>(API-fout)</hover></dark_red>'
 
   # Vertalingen voor '/sonar reload'
   reload:

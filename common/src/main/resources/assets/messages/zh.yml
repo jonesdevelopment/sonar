@@ -60,6 +60,10 @@ commands:
     # 子命令悬停文本中 "是"（tick）和 "否"（cross）值的格式设置
     tick: '<green>✔</green>'
     cross: '<red>✗</red>'
+    # Formatting for the version information
+    outdated-version: ' <red><click:open_url:''https://github.com/jonesdevelopment/sonar/releases/latest''><hover:show_text:''(点击下载最新版本的 Sonar)''>(过时)</hover></click></red>'
+    unstable-version: ' <gold>(不稳定)</gold>'
+    api-error: ' <dark_red><hover:show_text:''查看服务器日志, 了解更多信息''>(API 错误)</hover></dark_red>'
 
   # 重新加载命令
   reload:
