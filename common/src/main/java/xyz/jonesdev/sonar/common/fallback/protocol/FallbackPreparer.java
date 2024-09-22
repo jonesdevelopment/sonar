@@ -111,9 +111,13 @@ public class FallbackPreparer {
     Sonar.get().getLogger().info("Preloading all registered packets...");
     FallbackPacketRegistry.values();
 
-    // Prepare LoginSuccess packet
-    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(UUID.randomUUID(),
-      Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username")));
+    // Prepare LoginSuccess packet with capped username to 16 characters
+    final UUID uuid = UUID.randomUUID();
+    String username = Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username");
+    if (username.length() > 16) {
+      username = username.substring(0, 16);
+    }
+    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(uuid, username, true));
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
