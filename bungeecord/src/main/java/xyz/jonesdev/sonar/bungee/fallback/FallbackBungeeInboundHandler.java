@@ -25,8 +25,8 @@ import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.exception.ReflectiveOperationException;
 import xyz.jonesdev.sonar.common.fallback.FallbackInboundHandlerAdapter;
+import xyz.jonesdev.sonar.common.util.exception.ReflectiveOperationException;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

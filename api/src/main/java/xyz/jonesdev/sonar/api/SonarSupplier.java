@@ -19,20 +19,15 @@ package xyz.jonesdev.sonar.api;
 
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.exception.AlreadyInitializedException;
 
 @UtilityClass
 public class SonarSupplier {
-  private Sonar _sonar;
+  Sonar sonar;
 
-  public void set(final @NotNull Sonar instance) {
-    if (_sonar != null) {
-      throw new AlreadyInitializedException("Sonar is already initialized");
+  public void set(final @NotNull Sonar _sonar) {
+    if (sonar != null) {
+      throw new IllegalStateException("Sonar is already initialized");
     }
-    _sonar = instance;
-  }
-
-  public @NotNull Sonar get() {
-    return _sonar;
+    sonar = _sonar;
   }
 }
