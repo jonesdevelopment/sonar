@@ -53,7 +53,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
    * @param hostname Hostname (server address) sent by the client
    * @param protocol Protocol version number sent by the client
    */
-  protected final void handleHandshake(final @NotNull Channel channel,
+  protected final void handleHandshake(final @NotNull ChannelHandlerContext ctx,
                                        final @NotNull String hostname,
                                        final int protocol) throws Exception {
     // Check if the hostname is invalid
@@ -65,7 +65,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       throw QuietDecoderException.INSTANCE;
     }
     protocolVersion = ProtocolVersion.fromId(protocol);
-    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
+    ctx.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
   }
 
   /**

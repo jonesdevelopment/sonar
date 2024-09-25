@@ -119,7 +119,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
           case LOGIN:
           case TRANSFER:
             // Let the actual handler know about the handshake packet
-            handleHandshake(ctx.channel(), handshake.getHostname(), handshake.getProtocolVersionId());
+            handleHandshake(ctx, handshake.getHostname(), handshake.getProtocolVersionId());
             // Be ready for the next packet (which is supposed to be a login packet)
             updateRegistry(FallbackPacketRegistry.LOGIN, Objects.requireNonNull(protocolVersion));
             break;
@@ -135,6 +135,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         handleLogin(ctx.channel(), ctx, () -> {
           byteBuf.readerIndex(originalReaderIndex);
           ctx.fireChannelRead(byteBuf.retain());
+          // TODO: recode this?
           final ChannelHandler inboundHandler = ctx.pipeline().remove(FALLBACK_INBOUND_HANDLER);
           if (inboundHandler != null) {
             channelRemovalListener.accept(ctx.pipeline(), FALLBACK_INBOUND_HANDLER, inboundHandler);

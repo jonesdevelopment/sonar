@@ -17,7 +17,6 @@
 
 package xyz.jonesdev.sonar.bungee.fallback;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.HandlerBoss;
@@ -55,36 +54,36 @@ final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
       final DefinedPacket wrappedPacket = packetWrapper.packet;
       // Skip any unknown or invalid packets
       if (wrappedPacket != null) {
-        final Channel channel = ctx.channel();
-        // Intercept any handshake packet by the client
         if (wrappedPacket instanceof Handshake) {
           final Handshake handshake = (Handshake) wrappedPacket;
           // We don't care about server pings; remove the handler
           if (handshake.getRequestedProtocol() == STATUS) {
             ctx.pipeline().remove(this);
           } else {
-            handleHandshake(channel, handshake.getHost(), handshake.getProtocolVersion());
+            handleHandshake(ctx, handshake.getHost(), handshake.getProtocolVersion());
           }
-        }
-        // Intercept any server login packet by the client
-        else if (wrappedPacket instanceof LoginRequest) {
+        } else if (wrappedPacket instanceof LoginRequest) {
           // Make sure to use the potentially modified, real IP
           final LoginRequest loginRequest = (LoginRequest) wrappedPacket;
-          final HandlerBoss handlerBoss = channel.pipeline().get(HandlerBoss.class);
-          final ChannelWrapper channelWrapper;
-          try {
-            channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER_GETTER.invokeExact(handlerBoss);
-          } catch (final Throwable throwable) {
-            throw new ReflectiveOperationException(throwable);
+          final HandlerBoss handlerBoss = ctx.pipeline().get(HandlerBoss.class);
+          // This might sometimes happen if the client unexpectedly disconnects
+          if (handlerBoss != null) {
+            // Get the real IP address of the player through the channel wrapper
+            final ChannelWrapper channelWrapper;
+            try {
+              channelWrapper = (ChannelWrapper) CHANNEL_WRAPPER_GETTER.invokeExact(handlerBoss);
+            } catch (final Throwable throwable) {
+              throw new ReflectiveOperationException(throwable);
+            }
+            // We've done our job - deject this pipeline
+            ctx.pipeline().remove(this);
+            // Make sure to mark this packet as released
+            packetWrapper.trySingleRelease();
+            // Let Sonar process the login packet
+            final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
+            handleLogin(ctx.channel(), ctx, () -> ctx.fireChannelRead(msg), loginRequest.getData(), socketAddress);
+            return;
           }
-          final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
-          // We've done our job - deject this pipeline
-          ctx.pipeline().remove(this);
-          // Make sure to mark this packet as released
-          packetWrapper.trySingleRelease();
-          // Let Sonar process the login packet
-          handleLogin(channel, ctx, () -> ctx.fireChannelRead(msg), loginRequest.getData(), socketAddress);
-          return;
         }
       }
     }

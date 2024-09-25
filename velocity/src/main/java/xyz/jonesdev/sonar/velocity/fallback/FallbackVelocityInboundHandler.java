@@ -38,14 +38,14 @@ final class FallbackVelocityInboundHandler extends FallbackInboundHandlerAdapter
       if (handshake.getNextStatus() == STATUS) {
         ctx.pipeline().remove(this);
       } else {
-        handleHandshake(ctx.channel(), handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
+        handleHandshake(ctx, handshake.getServerAddress(), handshake.getProtocolVersion().getProtocol());
       }
     } else if (msg instanceof ServerLoginPacket serverLogin) {
+      // Deject this pipeline and let Sonar process the login packet
+      ctx.pipeline().remove(this);
       // Make sure to use the potentially modified, original IP
       final MinecraftConnection minecraftConnection = (MinecraftConnection) ctx.pipeline().get(HANDLER);
       final InetSocketAddress socketAddress = (InetSocketAddress) minecraftConnection.getRemoteAddress();
-      // Deject this pipeline and let Sonar process the login packet
-      ctx.pipeline().remove(this);
       handleLogin(ctx.channel(), ctx, () -> ctx.fireChannelRead(msg), serverLogin.getUsername(), socketAddress);
       return;
     }
