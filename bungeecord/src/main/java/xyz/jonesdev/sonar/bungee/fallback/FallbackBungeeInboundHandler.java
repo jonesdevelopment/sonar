@@ -48,7 +48,7 @@ final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
   }
 
   @Override
-  public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
+  public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
     if (msg instanceof PacketWrapper) {
       final PacketWrapper packetWrapper = (PacketWrapper) msg;
       final DefinedPacket wrappedPacket = packetWrapper.packet;
@@ -81,7 +81,7 @@ final class FallbackBungeeInboundHandler extends FallbackInboundHandlerAdapter {
             packetWrapper.trySingleRelease();
             // Let Sonar process the login packet
             final InetSocketAddress socketAddress = (InetSocketAddress) channelWrapper.getRemoteAddress();
-            handleLogin(ctx.channel(), ctx, () -> ctx.fireChannelRead(msg), loginRequest.getData(), socketAddress);
+            handleLogin(ctx, () -> ctx.fireChannelRead(msg), loginRequest.getData(), socketAddress);
             return;
           }
         }
