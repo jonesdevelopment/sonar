@@ -18,10 +18,10 @@
 package xyz.jonesdev.sonar.common.fallback;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -50,8 +50,8 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.closeWith;
 @Getter
 @ToString(of = {"protocolVersion", "inetAddress", "geyser"})
 public final class FallbackUserWrapper implements FallbackUser {
+  @Accessors(fluent = true)
   private final Channel channel;
-  private final ChannelPipeline pipeline;
   private final InetAddress inetAddress;
   private final ProtocolVersion protocolVersion;
   private final String fingerprint;
@@ -68,7 +68,6 @@ public final class FallbackUserWrapper implements FallbackUser {
                              final @NotNull String fingerprint,
                              final boolean geyser) {
     this.channel = channel;
-    this.pipeline = channel.pipeline();
     this.inetAddress = inetAddress;
     this.protocolVersion = protocolVersion;
     this.username = username;
@@ -103,8 +102,8 @@ public final class FallbackUserWrapper implements FallbackUser {
 
       // Replace normal encoder to allow custom packets
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
-      pipeline.addFirst(FALLBACK_FRAME_ENCODER, FallbackVarIntLengthEncoder.INSTANCE);
-      pipeline.addLast(FALLBACK_PACKET_ENCODER, newEncoder);
+      channel.pipeline().addFirst(FALLBACK_FRAME_ENCODER, FallbackVarIntLengthEncoder.INSTANCE);
+      channel.pipeline().addLast(FALLBACK_PACKET_ENCODER, newEncoder);
 
       // Send LoginSuccess packet to make the client think they are joining the server
       write(loginSuccess);
@@ -114,19 +113,19 @@ public final class FallbackUserWrapper implements FallbackUser {
 
       // Replace normal decoder to allow custom packets
       final FallbackPacketDecoder newDecoder = new FallbackPacketDecoder(protocolVersion);
-      pipeline.addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
-      pipeline.addLast(FALLBACK_PACKET_DECODER, newDecoder);
+      channel.pipeline().addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
+      channel.pipeline().addLast(FALLBACK_PACKET_DECODER, newDecoder);
       // Listen for all incoming packets by setting the packet listener
       newDecoder.setListener(new FallbackPreJoinHandler(this));
 
       // Make sure to catch all exceptions during the verification
-      pipeline.addLast(FALLBACK_TAIL_EXCEPTIONS, FallbackTailExceptionsHandler.INSTANCE);
+      channel.pipeline().addLast(FALLBACK_TAIL_EXCEPTIONS, FallbackTailExceptionsHandler.INSTANCE);
     });
   }
 
   @Override
   public void disconnect(final @NotNull Component reason) {
-    final FallbackPacketEncoder encoder = pipeline.get(FallbackPacketEncoder.class);
+    final FallbackPacketEncoder encoder = channel.pipeline().get(FallbackPacketEncoder.class);
     final boolean duringLogin = encoder != null && encoder.getPacketRegistry() != GAME;
     closeWith(channel, protocolVersion, DisconnectPacket.create(reason, duringLogin));
   }

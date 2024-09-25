@@ -73,7 +73,7 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
     final SetHeldItemPacket heldItemPacket = new SetHeldItemPacket(expectedSlotId);
     user.delayedWrite(heldItemPacket);
     user.delayedWrite(heldItemPacket);
-    user.getChannel().flush();
+    user.channel().flush();
   }
 
   /**
@@ -90,7 +90,7 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
   private void markSuccess() {
     // Either send the player to the vehicle check,
     // send the player to the CAPTCHA, or finish the verification.
-    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
+    final var decoder = user.channel().pipeline().get(FallbackPacketDecoder.class);
     // Pass the player to the next best verification handler
     if (Sonar.get().getConfig().getVerification().getVehicle().isEnabled()) {
       decoder.setListener(new FallbackVehicleHandler(user));
