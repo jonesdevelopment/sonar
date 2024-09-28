@@ -224,7 +224,7 @@ public class ProtocolUtil {
 
   public static void closeWith(final @NotNull Channel channel,
                                final @NotNull ProtocolVersion protocolVersion,
-                               final @NotNull Object msg) {
+                               final Object msg) {
     if (protocolVersion.compareTo(MINECRAFT_1_8) < 0
       && protocolVersion.compareTo(MINECRAFT_1_7_2) >= 0) {
       channel.eventLoop().execute(() -> {
@@ -282,13 +282,6 @@ public class ProtocolUtil {
   public static void writeUUID(final @NotNull ByteBuf byteBuf, final @NotNull UUID uuid) {
     byteBuf.writeLong(uuid.getMostSignificantBits());
     byteBuf.writeLong(uuid.getLeastSignificantBits());
-  }
-
-  public static void writeUUIDIntArray(final @NotNull ByteBuf byteBuf, final @NotNull UUID uuid) {
-    byteBuf.writeInt((int) (uuid.getMostSignificantBits() >> 32));
-    byteBuf.writeInt((int) uuid.getMostSignificantBits());
-    byteBuf.writeInt((int) (uuid.getLeastSignificantBits() >> 32));
-    byteBuf.writeInt((int) uuid.getLeastSignificantBits());
   }
 
   public static void writeByteArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
