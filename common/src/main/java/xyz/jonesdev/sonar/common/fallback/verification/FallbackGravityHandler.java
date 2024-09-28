@@ -157,6 +157,11 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       // Synchronize the Y coordinate
       this.y = dynamicSpawnYPosition;
       checkMovement = true;
+
+      // Send the welcome message to the player
+      if (welcomeMessage != null) {
+        user.write(welcomeMessage);
+      }
       return;
     }
 

@@ -198,6 +198,9 @@ verification:
     # Message shown to the player when they enter the wrong answer in chat
     incorrect: '<prefix><red>¡Has introducido una respuesta incorrecta! Por favor, inténtalo de nuevo.'
 
+  # Mensaje que se muestra al jugador cuando está siendo verificado
+  welcome: '<prefijo><verde>Estás siendo verificado. Por favor, no te muevas; se trata de un proceso automático.'
+
   # Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet
   currently-preparing:
     - <header>

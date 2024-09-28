@@ -198,6 +198,9 @@ verification:
     # 当玩家输入错误的验证码时显示的消息
     incorrect: '<prefix><red>您输入了错误的答案! 请重试.'
 
+  # 当玩家正在接受验证时显示的信息
+  welcome: '<prefix><green>您正在接受验证. 请不要移动; 这是一个自动过程.'
+
   # 当验证码还在准备的时候显示的踢出消息
   currently-preparing:
     - <header>

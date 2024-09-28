@@ -201,6 +201,9 @@ verification:
     # Message shown to the player when they enter the wrong answer in chat
     incorrect: '<prefix><red>Wprowadzono nieprawidłowy kod. Spróbuj ponownie.'
 
+  # Wiadomość wyświetlana graczowi podczas weryfikacji
+  welcome: '<prefix><green>Jesteś w trakcie weryfikacji. Nie ruszaj się, to proces automatyczny.'
+
   # Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet
   currently-preparing:
     - <header>

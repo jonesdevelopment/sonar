@@ -39,12 +39,12 @@ public final class ComponentHolder {
   private final String serializedComponent;
   private BinaryTag cachedBinaryTag;
 
-  public ComponentHolder(final Component component) {
+  public ComponentHolder(final @NotNull Component component) {
     this.serializedComponent = GsonComponentSerializer.gson().serialize(component);
   }
 
   // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
-  private BinaryTag serialize(final JsonElement json) {
+  private BinaryTag serialize(final @NotNull JsonElement json) {
     if (json instanceof JsonPrimitive) {
       final JsonPrimitive jsonPrimitive = (JsonPrimitive) json;
 
@@ -141,8 +141,7 @@ public final class ComponentHolder {
     return EndBinaryTag.endBinaryTag();
   }
 
-  public void write(final @NotNull ByteBuf byteBuf,
-                    final @NotNull ProtocolVersion protocolVersion) {
+  public void write(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.compareTo(MINECRAFT_1_20_3) >= 0) {
       if (cachedBinaryTag == null) {
         cachedBinaryTag = serialize(new JsonParser().parse(serializedComponent));

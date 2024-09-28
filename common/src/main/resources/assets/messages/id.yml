@@ -198,6 +198,9 @@ verification:
     # Pesan yang ditampilkan kepada pemain saat mereka memasukkan jawaban yang salah di chat
     incorrect: '<prefix><red>Anda telah memasukkan jawaban yang salah! Silakan coba lagi.'
 
+  # Pesan yang ditampilkan kepada pemain ketika mereka sedang diverifikasi
+  welcome: '<prefix><green>Anda sedang diverifikasi. Jangan bergerak; ini adalah proses otomatis.'
+
   # Pesan putus yang ditampilkan saat seseorang bergabung sementara captcha belum disiapkan
   currently-preparing:
     - <header>

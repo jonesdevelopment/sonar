@@ -198,6 +198,9 @@ verification:
     # Message affiché au joueur lorsqu'il entre la mauvaise réponse dans le chat
     incorrect: '<prefix><red>Vous avez saisi une mauvaise réponse ! Veuillez réessayer.'
 
+  # Message affiché au joueur lorsqu'il est en cours de vérification
+  welcome: '<prefix><green>Vous êtes en cours de vérification. Ne bougez pas, il s''agit d''un processus automatique.'
+
   # Message de déconnexion affiché lorsque quelqu'un rejoint alors que le CAPTCHA n'a pas été préparé
   currently-preparing:
     - <header>
