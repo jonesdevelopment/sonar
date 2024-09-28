@@ -44,9 +44,8 @@ import java.util.UUID;
 public class FallbackPreparer {
   private final Random RANDOM = new Random();
 
-  public static final int PLAYER_ENTITY_ID = RANDOM.nextInt(50);
-  public static final int VEHICLE_BOAT_ENTITY_ID = PLAYER_ENTITY_ID + 1 + RANDOM.nextInt(10);
-  public static final int VEHICLE_MINECART_ENTITY_ID = VEHICLE_BOAT_ENTITY_ID + 1 + RANDOM.nextInt(10);
+  public static final int PLAYER_ENTITY_ID = RANDOM.nextInt();
+  public static final int VEHICLE_ENTITY_ID = RANDOM.nextInt();
 
   public static final CompoundBinaryTag MAP_ITEM_NBT = CompoundBinaryTag.builder()
     .put("map", IntBinaryTag.intBinaryTag(0)) // map type
@@ -100,8 +99,7 @@ public class FallbackPreparer {
   public FallbackPacket teleportMinecart;
   public FallbackPacket spawnBoatEntity;
   public FallbackPacket spawnMinecartEntity;
-  public FallbackPacket setBoatPassengers;
-  public FallbackPacket setMinecartPassengers;
+  public FallbackPacket setPassengers;
   public FallbackPacket[] xpCountdown;
 
   public static int maxMovementTick, dynamicSpawnYPosition, maxTotalPacketsSent;
@@ -182,17 +180,16 @@ public class FallbackPreparer {
     }
 
     // Prepare packets for the vehicle check
-    removeBoat = new RemoveEntitiesPacket(VEHICLE_BOAT_ENTITY_ID);
+    removeBoat = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
     teleportMinecart = new TeleportEntityPacket(
-      VEHICLE_MINECART_ENTITY_ID, SPAWN_X_POSITION, IN_VOID_Y_POSITION, SPAWN_Z_POSITION, false);
-    spawnBoatEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(VEHICLE_BOAT_ENTITY_ID,
+      VEHICLE_ENTITY_ID, SPAWN_X_POSITION, IN_VOID_Y_POSITION, SPAWN_Z_POSITION, false);
+    spawnBoatEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(VEHICLE_ENTITY_ID,
       EntityType.BOAT, RANDOM.nextInt(16), IN_AIR_Y_POSITION, RANDOM.nextInt(16),
       0, 0, 0, 0));
-    spawnMinecartEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(VEHICLE_MINECART_ENTITY_ID,
+    spawnMinecartEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(VEHICLE_ENTITY_ID,
       EntityType.MINECART, RANDOM.nextInt(16), IN_AIR_Y_POSITION, RANDOM.nextInt(16),
       0, 0, 0, 0));
-    setBoatPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_BOAT_ENTITY_ID, PLAYER_ENTITY_ID));
-    setMinecartPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_MINECART_ENTITY_ID, PLAYER_ENTITY_ID));
+    setPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
     // If the welcome message is empty, we don't need to send a message to the player
     final String welcome = Sonar.get().getConfig().getMessagesConfig().getString("verification.welcome");

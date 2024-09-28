@@ -34,7 +34,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
 
     // Send the necessary packets to mount the player on the boat vehicle
     user.delayedWrite(spawnBoatEntity);
-    user.delayedWrite(setBoatPassengers);
+    user.delayedWrite(setPassengers);
     user.channel().flush();
   }
 
@@ -113,7 +113,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
     user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
     user.delayedWrite(spawnMinecartEntity);
-    user.delayedWrite(setMinecartPassengers);
+    user.delayedWrite(setPassengers);
     user.channel().flush();
   }
 
