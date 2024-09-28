@@ -80,6 +80,7 @@ public class FallbackPreparer {
   public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlivePacket(RANDOM.nextInt());
 
   public static FallbackPacket loginSuccess;
+  public FallbackPacket welcomeMessage;
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
   public static FallbackPacket joinGame;
@@ -196,6 +197,16 @@ public class FallbackPreparer {
       0, 0, 0, 0));
     setBoatPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_BOAT_ENTITY_ID, PLAYER_ENTITY_ID));
     setMinecartPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_MINECART_ENTITY_ID, PLAYER_ENTITY_ID));
+
+    // If the welcome message is empty, we don't need to send a message to the player
+    final String welcome = Sonar.get().getConfig().getMessagesConfig().getString("verification.welcome");
+    if (welcome.isEmpty()) {
+      welcomeMessage = null;
+    } else {
+      welcomeMessage = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
+        MiniMessage.miniMessage().deserialize(welcome,
+          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())))));
+    }
 
     if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
       || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {

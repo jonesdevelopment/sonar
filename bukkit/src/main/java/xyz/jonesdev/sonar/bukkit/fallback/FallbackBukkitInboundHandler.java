@@ -34,12 +34,14 @@ import java.net.InetSocketAddress;
 import java.util.Objects;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INBOUND_HANDLER;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
+  private static final ProtocolVersion DEFAULT_PROTOCOL_VERSION = ProtocolVersion.MINECRAFT_1_7_2;
+
+  private FallbackPacketRegistry.ProtocolRegistry registry;
 
   FallbackBukkitInboundHandler() {
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
@@ -53,17 +55,13 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
     };
   }
 
-  private FallbackPacketRegistry.ProtocolRegistry registry;
-
-  private static final ProtocolVersion DEFAULT_PROTOCOL_VERSION = ProtocolVersion.MINECRAFT_1_7_2;
-
   public void updateRegistry(final @NotNull FallbackPacketRegistry registry,
                              final @NotNull ProtocolVersion protocolVersion) {
-    this.registry = registry.getProtocolRegistry(SERVERBOUND, protocolVersion);
+    this.registry = registry.getProtocolRegistry(FallbackPacketRegistry.Direction.SERVERBOUND, protocolVersion);
   }
 
   @Override
-  public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) throws Exception {
+  public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
     if (msg instanceof ByteBuf) {
       final ByteBuf byteBuf = (ByteBuf) msg;
 
@@ -119,7 +117,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
           case LOGIN:
           case TRANSFER:
             // Let the actual handler know about the handshake packet
-            handleHandshake(ctx.channel(), handshake.getHostname(), handshake.getProtocolVersionId());
+            handleHandshake(ctx, handshake.getHostname(), handshake.getProtocolVersionId());
             // Be ready for the next packet (which is supposed to be a login packet)
             updateRegistry(FallbackPacketRegistry.LOGIN, Objects.requireNonNull(protocolVersion));
             break;
@@ -132,9 +130,10 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         // We've done our job - deject this pipeline
         ctx.pipeline().remove(this);
         // Let Sonar process the login packet
-        handleLogin(ctx.channel(), ctx, () -> {
+        handleLogin(ctx, () -> {
           byteBuf.readerIndex(originalReaderIndex);
           ctx.fireChannelRead(byteBuf.retain());
+          // TODO: recode this?
           final ChannelHandler inboundHandler = ctx.pipeline().remove(FALLBACK_INBOUND_HANDLER);
           if (inboundHandler != null) {
             channelRemovalListener.accept(ctx.pipeline(), FALLBACK_INBOUND_HANDLER, inboundHandler);

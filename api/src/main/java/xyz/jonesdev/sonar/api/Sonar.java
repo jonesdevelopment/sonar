@@ -97,6 +97,6 @@ public interface Sonar {
 
   @NotNull
   static Sonar get() {
-    return SonarSupplier.get();
+    return SonarSupplier.sonar;
   }
 }

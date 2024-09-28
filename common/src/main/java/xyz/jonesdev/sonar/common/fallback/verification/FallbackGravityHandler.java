@@ -74,7 +74,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       user.delayedWrite(BLOCKS_PACKETS[index]);
     }
     // Send all packets at once
-    user.getChannel().flush();
+    user.channel().flush();
 
     // 1.8 and below don't have TeleportConfirm packets, which is why we're skipping that check.
     if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
@@ -97,7 +97,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       preJoinHandler.validateClientInformation();
     }
     // Send the player to the next verification handler
-    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
+    final var decoder = user.channel().pipeline().get(FallbackPacketDecoder.class);
     decoder.setListener(new FallbackProtocolHandler(user));
   }
 
@@ -157,6 +157,11 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       // Synchronize the Y coordinate
       this.y = dynamicSpawnYPosition;
       checkMovement = true;
+
+      // Send the welcome message to the player
+      if (welcomeMessage != null) {
+        user.write(welcomeMessage);
+      }
       return;
     }
 

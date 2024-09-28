@@ -284,6 +284,13 @@ public class ProtocolUtil {
     byteBuf.writeLong(uuid.getLeastSignificantBits());
   }
 
+  public static void writeUUIDIntArray(final @NotNull ByteBuf byteBuf, final @NotNull UUID uuid) {
+    byteBuf.writeInt((int) (uuid.getMostSignificantBits() >> 32));
+    byteBuf.writeInt((int) uuid.getMostSignificantBits());
+    byteBuf.writeInt((int) (uuid.getLeastSignificantBits() >> 32));
+    byteBuf.writeInt((int) uuid.getLeastSignificantBits());
+  }
+
   public static void writeByteArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
     checkState(bytes.length < Short.MAX_VALUE, "Too long array");
     writeVarInt(byteBuf, bytes.length);

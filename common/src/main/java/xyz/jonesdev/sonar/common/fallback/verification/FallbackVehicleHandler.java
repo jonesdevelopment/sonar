@@ -35,7 +35,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     // Send the necessary packets to mount the player on the boat vehicle
     user.delayedWrite(spawnBoatEntity);
     user.delayedWrite(setBoatPassengers);
-    user.getChannel().flush();
+    user.channel().flush();
   }
 
   private int expectedTransactionId;
@@ -47,7 +47,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     // Pass the player to the next best verification handler
     if (user.isForceCaptcha() || Sonar.get().getFallback().shouldPerformCaptcha()) {
       // Either send the player to the CAPTCHA or finish the verification.
-      final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
+      final var decoder = user.channel().pipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
       decoder.setListener(new FallbackCaptchaHandler(user));
     } else {
@@ -91,7 +91,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         waitingRemoveMinecart = true;
         expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
         user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
-        user.getChannel().flush();
+        user.channel().flush();
       } else {
         // If the player is riding a boat, remove the entity
         // The next Y coordinate the player will send is going
@@ -114,7 +114,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
     user.delayedWrite(spawnMinecartEntity);
     user.delayedWrite(setMinecartPassengers);
-    user.getChannel().flush();
+    user.channel().flush();
   }
 
   @Override

@@ -26,8 +26,8 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.exception.ReflectiveOperationException;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.util.exception.ReflectiveOperationException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

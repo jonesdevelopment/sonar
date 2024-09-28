@@ -63,12 +63,12 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
       if (user.isGeyser()) {
         user.write(transferToOrigin);
         // Make sure we cannot receive any more packets from the player
-        user.getPipeline().remove(FallbackPacketDecoder.class);
-        user.getPipeline().remove(FallbackPacketEncoder.class);
-        user.getPipeline().remove(FallbackVarInt21FrameDecoder.class);
-        user.getPipeline().remove(FallbackVarIntLengthEncoder.class);
+        user.channel().pipeline().remove(FallbackPacketDecoder.class);
+        user.channel().pipeline().remove(FallbackPacketEncoder.class);
+        user.channel().pipeline().remove(FallbackVarInt21FrameDecoder.class);
+        user.channel().pipeline().remove(FallbackVarIntLengthEncoder.class);
       } else {
-        closeWith(user.getChannel(), user.getProtocolVersion(), transferToOrigin);
+        closeWith(user.channel(), user.getProtocolVersion(), transferToOrigin);
       }
     } else {
       // Disconnect player with the verification success message

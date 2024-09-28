@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.api.fallback;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -29,10 +28,7 @@ import java.net.InetAddress;
 
 public interface FallbackUser {
   @NotNull
-  Channel getChannel();
-
-  @NotNull
-  ChannelPipeline getPipeline();
+  Channel channel();
 
   @NotNull
   InetAddress getInetAddress();
@@ -69,8 +65,8 @@ public interface FallbackUser {
    * @param msg Message to send to the player
    */
   default void write(final @NotNull Object msg) {
-    if (getChannel().isActive()) {
-      getChannel().writeAndFlush(msg, getChannel().voidPromise());
+    if (channel().isActive()) {
+      channel().writeAndFlush(msg, channel().voidPromise());
     } else {
       ReferenceCountUtil.release(msg);
     }
@@ -81,8 +77,8 @@ public interface FallbackUser {
    * sent once all messages are flushed.
    */
   default void delayedWrite(final @NotNull Object msg) {
-    if (getChannel().isActive()) {
-      getChannel().write(msg, getChannel().voidPromise());
+    if (channel().isActive()) {
+      channel().write(msg, channel().voidPromise());
     } else {
       ReferenceCountUtil.release(msg);
     }

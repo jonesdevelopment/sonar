@@ -60,7 +60,7 @@ public final class FallbackCaptchaHandler extends FallbackVerificationHandler {
     // Make sure the player knows that they have to enter the code in chat
     user.delayedWrite(enterCodeMessage);
     // Send all packets in one flush
-    user.getChannel().flush();
+    user.channel().flush();
   }
 
   private final String answer;

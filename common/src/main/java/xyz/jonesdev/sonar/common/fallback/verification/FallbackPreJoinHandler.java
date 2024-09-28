@@ -49,7 +49,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       // This trick helps in reducing unnecessary outgoing server traffic
       // by avoiding sending other packets to clients that are potentially bots.
       if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
-        user.getChannel().eventLoop().schedule(this::markSuccess, 100L, TimeUnit.MILLISECONDS);
+        user.channel().eventLoop().schedule(this::markSuccess, 100L, TimeUnit.MILLISECONDS);
       } else {
         sendKeepAlive();
       }
@@ -78,12 +78,12 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     // Write the FinishConfiguration packet to the buffer
     user.delayedWrite(FINISH_CONFIGURATION);
     // Send all packets in one flush
-    user.getChannel().flush();
+    user.channel().flush();
   }
 
   private void markSuccess() {
     // Pass the player to the next verification handler
-    final var decoder = user.getPipeline().get(FallbackPacketDecoder.class);
+    final var decoder = user.channel().pipeline().get(FallbackPacketDecoder.class);
     decoder.setListener(new FallbackGravityHandler(user, this));
   }
 
@@ -164,8 +164,8 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
   private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
     // Update the packet registry state in the encoder and decoder pipelines
-    user.getPipeline().get(FallbackPacketDecoder.class).updateRegistry(registry);
-    user.getPipeline().get(FallbackPacketEncoder.class).updateRegistry(registry);
+    user.channel().pipeline().get(FallbackPacketDecoder.class).updateRegistry(registry);
+    user.channel().pipeline().get(FallbackPacketEncoder.class).updateRegistry(registry);
   }
 
   private void synchronizeClientRegistry() {

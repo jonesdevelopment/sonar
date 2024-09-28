@@ -49,11 +49,8 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
 
   /**
    * Validates and handles incoming handshake packets
-   *
-   * @param hostname Hostname (server address) sent by the client
-   * @param protocol Protocol version number sent by the client
    */
-  protected final void handleHandshake(final @NotNull Channel channel,
+  protected final void handleHandshake(final @NotNull ChannelHandlerContext ctx,
                                        final @NotNull String hostname,
                                        final int protocol) throws Exception {
     // Check if the hostname is invalid
@@ -65,20 +62,14 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       throw QuietDecoderException.INSTANCE;
     }
     protocolVersion = ProtocolVersion.fromId(protocol);
-    channel.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
+    ctx.pipeline().addFirst(FALLBACK_BANDWIDTH, FallbackBandwidthHandler.INSTANCE);
   }
 
   /**
    * Validates and handles incoming login packets
-   *
-   * @param channel       Forwarded client channel
-   * @param loginPacket   Login packet sent by the client
-   * @param username      Username sent by the client
-   * @param socketAddress Socket address of the client
    */
-  protected final void handleLogin(final @NotNull Channel channel,
-                                   final @NotNull ChannelHandlerContext ctx,
-                                   final @NotNull Runnable loginPacket,
+  protected final void handleLogin(final @NotNull ChannelHandlerContext ctx,
+                                   final @NotNull Runnable initialLoginAction,
                                    final @NotNull String username,
                                    final @NotNull InetSocketAddress socketAddress) throws Exception {
     // Check if the player has already sent a login packet
@@ -86,7 +77,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       throw QuietDecoderException.INSTANCE;
     }
     // Connections from unknown protocol versions will be discarded
-    // as this is the safest way of handling unwanted connections
+    // as this is the safest way of handling unwanted connections.
     // Sonar does not support snapshots or Minecraft versions older than 1.7.2
     if (protocolVersion.isUnknown()) {
       throw QuietDecoderException.INSTANCE;
@@ -95,17 +86,17 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     this.username = username;
 
     final InetAddress inetAddress = socketAddress.getAddress();
-    channel.pipeline().get(FallbackInboundHandler.class).setInetAddress(inetAddress);
+    ctx.pipeline().get(FallbackInboundHandler.class).setInetAddress(inetAddress);
 
     // Check if Fallback is already verifying a player with the same IP address
     if (Sonar.get().getFallback().getConnected().containsKey(inetAddress)) {
-      customDisconnect(channel, protocolVersion, alreadyVerifying);
+      customDisconnect(ctx.channel(), alreadyVerifying, protocolVersion);
       return;
     }
 
     // Check if the protocol ID of the player is not allowed to enter the server
     if (Sonar.get().getConfig().getVerification().getBlacklistedProtocols().contains(protocolVersion.getProtocol())) {
-      customDisconnect(channel, protocolVersion, protocolBlacklisted);
+      customDisconnect(ctx.channel(), protocolBlacklisted, protocolVersion);
       return;
     }
 
@@ -115,34 +106,34 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     if (limit > 0) {
       final int score = Sonar.get().getFallback().getBlacklist().asMap().getOrDefault(hostAddress, 0);
       if (score >= limit) {
-        customDisconnect(channel, protocolVersion, blacklisted);
+        customDisconnect(ctx.channel(), blacklisted, protocolVersion);
         return;
       }
     }
 
     // Don't continue the verification process if the verification is disabled
     if (!Sonar.get().getFallback().shouldVerifyNewPlayers()) {
-      initialLogin(ctx, inetAddress, loginPacket);
+      initialLogin(ctx.channel(), inetAddress, initialLoginAction);
       return;
     }
 
     // Completely skip Geyser connections if configured
-    final boolean geyser = GeyserUtil.isGeyserConnection(channel, socketAddress);
+    final boolean geyser = GeyserUtil.isGeyserConnection(ctx.channel(), socketAddress);
     if (geyser && !Sonar.get().getConfig().getVerification().isCheckGeyser()) {
-      initialLogin(ctx, inetAddress, loginPacket);
+      initialLogin(ctx.channel(), inetAddress, initialLoginAction);
       return;
     }
 
     // Make sure we actually have to verify the player
     final String fingerprint = FingerprintingUtil.getFingerprint(username, hostAddress);
     if (Sonar.get().getVerifiedPlayerController().getCache().contains(fingerprint)) {
-      initialLogin(ctx, inetAddress, loginPacket);
+      initialLogin(ctx.channel(), inetAddress, initialLoginAction);
       return;
     }
 
     // Check if the IP address is currently being rate-limited
     if (!Sonar.get().getFallback().getRatelimiter().attempt(inetAddress)) {
-      customDisconnect(channel, protocolVersion, reconnectedTooFast);
+      customDisconnect(ctx.channel(), reconnectedTooFast, protocolVersion);
       return;
     }
 
@@ -150,10 +141,10 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     rewriteProtocol(ctx, channelRemovalListener);
 
     // Queue the connection for further processing
-    Sonar.get().getFallback().getQueue().getPlayers().compute(inetAddress, (__, action) -> {
+    Sonar.get().getFallback().getQueue().getPlayers().compute(inetAddress, (__, runnable) -> {
       // Check if the player is already queued since we don't want bots to flood the queue
-      if (action != null) {
-        customDisconnect(channel, protocolVersion, alreadyQueued);
+      if (runnable != null) {
+        customDisconnect(ctx.channel(), alreadyQueued, protocolVersion);
         // Remove other instances of this IP address from the queue
         return null;
       }
@@ -162,13 +153,38 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
         // Check if the username matches the valid name regex to prevent
         // UTF-16 names or other types of exploits
         if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(username).matches()) {
-          customDisconnect(channel, protocolVersion, invalidUsername);
+          customDisconnect(ctx.channel(), invalidUsername, protocolVersion);
           return;
         }
 
         // Create an instance for the user and let the verification handler take over the channel
-        new FallbackUserWrapper(channel, inetAddress, protocolVersion, username, fingerprint, geyser);
+        new FallbackUserWrapper(ctx.channel(), inetAddress, protocolVersion, username, fingerprint, geyser);
       };
+    });
+  }
+
+  /**
+   * Executes the maximum accounts per IP limit check before letting the player join
+   */
+  protected final void initialLogin(final @NotNull Channel channel,
+                                    final @NotNull InetAddress inetAddress,
+                                    final @NotNull Runnable loginPacket) throws Exception {
+    Sonar.get().getFallback().getOnline().compute(inetAddress, (__, count) -> {
+      final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
+      // Skip the maximum online per IP check if it's disabled in the configuration
+      if (count != null && maxOnlinePerIp > 0) {
+        // Check if the number of online players using the same IP address as
+        // the connecting player is greater than the configured amount
+        if (count >= maxOnlinePerIp) {
+          customDisconnect(channel, tooManyOnlinePerIP, protocolVersion);
+          return count + 1;
+        }
+      }
+
+      // Let the server know about the login packet
+      loginPacket.run();
+      // Increment the number of accounts with the same IP
+      return count == null ? 1 : count + 1;
     });
   }
 
@@ -196,58 +212,24 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       TimeUnit.MILLISECONDS));
   }
 
-  /**
-   * Executes the maximum accounts per IP limit check before letting the player join
-   *
-   * @param ctx         Forwarded client channel context
-   * @param inetAddress Resolved client IP address
-   * @param loginPacket Login packet sent by the client
-   */
-  protected final void initialLogin(final @NotNull ChannelHandlerContext ctx,
-                                    final @NotNull InetAddress inetAddress,
-                                    final @NotNull Runnable loginPacket) throws Exception {
-    Sonar.get().getFallback().getOnline().compute(inetAddress, (__, count) -> {
-      final int maxOnlinePerIp = Sonar.get().getConfig().getMaxOnlinePerIp();
-      // Skip the maximum online per IP check if it's disabled in the configuration
-      if (count != null && maxOnlinePerIp > 0) {
-        // Check if the number of online players using the same IP address as
-        // the connecting player is greater than the configured amount
-        if (count >= maxOnlinePerIp) {
-          customDisconnect(ctx.channel(), protocolVersion, tooManyOnlinePerIP);
-          return count + 1;
-        }
-      }
-
-      // Let the server know about the login packet
-      loginPacket.run();
-      // Increment the number of accounts with the same IP
-      return count == null ? 1 : count + 1;
-    });
-  }
-
-  /**
-   * Disconnect the player before verification (during login)
-   * by replacing the encoder before running the method.
-   *
-   * @param packet          Disconnect packet
-   * @param channel         Channel of the player
-   * @param protocolVersion Protocol version of the player
-   */
-  private void customDisconnect(final @NotNull Channel channel,
-                                final @NotNull ProtocolVersion protocolVersion,
-                                final @NotNull FallbackPacket packet) {
+  private static void customDisconnect(final @NotNull Channel channel,
+                                       final @NotNull FallbackPacket packet,
+                                       final ProtocolVersion protocolVersion) {
     if (channel.isActive()) {
       if (channel.eventLoop().inEventLoop()) {
-        _customDisconnect(channel, protocolVersion, packet);
+        _customDisconnect(channel, packet, protocolVersion);
       } else {
-        channel.eventLoop().execute(() -> _customDisconnect(channel, protocolVersion, packet));
+        channel.eventLoop().execute(() -> _customDisconnect(channel, packet, protocolVersion));
       }
     }
   }
 
-  private void _customDisconnect(final @NotNull Channel channel,
-                                 final @NotNull ProtocolVersion protocolVersion,
-                                 final @NotNull FallbackPacket packet) {
+  /**
+   * Disconnect the player before verification (during login)
+   */
+  private static void _customDisconnect(final @NotNull Channel channel,
+                                        final @NotNull FallbackPacket packet,
+                                        final ProtocolVersion protocolVersion) {
     // Remove the connection handler pipeline to completely take over the channel
     final String handler = Sonar.get().getPlatform().getConnectionHandler();
     if (channel.pipeline().context(handler) != null) {

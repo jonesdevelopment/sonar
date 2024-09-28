@@ -199,6 +199,9 @@ verification:
     # Nachricht, die dem Spieler angezeigt wird, wenn er den falschen Code im Chat eingibt
     incorrect: '<prefix><red>Du hast eine falsche Antwort eingegeben! Bitte versuche es erneut.'
 
+  # Nachricht, die dem Spieler angezeigt wird, wenn er überprüft wird
+  welcome: '<prefix><green>Sie werden gerade überprüft. Bitte bewegen Sie sich nicht, dies ist ein automatischer Vorgang.'
+
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, während der CAPTCHA noch nicht vorbereitet wurde
   currently-preparing:
     - <header>

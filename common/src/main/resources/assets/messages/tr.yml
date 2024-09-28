@@ -198,6 +198,9 @@ verification:
     # Message that is shown to the player when they enter the wrong answer in chat
     incorrect: '<prefix><red>Yanlış bir cevap girdiniz! Lütfen tekrar deneyin.'
 
+  # Doğrulandıklarında oyuncuya gösterilen mesaj
+  welcome: '<prefix><green>Doğrulanıyorsunuz. Lütfen hareket etmeyin; bu otomatik bir süreçtir.'
+
   # CAPTCHA henüz hazırlanmamışken birisi katıldığında gösterilen bağlantıyı kesme mesajı
   currently-preparing:
     - <header>
