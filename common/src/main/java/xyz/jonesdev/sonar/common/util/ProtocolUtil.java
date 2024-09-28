@@ -47,12 +47,12 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.util.Version;
 import lombok.experimental.UtilityClass;
-import net.kyori.adventure.nbt.*;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagType;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
-import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -297,49 +297,21 @@ public class ProtocolUtil {
     }
   }
 
-  public static void writeCompoundTag(final @NotNull ByteBuf byteBuf, final @NotNull CompoundBinaryTag compoundTag) {
+  // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java#L458
+  @SuppressWarnings("unchecked")
+  public static <T extends BinaryTag> void writeBinaryTag(final @NotNull ByteBuf byteBuf,
+                                                          final @NotNull ProtocolVersion protocolVersion,
+                                                          final @NotNull T tag) {
+    final BinaryTagType<T> type = (BinaryTagType<T>) tag.type();
+    byteBuf.writeByte(type.id());
     try {
-      BinaryTagIO.writer().write(compoundTag, (DataOutput) new ByteBufOutputStream(byteBuf));
-    } catch (IOException exception) {
-      throw new EncoderException("Unable to encode NBT CompoundTag");
-    }
-  }
-
-  // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/ByteMessage.java#L219
-  public static void writeNamelessCompoundTag(final @NotNull ByteBuf byteBuf, final @NotNull BinaryTag binaryTag) {
-    try (final ByteBufOutputStream output = new ByteBufOutputStream(byteBuf)) {
-      // TODO: Find a way to improve this...
-      output.writeByte(binaryTag.type().id());
-      if (binaryTag instanceof CompoundBinaryTag) {
-        CompoundBinaryTag tag = (CompoundBinaryTag) binaryTag;
-        tag.type().write(tag, output);
-      } else if (binaryTag instanceof ByteBinaryTag) {
-        ByteBinaryTag tag = (ByteBinaryTag) binaryTag;
-        tag.type().write(tag, output);
-      } else if (binaryTag instanceof ShortBinaryTag) {
-        ShortBinaryTag tag = (ShortBinaryTag) binaryTag;
-        tag.type().write(tag, output);
-      } else if (binaryTag instanceof IntBinaryTag) {
-        IntBinaryTag tag = (IntBinaryTag) binaryTag;
-        tag.type().write(tag, output);
-      } else if (binaryTag instanceof LongBinaryTag) {
-        LongBinaryTag tag = (LongBinaryTag) binaryTag;
-        tag.type().write(tag, output);
-      } else if (binaryTag instanceof DoubleBinaryTag) {
-        DoubleBinaryTag tag = (DoubleBinaryTag) binaryTag;
-        tag.type().write(tag, output);
-      } else if (binaryTag instanceof StringBinaryTag) {
-        StringBinaryTag tag = (StringBinaryTag) binaryTag;
-        tag.type().write(tag, output);
-      } else if (binaryTag instanceof ListBinaryTag) {
-        ListBinaryTag tag = (ListBinaryTag) binaryTag;
-        tag.type().write(tag, output);
-      } else if (binaryTag instanceof EndBinaryTag) {
-        EndBinaryTag tag = (EndBinaryTag) binaryTag;
-        tag.type().write(tag, output);
+      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) < 0) {
+        // pre-1.20.2 clients need an empty name
+        byteBuf.writeShort(0);
       }
+      type.write(tag, new ByteBufOutputStream(byteBuf));
     } catch (IOException exception) {
-      throw new EncoderException("Unable to encode NBT CompoundTag");
+      throw new EncoderException("Unable to encode BinaryTag", exception);
     }
   }
 

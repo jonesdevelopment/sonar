@@ -90,11 +90,8 @@ public final class ChunkDataPacket implements FallbackPacket {
     }
 
     if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0) {
-        writeNamelessCompoundTag(byteBuf, MODERN_TAG);
-      } else {
-        writeCompoundTag(byteBuf, protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? LEGACY_TAG : MODERN_TAG);
-      }
+      writeBinaryTag(byteBuf, protocolVersion,
+        protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? LEGACY_TAG : MODERN_TAG);
 
       if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0 && protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
         if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {

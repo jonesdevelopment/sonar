@@ -109,7 +109,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
-      writeCompoundTag(byteBuf, CODEC_1_16);
+      writeBinaryTag(byteBuf, protocolVersion, CODEC_1_16);
       writeString(byteBuf, DEFAULT_DIMENSION_1_16_2.getIdentifier());
       writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
@@ -127,8 +127,8 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
-      writeCompoundTag(byteBuf, CODEC_1_16_2);
-      writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_16_2.getTag());
+      writeBinaryTag(byteBuf, protocolVersion, CODEC_1_16_2);
+      writeBinaryTag(byteBuf, protocolVersion, DEFAULT_DIMENSION_1_16_2.getTag());
       writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
       writeVarInt(byteBuf, 0); // max players
@@ -146,11 +146,11 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
       if (protocolVersion.compareTo(MINECRAFT_1_18_2) >= 0) {
-        writeCompoundTag(byteBuf, CODEC_1_18_2);
-        writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_18_2.getTag());
+        writeBinaryTag(byteBuf, protocolVersion, CODEC_1_18_2);
+        writeBinaryTag(byteBuf, protocolVersion, DEFAULT_DIMENSION_1_18_2.getTag());
       } else {
-        writeCompoundTag(byteBuf, CODEC_1_16_2);
-        writeCompoundTag(byteBuf, DEFAULT_DIMENSION_1_16_2.getTag());
+        writeBinaryTag(byteBuf, protocolVersion, CODEC_1_16_2);
+        writeBinaryTag(byteBuf, protocolVersion, DEFAULT_DIMENSION_1_16_2.getTag());
       }
       writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);
@@ -171,12 +171,12 @@ public final class JoinGamePacket implements FallbackPacket {
       writeStringArray(byteBuf, levelNames);
       if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
         if (protocolVersion.compareTo(MINECRAFT_1_19_4) >= 0) {
-          writeCompoundTag(byteBuf, CODEC_1_19_4);
+          writeBinaryTag(byteBuf, protocolVersion, CODEC_1_19_4);
         } else {
-          writeCompoundTag(byteBuf, CODEC_1_19_1);
+          writeBinaryTag(byteBuf, protocolVersion, CODEC_1_19_1);
         }
       } else {
-        writeCompoundTag(byteBuf, CODEC_1_19);
+        writeBinaryTag(byteBuf, protocolVersion, CODEC_1_19);
       }
       writeString(byteBuf, worldType);
       writeString(byteBuf, levelType);
@@ -197,7 +197,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
-      writeCompoundTag(byteBuf, CODEC_1_20);
+      writeBinaryTag(byteBuf, protocolVersion, CODEC_1_20);
       writeString(byteBuf, worldType);
       writeString(byteBuf, levelType);
       byteBuf.writeLong(partialHashedSeed);

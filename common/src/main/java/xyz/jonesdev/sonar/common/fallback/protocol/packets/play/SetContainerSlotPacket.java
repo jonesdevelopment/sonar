@@ -29,7 +29,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeBinaryTag;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @ToString
@@ -79,10 +80,8 @@ public final class SetContainerSlotPacket implements FallbackPacket {
         byteBuf.writeByte(0);
       }
     } else {
-      if (protocolVersion.compareTo(MINECRAFT_1_20_2) < 0) {
-        writeCompoundTag(byteBuf, compoundBinaryTag);
-      } else if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
-        writeNamelessCompoundTag(byteBuf, compoundBinaryTag);
+      if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
+        writeBinaryTag(byteBuf, protocolVersion, compoundBinaryTag);
       } else { // 1.20.5+
         // TODO: find a way to improve this
         // component

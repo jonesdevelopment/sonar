@@ -43,7 +43,7 @@ public final class RegistryDataPacket implements FallbackPacket {
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_5) < 0) {
-      writeNamelessCompoundTag(byteBuf, tag);
+      writeBinaryTag(byteBuf, protocolVersion, tag);
     } else if (type != null) {
       writeString(byteBuf, type);
       writeVarInt(byteBuf, bundles.size());
@@ -54,7 +54,7 @@ public final class RegistryDataPacket implements FallbackPacket {
         final CompoundBinaryTag tag = bundle.getTag();
         if (tag != null) {
           byteBuf.writeBoolean(true);
-          writeNamelessCompoundTag(byteBuf, tag);
+          writeBinaryTag(byteBuf, protocolVersion, tag);
         } else {
           byteBuf.writeBoolean(false);
         }
