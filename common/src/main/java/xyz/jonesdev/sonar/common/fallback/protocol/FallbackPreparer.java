@@ -76,7 +76,7 @@ public class FallbackPreparer {
   public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
   public final FallbackPacket[] REGISTRY_SYNC_1_21 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21);
   public final FallbackPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
-  public final static FallbackPacket CACHED_HELD_ITEM_SLOT = new SetHeldItemPacket(~4);
+  public final static FallbackPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
   public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlivePacket(RANDOM.nextInt());
 
   public static FallbackPacket loginSuccess;
