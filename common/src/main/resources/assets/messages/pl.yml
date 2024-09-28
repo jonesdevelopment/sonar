@@ -16,7 +16,7 @@
 # Placeholder for every '<prefix>' in this configuration file
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Placeholder for every '<support-url>' in this configuration file
-support-url: jhttps://jonesdev.xyz/discord/
+support-url: https://jonesdev.xyz/discord/
 # Placeholder for every '<header>' in this configuration file
 header:
   - <b><yellow>Sonar</b><reset>
