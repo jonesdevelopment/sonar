@@ -70,7 +70,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     // Spawn the invisible platform below the player
     if (enableCollisionsCheck) {
       final int index = RANDOM.nextInt(BLOCKS_PACKETS.length);
-      blockHeight = POSSIBLE_BLOCK_TYPES[index].getBlockHeight();
+      blockHeight = POSSIBLE_BLOCK_TYPES[index].getBlockHeight().apply(user.getProtocolVersion());
       user.delayedWrite(BLOCKS_PACKETS[index]);
     }
     // Send all packets at once
