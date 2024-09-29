@@ -54,7 +54,7 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
 
       for (final BlockUpdate block : blockUpdates) {
         byteBuf.writeShort(block.getLegacyBlockState());
-        final int blockId = block.getBlockType().getId(protocolVersion);
+        final int blockId = block.getBlockType().getId().apply(protocolVersion);
         if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_13)) {
           writeVarInt(byteBuf, blockId);
         } else {
@@ -82,7 +82,7 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
 
       for (final BlockUpdate block : blockUpdates) {
         // https://wiki.vg/Protocol#Update_Section_Blocks
-        final int shiftedBlockId = block.getBlockType().getId(protocolVersion) << 12;
+        final int shiftedBlockId = block.getBlockType().getId().apply(protocolVersion) << 12;
         final long positionIdValue = shiftedBlockId | block.getBlockState();
         writeVarLong(byteBuf, positionIdValue);
       }

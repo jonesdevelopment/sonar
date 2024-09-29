@@ -19,7 +19,6 @@ package xyz.jonesdev.sonar.common.fallback.protocol.block;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.util.function.Function;
@@ -27,6 +26,7 @@ import java.util.function.Function;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 
 // TODO: load mappings from a separate file
+@Getter
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
 public enum BlockType {
@@ -67,7 +67,7 @@ public enum BlockType {
       return 7385;
     }
     return 7389;
-  }, 0.75f),
+  }, protocolVersion -> (double) 0.75f),
   TRAPDOOR(protocolVersion -> {
     // We have to use wooden trapdoors for 1.7 since 1.7 doesn't have iron trapdoors
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_7_6)) {
@@ -107,7 +107,7 @@ public enum BlockType {
       return 10273;
     }
     return 10414;
-  }, 0.1875),
+  }, protocolVersion -> 0.1875),
   END_PORTAL_FRAME(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
       return 120;
@@ -140,7 +140,7 @@ public enum BlockType {
       return 7410;
     }
     return 7414;
-  }, 0.8125),
+  }, protocolVersion -> 0.8125),
   DAYLIGHT_SENSOR(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
       return 151;
@@ -176,7 +176,7 @@ public enum BlockType {
       return 9067;
     }
     return 9207;
-  }, 0.375),
+  }, protocolVersion -> 0.375),
   COBBLESTONE_WALL(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
       return 139;
@@ -209,7 +209,7 @@ public enum BlockType {
       return 7918;
     }
     return 7922;
-  }, 1.5),
+  }, protocolVersion -> 1.5),
   STONE_SLABS(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
       return 44;
@@ -245,7 +245,7 @@ public enum BlockType {
       return 11090;
     }
     return 11231;
-  }, 0.5),
+  }, protocolVersion -> 0.5),
   WHITE_CARPET(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
       return 171;
@@ -281,13 +281,8 @@ public enum BlockType {
       return 10587;
     }
     return 10728;
-  }, 0.0625);
+  }, protocolVersion -> protocolVersion.compareTo(MINECRAFT_1_8) < 0 ? 0 : 0.0625);
 
-  private final Function<ProtocolVersion, Integer> idFunction;
-  @Getter
-  private final double blockHeight;
-
-  public int getId(final @NotNull ProtocolVersion protocolVersion) {
-    return idFunction.apply(protocolVersion);
-  }
+  private final Function<ProtocolVersion, Integer> id;
+  private final Function<ProtocolVersion, Double> blockHeight;
 }
