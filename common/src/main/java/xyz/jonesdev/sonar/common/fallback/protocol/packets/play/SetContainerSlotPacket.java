@@ -45,7 +45,7 @@ public final class SetContainerSlotPacket implements FallbackPacket {
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeByte(windowId);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17_1) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17_1)) {
       writeVarInt(byteBuf, 0);
     }
 
@@ -55,42 +55,40 @@ public final class SetContainerSlotPacket implements FallbackPacket {
       byteBuf.writeBoolean(true);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_20_5) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20_5)) {
       writeVarInt(byteBuf, count);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_13_2) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_13_2)) {
       byteBuf.writeShort(itemType.getId(protocolVersion));
     } else {
       writeVarInt(byteBuf, itemType.getId(protocolVersion));
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_20_5)) {
       byteBuf.writeByte(count);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_13)) {
       byteBuf.writeShort(0); // data
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_17)) {
+      if (protocolVersion.lessThan(MINECRAFT_1_8)) {
         byteBuf.writeShort(-1);
       } else {
         byteBuf.writeByte(0);
       }
-    } else {
-      if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
-        writeBinaryTag(byteBuf, protocolVersion, compoundBinaryTag);
-      } else { // 1.20.5+
-        // TODO: find a way to improve this
-        // component
-        writeVarInt(byteBuf, 1); // component count to add
-        writeVarInt(byteBuf, 0); // component count to remove
-        // single VarInt component
-        writeVarInt(byteBuf, 26); // map component
-        writeVarInt(byteBuf, 0); // map id
-      }
+    } else if (protocolVersion.lessThan(MINECRAFT_1_20_5)) {
+      writeBinaryTag(byteBuf, protocolVersion, compoundBinaryTag);
+    } else { // 1.20.5+
+      // TODO: find a way to improve this
+      // component
+      writeVarInt(byteBuf, 1); // component count to add
+      writeVarInt(byteBuf, 0); // component count to remove
+      // single VarInt component
+      writeVarInt(byteBuf, 26); // map component
+      writeVarInt(byteBuf, 0); // map id
     }
   }
 

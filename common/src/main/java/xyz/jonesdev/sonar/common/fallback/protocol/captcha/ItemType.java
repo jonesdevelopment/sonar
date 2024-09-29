@@ -33,37 +33,37 @@ public enum ItemType {
   // - https://pokechu22.github.io/Burger/1.20.4.html
   // - https://github.com/ViaVersion/Mappings/tree/main/mappings
   FILLED_MAP(protocolVersion -> {
-    if (protocolVersion.compareTo(MINECRAFT_1_12_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
       return 358;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_13_1) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_13_1)) {
       return 608;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_13_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_13_2)) {
       return 613;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_15_2)) {
       return 671;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_16_4) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_16_4)) {
       return 733;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_18_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_18_2)) {
       return 847;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_19_1) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_1)) {
       return 886;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_3)) {
       return 914;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_19_4) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_4)) {
       return 937;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_20_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20_2)) {
       return 941;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_20_3) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20_3)) {
       return 979;
     }
     return 982;

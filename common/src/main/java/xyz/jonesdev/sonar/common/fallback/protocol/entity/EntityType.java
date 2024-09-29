@@ -32,52 +32,52 @@ public enum EntityType {
   // - https://github.com/PrismarineJS/minecraft-data/blob/master/data/pc/
   // - https://pokechu22.github.io/Burger/1.20.4.html
   BOAT(protocolVersion -> {
-    if (protocolVersion.compareTo(MINECRAFT_1_13_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_13_2)) {
       return 1;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_14_4) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_14_4)) {
       return 5;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_16_4) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_16_4)) {
       return 6;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_18_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_18_2)) {
       return 7;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_3)) {
       return 8;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_20_3) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20_3)) {
       return 9;
     }
     return 10;
   }),
   MINECART(protocolVersion -> {
-    if (protocolVersion.compareTo(MINECRAFT_1_13_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_13_2)) {
       return 10;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_14_4) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_14_4)) {
       return 41;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_15_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_15_2)) {
       return 42;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_16_4) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_16_4)) {
       return 45;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_18_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_18_2)) {
       return 50;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_19_1) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_1)) {
       return 53;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_3)) {
       return 54;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_20_2) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20_2)) {
       return 64;
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_20_3) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20_3)) {
       return 65;
     }
     return 69;

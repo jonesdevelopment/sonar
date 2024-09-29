@@ -70,31 +70,30 @@ public final class ChunkDataPacket implements FallbackPacket {
     byteBuf.writeInt(sectionX);
     byteBuf.writeInt(sectionZ);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_17_1) <= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)) {
+      if (protocolVersion.lessThanOrEquals(MINECRAFT_1_17_1)) {
         writeVarInt(byteBuf, 0); // mask
       }
     } else {
       byteBuf.writeBoolean(true); // full chunk
 
-      if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
-        && protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
+      if (protocolVersion.inBetween(MINECRAFT_1_16, MINECRAFT_1_16_1)) {
         byteBuf.writeBoolean(true); // ignore old data
       }
 
-      if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
+      if (protocolVersion.greaterThan(MINECRAFT_1_8)) {
         writeVarInt(byteBuf, 0);
       } else {
         byteBuf.writeShort(1); // fix void chunk
       }
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_14)) {
       writeBinaryTag(byteBuf, protocolVersion,
-        protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? LEGACY_TAG : MODERN_TAG);
+        protocolVersion.lessThan(MINECRAFT_1_18) ? LEGACY_TAG : MODERN_TAG);
 
-      if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0 && protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
-        if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
+      if (protocolVersion.inBetween(MINECRAFT_1_15, MINECRAFT_1_17_1)) {
+        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16_2)) {
           writeVarInt(byteBuf, 1024);
 
           for (int i = 0; i < 1024; i++) {
@@ -108,16 +107,16 @@ public final class ChunkDataPacket implements FallbackPacket {
       }
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_13)) {
+      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_8)) {
         writeByteArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
       } else {
         byteBuf.writeInt(0); // compressed size
         byteBuf.writeBytes(LEGACY_FILLER_BYTES_17); // 1.7
       }
-    } else if (protocolVersion.compareTo(MINECRAFT_1_15) < 0) {
+    } else if (protocolVersion.lessThan(MINECRAFT_1_15)) {
       writeByteArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
-    } else if (protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
+    } else if (protocolVersion.lessThan(MINECRAFT_1_18)) {
       writeVarInt(byteBuf, 0); // 1.15 - 1.17.1
     } else {
       writeVarInt(byteBuf, SECTION_BYTES.length * 16);
@@ -127,14 +126,14 @@ public final class ChunkDataPacket implements FallbackPacket {
       }
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_9_4) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9_4)) {
       writeVarInt(byteBuf, 0);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_18) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18)) {
       byteBuf.ensureWritable(LIGHT_BYTES.length);
 
-      if (protocolVersion.compareTo(MINECRAFT_1_20) >= 0) {
+      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20)) {
         byteBuf.writeBytes(LIGHT_BYTES, 1, LIGHT_BYTES.length - 1);
       } else {
         byteBuf.writeBytes(LIGHT_BYTES);

@@ -48,29 +48,25 @@ public final class LoginStartPacket implements FallbackPacket {
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     username = readString(byteBuf, 16);
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19) >= 0) {
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_3) < 0) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_19_3)) {
         if (byteBuf.readBoolean()) {
-          readPlayerKey(byteBuf);
+          byteBuf.readLong(); // expiry
+          readByteArray(byteBuf); // key
+          readByteArray(byteBuf, 4096); // signature
         }
       }
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0) {
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_2)) {
         uuid = readUUID(byteBuf);
         return;
       }
 
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_19_1) >= 0) {
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
         if (byteBuf.readBoolean()) {
           uuid = readUUID(byteBuf);
         }
       }
     }
-  }
-
-  private static void readPlayerKey(final @NotNull ByteBuf byteBuf) {
-    final long expiry = byteBuf.readLong();
-    final byte[] key = readByteArray(byteBuf);
-    final byte[] signature = readByteArray(byteBuf, 4096);
   }
 }

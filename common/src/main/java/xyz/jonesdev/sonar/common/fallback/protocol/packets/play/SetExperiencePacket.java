@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
@@ -41,7 +40,7 @@ public final class SetExperiencePacket implements FallbackPacket {
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeFloat(experienceBar);
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeShort(level);
       byteBuf.writeShort(totalExperience);
     } else {

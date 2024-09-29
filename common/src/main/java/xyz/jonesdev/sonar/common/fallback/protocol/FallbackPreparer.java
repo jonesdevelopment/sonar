@@ -162,7 +162,7 @@ public class FallbackPreparer {
           blocks[index++] = new BlockUpdate(position, POSSIBLE_BLOCK_TYPES[i]);
         }
       }
-      BLOCKS_PACKETS[i] = new UpdateSectionBlocksPacket(0, 0, blocks);
+      BLOCKS_PACKETS[i] = new FallbackPacketSnapshot(new UpdateSectionBlocksPacket(0, 0, blocks));
     }
 
     // Prepare disconnect packets during login

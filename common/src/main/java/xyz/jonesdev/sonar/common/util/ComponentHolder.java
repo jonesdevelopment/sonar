@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_3;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeBinaryTag;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeString;
 
@@ -142,7 +141,7 @@ public final class ComponentHolder {
   }
 
   public void write(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_20_3) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_3)) {
       if (cachedBinaryTag == null) {
         cachedBinaryTag = serialize(new JsonParser().parse(serializedComponent));
       }

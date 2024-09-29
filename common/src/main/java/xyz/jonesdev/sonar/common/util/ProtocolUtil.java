@@ -58,9 +58,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_7_2;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
 public class ProtocolUtil {
@@ -225,8 +222,7 @@ public class ProtocolUtil {
   public static void closeWith(final @NotNull Channel channel,
                                final @NotNull ProtocolVersion protocolVersion,
                                final Object msg) {
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0
-      && protocolVersion.compareTo(MINECRAFT_1_7_2) >= 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       channel.eventLoop().execute(() -> {
         channel.config().setAutoRead(false);
         channel.eventLoop().schedule(() -> {
@@ -305,7 +301,7 @@ public class ProtocolUtil {
     final BinaryTagType<T> type = (BinaryTagType<T>) tag.type();
     byteBuf.writeByte(type.id());
     try {
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_2) < 0) {
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
         // pre-1.20.2 clients need an empty name
         byteBuf.writeShort(0);
       }

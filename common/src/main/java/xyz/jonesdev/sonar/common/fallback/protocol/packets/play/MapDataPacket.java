@@ -33,43 +33,46 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 public final class MapDataPacket implements FallbackPacket {
   private byte[] buffer;
   private int x, y;
+  private int scaling;
+  private boolean locked;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    writeVarInt(byteBuf, 0);
+    writeVarInt(byteBuf, 0); // item damage
 
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeShort(buffer.length + 3);
-      byteBuf.writeByte(0); // scaling
+      byteBuf.writeByte(0);
       byteBuf.writeByte(x);
       byteBuf.writeByte(y);
       byteBuf.writeBytes(buffer);
-    } else {
-      byteBuf.writeByte(0); // scaling
-
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0
-        && protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) < 0) {
-        byteBuf.writeBoolean(false);
-      }
-
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_14) >= 0) {
-        byteBuf.writeBoolean(false);
-      }
-
-      if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_17) >= 0) {
-        byteBuf.writeBoolean(false);
-      } else {
-        writeVarInt(byteBuf, 0);
-      }
-
-      byteBuf.writeByte(128); // rows
-      byteBuf.writeByte(128); // columns
-      byteBuf.writeByte(x);
-      byteBuf.writeByte(y);
-
-      writeVarInt(byteBuf, buffer.length);
-      byteBuf.writeBytes(buffer);
+      return;
     }
+
+    byteBuf.writeByte(scaling);
+
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)
+      && protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_17)) {
+      byteBuf.writeBoolean(false); // no icon
+    }
+
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_14)) {
+      byteBuf.writeBoolean(locked);
+    }
+
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17)) {
+      byteBuf.writeBoolean(false); // no icon
+    } else {
+      writeVarInt(byteBuf, 0); // no icon
+    }
+
+    byteBuf.writeByte(128); // rows
+    byteBuf.writeByte(128); // columns
+    byteBuf.writeByte(x);
+    byteBuf.writeByte(y);
+
+    writeVarInt(byteBuf, buffer.length);
+    byteBuf.writeBytes(buffer);
   }
 
   @Override

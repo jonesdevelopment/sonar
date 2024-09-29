@@ -145,7 +145,7 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
-      if (protocolVersion.compareTo(MINECRAFT_1_18_2) >= 0) {
+      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18_2)) {
         writeBinaryTag(byteBuf, protocolVersion, CODEC_1_18_2);
         writeBinaryTag(byteBuf, protocolVersion, DEFAULT_DIMENSION_1_18_2.getTag());
       } else {
@@ -169,8 +169,8 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
-      if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
-        if (protocolVersion.compareTo(MINECRAFT_1_19_4) >= 0) {
+      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_1)) {
+        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_4)) {
           writeBinaryTag(byteBuf, protocolVersion, CODEC_1_19_4);
         } else {
           writeBinaryTag(byteBuf, protocolVersion, CODEC_1_19_1);
@@ -193,7 +193,6 @@ public final class JoinGamePacket implements FallbackPacket {
     }
 
     if (protocolVersion.equals(MINECRAFT_1_20)) {
-      byteBuf.writeBoolean(isHardcore);
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(-1); // previous gamemode
       writeStringArray(byteBuf, levelNames);
@@ -230,11 +229,11 @@ public final class JoinGamePacket implements FallbackPacket {
       byteBuf.writeBoolean(isDebug);
       byteBuf.writeBoolean(isFlat);
       byteBuf.writeBoolean(false); // no last death location
-      writeVarInt(byteBuf, 0);
+      writeVarInt(byteBuf, 0); // pearl cooldown
       return;
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_20_5) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20_5)) {
       byteBuf.writeBoolean(isHardcore);
       writeStringArray(byteBuf, levelNames);
       writeVarInt(byteBuf, 0); // max players

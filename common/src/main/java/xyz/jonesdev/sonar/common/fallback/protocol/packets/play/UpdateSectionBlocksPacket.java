@@ -41,11 +41,11 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_16_2)) {
       byteBuf.writeInt(sectionX);
       byteBuf.writeInt(sectionZ);
 
-      if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+      if (protocolVersion.lessThan(MINECRAFT_1_8)) {
         byteBuf.writeShort(blockUpdates.length);
         byteBuf.writeInt(4 * blockUpdates.length);
       } else {
@@ -55,11 +55,11 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
       for (final BlockUpdate block : blockUpdates) {
         byteBuf.writeShort(block.getLegacyBlockState());
         final int blockId = block.getBlockType().getId(protocolVersion);
-        if (protocolVersion.compareTo(MINECRAFT_1_13) >= 0) {
+        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_13)) {
           writeVarInt(byteBuf, blockId);
         } else {
           final int shiftedBlockId = blockId << 4;
-          if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+          if (protocolVersion.lessThan(MINECRAFT_1_8)) {
             byteBuf.writeShort(shiftedBlockId);
           } else {
             writeVarInt(byteBuf, shiftedBlockId);
@@ -74,7 +74,7 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
       byteBuf.writeLong(((sectionX & 0x3FFFFFL) << 42) | (sectionY & 0xFFFFF) | ((sectionZ & 0x3FFFFFL) << 20));
 
       // 1.20+ don't have light update suppression
-      if (protocolVersion.compareTo(MINECRAFT_1_20) < 0) {
+      if (protocolVersion.lessThan(MINECRAFT_1_20)) {
         byteBuf.writeBoolean(true); // suppress light updates
       }
 

@@ -20,11 +20,11 @@ package xyz.jonesdev.sonar.common.fallback.verification;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackVehicleHandler extends FallbackVerificationHandler {
@@ -206,7 +206,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
 
         // 1.8 and below do not have PaddleBoat packets, so we simply exempt them from the PaddleBoat check.
         // Clients don't send PaddleBoat & VehicleMovePacket packets while riding minecarts.
-        if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0 || inMinecart) {
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_9) || inMinecart) {
           paddlePackets++;
           vehicleMovePackets++;
         } else if (!user.isGeyser()) {

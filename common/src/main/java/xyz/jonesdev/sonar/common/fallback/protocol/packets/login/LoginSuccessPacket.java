@@ -43,9 +43,9 @@ public final class LoginSuccessPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16)) {
       writeUUID(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_7_6) >= 0) {
+    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_7_6)) {
       writeString(byteBuf, uuid.toString());
     } else {
       writeString(byteBuf, FastUuidSansHyphens.toString(uuid));
@@ -53,7 +53,7 @@ public final class LoginSuccessPacket implements FallbackPacket {
 
     writeString(byteBuf, username);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
       // We don't need to send any properties to the client
       writeVarInt(byteBuf, 0);
     }

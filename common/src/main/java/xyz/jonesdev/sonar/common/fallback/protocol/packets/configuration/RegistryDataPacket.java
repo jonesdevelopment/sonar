@@ -42,7 +42,7 @@ public final class RegistryDataPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_5) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {
       writeBinaryTag(byteBuf, protocolVersion, tag);
     } else if (type != null) {
       writeString(byteBuf, type);

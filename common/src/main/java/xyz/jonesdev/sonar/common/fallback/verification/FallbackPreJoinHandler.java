@@ -45,10 +45,10 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     super(user);
 
     // Start initializing the actual join process for pre-1.20.2 clients
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
+    if (user.getProtocolVersion().lessThan(MINECRAFT_1_20_2)) {
       // This trick helps in reducing unnecessary outgoing server traffic
       // by avoiding sending other packets to clients that are potentially bots.
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+      if (user.getProtocolVersion().lessThan(MINECRAFT_1_8)) {
         user.channel().eventLoop().schedule(this::markSuccess, 100L, TimeUnit.MILLISECONDS);
       } else {
         sendKeepAlive();
@@ -111,7 +111,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       expectedKeepAliveId = 0;
 
       // Immediately verify the player if they do not need any configuration (pre-1.20.2)
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
+      if (user.getProtocolVersion().lessThan(MINECRAFT_1_20_2)) {
         markSuccess();
       }
     } else if (packet instanceof LoginAcknowledgedPacket) {
@@ -150,7 +150,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       // Check if the channel is correct - 1.13 uses the new namespace
       // system ('minecraft:' + channel) and anything below 1.13 uses
       // the legacy namespace system ('MC|' + channel).
-      checkState(usingLegacyChannel || user.getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0,
+      checkState(usingLegacyChannel || user.getProtocolVersion().greaterThanOrEquals(MINECRAFT_1_13),
         "illegal PluginMessage channel: " + pluginMessage.getChannel());
 
       // Validate the client branding using a regex to filter unwanted characters.
@@ -170,9 +170,9 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
   private void synchronizeClientRegistry() {
     // 1.20.5+ adds new "game bundle features" which overcomplicate all of this...
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
+    if (user.getProtocolVersion().greaterThanOrEquals(MINECRAFT_1_20_5)) {
       // Write the new RegistrySync packets to the buffer
-      for (final FallbackPacket syncPacket : user.getProtocolVersion().compareTo(MINECRAFT_1_21) < 0
+      for (final FallbackPacket syncPacket : user.getProtocolVersion().lessThan(MINECRAFT_1_21)
         ? REGISTRY_SYNC_1_20_5 : REGISTRY_SYNC_1_21) {
         user.delayedWrite(syncPacket);
       }
@@ -191,7 +191,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     // https://discord.com/channels/923308209769426994/1116066363887321199/1256929441053933608
     String brand = new String(data, StandardCharsets.UTF_8);
     // Remove the invalid character at the beginning of the client brand
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+    if (user.getProtocolVersion().greaterThanOrEquals(MINECRAFT_1_8)) {
       brand = brand.substring(1);
     }
     // Check for illegal client brands

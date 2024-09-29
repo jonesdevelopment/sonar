@@ -91,6 +91,22 @@ public enum ProtocolVersion {
     return ID_TO_PROTOCOL_CONSTANT.getOrDefault(protocol, UNKNOWN);
   }
 
+  public boolean greaterThan(final ProtocolVersion that) {
+    return compareTo(that) > 0;
+  }
+
+  public boolean greaterThanOrEquals(final ProtocolVersion that) {
+    return compareTo(that) >= 0;
+  }
+
+  public boolean lessThan(final ProtocolVersion that) {
+    return compareTo(that) < 0;
+  }
+
+  public boolean lessThanOrEquals(final ProtocolVersion that) {
+    return compareTo(that) <= 0;
+  }
+
   public boolean inBetween(final ProtocolVersion first, final ProtocolVersion last) {
     return compareTo(first) >= 0 && compareTo(last) <= 0;
   }

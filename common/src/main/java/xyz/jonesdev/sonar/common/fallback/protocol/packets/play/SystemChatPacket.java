@@ -51,17 +51,17 @@ public final class SystemChatPacket implements FallbackPacket {
     componentHolder.write(byteBuf, protocolVersion);
 
     // Type
-    if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_1)) {
       byteBuf.writeBoolean(false); // it's not the GAME_INFO type
-    } else if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
+    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
       writeVarInt(byteBuf, 1); // system chat
-    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_8)) {
       byteBuf.writeByte(1); // system chat
     }
 
     // Sender
-    if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
-      && protocolVersion.compareTo(MINECRAFT_1_19) < 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16)
+      && protocolVersion.lessThan(MINECRAFT_1_19)) {
       writeUUID(byteBuf, UUID.randomUUID());
     }
   }
@@ -70,8 +70,8 @@ public final class SystemChatPacket implements FallbackPacket {
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     message = readString(byteBuf, 256);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_19_1) <= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
+      if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_1)) {
         byteBuf.readLong(); // expiresAt
         final long saltLong = byteBuf.readLong();
         final byte[] signatureBytes = readByteArray(byteBuf);
@@ -79,7 +79,7 @@ public final class SystemChatPacket implements FallbackPacket {
 
         if (saltLong != 0L && signatureBytes.length > 0) {
           // No need to store the valid signature
-        } else if ((protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0
+        } else if ((protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_1)
           || saltLong == 0L) && signatureBytes.length == 0) {
           unsigned = true;
         } else {
@@ -91,7 +91,7 @@ public final class SystemChatPacket implements FallbackPacket {
           throw QuietDecoderException.INSTANCE;
         }
 
-        if (protocolVersion.compareTo(MINECRAFT_1_19_1) >= 0) {
+        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_1)) {
           final int size = readVarInt(byteBuf);
           if (size < 0 || size > 5) {
             throw QuietDecoderException.INSTANCE;
