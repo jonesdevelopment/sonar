@@ -199,6 +199,7 @@ verification:
     incorrect: '<prefix><red>Yanlış bir cevap girdiniz! Lütfen tekrar deneyin.'
 
   # Doğrulandıklarında oyuncuya gösterilen mesaj
+  # Karşılama mesajını tamamen devre dışı bırakmak için bunu '' olarak ayarlayın
   welcome: '<prefix><green>Doğrulanıyorsunuz. Lütfen hareket etmeyin; bu otomatik bir süreçtir.'
 
   # CAPTCHA henüz hazırlanmamışken birisi katıldığında gösterilen bağlantıyı kesme mesajı

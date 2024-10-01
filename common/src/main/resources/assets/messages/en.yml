@@ -199,6 +199,7 @@ verification:
     incorrect: '<prefix><red>You have entered a wrong answer! Please try again.'
 
   # Message shown to the player when they are being verified
+  # Set this to '' to disable the welcome message entirely
   welcome: '<prefix><green>You are being verified. Please do not move; this is an automatic process.'
 
   # Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet

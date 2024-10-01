@@ -200,6 +200,7 @@ verification:
     incorrect: '<prefix><red>Du hast eine falsche Antwort eingegeben! Bitte versuche es erneut.'
 
   # Nachricht, die dem Spieler angezeigt wird, wenn er überprüft wird
+  # Setzen Sie dies auf '', um die Willkommensnachricht vollständig zu deaktivieren
   welcome: '<prefix><green>Sie werden gerade überprüft. Bitte bewegen Sie sich nicht, dies ist ein automatischer Vorgang.'
 
   # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, während der CAPTCHA noch nicht vorbereitet wurde
