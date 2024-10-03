@@ -199,6 +199,7 @@ verification:
     incorrect: '<prefix><red>Zadali jste špatnou odpověď! Zkuste to prosím znovu.'
 
   # Zpráva zobrazená hráči při ověřování
+  # Nastavením této hodnoty na '' uvítací zprávu zcela vypnete
   welcome: '<prefix><green>Jste ověřováni. Prosím, nehýbejte se; jedná se o automatický proces.'
 
   # Zpráva o odpojení, která se zobrazí, když se někdo připojí, zatímco captcha ještě není připravena

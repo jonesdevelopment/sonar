@@ -199,6 +199,7 @@ verification:
     incorrect: '<prefix><red>თქვენ მიუთითეთ არასწორი კოდი. გთხოვთ ხელახლა ცადოთ.'
 
   # Message shown to the player when they are being verified
+  # Set this to '' to disable the welcome message entirely
   welcome: '<prefix><green>You are being verified. Please do not move; this is an automatic process.'
 
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე შემოვა მაგრამ CAPTCHA არ არის მზად

@@ -199,7 +199,8 @@ verification:
     incorrect: '<prefix><red>¡Has introducido una respuesta incorrecta! Por favor, inténtalo de nuevo.'
 
   # Mensaje que se muestra al jugador cuando está siendo verificado
-  welcome: '<prefijo><verde>Estás siendo verificado. Por favor, no te muevas; se trata de un proceso automático.'
+  # Ajústalo a '' para desactivar por completo el mensaje de bienvenida
+  welcome: '<prefix><green>Estás siendo verificado. Por favor, no te muevas; se trata de un proceso automático.'
 
   # Disconnect message that is shown when someone joins while the captcha hasn't been prepared yet
   currently-preparing:

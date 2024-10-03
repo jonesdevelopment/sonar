@@ -199,6 +199,7 @@ verification:
     incorrect: '<prefix><red>Je hebt een verkeerd antwoord ingevoerd! Probeer het opnieuw.'
 
   # Bericht dat aan de speler wordt getoond als hij wordt geverifieerd
+  # Stel dit in op '' om het welkomstbericht volledig uit te schakelen
   welcome: '<prefix><green>U wordt geverifieerd. Beweeg je niet, dit is een automatisch proces.'
 
   # Verbindingsbericht dat wordt getoond als iemand zich aansluit terwijl de captcha nog niet is voorbereid

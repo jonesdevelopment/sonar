@@ -188,10 +188,10 @@ public class FallbackPreparer {
     teleportMinecart = new TeleportEntityPacket(
       VEHICLE_ENTITY_ID, SPAWN_X_POSITION, IN_VOID_Y_POSITION, SPAWN_Z_POSITION, false);
     spawnBoatEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(VEHICLE_ENTITY_ID,
-      EntityType.BOAT, RANDOM.nextInt(16), IN_AIR_Y_POSITION, RANDOM.nextInt(16),
+      EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
       0, 0, 0, 0));
     spawnMinecartEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(VEHICLE_ENTITY_ID,
-      EntityType.MINECART, RANDOM.nextInt(16), IN_AIR_Y_POSITION, RANDOM.nextInt(16),
+      EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
       0, 0, 0, 0));
     setPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
