@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Range;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.model.VerifiedPlayer;
+import xyz.jonesdev.sonar.api.fingerprint.FingerprintingUtil;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -45,8 +46,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class VerifiedPlayerController {
-  private static final ExecutorService DB_UPDATE_SERVICE = Executors.newSingleThreadExecutor();
-
   @Getter
   private final Set<String> cache = Collections.synchronizedSet(new HashSet<>());
   private @Nullable ConnectionSource connectionSource;
@@ -54,6 +53,7 @@ public final class VerifiedPlayerController {
   private QueryBuilder<VerifiedPlayer, Integer> queryBuilder;
   @Getter
   private final @NotNull SonarConfiguration.Database.Type cachedDatabaseType;
+  private final ExecutorService updateService = Executors.newSingleThreadExecutor();
 
   public VerifiedPlayerController(final @NotNull LibraryManager libraryManager) {
     final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
@@ -95,7 +95,6 @@ public final class VerifiedPlayerController {
         Sonar.get().getConfig().getGeneralConfig().getString("database.password"),
         cachedDatabaseType.getDatabaseType());
 
-      // Create database table
       try {
         TableUtils.createTableIfNotExists(connectionSource, VerifiedPlayer.class);
       } catch (SQLException ignored) {
@@ -111,14 +110,16 @@ public final class VerifiedPlayerController {
 
       // Make sure to run the clean task and the caching task in the same thread
       // https://github.com/jonesdevelopment/sonar/issues/150
-      DB_UPDATE_SERVICE.execute(() -> {
-        try {
-          // Make sure to clear all outdated entries first
-          clearOld(database.getMaximumAge());
-          // Add all entries from the database to the cache
-          dao.queryForAll().forEach(verifiedPlayer -> cache.add(verifiedPlayer.getFingerprint()));
-        } catch (SQLException exception) {
-          exception.printStackTrace(System.err);
+      updateService.execute(() -> {
+        if (connectionSource != null) {
+          try {
+            // Make sure to clear all outdated entries first
+            clearOld(database.getMaximumAge());
+            // Add all entries from the database to the cache
+            dao.queryForAll().forEach(verifiedPlayer -> cache.add(verifiedPlayer.getFingerprint()));
+          } catch (SQLException exception) {
+            exception.printStackTrace(System.err);
+          }
         }
       });
     } catch (SQLException exception) {
@@ -137,16 +138,17 @@ public final class VerifiedPlayerController {
       } catch (Exception exception) {
         exception.printStackTrace(System.err);
       }
+      // Make sure not to reuse a closed connection
+      connectionSource = null;
+      updateService.shutdown();
     }
   }
 
   /**
-   * Clear all old entries using the given timestamp.
+   * Clear all old entries using the given timestamp
    */
   private void clearOld(final @Range(from = 1, to = 365) int maximumAge) throws SQLException {
-    final long timestamp = Instant.now()
-      .minus(maximumAge, ChronoUnit.DAYS)
-      .getEpochSecond() * 1000L; // convert to ms
+    final long timestamp = Instant.now().minus(maximumAge, ChronoUnit.DAYS).getEpochSecond() * 1000L;
 
     final List<VerifiedPlayer> oldEntries = queryBuilder.where()
       .lt("timestamp", new Timestamp(timestamp))
@@ -175,34 +177,36 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    DB_UPDATE_SERVICE.execute(() -> {
-      // We cannot throw a NullPointerException within the executor service
-      // because we want to handle the error instead of simply throwing an exception
-      if (connectionSource == null) {
-        return;
-      }
+    updateService.execute(() -> {
+      if (connectionSource != null) {
+        try {
+          final List<VerifiedPlayer> verifiedPlayer = queryBuilder.where()
+            .eq("fingerprint", fingerprint)
+            .query();
 
-      try {
-        final List<VerifiedPlayer> verifiedPlayer = queryBuilder.where()
-          .eq("fingerprint", fingerprint)
-          .query();
-
-        if (verifiedPlayer != null) {
-          for (final VerifiedPlayer player : verifiedPlayer) {
-            dao.delete(player);
+          if (verifiedPlayer != null) {
+            for (final VerifiedPlayer player : verifiedPlayer) {
+              dao.delete(player);
+            }
           }
+        } catch (SQLException exception) {
+          exception.printStackTrace(System.err);
         }
-      } catch (SQLException exception) {
-        exception.printStackTrace(System.err);
       }
     });
   }
 
   /**
-   * First, cache the player locally and then,
-   * secondly, asynchronously add the player to the database.
-   *
-   * @param player VerifiedPlayer model
+   * Creates a new VerifiedPlayer model from the given username, host address, and timestamp
+   */
+  public void add(final @NotNull String username, final @NotNull String hostAddress, final long timestamp) {
+    final String fingerprint = FingerprintingUtil.getFingerprint(username, hostAddress);
+    // Add a new VerifiedPlayer object from the given parameters to the database
+    add(new VerifiedPlayer(fingerprint, timestamp));
+  }
+
+  /**
+   * Caches the player locally and then adds the player to the database
    */
   public void add(final @NotNull VerifiedPlayer player) {
     cache.add(player.getFingerprint());
@@ -212,39 +216,27 @@ public final class VerifiedPlayerController {
       return;
     }
 
-    DB_UPDATE_SERVICE.execute(() -> {
-      // We cannot throw a NullPointerException within the executor service
-      // because we want to handle the error instead of simply throwing an exception
-      if (connectionSource == null) {
-        return;
-      }
-
-      try {
-        dao.createIfNotExists(player);
-      } catch (SQLException exception) {
-        exception.printStackTrace(System.err);
+    updateService.execute(() -> {
+      if (connectionSource != null) {
+        try {
+          dao.createIfNotExists(player);
+        } catch (SQLException exception) {
+          exception.printStackTrace(System.err);
+        }
       }
     });
-  }
-
-  /**
-   * Returns the number of verified IP addresses
-   *
-   * @return Estimated size of the local cache
-   */
-  public int estimatedSize() {
-    return cache.size();
   }
 
   /**
    * Clear the local cache, and, if the database type is set,
    * remove the table from the database.
    */
-  public synchronized void clearAll() {
+  public void clearAll() {
     cache.clear();
 
     // Delete the entire table from the database, if necessary
-    if (cachedDatabaseType != SonarConfiguration.Database.Type.NONE) {
+    if (connectionSource != null
+      && cachedDatabaseType != SonarConfiguration.Database.Type.NONE) {
       try {
         dao.deleteBuilder().delete();
       } catch (SQLException exception) {

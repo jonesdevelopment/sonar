@@ -130,7 +130,7 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @Override
   public int getTotalPlayersVerified() {
-    return Sonar.get().getVerifiedPlayerController().estimatedSize();
+    return Sonar.get().getVerifiedPlayerController().getCache().size();
   }
 
   @Override

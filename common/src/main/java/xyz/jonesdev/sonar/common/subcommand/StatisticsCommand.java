@@ -70,7 +70,7 @@ public final class StatisticsCommand extends Subcommand {
 
         placeholders = new TagResolver.Single[]{
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("verified", DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().estimatedSize())),
+          Placeholder.unparsed("verified", DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().getCache().size())),
           Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
           Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
           Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getPlayers().size())),
