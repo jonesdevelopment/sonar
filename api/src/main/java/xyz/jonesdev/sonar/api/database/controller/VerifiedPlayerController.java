@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Range;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.database.model.VerifiedPlayer;
+import xyz.jonesdev.sonar.api.fingerprint.FingerprintingUtil;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -196,10 +197,16 @@ public final class VerifiedPlayerController {
   }
 
   /**
-   * First, cache the player locally and then,
-   * secondly, asynchronously add the player to the database.
-   *
-   * @param player VerifiedPlayer model
+   * Creates a new VerifiedPlayer model from the given username, host address, and timestamp
+   */
+  public void add(final @NotNull String username, final @NotNull String hostAddress, final long timestamp) {
+    final String fingerprint = FingerprintingUtil.getFingerprint(username, hostAddress);
+    // Add a new VerifiedPlayer object from the given parameters to the database
+    add(new VerifiedPlayer(fingerprint, timestamp));
+  }
+
+  /**
+   * Caches the player locally and then adds the player to the database
    */
   public void add(final @NotNull VerifiedPlayer player) {
     cache.add(player.getFingerprint());
