@@ -95,7 +95,7 @@ public final class VerifiedCommand extends Subcommand {
       }
 
       case "clear": {
-        final int verifiedSize = Sonar.get().getVerifiedPlayerController().estimatedSize();
+        final int verifiedSize = Sonar.get().getVerifiedPlayerController().getCache().size();
 
         if (verifiedSize == 0) {
           invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
@@ -113,7 +113,7 @@ public final class VerifiedCommand extends Subcommand {
       }
 
       case "size": {
-        final int verifiedSize = Sonar.get().getVerifiedPlayerController().estimatedSize();
+        final int verifiedSize = Sonar.get().getVerifiedPlayerController().getCache().size();
 
         invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.size"),

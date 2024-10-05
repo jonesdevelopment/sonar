@@ -228,19 +228,10 @@ public final class VerifiedPlayerController {
   }
 
   /**
-   * Returns the number of verified IP addresses
-   *
-   * @return Estimated size of the local cache
-   */
-  public int estimatedSize() {
-    return cache.size();
-  }
-
-  /**
    * Clear the local cache, and, if the database type is set,
    * remove the table from the database.
    */
-  public synchronized void clearAll() {
+  public void clearAll() {
     cache.clear();
 
     // Delete the entire table from the database, if necessary

@@ -66,7 +66,7 @@ public final class AttackTracker {
       // An attack has been detected
       if (currentAttack == null) {
         currentAttack = new AttackStatistics();
-        currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().estimatedSize();
+        currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().getCache().size();
         currentAttack.failedVerifications = Sonar.get().getStatistics().getTotalFailedVerifications();
         Sonar.get().getEventManager().publish(new AttackDetectedEvent());
         Sonar.get().getChatNotificationHandler().handleNotification();
@@ -118,7 +118,7 @@ public final class AttackTracker {
               final String endTimestamp = String.valueOf(System.currentTimeMillis() / 1000L);
               final long blacklisted = Sonar.get().getFallback().getBlacklist().estimatedSize();
               // Calculate during-attack-statistics using their deltas
-              final long totalVerified = Sonar.get().getVerifiedPlayerController().estimatedSize();
+              final long totalVerified = Sonar.get().getVerifiedPlayerController().getCache().size();
               final long verified = Math.max(totalVerified - currentAttack.successfulVerifications, 0);
               final long totalFailed = Sonar.get().getStatistics().getTotalFailedVerifications();
               final long failed = Math.max(totalFailed - currentAttack.failedVerifications, 0);
