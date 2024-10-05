@@ -26,7 +26,7 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 
-import static java.util.Collections.emptyList;
+import java.util.Collections;
 
 public final class BungeeSonarCommand extends Command implements TabExecutor, SonarCommand {
   public BungeeSonarCommand() {
@@ -48,7 +48,7 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
   public Iterable<String> onTabComplete(final @NotNull CommandSender sender, final String @NotNull [] args) {
     // Do not allow tab completion if the player does not have the required permission
     if (!sender.hasPermission("sonar.command")) {
-      return emptyList();
+      return Collections.emptyList();
     }
     return getCachedTabSuggestions(args);
   }
