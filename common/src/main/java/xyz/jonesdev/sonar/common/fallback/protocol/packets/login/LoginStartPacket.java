@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.login;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.DecoderException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.UUID;
 
@@ -51,9 +53,19 @@ public final class LoginStartPacket implements FallbackPacket {
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
       if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_19_3)) {
         if (byteBuf.readBoolean()) {
-          byteBuf.readLong(); // expiry
-          readByteArray(byteBuf); // key
-          readByteArray(byteBuf, 4096); // signature
+          final long expiry = byteBuf.readLong();
+          final long now = System.currentTimeMillis();
+          if (expiry < now) {
+            throw DEBUG ? new DecoderException("Signature is expired: " + expiry) : QuietDecoderException.INSTANCE;
+          }
+          final byte[] key = readByteArray(byteBuf);
+          if (key.length == 0) {
+            throw DEBUG ? new DecoderException("Empty key") : QuietDecoderException.INSTANCE;
+          }
+          final byte[] signature = readByteArray(byteBuf, 4096);
+          if (signature.length == 0) {
+            throw DEBUG ? new DecoderException("Empty signature") : QuietDecoderException.INSTANCE;
+          }
         }
       }
 
