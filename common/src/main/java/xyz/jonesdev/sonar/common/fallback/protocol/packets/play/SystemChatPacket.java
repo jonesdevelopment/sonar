@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.DecoderException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,6 @@ import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.UUID;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Data
@@ -51,17 +51,17 @@ public final class SystemChatPacket implements FallbackPacket {
     componentHolder.write(byteBuf, protocolVersion);
 
     // Type
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_1)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
       byteBuf.writeBoolean(false); // it's not the GAME_INFO type
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
       writeVarInt(byteBuf, 1); // system chat
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_8)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeByte(1); // system chat
     }
 
     // Sender
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16)
-      && protocolVersion.lessThan(MINECRAFT_1_19)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16)
+      && protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_19)) {
       writeUUID(byteBuf, UUID.randomUUID());
     }
   }
@@ -70,16 +70,22 @@ public final class SystemChatPacket implements FallbackPacket {
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     message = readString(byteBuf, 256);
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
-      if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_1)) {
-        byteBuf.readLong(); // expiresAt
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
+      final long timestamp = byteBuf.readLong();
+      final long now = System.currentTimeMillis();
+      if (timestamp > now) {
+        throw DEBUG ? new DecoderException("Message appears to be from the future: "
+          + "(expected >" + now + ", got " + timestamp + ")") : QuietDecoderException.INSTANCE;
+      }
+
+      if (protocolVersion.lessThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
         final long saltLong = byteBuf.readLong();
         final byte[] signatureBytes = readByteArray(byteBuf);
         boolean unsigned = false;
 
         if (saltLong != 0L && signatureBytes.length > 0) {
           // No need to store the valid signature
-        } else if ((protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_1)
+        } else if ((protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)
           || saltLong == 0L) && signatureBytes.length == 0) {
           unsigned = true;
         } else {
@@ -91,7 +97,7 @@ public final class SystemChatPacket implements FallbackPacket {
           throw QuietDecoderException.INSTANCE;
         }
 
-        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_1)) {
+        if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
           final int size = readVarInt(byteBuf);
           if (size < 0 || size > 5) {
             throw QuietDecoderException.INSTANCE;
@@ -108,7 +114,6 @@ public final class SystemChatPacket implements FallbackPacket {
           }
         }
       } else {
-        byteBuf.readLong(); // timestamp
         byteBuf.readLong(); // salt
         final boolean signed = byteBuf.readBoolean();
 
