@@ -69,13 +69,8 @@ public final class LoginStartPacket implements FallbackPacket {
         }
       }
 
-      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_2)) {
-        uuid = readUUID(byteBuf);
-        return;
-      }
-
       if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
-        if (byteBuf.readBoolean()) {
+        if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_2) || byteBuf.readBoolean()) {
           uuid = readUUID(byteBuf);
         }
       }
