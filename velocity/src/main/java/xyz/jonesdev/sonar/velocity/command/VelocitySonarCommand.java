@@ -23,9 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 
+import java.util.Collections;
 import java.util.List;
-
-import static java.util.Collections.emptyList;
 
 public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
 
@@ -44,7 +43,7 @@ public final class VelocitySonarCommand implements SimpleCommand, SonarCommand {
   public List<String> suggest(final @NotNull Invocation invocation) {
     // Do not allow tab completion if the player does not have the required permission
     if (!invocation.source().hasPermission("sonar.command")) {
-      return emptyList();
+      return Collections.emptyList();
     }
     return getCachedTabSuggestions(invocation.arguments());
   }

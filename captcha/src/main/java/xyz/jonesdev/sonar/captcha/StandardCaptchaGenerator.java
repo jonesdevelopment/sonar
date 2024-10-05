@@ -38,10 +38,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
-import static java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
-import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.FONTS;
-import static xyz.jonesdev.sonar.captcha.StandardTTFFontProvider.STANDARD_FONT_SIZE;
-
 @Getter
 @RequiredArgsConstructor
 public final class StandardCaptchaGenerator implements CaptchaGenerator {
@@ -92,7 +88,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
 
   private @NotNull BufferedImage createBackgroundImage() {
     // Create a new image buffer with a 3-byte color spectrum
-    final BufferedImage image = new BufferedImage(width, height, TYPE_3BYTE_BGR);
+    final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
     if (background == null) {
       // Fill the entire image with a noise texture
       return FBM.filter(image, image);
@@ -128,7 +124,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
 
     for (int i = 0; i < answer.length; i++) {
       // Create a glyph vector for the character with a random font
-      final Font font = FONTS[RANDOM.nextInt(FONTS.length)];
+      final Font font = StandardTTFFontProvider.FONTS[RANDOM.nextInt(StandardTTFFontProvider.FONTS.length)];
       glyphs[i] = font.createGlyphVector(ctx, String.valueOf(answer[i]));
     }
 
@@ -139,7 +135,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
       .mapToDouble(glyph -> glyph.getLogicalBounds().getWidth() * scalingXY - 1)
       .sum();
     double beginX = Math.max(Math.min(width / 2D - totalWidth / 2D, totalWidth), 0);
-    double beginY = (height + STANDARD_FONT_SIZE / 2D) / 2D + scalingXY;
+    double beginY = (height + StandardTTFFontProvider.STANDARD_FONT_SIZE / 2D) / 2D + scalingXY;
 
     // Draw each glyph one by one
     for (final GlyphVector glyph : glyphs) {

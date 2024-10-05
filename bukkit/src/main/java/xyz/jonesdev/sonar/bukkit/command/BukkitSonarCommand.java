@@ -27,9 +27,8 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.SonarCommand;
 
+import java.util.Collections;
 import java.util.List;
-
-import static java.util.Collections.emptyList;
 
 public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, SonarCommand {
 
@@ -55,7 +54,7 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
                                     final String @NotNull [] args) {
     // Do not allow tab completion if the player does not have the required permission
     if (!sender.hasPermission("sonar.command")) {
-      return emptyList();
+      return Collections.emptyList();
     }
     return getCachedTabSuggestions(args);
   }
