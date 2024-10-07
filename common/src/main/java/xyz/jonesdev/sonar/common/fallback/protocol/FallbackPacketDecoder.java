@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.maxTotalPacketsSent;
@@ -43,11 +41,11 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
   public FallbackPacketDecoder(final @NotNull ProtocolVersion protocolVersion) {
     this.protocolVersion = protocolVersion;
-    updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? LOGIN : GAME);
+    updateRegistry(protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_2) ? LOGIN : GAME);
   }
 
   public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
-    this.registry = registry.getProtocolRegistry(SERVERBOUND, protocolVersion);
+    this.registry = registry.getProtocolRegistry(FallbackPacketRegistry.Direction.SERVERBOUND, protocolVersion);
   }
 
   @Override

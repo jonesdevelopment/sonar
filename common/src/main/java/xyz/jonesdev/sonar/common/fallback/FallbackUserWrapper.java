@@ -41,7 +41,6 @@ import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import java.net.InetAddress;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.CONFIG;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.loginSuccess;
@@ -109,7 +108,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       write(loginSuccess);
 
       // The LoginSuccess packet has been sent, now we can change the registry state
-      newEncoder.updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME);
+      newEncoder.updateRegistry(protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_2) ? CONFIG : GAME);
 
       // Replace normal decoder to allow custom packets
       final FallbackPacketDecoder newDecoder = new FallbackPacketDecoder(protocolVersion);

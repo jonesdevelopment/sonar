@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.EncoderException;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
@@ -71,8 +72,7 @@ public final class FallbackPacketSnapshot implements FallbackPacket {
   }
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf,
-                     final @NotNull ProtocolVersion protocolVersion) throws Exception {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     final int hash = mappings.get(protocolVersion.getProtocol());
     final byte[] bytes = cachedBytes.get(hash);
 
@@ -81,7 +81,7 @@ public final class FallbackPacketSnapshot implements FallbackPacket {
     } else {
       Sonar.get().getLogger().error("Could not find cached packet {} for version {}",
         toString(), protocolVersion);
-      throw new IllegalStateException("Unable to find cached packet. Contact the developer!");
+      throw new EncoderException("Unable to find cached packet. Contact the developer!");
     }
   }
 

@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-
 @Getter
 @ToString
 @NoArgsConstructor
@@ -45,7 +43,7 @@ public final class SetPlayerPositionPacket implements FallbackPacket {
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       // 1.7.2-1.7.10 send the minimum bounding box Y coordinate
       byteBuf.readDouble();
     }
@@ -55,7 +53,7 @@ public final class SetPlayerPositionPacket implements FallbackPacket {
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    return protocolVersion.compareTo(MINECRAFT_1_8) < 0 ? 33 : 25;
+    return protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8) ? 33 : 25;
   }
 
   @Override

@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 @Getter
@@ -45,10 +44,10 @@ public final class AnimationPacket implements FallbackPacket {
 
   @Override
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       entityId = byteBuf.readInt();
       type = LegacyAnimationType.getById(byteBuf.readByte());
-    } else if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
+    } else if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_8)) {
       // Only 1.9+ clients have an offhand
       hand = readVarInt(byteBuf);
     }

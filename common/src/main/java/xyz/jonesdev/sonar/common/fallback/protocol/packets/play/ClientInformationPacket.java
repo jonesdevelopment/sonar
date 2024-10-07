@@ -57,19 +57,19 @@ public final class ClientInformationPacket implements FallbackPacket {
     chatVisibility = readVarInt(byteBuf);
     chatColors = byteBuf.readBoolean();
 
-    if (protocolVersion.compareTo(MINECRAFT_1_7_6) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_7_6)) {
       difficulty = byteBuf.readByte();
     }
 
     skinParts = byteBuf.readUnsignedByte();
 
-    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
       mainHand = readVarInt(byteBuf);
 
-      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
+      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)) {
         chatFilteringEnabled = byteBuf.readBoolean();
 
-        if (protocolVersion.compareTo(MINECRAFT_1_18) >= 0) {
+        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18)) {
           clientListingAllowed = byteBuf.readBoolean();
         }
       }

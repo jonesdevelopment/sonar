@@ -75,7 +75,7 @@ public class FallbackPreparer {
   public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
   public final FallbackPacket[] REGISTRY_SYNC_1_21 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21);
   public final FallbackPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
-  public final static FallbackPacket CACHED_HELD_ITEM_SLOT = new SetHeldItemPacket(~4);
+  public final static FallbackPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
   public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlivePacket(RANDOM.nextInt());
 
   public static FallbackPacket loginSuccess;
@@ -110,9 +110,13 @@ public class FallbackPreparer {
     Sonar.get().getLogger().info("Preloading all registered packets...");
     FallbackPacketRegistry.values();
 
-    // Prepare LoginSuccess packet
-    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(UUID.randomUUID(),
-      Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username")));
+    // Prepare LoginSuccess packet with capped username to 16 characters
+    final UUID uuid = UUID.randomUUID();
+    String username = Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username");
+    if (username.length() > 16) {
+      username = username.substring(0, 16);
+    }
+    loginSuccess = new FallbackPacketSnapshot(new LoginSuccessPacket(uuid, username, true));
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
@@ -158,7 +162,7 @@ public class FallbackPreparer {
           blocks[index++] = new BlockUpdate(position, POSSIBLE_BLOCK_TYPES[i]);
         }
       }
-      BLOCKS_PACKETS[i] = new UpdateSectionBlocksPacket(0, 0, blocks);
+      BLOCKS_PACKETS[i] = new FallbackPacketSnapshot(new UpdateSectionBlocksPacket(0, 0, blocks));
     }
 
     // Prepare disconnect packets during login

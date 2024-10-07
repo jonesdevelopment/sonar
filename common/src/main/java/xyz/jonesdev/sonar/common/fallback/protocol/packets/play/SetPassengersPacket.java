@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
@@ -40,7 +39,7 @@ public final class SetPassengersPacket implements FallbackPacket {
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     // You can find this in the EntityAttach packet,
     // which was later replaced by SetPassengers in 1.9+
-    if (protocolVersion.compareTo(MINECRAFT_1_9) < 0) {
+    if (protocolVersion.lessThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeInt(passengerId);
       byteBuf.writeInt(entityId);
       byteBuf.writeByte(0); // leash

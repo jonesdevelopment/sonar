@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.verification;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.AnimationPacket;
@@ -27,8 +28,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.EntityAnimationP
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetHeldItemPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.TransactionPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.CACHED_HELD_ITEM_SLOT;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.INVALID_HELD_ITEM_SLOT;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.PLAYER_ENTITY_ID;
 
 public final class FallbackProtocolHandler extends FallbackVerificationHandler {
@@ -65,8 +65,8 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
     // Move the player's slot by 4 (slot limit divided by 2),
     // and then modulo it by the slot limit (8) to ensure that we don't send invalid slot IDs.
     expectedSlotId = (currentClientSlotId + 4) % 8;
-    // Send a HeldItemChange packet to the player to see if the player responds
-    user.delayedWrite(CACHED_HELD_ITEM_SLOT);
+    // Send an invalid HeldItemChange packet to the player to see if the player responds
+    user.delayedWrite(INVALID_HELD_ITEM_SLOT);
     // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
     // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
     // We can take advantage of this by sending two packets with the same content to check for a valid response.
@@ -168,7 +168,7 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
         checkState(animationPacket.getHand() == AnimationPacket.MAIN_HAND,
           "invalid hand " + animationPacket.getHand());
         // Check that the 1.7 client is responding to the correct entity id and animation type.
-        if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_8)) {
           // Check entity id is player itself and if the player is sending the correct animation type
           if (animationPacket.getEntityId() == PLAYER_ENTITY_ID
             && animationPacket.getType() == AnimationPacket.LegacyAnimationType.SWING_ARM) {

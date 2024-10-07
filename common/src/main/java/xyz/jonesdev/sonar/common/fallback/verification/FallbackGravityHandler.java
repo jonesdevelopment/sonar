@@ -20,12 +20,12 @@ package xyz.jonesdev.sonar.common.fallback.verification;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 
 import static xyz.jonesdev.sonar.api.config.SonarConfiguration.Verification.Gamemode.CREATIVE;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 
 public final class FallbackGravityHandler extends FallbackVerificationHandler {
@@ -49,11 +49,11 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       user.delayedWrite(DEFAULT_ABILITIES);
     }
     // Write the DefaultSpawnPosition packet to the buffer
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_19_3) >= 0) {
+    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_3)) {
       user.delayedWrite(defaultSpawnPosition);
     }
     // Teleport the player to the position where we're starting to check them
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       user.delayedWrite(spawnPosition);
       user.delayedWrite(fallStartPosition);
     } else {
@@ -62,7 +62,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     }
     // 1.20.3+ introduced game events
     // Make sure the client knows that we're sending chunks next
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_3) >= 0) {
+    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_3)) {
       user.delayedWrite(START_WRITING_CHUNKS);
     }
     // Teleport player into an empty world by sending an empty chunk packet
@@ -77,7 +77,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     user.channel().flush();
 
     // 1.8 and below don't have TeleportConfirm packets, which is why we're skipping that check.
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_9) < 0) {
+    if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_9)) {
       // Enable the movement checks
       teleported = true;
     }
@@ -93,7 +93,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     // Force-stop the movement checks
     teleported = false;
     // Exempt pre-1.20.2 since they've already passed that check in the configuration phase
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
+    if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
       preJoinHandler.validateClientInformation();
     }
     // Send the player to the next verification handler
@@ -193,7 +193,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
         checkState(rotated, "illegal movement packet order: " + deltaY);
         checkState(movementTick == 0, "illegal y motion: " + movementTick);
         // 1.7 clients immediately start falling after this packet
-        if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_8)) {
           movementTick++;
         }
         // We've received the first position packet; the player will now start falling

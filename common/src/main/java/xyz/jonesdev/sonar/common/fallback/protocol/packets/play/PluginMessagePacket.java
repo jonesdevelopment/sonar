@@ -25,7 +25,6 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readExtendedForgeShort;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readString;
 
@@ -47,7 +46,7 @@ public final class PluginMessagePacket implements FallbackPacket {
     channel = readString(byteBuf, 48);
 
     final int length;
-    if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       length = byteBuf.readableBytes();
       if (length > Short.MAX_VALUE) {
         throw QuietDecoderException.INSTANCE;

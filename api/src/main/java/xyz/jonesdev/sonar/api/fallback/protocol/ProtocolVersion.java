@@ -68,7 +68,8 @@ public enum ProtocolVersion {
   MINECRAFT_1_20_2(764),
   MINECRAFT_1_20_3(765),
   MINECRAFT_1_20_5(766),
-  MINECRAFT_1_21(767);
+  MINECRAFT_1_21(767),
+  MINECRAFT_1_21_2(768);
 
   private final int protocol;
 
@@ -88,6 +89,22 @@ public enum ProtocolVersion {
 
   public static ProtocolVersion fromId(final int protocol) {
     return ID_TO_PROTOCOL_CONSTANT.getOrDefault(protocol, UNKNOWN);
+  }
+
+  public boolean greaterThan(final ProtocolVersion that) {
+    return compareTo(that) > 0;
+  }
+
+  public boolean greaterThanOrEquals(final ProtocolVersion that) {
+    return compareTo(that) >= 0;
+  }
+
+  public boolean lessThan(final ProtocolVersion that) {
+    return compareTo(that) < 0;
+  }
+
+  public boolean lessThanOrEquals(final ProtocolVersion that) {
+    return compareTo(that) <= 0;
   }
 
   public boolean inBetween(final ProtocolVersion first, final ProtocolVersion last) {
