@@ -73,6 +73,10 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       blockHeight = POSSIBLE_BLOCK_TYPES[index].getBlockHeight().apply(user.getProtocolVersion());
       user.delayedWrite(BLOCKS_PACKETS[index]);
     }
+    // Update the world time, if necessary
+    if (updateTime != null) {
+      user.delayedWrite(updateTime);
+    }
     // Send all packets at once
     user.channel().flush();
 

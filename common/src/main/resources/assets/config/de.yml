@@ -162,6 +162,12 @@ verification:
   # - CREATIVE: Gesundheit und Hunger sind versteckt
   # - ADVENTURE: alle UI-Komponenten sind sichtbar
   gamemode: ADVENTURE
+  # Tageszeit in der Verifizierungswelt
+  # Alle Tageszeiten finden Sie hier:
+  # https://minecraft.wiki/w/Daylight_cycle
+  # Dies ist nur eine visuelle Einstellung und ändert nichts am Verifizierungsprozess!
+  # Wenn dieser Wert auf 1000 gesetzt ist, wird das Paket nicht gesendet.
+  time-of-day: 1000
   # Sonar speichert die meisten Pakete, die es an den Client sendet, einschließlich des LoginSuccess-Pakets.
   # Welchen Benutzernamen soll Sonar für das LoginSuccess-Paket verwenden?
   # Der Benutzername ist für den Spieler ohne Änderungen am Client nicht sichtbar

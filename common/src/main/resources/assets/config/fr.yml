@@ -164,6 +164,12 @@ verification:
   # - CREATIVE : la santé et la faim sont cachées
   # - ADVENTURE : tous les composants de l'interface utilisateur sont visibles
   gamemode: ADVENTURE
+  # L'heure d'été dans le monde de la vérification
+  # Vous pouvez trouver toutes les heures d'été ici :
+  # https://minecraft.wiki/w/Daylight_cycle
+  # Il s'agit uniquement d'un paramètre visuel qui ne modifie pas le processus de vérification !
+  # Si cette valeur est fixée à 1000, le paquet ne sera pas envoyé.
+  time-of-day: 1000
   # Sonar met en cache la plupart des paquets qu'il envoie au client, y compris le paquet LoginSuccess.
   # Quel nom d'utilisateur Sonar doit-il utiliser pour le paquet LoginSuccess ?
   # Le nom d'utilisateur ne sera pas visible par le joueur sans modification du client

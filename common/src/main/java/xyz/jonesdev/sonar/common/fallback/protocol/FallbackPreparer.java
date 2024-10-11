@@ -101,6 +101,7 @@ public class FallbackPreparer {
   public FallbackPacket spawnMinecartEntity;
   public FallbackPacket setPassengers;
   public FallbackPacket[] xpCountdown;
+  public FallbackPacket updateTime;
 
   public static int maxMovementTick, dynamicSpawnYPosition, maxTotalPacketsSent;
 
@@ -190,6 +191,14 @@ public class FallbackPreparer {
       EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
       0, 0, 0, 0));
     setPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
+
+    // Prepare update time packet
+    final int timeOfDay = Sonar.get().getConfig().getVerification().getTimeOfDay();
+    if (timeOfDay != 1000) {
+      updateTime = new UpdateTimePacket(0L, timeOfDay);
+    } else {
+      updateTime = null;
+    }
 
     // If the welcome message is empty, we don't need to send a message to the player
     final String welcome = Sonar.get().getConfig().getMessagesConfig().getString("verification.welcome");
