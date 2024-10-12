@@ -150,9 +150,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     } else if (packet instanceof SetPlayerPositionRotationPacket) {
       final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
 
-      if (expectMovement) {
-        handleMovement(posRot.getY(), posRot.isOnGround());
-      } else if (expectTeleport) {
+      if (expectTeleport) {
         checkState(!posRot.isOnGround(), "invalid ground state on teleport " + teleports);
         teleports++;
         // Expect 1.9+ players to send a ConfirmTeleportation packet after the teleport
@@ -160,6 +158,8 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           confirmed++;
         }
         expectTeleport = false;
+      } else if (expectMovement) {
+        handleMovement(posRot.getY(), posRot.isOnGround());
       }
     } else if (packet instanceof ConfirmTeleportationPacket) {
       if (!expectMovement) {
@@ -236,7 +236,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
             // Teleport the player to see if they are bugged to the vehicle
             expectedTeleportId = RANDOM.nextInt();
             user.write(new SetPlayerPositionRotationPacket(
-              SPAWN_X_POSITION, RANDOM.nextInt(), SPAWN_Z_POSITION, 0, 0,
+              SPAWN_X_POSITION, -RANDOM.nextInt(Short.MAX_VALUE), SPAWN_Z_POSITION, 0, 0,
               expectedTeleportId, 0, false, false));
             expectTeleport = true;
           }
