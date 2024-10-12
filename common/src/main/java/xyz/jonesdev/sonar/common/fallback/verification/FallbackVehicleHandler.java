@@ -32,24 +32,26 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   public FallbackVehicleHandler(final @NotNull FallbackUser user) {
     super(user);
 
+    this.canTeleportPlayer = user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_15_2)
+      || user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17);
+
     // Send the necessary packets to mount the player on the boat vehicle
     user.delayedWrite(spawnBoatEntity);
     user.delayedWrite(setPassengers);
     user.channel().flush();
   }
 
-  private int expectedTransactionId;
-  private int paddlePackets, inputPackets, positionPackets, rotationPackets, vehicleMovePackets;
-  private boolean expectMovement, inVoid, inMinecart, waitingSpawnMinecart, waitingRemoveMinecart;
+  private final boolean canTeleportPlayer;
+  private int expectedTransactionId, expectedTeleportId;
+  private int paddles, inputs, positions, rotations, vehicleMoves, teleports, confirmed;
+  private boolean expectMovement, expectTeleport, inVoid, inMinecart, waitingSpawnMinecart, waitingRemoveMinecart;
   private double minecartMotion, minecartY = IN_AIR_Y_POSITION;
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
     if (user.isForceCaptcha() || Sonar.get().getFallback().shouldPerformCaptcha()) {
-      // Either send the player to the CAPTCHA or finish the verification.
-      final var decoder = user.channel().pipeline().get(FallbackPacketDecoder.class);
       // Send the player to the CAPTCHA handler
-      decoder.setListener(new FallbackCaptchaHandler(user));
+      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackCaptchaHandler(user));
     } else {
       // The player has passed all checks
       finishVerification();
@@ -65,7 +67,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     checkState(y <= minimumY, "illegal y position: " + y + "/" + minimumY);
 
     if (!waitingRemoveMinecart && !waitingSpawnMinecart
-      && positionPackets++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
+      && positions++ > Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets()) {
       if (user.isGeyser() || inVoid) {
         // Mark this check as successful if the player sent a few position packets
         markSuccess();
@@ -79,19 +81,21 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   private void handleRotation() {
     // Once the player sent enough packets, go to the next stage
     final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
-    if (paddlePackets > minimumPackets
-      && inputPackets > minimumPackets
-      && rotationPackets > minimumPackets
-      && vehicleMovePackets > minimumPackets) {
+    if (paddles > minimumPackets && inputs > minimumPackets
+      && rotations > minimumPackets && vehicleMoves > minimumPackets
+      && (!canTeleportPlayer || (teleports > minimumPackets && confirmed > minimumPackets))) {
+      // Check if the player has confirmed all teleport packets
+      checkState(confirmed == teleports,
+        "missing teleports confirmations: " + confirmed + "/" + teleports);
       // If the player is riding a Minecart, teleport the entity to < -100
       // to see how the player reacts to the invalid position of the entity.
       if (inMinecart) {
-        user.delayedWrite(teleportMinecart);
         // We're using transactions to avoid false positives with lag
-        waitingRemoveMinecart = true;
         expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
+        user.delayedWrite(teleportMinecart);
         user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
         user.channel().flush();
+        waitingRemoveMinecart = true;
       } else {
         // If the player is riding a boat, remove the entity
         // The next Y coordinate the player will send is going
@@ -101,20 +105,20 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
       // Listen for next movement packet(s)
       expectMovement = true;
     }
-    rotationPackets++;
+    rotations++;
   }
 
   private void spawnMinecart() {
     expectMovement = false;
-    paddlePackets = inputPackets = positionPackets = rotationPackets = 0;
+    paddles = inputs = positions = rotations = 0;
     // Use transaction packets to confirm that the entity has spawned
-    waitingSpawnMinecart = true;
     minecartMotion = 0.03999999910593033D * 2 * -1;
     expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
     user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
     user.delayedWrite(spawnMinecartEntity);
     user.delayedWrite(setPassengers);
     user.channel().flush();
+    waitingSpawnMinecart = true;
   }
 
   @Override
@@ -132,21 +136,40 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
       checkState(expectedTransactionId == transaction.getTransactionId(),
         "expected T ID " + expectedTransactionId + ", but got " + transaction.getTransactionId());
 
-      // We're "lag compensating" the Minecart to avoid false positives
+      // We are lag compensating the Minecart to avoid false positives
       if (waitingSpawnMinecart) {
         waitingSpawnMinecart = false;
         inMinecart = true;
       } else if (waitingRemoveMinecart) {
         waitingRemoveMinecart = inMinecart = false;
         inVoid = true;
-        positionPackets = 0;
+        positions = 0;
       }
 
       expectedTransactionId = 0;
     } else if (packet instanceof SetPlayerPositionRotationPacket) {
+      final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
+
       if (expectMovement) {
-        final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
         handleMovement(posRot.getY(), posRot.isOnGround());
+      } else if (expectTeleport) {
+        checkState(!posRot.isOnGround(), "invalid ground state on teleport " + teleports);
+        teleports++;
+        // Expect 1.9+ players to send a ConfirmTeleportation packet after the teleport
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_9)) {
+          confirmed++;
+        }
+        expectTeleport = false;
+      }
+    } else if (packet instanceof ConfirmTeleportationPacket) {
+      if (!expectMovement) {
+        final ConfirmTeleportationPacket teleportConfirm = (ConfirmTeleportationPacket) packet;
+
+        // Check if the teleport ID matches the expected ID
+        checkState(teleportConfirm.getTeleportId() == expectedTeleportId,
+          "expected TP ID " + expectedTeleportId + ", but got " + teleportConfirm.getTeleportId());
+
+        confirmed++;
       }
     } else if (packet instanceof SetPlayerPositionPacket) {
       if (expectMovement) {
@@ -159,7 +182,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
       }
     } else if (packet instanceof PaddleBoatPacket) {
       checkState(!inMinecart, "invalid packet order (unexpected PaddleBoatPacket)");
-      paddlePackets++;
+      paddles++;
     } else if (packet instanceof VehicleMovePacket) {
       checkState(!inMinecart, "invalid packet order (unexpected VehicleMovePacket)");
       final VehicleMovePacket vehicleMove = (VehicleMovePacket) packet;
@@ -178,7 +201,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         checkState(difference < 1e-7,
           "invalid vehicle gravity: " + predicted + "/" + minecartMotion + "/" + difference);
       }
-      vehicleMovePackets++;
+      vehicleMoves++;
     } else if (packet instanceof PlayerInputPacket) {
       if (!expectMovement) {
         final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
@@ -200,22 +223,37 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         if (user.isGeyser()) {
           handleRotation();
         } else {
-          checkState(rotationPackets >= inputPackets,
-            "illegal packet order; r/i " + rotationPackets + "/" + inputPackets);
+          checkState(rotations >= inputs,
+            "illegal packet order; r/i " + rotations + "/" + inputs);
+
+          // This check does not work on 1.16-1.16.5 because Mojang did some stuff
+          // Only perform the buggy teleport check once in a while (every 2 packets)
+          if (canTeleportPlayer && inputs % 2 == 0) {
+            if (expectTeleport) {
+              // This shouldn't happen, so we're better off not counting this packet
+              return;
+            }
+            // Teleport the player to see if they are bugged to the vehicle
+            expectedTeleportId = RANDOM.nextInt();
+            user.write(new SetPlayerPositionRotationPacket(
+              SPAWN_X_POSITION, RANDOM.nextInt(), SPAWN_Z_POSITION, 0, 0,
+              expectedTeleportId, 0, false, false));
+            expectTeleport = true;
+          }
         }
 
         // 1.8 and below do not have PaddleBoat packets, so we simply exempt them from the PaddleBoat check.
         // Clients don't send PaddleBoat & VehicleMovePacket packets while riding minecarts.
         if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_9) || inMinecart) {
-          paddlePackets++;
-          vehicleMovePackets++;
+          paddles++;
+          vehicleMoves++;
         } else if (!user.isGeyser()) {
-          checkState(paddlePackets >= inputPackets,
-            "illegal packet order; i/p " + inputPackets + "/" + paddlePackets);
-          checkState(vehicleMovePackets >= inputPackets,
-            "illegal packet order; i/v " + inputPackets + "/" + vehicleMovePackets);
+          checkState(paddles >= inputs,
+            "illegal packet order; i/p " + inputs + "/" + paddles);
+          checkState(vehicleMoves >= inputs,
+            "illegal packet order; i/v " + inputs + "/" + vehicleMoves);
         }
-        inputPackets++;
+        inputs++;
       }
     }
   }

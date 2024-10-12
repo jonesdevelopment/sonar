@@ -69,7 +69,7 @@ public class FallbackPreparer {
   public final FallbackPacket NO_MOVE_ABILITIES = new PlayerAbilitiesPacket(0x02, 0, 0);
   public final FallbackPacket NO_MOVE_ABILITIES_BEDROCK = new PlayerAbilitiesPacket(0x06, 0, 0);
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
-    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, 0, false));
+    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, 0, false, true));
   public final FallbackPacket EMPTY_CHUNK_DATA = new FallbackPacketSnapshot(new ChunkDataPacket(0, 0));
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket();
   public final FallbackPacket REGISTRY_SYNC_LEGACY = new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null));
@@ -146,13 +146,13 @@ public class FallbackPreparer {
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
-      0, 0, FIRST_TELEPORT_ID, 0, false));
+      0, 0, FIRST_TELEPORT_ID, 0, false, true));
     fallStartPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition - IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
-      0, -90, SECOND_TELEPORT_ID, 1 << 1, false));
+      0, -90, SECOND_TELEPORT_ID, 1 << 1, false, true));
     fallStartPositionLegacy = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
-      0, -90, 0, 0, false));
+      0, -90, 0, 0, false, true));
 
     // Prepare collision platform positions
     final int length = BLOCKS_PER_ROW / 2;

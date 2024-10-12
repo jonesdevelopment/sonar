@@ -88,14 +88,11 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
   }
 
   private void markSuccess() {
-    // Either send the player to the vehicle check,
-    // send the player to the CAPTCHA, or finish the verification.
-    final var decoder = user.channel().pipeline().get(FallbackPacketDecoder.class);
     // Pass the player to the next best verification handler
     if (Sonar.get().getConfig().getVerification().getVehicle().isEnabled()) {
-      decoder.setListener(new FallbackVehicleHandler(user));
+      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackVehicleHandler(user));
     } else if (user.isForceCaptcha() || Sonar.get().getFallback().shouldPerformCaptcha()) {
-      decoder.setListener(new FallbackCaptchaHandler(user));
+      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackCaptchaHandler(user));
     } else {
       // The player has passed all checks
       finishVerification();

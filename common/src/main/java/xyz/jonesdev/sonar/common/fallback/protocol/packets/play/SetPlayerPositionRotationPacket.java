@@ -38,6 +38,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   private float yaw, pitch;
   private int teleportId, relativeMask;
   private boolean onGround;
+  private boolean dismountVehicle;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
@@ -54,7 +55,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
 
       if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)
         && protocolVersion.lessThanOrEquals(MINECRAFT_1_19_3)) {
-        byteBuf.writeBoolean(true); // Always dismount vehicle
+        byteBuf.writeBoolean(dismountVehicle);
       }
     }
   }

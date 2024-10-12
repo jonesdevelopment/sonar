@@ -101,8 +101,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       preJoinHandler.validateClientInformation();
     }
     // Send the player to the next verification handler
-    final var decoder = user.channel().pipeline().get(FallbackPacketDecoder.class);
-    decoder.setListener(new FallbackProtocolHandler(user));
+    user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackProtocolHandler(user));
   }
 
   @Override
@@ -125,9 +124,8 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       // Only expect this packet to be sent once
       checkState(!teleported, "duplicate teleport confirm");
       // Check if the teleport ID matches the expected ID
-      final int teleportId = teleportConfirm.getTeleportId();
-      checkState(teleportId == expectedTeleportId,
-        "expected TP ID " + expectedTeleportId + ", but got " + teleportId);
+      checkState(teleportConfirm.getTeleportId() == expectedTeleportId,
+        "expected TP ID " + expectedTeleportId + ", but got " + teleportConfirm.getTeleportId());
 
       // The first teleport ID is not useful for us in this context, skip it
       if (expectedTeleportId == FIRST_TELEPORT_ID) {
@@ -135,6 +133,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       } else {
         // Enable the movement checks
         teleported = true;
+        expectedTeleportId = -1;
       }
     } else if (packet instanceof ClientInformationPacket
       || packet instanceof PluginMessagePacket) {
