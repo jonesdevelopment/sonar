@@ -385,6 +385,23 @@ public enum FallbackPacketRegistry {
         map(0x6B, MINECRAFT_1_20_2, true),
         map(0x6D, MINECRAFT_1_20_3, true),
         map(0x70, MINECRAFT_1_20_5, true));
+      clientbound.register(UpdateTimePacket.class, UpdateTimePacket::new,
+        map(0x03, MINECRAFT_1_7_2, true),
+        map(0x44, MINECRAFT_1_9, true),
+        map(0x46, MINECRAFT_1_12, true),
+        map(0x47, MINECRAFT_1_12_1, true),
+        map(0x4A, MINECRAFT_1_13, true),
+        map(0x4E, MINECRAFT_1_14, true),
+        map(0x4F, MINECRAFT_1_15, true),
+        map(0x4E, MINECRAFT_1_16, true),
+        map(0x58, MINECRAFT_1_17, true),
+        map(0x59, MINECRAFT_1_18, true),
+        map(0x5C, MINECRAFT_1_19_1, true),
+        map(0x5A, MINECRAFT_1_19_3, true),
+        map(0x5E, MINECRAFT_1_19_4, true),
+        map(0x60, MINECRAFT_1_20_2, true),
+        map(0x62, MINECRAFT_1_20_3, true),
+        map(0x64, MINECRAFT_1_20_5, true));
 
       serverbound.register(SetHeldItemPacket.class, SetHeldItemPacket::new,
         map(0x09, MINECRAFT_1_7_2, false),

@@ -159,6 +159,12 @@ verification:
   # - CREATIVE: 创造模式, 隐藏血量和饱食度
   # - ADVENTURE: 冒险模式, 所有UI可见
   gamemode: ADVENTURE
+  # 验证世界的夏令时间
+  # 您可以在这里找到所有的夏令时间:
+  # https://minecraft.wiki/w/Daylight_cycle
+  # 这只是一个可视化设置, 不会改变验证过程!
+  # 如果该值设置为 1000, 则不会发送数据包.
+  time-of-day: 1000
   # Sonar 缓存它发送到客户端的大部分数据包, 包括 LoginSuccess 数据包.
   # Sonar 应该使用哪个用户名来接收 LoginSuccess 数据包?
   # 如果不修改客户端, 用户名将不会对玩家可见

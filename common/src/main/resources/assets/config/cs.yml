@@ -165,6 +165,12 @@ verification:
   # - CREATIVE: životy a hunger neni zobrazen
   # - ADVENTURE: všechny komponenty UI jsou zobrazeny
   gamemode: ADVENTURE
+  # Letní čas v ověřovacím světě
+  # Všechny letní časy najdete zde:
+  # https://minecraft.wiki/w/Daylight_cycle
+  # Jedná se pouze o vizuální nastavení, které nemění proces ověřování!
+  # Pokud je tato hodnota nastavena na 1000, paket nebude odeslán.
+  time-of-day: 1000
   # Sonar ukládá do mezipaměti většinu paketů, které odesílá klientovi, včetně paketu LoginSuccess.
   # Které uživatelské jméno má Sonar použít pro paket LoginSuccess?
   # Uživatelské jméno nebude pro hráče viditelné bez úpravy klienta

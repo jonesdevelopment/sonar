@@ -164,6 +164,12 @@ verification:
   # - CREATIVE: gezondheid en honger zijn verborgen
   # - ADVENTURE: alle UI-componenten zijn zichtbaar
   gamemode: ADVENTURE
+  # Zomertijd in de verificatiewereld
+  # Je kunt alle zomertijd hier vinden:
+  # https://minecraft.wiki/w/Daylight_cycle
+  # Dit is alleen een visuele instelling en verandert niets aan het verificatieproces!
+  # Als deze waarde is ingesteld op 1000, wordt het pakket niet verzonden.
+  time-of-day: 1000
   # Sonar cached de meeste pakketten die het naar de client stuurt, inclusief het LoginSuccess pakket.
   # Welke gebruikersnaam moet Sonar gebruiken voor het LoginSucces pakket?
   # De gebruikersnaam zal niet zichtbaar zijn voor de speler zonder client aanpassingen

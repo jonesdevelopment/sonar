@@ -164,6 +164,12 @@ verification:
   # - CREATIVE: pasek życia i głodu jest ukryty
   # - ADVENTURE: wszystkie komponenty interfejsu są widoczne
   gamemode: ADVENTURE
+  # Czas letni w weryfikowanym świecie
+  # Wszystkie czasy letnie można znaleźć tutaj:
+  # https://minecraft.wiki/w/Daylight_cycle
+  # Jest to tylko ustawienie wizualne i nie zmienia procesu weryfikacji!
+  # Jeśli ta wartość jest ustawiona na 1000, pakiet nie zostanie wysłany.
+  time-of-day: 1000
   # Sonar buforuje większość pakietów, które wysyła do klienta, w tym pakiet LoginSuccess.
   # Jakiej nazwy użytkownika powinien używać Sonar dla pakietu LoginSuccess?
   # Nazwa użytkownika nie będzie widoczna dla gracza bez modyfikacji klienta
