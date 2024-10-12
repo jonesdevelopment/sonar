@@ -18,10 +18,8 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.dimension;
 
 import lombok.experimental.UtilityClass;
-import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 
@@ -39,9 +37,6 @@ public final class DimensionRegistry {
   public final CompoundBinaryTag CODEC_1_20;
   public final CompoundBinaryTag CODEC_1_21;
 
-  public final DimensionInfo DEFAULT_DIMENSION_1_16_2;
-  public final DimensionInfo DEFAULT_DIMENSION_1_18_2;
-
   static {
     CODEC_1_16 = getCodec("codec_1_16.nbt");
     CODEC_1_16_2 = getCodec("codec_1_16_2.nbt");
@@ -51,9 +46,6 @@ public final class DimensionRegistry {
     CODEC_1_19_4 = getCodec("codec_1_19_4.nbt");
     CODEC_1_20 = getCodec("codec_1_20.nbt");
     CODEC_1_21 = getCodec("codec_1_21.nbt");
-
-    DEFAULT_DIMENSION_1_16_2 = getDimension(CODEC_1_16_2);
-    DEFAULT_DIMENSION_1_18_2 = getDimension(CODEC_1_18_2);
   }
 
   private @NotNull CompoundBinaryTag getCodec(final @NotNull String fileName) {
@@ -63,11 +55,5 @@ public final class DimensionRegistry {
       Sonar.get().getLogger().error("Could not load mappings for {}: {}", fileName, throwable);
       throw new IllegalStateException(throwable);
     }
-  }
-
-  private static @NotNull DimensionInfo getDimension(final @NotNull CompoundBinaryTag tag) {
-    final ListBinaryTag dimensions = tag.getCompound("minecraft:dimension_type").getList("value");
-    final BinaryTag elementTag = ((CompoundBinaryTag) dimensions.get(0)).get("element");
-    return new DimensionInfo("minecraft:overworld", 0, (CompoundBinaryTag) elementTag);
   }
 }

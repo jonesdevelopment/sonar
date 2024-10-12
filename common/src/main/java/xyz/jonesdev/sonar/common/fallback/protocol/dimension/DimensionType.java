@@ -19,14 +19,14 @@ package xyz.jonesdev.sonar.common.fallback.protocol.dimension;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 @Getter
-@ToString
 @RequiredArgsConstructor
-public final class DimensionInfo {
-  private final String identifier;
-  private final int id;
-  private final CompoundBinaryTag tag;
+public enum DimensionType {
+  OVERWORLD("minecraft:overworld", 0, 0),
+  THE_NETHER("minecraft:the_nether", -1, 1),
+  THE_END("minecraft:the_end", 1, 2);
+
+  private final String key;
+  private final int legacyId, id;
 }

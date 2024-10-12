@@ -30,6 +30,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
+import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionType;
 import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
@@ -121,10 +122,13 @@ public class FallbackPreparer {
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
-      Sonar.get().getConfig().getVerification().getGamemode().getId(), RANDOM.nextLong(),
-      0, 0, false, true, false,
-      false, false, false, true,
-      new String[]{"minecraft:overworld"}, "minecraft:overworld", "flat"));
+      Sonar.get().getConfig().getVerification().getGamemode().getId(),
+      -1, 0, 0,
+      RANDOM.nextInt(3), 1, 0, 0,
+      new String[]{"lol"}, "lol", "flat",
+      DimensionType.OVERWORLD, RANDOM.nextLong() & 1337,
+      false, true, false,
+      false, false, false, true));
 
     // Prepare the gravity check
     maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
