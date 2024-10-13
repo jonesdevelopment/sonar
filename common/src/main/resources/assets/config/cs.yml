@@ -194,7 +194,7 @@ verification:
   write-timeout: 15000
   # Jak dlouho by měl hráč čekat, než se při ověřování znovu připojí
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
-  rejoin-delay: 8000
+  rejoin-delay: 5000
   # Jak dlouho by si měl Sonar pamatovat počet neúspěšných ověření hráče?
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
   remember-time: 120000
