@@ -281,7 +281,6 @@ public class ProtocolUtil {
   }
 
   public static void writeByteArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
-    checkState(bytes.length < Short.MAX_VALUE, "Too long array");
     writeVarInt(byteBuf, bytes.length);
     byteBuf.writeBytes(bytes);
   }
