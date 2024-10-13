@@ -190,7 +190,7 @@ verification:
   read-timeout: 8000
   # Temps écoulé depuis que le serveur a cessé d'envoyer des paquets avant de se déconnecter
   # (Cette valeur représente le temps en millisecondes : 1 seconde = 1000 millisecondes)
-  write-timeout: 10000
+  write-timeout: 15000
   # Combien de temps un joueur doit-il attendre avant de se reconnecter pendant la vérification
   # (Cette valeur représente le temps en millisecondes : 1 seconde = 1000 millisecondes)
   rejoin-delay: 8000

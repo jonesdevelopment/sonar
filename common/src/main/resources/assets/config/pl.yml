@@ -190,7 +190,7 @@ verification:
   read-timeout: 8000
   # Czas, jaki ma upłynąć od zatrzymania wysyłania pakietów przez serwer do wyrzucenia.
   # (Wartość ta reprezentuje czas w milisekundach: 1 sekunda = 1000 milisekund)
-  write-timeout: 10000
+  write-timeout: 15000
   # Jak długo niezweryfikowany gracz powinien czekać przed ponownym połączeniem do serwera?
   # (Wartość ta reprezentuje czas w milisekundach: 1 sekunda = 1000 milisekund)
   rejoin-delay: 8000

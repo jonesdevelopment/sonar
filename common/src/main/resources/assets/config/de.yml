@@ -188,7 +188,7 @@ verification:
   read-timeout: 8000
   # Die Zeit, seit der der Server keine Pakete mehr sendet, bevor er die Verbindung zum Spieler trennt
   # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
-  write-timeout: 10000
+  write-timeout: 15000
   # Wie lange sollte ein Spieler warten, bevor er während der Überprüfung erneut verbinden kann
   # (Dieser Wert stellt die Zeit in Millisekunden dar: 1 Sekunde = 1000 Millisekunden)
   rejoin-delay: 8000

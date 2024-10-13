@@ -191,7 +191,7 @@ verification:
   read-timeout: 8000
   # Doba od okamžiku, kdy server přestal posílat pakety před odpojením hráče
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
-  write-timeout: 10000
+  write-timeout: 15000
   # Jak dlouho by měl hráč čekat, než se při ověřování znovu připojí
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
   rejoin-delay: 8000
