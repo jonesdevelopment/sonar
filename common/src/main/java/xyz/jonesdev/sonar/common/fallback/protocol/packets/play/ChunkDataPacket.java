@@ -38,33 +38,6 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 public final class ChunkDataPacket implements FallbackPacket {
   private int sectionX, sectionZ;
 
-  private static final byte[] SECTION_BYTES = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
-  private static final byte[] LIGHT_BYTES = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
-
-  private static final byte[] LEGACY_FILLER_BYTES_17 = new byte[2];
-  private static final byte[] LEGACY_FILLER_BYTES = new byte[256];
-  private static final byte[] MODERN_FILLER_BYTES = new byte[256 * 4];
-
-  // Prepare nbt for 1.18 and pre-1.18
-  private static final CompoundBinaryTag MODERN_TAG, LEGACY_TAG;
-
-  static {
-    MODERN_TAG = prepareNBT(false);
-    LEGACY_TAG = prepareNBT(true);
-  }
-
-  private static @NotNull CompoundBinaryTag prepareNBT(final boolean legacy) {
-    final long[] arrayData = new long[legacy ? 36 : 37];
-    final LongArrayBinaryTag longArray = LongArrayBinaryTag.longArrayBinaryTag(arrayData);
-
-    final CompoundBinaryTag motion = CompoundBinaryTag.builder()
-      .put("MOTION_BLOCKING", longArray)
-      .build();
-    return CompoundBinaryTag.builder()
-      .put("root", motion)
-      .build();
-  }
-
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeInt(sectionX);
@@ -89,8 +62,15 @@ public final class ChunkDataPacket implements FallbackPacket {
     }
 
     if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_14)) {
-      writeBinaryTag(byteBuf, protocolVersion,
-        protocolVersion.lessThan(MINECRAFT_1_18) ? LEGACY_TAG : MODERN_TAG);
+      final long[] motionBlockingData = new long[protocolVersion.lessThan(MINECRAFT_1_18) ? 36 : 37];
+      final CompoundBinaryTag motionBlockingTag = CompoundBinaryTag.builder()
+        .put("MOTION_BLOCKING", LongArrayBinaryTag.longArrayBinaryTag(motionBlockingData))
+        .build();
+      final CompoundBinaryTag rootTag = CompoundBinaryTag.builder()
+        .put("root", motionBlockingTag)
+        .build();
+
+      writeBinaryTag(byteBuf, protocolVersion, rootTag);
 
       if (protocolVersion.inBetween(MINECRAFT_1_15, MINECRAFT_1_17_1)) {
         if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16_2)) {
@@ -107,22 +87,19 @@ public final class ChunkDataPacket implements FallbackPacket {
       }
     }
 
-    if (protocolVersion.lessThan(MINECRAFT_1_13)) {
-      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_8)) {
-        writeByteArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
-      } else {
-        byteBuf.writeInt(0); // compressed size
-        byteBuf.writeBytes(LEGACY_FILLER_BYTES_17); // 1.7
-      }
+    if (protocolVersion.lessThan(MINECRAFT_1_8)) {
+      byteBuf.writeInt(0);
+      byteBuf.writeBytes(new byte[2]);
     } else if (protocolVersion.lessThan(MINECRAFT_1_15)) {
-      writeByteArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
+      writeVarInt(byteBuf, 0);
     } else if (protocolVersion.lessThan(MINECRAFT_1_18)) {
-      writeVarInt(byteBuf, 0); // 1.15 - 1.17.1
+      writeByteArray(byteBuf, new byte[256 * 4]);
     } else {
-      writeVarInt(byteBuf, SECTION_BYTES.length * 16);
+      final byte[] sectionData = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
+      writeVarInt(byteBuf, sectionData.length * 16);
 
       for (int i = 0; i < 16; i++) {
-        byteBuf.writeBytes(SECTION_BYTES);
+        byteBuf.writeBytes(sectionData);
       }
     }
 
@@ -131,12 +108,14 @@ public final class ChunkDataPacket implements FallbackPacket {
     }
 
     if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18)) {
-      byteBuf.ensureWritable(LIGHT_BYTES.length);
+      final byte[] lightData = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
+
+      byteBuf.ensureWritable(lightData.length);
 
       if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20)) {
-        byteBuf.writeBytes(LIGHT_BYTES, 1, LIGHT_BYTES.length - 1);
+        byteBuf.writeBytes(lightData, 1, lightData.length - 1);
       } else {
-        byteBuf.writeBytes(LIGHT_BYTES);
+        byteBuf.writeBytes(lightData);
       }
     }
   }
