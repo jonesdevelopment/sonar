@@ -41,8 +41,7 @@ import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import java.net.InetAddress;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.CONFIG;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.loginSuccess;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.closeWith;
 
@@ -125,7 +124,7 @@ public final class FallbackUserWrapper implements FallbackUser {
   @Override
   public void disconnect(final @NotNull Component reason) {
     final FallbackPacketEncoder encoder = channel.pipeline().get(FallbackPacketEncoder.class);
-    final boolean duringLogin = encoder != null && encoder.getPacketRegistry() != GAME;
+    final boolean duringLogin = encoder != null && encoder.getPacketRegistry() == LOGIN;
     closeWith(channel, protocolVersion, DisconnectPacket.create(reason, duringLogin));
   }
 }
