@@ -181,7 +181,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     }
 
     // Ensure that the player's Y coordinate is above the collision platform
-    checkState(y >= DEFAULT_Y_COLLIDE_POSITION,
+    checkState(y >= PLATFORM_Y_POSITION,
       "fell through blocks: " + y + "/" + deltaY + "/" + movementTick);
 
     // The player is not allowed to move away from the collision platform.
@@ -232,7 +232,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
         failOrShowCaptcha("illegal collision tick: " + movementTick + "/" + blockHeight);
       }
       // Calculate the difference between the player's Y coordinate and the expected Y coordinate
-      final double collisionOffsetY = (DEFAULT_Y_COLLIDE_POSITION + blockHeight) - y;
+      final double collisionOffsetY = (PLATFORM_Y_POSITION + blockHeight) - y;
       // Make sure the player is actually colliding with the blocks and not only spoofing ground
       if (collisionOffsetY != 0) {
         failOrShowCaptcha("illegal collision: " + collisionOffsetY + "/" + y + "/" + blockHeight);

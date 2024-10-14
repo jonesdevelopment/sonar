@@ -62,11 +62,10 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
    * <a href="https://wiki.vg/Protocol#Set_Held_Item_.28serverbound.29">Wiki.vg - SetHeldItem (play)</a>
    */
   private void sendSetHeldItem() {
-    // Move the player's slot by 4 (slot limit divided by 2),
-    // and then modulo it by the slot limit (8) to ensure that we don't send invalid slot IDs.
-    expectedSlotId = (currentClientSlotId + 4) % 8;
-    // Send an invalid HeldItemChange packet to the player to see if the player responds
+    // Send an invalid HeldItemChange packet to the player to see if the player responds at all
     user.delayedWrite(INVALID_HELD_ITEM_SLOT);
+    // Increment the player's slot by a random slot, and then modulo it by the maximum slot (8)
+    expectedSlotId = (currentClientSlotId + 1 + RANDOM.nextInt(7)) % 8;
     // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
     // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
     // We can take advantage of this by sending two packets with the same content to check for a valid response.
@@ -83,8 +82,8 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
    * <a href="https://wiki.vg/Protocol#Swing_Arm">Wiki.vg - SwingArm</a>
    */
   private void sendArmAnimation() {
-    waitingSwingArm = true;
     user.write(new EntityAnimationPacket(PLAYER_ENTITY_ID, EntityAnimationPacket.Type.SWING_MAIN_ARM));
+    waitingSwingArm = true;
   }
 
   private void markSuccess() {
@@ -103,11 +102,8 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof TransactionPacket) {
       final TransactionPacket transaction = (TransactionPacket) packet;
-
-      // Make sure random transactions aren't counted
-      checkState(expectedTransactionId <= 0, "unexpected transaction");
       // Make sure the window ID is valid
-      checkState(transaction.getWindowId() == 0, "wrong window ID " + transaction.getWindowId());
+      checkState(transaction.getWindowId() == 0, "wrong window: " + transaction.getWindowId());
       // Make sure the transaction was accepted
       // This must - by vanilla protocol - always be accepted
       checkState(transaction.isAccepted(), "didn't accept transaction");
@@ -143,10 +139,9 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
       // Also check if the player sent an invalid slot which is impossible by vanilla protocol
       checkState(slotId >= 0 && slotId <= 8, "slot out of range: " + slotId);
       // Check if the player sent a duplicate slot packet which is impossible by vanilla protocol
-      checkState(slotId != currentClientSlotId, "invalid slot: " + slotId);
+      checkState(slotId != currentClientSlotId, "duplicate slot: " + slotId);
 
       // Only continue checking if we're actually expecting a SetHeldItem packet
-      // The player can send a SetHeldItem packet by themselves -> exempt
       if (expectedSlotId != -1
         // Check if the slot ID matches the expected slot ID
         // This can false flag if a player spams these packets, which is why we don't fail for this
@@ -162,17 +157,19 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
       // Make sure we are awaiting an AnimationPacket packet
       if (waitingSwingArm) {
         final AnimationPacket animationPacket = (AnimationPacket) packet;
-        checkState(animationPacket.getHand() == AnimationPacket.MAIN_HAND,
-          "invalid hand " + animationPacket.getHand());
-        // Check that the 1.7 client is responding to the correct entity id and animation type.
+
         if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_8)) {
-          // Check entity id is player itself and if the player is sending the correct animation type
-          if (animationPacket.getEntityId() == PLAYER_ENTITY_ID
-            && animationPacket.getType() == AnimationPacket.LegacyAnimationType.SWING_ARM) {
+          // Check if the entity ID is the player itself
+          checkState(animationPacket.getEntityId() == PLAYER_ENTITY_ID,
+            "invalid entity ID " + animationPacket.getEntityId());
+          // Check if the player is sending the correct animation type
+          if (animationPacket.getType() == AnimationPacket.LegacyAnimationType.SWING_ARM) {
             markSuccess();
             waitingSwingArm = false;
           }
         } else {
+          checkState(animationPacket.getHand() == AnimationPacket.MAIN_HAND,
+            "invalid hand " + animationPacket.getHand());
           markSuccess();
           waitingSwingArm = false;
         }

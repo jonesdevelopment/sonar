@@ -22,9 +22,7 @@ import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
-import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.MapCaptchaInfo;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetContainerSlotPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetPlayerPositionPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SetPlayerPositionRotationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.SystemChatPacket;
@@ -45,10 +43,9 @@ public final class FallbackCaptchaHandler extends FallbackVerificationHandler {
 
     this.tries = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
 
-    // If the player is on Java, set the 5th slot (ID 4) in the player's hotbar to the map
-    // If the player is on Bedrock, set the 1st slot (ID 0) in the player's hotbar to the map
-    final int slotId = user.isGeyser() ? 36 : 40;
-    user.delayedWrite(new SetContainerSlotPacket(0, slotId, 1, ItemType.FILLED_MAP, MAP_ITEM_NBT));
+    // We may not be on slot 4, so we need to make sure to synchronize the current slot
+    user.delayedWrite(CAPTCHA_HELD_ITEM_SLOT);
+    user.delayedWrite(CAPTCHA_SET_CONTAINER_SLOT);
     // Send random captcha to the player
     final MapCaptchaInfo captcha = CaptchaPreparer.getRandomCaptcha();
     this.answer = captcha.getAnswer().toLowerCase();
@@ -99,7 +96,7 @@ public final class FallbackCaptchaHandler extends FallbackVerificationHandler {
       if (keepAliveStreak++ > 20) {
         keepAliveStreak = 0;
         // Send a KeepAlive packet to prevent timeout
-        user.write(CAPTCHA_KEEP_ALIVE);
+        user.write(RANDOM_KEEP_ALIVE);
       }
     }
   }

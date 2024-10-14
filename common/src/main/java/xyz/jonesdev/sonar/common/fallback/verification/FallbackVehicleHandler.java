@@ -36,8 +36,8 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
       || user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17);
 
     // Send the necessary packets to mount the player on the boat vehicle
-    user.delayedWrite(spawnBoatEntity);
-    user.delayedWrite(setPassengers);
+    user.delayedWrite(SPAWN_BOAT_ENTITY);
+    user.delayedWrite(SET_VEHICLE_PASSENGERS);
     user.channel().flush();
   }
 
@@ -86,13 +86,13 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
       && (!canTeleportPlayer || (teleports > minimumPackets && confirmed > minimumPackets))) {
       // Check if the player has confirmed all teleport packets
       checkState(confirmed == teleports,
-        "missing teleports confirmations: " + confirmed + "/" + teleports);
+        "missing teleport confirmations: " + confirmed + "/" + teleports);
       // If the player is riding a Minecart, teleport the entity to < -100
       // to see how the player reacts to the invalid position of the entity.
       if (inMinecart) {
         // We're using transactions to avoid false positives with lag
         expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
-        user.delayedWrite(teleportMinecart);
+        user.delayedWrite(TELEPORT_VEHICLE);
         user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
         user.channel().flush();
         waitingRemoveMinecart = true;
@@ -100,7 +100,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         // If the player is riding a boat, remove the entity
         // The next Y coordinate the player will send is going
         // to be the vehicle spawn position (64 in this case).
-        user.write(removeBoat);
+        user.write(REMOVE_VEHICLE);
       }
       // Listen for next movement packet(s)
       expectMovement = true;
@@ -115,8 +115,8 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     minecartMotion = 0.03999999910593033D * 2 * -1;
     expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
     user.delayedWrite(new TransactionPacket(0, expectedTransactionId, false));
-    user.delayedWrite(spawnMinecartEntity);
-    user.delayedWrite(setPassengers);
+    user.delayedWrite(SPAWN_MINECART_ENTITY);
+    user.delayedWrite(SET_VEHICLE_PASSENGERS);
     user.channel().flush();
     waitingSpawnMinecart = true;
   }
@@ -125,10 +125,8 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof TransactionPacket) {
       final TransactionPacket transaction = (TransactionPacket) packet;
-      // Make sure random transactions aren't counted
-      checkState(expectedTransactionId <= 0, "unexpected transaction");
       // Make sure the window ID is valid
-      checkState(transaction.getWindowId() == 0, "wrong window ID " + transaction.getWindowId());
+      checkState(transaction.getWindowId() == 0, "wrong window: " + transaction.getWindowId());
       // Make sure the transaction was accepted
       // This must - by vanilla protocol - always be accepted
       checkState(transaction.isAccepted(), "didn't accept transaction");
@@ -201,9 +199,15 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         checkState(difference < 1e-7,
           "invalid vehicle gravity: " + predicted + "/" + minecartMotion + "/" + difference);
       }
+
+      // 1.21.2+ do not send PlayerInput packets when inside a vehicle
+      if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+        handlePlayerInput();
+      }
       vehicleMoves++;
     } else if (packet instanceof PlayerInputPacket) {
-      if (!expectMovement) {
+      // 1.21.2+ send PlayerInput packets when the player starts sprinting, sneaking, etc.
+      if (!expectMovement && user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2)) {
         final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
         // Check if the player is sending invalid vehicle speed values
@@ -214,47 +218,46 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         checkState(sideways <= maxVehicleSpeed, "illegal speed (s): " + sideways);
 
         // Only mark this packet as correct if the player is not moving the vehicle
-        if (playerInput.isJump() || playerInput.isUnmount()) {
+        if (playerInput.isJump() || playerInput.isSneak()) {
           return;
         }
 
-        // Bedrock users do not send SetPlayerPositionRotation and SetPlayerRotation packets
-        // Don't ask me why; Microsoft is doing some *fascinating* things with Bedrock...
-        if (user.isGeyser()) {
-          handleRotation();
-        } else {
-          checkState(rotations >= inputs,
-            "illegal packet order; r/i " + rotations + "/" + inputs);
-
-          // This check does not work on 1.16-1.16.5 because Mojang did some stuff
-          // Only perform the buggy teleport check once in a while (every 2 packets)
-          if (canTeleportPlayer && inputs % 2 == 0) {
-            if (expectTeleport) {
-              // This shouldn't happen, so we're better off not counting this packet
-              return;
-            }
-            // Teleport the player to see if they are bugged to the vehicle
-            expectedTeleportId = RANDOM.nextInt();
-            user.write(new SetPlayerPositionRotationPacket(
-              SPAWN_X_POSITION, -RANDOM.nextInt(Short.MAX_VALUE), SPAWN_Z_POSITION, 0, 0,
-              expectedTeleportId, 0, false, false));
-            expectTeleport = true;
-          }
-        }
-
-        // 1.8 and below do not have PaddleBoat packets, so we simply exempt them from the PaddleBoat check.
-        // Clients don't send PaddleBoat & VehicleMovePacket packets while riding minecarts.
-        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_9) || inMinecart) {
-          paddles++;
-          vehicleMoves++;
-        } else if (!user.isGeyser()) {
-          checkState(paddles >= inputs,
-            "illegal packet order; i/p " + inputs + "/" + paddles);
-          checkState(vehicleMoves >= inputs,
-            "illegal packet order; i/v " + inputs + "/" + vehicleMoves);
-        }
-        inputs++;
+        handlePlayerInput();
       }
     }
+  }
+
+  private void handlePlayerInput() {
+    // Bedrock users do not send SetPlayerPositionRotation and SetPlayerRotation packets
+    // Don't ask me why; Microsoft is doing some *fascinating* things with Bedrock...
+    if (user.isGeyser()) {
+      handleRotation();
+    } else {
+      checkState(rotations >= inputs,
+        "illegal packet order; r/i " + rotations + "/" + inputs);
+
+      // This check does not work on 1.16-1.16.5 because Mojang did some stuff
+      if (canTeleportPlayer && !expectTeleport) {
+        // Teleport the player to see if they are bugged to the vehicle
+        expectedTeleportId = RANDOM.nextInt();
+        user.write(new SetPlayerPositionRotationPacket(
+          SPAWN_X_POSITION, Short.MAX_VALUE + RANDOM.nextInt(Short.MAX_VALUE), SPAWN_Z_POSITION,
+          0, -90, expectedTeleportId, 0, false, false));
+        expectTeleport = true;
+      }
+    }
+
+    // 1.8 and below do not have PaddleBoat packets, so we simply exempt them from the PaddleBoat check.
+    // Clients don't send PaddleBoat & VehicleMovePacket packets while riding minecarts.
+    if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_9) || inMinecart) {
+      paddles++;
+      vehicleMoves++;
+    } else if (!user.isGeyser()) {
+      checkState(paddles >= inputs,
+        "illegal packet order; i/p " + inputs + "/" + paddles);
+      checkState(vehicleMoves >= inputs,
+        "illegal packet order; i/v " + inputs + "/" + vehicleMoves);
+    }
+    inputs++;
   }
 }

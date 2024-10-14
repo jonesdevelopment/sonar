@@ -29,6 +29,7 @@ import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.CaptchaPreparer;
+import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionType;
 import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
@@ -48,23 +49,26 @@ public class FallbackPreparer {
   public static final int PLAYER_ENTITY_ID = RANDOM.nextInt();
   public static final int VEHICLE_ENTITY_ID = RANDOM.nextInt();
 
-  public static final CompoundBinaryTag MAP_ITEM_NBT = CompoundBinaryTag.builder()
-    .put("map", IntBinaryTag.intBinaryTag(0)) // map type
-    .build();
-
   public static final BlockType[] POSSIBLE_BLOCK_TYPES = BlockType.values();
   public final FallbackPacket[] BLOCKS_PACKETS = new FallbackPacket[POSSIBLE_BLOCK_TYPES.length];
 
   public final int BLOCKS_PER_ROW = 8; // 8 * 8 = 64 (vanilla protocol maximum)
   public final int SPAWN_X_POSITION = 16 / 2; // middle of the chunk
   public final int SPAWN_Z_POSITION = 16 / 2; // middle of the chunk
-  public final int DEFAULT_Y_COLLIDE_POSITION = 1 + RANDOM.nextInt(255); // 255 is the maximum Y position
+  public final int PLATFORM_Y_POSITION = 1 + RANDOM.nextInt(255); // 255 is the maximum Y position
   public final int IN_AIR_Y_POSITION = 1000 + RANDOM.nextInt(338); // High altitude (randomized)
-  public final int IN_VOID_Y_POSITION = -(120 + RANDOM.nextInt(120)); // Low altitude (randomized)
+  public final int IN_VOID_Y_POSITION = -(65 + RANDOM.nextInt(16)); // Low altitude (randomized)
 
   public final int FIRST_TELEPORT_ID = RANDOM.nextInt();
   public final int SECOND_TELEPORT_ID = RANDOM.nextInt();
 
+  private final int MAP_SLOT = RANDOM.nextInt(9);
+
+  public static final FallbackPacket CAPTCHA_SET_CONTAINER_SLOT = new SetContainerSlotPacket(
+    0, 36 + MAP_SLOT, 1, ItemType.FILLED_MAP, CompoundBinaryTag.builder()
+    .put("map", IntBinaryTag.intBinaryTag(0)) // map id
+    .build());
+  public final static FallbackPacket CAPTCHA_HELD_ITEM_SLOT = new SetHeldItemPacket(MAP_SLOT);
   public final FallbackPacket DEFAULT_ABILITIES = new PlayerAbilitiesPacket(0x00, 0, 0);
   public final FallbackPacket NO_MOVE_ABILITIES = new PlayerAbilitiesPacket(0x02, 0, 0);
   public final FallbackPacket NO_MOVE_ABILITIES_BEDROCK = new PlayerAbilitiesPacket(0x06, 0, 0);
@@ -77,7 +81,17 @@ public class FallbackPreparer {
   public final FallbackPacket[] REGISTRY_SYNC_1_21 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21);
   public final FallbackPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
   public final static FallbackPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
-  public final FallbackPacket CAPTCHA_KEEP_ALIVE = new KeepAlivePacket(RANDOM.nextInt());
+  public final FallbackPacket RANDOM_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(RANDOM.nextInt()));
+  public static final FallbackPacket SPAWN_BOAT_ENTITY = new FallbackPacketSnapshot(new SpawnEntityPacket(
+    VEHICLE_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
+    0, 0, 0, 0));
+  public static final FallbackPacket SPAWN_MINECART_ENTITY = new FallbackPacketSnapshot(new SpawnEntityPacket(
+    VEHICLE_ENTITY_ID, EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
+    0, 0, 0, 0));
+  public static final FallbackPacket TELEPORT_VEHICLE = new TeleportEntityPacket(
+    VEHICLE_ENTITY_ID, SPAWN_X_POSITION, IN_VOID_Y_POSITION, SPAWN_Z_POSITION, false);
+  public static final FallbackPacket REMOVE_VEHICLE = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
+  public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
   public static FallbackPacket loginSuccess;
   public FallbackPacket welcomeMessage;
@@ -96,11 +110,6 @@ public class FallbackPreparer {
   public FallbackPacket protocolBlacklisted;
   public FallbackPacket invalidUsername;
   public FallbackPacket tooManyOnlinePerIP;
-  public FallbackPacket removeBoat;
-  public FallbackPacket teleportMinecart;
-  public FallbackPacket spawnBoatEntity;
-  public FallbackPacket spawnMinecartEntity;
-  public FallbackPacket setPassengers;
   public FallbackPacket[] xpCountdown;
   public FallbackPacket updateTime;
 
@@ -141,7 +150,7 @@ public class FallbackPreparer {
     }
 
     // Set the dynamic block and collide Y position based on the maximum fall distance
-    dynamicSpawnYPosition = DEFAULT_Y_COLLIDE_POSITION + (int) Math.ceil(fallDistance);
+    dynamicSpawnYPosition = PLATFORM_Y_POSITION + (int) Math.ceil(fallDistance);
     defaultSpawnPosition = new FallbackPacketSnapshot(new SetDefaultSpawnPositionPacket(
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
@@ -163,7 +172,7 @@ public class FallbackPreparer {
       for (int x = 0; x < BLOCKS_PER_ROW; x++) {
         for (int z = 0; z < BLOCKS_PER_ROW; z++) {
           final BlockUpdate.BlockPosition position = new BlockUpdate.BlockPosition(
-            x + length, DEFAULT_Y_COLLIDE_POSITION, z + length, 0, 0);
+            x + length, PLATFORM_Y_POSITION, z + length, 0, 0);
           blocks[index++] = new BlockUpdate(position, POSSIBLE_BLOCK_TYPES[i]);
         }
       }
@@ -187,18 +196,6 @@ public class FallbackPreparer {
     } else {
       transferToOrigin = null;
     }
-
-    // Prepare packets for the vehicle check
-    removeBoat = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
-    teleportMinecart = new TeleportEntityPacket(
-      VEHICLE_ENTITY_ID, SPAWN_X_POSITION, IN_VOID_Y_POSITION, SPAWN_Z_POSITION, false);
-    spawnBoatEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(VEHICLE_ENTITY_ID,
-      EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
-      0, 0, 0, 0));
-    spawnMinecartEntity = new FallbackPacketSnapshot(new SpawnEntityPacket(VEHICLE_ENTITY_ID,
-      EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
-      0, 0, 0, 0));
-    setPassengers = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
     // Prepare update time packet
     final int timeOfDay = Sonar.get().getConfig().getVerification().getTimeOfDay();
