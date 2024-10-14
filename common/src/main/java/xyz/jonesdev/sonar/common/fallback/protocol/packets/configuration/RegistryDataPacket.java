@@ -74,7 +74,8 @@ public final class RegistryDataPacket implements FallbackPacket {
       final ArrayList<RegistryDataPacket.Bundle> bundles = new ArrayList<>();
       for (final BinaryTag binaryTag : rootTag.getCompound(type).getList("value")) {
         final CompoundBinaryTag tag = (CompoundBinaryTag) binaryTag;
-        bundles.add(new Bundle(tag.getString("name"), tag.getCompound("element")));
+        // CompoundBinaryTag#getCompound(String) will return an empty compound tag when not exist.
+        bundles.add(new Bundle(tag.getString("name"), tag.get("element") == null ? null : tag.getCompound("element")));
       }
       packets[index++] = new FallbackPacketSnapshot(new RegistryDataPacket(rootTag, type, bundles));
     }

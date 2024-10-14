@@ -35,6 +35,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionType;
 import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.UpdateTagsPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
@@ -73,12 +74,14 @@ public class FallbackPreparer {
   public final FallbackPacket NO_MOVE_ABILITIES = new PlayerAbilitiesPacket(0x02, 0, 0);
   public final FallbackPacket NO_MOVE_ABILITIES_BEDROCK = new PlayerAbilitiesPacket(0x06, 0, 0);
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
-    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, 0, false, true));
+    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, 0, false, false, true));
   public final FallbackPacket EMPTY_CHUNK_DATA = new FallbackPacketSnapshot(new ChunkDataPacket(0, 0));
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket();
   public final FallbackPacket REGISTRY_SYNC_LEGACY = new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null));
   public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
   public final FallbackPacket[] REGISTRY_SYNC_1_21 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21);
+  public final FallbackPacket[] REGISTRY_SYNC_1_21_2 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_2);
+  public final FallbackPacket TAGS_SYNC_1_21_2 = new FallbackPacketSnapshot(new UpdateTagsPacket(DimensionRegistry.TAGS_1_21_2));
   public final FallbackPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
   public final static FallbackPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
   public final FallbackPacket RANDOM_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(RANDOM.nextInt()));
@@ -91,7 +94,7 @@ public class FallbackPreparer {
   public static final FallbackPacket REMOVE_VEHICLE = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
   public static final FallbackPacket TELEPORT_IN_VEHICLE = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
     SPAWN_X_POSITION, 10000 + RANDOM.nextInt(10000), SPAWN_Z_POSITION, 0, -90,
-    RANDOM.nextInt(), 0, false, false));
+    RANDOM.nextInt(), 0, false, false, false));
   public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
   public static FallbackPacket loginSuccess;
@@ -156,13 +159,13 @@ public class FallbackPreparer {
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
-      0, 0, FIRST_TELEPORT_ID, 0, false, true));
+      0, 0, FIRST_TELEPORT_ID, 0, false, false, true));
     fallStartPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition - IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
-      0, -90, SECOND_TELEPORT_ID, 1 << 1, false, true));
+      0, -90, SECOND_TELEPORT_ID, 1 << 1, false, false, true));
     fallStartPositionLegacy = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
-      0, -90, 0, 0, false, true));
+      0, -90, 0, 0, false, false, true));
 
     // Prepare collision platform positions
     final int length = BLOCKS_PER_ROW / 2;

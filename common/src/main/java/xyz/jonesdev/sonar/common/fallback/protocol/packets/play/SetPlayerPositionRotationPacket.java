@@ -37,7 +37,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   private double x, y, z;
   private float yaw, pitch;
   private int teleportId, relativeMask;
-  private boolean onGround;
+  private boolean onGround, horizontalCollision;
   private boolean dismountVehicle;
 
   @Override
@@ -71,7 +71,13 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();
     pitch = byteBuf.readFloat();
-    onGround = byteBuf.readBoolean();
+    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
+      short flag = byteBuf.readUnsignedByte();
+      onGround = (flag & 1) != 0;
+      horizontalCollision = (flag & 2) != 0;
+    } else {
+      onGround = byteBuf.readBoolean();
+    }
   }
 
   @Override
