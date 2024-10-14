@@ -62,8 +62,6 @@ import java.util.concurrent.TimeUnit;
 @UtilityClass
 public class ProtocolUtil {
   public static final boolean DEBUG = Boolean.getBoolean("sonar.debug-traces");
-  public static final String BRAND_CHANNEL_LEGACY = "MC|Brand";
-  public static final String BRAND_CHANNEL = "minecraft:brand";
   private static final int[] VAR_INT_LENGTHS = new int[65];
 
   static {

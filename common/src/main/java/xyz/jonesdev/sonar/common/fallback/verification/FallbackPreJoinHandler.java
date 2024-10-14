@@ -36,8 +36,6 @@ import java.util.regex.Pattern;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL_LEGACY;
 
 public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
@@ -139,8 +137,8 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     } else if (packet instanceof PluginMessagePacket) {
       final PluginMessagePacket pluginMessage = (PluginMessagePacket) packet;
 
-      final boolean usingModernChannel = pluginMessage.getChannel().equals(BRAND_CHANNEL);
-      final boolean usingLegacyChannel = pluginMessage.getChannel().equals(BRAND_CHANNEL_LEGACY);
+      final boolean usingModernChannel = pluginMessage.getChannel().equals("minecraft:brand");
+      final boolean usingLegacyChannel = pluginMessage.getChannel().equals("MC|Brand");
 
       // Skip this payload if it does not contain client brand information
       if (!usingModernChannel && !usingLegacyChannel) {
