@@ -119,9 +119,9 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       checkState(!acknowledgedLogin, "sent duplicate login ack");
       markAcknowledged();
     } else if (packet instanceof FinishConfigurationPacket) {
-      validateClientInformation();
       // Update the encoder and decoder state because we're currently in the CONFIG state
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);
+      validateClientInformation();
       markSuccess();
     } else if (packet instanceof ClientInformationPacket) {
       final ClientInformationPacket clientInformation = (ClientInformationPacket) packet;
