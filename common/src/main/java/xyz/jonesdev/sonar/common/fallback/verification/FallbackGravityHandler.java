@@ -119,13 +119,13 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
         handleMovement(position.getX(), position.getY(), position.getZ(), position.isOnGround(), false);
       }
     } else if (packet instanceof ConfirmTeleportationPacket) {
-      final ConfirmTeleportationPacket teleportConfirm = (ConfirmTeleportationPacket) packet;
+      final ConfirmTeleportationPacket confirmTeleport = (ConfirmTeleportationPacket) packet;
 
       // Only expect this packet to be sent once
       checkState(!teleported, "duplicate teleport confirm");
       // Check if the teleport ID matches the expected ID
-      checkState(teleportConfirm.getTeleportId() == expectedTeleportId,
-        "expected TP ID " + expectedTeleportId + ", but got " + teleportConfirm.getTeleportId());
+      checkState(confirmTeleport.getTeleportId() == expectedTeleportId,
+        "expected TP ID " + expectedTeleportId + ", but got " + confirmTeleport.getTeleportId());
 
       // The first teleport ID is not useful for us in this context, skip it
       if (expectedTeleportId == FIRST_TELEPORT_ID) {

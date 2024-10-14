@@ -88,9 +88,10 @@ public class FallbackPreparer {
   public static final FallbackPacket SPAWN_MINECART_ENTITY = new FallbackPacketSnapshot(new SpawnEntityPacket(
     VEHICLE_ENTITY_ID, EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
     0, 0, 0, 0));
-  public static final FallbackPacket TELEPORT_VEHICLE = new TeleportEntityPacket(
-    VEHICLE_ENTITY_ID, SPAWN_X_POSITION, IN_VOID_Y_POSITION, SPAWN_Z_POSITION, false);
   public static final FallbackPacket REMOVE_VEHICLE = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
+  public static final FallbackPacket TELEPORT_IN_VEHICLE = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
+    SPAWN_X_POSITION, 10000 + RANDOM.nextInt(10000), SPAWN_Z_POSITION, 0, -90,
+    RANDOM.nextInt(), 0, false, false));
   public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
   public static FallbackPacket loginSuccess;

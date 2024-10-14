@@ -122,8 +122,12 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           handlePlayerInput();
         }
       } else if (packet instanceof SetPlayerPositionRotationPacket) {
-        if (!state.inVehicle && state != State.WAITING) {
-          final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
+        final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
+
+        if (state.inVehicle) {
+          checkState(!posRot.isOnGround(), "illegal ground state on teleport");
+          checkState(posRot.getY() >= 10000, "invalid y: " + posRot.getY());
+        } else if (state != State.WAITING) {
           handleMovement(posRot.getY(), posRot.isOnGround());
         }
       } else if (packet instanceof SetPlayerPositionPacket) {
@@ -197,8 +201,12 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
     if (inputs > minimumPackets && rotations > minimumPackets
       && paddles > minimumPackets && vehicleMoves > minimumPackets) {
+      // Move on to the next stage
       user.delayedWrite(REMOVE_VEHICLE);
       prepareForNextState(state == State.IN_BOAT ? State.IN_AIR_AFTER_BOAT : State.IN_AIR_AFTER_MINECART);
+    } else if (canTeleportPlayer && inputs <= minimumPackets) {
+      // Teleport the player while the player is in the vehicle to see whether they dismount the vehicle or not
+      user.write(TELEPORT_IN_VEHICLE);
     }
   }
 }
