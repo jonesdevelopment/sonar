@@ -193,7 +193,7 @@ verification:
   rejoin-delay: 5000
   # De tijd sinds de server stopte met het versturen van pakketten voordat de verbinding met de speler werd verbroken
   # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
-  write-timeout: 15000
+  write-timeout: 10000
   # Hoe lang moet Sonar het aantal mislukte verificaties voor een speler onthouden?
   # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
   remember-time: 120000

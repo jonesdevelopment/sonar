@@ -191,7 +191,7 @@ verification:
   read-timeout: 8000
   # The time since the server stopped sending packets before disconnecting the player
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
-  write-timeout: 15000
+  write-timeout: 10000
   # How long should a player wait before reconnecting during verification
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   rejoin-delay: 5000
