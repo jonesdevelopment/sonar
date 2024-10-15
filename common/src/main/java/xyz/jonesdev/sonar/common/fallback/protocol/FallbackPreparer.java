@@ -63,6 +63,7 @@ public class FallbackPreparer {
 
   public final int FIRST_TELEPORT_ID = RANDOM.nextInt();
   public final int SECOND_TELEPORT_ID = RANDOM.nextInt();
+  public static final int VEHICLE_TELEPORT_ID = RANDOM.nextInt();
 
   private final int MAP_SLOT = RANDOM.nextInt(9);
 
@@ -95,7 +96,7 @@ public class FallbackPreparer {
   public static final FallbackPacket REMOVE_VEHICLE = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
   public static final FallbackPacket TELEPORT_IN_VEHICLE = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
     SPAWN_X_POSITION, 10000 + RANDOM.nextInt(10000), SPAWN_Z_POSITION, 0, -90,
-    RANDOM.nextInt(), 0, false, false, false));
+    VEHICLE_TELEPORT_ID, 0, false, false, false));
   public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
   public static FallbackPacket loginSuccess;
