@@ -40,7 +40,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   }
 
   private final boolean canTeleportPlayer;
-  private boolean waitingForStateChange, vehiclePacketAfterTeleport, exceptTeleport;
+  private boolean waitingForStateChange, vehiclePacketAfterTeleport, expectTeleport;
   private State state = State.WAITING;
   private State nextState;
   private int expectedKeepAliveId;
@@ -129,7 +129,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           handlePlayerInput();
         }
       } else if (packet instanceof SetPlayerPositionRotationPacket) {
-        checkState(exceptTeleport, "send full position rotation without teleport");
+        checkState(expectTeleport, "send full position rotation without teleport");
         final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
 
         if (state.inVehicle) {
@@ -149,12 +149,12 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           handleMovement(position.getY(), position.isOnGround());
         }
       } else if (packet instanceof ConfirmTeleportationPacket) {
-        checkState(exceptTeleport, "non-except teleportation");
+        checkState(expectTeleport, "non-except teleportation");
         final ConfirmTeleportationPacket confirm = (ConfirmTeleportationPacket) packet;
         if (state.inVehicle && confirm.getTeleportId() == VEHICLE_TELEPORT_ID) {
           vehiclePacketAfterTeleport = true;
         }
-        exceptTeleport = false;
+        expectTeleport = false;
       }
     }
   }
@@ -221,13 +221,13 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
     if (inputs > minimumPackets && rotations > minimumPackets
       && paddles > minimumPackets && vehicleMoves > minimumPackets
-      && !exceptTeleport && !vehiclePacketAfterTeleport) {
+      && !expectTeleport && !vehiclePacketAfterTeleport) {
       // Move on to the next stage
       user.delayedWrite(REMOVE_VEHICLE);
       prepareForNextState(state == State.IN_BOAT ? State.IN_AIR_AFTER_BOAT : State.IN_AIR_AFTER_MINECART);
     } else if (canTeleportPlayer && inputs <= minimumPackets) {
       // Teleport the player while the player is in the vehicle to see whether they dismount the vehicle or not
-      exceptTeleport = true;
+      expectTeleport = true;
       user.write(TELEPORT_IN_VEHICLE);
     }
   }
