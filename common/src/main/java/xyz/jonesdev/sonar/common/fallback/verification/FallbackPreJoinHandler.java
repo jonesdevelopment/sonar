@@ -128,8 +128,10 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     } else if (packet instanceof ClientInformationPacket) {
       final ClientInformationPacket clientInformation = (ClientInformationPacket) packet;
 
-      checkState(clientInformation.getViewDistance() >= 2,
-        "view distance: " + clientInformation.getViewDistance());
+      if (!user.isGeyser()) {
+        checkState(clientInformation.getViewDistance() >= 2,
+          "view distance: " + clientInformation.getViewDistance());
+      }
       // Ensure that the client locale is correct
       validateClientLocale(clientInformation.getLocale());
       // Check if the player sent an unused bit flag in the skin section
