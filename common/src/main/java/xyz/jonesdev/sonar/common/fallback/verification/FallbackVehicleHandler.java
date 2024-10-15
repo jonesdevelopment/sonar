@@ -154,6 +154,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         if (state.inVehicle && confirm.getTeleportId() == VEHICLE_TELEPORT_ID) {
           vehiclePacketAfterTeleport = true;
         }
+        exceptTeleport = false;
       }
     }
   }
