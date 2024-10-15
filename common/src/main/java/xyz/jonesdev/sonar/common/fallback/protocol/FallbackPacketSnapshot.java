@@ -19,70 +19,74 @@ package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.EncoderException;
+import io.netty.util.collection.IntObjectHashMap;
+import io.netty.util.collection.IntObjectMap;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-
-import java.util.HashMap;
-import java.util.Map;
+import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.ID_TO_PROTOCOL_CONSTANT;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 
 // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/PacketSnapshot.java
-@Getter
 public final class FallbackPacketSnapshot implements FallbackPacket {
-  private final Map<Integer, Integer> mappings = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
-  private final Map<Integer, byte[]> cachedBytes = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
-  private final FallbackPacket originalPacket;
+  private final IntObjectMap<Integer> mappings = new IntObjectHashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
+  private final IntObjectMap<byte[]> cachedBytes = new IntObjectHashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
+  @Getter
+  private final Class<? extends FallbackPacket> originalPacketClass;
 
   public FallbackPacketSnapshot(final @NotNull FallbackPacket originalPacket) {
-    final Map<Integer, Integer> hashes = new HashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
+    this.originalPacketClass = originalPacket.getClass();
+
+    final IntObjectMap<Integer> hashedData = new IntObjectHashMap<>(ID_TO_PROTOCOL_CONSTANT.size());
 
     for (final ProtocolVersion protocolVersion : ID_TO_PROTOCOL_CONSTANT.values()) {
       // Allocate a buffer for each protocol version
       final ByteBuf byteBuf = Unpooled.buffer();
       try {
-        originalPacket.encode(byteBuf, protocolVersion);
-      } catch (Exception exception) {
-        Sonar.get().getLogger().error("Could not encode packet {} for version {}: {}",
-          originalPacket.toString(), protocolVersion, exception);
-        break;
-      }
+        try {
+          originalPacket.encode(byteBuf, protocolVersion);
+        } catch (Throwable throwable) {
+          Sonar.get().getLogger().error("Could not encode packet {} for version {}: {}",
+            originalPacket, protocolVersion, throwable);
+          break;
+        }
 
-      // Make sure we don't unnecessarily fill the RAM
-      final int protocol = protocolVersion.getProtocol();
-      final int hash = byteBuf.hashCode();
-      final int hashed = hashes.getOrDefault(hash, -1);
-      if (hashed != -1) {
-        mappings.put(protocol, hashed);
-      } else {
-        hashes.put(hash, protocol);
-        mappings.put(protocol, protocol);
-        // Cache the raw bytes of the encoded packet
-        final byte[] bytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(bytes);
-        cachedBytes.put(protocol, bytes);
+        final Integer protocol = protocolVersion.getProtocol();
+        final Integer hash = byteBuf.hashCode();
+        final Integer hashed = hashedData.getOrDefault(hash, -1);
+
+        if (hashed != -1) {
+          mappings.put(protocol, hashed);
+        } else {
+          hashedData.put(hash, protocol);
+          mappings.put(protocol, protocol);
+          // Cache the raw bytes of the encoded packet
+          final byte[] bytes = new byte[byteBuf.readableBytes()];
+          byteBuf.readBytes(bytes);
+          cachedBytes.put(protocol, bytes);
+        }
+      } finally {
+        // Make sure to release the buffer to avoid memory leaks
+        byteBuf.release();
       }
-      // Make sure to release the buffer to avoid memory leaks
-      byteBuf.release();
     }
-    this.originalPacket = originalPacket;
   }
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf,
-                     final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    final int hash = mappings.get(protocolVersion.getProtocol());
-    final byte[] bytes = cachedBytes.get(hash);
-
-    if (bytes != null) {
-      byteBuf.writeBytes(bytes);
-    } else {
-      Sonar.get().getLogger().error("Could not find cached packet {} for version {}",
-        toString(), protocolVersion);
-      throw new IllegalStateException("Unable to find cached packet. Contact the developer!");
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
+    final Integer hash = mappings.get(protocolVersion.getProtocol());
+    if (hash == null) {
+      throw DEBUG ? new EncoderException("Unable to find protocol version hash!") : QuietDecoderException.INSTANCE;
     }
+    final byte[] bytes = cachedBytes.get(hash);
+    if (bytes == null) {
+      throw DEBUG ? new EncoderException("Unable to find cached packet!") : QuietDecoderException.INSTANCE;
+    }
+    byteBuf.writeBytes(bytes);
   }
 
   @Override

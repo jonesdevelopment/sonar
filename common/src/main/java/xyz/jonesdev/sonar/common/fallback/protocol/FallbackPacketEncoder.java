@@ -21,23 +21,19 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.CLIENTBOUND;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
+@RequiredArgsConstructor
 public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPacket> {
   private final ProtocolVersion protocolVersion;
   @Getter
   private FallbackPacketRegistry packetRegistry;
   private FallbackPacketRegistry.ProtocolRegistry protocolRegistry;
-
-  public FallbackPacketEncoder(final ProtocolVersion protocolVersion) {
-    this.protocolVersion = protocolVersion;
-    updateRegistry(LOGIN);
-  }
 
   public void updateRegistry(final @NotNull FallbackPacketRegistry packetRegistry) {
     this.packetRegistry = packetRegistry;
@@ -48,9 +44,9 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
   protected void encode(final ChannelHandlerContext ctx,
                         final @NotNull FallbackPacket packet,
                         final ByteBuf out) throws Exception {
-    final FallbackPacket originalPacket = packet instanceof FallbackPacketSnapshot
-      ? ((FallbackPacketSnapshot) packet).getOriginalPacket() : packet;
-    final int packetId = protocolRegistry.getPacketId(originalPacket.getClass());
+    final Class<? extends FallbackPacket> originalPacket = packet instanceof FallbackPacketSnapshot
+      ? ((FallbackPacketSnapshot) packet).getOriginalPacketClass() : packet.getClass();
+    final int packetId = protocolRegistry.getPacketId(originalPacket);
     writeVarInt(out, packetId);
     packet.encode(out, protocolVersion);
   }

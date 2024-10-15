@@ -42,7 +42,8 @@ import java.net.InetAddress;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.*;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
+import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.loginSuccess;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.closeWith;
 
@@ -100,24 +101,34 @@ public final class FallbackUserWrapper implements FallbackUser {
       Sonar.get().getFallback().getConnected().compute(inetAddress, (__, v) -> true);
 
       // Replace normal encoder to allow custom packets
+      // TODO: recode injection
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
       channel.pipeline().addFirst(FALLBACK_FRAME_ENCODER, FallbackVarIntLengthEncoder.INSTANCE);
       channel.pipeline().addLast(FALLBACK_PACKET_ENCODER, newEncoder);
 
-      // Send LoginSuccess packet to make the client think they are joining the server
-      write(loginSuccess);
-
-      // The LoginSuccess packet has been sent, now we can change the registry state
-      newEncoder.updateRegistry(protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0 ? CONFIG : GAME);
-
       // Replace normal decoder to allow custom packets
+      // TODO: recode injection
       final FallbackPacketDecoder newDecoder = new FallbackPacketDecoder(protocolVersion);
       channel.pipeline().addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
       channel.pipeline().addLast(FALLBACK_PACKET_DECODER, newDecoder);
+
+      // We're sending the LoginSuccess packet now
+      newDecoder.updateRegistry(LOGIN);
+      newEncoder.updateRegistry(LOGIN);
+      // Send LoginSuccess packet to make the client think they are joining the server
+      write(loginSuccess);
+
+      // pre-1.20.2 clients do not have the configuration stage
+      if (protocolVersion.compareTo(MINECRAFT_1_20_2) < 0) {
+        newDecoder.updateRegistry(GAME);
+        newEncoder.updateRegistry(GAME);
+      }
+
       // Listen for all incoming packets by setting the packet listener
       newDecoder.setListener(new FallbackPreJoinHandler(this));
 
       // Make sure to catch all exceptions during the verification
+      // TODO: recode injection
       channel.pipeline().addLast(FALLBACK_TAIL_EXCEPTIONS, FallbackTailExceptionsHandler.INSTANCE);
     });
   }
