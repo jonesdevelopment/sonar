@@ -30,12 +30,8 @@ import xyz.jonesdev.sonar.api.update.UpdateChecker;
 
 import java.util.*;
 
-import static java.util.Collections.emptyList;
-
 public interface SonarCommand {
-  List<String> TAB_SUGGESTIONS = new ArrayList<>();
-
-  Map<String, List<String>> ARG_TAB_SUGGESTIONS = new HashMap<>();
+  Map<Integer, List<String>> TAB_SUGGESTIONS = new LinkedHashMap<>();
 
   default void handle(final @NotNull InvocationSource source, final String @NotNull [] args) {
     // Check if the player actually has the permission to run the command
@@ -105,29 +101,28 @@ public interface SonarCommand {
   }
 
   static void prepareCachedTabSuggestions() {
-    // Don't re-cache tab suggestions
-    if (!TAB_SUGGESTIONS.isEmpty()) return;
-    // Cache tab suggestions
-    for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
-      TAB_SUGGESTIONS.add(subcommand.getInfo().name());
-      if (subcommand.getInfo().aliases().length > 0) {
-        TAB_SUGGESTIONS.addAll(Arrays.asList(subcommand.getInfo().aliases()));
+    if (TAB_SUGGESTIONS.isEmpty()) {
+      final List<String> subcommandsAndAliases = new ArrayList<>();
+      for (final Subcommand subcommand : Sonar.get().getSubcommandRegistry().getSubcommands()) {
+        subcommandsAndAliases.add(subcommand.getInfo().name());
+
+        final List<String> arguments = Arrays.asList(subcommand.getInfo().arguments());
+        TAB_SUGGESTIONS.put(subcommand.getInfo().name().hashCode(), arguments);
+
+        for (final String alias : subcommand.getInfo().aliases()) {
+          subcommandsAndAliases.add(alias);
+          TAB_SUGGESTIONS.put(alias.hashCode(), arguments);
+        }
       }
-      final List<String> arguments = Arrays.asList(subcommand.getInfo().arguments());
-      ARG_TAB_SUGGESTIONS.put(subcommand.getInfo().name(), arguments);
-      for (final String alias : subcommand.getInfo().aliases()) {
-        ARG_TAB_SUGGESTIONS.put(alias, arguments);
-      }
+      TAB_SUGGESTIONS.put(-1, subcommandsAndAliases);
     }
   }
 
   default List<String> getCachedTabSuggestions(final String @NotNull [] arguments) {
-    if (arguments.length <= 1) {
-      return TAB_SUGGESTIONS;
-    } else if (arguments.length == 2) {
-      final String subcommandName = arguments[0].toLowerCase();
-      return ARG_TAB_SUGGESTIONS.getOrDefault(subcommandName, emptyList());
+    if (arguments.length <= 2) {
+      final int subcommandHash = arguments.length <= 1 ? -1 : arguments[0].toLowerCase().hashCode();
+      return TAB_SUGGESTIONS.getOrDefault(subcommandHash, Collections.emptyList());
     }
-    return emptyList();
+    return Collections.emptyList();
   }
 }
