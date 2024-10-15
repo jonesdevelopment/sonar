@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.UpdateTagsPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacket;
@@ -76,8 +75,6 @@ public enum FallbackPacketRegistry {
       clientbound.register(RegistryDataPacket.class, RegistryDataPacket::new,
         map(0x05, MINECRAFT_1_20_2, true),
         map(0x07, MINECRAFT_1_20_5, true));
-      clientbound.register(UpdateTagsPacket.class, UpdateTagsPacket::new,
-        map(0x0D, MINECRAFT_1_21_2_PRE3, true));
 
       serverbound.register(ClientInformationPacket.class, ClientInformationPacket::new,
         map(0x00, MINECRAFT_1_20_2, false));

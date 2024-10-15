@@ -175,10 +175,6 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     for (final FallbackPacket packet : getRegistryPackets(user.getProtocolVersion())) {
       user.delayedWrite(packet);
     }
-    // 1.21.2 introduces new game tags
-    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
-      user.delayedWrite(TAGS_SYNC_1_21_2);
-    }
   }
 
   private void validateClientBrand(final byte @NotNull [] data) {
