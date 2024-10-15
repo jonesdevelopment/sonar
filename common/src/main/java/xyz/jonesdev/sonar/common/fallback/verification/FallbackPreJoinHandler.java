@@ -89,10 +89,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
   void validateClientInformation() {
     checkState(receivedClientInfo, "didn't send client settings");
-    // Don't check Geyser players for plugin messages as they don't have them
-    if (!user.isGeyser()) {
-      checkState(receivedClientBrand, "didn't send plugin message");
-    }
+    checkState(receivedClientBrand, "didn't send plugin message");
   }
 
   @Override
@@ -121,7 +118,9 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     } else if (packet instanceof FinishConfigurationPacket) {
       // Update the encoder and decoder state because we're currently in the CONFIG state
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);
-      validateClientInformation();
+      if (!user.isGeyser()) {
+        validateClientInformation();
+      }
       markSuccess();
     } else if (packet instanceof ClientInformationPacket) {
       final ClientInformationPacket clientInformation = (ClientInformationPacket) packet;
