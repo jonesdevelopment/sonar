@@ -97,7 +97,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     // Force-stop the movement checks
     teleported = false;
     // Exempt pre-1.20.2 since they've already passed that check in the configuration phase
-    if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
+    if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2) && !user.isGeyser()) {
       preJoinHandler.validateClientInformation();
     }
     // Send the player to the next verification handler

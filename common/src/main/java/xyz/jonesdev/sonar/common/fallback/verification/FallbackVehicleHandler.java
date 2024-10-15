@@ -60,7 +60,6 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    System.out.println(state + " | " + packet);
     if (packet instanceof KeepAlivePacket) {
       final KeepAlivePacket keepAlivePacket = (KeepAlivePacket) packet;
 
