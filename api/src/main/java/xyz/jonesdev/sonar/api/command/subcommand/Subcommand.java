@@ -23,7 +23,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
 import xyz.jonesdev.sonar.api.command.InvocationSource;
 
 import java.util.Objects;
@@ -91,7 +90,7 @@ public abstract class Subcommand {
     }
 
     // Execute the sub command from the invocation source with the given arguments
-    execute(new CommandInvocation(invocationSource, arguments));
+    execute(invocationSource, arguments);
   }
 
   public final @NotNull String getDescription() {
@@ -99,5 +98,5 @@ public abstract class Subcommand {
     return Objects.requireNonNull(Sonar.get().getConfig().getMessagesConfig().getString(path));
   }
 
-  protected abstract void execute(final @NotNull CommandInvocation invocation);
+  protected abstract void execute(final @NotNull InvocationSource source, final String @NotNull [] args);
 }

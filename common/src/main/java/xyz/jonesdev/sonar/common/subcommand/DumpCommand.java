@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.SonarPlatform;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
@@ -46,7 +46,7 @@ public final class DumpCommand extends Subcommand {
   private static final Gson GSON = new GsonBuilder().create();
 
   @Override
-  protected void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull InvocationSource source, final String @NotNull [] args) {
     final var mappings = new WeakHashMap<String, Object>();
     mappings.put("sonar", new Dump.Sonar(
       Sonar.get().getVersion().getFormatted(),
