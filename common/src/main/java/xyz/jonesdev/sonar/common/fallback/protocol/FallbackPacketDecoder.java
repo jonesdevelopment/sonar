@@ -21,28 +21,23 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.DecoderException;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.maxTotalPacketsSent;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
+@RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private final ProtocolVersion protocolVersion;
   private FallbackPacketRegistry.ProtocolRegistry registry;
   @Setter
   private FallbackPacketListener listener;
   private int totalPacketsSent;
-
-  public FallbackPacketDecoder(final @NotNull ProtocolVersion protocolVersion) {
-    this.protocolVersion = protocolVersion;
-    updateRegistry(protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_2) ? LOGIN : GAME);
-  }
 
   public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
     this.registry = registry.getProtocolRegistry(FallbackPacketRegistry.Direction.SERVERBOUND, protocolVersion);

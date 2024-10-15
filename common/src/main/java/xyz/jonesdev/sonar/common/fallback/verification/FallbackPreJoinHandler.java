@@ -80,9 +80,11 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
   }
 
   private void markSuccess() {
-    // Pass the player to the next verification handler
-    final FallbackGravityHandler gravityHandler = new FallbackGravityHandler(user, this);
-    user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(gravityHandler);
+    if (user.channel().isActive()) {
+      // Pass the player to the next verification handler
+      final FallbackGravityHandler gravityHandler = new FallbackGravityHandler(user, this);
+      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(gravityHandler);
+    }
   }
 
   void validateClientInformation() {
