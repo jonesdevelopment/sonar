@@ -451,7 +451,7 @@ public enum FallbackPacketRegistry {
         map(0x1B, MINECRAFT_1_20_2, false),
         map(0x1C, MINECRAFT_1_20_3, false),
         map(0x1F, MINECRAFT_1_20_5, false),
-        map(0x21, MINECRAFT_1_21_2_PRE3, true));
+        map(0x21, MINECRAFT_1_21_2_PRE3, false));
       serverbound.register(PlayerInputPacket.class, PlayerInputPacket::new,
         map(0x0C, MINECRAFT_1_7_2, false),
         map(0x15, MINECRAFT_1_9, false),
