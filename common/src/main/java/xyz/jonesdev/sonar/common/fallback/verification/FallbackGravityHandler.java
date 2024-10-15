@@ -133,7 +133,6 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       } else {
         // Enable the movement checks
         teleported = true;
-        expectedTeleportId = -1;
       }
     } else if (packet instanceof ClientInformationPacket
       || packet instanceof PluginMessagePacket) {
