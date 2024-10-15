@@ -22,7 +22,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
@@ -33,19 +33,19 @@ import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 public final class VerboseCommand extends Subcommand {
 
   @Override
-  protected void execute(final @NotNull CommandInvocation invocation) {
-    if (Sonar.get().getActionBarNotificationHandler().isSubscribed(invocation.getSource().getUuid())) {
-      Sonar.get().getActionBarNotificationHandler().unsubscribe(invocation.getSource().getUuid());
+  protected void execute(final @NotNull InvocationSource source, final String @NotNull [] args) {
+    if (Sonar.get().getActionBarNotificationHandler().isSubscribed(source.getUuid())) {
+      Sonar.get().getActionBarNotificationHandler().unsubscribe(source.getUuid());
       // Reset ActionBar component when unsubscribing
-      invocation.getSource().getAudience().sendActionBar(Component.empty());
-      invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+      source.getAudience().sendActionBar(Component.empty());
+      source.sendMessage(MiniMessage.miniMessage().deserialize(
         Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.unsubscribe"),
         Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
       return;
     }
 
-    Sonar.get().getActionBarNotificationHandler().subscribe(invocation.getSource().getUuid());
-    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+    Sonar.get().getActionBarNotificationHandler().subscribe(source.getUuid());
+    source.sendMessage(MiniMessage.miniMessage().deserialize(
       Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.subscribe"),
       Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
   }
