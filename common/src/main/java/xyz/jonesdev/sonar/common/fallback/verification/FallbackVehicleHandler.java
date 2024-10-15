@@ -97,7 +97,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         }
 
         // 1.21.2+ do not send PlayerInput packets when inside a vehicle
-        if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+        if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
           handlePlayerInput();
         }
         vehicleMoves++;
@@ -118,7 +118,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         checkState(sideways <= maxVehicleSpeed, "illegal speed (s): " + sideways);
 
         // 1.21.2+ send PlayerInput packets when the player starts sprinting, sneaking, etc.
-        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2)) {
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
           handlePlayerInput();
         }
       } else if (packet instanceof SetPlayerPositionRotationPacket) {

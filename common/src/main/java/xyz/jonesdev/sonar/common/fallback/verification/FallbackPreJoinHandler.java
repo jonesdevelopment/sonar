@@ -24,7 +24,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.EnabledFeaturesPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginAcknowledgedPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.ClientInformationPacket;
@@ -174,9 +173,6 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     if (user.getProtocolVersion().greaterThanOrEquals(MINECRAFT_1_20_5)) {
       // Write the new RegistrySync packets to the buffer
       boolean withTags = user.getProtocolVersion().greaterThanOrEquals(MINECRAFT_1_21_2_PRE3);
-      if (withTags) {
-        user.delayedWrite(new EnabledFeaturesPacket());
-      }
       for (final FallbackPacket syncPacket : withTags ? REGISTRY_SYNC_1_21_2 :
         (user.getProtocolVersion().lessThan(MINECRAFT_1_21)
           ? REGISTRY_SYNC_1_20_5 : REGISTRY_SYNC_1_21)

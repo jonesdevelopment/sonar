@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.EnabledFeaturesPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.FinishConfigurationPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.RegistryDataPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration.UpdateTagsPacket;
@@ -79,8 +78,6 @@ public enum FallbackPacketRegistry {
         map(0x07, MINECRAFT_1_20_5, true));
       clientbound.register(UpdateTagsPacket.class, UpdateTagsPacket::new,
         map(0x0D, MINECRAFT_1_21_2_PRE3, true));
-      clientbound.register(EnabledFeaturesPacket.class, EnabledFeaturesPacket::new,
-        map(0x0C, MINECRAFT_1_21_2_PRE3, true));
 
       serverbound.register(ClientInformationPacket.class, ClientInformationPacket::new,
         map(0x00, MINECRAFT_1_20_2, false));
