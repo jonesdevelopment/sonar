@@ -42,16 +42,32 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    boolean v1_21_2 = protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2_PRE3);
+    if (v1_21_2) {
+      writeVarInt(byteBuf, teleportId);
+    }
     byteBuf.writeDouble(x);
     // Account for the minimum Y bounding box issue on 1.7.2-1.7.10
     byteBuf.writeDouble(protocolVersion.greaterThanOrEquals(MINECRAFT_1_8) ? y : y + 1.62f);
     byteBuf.writeDouble(z);
-    byteBuf.writeFloat(yaw);
-    byteBuf.writeFloat(pitch);
-    byteBuf.writeByte(relativeMask);
+    if (v1_21_2) {
+      // Delta movement?
+      byteBuf.writeDouble(0);
+      byteBuf.writeDouble(0);
+      byteBuf.writeDouble(0);
+      byteBuf.writeFloat(yaw);
+      byteBuf.writeFloat(pitch);
+      byteBuf.writeInt(relativeMask);
+    } else {
+      byteBuf.writeFloat(yaw);
+      byteBuf.writeFloat(pitch);
+      byteBuf.writeByte(relativeMask);
+    }
 
     if (protocolVersion.greaterThan(MINECRAFT_1_8)) {
-      writeVarInt(byteBuf, teleportId);
+      if (!v1_21_2) {
+        writeVarInt(byteBuf, teleportId);
+      }
 
       if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)
         && protocolVersion.lessThanOrEquals(MINECRAFT_1_19_3)) {
