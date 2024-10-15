@@ -243,8 +243,14 @@ public final class SonarConfiguration {
 
     // Messages
     prefix = MiniMessage.miniMessage().deserialize(messagesConfig.getString("prefix"));
-    noPermission = MiniMessage.miniMessage().deserialize(messagesConfig.getString("commands.no-permission"),
-      Placeholder.component("prefix", prefix));
+
+    final String noPermissionMessage = messagesConfig.getString("commands.no-permission");
+    if (noPermissionMessage.isEmpty()) {
+      noPermission = null;
+    } else {
+      noPermission = MiniMessage.miniMessage().deserialize(noPermissionMessage,
+        Placeholder.component("prefix", prefix));
+    }
 
     SonarCommand.prepareCachedTabSuggestions();
 

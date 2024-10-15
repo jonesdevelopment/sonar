@@ -23,7 +23,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
@@ -39,13 +39,13 @@ import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
 public final class StatisticsCommand extends Subcommand {
 
   @Override
-  protected void execute(final @NotNull CommandInvocation invocation) {
+  protected void execute(final @NotNull InvocationSource source, final String @NotNull [] args) {
     String type = "general";
-    if (invocation.getRawArguments().length >= 2) {
+    if (args.length >= 2) {
       try {
-        type = invocation.getRawArguments()[1].toLowerCase();
+        type = args[1].toLowerCase();
       } catch (Exception exception) {
-        invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+        source.sendMessage(MiniMessage.miniMessage().deserialize(
           Sonar.get().getConfig().getMessagesConfig().getString("commands.statistics.unknown-type"),
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
           Placeholder.unparsed("statistics", getArguments())));
@@ -53,11 +53,11 @@ public final class StatisticsCommand extends Subcommand {
       }
     }
 
-    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+    source.sendMessage(MiniMessage.miniMessage().deserialize(
       Sonar.get().getConfig().getMessagesConfig().getString("commands.statistics.header"),
       Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
       Placeholder.unparsed("statistics-type", type)));
-    invocation.getSource().sendMessage(Component.empty());
+    source.sendMessage(Component.empty());
 
     TagResolver.@NotNull Single[] placeholders = null;
 
@@ -118,7 +118,7 @@ public final class StatisticsCommand extends Subcommand {
     }
 
     for (final String msg : Sonar.get().getConfig().getMessagesConfig().getStringList("commands.statistics." + type)) {
-      invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(msg, placeholders));
+      source.sendMessage(MiniMessage.miniMessage().deserialize(msg, placeholders));
     }
   }
 }

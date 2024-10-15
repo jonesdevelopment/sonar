@@ -21,7 +21,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.api.command.CommandInvocation;
+import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
@@ -32,8 +32,8 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 public final class ReloadCommand extends Subcommand {
 
   @Override
-  protected void execute(final @NotNull CommandInvocation invocation) {
-    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+  protected void execute(final @NotNull InvocationSource source, final String @NotNull [] args) {
+    source.sendMessage(MiniMessage.miniMessage().deserialize(
       Sonar.get().getConfig().getMessagesConfig().getString("commands.reload.start"),
       Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
 
@@ -41,7 +41,7 @@ public final class ReloadCommand extends Subcommand {
 
     Sonar.get().reload();
 
-    invocation.getSource().sendMessage(MiniMessage.miniMessage().deserialize(
+    source.sendMessage(MiniMessage.miniMessage().deserialize(
       Sonar.get().getConfig().getMessagesConfig().getString("commands.reload.finish"),
       Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
       Placeholder.unparsed("time-taken", String.valueOf(timer.delay()))));

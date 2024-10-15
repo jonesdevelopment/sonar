@@ -40,7 +40,9 @@ public interface SonarCommand {
   default void handle(final @NotNull InvocationSource source, final String @NotNull [] args) {
     // Check if the player actually has the permission to run the command
     if (source.isPlayer() && !source.getPermissionFunction().test("sonar.command")) {
-      source.sendMessage(Sonar.get().getConfig().getNoPermission());
+      if (Sonar.get().getConfig().getNoPermission() != null) {
+        source.sendMessage(Sonar.get().getConfig().getNoPermission());
+      }
       return;
     }
 
