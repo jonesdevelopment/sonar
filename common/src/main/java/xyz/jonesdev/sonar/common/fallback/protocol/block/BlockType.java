@@ -66,7 +66,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_4)) {
       return 7385;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 7389;
     }
     return 7619;
@@ -109,7 +109,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20)) {
       return 10273;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 10414;
     }
     return 10749;
@@ -145,7 +145,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_4)) {
       return 7410;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 7414;
     }
     return 7644;
@@ -184,7 +184,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20)) {
       return 9067;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 9207;
     }
     return 9462;
@@ -220,7 +220,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_19_4)) {
       return 7918;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 7922;
     }
     return 8152;
@@ -259,7 +259,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20)) {
       return 11090;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 11231;
     }
     return 11566;
@@ -298,7 +298,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20)) {
       return 10587;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 10728;
     }
     return 11063;

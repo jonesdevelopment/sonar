@@ -50,7 +50,7 @@ public enum EntityType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20_3)) {
       return 9;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 10;
     }
     return 85; // 1.21.2 split the boat type in id registries.
@@ -83,7 +83,7 @@ public enum EntityType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_20_3)) {
       return 65;
     }
-    if (protocolVersion.lessThan(MINECRAFT_1_21_2_PRE3)) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 69;
     }
     return 82;
