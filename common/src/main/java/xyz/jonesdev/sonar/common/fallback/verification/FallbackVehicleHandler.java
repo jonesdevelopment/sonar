@@ -60,7 +60,6 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
-    Sonar.get().getLogger().info(packet.toString());
     if (packet instanceof KeepAlivePacket) {
       final KeepAlivePacket keepAlivePacket = (KeepAlivePacket) packet;
 
