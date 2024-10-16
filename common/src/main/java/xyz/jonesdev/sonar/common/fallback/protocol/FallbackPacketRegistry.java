@@ -70,8 +70,8 @@ public enum FallbackPacketRegistry {
         map(0x02, MINECRAFT_1_20_2, false),
         map(0x03, MINECRAFT_1_20_5, false));
       clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
-        map(0x03, MINECRAFT_1_20_2, false),
-        map(0x04, MINECRAFT_1_20_5, false));
+        map(0x03, MINECRAFT_1_20_2, true),
+        map(0x04, MINECRAFT_1_20_5, true));
       clientbound.register(RegistryDataPacket.class, RegistryDataPacket::new,
         map(0x05, MINECRAFT_1_20_2, true),
         map(0x07, MINECRAFT_1_20_5, true));
@@ -467,7 +467,7 @@ public enum FallbackPacketRegistry {
         map(0x22, MINECRAFT_1_20_2, false),
         map(0x23, MINECRAFT_1_20_3, false),
         map(0x26, MINECRAFT_1_20_5, false),
-        map(0x28, MINECRAFT_1_21_2_PRE4, true));
+        map(0x28, MINECRAFT_1_21_2_PRE4, false));
       serverbound.register(VehicleMovePacket.class, VehicleMovePacket::new,
         map(0x10, MINECRAFT_1_9, false),
         map(0x11, MINECRAFT_1_12, false),
