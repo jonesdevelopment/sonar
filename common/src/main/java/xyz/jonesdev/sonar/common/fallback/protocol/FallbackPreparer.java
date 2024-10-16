@@ -58,12 +58,10 @@ public class FallbackPreparer {
   public final int SPAWN_X_POSITION = 16 / 2; // middle of the chunk
   public final int SPAWN_Z_POSITION = 16 / 2; // middle of the chunk
   public final int PLATFORM_Y_POSITION = 1 + RANDOM.nextInt(255); // 255 is the maximum Y position
-  public final int IN_AIR_Y_POSITION = 1000 + RANDOM.nextInt(338); // High altitude (randomized)
-  public final int IN_VOID_Y_POSITION = -(65 + RANDOM.nextInt(16)); // Low altitude (randomized)
+  public final int IN_AIR_Y_POSITION = 3000 + RANDOM.nextInt(500); // Random high altitude
 
   public final int FIRST_TELEPORT_ID = RANDOM.nextInt();
   public final int SECOND_TELEPORT_ID = RANDOM.nextInt();
-  public static final int VEHICLE_TELEPORT_ID = RANDOM.nextInt();
 
   private final int MAP_SLOT = RANDOM.nextInt(9);
 
@@ -91,13 +89,11 @@ public class FallbackPreparer {
     VEHICLE_ENTITY_ID, EntityType.BOAT, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
     0, 0, 0, 0));
   public static final FallbackPacket SPAWN_MINECART_ENTITY = new FallbackPacketSnapshot(new SpawnEntityPacket(
-    VEHICLE_ENTITY_ID, EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
+    VEHICLE_ENTITY_ID, EntityType.MINECART, SPAWN_X_POSITION, IN_AIR_Y_POSITION - 16, SPAWN_Z_POSITION,
     0, 0, 0, 0));
   public static final FallbackPacket REMOVE_VEHICLE = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
-  public static final FallbackPacket TELEPORT_IN_VEHICLE = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
-    SPAWN_X_POSITION, 10000 + RANDOM.nextInt(10000), SPAWN_Z_POSITION, 0, -90,
-    VEHICLE_TELEPORT_ID, 0, false, false, false));
-  public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
+  public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(
+    new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
   public static FallbackPacket loginSuccess;
   public FallbackPacket welcomeMessage;

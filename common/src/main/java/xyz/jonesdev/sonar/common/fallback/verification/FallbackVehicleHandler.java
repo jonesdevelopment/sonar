@@ -33,19 +33,15 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   public FallbackVehicleHandler(final @NotNull FallbackUser user) {
     super(user);
 
-    this.canTeleportPlayer = user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_15_2)
-      || user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17);
-
     spawnVehicle(State.IN_BOAT);
   }
 
-  private final boolean canTeleportPlayer;
-  private boolean waitingForStateChange, vehiclePacketAfterTeleport, waitingForTeleport;
+  private boolean waitingForStateChange;
   private State state = State.WAITING;
   private State nextState;
   private int expectedKeepAliveId;
   private int rotations, inputs, paddles, vehicleMoves;
-  private double boatMotion, boatY = IN_AIR_Y_POSITION, teleportY;
+  private double boatMotion, boatY = IN_AIR_Y_POSITION;
 
   @RequiredArgsConstructor
   private enum State {
@@ -77,7 +73,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         checkState(state == State.IN_BOAT, "invalid state: got " + packet + " in " + state);
         paddles++;
       } else if (packet instanceof VehicleMovePacket) {
-        checkState(state.inVehicle, "invalid state: got " + packet + " in " + state);
+        checkState(state == State.IN_BOAT, "invalid state: got " + packet + " in " + state);
 
         final VehicleMovePacket vehicleMove = (VehicleMovePacket) packet;
         // Check the Y position of the vehicle
@@ -93,23 +89,13 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           final double difference = Math.abs(boatMotion - predicted);
           // Check if the difference between the predicted and actual motion is too large
           checkState(difference < 1e-7, "bad vehicle gravity: " + predicted + "/" + boatMotion);
-
-          if (vehiclePacketAfterTeleport) {
-            vehiclePacketAfterTeleport = false;
-            checkState(
-              // 0.3325 is the offset of the player's Y position from the vehicle.
-              Math.abs(vehicleMove.getY() - 0.3325 - teleportY) <= 0.04,
-              "invalid y: " + teleportY + "/" + vehicleMove.getY()
-            );
-          }
         }
-
         vehicleMoves++;
       } else if (packet instanceof SetPlayerRotationPacket) {
         if (state.inVehicle) {
           rotations++;
           // 1.21.2+ do not send PlayerInput packets when inside a vehicle.
-          // Handle it after SetPlayerRotationPacket as simulation vanilla behavior.
+          // Handle it after SetPlayerRotationPacket to simulate the vanilla client behavior of the version before that.
           if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
             handlePlayerInput();
           }
@@ -119,7 +105,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
           checkState(state.inVehicle, "invalid state: got " + packet + " in " + state);
 
-          final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
+        final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
           // Check if the player is sending invalid vehicle speed values
           final float forward = Math.abs(playerInput.getForward());
@@ -131,37 +117,10 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         }
       } else if (packet instanceof SetPlayerPositionRotationPacket) {
         final SetPlayerPositionRotationPacket posRot = (SetPlayerPositionRotationPacket) packet;
-
-        if (state.inVehicle) {
-          checkState(waitingForTeleport, "sent full position without teleport");
-          if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
-            waitingForTeleport = false;
-          }
-          checkState(!posRot.isOnGround(), "illegal ground state on teleport");
-          if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
-            checkState(posRot.getY() >= 10000, "invalid y: " + posRot.getY());
-          } else {
-            // Send Teleport -> Receive Teleport -> Waiting Next Tick -> PlayerPosition -> TeleportConfirm -> VehicleMove
-            teleportY = posRot.getY();
-          }
-        } else if (state != State.WAITING) {
-          handleMovement(posRot.getY(), posRot.isOnGround());
-        }
+        handleMovement(posRot.getY(), posRot.isOnGround());
       } else if (packet instanceof SetPlayerPositionPacket) {
-        if (!state.inVehicle && state != State.WAITING) {
-          final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
-          handleMovement(position.getY(), position.isOnGround());
-        }
-      } else if (packet instanceof ConfirmTeleportationPacket) {
-        checkState(waitingForTeleport, "did not expect teleportation");
-        final ConfirmTeleportationPacket confirm = (ConfirmTeleportationPacket) packet;
-        checkState(confirm.getTeleportId() == VEHICLE_TELEPORT_ID, "teleport id mismatch");
-        if (state.inVehicle && user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
-          vehiclePacketAfterTeleport = true;
-        }
-        if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
-          waitingForTeleport = false;
-        }
+        final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
+        handleMovement(position.getY(), position.isOnGround());
       }
     }
   }
@@ -190,9 +149,15 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     }
   }
 
-  private void handleMovement(final double y, final boolean onGround) {
-    checkState(!onGround, "invalid ground state: " + y);
-    checkState(y <= IN_AIR_Y_POSITION, "illegal y position: " + y);
+  private void handleMovement(final double y, final boolean isOnGround) {
+    // Make sure we're currently expecting movement
+    if (state.inVehicle || state == State.WAITING) {
+      return;
+    }
+
+    // Make sure the ground state and y position are correct
+    checkState(y <= boatY, "invalid y: " + y);
+    checkState(!isOnGround, "invalid ground state: " + y);
 
     if (state == State.IN_AIR_AFTER_BOAT) {
       spawnVehicle(State.IN_MINECART);
@@ -202,39 +167,30 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   }
 
   private void handlePlayerInput() {
-    // Bedrock users do not send SetPlayerPositionRotation and SetPlayerRotation packets
-    // Don't ask me why; Microsoft is doing some *fascinating* things with Bedrock...
-    if (user.isGeyser()) {
-      rotations++;
-    } else {
-      checkState(rotations >= inputs,
-        "illegal packet order; r/i " + rotations + "/" + inputs);
-    }
-
     // 1.8 and below do not have PaddleBoat packets, so we simply exempt them from the PaddleBoat check.
     // Clients also don't send PaddleBoat & VehicleMovePacket packets while riding minecarts.
     if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_9) || state == State.IN_MINECART) {
       paddles++;
       vehicleMoves++;
-    } else if (!user.isGeyser()) {
-      checkState(paddles >= inputs,
-        "illegal packet order; i/p " + inputs + "/" + paddles);
-      checkState(vehicleMoves >= inputs,
-        "illegal packet order; i/v " + inputs + "/" + vehicleMoves);
     }
+
+    // Check for packet order
+    checkState(rotations >= inputs,
+      "illegal packet order; i/r " + inputs + "/" + rotations);
+    checkState(paddles >= inputs,
+      "illegal packet order; i/p " + inputs + "/" + paddles);
+    checkState(vehicleMoves >= inputs,
+      "illegal packet order; i/v " + inputs + "/" + vehicleMoves);
+
     inputs++;
+
     // Check if we've received more than the minimum number of packets
     final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
     if (inputs > minimumPackets && rotations > minimumPackets
-      && paddles > minimumPackets && vehicleMoves > minimumPackets
-      && (state == State.IN_MINECART || !waitingForTeleport && !vehiclePacketAfterTeleport)) {
+      && paddles > minimumPackets && vehicleMoves > minimumPackets) {
       // Move on to the next stage
       user.delayedWrite(REMOVE_VEHICLE);
       prepareForNextState(state == State.IN_BOAT ? State.IN_AIR_AFTER_BOAT : State.IN_AIR_AFTER_MINECART);
-    } else if (canTeleportPlayer && inputs <= minimumPackets) {
-      // Teleport the player while the player is in the vehicle to see whether they dismount the vehicle or not
-      waitingForTeleport = true;
-      user.write(TELEPORT_IN_VEHICLE);
     }
   }
 }
