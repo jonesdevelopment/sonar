@@ -110,13 +110,13 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           rotations++;
           // 1.21.2+ do not send PlayerInput packets when inside a vehicle.
           // Handle it after SetPlayerRotationPacket as simulation vanilla behavior.
-          if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
+          if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
             handlePlayerInput();
           }
         }
       } else if (packet instanceof PlayerInputPacket) {
         // 1.21.2+ send PlayerInput packets when the player starts sprinting, sneaking, etc.
-        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
           checkState(state.inVehicle, "invalid state: got " + packet + " in " + state);
 
           final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
@@ -134,11 +134,11 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
 
         if (state.inVehicle) {
           checkState(waitingForTeleport, "sent full position without teleport");
-          if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
+          if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
             waitingForTeleport = false;
           }
           checkState(!posRot.isOnGround(), "illegal ground state on teleport");
-          if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
+          if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
             checkState(posRot.getY() >= 10000, "invalid y: " + posRot.getY());
           } else {
             // Send Teleport -> Receive Teleport -> Waiting Next Tick -> PlayerPosition -> TeleportConfirm -> VehicleMove
@@ -156,10 +156,10 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         checkState(waitingForTeleport, "did not expect teleportation");
         final ConfirmTeleportationPacket confirm = (ConfirmTeleportationPacket) packet;
         checkState(confirm.getTeleportId() == VEHICLE_TELEPORT_ID, "teleport id mismatch");
-        if (state.inVehicle && user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
+        if (state.inVehicle && user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
           vehiclePacketAfterTeleport = true;
         }
-        if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE3)) {
+        if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
           waitingForTeleport = false;
         }
       }
