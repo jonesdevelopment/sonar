@@ -67,8 +67,8 @@ public enum FallbackPacketRegistry {
         map(0x01, MINECRAFT_1_20_2, true),
         map(0x02, MINECRAFT_1_20_5, true));
       clientbound.register(FinishConfigurationPacket.class, FinishConfigurationPacket::new,
-        map(0x02, MINECRAFT_1_20_2, false),
-        map(0x03, MINECRAFT_1_20_5, false));
+        map(0x02, MINECRAFT_1_20_2, true),
+        map(0x03, MINECRAFT_1_20_5, true));
       clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
         map(0x03, MINECRAFT_1_20_2, true),
         map(0x04, MINECRAFT_1_20_5, true));
