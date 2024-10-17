@@ -93,6 +93,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
       } else if (packet instanceof SetPlayerRotationPacket) {
         if (state.inVehicle) {
           rotations++;
+
           // 1.21.2+ do not send PlayerInput packets when inside a vehicle.
           // Handle it after SetPlayerRotationPacket to simulate vanilla behavior.
           if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
@@ -112,6 +113,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           final float maxVehicleSpeed = /*user.isGeyser() ? 1 :*/ 0.98f;
           checkState(forward <= maxVehicleSpeed, "illegal speed (f): " + forward);
           checkState(sideways <= maxVehicleSpeed, "illegal speed (s): " + sideways);
+
           handlePlayerInput();
         }
       } else if (packet instanceof SetPlayerPositionRotationPacket) {
