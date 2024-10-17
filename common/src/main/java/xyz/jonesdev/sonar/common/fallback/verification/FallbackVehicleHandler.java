@@ -70,26 +70,27 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
       waitingForStateChange = false;
     } else if (!waitingForStateChange) {
       if (packet instanceof PaddleBoatPacket) {
-        checkState(state == State.IN_BOAT, "invalid state: got " + packet + " in " + state);
-        paddles++;
+        if (state == State.IN_BOAT) {
+          paddles++;
+        }
       } else if (packet instanceof VehicleMovePacket) {
-        checkState(state == State.IN_BOAT, "invalid state: got " + packet + " in " + state);
+        if (state == State.IN_BOAT) {
+          final VehicleMovePacket vehicleMove = (VehicleMovePacket) packet;
+          // Check the Y position of the vehicle
+          checkState(vehicleMove.getY() <= IN_AIR_Y_POSITION, "bad vehicle y: " + vehicleMove.getY());
 
-        final VehicleMovePacket vehicleMove = (VehicleMovePacket) packet;
-        // Check the Y position of the vehicle
-        checkState(vehicleMove.getY() <= IN_AIR_Y_POSITION, "bad vehicle y: " + vehicleMove.getY());
+          // Check the gravity of the vehicle
+          final double lastBoatMotion = boatMotion;
+          final double lastBoatY = boatY;
+          boatY = vehicleMove.getY();
+          boatMotion = boatY - lastBoatY;
+          final double predicted = lastBoatMotion - 0.03999999910593033D;
+          final double difference = Math.abs(boatMotion - predicted);
+          // Check if the difference between the predicted and actual motion is too large
+          checkState(difference < 1e-7, "bad vehicle gravity: " + predicted + "/" + boatMotion);
 
-        // Check the gravity of the vehicle
-        final double lastBoatMotion = boatMotion;
-        final double lastBoatY = boatY;
-        boatY = vehicleMove.getY();
-        boatMotion = boatY - lastBoatY;
-        final double predicted = lastBoatMotion - 0.03999999910593033D;
-        final double difference = Math.abs(boatMotion - predicted);
-        // Check if the difference between the predicted and actual motion is too large
-        checkState(difference < 1e-7, "bad vehicle gravity: " + predicted + "/" + boatMotion);
-
-        vehicleMoves++;
+          vehicleMoves++;
+        }
       } else if (packet instanceof SetPlayerRotationPacket) {
         if (state.inVehicle) {
           rotations++;
@@ -102,9 +103,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         }
       } else if (packet instanceof PlayerInputPacket) {
         // 1.21.2+ send PlayerInput packets when the player starts sprinting, sneaking, etc.
-        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
-          checkState(state.inVehicle, "invalid state: got " + packet + " in " + state);
-
+        if (state.inVehicle && user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
           final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
           // Check if the player is sending invalid vehicle speed values
