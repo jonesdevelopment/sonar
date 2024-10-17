@@ -79,23 +79,22 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         // Check the Y position of the vehicle
         checkState(vehicleMove.getY() <= IN_AIR_Y_POSITION, "bad vehicle y: " + vehicleMove.getY());
 
-        if (!user.isGeyser()) {
-          // Check the gravity of the vehicle
-          final double lastBoatMotion = boatMotion;
-          final double lastBoatY = boatY;
-          boatY = vehicleMove.getY();
-          boatMotion = boatY - lastBoatY;
-          final double predicted = lastBoatMotion - 0.03999999910593033D;
-          final double difference = Math.abs(boatMotion - predicted);
-          // Check if the difference between the predicted and actual motion is too large
-          checkState(difference < 1e-7, "bad vehicle gravity: " + predicted + "/" + boatMotion);
-        }
+        // Check the gravity of the vehicle
+        final double lastBoatMotion = boatMotion;
+        final double lastBoatY = boatY;
+        boatY = vehicleMove.getY();
+        boatMotion = boatY - lastBoatY;
+        final double predicted = lastBoatMotion - 0.03999999910593033D;
+        final double difference = Math.abs(boatMotion - predicted);
+        // Check if the difference between the predicted and actual motion is too large
+        checkState(difference < 1e-7, "bad vehicle gravity: " + predicted + "/" + boatMotion);
+
         vehicleMoves++;
       } else if (packet instanceof SetPlayerRotationPacket) {
         if (state.inVehicle) {
           rotations++;
           // 1.21.2+ do not send PlayerInput packets when inside a vehicle.
-          // Handle it after SetPlayerRotationPacket to simulate the vanilla client behavior of the version before that.
+          // Handle it after SetPlayerRotationPacket to simulate vanilla behavior.
           if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
             handlePlayerInput();
           }
@@ -105,12 +104,12 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
         if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
           checkState(state.inVehicle, "invalid state: got " + packet + " in " + state);
 
-        final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
+          final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
 
           // Check if the player is sending invalid vehicle speed values
           final float forward = Math.abs(playerInput.getForward());
           final float sideways = Math.abs(playerInput.getSideways());
-          final float maxVehicleSpeed = user.isGeyser() ? 1 : 0.98f;
+          final float maxVehicleSpeed = /*user.isGeyser() ? 1 :*/ 0.98f;
           checkState(forward <= maxVehicleSpeed, "illegal speed (f): " + forward);
           checkState(sideways <= maxVehicleSpeed, "illegal speed (s): " + sideways);
           handlePlayerInput();
