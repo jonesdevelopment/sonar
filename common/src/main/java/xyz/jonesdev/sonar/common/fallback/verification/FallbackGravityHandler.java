@@ -94,17 +94,6 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
   private int movementTick, expectedTeleportId = FIRST_TELEPORT_ID;
   private SetPlayerPositionRotationPacket lastPositionPacket;
 
-  private void markSuccess() {
-    // Force-stop the movement checks
-    teleported = false;
-    // Exempt pre-1.20.2 since they've already passed that check in the configuration phase
-    if (!user.isGeyser() && user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
-      preJoinHandler.validateClientInformation();
-    }
-    // Send the player to the next verification handler
-    user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackProtocolHandler(user));
-  }
-
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof SetPlayerPositionRotationPacket) {
@@ -148,8 +137,20 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     } else if (packet instanceof ClientInformationPacket
       || packet instanceof PluginMessagePacket) {
       // Pass these packets back to the login handler
+      // TODO: recode this
       preJoinHandler.handle(packet);
     }
+  }
+
+  private void markSuccess() {
+    // Force-stop the movement checks
+    teleported = false;
+    // Exempt pre-1.20.2 since they've already passed that check in the configuration phase
+    if (!user.isGeyser() && user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
+      preJoinHandler.validateClientInformation();
+    }
+    // Send the player to the next verification handler
+    user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackProtocolHandler(user));
   }
 
   private void handleMovement(final double x, final double y, final double z,

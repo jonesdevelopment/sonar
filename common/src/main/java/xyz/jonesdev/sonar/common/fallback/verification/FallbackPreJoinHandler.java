@@ -62,28 +62,6 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
   private boolean receivedClientInfo, receivedClientBrand, acknowledgedLogin;
   private int expectedKeepAliveId = PRE_JOIN_KEEP_ALIVE_ID;
 
-  private void markAcknowledged() {
-    acknowledgedLogin = true;
-    synchronizeClientRegistry();
-    // Write the FinishConfiguration packet to the buffer
-    user.delayedWrite(FINISH_CONFIGURATION);
-    // Send all packets in one flush
-    user.channel().flush();
-  }
-
-  private void markSuccess() {
-    if (user.channel().isActive()) {
-      // Pass the player to the next verification handler
-      final FallbackGravityHandler gravityHandler = new FallbackGravityHandler(user, this);
-      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(gravityHandler);
-    }
-  }
-
-  void validateClientInformation() {
-    checkState(receivedClientInfo, "didn't send client settings");
-    checkState(receivedClientBrand, "didn't send plugin message");
-  }
-
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof KeepAlivePacket) {
@@ -165,17 +143,35 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     }
   }
 
-  private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
-    // Update the packet registry state in the encoder and decoder pipelines
-    user.channel().pipeline().get(FallbackPacketDecoder.class).updateRegistry(registry);
-    user.channel().pipeline().get(FallbackPacketEncoder.class).updateRegistry(registry);
-  }
-
-  private void synchronizeClientRegistry() {
+  private void markAcknowledged() {
+    acknowledgedLogin = true;
     // Write the new RegistrySync packets to the buffer
     for (final FallbackPacket packet : getRegistryPackets(user.getProtocolVersion())) {
       user.delayedWrite(packet);
     }
+    // Write the FinishConfiguration packet to the buffer
+    user.delayedWrite(FINISH_CONFIGURATION);
+    // Send all packets in one flush
+    user.channel().flush();
+  }
+
+  private void markSuccess() {
+    if (user.channel().isActive()) {
+      // Pass the player to the next verification handler
+      final FallbackGravityHandler gravityHandler = new FallbackGravityHandler(user, this);
+      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(gravityHandler);
+    }
+  }
+
+  void validateClientInformation() {
+    checkState(receivedClientInfo, "didn't send client settings");
+    checkState(receivedClientBrand, "didn't send plugin message");
+  }
+
+  private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
+    // Update the packet registry state in the encoder and decoder pipelines
+    user.channel().pipeline().get(FallbackPacketDecoder.class).updateRegistry(registry);
+    user.channel().pipeline().get(FallbackPacketEncoder.class).updateRegistry(registry);
   }
 
   private void validateClientBrand(final byte @NotNull [] data) {

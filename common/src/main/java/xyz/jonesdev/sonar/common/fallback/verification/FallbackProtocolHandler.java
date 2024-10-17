@@ -44,61 +44,6 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
   private short expectedTransactionId;
   private int currentClientSlotId, expectedSlotId = -1;
 
-  /**
-   * Uses Transaction (ping) packets to check for an immediate, legitimate response from the client
-   * <br>
-   * <a href="https://wiki.vg/Protocol#Ping_.28configuration.29">Wiki.vg - Ping (configuration)</a>
-   * <a href="https://wiki.vg/Protocol#Ping_.28play.29">Wiki.vg - Ping (play)</a>
-   */
-  private void sendTransaction() {
-    // Send a Transaction (Ping) packet with a random ID
-    expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
-    user.write(new TransactionPacket(0, expectedTransactionId, false));
-    waitingTransaction = true;
-  }
-
-  /**
-   * Uses SetHeldItem packets to check for a legitimate response from the client
-   * <br>
-   * <a href="https://wiki.vg/Protocol#Set_Held_Item_.28serverbound.29">Wiki.vg - SetHeldItem (play)</a>
-   */
-  private void sendSetHeldItem() {
-    // Send an invalid HeldItemChange packet to the player to see if the player responds at all
-    user.delayedWrite(INVALID_HELD_ITEM_SLOT);
-    // Increment the player's slot by a random slot, and then modulo it by the maximum slot (8)
-    expectedSlotId = (currentClientSlotId + 1 + RANDOM.nextInt(7)) % 8;
-    // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
-    // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
-    // We can take advantage of this by sending two packets with the same content to check for a valid response.
-    final SetHeldItemPacket heldItemPacket = new SetHeldItemPacket(expectedSlotId);
-    user.delayedWrite(heldItemPacket);
-    user.delayedWrite(heldItemPacket);
-    user.channel().flush();
-  }
-
-  /**
-   * Uses EntityAnimation packets to check for the excepted Animation (SwingArm) from the client.
-   * <br>
-   * <a href="https://wiki.vg/Protocol#Entity_Animation">Wiki.vg - EntityAnimation</a>
-   * <a href="https://wiki.vg/Protocol#Swing_Arm">Wiki.vg - SwingArm</a>
-   */
-  private void sendArmAnimation() {
-    user.write(new EntityAnimationPacket(PLAYER_ENTITY_ID, EntityAnimationPacket.Type.SWING_MAIN_ARM));
-    waitingSwingArm = true;
-  }
-
-  private void markSuccess() {
-    // Pass the player to the next best verification handler
-    if (!user.isGeyser() && Sonar.get().getConfig().getVerification().getVehicle().isEnabled()) {
-      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackVehicleHandler(user));
-    } else if (user.isForceCaptcha() || Sonar.get().getFallback().shouldPerformCaptcha()) {
-      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackCaptchaHandler(user));
-    } else {
-      // The player has passed all checks
-      finishVerification();
-    }
-  }
-
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof TransactionPacket) {
@@ -177,6 +122,61 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
           waitingSwingArm = false;
         }
       }
+    }
+  }
+
+  /**
+   * Uses Transaction (ping) packets to check for an immediate, legitimate response from the client
+   * <br>
+   * <a href="https://wiki.vg/Protocol#Ping_.28configuration.29">Wiki.vg - Ping (configuration)</a>
+   * <a href="https://wiki.vg/Protocol#Ping_.28play.29">Wiki.vg - Ping (play)</a>
+   */
+  private void sendTransaction() {
+    // Send a Transaction (Ping) packet with a random ID
+    expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
+    user.write(new TransactionPacket(0, expectedTransactionId, false));
+    waitingTransaction = true;
+  }
+
+  /**
+   * Uses SetHeldItem packets to check for a legitimate response from the client
+   * <br>
+   * <a href="https://wiki.vg/Protocol#Set_Held_Item_.28serverbound.29">Wiki.vg - SetHeldItem (play)</a>
+   */
+  private void sendSetHeldItem() {
+    // Send an invalid HeldItemChange packet to the player to see if the player responds at all
+    user.delayedWrite(INVALID_HELD_ITEM_SLOT);
+    // Increment the player's slot by a random slot, and then modulo it by the maximum slot (8)
+    expectedSlotId = (currentClientSlotId + 1 + RANDOM.nextInt(7)) % 8;
+    // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
+    // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
+    // We can take advantage of this by sending two packets with the same content to check for a valid response.
+    final SetHeldItemPacket heldItemPacket = new SetHeldItemPacket(expectedSlotId);
+    user.delayedWrite(heldItemPacket);
+    user.delayedWrite(heldItemPacket);
+    user.channel().flush();
+  }
+
+  /**
+   * Uses EntityAnimation packets to check for the excepted Animation (SwingArm) from the client.
+   * <br>
+   * <a href="https://wiki.vg/Protocol#Entity_Animation">Wiki.vg - EntityAnimation</a>
+   * <a href="https://wiki.vg/Protocol#Swing_Arm">Wiki.vg - SwingArm</a>
+   */
+  private void sendArmAnimation() {
+    user.write(new EntityAnimationPacket(PLAYER_ENTITY_ID, EntityAnimationPacket.Type.SWING_MAIN_ARM));
+    waitingSwingArm = true;
+  }
+
+  private void markSuccess() {
+    // Pass the player to the next best verification handler
+    if (!user.isGeyser() && Sonar.get().getConfig().getVerification().getVehicle().isEnabled()) {
+      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackVehicleHandler(user));
+    } else if (user.isForceCaptcha() || Sonar.get().getFallback().shouldPerformCaptcha()) {
+      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackCaptchaHandler(user));
+    } else {
+      // The player has passed all checks
+      finishVerification();
     }
   }
 }
