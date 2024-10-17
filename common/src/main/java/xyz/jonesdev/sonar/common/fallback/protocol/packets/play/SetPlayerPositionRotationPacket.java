@@ -42,7 +42,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    boolean v1_21_2 = protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2_PRE4);
+    boolean v1_21_2 = protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2_PRE5);
     if (v1_21_2) {
       writeVarInt(byteBuf, teleportId);
     }
@@ -87,7 +87,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();
     pitch = byteBuf.readFloat();
-    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
+    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
       short flag = byteBuf.readUnsignedByte();
       onGround = (flag & 1) != 0;
       horizontalCollision = (flag & 2) != 0;

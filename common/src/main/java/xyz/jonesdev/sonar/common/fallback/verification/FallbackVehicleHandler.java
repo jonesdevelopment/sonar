@@ -95,13 +95,13 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           rotations++;
           // 1.21.2+ do not send PlayerInput packets when inside a vehicle.
           // Handle it after SetPlayerRotationPacket to simulate vanilla behavior.
-          if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
+          if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
             handlePlayerInput();
           }
         }
       } else if (packet instanceof PlayerInputPacket) {
         // 1.21.2+ send PlayerInput packets when the player starts sprinting, sneaking, etc.
-        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
           checkState(state.inVehicle, "invalid state: got " + packet + " in " + state);
 
           final PlayerInputPacket playerInput = (PlayerInputPacket) packet;

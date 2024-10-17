@@ -69,7 +69,7 @@ public enum ProtocolVersion {
   MINECRAFT_1_20_3(765),
   MINECRAFT_1_20_5(766),
   MINECRAFT_1_21(767),
-  MINECRAFT_1_21_2_PRE4(1073742040);
+  MINECRAFT_1_21_2_PRE5(1073742041);
 
   private final int protocol;
 

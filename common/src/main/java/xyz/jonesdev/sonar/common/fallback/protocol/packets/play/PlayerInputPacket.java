@@ -41,7 +41,7 @@ public final class PlayerInputPacket implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE4)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
       final byte mask = byteBuf.readByte();
       jump = (mask & 16) != 0;
       sneak = (mask & 32) != 0;

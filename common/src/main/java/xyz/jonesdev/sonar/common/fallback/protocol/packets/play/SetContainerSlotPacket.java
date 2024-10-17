@@ -43,7 +43,7 @@ public final class SetContainerSlotPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2_PRE4)) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2_PRE5)) {
       writeVarInt(byteBuf, windowId);
     } else {
       byteBuf.writeByte(windowId);
@@ -91,7 +91,7 @@ public final class SetContainerSlotPacket implements FallbackPacket {
       writeVarInt(byteBuf, 1); // component count to add
       writeVarInt(byteBuf, 0); // component count to remove
       // single VarInt component
-      writeVarInt(byteBuf, protocolVersion.lessThan(MINECRAFT_1_21_2_PRE4) ? 26 : 36); // map component
+      writeVarInt(byteBuf, protocolVersion.lessThan(MINECRAFT_1_21_2_PRE5) ? 26 : 36); // map component
       writeVarInt(byteBuf, 0); // map id
     }
   }
