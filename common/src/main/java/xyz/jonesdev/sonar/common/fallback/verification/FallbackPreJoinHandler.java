@@ -49,29 +49,21 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_8)) {
         user.channel().eventLoop().schedule(this::markSuccess, 100L, TimeUnit.MILLISECONDS);
       } else {
-        sendKeepAlive();
+        /*
+         * The purpose of this KeepAlive packet is to confirm that the connection
+         * is active and legitimate, thereby preventing bot connections that
+         * could flood the server with login attempts and other unwanted traffic.
+         */
+        user.write(PRE_JOIN_KEEP_ALIVE);
       }
     }
   }
 
   private boolean receivedClientInfo, receivedClientBrand, acknowledgedLogin;
-  private int expectedKeepAliveId;
-
-  /**
-   * The purpose of these KeepAlive packets is to confirm that the connection
-   * is active and legitimate, thereby preventing bot connections that
-   * could flood the server with login attempts and other unwanted traffic.
-   */
-  private void sendKeepAlive() {
-    // Send a KeepAlive packet with a random ID
-    expectedKeepAliveId = RANDOM.nextInt();
-    user.write(new KeepAlivePacket(expectedKeepAliveId));
-  }
+  private int expectedKeepAliveId = PRE_JOIN_KEEP_ALIVE_ID;
 
   private void markAcknowledged() {
     acknowledgedLogin = true;
-    // Update state, so we're able to send/receive configuration packets
-    updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
     synchronizeClientRegistry();
     // Write the FinishConfiguration packet to the buffer
     user.delayedWrite(FINISH_CONFIGURATION);
@@ -103,18 +95,25 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       checkState(keepAliveId == expectedKeepAliveId,
         "expected K ID " + expectedKeepAliveId + " but got " + keepAliveId);
 
+      // Immediately verify the player if they do not need any configuration (pre-1.20.2)
+      if (expectedKeepAliveId != 0) {
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
+          markSuccess();
+        } else {
+          markAcknowledged();
+        }
+      }
+
       // 1.8 clients send KeepAlive packets with the ID 0 every second
       // while the player is in the "Downloading terrain" screen.
       expectedKeepAliveId = 0;
-
-      // Immediately verify the player if they do not need any configuration (pre-1.20.2)
-      if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
-        markSuccess();
-      }
     } else if (packet instanceof LoginAcknowledgedPacket) {
       // Prevent users from sending multiple LoginAcknowledged packets
       checkState(!acknowledgedLogin, "sent duplicate login ack");
-      markAcknowledged();
+      // Update state, so we're able to send/receive packets during the CONFIG state
+      updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
+      // Perform the KeepAlive check now (config, not pre-config)
+      user.write(PRE_JOIN_KEEP_ALIVE);
     } else if (packet instanceof FinishConfigurationPacket) {
       // Update the encoder and decoder state because we're currently in the CONFIG state
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);

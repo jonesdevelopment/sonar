@@ -62,6 +62,7 @@ public class FallbackPreparer {
 
   public final int FIRST_TELEPORT_ID = RANDOM.nextInt();
   public final int SECOND_TELEPORT_ID = RANDOM.nextInt();
+  public final int PRE_JOIN_KEEP_ALIVE_ID = RANDOM.nextInt() & 1337;
 
   private final int MAP_SLOT = RANDOM.nextInt(9);
 
@@ -77,6 +78,7 @@ public class FallbackPreparer {
     SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, 0, false, false, true));
   public final FallbackPacket EMPTY_CHUNK_DATA = new FallbackPacketSnapshot(new ChunkDataPacket(0, 0));
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket();
+  public final FallbackPacket PRE_JOIN_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(PRE_JOIN_KEEP_ALIVE_ID));
   public final FallbackPacket[] REGISTRY_SYNC_1_20 = new FallbackPacket[] {
     new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null))};
   public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
