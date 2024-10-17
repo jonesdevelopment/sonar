@@ -39,30 +39,28 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 public final class LoginSuccessPacket implements FallbackPacket {
   private UUID uuid;
   private String username;
+  private boolean strictErrorHandling;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16)) {
       writeUUID(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0) {
-      writeUUIDIntArray(byteBuf, uuid);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_7_6) >= 0) {
+    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_7_6)) {
       writeString(byteBuf, uuid.toString());
     } else {
       writeString(byteBuf, FastUuidSansHyphens.toString(uuid));
     }
 
-    // Cap the length of the username to 16 characters
-    if (username.length() > 16) {
-      username = username.substring(0, 16);
-    }
     writeString(byteBuf, username);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
-      writeVarInt(byteBuf, 0); // properties
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
+      // We don't need to send any properties to the client
+      writeVarInt(byteBuf, 0);
     }
-    if (protocolVersion.compareTo(MINECRAFT_1_20_5) >= 0) {
-      byteBuf.writeBoolean(false); // should authenticate
+
+    if (protocolVersion.equals(MINECRAFT_1_20_5) || protocolVersion.equals(MINECRAFT_1_21)) {
+      // Whether the client should disconnect on its own if it receives invalid data from the server
+      byteBuf.writeBoolean(strictErrorHandling);
     }
   }
 

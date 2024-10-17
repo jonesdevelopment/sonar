@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_9;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
@@ -41,13 +39,13 @@ public final class TeleportEntityPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       writeVarInt(byteBuf, entityId);
     } else {
       byteBuf.writeInt(entityId);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)) {
       byteBuf.writeDouble(x);
       byteBuf.writeDouble(y);
       byteBuf.writeDouble(z);
@@ -60,7 +58,7 @@ public final class TeleportEntityPacket implements FallbackPacket {
     byteBuf.writeByte(0); // pitch or yaw
     byteBuf.writeByte(0); // yaw or pitch
 
-    if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeBoolean(onGround);
     }
   }

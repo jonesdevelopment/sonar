@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.CLIENTBOUND;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
 
   public void updateRegistry(final @NotNull FallbackPacketRegistry packetRegistry) {
     this.packetRegistry = packetRegistry;
-    this.protocolRegistry = packetRegistry.getProtocolRegistry(CLIENTBOUND, protocolVersion);
+    this.protocolRegistry = packetRegistry.getProtocolRegistry(FallbackPacketRegistry.Direction.CLIENTBOUND, protocolVersion);
   }
 
   @Override

@@ -48,19 +48,17 @@ public final class SpawnEntityPacket implements FallbackPacket {
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     writeVarInt(byteBuf, entityId);
 
-    final boolean v1_9orHigher = protocolVersion.compareTo(MINECRAFT_1_9) >= 0;
-
-    if (v1_9orHigher) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
       writeUUID(byteBuf, UUID.randomUUID());
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_14)) {
       writeVarInt(byteBuf, entityType.getId(protocolVersion));
     } else {
       byteBuf.writeByte(entityType.getId(protocolVersion));
     }
 
-    if (v1_9orHigher) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
       byteBuf.writeDouble(x);
       byteBuf.writeDouble(y);
       byteBuf.writeDouble(z);
@@ -73,14 +71,14 @@ public final class SpawnEntityPacket implements FallbackPacket {
     byteBuf.writeByte(0); // pitch or yaw
     byteBuf.writeByte(0); // yaw or pitch
 
-    if (protocolVersion.compareTo(MINECRAFT_1_19) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
       byteBuf.writeByte(0); // head yaw
       writeVarInt(byteBuf, data); // data
     } else {
       byteBuf.writeInt(data); // data
     }
 
-    if (v1_9orHigher || data > 0) {
+    if (data > 0 || protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
       byteBuf.writeShort((int) (velocityX * 8000D));
       byteBuf.writeShort((int) (velocityY * 8000D));
       byteBuf.writeShort((int) (velocityZ * 8000D));

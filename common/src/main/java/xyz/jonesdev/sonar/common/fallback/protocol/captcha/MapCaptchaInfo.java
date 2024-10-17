@@ -20,10 +20,9 @@ package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.MapDataPacket;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 
 @Getter
 public final class MapCaptchaInfo {
@@ -42,22 +41,21 @@ public final class MapCaptchaInfo {
     }
     this.legacy = new FallbackPacket[grid.length];
     for (int i = 0; i < grid.length; i++) {
-      this.legacy[i] = new MapDataPacket(grid[i], i, 0);
+      this.legacy[i] = new MapDataPacket(grid[i], i, 0, 0, true);
     }
 
     // Prepare 1.8+ map data
-    this.modern = new MapDataPacket(buffer, 0, 0);
+    this.modern = new MapDataPacket(buffer, 0, 0, 0, true);
   }
 
   public void delayedWrite(final @NotNull FallbackUser user) {
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+    if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       // 1.7.2-1.7.10 needs separate packets for each axis
-      for (final FallbackPacket legacyPacket : legacy) {
-        user.delayedWrite(legacyPacket);
+      for (final FallbackPacket packet : legacy) {
+        user.delayedWrite(packet);
       }
       return;
     }
-    // Send modern packet
     user.delayedWrite(modern);
   }
 }

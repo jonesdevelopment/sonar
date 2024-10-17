@@ -190,7 +190,7 @@ verification:
   read-timeout: 8000
   # De tijd sinds de speler stopte met het verzenden van pakketten voordat de verbinding werd verbroken
   # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
-  rejoin-delay: 8000
+  rejoin-delay: 5000
   # De tijd sinds de server stopte met het versturen van pakketten voordat de verbinding met de speler werd verbroken
   # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
   write-timeout: 10000

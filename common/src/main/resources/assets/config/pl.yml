@@ -193,7 +193,7 @@ verification:
   write-timeout: 10000
   # Jak długo niezweryfikowany gracz powinien czekać przed ponownym połączeniem do serwera?
   # (Wartość ta reprezentuje czas w milisekundach: 1 sekunda = 1000 milisekund)
-  rejoin-delay: 8000
+  rejoin-delay: 5000
   # Jak długo Sonar powinien zapamiętywać liczbę nieudanych weryfikacji gracza?
   # (Wartość ta reprezentuje czas w milisekundach: 1 sekunda = 1000 milisekund)
   remember-time: 120000

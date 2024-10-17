@@ -188,7 +188,7 @@ verification:
   write-timeout: 10000
   # 当玩家在需要验证时(即还未通过检查的情况下)需要等待多少毫秒才可以重新连接?
   # (该值为毫秒. 1秒等于1000毫秒.)
-  rejoin-delay: 8000
+  rejoin-delay: 5000
   # 当玩家验证失败后, Sonar 应该记住他多久?
   # (该值为毫秒. 1秒等于1000毫秒.)
   remember-time: 120000

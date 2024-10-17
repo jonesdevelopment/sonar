@@ -41,7 +41,6 @@ import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import java.net.InetAddress;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_2;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.loginSuccess;
@@ -119,7 +118,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       write(loginSuccess);
 
       // pre-1.20.2 clients do not have the configuration stage
-      if (protocolVersion.compareTo(MINECRAFT_1_20_2) < 0) {
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
         newDecoder.updateRegistry(GAME);
         newEncoder.updateRegistry(GAME);
       }

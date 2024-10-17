@@ -25,6 +25,7 @@ import xyz.jonesdev.sonar.api.event.impl.UserBlacklistedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameDecoder;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarIntLengthEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
@@ -35,7 +36,6 @@ import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.Random;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_20_5;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.transferToOrigin;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.closeWith;
 
@@ -57,8 +57,7 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
 
     // If enabled, transfer the player back to the origin server.
     // This feature was introduced by Mojang in Minecraft version 1.20.5.
-    if (transferToOrigin != null
-      && user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
+    if (transferToOrigin != null && user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
       // Send the transfer packet to the player (and close the channel if on Java Edition)
       if (user.isGeyser()) {
         user.write(transferToOrigin);

@@ -42,8 +42,8 @@ public final class RegistryDataPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_20_5) < 0) {
-      writeNamelessCompoundTag(byteBuf, tag);
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {
+      writeBinaryTag(byteBuf, protocolVersion, tag);
     } else if (type != null) {
       writeString(byteBuf, type);
       writeVarInt(byteBuf, bundles.size());
@@ -54,7 +54,7 @@ public final class RegistryDataPacket implements FallbackPacket {
         final CompoundBinaryTag tag = bundle.getTag();
         if (tag != null) {
           byteBuf.writeBoolean(true);
-          writeNamelessCompoundTag(byteBuf, tag);
+          writeBinaryTag(byteBuf, protocolVersion, tag);
         } else {
           byteBuf.writeBoolean(false);
         }
@@ -74,7 +74,8 @@ public final class RegistryDataPacket implements FallbackPacket {
       final ArrayList<RegistryDataPacket.Bundle> bundles = new ArrayList<>();
       for (final BinaryTag binaryTag : rootTag.getCompound(type).getList("value")) {
         final CompoundBinaryTag tag = (CompoundBinaryTag) binaryTag;
-        bundles.add(new Bundle(tag.getString("name"), tag.getCompound("element")));
+        // CompoundBinaryTag#getCompound(String) will return an empty compound tag when not exist.
+        bundles.add(new Bundle(tag.getString("name"), tag.get("element") == null ? null : tag.getCompound("element")));
       }
       packets[index++] = new FallbackPacketSnapshot(new RegistryDataPacket(rootTag, type, bundles));
     }

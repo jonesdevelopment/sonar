@@ -194,7 +194,7 @@ verification:
   write-timeout: 10000
   # How long should a player wait before reconnecting during verification
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
-  rejoin-delay: 8000
+  rejoin-delay: 5000
   # How long should Sonar remember the number of failed verifications for a player?
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   remember-time: 120000
