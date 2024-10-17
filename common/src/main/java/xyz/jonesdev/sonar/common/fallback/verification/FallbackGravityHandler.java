@@ -92,6 +92,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
   private boolean teleported, canFall, checkMovement;
   private double y, deltaY, blockHeight;
   private int movementTick, expectedTeleportId = FIRST_TELEPORT_ID;
+  private SetPlayerPositionRotationPacket lastPositionPacket;
 
   private void markSuccess() {
     // Force-stop the movement checks
@@ -108,9 +109,11 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof SetPlayerPositionRotationPacket) {
       // Make sure the player has teleported before checking for position packets
+      final SetPlayerPositionRotationPacket position = (SetPlayerPositionRotationPacket) packet;
       if (teleported) {
-        final SetPlayerPositionRotationPacket position = (SetPlayerPositionRotationPacket) packet;
         handleMovement(position.getX(), position.getY(), position.getZ(), position.isOnGround(), true);
+      } else if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+        lastPositionPacket = position;
       }
     } else if (packet instanceof SetPlayerPositionPacket) {
       // Make sure the player has teleported before checking for position packets
@@ -129,10 +132,18 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
 
       // The first teleport ID is not useful for us in this context, skip it
       if (expectedTeleportId == FIRST_TELEPORT_ID) {
+        lastPositionPacket = null;
         expectedTeleportId = SECOND_TELEPORT_ID;
       } else {
         // Enable the movement checks
         teleported = true;
+
+        if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+          checkState(lastPositionPacket != null, "excepted position rotation but got teleport confirm.");
+          handleMovement(
+            lastPositionPacket.getX(), lastPositionPacket.getY(), lastPositionPacket.getZ(),
+            lastPositionPacket.isOnGround(), true);
+        }
       }
     } else if (packet instanceof ClientInformationPacket
       || packet instanceof PluginMessagePacket) {

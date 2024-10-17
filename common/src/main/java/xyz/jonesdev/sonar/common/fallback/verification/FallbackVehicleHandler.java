@@ -93,14 +93,16 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
       } else if (packet instanceof SetPlayerRotationPacket) {
         if (state.inVehicle) {
           rotations++;
-          // 1.21.2+ do not send PlayerInput packets when inside a vehicle
-          // Handle it after SetPlayerRotationPacket to simulate vanilla behavior
-          if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+
+          // 1.21.2+ do not send PlayerInput packets when inside a vehicle.
+          // Handle it after SetPlayerRotationPacket to simulate vanilla behavior.
+          if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
             handlePlayerInput();
           }
         }
       } else if (packet instanceof PlayerInputPacket) {
-        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2)) {
+        // 1.21.2+ send PlayerInput packets when the player starts sprinting, sneaking, etc.
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
           checkState(state.inVehicle, "invalid state: got " + packet + " in " + state);
 
           final PlayerInputPacket playerInput = (PlayerInputPacket) packet;
@@ -108,11 +110,10 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
           // Check if the player is sending invalid vehicle speed values
           final float forward = Math.abs(playerInput.getForward());
           final float sideways = Math.abs(playerInput.getSideways());
-          final float maxVehicleSpeed = user.isGeyser() ? 1 : 0.98f;
+          final float maxVehicleSpeed = /*user.isGeyser() ? 1 :*/ 0.98f;
           checkState(forward <= maxVehicleSpeed, "illegal speed (f): " + forward);
           checkState(sideways <= maxVehicleSpeed, "illegal speed (s): " + sideways);
 
-          // 1.21.2+ send PlayerInput packets when the player starts sprinting, sneaking, etc.
           handlePlayerInput();
         }
       } else if (packet instanceof SetPlayerPositionRotationPacket) {

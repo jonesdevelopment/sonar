@@ -22,9 +22,11 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.event.impl.CaptchaGenerationStartEvent;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
@@ -72,12 +74,14 @@ public class FallbackPreparer {
   public final FallbackPacket NO_MOVE_ABILITIES = new PlayerAbilitiesPacket(0x02, 0, 0);
   public final FallbackPacket NO_MOVE_ABILITIES_BEDROCK = new PlayerAbilitiesPacket(0x06, 0, 0);
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
-    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, 0, false, true));
+    SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION, 0, 90, 0, 0, false, false, true));
   public final FallbackPacket EMPTY_CHUNK_DATA = new FallbackPacketSnapshot(new ChunkDataPacket(0, 0));
   public final FallbackPacket FINISH_CONFIGURATION = new FinishConfigurationPacket();
-  public final FallbackPacket REGISTRY_SYNC_LEGACY = new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null));
+  public final FallbackPacket[] REGISTRY_SYNC_1_20 = new FallbackPacket[] {
+    new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null))};
   public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
   public final FallbackPacket[] REGISTRY_SYNC_1_21 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21);
+  public final FallbackPacket[] REGISTRY_SYNC_1_21_2 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_2);
   public final FallbackPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
   public final static FallbackPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
   public final FallbackPacket RANDOM_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(RANDOM.nextInt()));
@@ -153,13 +157,13 @@ public class FallbackPreparer {
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
-      0, 0, FIRST_TELEPORT_ID, 0, false, true));
+      0, 0, FIRST_TELEPORT_ID, 0, false, false, true));
     fallStartPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition - IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
-      0, -90, SECOND_TELEPORT_ID, 1 << 1, false, true));
+      0, -90, SECOND_TELEPORT_ID, 1 << 1, false, false, true));
     fallStartPositionLegacy = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, dynamicSpawnYPosition, SPAWN_Z_POSITION,
-      0, -90, 0, 0, false, true));
+      0, -90, 0, 0, false, false, true));
 
     // Prepare collision platform positions
     final int length = BLOCKS_PER_ROW / 2;
@@ -261,5 +265,18 @@ public class FallbackPreparer {
       + Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets() * 4
       + Sonar.get().getConfig().getVerification().getMap().getMaxTries()
       + 150 /* some arbitrary leeway */;
+  }
+
+  public static FallbackPacket[] getRegistryPackets(final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+      return REGISTRY_SYNC_1_21_2;
+    }
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21)) {
+      return REGISTRY_SYNC_1_21;
+    }
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
+      return REGISTRY_SYNC_1_20_5;
+    }
+    return REGISTRY_SYNC_1_20;
   }
 }

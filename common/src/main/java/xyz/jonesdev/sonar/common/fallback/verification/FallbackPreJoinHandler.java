@@ -173,16 +173,9 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
   }
 
   private void synchronizeClientRegistry() {
-    // 1.20.5+ adds new "game bundle features" which overcomplicate all of this...
-    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
-      // Write the new RegistrySync packets to the buffer
-      for (final FallbackPacket syncPacket : user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21)
-        ? REGISTRY_SYNC_1_20_5 : REGISTRY_SYNC_1_21) {
-        user.delayedWrite(syncPacket);
-      }
-    } else {
-      // Write the old RegistrySync packet to the buffer
-      user.delayedWrite(REGISTRY_SYNC_LEGACY);
+    // Write the new RegistrySync packets to the buffer
+    for (final FallbackPacket packet : getRegistryPackets(user.getProtocolVersion())) {
+      user.delayedWrite(packet);
     }
   }
 

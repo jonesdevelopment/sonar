@@ -40,7 +40,7 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
     sendTransaction();
   }
 
-  private boolean waitingSwingArm, waitingSlotConfirm;
+  private boolean waitingSwingArm, waitingSlotConfirm, waitingTransaction;
   private short expectedTransactionId;
   private int currentClientSlotId, expectedSlotId = -1;
 
@@ -54,6 +54,7 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
     // Send a Transaction (Ping) packet with a random ID
     expectedTransactionId = (short) -RANDOM.nextInt(Short.MAX_VALUE);
     user.write(new TransactionPacket(0, expectedTransactionId, false));
+    waitingTransaction = true;
   }
 
   /**
@@ -102,6 +103,8 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof TransactionPacket) {
       final TransactionPacket transaction = (TransactionPacket) packet;
+      // Make sure we are expecting a transaction packet
+      checkState(waitingTransaction, "unexpected transaction: " + transaction.getTransactionId());
       // Make sure the window ID is valid
       checkState(transaction.getWindowId() == 0, "wrong window: " + transaction.getWindowId());
       // Make sure the transaction was accepted
@@ -131,7 +134,7 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
         sendSetHeldItem();
       }
 
-      expectedTransactionId = 0;
+      waitingTransaction = false;
     } else if (packet instanceof SetHeldItemPacket) {
       final SetHeldItemPacket heldItemPacket = (SetHeldItemPacket) packet;
 

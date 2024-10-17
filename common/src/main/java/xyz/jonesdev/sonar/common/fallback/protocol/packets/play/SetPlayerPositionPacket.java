@@ -32,7 +32,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 @AllArgsConstructor
 public final class SetPlayerPositionPacket implements FallbackPacket {
   private double x, y, z;
-  private boolean onGround;
+  private boolean onGround, horizontalCollision;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -48,7 +48,13 @@ public final class SetPlayerPositionPacket implements FallbackPacket {
       byteBuf.readDouble();
     }
     z = byteBuf.readDouble();
-    onGround = byteBuf.readBoolean();
+    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+      short flag = byteBuf.readUnsignedByte();
+      onGround = (flag & 1) != 0;
+      horizontalCollision = (flag & 2) != 0;
+    } else {
+      onGround = byteBuf.readBoolean();
+    }
   }
 
   @Override

@@ -32,7 +32,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 @AllArgsConstructor
 public final class SetPlayerRotationPacket implements FallbackPacket {
   private float yaw, pitch;
-  private boolean onGround;
+  private boolean onGround, horizontalCollision;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -43,6 +43,12 @@ public final class SetPlayerRotationPacket implements FallbackPacket {
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     yaw = byteBuf.readFloat();
     pitch = byteBuf.readFloat();
-    onGround = byteBuf.readBoolean();
+    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+      short flag = byteBuf.readUnsignedByte();
+      onGround = (flag & 1) != 0;
+      horizontalCollision = (flag & 2) != 0;
+    } else {
+      onGround = byteBuf.readBoolean();
+    }
   }
 }
