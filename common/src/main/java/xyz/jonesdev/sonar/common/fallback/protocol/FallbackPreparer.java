@@ -62,7 +62,7 @@ public class FallbackPreparer {
 
   public final int FIRST_TELEPORT_ID = RANDOM.nextInt();
   public final int SECOND_TELEPORT_ID = RANDOM.nextInt();
-  public final int PRE_JOIN_KEEP_ALIVE_ID = RANDOM.nextInt() & 1337;
+  public final int PRE_JOIN_KEEP_ALIVE_ID = RANDOM.nextInt();
 
   private final int MAP_SLOT = RANDOM.nextInt(9);
 
