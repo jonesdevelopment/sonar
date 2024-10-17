@@ -96,7 +96,6 @@ public final class FallbackUserWrapper implements FallbackUser {
         return;
       }
 
-
       // Mark the player as connected by caching them in a map of verifying players
       Sonar.get().getFallback().getConnected().compute(inetAddress, (__, v) -> true);
 
