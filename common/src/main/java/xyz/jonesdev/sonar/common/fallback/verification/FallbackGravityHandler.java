@@ -101,7 +101,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       final SetPlayerPositionRotationPacket position = (SetPlayerPositionRotationPacket) packet;
       if (teleported) {
         handleMovement(position.getX(), position.getY(), position.getZ(), position.isOnGround(), true);
-      } else if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+      } else if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
         lastPositionPacket = position;
       }
     } else if (packet instanceof SetPlayerPositionPacket) {
@@ -127,7 +127,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
         // Enable the movement checks
         teleported = true;
 
-        if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+        if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
           checkState(lastPositionPacket != null, "excepted position rotation but got teleport confirm.");
           handleMovement(
             lastPositionPacket.getX(), lastPositionPacket.getY(), lastPositionPacket.getZ(),

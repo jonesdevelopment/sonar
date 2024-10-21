@@ -270,7 +270,7 @@ public class FallbackPreparer {
   }
 
   public static FallbackPacket[] getRegistryPackets(final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
       return REGISTRY_SYNC_1_21_2;
     }
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21)) {

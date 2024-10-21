@@ -164,7 +164,7 @@ public final class JoinGamePacket implements FallbackPacket {
       writeVarInt(byteBuf, portalCooldown);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2_PRE5)) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2)) {
       writeVarInt(byteBuf, seaLevel);
     }
 

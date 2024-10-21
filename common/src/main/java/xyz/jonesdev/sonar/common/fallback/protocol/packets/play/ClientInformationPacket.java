@@ -73,7 +73,7 @@ public final class ClientInformationPacket implements FallbackPacket {
         if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18)) {
           clientListingAllowed = byteBuf.readBoolean();
 
-          if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2_PRE5)) {
+          if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2)) {
             particleStatus = readVarInt(byteBuf);
           }
         }

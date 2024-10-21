@@ -43,7 +43,7 @@ public final class SetPlayerRotationPacket implements FallbackPacket {
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     yaw = byteBuf.readFloat();
     pitch = byteBuf.readFloat();
-    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2_PRE5)) {
+    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2)) {
       short flag = byteBuf.readUnsignedByte();
       onGround = (flag & 1) != 0;
       horizontalCollision = (flag & 2) != 0;
