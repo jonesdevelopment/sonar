@@ -45,7 +45,6 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
     final Class<? extends FallbackPacket> originalPacket = packet instanceof FallbackPacketSnapshot
       ? ((FallbackPacketSnapshot) packet).getOriginalPacketClass() : packet.getClass();
     final int packetId = protocolRegistry.getPacketId(originalPacket);
-    System.out.println(packetId + " | " + originalPacket.getSimpleName() + " | " + packet);
     ProtocolUtil.writeVarInt(out, packetId);
     packet.encode(out, protocolVersion);
   }

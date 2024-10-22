@@ -19,12 +19,11 @@ package xyz.jonesdev.sonar.common.fallback.protocol.block;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
 public final class BlockUpdate {
-  private final @NotNull BlockPosition position;
+  private final BlockPosition position;
   private final BlockType blockType;
   private final int legacyBlockState, blockState;
 
@@ -39,7 +38,6 @@ public final class BlockUpdate {
   }
 
   @Getter
-  @ToString
   @RequiredArgsConstructor
   public static final class BlockPosition {
     private final int x, y, z;

@@ -82,13 +82,10 @@ public final class SetContainerSlotPacket implements FallbackPacket {
       }
     } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {
       ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, compoundBinaryTag);
-    } else { // 1.20.5+
-      // TODO: find a way to improve this
-      // component
+    } else {
       ProtocolUtil.writeVarInt(byteBuf, 1); // component count to add
       ProtocolUtil.writeVarInt(byteBuf, 0); // component count to remove
-      // single VarInt component
-      ProtocolUtil.writeVarInt(byteBuf, protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_21_2) ? 26 : 36); // type
+      ProtocolUtil.writeVarInt(byteBuf, itemType.getComponents().apply(protocolVersion));
       ProtocolUtil.writeVarInt(byteBuf, 0); // data
     }
   }
