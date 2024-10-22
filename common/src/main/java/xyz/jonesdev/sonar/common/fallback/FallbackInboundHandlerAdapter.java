@@ -214,7 +214,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
 
   private static void customDisconnect(final @NotNull Channel channel,
                                        final @NotNull FallbackPacket packet,
-                                       final ProtocolVersion protocolVersion) {
+                                       final @NotNull ProtocolVersion protocolVersion) {
     if (channel.isActive()) {
       if (channel.eventLoop().inEventLoop()) {
         _customDisconnect(channel, packet, protocolVersion);
@@ -229,7 +229,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
    */
   private static void _customDisconnect(final @NotNull Channel channel,
                                         final @NotNull FallbackPacket packet,
-                                        final ProtocolVersion protocolVersion) {
+                                        final @NotNull ProtocolVersion protocolVersion) {
     // Remove the connection handler pipeline to completely take over the channel
     final String handler = Sonar.get().getPlatform().getConnectionHandler();
     if (channel.pipeline().context(handler) != null) {

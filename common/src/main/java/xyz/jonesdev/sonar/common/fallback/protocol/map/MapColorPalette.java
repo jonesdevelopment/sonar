@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
+package xyz.jonesdev.sonar.common.fallback.protocol.map;
 
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +26,7 @@ import java.awt.image.Raster;
 @UtilityClass
 public class MapColorPalette {
   // https://minecraft.wiki/w/Map_item_format#Full_color_tables
+  // TODO: load mappings from a separate file
   public static final int[] COLOR_MAP = {
     -1,
     -1,

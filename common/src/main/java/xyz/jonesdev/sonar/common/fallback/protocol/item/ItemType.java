@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
+package xyz.jonesdev.sonar.common.fallback.protocol.item;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

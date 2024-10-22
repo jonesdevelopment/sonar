@@ -15,12 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback.protocol.captcha;
+package xyz.jonesdev.sonar.common.fallback.protocol;
 
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.event.impl.CaptchaGenerationEndEvent;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapCaptchaInfo;
+import xyz.jonesdev.sonar.common.fallback.protocol.map.MapColorPalette;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;

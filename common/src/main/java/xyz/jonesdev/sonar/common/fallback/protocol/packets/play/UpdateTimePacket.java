@@ -33,7 +33,7 @@ public final class UpdateTimePacket implements FallbackPacket {
   private boolean tickDayTime;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     byteBuf.writeLong(worldAge);
     byteBuf.writeLong(timeOfDay);
 

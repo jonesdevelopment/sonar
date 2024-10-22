@@ -41,7 +41,7 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
   @Override
   protected void encode(final ChannelHandlerContext ctx,
                         final @NotNull FallbackPacket packet,
-                        final ByteBuf out) throws Exception {
+                        final @NotNull ByteBuf out) throws Exception {
     final Class<? extends FallbackPacket> originalPacket = packet instanceof FallbackPacketSnapshot
       ? ((FallbackPacketSnapshot) packet).getOriginalPacketClass() : packet.getClass();
     final int packetId = protocolRegistry.getPacketId(originalPacket);

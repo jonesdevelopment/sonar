@@ -100,7 +100,7 @@ public class ProtocolUtil {
     throw DEBUG ? new DecoderException("Bad VarInt") : QuietDecoderException.INSTANCE;
   }
 
-  public static void writeVarInt(final ByteBuf byteBuf, final int value) {
+  public static void writeVarInt(final @NotNull ByteBuf byteBuf, final int value) {
     // Peel the one and two byte count cases explicitly as they are the most common VarInt sizes
     // that the proxy will write, to improve inlining.
     if ((value & (0xFFFFFFFF << 7)) == 0) {
@@ -113,7 +113,7 @@ public class ProtocolUtil {
     }
   }
 
-  private void writeVarIntFull(final ByteBuf byteBuf, final int value) {
+  private void writeVarIntFull(final @NotNull ByteBuf byteBuf, final int value) {
     // See https://steinborn.me/posts/performance/how-fast-can-you-write-a-varint/
     if ((value & (0xFFFFFFFF << 7)) == 0) {
       byteBuf.writeByte(value);
@@ -135,7 +135,7 @@ public class ProtocolUtil {
     }
   }
 
-  public static void writeVarLong(final ByteBuf byteBuf, final long value) {
+  public static void writeVarLong(final @NotNull ByteBuf byteBuf, final long value) {
     // Peel the one and two byte count cases explicitly as they are the most common VarLong sizes
     // that the proxy will write, to improve inlining.
     if ((value & 0xFFFFFFFFFFFFFF80L) == 0L) {
@@ -148,7 +148,7 @@ public class ProtocolUtil {
     }
   }
 
-  private void writeVarLongFull(final ByteBuf byteBuf, final long value) {
+  private void writeVarLongFull(final @NotNull ByteBuf byteBuf, final long value) {
     if ((value & 0xFFFFFFFFFFFFFF80L) == 0L) {
       byteBuf.writeByte((byte) value);
     } else if ((value & 0xFFFFFFFFFFFFC000L) == 0L) {
@@ -219,7 +219,7 @@ public class ProtocolUtil {
 
   public static void closeWith(final @NotNull Channel channel,
                                final @NotNull ProtocolVersion protocolVersion,
-                               final Object msg) {
+                               final @NotNull Object msg) {
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       channel.eventLoop().execute(() -> {
         channel.config().setAutoRead(false);
@@ -236,11 +236,11 @@ public class ProtocolUtil {
     return new UUID(byteBuf.readLong(), byteBuf.readLong());
   }
 
-  public static byte @NotNull [] readByteArray(final ByteBuf byteBuf) {
+  public static byte @NotNull [] readByteArray(final @NotNull ByteBuf byteBuf) {
     return readByteArray(byteBuf, Short.MAX_VALUE);
   }
 
-  public static byte @NotNull [] readByteArray(final ByteBuf byteBuf, final int cap) {
+  public static byte @NotNull [] readByteArray(final @NotNull ByteBuf byteBuf, final int cap) {
     final int length = readVarInt(byteBuf);
     checkState(length >= 0, "Got a negative-length array");
     checkState(length <= cap, "Bad array size");
@@ -250,7 +250,7 @@ public class ProtocolUtil {
     return array;
   }
 
-  public static @NotNull String readString(final ByteBuf byteBuf, final int cap) throws DecoderException {
+  public static @NotNull String readString(final @NotNull ByteBuf byteBuf, final int cap) throws DecoderException {
     final int length = readVarInt(byteBuf);
     return readString(byteBuf, cap, length);
   }
@@ -267,7 +267,7 @@ public class ProtocolUtil {
     return str;
   }
 
-  public static void writeString(final ByteBuf byteBuf, final @NotNull CharSequence str) {
+  public static void writeString(final @NotNull ByteBuf byteBuf, final @NotNull CharSequence str) {
     final int size = ByteBufUtil.utf8Bytes(str);
     writeVarInt(byteBuf, size);
     byteBuf.writeCharSequence(str, StandardCharsets.UTF_8);
@@ -278,12 +278,12 @@ public class ProtocolUtil {
     byteBuf.writeLong(uuid.getLeastSignificantBits());
   }
 
-  public static void writeByteArray(final ByteBuf byteBuf, final byte @NotNull [] bytes) {
+  public static void writeByteArray(final @NotNull ByteBuf byteBuf, final byte @NotNull [] bytes) {
     writeVarInt(byteBuf, bytes.length);
     byteBuf.writeBytes(bytes);
   }
 
-  public static void writeStringArray(final ByteBuf byteBuf, final String @NotNull [] stringArray) {
+  public static void writeStringArray(final @NotNull ByteBuf byteBuf, final String @NotNull [] stringArray) {
     writeVarInt(byteBuf, stringArray.length);
     for (final String s : stringArray) {
       writeString(byteBuf, s);

@@ -26,7 +26,7 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
+import xyz.jonesdev.sonar.common.fallback.protocol.item.ItemType;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
@@ -94,7 +94,7 @@ public final class SetContainerSlotPacket implements FallbackPacket {
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
   }
 }
