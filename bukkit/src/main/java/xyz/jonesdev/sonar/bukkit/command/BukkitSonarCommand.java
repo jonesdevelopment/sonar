@@ -53,9 +53,6 @@ public final class BukkitSonarCommand implements CommandExecutor, TabExecutor, S
                                     final String commandAlias,
                                     final String @NotNull [] args) {
     // Do not allow tab completion if the player does not have the required permission
-    if (!sender.hasPermission("sonar.command")) {
-      return Collections.emptyList();
-    }
-    return getCachedTabSuggestions(args);
+    return sender.hasPermission("sonar.command") ? getCachedTabSuggestions(args) : Collections.emptyList();
   }
 }
