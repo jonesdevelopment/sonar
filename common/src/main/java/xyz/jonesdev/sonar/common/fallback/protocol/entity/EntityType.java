@@ -17,8 +17,8 @@
 
 package xyz.jonesdev.sonar.common.fallback.protocol.entity;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
 import java.util.function.Function;
@@ -26,6 +26,7 @@ import java.util.function.Function;
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 
 // TODO: load mappings from a separate file
+@Getter
 @RequiredArgsConstructor
 public enum EntityType {
   // Useful resources:
@@ -89,9 +90,5 @@ public enum EntityType {
     return 82;
   });
 
-  private final Function<ProtocolVersion, Integer> function;
-
-  public int getId(final @NotNull ProtocolVersion protocolVersion) {
-    return function.apply(protocolVersion);
-  }
+  private final Function<ProtocolVersion, Integer> id;
 }

@@ -61,9 +61,9 @@ public final class SetContainerSlotPacket implements FallbackPacket {
     }
 
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_13_2)) {
-      byteBuf.writeShort(itemType.getId(protocolVersion));
+      byteBuf.writeShort(itemType.getId().apply(protocolVersion));
     } else {
-      ProtocolUtil.writeVarInt(byteBuf, itemType.getId(protocolVersion));
+      ProtocolUtil.writeVarInt(byteBuf, itemType.getId().apply(protocolVersion));
     }
 
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {

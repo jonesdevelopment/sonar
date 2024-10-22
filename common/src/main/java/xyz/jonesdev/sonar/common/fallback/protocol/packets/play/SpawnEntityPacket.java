@@ -50,9 +50,9 @@ public final class SpawnEntityPacket implements FallbackPacket {
     }
 
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_14)) {
-      ProtocolUtil.writeVarInt(byteBuf, entityType.getId(protocolVersion));
+      ProtocolUtil.writeVarInt(byteBuf, entityType.getId().apply(protocolVersion));
     } else {
-      byteBuf.writeByte(entityType.getId(protocolVersion));
+      byteBuf.writeByte(entityType.getId().apply(protocolVersion));
     }
 
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)) {
