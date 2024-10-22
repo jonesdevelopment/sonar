@@ -30,11 +30,16 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 @AllArgsConstructor
 public final class UpdateTimePacket implements FallbackPacket {
   private long worldAge, timeOfDay;
+  private boolean tickDayTime;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     byteBuf.writeLong(worldAge);
     byteBuf.writeLong(timeOfDay);
+
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+      byteBuf.writeBoolean(tickDayTime);
+    }
   }
 
   @Override

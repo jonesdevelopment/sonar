@@ -204,7 +204,7 @@ public class FallbackPreparer {
     // Prepare update time packet
     final int timeOfDay = Sonar.get().getConfig().getVerification().getTimeOfDay();
     if (timeOfDay != 1000) {
-      updateTime = new UpdateTimePacket(0L, timeOfDay);
+      updateTime = new UpdateTimePacket(0L, timeOfDay, false);
     } else {
       updateTime = null;
     }

@@ -26,11 +26,10 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketSnapshot;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Getter
 @NoArgsConstructor
@@ -43,18 +42,18 @@ public final class RegistryDataPacket implements FallbackPacket {
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {
-      writeBinaryTag(byteBuf, protocolVersion, tag);
+      ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, tag);
     } else if (type != null) {
-      writeString(byteBuf, type);
-      writeVarInt(byteBuf, bundles.size());
+      ProtocolUtil.writeString(byteBuf, type);
+      ProtocolUtil.writeVarInt(byteBuf, bundles.size());
 
       for (final RegistryDataPacket.Bundle bundle : bundles) {
-        writeString(byteBuf, bundle.getName());
+        ProtocolUtil.writeString(byteBuf, bundle.getName());
         // Write the bundle tag
         final CompoundBinaryTag tag = bundle.getTag();
         if (tag != null) {
           byteBuf.writeBoolean(true);
-          writeBinaryTag(byteBuf, protocolVersion, tag);
+          ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, tag);
         } else {
           byteBuf.writeBoolean(false);
         }

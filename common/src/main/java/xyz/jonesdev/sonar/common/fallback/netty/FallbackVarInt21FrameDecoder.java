@@ -23,11 +23,10 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.ByteProcessor;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.List;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java
 public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
@@ -56,7 +55,7 @@ public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
       return;
     }
     if (length <= 0) {
-      throw DEBUG ? new DecoderException("Bad VarInt length: " + length) : QuietDecoderException.INSTANCE;
+      throw ProtocolUtil.DEBUG ? new DecoderException("Bad VarInt length: " + length) : QuietDecoderException.INSTANCE;
     }
 
     if (byteBuf.readableBytes() < length) {
@@ -75,7 +74,7 @@ public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
     final int wholeOrMore = byteBuf.getIntLE(byteBuf.readerIndex());
     final int atStop = ~wholeOrMore & 0x808080;
     if (atStop == 0) {
-      throw DEBUG ? new DecoderException("VarInt too big") : QuietDecoderException.INSTANCE;
+      throw ProtocolUtil.DEBUG ? new DecoderException("VarInt too big") : QuietDecoderException.INSTANCE;
     }
 
     final int bitsToKeep = Integer.numberOfTrailingZeros(atStop) + 1;

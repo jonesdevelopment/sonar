@@ -24,8 +24,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @NoArgsConstructor
@@ -38,7 +37,7 @@ public final class MapDataPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    writeVarInt(byteBuf, 0); // item damage
+    ProtocolUtil.writeVarInt(byteBuf, 0); // item damage
 
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeShort(buffer.length + 3);
@@ -63,7 +62,7 @@ public final class MapDataPacket implements FallbackPacket {
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17)) {
       byteBuf.writeBoolean(false); // no icon
     } else {
-      writeVarInt(byteBuf, 0); // no icon
+      ProtocolUtil.writeVarInt(byteBuf, 0); // no icon
     }
 
     byteBuf.writeByte(128); // rows
@@ -71,7 +70,7 @@ public final class MapDataPacket implements FallbackPacket {
     byteBuf.writeByte(x);
     byteBuf.writeByte(y);
 
-    writeVarInt(byteBuf, buffer.length);
+    ProtocolUtil.writeVarInt(byteBuf, buffer.length);
     byteBuf.writeBytes(buffer);
   }
 

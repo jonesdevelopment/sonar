@@ -26,11 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.util.FastUuidSansHyphens;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.util.UUID;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Getter
 @ToString
@@ -43,22 +41,23 @@ public final class LoginSuccessPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16)) {
-      writeUUID(byteBuf, uuid);
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_7_6)) {
-      writeString(byteBuf, uuid.toString());
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16)) {
+      ProtocolUtil.writeUUID(byteBuf, uuid);
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_7_6)) {
+      ProtocolUtil.writeString(byteBuf, uuid.toString());
     } else {
-      writeString(byteBuf, FastUuidSansHyphens.toString(uuid));
+      ProtocolUtil.writeString(byteBuf, FastUuidSansHyphens.toString(uuid));
     }
 
-    writeString(byteBuf, username);
+    ProtocolUtil.writeString(byteBuf, username);
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
       // We don't need to send any properties to the client
-      writeVarInt(byteBuf, 0);
+      ProtocolUtil.writeVarInt(byteBuf, 0);
     }
 
-    if (protocolVersion.equals(MINECRAFT_1_20_5) || protocolVersion.equals(MINECRAFT_1_21)) {
+    if (protocolVersion.equals(ProtocolVersion.MINECRAFT_1_20_5)
+      || protocolVersion.equals(ProtocolVersion.MINECRAFT_1_21)) {
       // Whether the client should disconnect on its own if it receives invalid data from the server
       byteBuf.writeBoolean(strictErrorHandling);
     }

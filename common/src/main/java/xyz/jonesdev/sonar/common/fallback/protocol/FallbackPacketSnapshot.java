@@ -26,10 +26,10 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.ID_TO_PROTOCOL_CONSTANT;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 
 // https://github.com/Nan1t/NanoLimbo/blob/main/src/main/java/ua/nanit/limbo/protocol/PacketSnapshot.java
 public final class FallbackPacketSnapshot implements FallbackPacket {
@@ -80,11 +80,11 @@ public final class FallbackPacketSnapshot implements FallbackPacket {
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     final Integer hash = mappings.get(protocolVersion.getProtocol());
     if (hash == null) {
-      throw DEBUG ? new EncoderException("Unable to find protocol version hash!") : QuietDecoderException.INSTANCE;
+      throw ProtocolUtil.DEBUG ? new EncoderException("Unable to find hash") : QuietDecoderException.INSTANCE;
     }
     final byte[] bytes = cachedBytes.get(hash);
     if (bytes == null) {
-      throw DEBUG ? new EncoderException("Unable to find cached packet!") : QuietDecoderException.INSTANCE;
+      throw ProtocolUtil.DEBUG ? new EncoderException("Unable to find cached packet") : QuietDecoderException.INSTANCE;
     }
     byteBuf.writeBytes(bytes);
   }

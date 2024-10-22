@@ -32,12 +32,12 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketListener;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.Random;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.transferToOrigin;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.closeWith;
 
 @RequiredArgsConstructor
 public abstract class FallbackVerificationHandler implements FallbackPacketListener {
@@ -67,7 +67,7 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
         user.channel().pipeline().remove(FallbackVarInt21FrameDecoder.class);
         user.channel().pipeline().remove(FallbackVarIntLengthEncoder.class);
       } else {
-        closeWith(user.channel(), user.getProtocolVersion(), transferToOrigin);
+        ProtocolUtil.closeWith(user.channel(), user.getProtocolVersion(), transferToOrigin);
       }
     } else {
       // Disconnect player with the verification success message

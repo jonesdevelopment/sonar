@@ -29,6 +29,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.util.GeyserUtil;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.net.InetAddress;
@@ -38,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.closeWith;
 
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -244,7 +244,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
         final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
         channel.pipeline().replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
       }
-      closeWith(channel, protocolVersion, packet);
+      ProtocolUtil.closeWith(channel, protocolVersion, packet);
     } else {
       channel.close();
     }

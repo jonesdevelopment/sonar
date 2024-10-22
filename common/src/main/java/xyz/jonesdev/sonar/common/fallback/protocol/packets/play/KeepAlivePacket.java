@@ -25,9 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
@@ -41,7 +39,7 @@ public final class KeepAlivePacket implements FallbackPacket {
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_12_2)) {
       byteBuf.writeLong(id);
     } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
-      writeVarInt(byteBuf, (int) id);
+      ProtocolUtil.writeVarInt(byteBuf, (int) id);
     } else {
       byteBuf.writeInt((int) id);
     }
@@ -52,7 +50,7 @@ public final class KeepAlivePacket implements FallbackPacket {
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_12_2)) {
       id = byteBuf.readLong();
     } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
-      id = readVarInt(byteBuf);
+      id = ProtocolUtil.readVarInt(byteBuf);
     } else {
       id = byteBuf.readInt();
     }

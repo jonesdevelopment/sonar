@@ -22,11 +22,9 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.util.List;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.varIntBytes;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintLengthEncoder.java
 @ChannelHandler.Sharable
@@ -37,12 +35,12 @@ public final class FallbackVarIntLengthEncoder extends MessageToMessageEncoder<B
   protected void encode(final @NotNull ChannelHandlerContext ctx,
                         final @NotNull ByteBuf byteBuf,
                         final @NotNull List<Object> out) throws Exception {
-    final int length = byteBuf.readableBytes();
-    final int varIntLength = varIntBytes(length);
+    final int readableBytes = byteBuf.readableBytes();
+    final int length = ProtocolUtil.varIntBytes(readableBytes);
 
-    final ByteBuf lenBuf = ctx.alloc().buffer(varIntLength);
+    final ByteBuf lenBuf = ctx.alloc().buffer(length);
 
-    writeVarInt(lenBuf, length);
+    ProtocolUtil.writeVarInt(lenBuf, readableBytes);
     out.add(lenBuf);
     out.add(byteBuf.retain());
   }

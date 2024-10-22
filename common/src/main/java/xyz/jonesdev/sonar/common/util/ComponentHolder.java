@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeBinaryTag;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeString;
-
 public final class ComponentHolder {
   private final String serializedComponent;
   private BinaryTag cachedBinaryTag;
@@ -145,9 +142,9 @@ public final class ComponentHolder {
       if (cachedBinaryTag == null) {
         cachedBinaryTag = serialize(new JsonParser().parse(serializedComponent));
       }
-      writeBinaryTag(byteBuf, protocolVersion, cachedBinaryTag);
+      ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, cachedBinaryTag);
     } else {
-      writeString(byteBuf, serializedComponent);
+      ProtocolUtil.writeString(byteBuf, serializedComponent);
     }
   }
 }

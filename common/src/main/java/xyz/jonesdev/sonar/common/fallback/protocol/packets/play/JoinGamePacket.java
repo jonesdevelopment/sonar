@@ -29,11 +29,9 @@ import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionType;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.util.Objects;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Data
 @NoArgsConstructor
@@ -65,110 +63,112 @@ public final class JoinGamePacket implements FallbackPacket {
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeInt(entityId);
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16_2)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16_2)) {
       byteBuf.writeBoolean(hardcore);
     }
 
-    if (protocolVersion.lessThan(MINECRAFT_1_20_2)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
       byteBuf.writeByte(gamemode);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16)) {
-      if (protocolVersion.lessThan(MINECRAFT_1_20_2)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16)) {
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
         byteBuf.writeByte(previousGamemode);
       }
 
-      writeStringArray(byteBuf, levelNames);
+      ProtocolUtil.writeStringArray(byteBuf, levelNames);
 
       final CompoundBinaryTag codec = getCodec(protocolVersion);
 
-      if (protocolVersion.lessThan(MINECRAFT_1_20_2)) {
-        writeBinaryTag(byteBuf, protocolVersion, codec);
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
+        ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, codec);
       }
 
-      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16_2) && protocolVersion.lessThan(MINECRAFT_1_19)) {
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16_2)
+        && protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_19)) {
         final ListBinaryTag dimensions = codec.getCompound("minecraft:dimension_type").getList("value");
         final BinaryTag elementTag = ((CompoundBinaryTag) dimensions.get(0)).get("element");
-        writeBinaryTag(byteBuf, protocolVersion, Objects.requireNonNull(elementTag));
-      } else if (protocolVersion.lessThan(MINECRAFT_1_20_2)) {
-        writeString(byteBuf, dimension.getKey());
+        ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, Objects.requireNonNull(elementTag));
+      } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
+        ProtocolUtil.writeString(byteBuf, dimension.getKey());
       }
-      if (protocolVersion.lessThan(MINECRAFT_1_20_2)) {
-        writeString(byteBuf, levelName);
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
+        ProtocolUtil.writeString(byteBuf, levelName);
       }
-    } else if (protocolVersion.greaterThan(MINECRAFT_1_9)) {
+    } else if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_9)) {
       byteBuf.writeInt(dimension.getLegacyId());
     } else {
       byteBuf.writeByte(dimension.getLegacyId());
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_15) && protocolVersion.lessThan(MINECRAFT_1_20_2)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_15)
+      && protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
       byteBuf.writeLong(partialHashedSeed);
     }
 
-    if (protocolVersion.lessThan(MINECRAFT_1_14)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_14)) {
       byteBuf.writeByte(difficulty);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16_2)) {
-      writeVarInt(byteBuf, maxPlayers);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16_2)) {
+      ProtocolUtil.writeVarInt(byteBuf, maxPlayers);
     } else {
       byteBuf.writeByte(maxPlayers);
     }
 
-    if (protocolVersion.lessThan(MINECRAFT_1_16)) {
-      writeString(byteBuf, levelType);
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_16)) {
+      ProtocolUtil.writeString(byteBuf, levelType);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_14)) {
-      writeVarInt(byteBuf, viewDistance);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_14)) {
+      ProtocolUtil.writeVarInt(byteBuf, viewDistance);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18)) {
-      writeVarInt(byteBuf, simulationDistance);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_18)) {
+      ProtocolUtil.writeVarInt(byteBuf, simulationDistance);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_8)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeBoolean(reducedDebugInfo);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_15)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_15)) {
       byteBuf.writeBoolean(showRespawnScreen);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20_2)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_2)) {
       byteBuf.writeBoolean(limitedCrafting);
 
-      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20_5)) {
-        writeVarInt(byteBuf, dimension.getId());
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
+        ProtocolUtil.writeVarInt(byteBuf, dimension.getId());
       } else {
-        writeString(byteBuf, dimension.getKey());
+        ProtocolUtil.writeString(byteBuf, dimension.getKey());
       }
 
-      writeString(byteBuf, levelName);
+      ProtocolUtil.writeString(byteBuf, levelName);
       byteBuf.writeLong(partialHashedSeed);
       byteBuf.writeByte(gamemode);
       byteBuf.writeByte(previousGamemode);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16)) {
       byteBuf.writeBoolean(debug);
       byteBuf.writeBoolean(flat);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
       byteBuf.writeBoolean(false); // last death location
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20)) {
-      writeVarInt(byteBuf, portalCooldown);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20)) {
+      ProtocolUtil.writeVarInt(byteBuf, portalCooldown);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2)) {
-      writeVarInt(byteBuf, seaLevel);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+      ProtocolUtil.writeVarInt(byteBuf, seaLevel);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20_5)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
       byteBuf.writeBoolean(secureProfile);
     }
   }
@@ -179,19 +179,19 @@ public final class JoinGamePacket implements FallbackPacket {
   }
 
   private static CompoundBinaryTag getCodec(final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21)) {
       return DimensionRegistry.CODEC_1_21;
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20)) {
       return DimensionRegistry.CODEC_1_20;
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_4)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_4)) {
       return DimensionRegistry.CODEC_1_19_4;
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19_1)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
       return DimensionRegistry.CODEC_1_19_1;
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
       return DimensionRegistry.CODEC_1_19;
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18_2)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_18_2)) {
       return DimensionRegistry.CODEC_1_18_2;
-    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16_2)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16_2)) {
       return DimensionRegistry.CODEC_1_16_2;
     }
     return DimensionRegistry.CODEC_1_16;

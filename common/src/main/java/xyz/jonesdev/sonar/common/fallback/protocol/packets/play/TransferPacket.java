@@ -25,9 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeString;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
@@ -39,8 +37,8 @@ public final class TransferPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    writeString(byteBuf, destinationHost);
-    writeVarInt(byteBuf, destinationPort);
+    ProtocolUtil.writeString(byteBuf, destinationHost);
+    ProtocolUtil.writeVarInt(byteBuf, destinationPort);
   }
 
   @Override

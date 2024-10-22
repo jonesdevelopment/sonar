@@ -25,10 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readString;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
@@ -53,28 +50,28 @@ public final class ClientInformationPacket implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    locale = readString(byteBuf, 16);
+    locale = ProtocolUtil.readString(byteBuf, 16);
     viewDistance = byteBuf.readByte();
-    chatVisibility = readVarInt(byteBuf);
+    chatVisibility = ProtocolUtil.readVarInt(byteBuf);
     chatColors = byteBuf.readBoolean();
 
-    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_7_6)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       difficulty = byteBuf.readByte();
     }
 
     skinParts = byteBuf.readUnsignedByte();
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
-      mainHand = readVarInt(byteBuf);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)) {
+      mainHand = ProtocolUtil.readVarInt(byteBuf);
 
-      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)) {
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17)) {
         chatFilteringEnabled = byteBuf.readBoolean();
 
-        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18)) {
+        if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_18)) {
           clientListingAllowed = byteBuf.readBoolean();
 
-          if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2)) {
-            particleStatus = readVarInt(byteBuf);
+          if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+            particleStatus = ProtocolUtil.readVarInt(byteBuf);
           }
         }
       }

@@ -24,8 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @Setter
@@ -37,7 +36,7 @@ public final class EntityAnimationPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
-    writeVarInt(byteBuf, entityId);
+    ProtocolUtil.writeVarInt(byteBuf, entityId);
     byteBuf.writeByte(type.ordinal());
   }
 

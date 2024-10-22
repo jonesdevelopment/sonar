@@ -24,8 +24,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @RequiredArgsConstructor
 public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPacket> {
@@ -46,7 +45,8 @@ public final class FallbackPacketEncoder extends MessageToByteEncoder<FallbackPa
     final Class<? extends FallbackPacket> originalPacket = packet instanceof FallbackPacketSnapshot
       ? ((FallbackPacketSnapshot) packet).getOriginalPacketClass() : packet.getClass();
     final int packetId = protocolRegistry.getPacketId(originalPacket);
-    writeVarInt(out, packetId);
+    System.out.println(packetId + " | " + originalPacket.getSimpleName() + " | " + packet);
+    ProtocolUtil.writeVarInt(out, packetId);
     packet.encode(out, protocolVersion);
   }
 }

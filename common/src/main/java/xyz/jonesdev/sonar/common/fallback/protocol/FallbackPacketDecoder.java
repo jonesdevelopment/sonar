@@ -25,11 +25,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.maxTotalPacketsSent;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 @RequiredArgsConstructor
 public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
@@ -59,11 +58,11 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
 
         // Don't allow the player to spam packets to overload netty
         if (++totalPacketsSent > maxTotalPacketsSent) {
-          throw DEBUG ? new DecoderException("Sent too many packets") : QuietDecoderException.INSTANCE;
+          throw ProtocolUtil.DEBUG ? new DecoderException("Sent too many packets") : QuietDecoderException.INSTANCE;
         }
 
         // Read the packet ID and then create the packet from it
-        final int packetId = readVarInt(byteBuf);
+        final int packetId = ProtocolUtil.readVarInt(byteBuf);
         final FallbackPacket packet = registry.createPacket(packetId);
 
         // Skip the packet if it's not registered within Sonar's packet registry
@@ -78,12 +77,13 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
           // Try to decode the packet for the given protocol version
           packet.decode(byteBuf, protocolVersion);
         } catch (Throwable throwable) {
-          throw DEBUG ? new DecoderException(throwable) : QuietDecoderException.INSTANCE;
+          throw ProtocolUtil.DEBUG ? new DecoderException(throwable) : QuietDecoderException.INSTANCE;
         }
 
         // Check if the packet still has bytes left after we decoded it
         if (byteBuf.isReadable()) {
-          throw DEBUG ? new DecoderException("Could not read packet to end") : QuietDecoderException.INSTANCE;
+          throw ProtocolUtil.DEBUG ? new DecoderException("Could not read packet to end ("
+            + byteBuf.readableBytes() + " bytes left)"): QuietDecoderException.INSTANCE;
         }
 
         // Let our verification handler process the packet
@@ -104,11 +104,13 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     final int packetSize = byteBuf.readableBytes();
     final int expectedMaxLen = packet.expectedMaxLength(byteBuf, protocolVersion);
     if (expectedMaxLen != -1 && packetSize > expectedMaxLen) {
-      throw DEBUG ? new DecoderException("Packet too large: " + packetSize) : QuietDecoderException.INSTANCE;
+      throw ProtocolUtil.DEBUG ? new DecoderException("Packet too large: " + packetSize + " max: " + expectedMaxLen)
+        : QuietDecoderException.INSTANCE;
     }
     final int expectedMinLen = packet.expectedMinLength(byteBuf, protocolVersion);
     if (expectedMinLen != -1 && packetSize < expectedMinLen) {
-      throw DEBUG ? new DecoderException("Packet too small: " + packetSize) : QuietDecoderException.INSTANCE;
+      throw ProtocolUtil.DEBUG ? new DecoderException("Packet too small: " + packetSize + " min: " + expectedMinLen)
+        : QuietDecoderException.INSTANCE;
     }
   }
 }

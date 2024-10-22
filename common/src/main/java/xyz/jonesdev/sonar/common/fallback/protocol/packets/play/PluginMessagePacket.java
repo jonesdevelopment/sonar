@@ -23,10 +23,8 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readExtendedForgeShort;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readString;
 
 @Getter
 @ToString
@@ -43,7 +41,7 @@ public final class PluginMessagePacket implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    channel = readString(byteBuf, 48);
+    channel = ProtocolUtil.readString(byteBuf, 48);
 
     final int length;
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
@@ -52,7 +50,7 @@ public final class PluginMessagePacket implements FallbackPacket {
         throw QuietDecoderException.INSTANCE;
       }
     } else {
-      length = readExtendedForgeShort(byteBuf);
+      length = ProtocolUtil.readExtendedForgeShort(byteBuf);
       if (length > FORGE_MAX_ARRAY_LENGTH) {
         throw QuietDecoderException.INSTANCE;
       }

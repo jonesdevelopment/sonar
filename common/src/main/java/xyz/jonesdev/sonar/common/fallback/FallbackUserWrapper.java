@@ -37,6 +37,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.DisconnectPacket;
 import xyz.jonesdev.sonar.common.fallback.verification.FallbackPreJoinHandler;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.net.InetAddress;
 
@@ -44,7 +45,6 @@ import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.loginSuccess;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.closeWith;
 
 @Getter
 @ToString(of = {"protocolVersion", "inetAddress", "geyser"})
@@ -136,6 +136,6 @@ public final class FallbackUserWrapper implements FallbackUser {
   public void disconnect(final @NotNull Component reason) {
     final FallbackPacketEncoder encoder = channel.pipeline().get(FallbackPacketEncoder.class);
     final boolean duringLogin = encoder != null && encoder.getPacketRegistry() == LOGIN;
-    closeWith(channel, protocolVersion, DisconnectPacket.create(reason, duringLogin));
+    ProtocolUtil.closeWith(channel, protocolVersion, DisconnectPacket.create(reason, duringLogin));
   }
 }

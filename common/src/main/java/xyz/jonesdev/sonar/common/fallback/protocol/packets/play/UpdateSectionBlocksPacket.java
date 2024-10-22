@@ -26,10 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarLong;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @NoArgsConstructor
@@ -41,28 +38,28 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.lessThan(MINECRAFT_1_16_2)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_16_2)) {
       byteBuf.writeInt(sectionX);
       byteBuf.writeInt(sectionZ);
 
-      if (protocolVersion.lessThan(MINECRAFT_1_8)) {
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
         byteBuf.writeShort(blockUpdates.length);
         byteBuf.writeInt(4 * blockUpdates.length);
       } else {
-        writeVarInt(byteBuf, blockUpdates.length);
+        ProtocolUtil.writeVarInt(byteBuf, blockUpdates.length);
       }
 
       for (final BlockUpdate block : blockUpdates) {
         byteBuf.writeShort(block.getLegacyBlockState());
         final int blockId = block.getBlockType().getId().apply(protocolVersion);
-        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_13)) {
-          writeVarInt(byteBuf, blockId);
+        if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_13)) {
+          ProtocolUtil.writeVarInt(byteBuf, blockId);
         } else {
           final int shiftedBlockId = blockId << 4;
-          if (protocolVersion.lessThan(MINECRAFT_1_8)) {
+          if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
             byteBuf.writeShort(shiftedBlockId);
           } else {
-            writeVarInt(byteBuf, shiftedBlockId);
+            ProtocolUtil.writeVarInt(byteBuf, shiftedBlockId);
           }
         }
       }
@@ -74,17 +71,17 @@ public final class UpdateSectionBlocksPacket implements FallbackPacket {
       byteBuf.writeLong(((sectionX & 0x3FFFFFL) << 42) | (sectionY & 0xFFFFF) | ((sectionZ & 0x3FFFFFL) << 20));
 
       // 1.20+ don't have light update suppression
-      if (protocolVersion.lessThan(MINECRAFT_1_20)) {
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20)) {
         byteBuf.writeBoolean(true); // suppress light updates
       }
 
-      writeVarInt(byteBuf, blockUpdates.length);
+      ProtocolUtil.writeVarInt(byteBuf, blockUpdates.length);
 
       for (final BlockUpdate block : blockUpdates) {
         // https://wiki.vg/Protocol#Update_Section_Blocks
         final int shiftedBlockId = block.getBlockType().getId().apply(protocolVersion) << 12;
         final long positionIdValue = shiftedBlockId | block.getBlockState();
-        writeVarLong(byteBuf, positionIdValue);
+        ProtocolUtil.writeVarLong(byteBuf, positionIdValue);
       }
     }
   }

@@ -27,11 +27,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.UUID;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 
 @Getter
 @ToString
@@ -48,7 +47,7 @@ public final class LoginStartPacket implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    username = readString(byteBuf, 16);
+    username = ProtocolUtil.readString(byteBuf, 16);
 
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
       if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_19_3)) {
@@ -56,22 +55,22 @@ public final class LoginStartPacket implements FallbackPacket {
           final long expiry = byteBuf.readLong();
           final long now = System.currentTimeMillis();
           if (expiry < now) {
-            throw DEBUG ? new DecoderException("Signature is expired: " + expiry) : QuietDecoderException.INSTANCE;
+            throw ProtocolUtil.DEBUG ? new DecoderException("Bad expiry: " + expiry) : QuietDecoderException.INSTANCE;
           }
-          final byte[] key = readByteArray(byteBuf);
+          final byte[] key = ProtocolUtil.readByteArray(byteBuf);
           if (key.length == 0) {
-            throw DEBUG ? new DecoderException("Empty key") : QuietDecoderException.INSTANCE;
+            throw ProtocolUtil.DEBUG ? new DecoderException("Empty key") : QuietDecoderException.INSTANCE;
           }
-          final byte[] signature = readByteArray(byteBuf, 4096);
+          final byte[] signature = ProtocolUtil.readByteArray(byteBuf, 4096);
           if (signature.length == 0) {
-            throw DEBUG ? new DecoderException("Empty signature") : QuietDecoderException.INSTANCE;
+            throw ProtocolUtil.DEBUG ? new DecoderException("Empty signature") : QuietDecoderException.INSTANCE;
           }
         }
       }
 
       if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
         if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_2) || byteBuf.readBoolean()) {
-          uuid = readUUID(byteBuf);
+          uuid = ProtocolUtil.readUUID(byteBuf);
         }
       }
     }

@@ -22,9 +22,7 @@ import lombok.Getter;
 import lombok.ToString;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readString;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString(of = {"protocolVersionId", "hostname", "port"})
@@ -49,9 +47,9 @@ public final class HandshakePacket implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
-    protocolVersionId = readVarInt(byteBuf);
-    hostname = readString(byteBuf, MAXIMUM_HOSTNAME_LENGTH);
+    protocolVersionId = ProtocolUtil.readVarInt(byteBuf);
+    hostname = ProtocolUtil.readString(byteBuf, MAXIMUM_HOSTNAME_LENGTH);
     port = byteBuf.readUnsignedShort();
-    intent = readVarInt(byteBuf);
+    intent = ProtocolUtil.readVarInt(byteBuf);
   }
 }

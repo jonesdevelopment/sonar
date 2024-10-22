@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginStartPacket;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.net.InetSocketAddress;
@@ -35,8 +36,6 @@ import java.util.Objects;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INBOUND_HANDLER;
 import static xyz.jonesdev.sonar.common.fallback.protocol.packets.handshake.HandshakePacket.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 
 final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
   private static final ProtocolVersion DEFAULT_PROTOCOL_VERSION = ProtocolVersion.MINECRAFT_1_7_2;
@@ -79,7 +78,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         return;
       }
 
-      final int packetId = readVarInt(byteBuf);
+      final int packetId = ProtocolUtil.readVarInt(byteBuf);
       final FallbackPacket packet = registry.createPacket(packetId);
 
       // Skip the packet if it's not registered within Sonar's packet registry
@@ -93,13 +92,14 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
         packet.decode(byteBuf, protocolVersion == null ? DEFAULT_PROTOCOL_VERSION : protocolVersion);
       } catch (Throwable throwable) {
         byteBuf.release();
-        throw DEBUG ? new DecoderException(throwable) : QuietDecoderException.INSTANCE;
+        throw ProtocolUtil.DEBUG ? new DecoderException(throwable) : QuietDecoderException.INSTANCE;
       }
 
       // Check if the packet still has bytes left after we decoded it
       if (byteBuf.isReadable()) {
         byteBuf.release();
-        throw DEBUG ? new DecoderException("Could not read packet to end") : QuietDecoderException.INSTANCE;
+        throw ProtocolUtil.DEBUG ? new DecoderException("Could not read packet to end ("
+          + byteBuf.readableBytes() + " bytes left)") : QuietDecoderException.INSTANCE;
       }
 
       /*
@@ -122,7 +122,8 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
             updateRegistry(FallbackPacketRegistry.LOGIN, Objects.requireNonNull(protocolVersion));
             break;
           default:
-            throw DEBUG ? new DecoderException("Bad intent " + handshake.getIntent()) : QuietDecoderException.INSTANCE;
+            throw ProtocolUtil.DEBUG ? new DecoderException("Bad handshake intent " + handshake.getIntent())
+              : QuietDecoderException.INSTANCE;
         }
       } else if (packet instanceof LoginStartPacket) {
         final LoginStartPacket loginStart = (LoginStartPacket) packet;

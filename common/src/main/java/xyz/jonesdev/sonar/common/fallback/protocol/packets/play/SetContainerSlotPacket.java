@@ -27,10 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeBinaryTag;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
@@ -43,56 +40,56 @@ public final class SetContainerSlotPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2)) {
-      writeVarInt(byteBuf, windowId);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+      ProtocolUtil.writeVarInt(byteBuf, windowId);
     } else {
       byteBuf.writeByte(windowId);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17_1)) {
-      writeVarInt(byteBuf, 0);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17_1)) {
+      ProtocolUtil.writeVarInt(byteBuf, 0);
     }
 
     byteBuf.writeShort(slot);
 
-    if (protocolVersion.inBetween(MINECRAFT_1_13_2, MINECRAFT_1_20_3)) {
+    if (protocolVersion.inBetween(ProtocolVersion.MINECRAFT_1_13_2, ProtocolVersion.MINECRAFT_1_20_3)) {
       byteBuf.writeBoolean(true);
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20_5)) {
-      writeVarInt(byteBuf, count);
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
+      ProtocolUtil.writeVarInt(byteBuf, count);
     }
 
-    if (protocolVersion.lessThan(MINECRAFT_1_13_2)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_13_2)) {
       byteBuf.writeShort(itemType.getId(protocolVersion));
     } else {
-      writeVarInt(byteBuf, itemType.getId(protocolVersion));
+      ProtocolUtil.writeVarInt(byteBuf, itemType.getId(protocolVersion));
     }
 
-    if (protocolVersion.lessThan(MINECRAFT_1_20_5)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {
       byteBuf.writeByte(count);
     }
 
-    if (protocolVersion.lessThan(MINECRAFT_1_13)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_13)) {
       byteBuf.writeShort(0); // data
     }
 
-    if (protocolVersion.lessThan(MINECRAFT_1_17)) {
-      if (protocolVersion.lessThan(MINECRAFT_1_8)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_17)) {
+      if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
         byteBuf.writeShort(-1);
       } else {
         byteBuf.writeByte(0);
       }
-    } else if (protocolVersion.lessThan(MINECRAFT_1_20_5)) {
-      writeBinaryTag(byteBuf, protocolVersion, compoundBinaryTag);
+    } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {
+      ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, compoundBinaryTag);
     } else { // 1.20.5+
       // TODO: find a way to improve this
       // component
-      writeVarInt(byteBuf, 1); // component count to add
-      writeVarInt(byteBuf, 0); // component count to remove
+      ProtocolUtil.writeVarInt(byteBuf, 1); // component count to add
+      ProtocolUtil.writeVarInt(byteBuf, 0); // component count to remove
       // single VarInt component
-      writeVarInt(byteBuf, protocolVersion.lessThan(MINECRAFT_1_21_2) ? 26 : 36); // map component
-      writeVarInt(byteBuf, 0); // map id
+      ProtocolUtil.writeVarInt(byteBuf, protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_21_2) ? 26 : 36); // type
+      ProtocolUtil.writeVarInt(byteBuf, 0); // data
     }
   }
 

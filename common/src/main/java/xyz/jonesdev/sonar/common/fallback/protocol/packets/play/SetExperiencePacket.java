@@ -25,8 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
@@ -40,13 +39,15 @@ public final class SetExperiencePacket implements FallbackPacket {
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeFloat(experienceBar);
+
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeShort(level);
       byteBuf.writeShort(totalExperience);
-    } else {
-      writeVarInt(byteBuf, level);
-      writeVarInt(byteBuf, totalExperience);
+      return;
     }
+
+    ProtocolUtil.writeVarInt(byteBuf, level);
+    ProtocolUtil.writeVarInt(byteBuf, totalExperience);
   }
 
   @Override

@@ -25,8 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
@@ -40,7 +39,7 @@ public final class TeleportEntityPacket implements FallbackPacket {
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
-      writeVarInt(byteBuf, entityId);
+      ProtocolUtil.writeVarInt(byteBuf, entityId);
     } else {
       byteBuf.writeInt(entityId);
     }

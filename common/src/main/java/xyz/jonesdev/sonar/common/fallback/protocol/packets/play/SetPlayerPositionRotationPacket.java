@@ -25,9 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
@@ -42,13 +40,13 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    boolean v1_21_2 = protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2);
+    final boolean v1_21_2 = protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2);
     if (v1_21_2) {
-      writeVarInt(byteBuf, teleportId);
+      ProtocolUtil.writeVarInt(byteBuf, teleportId);
     }
     byteBuf.writeDouble(x);
     // Account for the minimum Y bounding box issue on 1.7.2-1.7.10
-    byteBuf.writeDouble(protocolVersion.greaterThanOrEquals(MINECRAFT_1_8) ? y : y + 1.62f);
+    byteBuf.writeDouble(protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8) ? y : y + 1.62f);
     byteBuf.writeDouble(z);
     if (v1_21_2) {
       // Delta movement?
@@ -64,13 +62,13 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
       byteBuf.writeByte(relativeMask);
     }
 
-    if (protocolVersion.greaterThan(MINECRAFT_1_8)) {
+    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_8)) {
       if (!v1_21_2) {
-        writeVarInt(byteBuf, teleportId);
+        ProtocolUtil.writeVarInt(byteBuf, teleportId);
       }
 
-      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)
-        && protocolVersion.lessThanOrEquals(MINECRAFT_1_19_3)) {
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17)
+        && protocolVersion.lessThanOrEquals(ProtocolVersion.MINECRAFT_1_19_3)) {
         byteBuf.writeBoolean(dismountVehicle);
       }
     }
@@ -80,7 +78,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
-    if (protocolVersion.lessThan(MINECRAFT_1_8)) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       // 1.7.2-1.7.10 send the minimum bounding box Y coordinate
       byteBuf.readDouble();
     }
@@ -98,7 +96,7 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    return protocolVersion.lessThan(MINECRAFT_1_8) ? 41 : 33;
+    return protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8) ? 41 : 33;
   }
 
   @Override

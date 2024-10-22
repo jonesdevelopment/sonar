@@ -25,8 +25,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
-
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
@@ -39,13 +38,13 @@ public final class RemoveEntitiesPacket implements FallbackPacket {
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     // No idea why Mojang decided that this is a good idea, but whatever
     if (!protocolVersion.equals(ProtocolVersion.MINECRAFT_1_17)) {
-      writeVarInt(byteBuf, 1); // size
+      ProtocolUtil.writeVarInt(byteBuf, 1); // size
     }
 
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeInt(entityId);
     } else {
-      writeVarInt(byteBuf, entityId);
+      ProtocolUtil.writeVarInt(byteBuf, entityId);
     }
   }
 

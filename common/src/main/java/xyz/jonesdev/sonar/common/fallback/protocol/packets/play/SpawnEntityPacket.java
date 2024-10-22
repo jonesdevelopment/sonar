@@ -26,12 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.entity.EntityType;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.util.UUID;
-
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeUUID;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @ToString
@@ -46,19 +43,19 @@ public final class SpawnEntityPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    writeVarInt(byteBuf, entityId);
+    ProtocolUtil.writeVarInt(byteBuf, entityId);
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
-      writeUUID(byteBuf, UUID.randomUUID());
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)) {
+      ProtocolUtil.writeUUID(byteBuf, UUID.randomUUID());
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_14)) {
-      writeVarInt(byteBuf, entityType.getId(protocolVersion));
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_14)) {
+      ProtocolUtil.writeVarInt(byteBuf, entityType.getId(protocolVersion));
     } else {
       byteBuf.writeByte(entityType.getId(protocolVersion));
     }
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)) {
       byteBuf.writeDouble(x);
       byteBuf.writeDouble(y);
       byteBuf.writeDouble(z);
@@ -71,14 +68,14 @@ public final class SpawnEntityPacket implements FallbackPacket {
     byteBuf.writeByte(0); // pitch or yaw
     byteBuf.writeByte(0); // yaw or pitch
 
-    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_19)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
       byteBuf.writeByte(0); // head yaw
-      writeVarInt(byteBuf, data); // data
+      ProtocolUtil.writeVarInt(byteBuf, data); // data
     } else {
       byteBuf.writeInt(data); // data
     }
 
-    if (data > 0 || protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
+    if (data > 0 || protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)) {
       byteBuf.writeShort((int) (velocityX * 8000D));
       byteBuf.writeShort((int) (velocityY * 8000D));
       byteBuf.writeShort((int) (velocityZ * 8000D));
