@@ -26,15 +26,13 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SetPlayerPositionPacket implements FallbackPacket {
   private double x, y, z;
-  private boolean onGround;
+  private boolean onGround, horizontalCollision;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -45,17 +43,23 @@ public final class SetPlayerPositionPacket implements FallbackPacket {
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       // 1.7.2-1.7.10 send the minimum bounding box Y coordinate
       byteBuf.readDouble();
     }
     z = byteBuf.readDouble();
-    onGround = byteBuf.readBoolean();
+    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2)) {
+      short flag = byteBuf.readUnsignedByte();
+      onGround = (flag & 1) != 0;
+      horizontalCollision = (flag & 2) != 0;
+    } else {
+      onGround = byteBuf.readBoolean();
+    }
   }
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    return protocolVersion.compareTo(MINECRAFT_1_8) < 0 ? 33 : 25;
+    return protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8) ? 33 : 25;
   }
 
   @Override

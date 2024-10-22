@@ -44,6 +44,7 @@ public final class ClientInformationPacket implements FallbackPacket {
   private int mainHand;
   private boolean chatFilteringEnabled; // Added in 1.17
   private boolean clientListingAllowed; // Added in 1.18, overwrites server-list "anonymous" mode
+  private int particleStatus;
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
@@ -57,20 +58,24 @@ public final class ClientInformationPacket implements FallbackPacket {
     chatVisibility = readVarInt(byteBuf);
     chatColors = byteBuf.readBoolean();
 
-    if (protocolVersion.compareTo(MINECRAFT_1_7_6) <= 0) {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_7_6)) {
       difficulty = byteBuf.readByte();
     }
 
     skinParts = byteBuf.readUnsignedByte();
 
-    if (protocolVersion.compareTo(MINECRAFT_1_9) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9)) {
       mainHand = readVarInt(byteBuf);
 
-      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
+      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)) {
         chatFilteringEnabled = byteBuf.readBoolean();
 
-        if (protocolVersion.compareTo(MINECRAFT_1_18) >= 0) {
+        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18)) {
           clientListingAllowed = byteBuf.readBoolean();
+
+          if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2)) {
+            particleStatus = readVarInt(byteBuf);
+          }
         }
       }
     }

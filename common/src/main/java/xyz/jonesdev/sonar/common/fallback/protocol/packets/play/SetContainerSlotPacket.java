@@ -29,7 +29,8 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.captcha.ItemType;
 
 import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeBinaryTag;
+import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
 @Getter
 @ToString
@@ -42,9 +43,13 @@ public final class SetContainerSlotPacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    byteBuf.writeByte(windowId);
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2)) {
+      writeVarInt(byteBuf, windowId);
+    } else {
+      byteBuf.writeByte(windowId);
+    }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17_1) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17_1)) {
       writeVarInt(byteBuf, 0);
     }
 
@@ -54,44 +59,40 @@ public final class SetContainerSlotPacket implements FallbackPacket {
       byteBuf.writeBoolean(true);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_20_5) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20_5)) {
       writeVarInt(byteBuf, count);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_13_2) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_13_2)) {
       byteBuf.writeShort(itemType.getId(protocolVersion));
     } else {
       writeVarInt(byteBuf, itemType.getId(protocolVersion));
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_20_5)) {
       byteBuf.writeByte(count);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_13)) {
       byteBuf.writeShort(0); // data
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_17)) {
+      if (protocolVersion.lessThan(MINECRAFT_1_8)) {
         byteBuf.writeShort(-1);
       } else {
         byteBuf.writeByte(0);
       }
-    } else {
-      if (protocolVersion.compareTo(MINECRAFT_1_20_2) < 0) {
-        writeCompoundTag(byteBuf, compoundBinaryTag);
-      } else if (protocolVersion.compareTo(MINECRAFT_1_20_5) < 0) {
-        writeNamelessCompoundTag(byteBuf, compoundBinaryTag);
-      } else { // 1.20.5+
-        // TODO: find a way to improve this
-        // component
-        writeVarInt(byteBuf, 1); // component count to add
-        writeVarInt(byteBuf, 0); // component count to remove
-        // single VarInt component
-        writeVarInt(byteBuf, 26); // map component
-        writeVarInt(byteBuf, 0); // map id
-      }
+    } else if (protocolVersion.lessThan(MINECRAFT_1_20_5)) {
+      writeBinaryTag(byteBuf, protocolVersion, compoundBinaryTag);
+    } else { // 1.20.5+
+      // TODO: find a way to improve this
+      // component
+      writeVarInt(byteBuf, 1); // component count to add
+      writeVarInt(byteBuf, 0); // component count to remove
+      // single VarInt component
+      writeVarInt(byteBuf, protocolVersion.lessThan(MINECRAFT_1_21_2) ? 26 : 36); // map component
+      writeVarInt(byteBuf, 0); // map id
     }
   }
 

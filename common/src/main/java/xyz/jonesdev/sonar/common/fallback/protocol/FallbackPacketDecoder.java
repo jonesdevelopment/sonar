@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.Direction.SERVERBOUND;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.maxTotalPacketsSent;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.DEBUG;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
@@ -41,7 +40,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   private int totalPacketsSent;
 
   public void updateRegistry(final @NotNull FallbackPacketRegistry registry) {
-    this.registry = registry.getProtocolRegistry(SERVERBOUND, protocolVersion);
+    this.registry = registry.getProtocolRegistry(FallbackPacketRegistry.Direction.SERVERBOUND, protocolVersion);
   }
 
   @Override

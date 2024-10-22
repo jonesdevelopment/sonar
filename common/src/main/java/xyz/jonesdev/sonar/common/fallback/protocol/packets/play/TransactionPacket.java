@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_17;
-
 @Getter
 @ToString
 @NoArgsConstructor
@@ -38,7 +36,7 @@ public final class TransactionPacket implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_17)) {
       windowId = byteBuf.readByte();
       transactionId = byteBuf.readShort();
       accepted = byteBuf.readBoolean();
@@ -52,7 +50,7 @@ public final class TransactionPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(MINECRAFT_1_17) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_17)) {
       byteBuf.writeByte(windowId);
       byteBuf.writeShort((short) transactionId);
       byteBuf.writeBoolean(accepted);

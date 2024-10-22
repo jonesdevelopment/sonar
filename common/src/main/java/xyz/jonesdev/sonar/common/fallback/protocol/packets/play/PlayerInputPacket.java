@@ -26,33 +26,38 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
-
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class PlayerInputPacket implements FallbackPacket {
   private float sideways, forward;
-  private boolean jump, unmount;
+  private boolean jump, sneak;
 
   @Override
-  public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
+  public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+      final byte mask = byteBuf.readByte();
+      jump = (mask & 16) != 0;
+      sneak = (mask & 32) != 0;
+      return;
+    }
+
     sideways = byteBuf.readFloat();
     forward = byteBuf.readFloat();
 
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       jump = byteBuf.readBoolean();
-      unmount = byteBuf.readBoolean();
+      sneak = byteBuf.readBoolean();
     } else {
       final byte flags = byteBuf.readByte();
       jump = (flags & 0x01) != 0;
-      unmount = (flags & 0x02) != 0;
+      sneak = (flags & 0x02) != 0;
     }
   }
 }

@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.fallback.verification;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
+import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
@@ -34,10 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.*;
 import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL;
-import static xyz.jonesdev.sonar.common.util.ProtocolUtil.BRAND_CHANNEL_LEGACY;
 
 public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
@@ -45,57 +43,24 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     super(user);
 
     // Start initializing the actual join process for pre-1.20.2 clients
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
+    if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
       // This trick helps in reducing unnecessary outgoing server traffic
       // by avoiding sending other packets to clients that are potentially bots.
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) < 0) {
+      if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_8)) {
         user.channel().eventLoop().schedule(this::markSuccess, 100L, TimeUnit.MILLISECONDS);
       } else {
-        sendKeepAlive();
+        /*
+         * The purpose of this KeepAlive packet is to confirm that the connection
+         * is active and legitimate, thereby preventing bot connections that
+         * could flood the server with login attempts and other unwanted traffic.
+         */
+        user.write(PRE_JOIN_KEEP_ALIVE);
       }
     }
   }
 
   private boolean receivedClientInfo, receivedClientBrand, acknowledgedLogin;
-  private int expectedKeepAliveId;
-
-  /**
-   * The purpose of these KeepAlive packets is to confirm that the connection
-   * is active and legitimate, thereby preventing bot connections that
-   * could flood the server with login attempts and other unwanted traffic.
-   */
-  private void sendKeepAlive() {
-    // Send a KeepAlive packet with a random ID
-    expectedKeepAliveId = RANDOM.nextInt();
-    user.write(new KeepAlivePacket(expectedKeepAliveId));
-  }
-
-  private void markAcknowledged() {
-    acknowledgedLogin = true;
-    // Update state, so we're able to send/receive configuration packets
-    updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
-    synchronizeClientRegistry();
-    // Write the FinishConfiguration packet to the buffer
-    user.delayedWrite(FINISH_CONFIGURATION);
-    // Send all packets in one flush
-    user.channel().flush();
-  }
-
-  private void markSuccess() {
-    if (user.channel().isActive()) {
-      // Pass the player to the next verification handler
-      final var decoder = user.channel().pipeline().get(FallbackPacketDecoder.class);
-      decoder.setListener(new FallbackGravityHandler(user, this));
-    }
-  }
-
-  void validateClientInformation() {
-    checkState(receivedClientInfo, "didn't send client settings");
-    // Don't check Geyser players for plugin messages as they don't have them
-    if (!user.isGeyser()) {
-      checkState(receivedClientBrand, "didn't send plugin message");
-    }
-  }
+  private int expectedKeepAliveId = PRE_JOIN_KEEP_ALIVE_ID;
 
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
@@ -108,22 +73,31 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       checkState(keepAliveId == expectedKeepAliveId,
         "expected K ID " + expectedKeepAliveId + " but got " + keepAliveId);
 
+      // Immediately verify the player if they do not need any configuration (pre-1.20.2)
+      if (expectedKeepAliveId != 0) {
+        if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
+          markSuccess();
+        } else {
+          markAcknowledged();
+        }
+      }
+
       // 1.8 clients send KeepAlive packets with the ID 0 every second
       // while the player is in the "Downloading terrain" screen.
       expectedKeepAliveId = 0;
-
-      // Immediately verify the player if they do not need any configuration (pre-1.20.2)
-      if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_2) < 0) {
-        markSuccess();
-      }
     } else if (packet instanceof LoginAcknowledgedPacket) {
       // Prevent users from sending multiple LoginAcknowledged packets
       checkState(!acknowledgedLogin, "sent duplicate login ack");
-      markAcknowledged();
+      // Update state, so we're able to send/receive packets during the CONFIG state
+      updateEncoderDecoderState(FallbackPacketRegistry.CONFIG);
+      // Perform the KeepAlive check now (config, not pre-config)
+      user.write(PRE_JOIN_KEEP_ALIVE);
     } else if (packet instanceof FinishConfigurationPacket) {
       // Update the encoder and decoder state because we're currently in the CONFIG state
       updateEncoderDecoderState(FallbackPacketRegistry.GAME);
-      validateClientInformation();
+      if (!user.isGeyser()) {
+        validateClientInformation();
+      }
       markSuccess();
     } else if (packet instanceof ClientInformationPacket) {
       final ClientInformationPacket clientInformation = (ClientInformationPacket) packet;
@@ -143,8 +117,8 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     } else if (packet instanceof PluginMessagePacket) {
       final PluginMessagePacket pluginMessage = (PluginMessagePacket) packet;
 
-      final boolean usingModernChannel = pluginMessage.getChannel().equals(BRAND_CHANNEL);
-      final boolean usingLegacyChannel = pluginMessage.getChannel().equals(BRAND_CHANNEL_LEGACY);
+      final boolean usingModernChannel = pluginMessage.getChannel().equals("minecraft:brand");
+      final boolean usingLegacyChannel = pluginMessage.getChannel().equals("MC|Brand");
 
       // Skip this payload if it does not contain client brand information
       if (!usingModernChannel && !usingLegacyChannel) {
@@ -156,7 +130,8 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       // Check if the channel is correct - 1.13 uses the new namespace
       // system ('minecraft:' + channel) and anything below 1.13 uses
       // the legacy namespace system ('MC|' + channel).
-      checkState(usingLegacyChannel || user.getProtocolVersion().compareTo(MINECRAFT_1_13) >= 0,
+      checkState(usingLegacyChannel
+          || user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_13),
         "illegal PluginMessage channel: " + pluginMessage.getChannel());
 
       // Validate the client branding using a regex to filter unwanted characters.
@@ -168,24 +143,35 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     }
   }
 
+  private void markAcknowledged() {
+    acknowledgedLogin = true;
+    // Write the new RegistrySync packets to the buffer
+    for (final FallbackPacket packet : getRegistryPackets(user.getProtocolVersion())) {
+      user.delayedWrite(packet);
+    }
+    // Write the FinishConfiguration packet to the buffer
+    user.delayedWrite(FINISH_CONFIGURATION);
+    // Send all packets in one flush
+    user.channel().flush();
+  }
+
+  private void markSuccess() {
+    if (user.channel().isActive()) {
+      // Pass the player to the next verification handler
+      final FallbackGravityHandler gravityHandler = new FallbackGravityHandler(user, this);
+      user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(gravityHandler);
+    }
+  }
+
+  void validateClientInformation() {
+    checkState(receivedClientInfo, "didn't send client settings");
+    checkState(receivedClientBrand, "didn't send plugin message");
+  }
+
   private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
     // Update the packet registry state in the encoder and decoder pipelines
     user.channel().pipeline().get(FallbackPacketDecoder.class).updateRegistry(registry);
     user.channel().pipeline().get(FallbackPacketEncoder.class).updateRegistry(registry);
-  }
-
-  private void synchronizeClientRegistry() {
-    // 1.20.5+ adds new "game bundle features" which overcomplicate all of this...
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_20_5) >= 0) {
-      // Write the new RegistrySync packets to the buffer
-      for (final FallbackPacket syncPacket : user.getProtocolVersion().compareTo(MINECRAFT_1_21) < 0
-        ? REGISTRY_SYNC_1_20_5 : REGISTRY_SYNC_1_21) {
-        user.delayedWrite(syncPacket);
-      }
-    } else {
-      // Write the old RegistrySync packet to the buffer
-      user.delayedWrite(REGISTRY_SYNC_LEGACY);
-    }
   }
 
   private void validateClientBrand(final byte @NotNull [] data) {
@@ -197,7 +183,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     // https://discord.com/channels/923308209769426994/1116066363887321199/1256929441053933608
     String brand = new String(data, StandardCharsets.UTF_8);
     // Remove the invalid character at the beginning of the client brand
-    if (user.getProtocolVersion().compareTo(MINECRAFT_1_8) >= 0) {
+    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       brand = brand.substring(1);
     }
     // Check for illegal client brands

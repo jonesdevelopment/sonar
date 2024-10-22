@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_12_2;
-import static xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion.MINECRAFT_1_8;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.readVarInt;
 import static xyz.jonesdev.sonar.common.util.ProtocolUtil.writeVarInt;
 
@@ -40,9 +38,9 @@ public final class KeepAlivePacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_12_2)) {
       byteBuf.writeLong(id);
-    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       writeVarInt(byteBuf, (int) id);
     } else {
       byteBuf.writeInt((int) id);
@@ -51,9 +49,9 @@ public final class KeepAlivePacket implements FallbackPacket {
 
   @Override
   public void decode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    if (protocolVersion.compareTo(MINECRAFT_1_12_2) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_12_2)) {
       id = byteBuf.readLong();
-    } else if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       id = readVarInt(byteBuf);
     } else {
       id = byteBuf.readInt();

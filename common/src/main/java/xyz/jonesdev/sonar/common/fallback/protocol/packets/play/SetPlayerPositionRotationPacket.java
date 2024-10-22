@@ -37,24 +37,41 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   private double x, y, z;
   private float yaw, pitch;
   private int teleportId, relativeMask;
-  private boolean onGround;
+  private boolean onGround, horizontalCollision;
+  private boolean dismountVehicle;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    boolean v1_21_2 = protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2);
+    if (v1_21_2) {
+      writeVarInt(byteBuf, teleportId);
+    }
     byteBuf.writeDouble(x);
     // Account for the minimum Y bounding box issue on 1.7.2-1.7.10
-    byteBuf.writeDouble(protocolVersion.compareTo(MINECRAFT_1_8) >= 0 ? y : y + 1.62f);
+    byteBuf.writeDouble(protocolVersion.greaterThanOrEquals(MINECRAFT_1_8) ? y : y + 1.62f);
     byteBuf.writeDouble(z);
-    byteBuf.writeFloat(yaw);
-    byteBuf.writeFloat(pitch);
-    byteBuf.writeByte(relativeMask);
+    if (v1_21_2) {
+      // Delta movement?
+      byteBuf.writeDouble(0);
+      byteBuf.writeDouble(0);
+      byteBuf.writeDouble(0);
+      byteBuf.writeFloat(yaw);
+      byteBuf.writeFloat(pitch);
+      byteBuf.writeInt(relativeMask);
+    } else {
+      byteBuf.writeFloat(yaw);
+      byteBuf.writeFloat(pitch);
+      byteBuf.writeByte(relativeMask);
+    }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
-      writeVarInt(byteBuf, teleportId);
+    if (protocolVersion.greaterThan(MINECRAFT_1_8)) {
+      if (!v1_21_2) {
+        writeVarInt(byteBuf, teleportId);
+      }
 
-      if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0
-        && protocolVersion.compareTo(MINECRAFT_1_19_3) <= 0) {
-        byteBuf.writeBoolean(true); // Always dismount vehicle
+      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)
+        && protocolVersion.lessThanOrEquals(MINECRAFT_1_19_3)) {
+        byteBuf.writeBoolean(dismountVehicle);
       }
     }
   }
@@ -63,19 +80,25 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   public void decode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     x = byteBuf.readDouble();
     y = byteBuf.readDouble();
-    if (protocolVersion.compareTo(MINECRAFT_1_8) < 0) {
+    if (protocolVersion.lessThan(MINECRAFT_1_8)) {
       // 1.7.2-1.7.10 send the minimum bounding box Y coordinate
       byteBuf.readDouble();
     }
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();
     pitch = byteBuf.readFloat();
-    onGround = byteBuf.readBoolean();
+    if (protocolVersion.greaterThan(ProtocolVersion.MINECRAFT_1_21_2)) {
+      short flag = byteBuf.readUnsignedByte();
+      onGround = (flag & 1) != 0;
+      horizontalCollision = (flag & 2) != 0;
+    } else {
+      onGround = byteBuf.readBoolean();
+    }
   }
 
   @Override
   public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    return protocolVersion.compareTo(MINECRAFT_1_8) < 0 ? 41 : 33;
+    return protocolVersion.lessThan(MINECRAFT_1_8) ? 41 : 33;
   }
 
   @Override

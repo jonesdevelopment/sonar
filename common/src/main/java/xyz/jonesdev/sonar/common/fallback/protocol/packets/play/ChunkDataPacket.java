@@ -38,66 +38,42 @@ import static xyz.jonesdev.sonar.common.util.ProtocolUtil.*;
 public final class ChunkDataPacket implements FallbackPacket {
   private int sectionX, sectionZ;
 
-  private static final byte[] SECTION_BYTES = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
-  private static final byte[] LIGHT_BYTES = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
-
-  private static final byte[] LEGACY_FILLER_BYTES_17 = new byte[2];
-  private static final byte[] LEGACY_FILLER_BYTES = new byte[256];
-  private static final byte[] MODERN_FILLER_BYTES = new byte[256 * 4];
-
-  // Prepare nbt for 1.18 and pre-1.18
-  private static final CompoundBinaryTag MODERN_TAG, LEGACY_TAG;
-
-  static {
-    MODERN_TAG = prepareNBT(false);
-    LEGACY_TAG = prepareNBT(true);
-  }
-
-  private static @NotNull CompoundBinaryTag prepareNBT(final boolean legacy) {
-    final long[] arrayData = new long[legacy ? 36 : 37];
-    final LongArrayBinaryTag longArray = LongArrayBinaryTag.longArrayBinaryTag(arrayData);
-
-    final CompoundBinaryTag motion = CompoundBinaryTag.builder()
-      .put("MOTION_BLOCKING", longArray)
-      .build();
-    return CompoundBinaryTag.builder()
-      .put("root", motion)
-      .build();
-  }
-
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     byteBuf.writeInt(sectionX);
     byteBuf.writeInt(sectionZ);
 
-    if (protocolVersion.compareTo(MINECRAFT_1_17) >= 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_17_1) <= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_17)) {
+      if (protocolVersion.lessThanOrEquals(MINECRAFT_1_17_1)) {
         writeVarInt(byteBuf, 0); // mask
       }
     } else {
       byteBuf.writeBoolean(true); // full chunk
 
-      if (protocolVersion.compareTo(MINECRAFT_1_16) >= 0
-        && protocolVersion.compareTo(MINECRAFT_1_16_2) < 0) {
+      if (protocolVersion.inBetween(MINECRAFT_1_16, MINECRAFT_1_16_1)) {
         byteBuf.writeBoolean(true); // ignore old data
       }
 
-      if (protocolVersion.compareTo(MINECRAFT_1_8) > 0) {
+      if (protocolVersion.greaterThan(MINECRAFT_1_8)) {
         writeVarInt(byteBuf, 0);
       } else {
         byteBuf.writeShort(1); // fix void chunk
       }
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_14) >= 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_20_2) >= 0) {
-        writeNamelessCompoundTag(byteBuf, MODERN_TAG);
-      } else {
-        writeCompoundTag(byteBuf, protocolVersion.compareTo(MINECRAFT_1_18) < 0 ? LEGACY_TAG : MODERN_TAG);
-      }
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_14)) {
+      final long[] motionBlockingData = new long[protocolVersion.lessThan(MINECRAFT_1_18) ? 36 : 37];
+      final CompoundBinaryTag motionBlockingTag = CompoundBinaryTag.builder()
+        .put("MOTION_BLOCKING", LongArrayBinaryTag.longArrayBinaryTag(motionBlockingData))
+        .build();
+      final CompoundBinaryTag rootTag = CompoundBinaryTag.builder()
+        .put("root", motionBlockingTag)
+        .build();
 
-      if (protocolVersion.compareTo(MINECRAFT_1_15) >= 0 && protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
-        if (protocolVersion.compareTo(MINECRAFT_1_16_2) >= 0) {
+      writeBinaryTag(byteBuf, protocolVersion, rootTag);
+
+      if (protocolVersion.inBetween(MINECRAFT_1_15, MINECRAFT_1_17_1)) {
+        if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_16_2)) {
           writeVarInt(byteBuf, 1024);
 
           for (int i = 0; i < 1024; i++) {
@@ -111,36 +87,40 @@ public final class ChunkDataPacket implements FallbackPacket {
       }
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_13) < 0) {
-      if (protocolVersion.compareTo(MINECRAFT_1_8) >= 0) {
-        writeByteArray(byteBuf, LEGACY_FILLER_BYTES); // 1.8 - 1.12.2
-      } else {
-        byteBuf.writeInt(0); // compressed size
-        byteBuf.writeBytes(LEGACY_FILLER_BYTES_17); // 1.7
-      }
-    } else if (protocolVersion.compareTo(MINECRAFT_1_15) < 0) {
-      writeByteArray(byteBuf, MODERN_FILLER_BYTES); // 1.13 - 1.14.4
-    } else if (protocolVersion.compareTo(MINECRAFT_1_18) < 0) {
-      writeVarInt(byteBuf, 0); // 1.15 - 1.17.1
+    if (protocolVersion.lessThan(MINECRAFT_1_8)) {
+      byteBuf.writeInt(0);
+      byteBuf.writeBytes(new byte[2]);
+    } else if (protocolVersion.lessThan(MINECRAFT_1_15)) {
+      writeVarInt(byteBuf, 0);
+    } else if (protocolVersion.lessThan(MINECRAFT_1_18)) {
+      writeByteArray(byteBuf, new byte[256 * 4]);
     } else {
-      writeVarInt(byteBuf, SECTION_BYTES.length * 16);
+      final byte[] sectionData = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
+      int count = protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2) ? 24 : 16;
+      writeVarInt(byteBuf, sectionData.length * count);
 
-      for (int i = 0; i < 16; i++) {
-        byteBuf.writeBytes(SECTION_BYTES);
+      for (int i = 0; i < count; i++) {
+        byteBuf.writeBytes(sectionData);
       }
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_9_4) >= 0) {
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_9_4)) {
       writeVarInt(byteBuf, 0);
     }
 
-    if (protocolVersion.compareTo(MINECRAFT_1_18) >= 0) {
-      byteBuf.ensureWritable(LIGHT_BYTES.length);
+    if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2)) {
+      for (int i = 0; i < 6; i++) {
+        writeVarInt(byteBuf, 0);
+      }
+    } else if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_18)) {
+      final byte[] lightData = new byte[]{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, -1, -1, 0, 0};
 
-      if (protocolVersion.compareTo(MINECRAFT_1_20) >= 0) {
-        byteBuf.writeBytes(LIGHT_BYTES, 1, LIGHT_BYTES.length - 1);
+      byteBuf.ensureWritable(lightData.length);
+
+      if (protocolVersion.greaterThanOrEquals(MINECRAFT_1_20)) {
+        byteBuf.writeBytes(lightData, 1, lightData.length - 1);
       } else {
-        byteBuf.writeBytes(LIGHT_BYTES);
+        byteBuf.writeBytes(lightData);
       }
     }
   }
