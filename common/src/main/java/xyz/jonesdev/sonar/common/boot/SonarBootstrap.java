@@ -46,7 +46,6 @@ import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 @Getter
 @RequiredArgsConstructor
@@ -142,7 +141,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
     // Update ratelimiter cache
     getFallback().setRatelimiter(getConfig().getVerification().getReconnectDelay() > 0L
-      ? new CaffeineCacheRatelimiter(getConfig().getVerification().getReconnectDelay(), TimeUnit.MILLISECONDS)
+      ? new CaffeineCacheRatelimiter(Duration.ofMillis(getConfig().getVerification().getReconnectDelay()))
       : NoopCacheRatelimiter.INSTANCE);
 
     // Update blacklist cache

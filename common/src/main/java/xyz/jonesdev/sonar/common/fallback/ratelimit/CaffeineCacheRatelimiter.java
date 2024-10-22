@@ -26,21 +26,21 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.ratelimit.Ratelimiter;
 
 import java.net.InetAddress;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 // Idea taken from Velocity
 @Setter
 @RequiredArgsConstructor
 public final class CaffeineCacheRatelimiter implements Ratelimiter<InetAddress> {
-  private Cache<InetAddress, Long> expiringCache;
   private long timeout;
+  private Cache<InetAddress, Long> expiringCache;
 
-  public CaffeineCacheRatelimiter(final long timeout, final @NotNull TimeUnit unit) {
+  public CaffeineCacheRatelimiter(final @NotNull Duration duration) {
+    this.timeout = duration.toNanos();
     this.expiringCache = Caffeine.newBuilder()
       .ticker(Ticker.systemTicker())
-      .expireAfterWrite(timeout, unit)
+      .expireAfterWrite(duration)
       .build();
-    this.timeout = unit.toNanos(timeout);
   }
 
   @Override
