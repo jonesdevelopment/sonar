@@ -27,7 +27,8 @@ import xyz.jonesdev.sonar.api.command.InvocationSource;
 import xyz.jonesdev.sonar.api.command.subcommand.Subcommand;
 import xyz.jonesdev.sonar.api.command.subcommand.SubcommandInfo;
 
-import static xyz.jonesdev.sonar.api.Sonar.DECIMAL_FORMAT;
+import java.util.List;
+
 import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
 
 @SubcommandInfo(
@@ -67,17 +68,18 @@ public final class StatisticsCommand extends Subcommand {
         final long days = seconds / (24L * 60L * 60L);
         final long hours = (seconds % (24L * 60L * 60L)) / (60L * 60L);
         final long minutes = (seconds % (60L * 60L)) / 60L;
+        final String serverUptime = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L);
 
         placeholders = new TagResolver.Single[]{
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("verified", DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().getCache().size())),
-          Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
-          Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
-          Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getPlayers().size())),
-          Placeholder.unparsed("server-uptime", String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L)),
-          Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined())),
-          Placeholder.unparsed("total-attempts", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications())),
-          Placeholder.unparsed("total-failed", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications()))
+          Placeholder.unparsed("verified", Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().getCache().size())),
+          Placeholder.unparsed("verifying", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
+          Placeholder.unparsed("blacklisted", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
+          Placeholder.unparsed("queued", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getPlayers().size())),
+          Placeholder.unparsed("server-uptime", serverUptime),
+          Placeholder.unparsed("total-joins", Sonar.DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined())),
+          Placeholder.unparsed("total-attempts", Sonar.DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications())),
+          Placeholder.unparsed("total-failed", Sonar.DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications()))
         };
         break;
       }
@@ -85,11 +87,11 @@ public final class StatisticsCommand extends Subcommand {
       case "cpu": {
         placeholders = new TagResolver.Single[]{
           Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("process-cpu", DECIMAL_FORMAT.format(getProcessCPUUsage())),
-          Placeholder.unparsed("system-cpu", DECIMAL_FORMAT.format(getSystemCPUUsage())),
-          Placeholder.unparsed("average-process-cpu", DECIMAL_FORMAT.format(getAverageProcessCPUUsage())),
-          Placeholder.unparsed("average-system-cpu", DECIMAL_FORMAT.format(getAverageSystemCPUUsage())),
-          Placeholder.unparsed("virtual-core-count", DECIMAL_FORMAT.format(getVirtualCores()))
+          Placeholder.unparsed("process-cpu", Sonar.DECIMAL_FORMAT.format(getProcessCPUUsage())),
+          Placeholder.unparsed("system-cpu", Sonar.DECIMAL_FORMAT.format(getSystemCPUUsage())),
+          Placeholder.unparsed("average-process-cpu", Sonar.DECIMAL_FORMAT.format(getAverageProcessCPUUsage())),
+          Placeholder.unparsed("average-system-cpu", Sonar.DECIMAL_FORMAT.format(getAverageSystemCPUUsage())),
+          Placeholder.unparsed("virtual-core-count", Sonar.DECIMAL_FORMAT.format(getVirtualCores()))
         };
         break;
       }
@@ -117,7 +119,9 @@ public final class StatisticsCommand extends Subcommand {
       }
     }
 
-    for (final String msg : Sonar.get().getConfig().getMessagesConfig().getStringList("commands.statistics." + type)) {
+    final List<String> parts = Sonar.get().getConfig().getMessagesConfig().getStringList(
+      "commands.statistics." + type);
+    for (final String msg : parts) {
       source.sendMessage(MiniMessage.miniMessage().deserialize(msg, placeholders));
     }
   }
