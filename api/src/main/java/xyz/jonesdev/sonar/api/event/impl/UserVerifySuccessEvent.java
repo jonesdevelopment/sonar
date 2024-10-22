@@ -22,12 +22,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
-import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
 @Getter
 @ToString
 @RequiredArgsConstructor
 public final class UserVerifySuccessEvent implements SonarEvent {
   private final FallbackUser user;
-  private final SystemTimer loginTimer;
 }

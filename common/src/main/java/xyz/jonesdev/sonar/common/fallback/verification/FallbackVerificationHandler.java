@@ -53,7 +53,7 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
       user.getFingerprint(), user.getLoginTimer().getStart()));
 
     // Call the VerifySuccessEvent for external API usage
-    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(user, user.getLoginTimer()));
+    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(user));
 
     // If enabled, transfer the player back to the origin server.
     // This feature was introduced by Mojang in Minecraft version 1.20.5.

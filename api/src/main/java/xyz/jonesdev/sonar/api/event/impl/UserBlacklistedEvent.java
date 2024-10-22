@@ -20,7 +20,6 @@ package xyz.jonesdev.sonar.api.event.impl;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.jetbrains.annotations.ApiStatus;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
 import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
@@ -28,6 +27,5 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 @ToString
 @RequiredArgsConstructor
 public final class UserBlacklistedEvent implements SonarEvent {
-  @ApiStatus.Experimental
   private final FallbackUser user;
 }

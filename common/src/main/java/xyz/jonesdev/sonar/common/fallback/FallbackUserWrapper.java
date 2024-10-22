@@ -87,7 +87,7 @@ public final class FallbackUserWrapper implements FallbackUser {
     }
 
     // Call the VerifyJoinEvent for external API usage
-    Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(username, this));
+    Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(this));
 
     // Run this in the channel's event loop to avoid issues
     channel.eventLoop().execute(() -> {

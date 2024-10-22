@@ -27,6 +27,5 @@ import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 @ToString
 @RequiredArgsConstructor
 public final class UserVerifyJoinEvent implements SonarEvent {
-  private final String username;
   private final FallbackUser user;
 }
