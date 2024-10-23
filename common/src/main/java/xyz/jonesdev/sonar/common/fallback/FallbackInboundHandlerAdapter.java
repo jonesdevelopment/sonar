@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.fingerprint.FingerprintingUtil;
+import xyz.jonesdev.sonar.common.fallback.netty.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;

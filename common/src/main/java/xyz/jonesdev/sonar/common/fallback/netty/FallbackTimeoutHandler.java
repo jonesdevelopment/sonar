@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.common.fallback;
+package xyz.jonesdev.sonar.common.fallback.netty;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -26,12 +26,12 @@ import java.util.concurrent.TimeUnit;
 
 public final class FallbackTimeoutHandler extends IdleStateHandler {
   public FallbackTimeoutHandler(final int readTimeout, final int writeTimeout, final TimeUnit timeUnit) {
-    super(readTimeout, writeTimeout, 0L, timeUnit);
+    super(false, readTimeout, writeTimeout, 0L, timeUnit);
   }
 
   @Override
   protected void channelIdle(final @NotNull ChannelHandlerContext ctx,
-                             final @NotNull IdleStateEvent idleStateEvent) throws Exception {
+                             final IdleStateEvent idleStateEvent) throws Exception {
     // The netty (default) ReadTimeoutHandler would normally just throw an Exception
     // The default ReadTimeoutHandler does only check for the boolean 'closed' and
     // still throws the Exception even if the channel is closed
