@@ -34,6 +34,8 @@ import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarInt21FrameDecoder;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackVarIntLengthEncoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketDecoder;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.DisconnectPacket;
 import xyz.jonesdev.sonar.common.fallback.verification.FallbackPreJoinHandler;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
@@ -42,9 +44,6 @@ import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import java.net.InetAddress;
 
 import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.*;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.GAME;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry.LOGIN;
-import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.loginSuccess;
 
 @Getter
 @ToString(of = {"protocolVersion", "inetAddress", "geyser"})
@@ -112,15 +111,15 @@ public final class FallbackUserWrapper implements FallbackUser {
       channel.pipeline().addLast(FALLBACK_PACKET_DECODER, newDecoder);
 
       // We're sending the LoginSuccess packet now
-      newDecoder.updateRegistry(LOGIN);
-      newEncoder.updateRegistry(LOGIN);
+      newDecoder.updateRegistry(FallbackPacketRegistry.LOGIN);
+      newEncoder.updateRegistry(FallbackPacketRegistry.LOGIN);
       // Send LoginSuccess packet to make the client think they are joining the server
-      write(loginSuccess);
+      write(FallbackPreparer.loginSuccess);
 
       // pre-1.20.2 clients do not have the configuration stage
       if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
-        newDecoder.updateRegistry(GAME);
-        newEncoder.updateRegistry(GAME);
+        newDecoder.updateRegistry(FallbackPacketRegistry.GAME);
+        newEncoder.updateRegistry(FallbackPacketRegistry.GAME);
       }
 
       // Listen for all incoming packets by setting the packet listener
@@ -135,7 +134,7 @@ public final class FallbackUserWrapper implements FallbackUser {
   @Override
   public void disconnect(final @NotNull Component reason) {
     final FallbackPacketEncoder encoder = channel.pipeline().get(FallbackPacketEncoder.class);
-    final boolean duringLogin = encoder != null && encoder.getPacketRegistry() == LOGIN;
-    ProtocolUtil.closeWith(channel, protocolVersion, DisconnectPacket.create(reason, duringLogin));
+    final boolean duringLogin = encoder != null && encoder.getPacketRegistry() == FallbackPacketRegistry.LOGIN;
+    ProtocolUtil.closeWith(channel, protocolVersion, new DisconnectPacket(reason, duringLogin));
   }
 }

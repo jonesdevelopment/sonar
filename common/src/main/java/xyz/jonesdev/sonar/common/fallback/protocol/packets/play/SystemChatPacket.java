@@ -47,7 +47,7 @@ public final class SystemChatPacket implements FallbackPacket {
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
     // Serialized message
-    componentHolder.write(byteBuf, protocolVersion);
+    componentHolder.write(byteBuf, protocolVersion, false);
 
     // Type
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {

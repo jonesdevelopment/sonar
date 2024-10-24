@@ -96,7 +96,7 @@ public class FallbackPreparer {
   public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(
     new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
 
-  public static FallbackPacket loginSuccess;
+  public FallbackPacket loginSuccess;
   public FallbackPacket welcomeMessage;
   public FallbackPacket enterCodeMessage;
   public FallbackPacket incorrectCaptcha;
@@ -183,13 +183,13 @@ public class FallbackPreparer {
     }
 
     // Prepare disconnect packets during login
-    blacklisted = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getBlacklisted(), true));
-    alreadyVerifying = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getAlreadyVerifying(), true));
-    alreadyQueued = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getAlreadyQueued(), true));
-    protocolBlacklisted = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getProtocolBlacklisted(), true));
-    reconnectedTooFast = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getTooFastReconnect(), true));
-    invalidUsername = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getVerification().getInvalidUsername(), true));
-    tooManyOnlinePerIP = new FallbackPacketSnapshot(DisconnectPacket.create(Sonar.get().getConfig().getTooManyOnlinePerIp(), true));
+    blacklisted = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getBlacklisted(), true));
+    alreadyVerifying = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying(), true));
+    alreadyQueued = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued(), true));
+    protocolBlacklisted = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getProtocolBlacklisted(), true));
+    reconnectedTooFast = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect(), true));
+    invalidUsername = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getInvalidUsername(), true));
+    tooManyOnlinePerIP = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getTooManyOnlinePerIp(), true));
 
     // Prepare transfer packet
     if (Sonar.get().getConfig().getGeneralConfig().getBoolean("verification.transfer.enabled")) {

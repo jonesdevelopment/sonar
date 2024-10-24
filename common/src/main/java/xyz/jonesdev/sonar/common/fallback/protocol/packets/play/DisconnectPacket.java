@@ -21,7 +21,6 @@ import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
@@ -29,24 +28,25 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
 
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class DisconnectPacket implements FallbackPacket {
   private @NotNull ComponentHolder componentHolder;
   private boolean duringLogin;
 
+  public DisconnectPacket(final @NotNull Component component, final boolean duringLogin) {
+    this.componentHolder = new ComponentHolder(component);
+    this.duringLogin = duringLogin;
+  }
+
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    componentHolder.write(byteBuf, duringLogin ? ProtocolVersion.MINECRAFT_1_20_2 : protocolVersion);
+    // Force json serialization during login phase
+    componentHolder.write(byteBuf, protocolVersion, duringLogin);
   }
 
   @Override
   public void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
     throw new UnsupportedOperationException();
-  }
-
-  public static @NotNull DisconnectPacket create(final @NotNull Component component, final boolean duringLogin) {
-    return new DisconnectPacket(new ComponentHolder(component), duringLogin);
   }
 }

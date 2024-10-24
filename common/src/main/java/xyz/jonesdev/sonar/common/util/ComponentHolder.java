@@ -22,7 +22,6 @@ import com.google.gson.internal.LazilyParsedNumber;
 import io.netty.buffer.ByteBuf;
 import net.kyori.adventure.nbt.*;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
@@ -32,11 +31,14 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class ComponentHolder {
-  private final String serializedComponent;
-  private BinaryTag cachedBinaryTag;
+  private final String modernJson;
+  private final String legacyJson;
+  private final BinaryTag binaryTag;
 
   public ComponentHolder(final @NotNull Component component) {
-    this.serializedComponent = GsonComponentSerializer.gson().serialize(component);
+    this.modernJson = ProtocolUtil.PRE_1_20_3_SERIALIZER.serialize(component);
+    this.legacyJson = ProtocolUtil.PRE_1_16_SERIALIZER.serialize(component);
+    this.binaryTag = serialize(new JsonParser().parse(ProtocolUtil.MODERN_SERIALIZER.serialize(component)));
   }
 
   // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
@@ -137,14 +139,12 @@ public final class ComponentHolder {
     return EndBinaryTag.endBinaryTag();
   }
 
-  public void write(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_3)) {
-      if (cachedBinaryTag == null) {
-        cachedBinaryTag = serialize(new JsonParser().parse(serializedComponent));
-      }
-      ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, cachedBinaryTag);
+  public void write(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion, final boolean forceJson) {
+    if (!forceJson && protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_3)) {
+      ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, binaryTag);
     } else {
-      ProtocolUtil.writeString(byteBuf, serializedComponent);
+      ProtocolUtil.writeString(byteBuf,
+        protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16) ? modernJson : legacyJson);
     }
   }
 }
