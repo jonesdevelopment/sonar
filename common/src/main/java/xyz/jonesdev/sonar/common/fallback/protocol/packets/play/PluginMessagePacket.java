@@ -61,12 +61,12 @@ public final class PluginMessagePacket implements FallbackPacket {
   }
 
   @Override
-  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public int expectedMinLength(final ProtocolVersion protocolVersion) {
     return 4;
   }
 
   @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public int expectedMaxLength(final ProtocolVersion protocolVersion) {
     return 0xFFF; // strict size limit
   }
 }

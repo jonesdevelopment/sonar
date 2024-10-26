@@ -33,7 +33,7 @@ public final class LoginAcknowledgedPacket implements FallbackPacket {
   }
 
   @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public int expectedMaxLength(final ProtocolVersion protocolVersion) {
     // This packet is always empty; see https://wiki.vg/Protocol#Login_Acknowledged
     return 0;
   }

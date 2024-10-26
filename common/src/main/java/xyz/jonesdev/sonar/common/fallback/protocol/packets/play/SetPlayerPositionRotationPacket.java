@@ -95,12 +95,12 @@ public final class SetPlayerPositionRotationPacket implements FallbackPacket {
   }
 
   @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+  public int expectedMaxLength(final @NotNull ProtocolVersion protocolVersion) {
     return protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8) ? 41 : 33;
   }
 
   @Override
-  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public int expectedMinLength(final ProtocolVersion protocolVersion) {
     return 33;
   }
 }

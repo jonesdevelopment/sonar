@@ -79,12 +79,12 @@ public final class ClientInformationPacket implements FallbackPacket {
   }
 
   @Override
-  public int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public int expectedMinLength(final ProtocolVersion protocolVersion) {
     return 2;
   }
 
   @Override
-  public int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  public int expectedMaxLength(final ProtocolVersion protocolVersion) {
     return 0xff + 1; // 256 as a hard-limit
   }
 }

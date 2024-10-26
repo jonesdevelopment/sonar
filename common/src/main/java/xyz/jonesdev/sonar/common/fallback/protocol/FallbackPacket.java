@@ -39,20 +39,18 @@ public interface FallbackPacket {
   void decode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception;
 
   /**
-   * @param byteBuf         ByteBuf
    * @param protocolVersion Protocol version of the player
    * @return The minimum allowed length of the decoded packet
    */
-  default int expectedMinLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  default int expectedMinLength(final ProtocolVersion protocolVersion) {
     return -1;
   }
 
   /**
-   * @param byteBuf         ByteBuf
    * @param protocolVersion Protocol version of the player
    * @return The maximum allowed length of the decoded packet
    */
-  default int expectedMaxLength(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
+  default int expectedMaxLength(final ProtocolVersion protocolVersion) {
     return -1;
   }
 }

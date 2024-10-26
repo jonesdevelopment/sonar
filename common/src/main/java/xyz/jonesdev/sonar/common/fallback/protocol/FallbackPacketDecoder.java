@@ -43,8 +43,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelRead(final @NotNull ChannelHandlerContext ctx,
-                          final @NotNull Object msg) throws Exception {
+  public void channelRead(final @NotNull ChannelHandlerContext ctx, final Object msg) throws Exception {
     if (msg instanceof ByteBuf) {
       final ByteBuf byteBuf = (ByteBuf) msg;
 
@@ -71,7 +70,7 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
         }
 
         // Ensure that the packet isn't too large or too small
-        checkPacketSize(byteBuf, packet);
+        checkPacketSize(byteBuf.readableBytes(), packet);
 
         try {
           // Try to decode the packet for the given protocol version
@@ -99,15 +98,13 @@ public final class FallbackPacketDecoder extends ChannelInboundHandlerAdapter {
     }
   }
 
-  private void checkPacketSize(final @NotNull ByteBuf byteBuf,
-                               final @NotNull FallbackPacket packet) throws Exception {
-    final int packetSize = byteBuf.readableBytes();
-    final int expectedMaxLen = packet.expectedMaxLength(byteBuf, protocolVersion);
+  private void checkPacketSize(final int packetSize, final @NotNull FallbackPacket packet) throws Exception {
+    final int expectedMaxLen = packet.expectedMaxLength(protocolVersion);
     if (expectedMaxLen != -1 && packetSize > expectedMaxLen) {
       throw ProtocolUtil.DEBUG ? new DecoderException("Packet too large: " + packetSize + " max: " + expectedMaxLen)
         : QuietDecoderException.INSTANCE;
     }
-    final int expectedMinLen = packet.expectedMinLength(byteBuf, protocolVersion);
+    final int expectedMinLen = packet.expectedMinLength(protocolVersion);
     if (expectedMinLen != -1 && packetSize < expectedMinLen) {
       throw ProtocolUtil.DEBUG ? new DecoderException("Packet too small: " + packetSize + " min: " + expectedMinLen)
         : QuietDecoderException.INSTANCE;
