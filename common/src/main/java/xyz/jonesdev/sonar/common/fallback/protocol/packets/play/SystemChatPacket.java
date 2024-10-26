@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.play;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.DecoderException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -70,12 +69,7 @@ public final class SystemChatPacket implements FallbackPacket {
     message = ProtocolUtil.readString(byteBuf, 256);
 
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
-      final long timestamp = byteBuf.readLong();
-      final long now = System.currentTimeMillis();
-      if (timestamp > now) {
-        throw ProtocolUtil.DEBUG ? new DecoderException("Message appears to be from the future: "
-          + "(expected >" + now + ", got " + timestamp + ")") : QuietDecoderException.INSTANCE;
-      }
+      byteBuf.readLong(); // timestamp
 
       if (protocolVersion.lessThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
         final long saltLong = byteBuf.readLong();
