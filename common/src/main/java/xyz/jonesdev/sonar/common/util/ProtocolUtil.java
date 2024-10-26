@@ -50,9 +50,6 @@ import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.json.JSONOptions;
-import net.kyori.option.OptionState;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
@@ -66,41 +63,6 @@ import java.util.concurrent.TimeUnit;
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
 @UtilityClass
 public class ProtocolUtil {
-  public static final GsonComponentSerializer PRE_1_16_SERIALIZER = GsonComponentSerializer.builder()
-    .downsampleColors()
-    .options(OptionState.optionState()
-      // before 1.16
-      .value(JSONOptions.EMIT_RGB, Boolean.FALSE)
-      .value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.LEGACY_ONLY)
-      // before 1.20.3
-      .value(JSONOptions.EMIT_COMPACT_TEXT_COMPONENT, Boolean.FALSE)
-      .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, Boolean.FALSE)
-      .value(JSONOptions.VALIDATE_STRICT_EVENTS, Boolean.FALSE)
-      .build())
-    .build();
-  public static final GsonComponentSerializer PRE_1_20_3_SERIALIZER = GsonComponentSerializer.builder()
-    .options(OptionState.optionState()
-      // after 1.16
-      .value(JSONOptions.EMIT_RGB, Boolean.TRUE)
-      .value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.MODERN_ONLY)
-      // before 1.20.3
-      .value(JSONOptions.EMIT_COMPACT_TEXT_COMPONENT, Boolean.FALSE)
-      .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, Boolean.FALSE)
-      .value(JSONOptions.VALIDATE_STRICT_EVENTS, Boolean.FALSE)
-      .build())
-    .build();
-  public static final GsonComponentSerializer MODERN_SERIALIZER = GsonComponentSerializer.builder()
-    .options(OptionState.optionState()
-      // after 1.16
-      .value(JSONOptions.EMIT_RGB, Boolean.TRUE)
-      .value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.MODERN_ONLY)
-      // after 1.20.3
-      .value(JSONOptions.EMIT_COMPACT_TEXT_COMPONENT, Boolean.TRUE)
-      .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, Boolean.TRUE)
-      .value(JSONOptions.VALIDATE_STRICT_EVENTS, Boolean.TRUE)
-      .build())
-    .build();
-
   public static final boolean DEBUG = Boolean.getBoolean("sonar.debug-traces");
   private static final int[] VAR_INT_LENGTHS = new int[65];
 

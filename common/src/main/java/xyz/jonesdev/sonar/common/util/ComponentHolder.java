@@ -22,6 +22,7 @@ import com.google.gson.internal.LazilyParsedNumber;
 import io.netty.buffer.ByteBuf;
 import net.kyori.adventure.nbt.*;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 
@@ -36,9 +37,9 @@ public final class ComponentHolder {
   private final BinaryTag binaryTag;
 
   public ComponentHolder(final @NotNull Component component) {
-    this.modernJson = ProtocolUtil.PRE_1_20_3_SERIALIZER.serialize(component);
-    this.legacyJson = ProtocolUtil.PRE_1_16_SERIALIZER.serialize(component);
-    this.binaryTag = serialize(new JsonParser().parse(ProtocolUtil.MODERN_SERIALIZER.serialize(component)));
+    this.modernJson = GsonComponentSerializer.gson().serialize(component);
+    this.legacyJson = GsonComponentSerializer.colorDownsamplingGson().serialize(component);
+    this.binaryTag = serialize(new JsonParser().parse(GsonComponentSerializer.gson().serialize(component)));
   }
 
   // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
