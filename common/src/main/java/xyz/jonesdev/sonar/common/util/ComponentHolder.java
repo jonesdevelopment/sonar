@@ -39,7 +39,7 @@ public final class ComponentHolder {
   public ComponentHolder(final @NotNull Component component) {
     this.modernJson = GsonComponentSerializer.gson().serialize(component);
     this.legacyJson = GsonComponentSerializer.colorDownsamplingGson().serialize(component);
-    this.binaryTag = serialize(new JsonParser().parse(GsonComponentSerializer.gson().serialize(component)));
+    this.binaryTag = serialize(new JsonParser().parse(this.modernJson));
   }
 
   // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
