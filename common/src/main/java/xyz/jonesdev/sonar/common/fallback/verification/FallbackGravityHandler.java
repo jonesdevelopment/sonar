@@ -91,7 +91,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
   private final boolean enableGravityCheck, enableCollisionsCheck;
   private boolean teleported, canFall, checkMovement;
   private double y, deltaY, blockHeight;
-  private int movementTick, expectedTeleportId = FIRST_TELEPORT_ID;
+  private int movementTick, clientTick, expectedTeleportId = FIRST_TELEPORT_ID;
   private SetPlayerPositionRotationPacket lastPositionPacket;
 
   @Override
@@ -139,6 +139,8 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       // Pass these packets back to the login handler
       // TODO: recode this
       preJoinHandler.handle(packet);
+    } else if (packet instanceof ClientTickEndPacket) {
+      clientTick++;
     }
   }
 
@@ -199,6 +201,11 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     // This should not happen unless the max movement tick is configured to a high number.
     checkState(Math.abs(Math.abs(x) - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "illegal x offset: " + x);
     checkState(Math.abs(Math.abs(z) - BLOCKS_PER_ROW) < BLOCKS_PER_ROW, "illegal z offset: " + z);
+
+    // Check if the client is ticking correctly
+    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+      checkState(clientTick >= movementTick, "invalid ticking: " + clientTick + "/" + movementTick);
+    }
 
     if (!onGround) {
       // The deltaY is 0 whenever the player sends their first position packet.

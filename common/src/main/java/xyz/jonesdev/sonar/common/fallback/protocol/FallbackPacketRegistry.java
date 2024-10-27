@@ -422,6 +422,8 @@ public enum FallbackPacketRegistry {
         map(0x64, MINECRAFT_1_20_5, true),
         map(0x6B, MINECRAFT_1_21_2, true));
 
+      serverbound.register(ClientTickEndPacket.class, ClientTickEndPacket::new,
+        map(0x0B, MINECRAFT_1_21_2, false));
       serverbound.register(SetHeldItemPacket.class, SetHeldItemPacket::new,
         map(0x09, MINECRAFT_1_7_2, false),
         map(0x17, MINECRAFT_1_9, false),
