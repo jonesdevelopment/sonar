@@ -27,7 +27,7 @@ footer:
 # 当玩家尝试加入但有太多在线玩家同时使用者玩家的 IP 地址时显示的踢出消息.
 too-many-online-per-ip:
   - '<header>'
-  - <red>您所使用的 IP 地址已经无法再登录更多账户了.
+  - <red>您所使用的 IP 地址已经无法再在该服务器上登录更多账户了.
   - '<footer>'
 
 # 有关命令的语言配置.
@@ -77,11 +77,11 @@ commands:
   # '/sonar verbose' 命令的消息
   verbose:
     # 该子命令的描述
-    description: "启用或禁用 Sonar 冗余"
+    description: "启用或禁用 Sonar 的实时状态信息"
     # 玩家订阅详细信息时显示的消息
-    subscribe: '<prefix>已为您显示 Sonar 的详细信息.'
+    subscribe: '<prefix>已为您显示 Sonar 的实时状态信息.'
     # 玩家取消订阅详细信息时显示的消息
-    unsubscribe: '<prefix>不再为您显示 Sonar 的详细信息.'
+    unsubscribe: '<prefix>不再为您显示 Sonar 的实时状态信息.'
 
   # '/sonar notify' 命令的消息
   notify:
@@ -95,7 +95,7 @@ commands:
   # '/sonar blacklist' 命令的消息
   blacklist:
     # 该子命令的描述
-    description: "管理黑名单 IP 地址"
+    description: "管理黑名单中的 IP 地址"
     # 当尝试清理黑名单但黑名单中没有任何 IP 地址显示的消息
     empty: '<prefix>黑名单中没有任何 IP 地址.'
     # 当成功清理黑名单时显示的消息
@@ -114,7 +114,7 @@ commands:
   #  '/sonar verified' 命令的消息
   verified:
     # 该子命令的描述
-    description: "管理已验证的 IP 地址"
+    description: "管理已验证(白名单中)的 IP 地址"
     # 当尝试清除白名单但为空时显示的消息
     empty: '<prefix>白名单中没有任何玩家.'
     # 当成功清理白名单时显示的消息
@@ -130,7 +130,7 @@ commands:
     # 当尝试移除一个不在白名单中的 IP 地址时显示的消息
     ip-not-found: '<prefix>您提供的 IP 地址不在白名单中.'
     # 当尝试移除一个查询 IP 地址的验证历史时显示的信息
-    history: '<prefix><yellow>以前的 UUID 用于 <ip>:'
+    history: '<prefix><yellow><ip> 所拥有的历史 UUID:'
     history-entry: ' <gray>▪ <white><uuid>'
 
   # '/sonar statistics' 命令的消息
@@ -199,8 +199,8 @@ verification:
     incorrect: '<prefix><red>您输入了错误的答案! 请重试.'
 
   # 当玩家正在接受验证时显示的信息
-  # 将此项设置为''可完全禁用欢迎信息
-  welcome: '<prefix><green>您正在接受验证. 请不要移动; 这是一个自动过程.'
+  # 将此项设置为''可完全禁用加入时发送的消息
+  welcome: '<prefix><green>正在验证您的客户端. 请不要移动...'
 
   # 当验证码还在准备的时候显示的踢出消息
   currently-preparing:
@@ -263,7 +263,7 @@ verbose:
     # 默认的状态栏
     normal: '<prefix><gray>每秒连接数 <white><connections-per-second> <dark_aqua>╺ <gray>每秒登录次数 <white><logins-per-second> <dark_aqua>╺ <gray>正在验证的连接数 <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
     # 遭受攻击时的状态栏
-    attack: '<prefix><gray>每秒连接数 <white><connections-per-second> <dark_aqua>╺ <gray>每秒登录次数 <white><logins-per-second> <dark_aqua>╺ <gray>排队连接数 <white><queued> <dark_aqua>╺ <gray>正在验证的连接数 <white><verifying> <dark_aqua>╺ <gray>攻击持续时间 <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    attack: '<prefix><gray>每秒连接数 <white><connections-per-second> <dark_aqua>╺ <gray>每秒登录次数 <white><logins-per-second> <dark_aqua>╺ <gray>正在排队的连接数 <white><queued> <dark_aqua>╺ <gray>正在验证的连接数 <white><verifying> <dark_aqua>╺ <gray>攻击持续时间 <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
   # 动画占位符
   # 其它预设:
   # - ▙, ▛, ▜, ▟
