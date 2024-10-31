@@ -11,10 +11,10 @@
 # 需要帮助吗? https://jonesdev.xyz/discord
 # 源代码: https://github.com/jonesdevelopment/sonar
 # 文件: https://docs.jonesdev.xyz/administration/configuring-sonar
-# Copyright Jones Development and Sonar Contributors, 以 GPL-3.0 许可
+# Copyright Jones Development and Sonar Contributors, 以 GPL-3.0 许可证分发
 #
 
-# 未归类的设置
+# 常规的设置
 general:
   # Sonar 是否应该自动检查新的更新?
   # Sonar 使用 GitHub API 检查当前版本是否过时
@@ -24,18 +24,19 @@ general:
   # 具有相同 IP 地址的在线玩家的最大数量
   max-online-per-ip: 3
 
-# 攻击检测器的敏感度设置
-# 只有当您知道自己在做什么的时候才编辑它
+# 攻击检测器
+# 只有当您知道自己在做什么的时候才应该编辑它
 attack-tracker:
-  # 在一段时间内至少需要 x 个新玩家加入才满足触发条件.
+  # 在一段时间内至少需要多少个新玩家加入才满足触发条件?
   min-players-for-attack: 8
   # 至少经过多少毫秒后才可以解除遭受攻击模式
   # (该值为毫秒. 1秒等于1000毫秒.)
   min-attack-duration: 30000
-  # 攻击检测器要重复检测到多少次攻击 才能确认服务器正在遭受攻击?
+  # 要重复检测到多少次攻击 才应该被确认为服务器正在遭受攻击?
   # 该值作为缓冲区 以避免可能的误判
   min-attack-threshold: 2
-  # 当从遭受攻击标记为解除攻击时 应该需要等待多久才能再次被标记为正在遭受攻击?
+  # 当从遭受攻击状态标记为已缓解攻击状态时
+  #至少需要多少毫秒才允许为对于可能检测到的攻击重新进入遭受攻击状态?
   # (该值为毫秒. 1秒等于1000毫秒.)
   attack-cooldown-delay: 3000
 
@@ -43,7 +44,7 @@ attack-tracker:
 # 提示: IP 地址将以纯文本形式保存 请确保您的数据库安全!
 database:
   # 要连接到的数据库类型
-  # 可用类型: NONE (不使用数据库), MYSQL, MARIADB, H2
+  # 可用类型: NONE (不使用数据库), MYSQL, MARIADB, H2 (本地数据库)
   type: NONE
   # Sonar 插件目录中用于 H2 数据库的文件
   filename: verified_players
@@ -72,7 +73,7 @@ verification:
   # 可用类型: ALWAYS, DURING_ATTACK, NEVER
   # - ALWAYS: 玩家始终需要验证 直到他们通过验证为止
   # - DURING_ATTACK: 玩家仅在服务器疑似遭到攻击时验证
-  # - NEVER: 玩家不会被验证
+  # - NEVER: 永远不检查未被验证过的玩家
   timing: ALWAYS
   checks:
     # 检查玩家的下落移动是否遵循原版客户端.
@@ -84,19 +85,19 @@ verification:
       # 玩家跌落在平台上多少tick后才能被算作站在平台上?
       max-movement-ticks: 8
 
-    # 检查玩家是否与下方生成的方块发生碰撞
+    # 检查玩家是否可以正确地站在方块上
     collision:
       # Sonar 是否应该生成方块平台以检查玩家下落与方块之间的碰撞? (推荐启用)
       enabled: true
 
     # 检查客户端坐在实体上时是否发送了正确的数据包
     vehicle:
-      # 声纳是否应该检查玩家是否正确进入船只?
+      # Sonar 是否应该让玩家骑乘在实体上, 以便检查他们的数据包是否合法?
       enabled: true
-      # 客户端发送的最小数据包数量
+      # 客户端需要发送的所需的最小数据包数量
       minimum-packets: 2
 
-    # 地图验证码
+    # 手持地图验证码
     map-captcha:
       # Sonar 应该在什么时候向玩家发送验证码?
       # 可用类型: ALWAYS, DURING_ATTACK, NEVER
@@ -141,8 +142,8 @@ verification:
     # 为此您必须在服务器软件的配置文件中允许接受来自transfer的连接.
     # 此外 您可能希望减少 Velocity 或其它服务器软件/插件的登录速率限制
     # 因为这可能会阻止玩家快速地重新连接到服务器
-    # 如果你的服务器允许 Bedrock 玩家通过间歇泉加入, 请确保为间歇泉设置了
-    # 传输工具 TransferTool, 以便将 Bedrock 玩家重定向到正确的服务器.
+    # 如果你的服务器允许 Bedrock 玩家通过 Geyser 加入, 请确保为 Geyser 设置了
+    # TransferTool 扩展, 以便将 Bedrock 玩家重定向到正确的服务器.
     # https://github.com/onebeastchris/TransferTool
     enabled: false
     # 当玩家通过验证后, Sonar 应该将玩家转移到哪个服务器
@@ -153,28 +154,28 @@ verification:
     # 如果服务器地址不包含端口 请保留25565.
     destination-port: 25565
 
-  # 玩家在虚拟服务器中的游戏模式
+  # 玩家正在验证时所使用的游戏模式
   # 可用类型: SURVIVAL, CREATIVE, ADVENTURE
   # - SURVIVAL: 生存模式, 所有UI可见
   # - CREATIVE: 创造模式, 隐藏血量和饱食度
   # - ADVENTURE: 冒险模式, 所有UI可见
   gamemode: ADVENTURE
-  # 验证世界的夏令时间
-  # 您可以在这里找到所有的夏令时间:
+  # 验证过程中玩家所看到的当前世界中的一天时间
+  # 您可以在这里找到您想要的时间:
   # https://minecraft.wiki/w/Daylight_cycle
-  # 这只是一个可视化设置, 不会改变验证过程!
+  # 该选项不会改变验证过程.
   # 如果该值设置为 1000, 则不会发送数据包.
   time-of-day: 1000
   # Sonar 缓存它发送到客户端的大部分数据包, 包括 LoginSuccess 数据包.
   # Sonar 应该使用哪个用户名来接收 LoginSuccess 数据包?
   # 如果不修改客户端, 用户名将不会对玩家可见
   cached-username: "Sonar"
-  # 当 Sonar 尝试验证玩家时 是否在控制台中打印它?
+  # 当 Sonar 尝试验证玩家时 是否在控制台中打印有关玩家的信息?
   log-connections: true
-  # Sonar 是否应该记录在攻击期间内的验证会话?
+  # Sonar 是否应该在攻击期间内打印日志?
   log-during-attack: false
   # Sonar 是否应该记录验证过程中玩家的移动位置的变化?
-  # 有助于发现错误 但不建议在非调试环境下的服务器启用该选项.
+  # 有助于发现错误 但不建议在生产环境下的服务器启用该选项.
   debug-xyz-positions: false
   # Sonar 是否应该检查来自 Geyser 的(基岩版)玩家?
   # 此功能是实验性的. 请报告任何因为误判而导致无法通过检查的问题
@@ -186,7 +187,7 @@ verification:
   # 服务器在断开玩家连接前停止发送数据包的时间
   # (该值为毫秒. 1秒等于1000毫秒.)
   write-timeout: 10000
-  # 当玩家在需要验证时(即还未通过检查的情况下)需要等待多少毫秒才可以重新连接?
+  # 当玩家在还未通过检查的情况下断开连接后需要等待多少毫秒才可以重新连接?
   # (该值为毫秒. 1秒等于1000毫秒.)
   rejoin-delay: 5000
   # 当玩家验证失败后, Sonar 应该记住他多久?
