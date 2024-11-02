@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.api.fingerprint.FingerprintingUtil;
 import xyz.jonesdev.sonar.common.fallback.netty.FallbackTimeoutHandler;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketEncoder;
+import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacketRegistry;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.util.GeyserUtil;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
@@ -250,6 +251,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
       // We don't need to update the encoder if it has already been replaced by Sonar
       if (!(currentEncoder instanceof FallbackPacketEncoder)) {
         final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
+        newEncoder.updateRegistry(FallbackPacketRegistry.LOGIN);
         channel.pipeline().replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
       }
       ProtocolUtil.closeWith(channel, protocolVersion, packet);
