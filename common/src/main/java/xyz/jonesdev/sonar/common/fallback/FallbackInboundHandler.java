@@ -83,8 +83,8 @@ public final class FallbackInboundHandler extends ChannelInboundHandlerAdapter {
    * will run before the connection knows that there has been an error.
    */
   @Override
-  public void exceptionCaught(final @NotNull ChannelHandlerContext ctx,
-                              final Throwable cause) throws Exception {
+  public void exceptionCaught(final @NotNull ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+    cause.printStackTrace();
     ctx.close();
   }
 }

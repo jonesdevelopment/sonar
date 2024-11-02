@@ -203,31 +203,36 @@ verification:
   # Setzen Sie dies auf '', um die Willkommensnachricht vollständig zu deaktivieren
   welcome: '<prefix><green>Sie werden gerade überprüft. Bitte bewegen Sie sich nicht, dies ist ein automatischer Vorgang.'
 
-  # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, während der CAPTCHA noch nicht vorbereitet wurde
+  # Nachricht, die angezeigt wird, wenn jemand beitritt, während der CAPTCHA noch nicht vorbereitet wurde
   currently-preparing:
     - <header>
     - <yellow>Deine Anti-Bot-Daten wurden noch nicht vorbereitet.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
     - <footer>
-  # Trennungs-Nachricht, die angezeigt wird, wenn jemand zu schnell während der Verifizierung erneut beitritt
+  # Nachricht, die angezeigt wird, wenn jemand mit einer nicht unterstützten Minecraft-Version beitritt
+  unsupported-version:
+    - <header>
+    - <red>Dieser Server unterstützt deine Version von Minecraft nicht.
+    - <footer>
+  # Nachricht, die angezeigt wird, wenn jemand zu schnell während der Verifizierung erneut beitritt
   too-fast-reconnect:
     - <header>
     - <gold>Du hast zu schnell erneut eine Verbindung hergestellt, versuche es später noch einmal.
     - <gray>Bitte warte einige Sekunden bevor du es erneut versuchst.
     - <footer>
-  # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber bereits verifiziert wird
+  # Nachricht, die angezeigt wird, wenn jemand beitritt, aber bereits verifiziert wird
   already-verifying:
     - <header>
     - <red>Deine IP-Adresse wird derzeit verifiziert.
     - <red>Bitte warte einige Sekunden bevor du es erneut versuchst.
     - <footer>
-  # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber bereits in der Warteschlange für die Verifizierung ist
+  # Nachricht, die angezeigt wird, wenn jemand beitritt, aber bereits in der Warteschlange für die Verifizierung ist
   already-queued:
     - <header>
     - <red>Deine IP-Adresse befindet sich derzeit in der Warteschlange für die Verifizierung.
     - <red>Bitte warte einige Minuten, bevor du es erneut versuchst.
     - <footer>
-  # Trennungs-Nachricht, die angezeigt wird, wenn jemand beitritt, aber vorübergehend auf der Blacklist steht
+  # Nachricht, die angezeigt wird, wenn jemand beitritt, aber vorübergehend auf der Blacklist steht
   blacklisted:
     - <header>
     - <red>Du bist derzeit vom Betreten des Servers ausgeschlossen.

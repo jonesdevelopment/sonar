@@ -208,6 +208,11 @@ verification:
     - <yellow>Uw anti-bot gegevens zijn nog niet voorbereid.
     - <gray>Wacht een paar seconden voordat u opnieuw probeert te verifiëren.
     - <footer>
+  # Verbindingsbericht dat wordt weergegeven wanneer iemand lid wordt met een niet-ondersteunde Minecraft-versie
+  unsupported-version:
+    - <header>
+    - <red>Deze server ondersteunt jouw versie van Minecraft niet.
+    - <footer>
   # Verbindingsbericht dat wordt weergegeven wanneer iemand tijdens de verificatie te snel opnieuw deelneemt
   too-fast-reconnect:
     - <header>

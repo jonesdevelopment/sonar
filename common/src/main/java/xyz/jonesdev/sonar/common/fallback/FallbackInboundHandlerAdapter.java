@@ -73,17 +73,23 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
                                    final @NotNull Runnable initialLoginAction,
                                    final @NotNull String username,
                                    final @NotNull InetSocketAddress socketAddress) throws Exception {
-    // Check if the player has already sent a login packet
-    if (this.username != null) {
+    // Count every single attempted login
+    GlobalSonarStatistics.countLogin();
+    // Ensure that the player sent a handshake packet
+    if (protocolVersion == null) {
       throw QuietDecoderException.INSTANCE;
     }
     // Connections from unknown protocol versions will be discarded
     // as this is the safest way of handling unwanted connections.
     // Sonar does not support snapshots or Minecraft versions older than 1.7.2
     if (protocolVersion.isUnknown()) {
+      customDisconnect(ctx.channel(), unsupportedVersion, ProtocolVersion.MINECRAFT_1_7_2);
+      return;
+    }
+    // Ensure that the player has not sent a login packet yet
+    if (this.username != null) {
       throw QuietDecoderException.INSTANCE;
     }
-    GlobalSonarStatistics.countLogin();
     this.username = username;
 
     final InetAddress inetAddress = socketAddress.getAddress();
@@ -231,6 +237,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
   private static void _customDisconnect(final @NotNull Channel channel,
                                         final @NotNull FallbackPacket packet,
                                         final @NotNull ProtocolVersion protocolVersion) {
+    // TODO: recode this
     // Remove the connection handler pipeline to completely take over the channel
     final String handler = Sonar.get().getPlatform().getConnectionHandler();
     if (channel.pipeline().context(handler) != null) {

@@ -208,6 +208,11 @@ verification:
     - <yellow>Anti-bot verileriniz henüz hazır değil.
     - <gray>Tekrar doğrulamayı denemeden önce lütfen birkaç saniye bekleyin.
     - <footer>
+  # Birisi desteklenmeyen bir Minecraft sürümüyle katıldığında gösterilen bağlantıyı kes mesajı
+  unsupported-version:
+    - <header>
+    - <red>Bu sunucu senin Minecraft sürümünü desteklemiyor.
+    - <footer>
   # Doğrulama sırasında birisi çok hızlı bir şekilde yeniden katıldığında gösterilen bağlantıyı kesme mesajı
   too-fast-reconnect:
     - <header>

@@ -266,6 +266,7 @@ public final class SonarConfiguration {
 
     tooManyOnlinePerIp = deserializeDisconnectMessage("too-many-online-per-ip");
     verification.currentlyPreparing = deserializeDisconnectMessage("verification.currently-preparing");
+    verification.unsupportedVersion = deserializeDisconnectMessage("verification.unsupported-version");
     verification.tooFastReconnect = deserializeDisconnectMessage("verification.too-fast-reconnect");
     verification.alreadyVerifying = deserializeDisconnectMessage("verification.already-verifying");
     verification.alreadyQueued = deserializeDisconnectMessage("verification.already-queued");
@@ -440,6 +441,7 @@ public final class SonarConfiguration {
     private Component blacklisted;
     private Component protocolBlacklisted;
     private Component currentlyPreparing;
+    private Component unsupportedVersion;
   }
 
   @Getter

@@ -208,6 +208,11 @@ verification:
     - <yellow>Data anti-bot Anda belum disiapkan.
     - <gray>Silakan tunggu beberapa detik sebelum mencoba verifikasi lagi.
     - <footer>
+  # Pesan putus yang ditampilkan ketika seseorang bergabung dengan versi Minecraft yang tidak didukung
+  unsupported-version:
+    - <header>
+    - <red>Server ini tidak mendukung versi Minecraft Anda.
+    - <footer>
   # Pesan putus yang ditampilkan saat seseorang bergabung kembali terlalu cepat selama verifikasi
   too-fast-reconnect:
     - <header>

@@ -30,8 +30,7 @@ public final class FallbackTailExceptionsHandler extends ChannelDuplexHandler {
   // does not have any other pipelines that could handle this error.
   // Additionally, this will also run after our custom decoder.
   @Override
-  public void exceptionCaught(final @NotNull ChannelHandlerContext ctx,
-                              final Throwable cause) throws Exception {
+  public void exceptionCaught(final @NotNull ChannelHandlerContext ctx, final Throwable cause) throws Exception {
     // Close the channel if we encounter any errors.
     ctx.close();
   }

@@ -211,6 +211,11 @@ verification:
     - <yellow>Twoje dane antybotowe nie zostały jeszcze przygotowane.
     - <gray>Odczekaj kilka sekund przed ponowną próbą weryfikacji.
     - <footer>
+  # Komunikat o rozłączeniu wyświetlany, gdy ktoś dołączy z nieobsługiwaną wersją Minecrafta
+  unsupported-version:
+    - <header>
+    - <red>Ten serwer nie obsługuje twojej wersji gry Minecraft.
+    - <footer>
   # Disconnect message that is shown when someone rejoins too fast during verification
   too-fast-reconnect:
     - <header>

@@ -208,6 +208,11 @@ verification:
     - <yellow>Vaše anti-bot data ještě nejsou připravena.
     - <gray>Počkejte prosím několik sekund, než se pokusíte znovu ověřit.
     - <footer>
+  # Zpráva o odpojení, která se zobrazí, když se někdo připojí s nepodporovanou verzí Minecraftu
+  unsupported-version:
+    - <header>
+    - <red>Tento server nepodporuje vaši verzi Minecraftu.
+    - <footer>
   # Zpráva o odpojení, která se zobrazí, když se někdo znovu připojí příliš rychle během ověření
   too-fast-reconnect:
     - <header>

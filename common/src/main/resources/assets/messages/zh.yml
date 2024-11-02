@@ -208,6 +208,11 @@ verification:
     - <yellow>反机器人还在准备所需的数据
     - <gray>请稍后重新加入服务器
     - <footer>
+  # 当有人使用不支持的版本加入时显示的断开信息
+  unsupported-version:
+    - <header>
+    - <red>此服务器不支持您的威廉与版本.
+    - <footer>
   # 当玩家需要验证时重新连接速度太快时显示的踢出消息
   too-fast-reconnect:
     - <header>

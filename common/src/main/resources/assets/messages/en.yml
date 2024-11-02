@@ -208,6 +208,11 @@ verification:
     - <yellow>Your anti-bot data has not been prepared yet.
     - <gray>Please wait a few seconds before trying to verify again.
     - <footer>
+  # Disconnect message that is shown when someone joins with an unsupported Minecraft version
+  unsupported-version:
+    - <header>
+    - <red>This server does not support your version of Minecraft.
+    - <footer>
   # Disconnect message that is shown when someone rejoins too fast during verification
   too-fast-reconnect:
     - <header>

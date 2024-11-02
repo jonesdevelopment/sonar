@@ -208,6 +208,11 @@ verification:
     - <yellow>ანტიბოტი ჯერ არ მომზადებულა.
     - <gray>გთხოვთ დაიცადოთ რამოდენიმე წამი სანამ ხელახლა შემოხვალთ.
     - <footer>
+  # Disconnect message that is shown when someone joins with an unsupported Minecraft version
+  unsupported-version:
+    - <header>
+    - <red>This server does not support your version of Minecraft.
+    - <footer>
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე ხელახლა შემოდის ძალიან სწრაფად შემოწმების დროს.
   too-fast-reconnect:
     - <header>

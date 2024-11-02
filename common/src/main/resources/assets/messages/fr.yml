@@ -208,6 +208,11 @@ verification:
     - <yellow>Vos données anti-bot n'ont pas encore été préparées.
     - <gray>Veuillez patienter quelques secondes avant d'essayer de vous vérifier à nouveau.
     - <footer>
+  # Message de déconnexion affiché lorsque quelqu'un se connecte avec une version de Minecraft non prise en charge
+  unsupported-version:
+    - <header>
+    - <red>Ce serveur ne prend pas en charge votre version de Minecraft.
+    - <footer>
   # Message de déconnexion affiché lorsque quelqu'un se reconnecte trop rapidement pendant la vérification
   too-fast-reconnect:
     - <header>

@@ -41,7 +41,7 @@ public final class DisconnectPacket implements FallbackPacket {
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
-    // Force json serialization during login phase
+    // Force JSON serialization during login phase
     componentHolder.write(byteBuf, protocolVersion, duringLogin);
   }
 

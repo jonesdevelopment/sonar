@@ -112,6 +112,7 @@ public class FallbackPreparer {
   public FallbackPacket reconnectedTooFast;
   public FallbackPacket protocolBlacklisted;
   public FallbackPacket invalidUsername;
+  public FallbackPacket unsupportedVersion;
   public FallbackPacket tooManyOnlinePerIP;
   public FallbackPacket[] xpCountdown;
   public FallbackPacket updateTime;
@@ -189,6 +190,7 @@ public class FallbackPreparer {
     protocolBlacklisted = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getProtocolBlacklisted(), true));
     reconnectedTooFast = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect(), true));
     invalidUsername = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getInvalidUsername(), true));
+    unsupportedVersion = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getUnsupportedVersion(), true));
     tooManyOnlinePerIP = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getTooManyOnlinePerIp(), true));
 
     // Prepare transfer packet
