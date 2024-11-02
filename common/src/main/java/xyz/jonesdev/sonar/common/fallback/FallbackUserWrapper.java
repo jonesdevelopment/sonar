@@ -18,6 +18,7 @@
 package xyz.jonesdev.sonar.common.fallback;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -59,13 +60,13 @@ public final class FallbackUserWrapper implements FallbackUser {
   @Setter
   private boolean forceCaptcha;
 
-  public FallbackUserWrapper(final @NotNull Channel channel,
+  public FallbackUserWrapper(final @NotNull ChannelHandlerContext ctx,
                              final @NotNull InetAddress inetAddress,
                              final @NotNull ProtocolVersion protocolVersion,
                              final @NotNull String username,
                              final @NotNull String fingerprint,
                              final boolean geyser) {
-    this.channel = channel;
+    this.channel = ctx.channel();
     this.inetAddress = inetAddress;
     this.protocolVersion = protocolVersion;
     this.username = username;

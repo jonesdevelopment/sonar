@@ -157,17 +157,8 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
         return null;
       }
 
-      return () -> {
-        // Check if the username matches the valid name regex to prevent
-        // UTF-16 names or other types of exploits
-        if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(username).matches()) {
-          customDisconnect(ctx.channel(), invalidUsername, protocolVersion);
-          return;
-        }
-
-        // Create an instance for the user and let the verification handler take over the channel
-        new FallbackUserWrapper(ctx.channel(), inetAddress, protocolVersion, username, fingerprint, geyser);
-      };
+      // Create an instance for the user and let the verification handler take over the channel
+      return () -> new FallbackUserWrapper(ctx, inetAddress, protocolVersion, username, fingerprint, geyser);
     });
   }
 

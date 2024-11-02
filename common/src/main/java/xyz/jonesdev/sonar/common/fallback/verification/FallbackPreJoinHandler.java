@@ -157,6 +157,10 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
   private void markSuccess() {
     if (user.channel().isActive()) {
+      // Check if the username matches the valid name regex to prevent UTF-16 names or other types of exploits
+      checkState(Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(user.getUsername()).matches(),
+        "username " + user.getUsername() + " does not match regex");
+
       // Pass the player to the next verification handler
       final FallbackGravityHandler gravityHandler = new FallbackGravityHandler(user, this);
       user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(gravityHandler);
