@@ -84,7 +84,6 @@ public final class FallbackInboundHandler extends ChannelInboundHandlerAdapter {
    */
   @Override
   public void exceptionCaught(final @NotNull ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-    cause.printStackTrace();
     ctx.close();
   }
 }
