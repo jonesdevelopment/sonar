@@ -40,6 +40,7 @@ allprojects {
       removeUnusedImports()
       trimTrailingWhitespace()
       indentWithSpaces(2)
+      licenseHeaderFile("../HEADER")
     }
   }
 
