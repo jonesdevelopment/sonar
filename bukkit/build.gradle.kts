@@ -46,6 +46,3 @@ tasks {
     relocate("net.kyori", "xyz.jonesdev.sonar.libs.kyori")
   }
 }
-
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11

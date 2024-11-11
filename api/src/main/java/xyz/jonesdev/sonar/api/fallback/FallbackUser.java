@@ -27,23 +27,17 @@ import xyz.jonesdev.sonar.api.timer.SystemTimer;
 import java.net.InetAddress;
 
 public interface FallbackUser {
-  @NotNull
-  Channel channel();
+  @NotNull Channel channel();
 
-  @NotNull
-  InetAddress getInetAddress();
+  @NotNull InetAddress getInetAddress();
 
-  @NotNull
-  ProtocolVersion getProtocolVersion();
+  @NotNull ProtocolVersion getProtocolVersion();
 
-  @NotNull
-  SystemTimer getLoginTimer();
+  @NotNull SystemTimer getLoginTimer();
 
-  @NotNull
-  String getFingerprint();
+  @NotNull String getFingerprint();
 
-  @NotNull
-  String getUsername();
+  @NotNull String getUsername();
 
   boolean isForceCaptcha();
 

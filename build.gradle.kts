@@ -3,7 +3,8 @@ import net.kyori.indra.git.IndraGitExtension
 plugins {
   java
   alias(libs.plugins.shadow)
-  alias(libs.plugins.indra.git) apply true
+  alias(libs.plugins.indra.git)
+  alias(libs.plugins.spotless)
 }
 
 allprojects {
@@ -15,6 +16,7 @@ allprojects {
 
   apply(plugin = "java")
   apply(plugin = "com.gradleup.shadow")
+  apply(plugin = "com.diffplug.spotless")
 
   dependencies {
     compileOnly(rootProject.libs.lombok)
@@ -29,6 +31,16 @@ allprojects {
     compileOnly(rootProject.libs.caffeine)
     compileOnly(rootProject.libs.netty)
     compileOnly(rootProject.libs.libby.core)
+  }
+
+  spotless {
+    java {
+      endWithNewline()
+      formatAnnotations()
+      removeUnusedImports()
+      trimTrailingWhitespace()
+      indentWithSpaces(2)
+    }
   }
 
   tasks {
@@ -80,6 +92,9 @@ allprojects {
         attributes["Git-Commit"] = gitCommit
       }
     }
+
+    java.sourceCompatibility = JavaVersion.VERSION_11
+    java.targetCompatibility = JavaVersion.VERSION_11
   }
 }
 
@@ -87,7 +102,7 @@ tasks {
   // This is a small wrapper tasks to simplify the building process
   register("build-sonar") {
     val subprojects = listOf("api", "captcha", "common", "bukkit", "bungeecord", "velocity")
-    val buildTasks = subprojects.flatMap { listOf("$it:clean", "$it:shadowJar") }
+    val buildTasks = subprojects.flatMap { listOf("$it:clean", "$it:spotlessApply", "$it:shadowJar") }
     dependsOn(buildTasks)
   }
 }
