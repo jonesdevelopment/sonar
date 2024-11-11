@@ -43,6 +43,7 @@ public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
     // Skip any runs of 0x00 we might find
     final int packetStart = byteBuf.forEachByte(ByteProcessor.FIND_NON_NUL);
     if (packetStart == -1) {
+      byteBuf.clear();
       return;
     }
     byteBuf.readerIndex(packetStart);
