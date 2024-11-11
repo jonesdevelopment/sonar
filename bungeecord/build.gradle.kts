@@ -30,6 +30,3 @@ tasks {
     archiveFileName = "Sonar-Bungee.jar" // Hardcode a shortened version of the name
   }
 }
-
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11

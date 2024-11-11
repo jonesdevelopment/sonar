@@ -75,28 +75,23 @@ public interface Sonar {
 
   void reload();
 
-  @NotNull
-  default SonarVersion getVersion() {
+  @NotNull default SonarVersion getVersion() {
     return SonarVersion.INSTANCE;
   }
 
-  @NotNull
-  default SonarEventManager getEventManager() {
+  @NotNull default SonarEventManager getEventManager() {
     return SonarEventManager.INSTANCE;
   }
 
-  @NotNull
-  default AttackTracker getAttackTracker() {
+  @NotNull default AttackTracker getAttackTracker() {
     return AttackTracker.INSTANCE;
   }
 
-  @NotNull
-  default Fallback getFallback() {
+  @NotNull default Fallback getFallback() {
     return Fallback.INSTANCE;
   }
 
-  @NotNull
-  static Sonar get() {
+  @NotNull static Sonar get() {
     return SonarSupplier.sonar;
   }
 }
