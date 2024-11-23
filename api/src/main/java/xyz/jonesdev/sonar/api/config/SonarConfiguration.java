@@ -458,7 +458,7 @@ public final class SonarConfiguration {
         Library.builder()
           .groupId("org{}mariadb{}jdbc")
           .artifactId("mariadb-java-client")
-          .version("3.4.1")
+          .version("3.5.1")
           .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
           .build()),
       H2("H2", "jdbc:h2:file:%s", new H2DatabaseTypeAdapter(),
