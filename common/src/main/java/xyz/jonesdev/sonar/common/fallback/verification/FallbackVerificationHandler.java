@@ -93,7 +93,7 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
         Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.failed")
           .replace("<username>", user.getUsername())
           .replace("<ip>", Sonar.get().getConfig().formatAddress(user.getInetAddress()))
-          .replace("<protocol>", String.valueOf(user.getProtocolVersion().getProtocol()))
+          .replace("<protocol>", user.getProtocolVersion().getName())
           .replace("<reason>", reason));
     }
 
@@ -123,7 +123,7 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
           Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.blacklisted")
             .replace("<username>", user.getUsername())
             .replace("<ip>", Sonar.get().getConfig().formatAddress(user.getInetAddress()))
-            .replace("<protocol>", String.valueOf(user.getProtocolVersion().getProtocol())));
+            .replace("<protocol>", user.getProtocolVersion().getName()));
       }
     }
 

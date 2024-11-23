@@ -83,7 +83,7 @@ public final class FallbackUserWrapper implements FallbackUser {
         Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.connection")
           .replace("<username>", username)
           .replace("<ip>", Sonar.get().getConfig().formatAddress(inetAddress))
-          .replace("<protocol>", String.valueOf(protocolVersion.getProtocol())));
+          .replace("<protocol>", protocolVersion.getName()));
     }
 
     // Call the VerifyJoinEvent for external API usage
