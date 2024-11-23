@@ -25,7 +25,8 @@ import java.util.Map;
 
 @Getter
 @RequiredArgsConstructor
-public enum ProtocolVersion {  UNKNOWN(-1, "Unknown"),
+public enum ProtocolVersion {
+  UNKNOWN(-1, "Unknown"),
   MINECRAFT_1_7_2(4, "1.7.2"),
   MINECRAFT_1_7_6(5, "1.7.6"),
   MINECRAFT_1_8(47, "1.8"),
