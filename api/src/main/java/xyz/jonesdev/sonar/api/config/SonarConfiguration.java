@@ -220,16 +220,12 @@ public final class SonarConfiguration {
     webhook.content = webhookConfig.getString("webhook.content");
     webhook.footer.text = webhookConfig.getString("webhook.embed.footer.text");
     webhook.footer.iconUrl = webhookConfig.getString("webhook.embed.footer.icon-url");
-
-    final String realEmbedPath = "webhook.embed";
-    final String embedPath = realEmbedPath + ".";
-
-    webhook.embed.title = webhookConfig.getString(embedPath + "title");
-    webhook.embed.titleUrl = webhookConfig.getString(embedPath + "title-url");
-    webhook.embed.description = String.join("\n", webhookConfig.getStringList(embedPath + "description"));
-    webhook.embed.r = webhookConfig.getInt(embedPath + "color.red");
-    webhook.embed.g = webhookConfig.getInt(embedPath + "color.green");
-    webhook.embed.b = webhookConfig.getInt(embedPath + "color.blue");
+    webhook.embed.title = webhookConfig.getString("webhook.embed.title");
+    webhook.embed.titleUrl = webhookConfig.getString("webhook.embed.title-url");
+    webhook.embed.description = String.join("\n", webhookConfig.getStringList("webhook.embed.description"));
+    webhook.embed.r = webhookConfig.getInt("webhook.embed.color.red");
+    webhook.embed.g = webhookConfig.getInt("webhook.embed.color.green");
+    webhook.embed.b = webhookConfig.getInt("webhook.embed.color.blue");
 
     if (!webhook.url.isEmpty()) {
       if (webhook.username.isEmpty()) {
@@ -455,14 +451,14 @@ public final class SonarConfiguration {
         Library.builder()
           .groupId("com{}mysql")
           .artifactId("mysql-connector-j")
-          .version("9.0.0")
+          .version("9.1.0")
           .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
           .build()),
       MARIADB("MariaDB", "jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter(),
         Library.builder()
           .groupId("org{}mariadb{}jdbc")
           .artifactId("mariadb-java-client")
-          .version("3.4.1")
+          .version("3.5.1")
           .relocate("org{}mariadb", "xyz{}jonesdev{}sonar{}libs{}mariadb")
           .build()),
       H2("H2", "jdbc:h2:file:%s", new H2DatabaseTypeAdapter(),
