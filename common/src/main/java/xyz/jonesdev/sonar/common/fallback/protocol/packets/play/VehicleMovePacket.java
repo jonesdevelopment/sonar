@@ -33,6 +33,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 public final class VehicleMovePacket implements FallbackPacket {
   private double x, y, z;
   private float yaw, pitch;
+  private boolean onGround;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
@@ -50,5 +51,6 @@ public final class VehicleMovePacket implements FallbackPacket {
     z = byteBuf.readDouble();
     yaw = byteBuf.readFloat();
     pitch = byteBuf.readFloat();
+    onGround = byteBuf.readBoolean();
   }
 }
