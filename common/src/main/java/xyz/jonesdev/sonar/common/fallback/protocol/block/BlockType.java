@@ -69,7 +69,10 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 7389;
     }
-    return 7619;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 7619;
+    }
+    return 8163;
   }, protocolVersion -> (double) 0.75f),
   TRAPDOOR(protocolVersion -> {
     // We have to use wooden trapdoors for 1.7 since 1.7 doesn't have iron trapdoors
@@ -112,7 +115,10 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 10414;
     }
-    return 10749;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 10749;
+    }
+    return 11285;
   }, protocolVersion -> 0.1875),
   END_PORTAL_FRAME(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
@@ -148,7 +154,10 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 7414;
     }
-    return 7644;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 7644;
+    }
+    return 8188;
   }, protocolVersion -> 0.8125),
   DAYLIGHT_SENSOR(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
@@ -187,7 +196,10 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 9207;
     }
-    return 9462;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 9462;
+    }
+    return 10005;
   }, protocolVersion -> 0.375),
   COBBLESTONE_WALL(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
@@ -223,7 +235,10 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 7922;
     }
-    return 8152;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 8152;
+    }
+    return 8696;
   }, protocolVersion -> 1.5),
   STONE_SLABS(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
@@ -262,7 +277,10 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 11231;
     }
-    return 11566;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 11566;
+    }
+    return 12116;
   }, protocolVersion -> 0.5),
   WHITE_CARPET(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
@@ -301,7 +319,10 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 10728;
     }
-    return 11063;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 11063;
+    }
+    return 11607;
   }, protocolVersion -> protocolVersion.compareTo(MINECRAFT_1_8) < 0 ? 0 : 0.0625);
 
   private final Function<ProtocolVersion, Integer> id;

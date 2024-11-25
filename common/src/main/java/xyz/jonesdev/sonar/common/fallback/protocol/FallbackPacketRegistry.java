@@ -437,7 +437,8 @@ public enum FallbackPacketRegistry {
         map(0x2B, MINECRAFT_1_20_2, false),
         map(0x2C, MINECRAFT_1_20_3, false),
         map(0x2F, MINECRAFT_1_20_5, false),
-        map(0x31, MINECRAFT_1_21_2, false));
+        map(0x31, MINECRAFT_1_21_2, false),
+        map(0x33, MINECRAFT_1_21_4, false));
       serverbound.register(PaddleBoatPacket.class, PaddleBoatPacket::new,
         map(0x11, MINECRAFT_1_9, false),
         map(0x12, MINECRAFT_1_12, false),
@@ -469,7 +470,8 @@ public enum FallbackPacketRegistry {
         map(0x22, MINECRAFT_1_20_2, false),
         map(0x23, MINECRAFT_1_20_3, false),
         map(0x26, MINECRAFT_1_20_5, false),
-        map(0x28, MINECRAFT_1_21_2, false));
+        map(0x28, MINECRAFT_1_21_2, false),
+        map(0x29, MINECRAFT_1_21_4, false));
       serverbound.register(VehicleMovePacket.class, VehicleMovePacket::new,
         map(0x10, MINECRAFT_1_9, false),
         map(0x11, MINECRAFT_1_12, false),
@@ -526,7 +528,7 @@ public enum FallbackPacketRegistry {
         map(0x08, MINECRAFT_1_19_4, false),
         map(0x09, MINECRAFT_1_20_2, false),
         map(0x0A, MINECRAFT_1_20_5, false),
-        map(0xC, MINECRAFT_1_21_2, false));
+        map(0x0C, MINECRAFT_1_21_2, false));
       serverbound.register(PluginMessagePacket.class, PluginMessagePacket::new,
         map(0x17, MINECRAFT_1_7_2, false),
         map(0x09, MINECRAFT_1_9, false),
@@ -627,7 +629,8 @@ public enum FallbackPacketRegistry {
         map(0x23, MINECRAFT_1_20_2, false),
         map(0x24, MINECRAFT_1_20_3, false),
         map(0x27, MINECRAFT_1_20_5, false),
-        map(0x29, MINECRAFT_1_21_2, false));
+        map(0x29, MINECRAFT_1_21_2, false),
+        map(0x2B, MINECRAFT_1_21_4, false));
       serverbound.register(AnimationPacket.class, AnimationPacket::new,
         map(0x0A, MINECRAFT_1_7_2, false),
         map(0x1A, MINECRAFT_1_9, false),
@@ -641,7 +644,8 @@ public enum FallbackPacketRegistry {
         map(0x32, MINECRAFT_1_20_2, false),
         map(0x33, MINECRAFT_1_20_3, false),
         map(0x36, MINECRAFT_1_20_5, false),
-        map(0x38, MINECRAFT_1_21_2, false));
+        map(0x38, MINECRAFT_1_21_2, false),
+        map(0x3A, MINECRAFT_1_21_4, false));
     }
   };
 
