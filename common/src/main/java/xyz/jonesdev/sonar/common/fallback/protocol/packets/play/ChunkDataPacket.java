@@ -88,10 +88,12 @@ public final class ChunkDataPacket implements FallbackPacket {
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       byteBuf.writeInt(0);
       byteBuf.writeBytes(new byte[2]);
-    } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_15)) {
+    } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_13)) {
       ProtocolUtil.writeVarInt(byteBuf, 0);
-    } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_18)) {
+    } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_15)) {
       ProtocolUtil.writeByteArray(byteBuf, new byte[256 * 4]);
+    } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_18)) {
+      ProtocolUtil.writeVarInt(byteBuf, 0);
     } else {
       final byte[] sectionData = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
       int count = protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2) ? 24 : 16;
