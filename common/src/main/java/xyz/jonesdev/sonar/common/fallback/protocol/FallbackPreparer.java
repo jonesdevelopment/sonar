@@ -272,14 +272,11 @@ public class FallbackPreparer {
   public static FallbackPacket[] getRegistryPackets(final @NotNull ProtocolVersion protocolVersion) {
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_4)) {
       return REGISTRY_SYNC_1_21_4;
-    }
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
       return REGISTRY_SYNC_1_21_2;
-    }
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21)) {
       return REGISTRY_SYNC_1_21;
-    }
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
       return REGISTRY_SYNC_1_20_5;
     }
     return REGISTRY_SYNC_1_20;

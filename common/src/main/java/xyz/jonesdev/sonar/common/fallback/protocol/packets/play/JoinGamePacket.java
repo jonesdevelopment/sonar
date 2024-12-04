@@ -27,6 +27,7 @@ import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionType;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
@@ -77,7 +78,7 @@ public final class JoinGamePacket implements FallbackPacket {
 
       ProtocolUtil.writeStringArray(byteBuf, levelNames);
 
-      final CompoundBinaryTag codec = ProtocolUtil.getCodec(protocolVersion);
+      final CompoundBinaryTag codec = getCodec(protocolVersion);
 
       if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
         ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, codec);
@@ -170,6 +171,23 @@ public final class JoinGamePacket implements FallbackPacket {
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
       byteBuf.writeBoolean(secureProfile);
     }
+  }
+
+  private static CompoundBinaryTag getCodec(final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20)) {
+      return DimensionRegistry.CODEC_1_20;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_4)) {
+      return DimensionRegistry.CODEC_1_19_4;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
+      return DimensionRegistry.CODEC_1_19_1;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
+      return DimensionRegistry.CODEC_1_19;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_18_2)) {
+      return DimensionRegistry.CODEC_1_18_2;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16_2)) {
+      return DimensionRegistry.CODEC_1_16_2;
+    }
+    return DimensionRegistry.CODEC_1_16;
   }
 
   @Override
