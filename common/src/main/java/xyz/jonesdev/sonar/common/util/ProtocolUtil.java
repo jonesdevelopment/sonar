@@ -28,10 +28,8 @@ import io.netty.util.Version;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
-import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.io.IOException;
@@ -318,25 +316,6 @@ public class ProtocolUtil {
       high = byteBuf.readUnsignedByte();
     }
     return ((high & 0xFF) << 15) | low;
-  }
-
-  public static CompoundBinaryTag getCodec(final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21)) {
-      return DimensionRegistry.CODEC_1_21;
-    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20)) {
-      return DimensionRegistry.CODEC_1_20;
-    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_4)) {
-      return DimensionRegistry.CODEC_1_19_4;
-    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_1)) {
-      return DimensionRegistry.CODEC_1_19_1;
-    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19)) {
-      return DimensionRegistry.CODEC_1_19;
-    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_18_2)) {
-      return DimensionRegistry.CODEC_1_18_2;
-    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16_2)) {
-      return DimensionRegistry.CODEC_1_16_2;
-    }
-    return DimensionRegistry.CODEC_1_16;
   }
 
   private void checkState(final boolean expression, final String message) {

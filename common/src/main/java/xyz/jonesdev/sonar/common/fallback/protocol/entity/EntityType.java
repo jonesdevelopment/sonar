@@ -54,7 +54,11 @@ public enum EntityType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 10;
     }
-    return 85; // 1.21.2 split the boat type in id registries.
+    // 1.21.2 split the boat type in id registries.
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 85;
+    }
+    return 84;
   }),
   MINECART(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_13_2)) {
@@ -87,7 +91,10 @@ public enum EntityType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 69;
     }
-    return 82;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
+      return 82;
+    }
+    return 81;
   });
 
   private final Function<ProtocolVersion, Integer> id;
