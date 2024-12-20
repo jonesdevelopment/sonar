@@ -70,10 +70,9 @@ queue:
 # lekkiego serwera Limbo, na którym przeprowadzane są zaawansowane kontrole antybotowe
 verification:
   # Kiedy Sonar powinien weryfikować nowych graczy?
-  # Możliwe rodzaje: ALWAYS, DURING_ATTACK, NEVER
+  # Możliwe rodzaje: ALWAYS, DURING_ATTACK
   # - ALWAYS: Nowi gracze będą zawsze weryfikowani (zalecane)
   # - DURING_ATTACK: Nowi gracze będą weryfikowani tylko podczas ataku
-  # - NEVER: Nowi gracze nigdy nie będą weryfikowani
   timing: ALWAYS
   checks:
     # Sprawdza, czy ruch spadający gracza jest zgodny z działaniem grawitacji Minecraft.

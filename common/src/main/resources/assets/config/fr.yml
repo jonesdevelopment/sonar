@@ -70,10 +70,9 @@ queue:
 # un serveur limbo léger où des vérifications avancées de bot sont effectuées
 verification:
   # Quand Sonar devrait-il vérifier les nouveaux joueurs ?
-  # Types possibles : ALWAYS, DURING_ATTACK, NEVER
+  # Types possibles : ALWAYS, DURING_ATTACK
   # - ALWAYS : Les nouveaux joueurs seront toujours vérifiés (Recommandé)
   # - DURING_ATTACK : Les nouveaux joueurs ne seront vérifiés que pendant une attaque
-  # - NEVER : Les nouveaux joueurs ne seront jamais vérifiés
   timing: ALWAYS
   checks:
     # Vérifie si le mouvement de chute des joueurs suit la formule de la gravité de Minecraft

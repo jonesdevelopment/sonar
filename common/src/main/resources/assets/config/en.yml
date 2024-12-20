@@ -70,10 +70,9 @@ queue:
 # a lightweight limbo server where advanced bot checks are performed
 verification:
   # When should Sonar verify new players?
-  # Possible types: ALWAYS, DURING_ATTACK, NEVER
+  # Possible types: ALWAYS, DURING_ATTACK
   # - ALWAYS: New players will always be checked (Recommended)
   # - DURING_ATTACK: New players will only be checked during an attack
-  # - NEVER: New players will never be checked
   timing: ALWAYS
   checks:
     # Checks if the players' falling motion is following Minecraft's gravity formula

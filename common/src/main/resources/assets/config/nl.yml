@@ -70,10 +70,9 @@ queue:
 # een lichtgewicht limbo-server waar geavanceerde bot-controles worden uitgevoerd
 verification:
   # Wanneer moet Sonar nieuwe spelers verifiëren?
-  # Mogelijke typen: ALWAYS, DURING_ATTACK, NEVER
+  # Mogelijke typen: ALWAYS, DURING_ATTACK
   # - ALWAYS: Nieuwe spelers worden altijd gecontroleerd (Aanbevolen)
   # - DURING_ATTACK: Nieuwe spelers worden alleen gecontroleerd tijdens een aanval
-  # - NEVER: Nieuwe spelers worden nooit gecontroleerd
   timing: ALWAYS
   checks:
     # Controleert of de valbeweging van de spelers de zwaartekrachtformule van Minecraft volgt

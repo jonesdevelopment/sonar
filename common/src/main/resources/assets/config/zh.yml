@@ -70,10 +70,9 @@ queue:
 # 每个需要验证的玩家都将被发送到一个轻量级的虚拟服务器来检查高级机器人
 verification:
   # Sonar 应该在什么时候验证玩家?
-  # 可用类型: ALWAYS, DURING_ATTACK, NEVER
+  # 可用类型: ALWAYS, DURING_ATTACK
   # - ALWAYS: 玩家始终需要验证 直到他们通过验证为止
   # - DURING_ATTACK: 玩家仅在服务器疑似遭到攻击时验证
-  # - NEVER: 永远不检查未被验证过的玩家
   timing: ALWAYS
   checks:
     # 检查玩家的下落移动是否遵循原版客户端.

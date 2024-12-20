@@ -71,10 +71,9 @@ queue:
 # Jednoduchého limbo serveru kde proběhnou zkoušky proti botům
 verification:
   # Kdy by měl Sonar verifikovat nové hráče?
-  # TYPY: ALWAYS, DURING_ATTACK, NEVER (Vždy, Pouze při útoku, Nikdy)
+  # TYPY: ALWAYS, DURING_ATTACK
   # - ALWAYS: Noví hráči budou vždy verifikováni (Doporučeno)
   # - DURING_ATTACK: New players will only be checked during an attack Noví hráči budou verifikováni pouze při útoku
-  # - NEVER: Noví hráči nebudou nikdy vyžkoušeni
   timing: ALWAYS
   checks:
     # Kontroluje, zda pohyb hráčů je roven gravitační formuli Minecraftu

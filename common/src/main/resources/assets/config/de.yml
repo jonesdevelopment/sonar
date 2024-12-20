@@ -68,10 +68,9 @@ queue:
 # einem leichtgewichtigen Limbo-Server gesendet, wo fortgeschrittene Bot-Überprüfungen durchgeführt werden
 verification:
   # Wann sollte Sonar neue Spieler überprüfen?
-  # Mögliche Typen: ALWAYS, DURING_ATTACK, NEVER
+  # Mögliche Typen: ALWAYS, DURING_ATTACK
   # - ALWAYS: Neue Spieler werden immer überprüft (Empfohlen)
   # - DURING_ATTACK: Neue Spieler werden nur während eines Angriffs überprüft
-  # - NEVER: Neue Spieler werden nie überprüft
   timing: ALWAYS
   checks:
     # Überprüft, ob die Fallbewegung der Spieler der Gravitationsformel von Minecraft folgt
