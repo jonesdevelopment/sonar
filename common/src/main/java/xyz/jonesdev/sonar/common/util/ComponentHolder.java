@@ -43,7 +43,7 @@ public final class ComponentHolder {
   }
 
   // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/packet/chat/ComponentHolder.java
-  private BinaryTag serialize(final @NotNull JsonElement json) {
+  private static BinaryTag serialize(final @NotNull JsonElement json) {
     if (json instanceof JsonPrimitive) {
       final JsonPrimitive jsonPrimitive = (JsonPrimitive) json;
 
