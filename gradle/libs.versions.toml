@@ -1,5 +1,5 @@
 [versions]
-netty = "4.1.115.Final"
+netty = "4.1.116.Final"
 adventure = "4.17.0"
 adventure-platform = "4.3.4"
 bstats = "3.1.0"
