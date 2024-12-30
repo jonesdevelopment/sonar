@@ -100,13 +100,11 @@ public final class FallbackUserWrapper implements FallbackUser {
       Sonar.get().getFallback().getConnected().compute(inetAddress, (__, v) -> true);
 
       // Replace normal encoder to allow custom packets
-      // TODO: recode injection
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);
       channel.pipeline().addFirst(FALLBACK_FRAME_ENCODER, FallbackVarIntLengthEncoder.INSTANCE);
       channel.pipeline().addLast(FALLBACK_PACKET_ENCODER, newEncoder);
 
       // Replace normal decoder to allow custom packets
-      // TODO: recode injection
       final FallbackPacketDecoder newDecoder = new FallbackPacketDecoder(protocolVersion);
       channel.pipeline().addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
       channel.pipeline().addLast(FALLBACK_PACKET_DECODER, newDecoder);
@@ -127,7 +125,6 @@ public final class FallbackUserWrapper implements FallbackUser {
       newDecoder.setListener(new FallbackPreJoinHandler(this));
 
       // Make sure to catch all exceptions during the verification
-      // TODO: recode injection
       channel.pipeline().addLast(FALLBACK_TAIL_EXCEPTIONS, FallbackTailExceptionsHandler.INSTANCE);
     });
   }
