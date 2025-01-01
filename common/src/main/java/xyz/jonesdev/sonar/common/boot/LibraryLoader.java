@@ -72,7 +72,7 @@ class LibraryLoader {
         Library.builder()
           .groupId("net{}kyori")
           .artifactId("adventure-text-minimessage")
-          .version("4.18.0")
+          .version("4.13.1") // adventure-platforms hasn't updated in years... Please update! :'(
           .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
           .build(),
         Library.builder()
