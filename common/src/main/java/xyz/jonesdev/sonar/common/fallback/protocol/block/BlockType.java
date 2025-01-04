@@ -118,7 +118,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
       return 10749;
     }
-    return 11285;
+    return 11293;
   }, protocolVersion -> 0.1875),
   END_PORTAL_FRAME(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
@@ -157,7 +157,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
       return 7644;
     }
-    return 8188;
+    return 8185;
   }, protocolVersion -> 0.8125),
   DAYLIGHT_SENSOR(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
@@ -199,7 +199,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
       return 9462;
     }
-    return 10005;
+    return 10006;
   }, protocolVersion -> 0.375),
   COBBLESTONE_WALL(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
@@ -280,7 +280,7 @@ public enum BlockType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
       return 11566;
     }
-    return 12116;
+    return 12110;
   }, protocolVersion -> 0.5),
   WHITE_CARPET(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_12_2)) {
