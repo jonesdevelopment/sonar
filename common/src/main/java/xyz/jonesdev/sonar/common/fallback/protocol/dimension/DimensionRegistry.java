@@ -54,7 +54,7 @@ public final class DimensionRegistry {
 
   private @NotNull CompoundBinaryTag getCodec(final @NotNull String fileName) {
     try (final InputStream inputStream = Sonar.class.getResourceAsStream("/assets/codecs/" + fileName)) {
-      return BinaryTagIO.reader().read(Objects.requireNonNull(inputStream), BinaryTagIO.Compression.GZIP);
+      return BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream), BinaryTagIO.Compression.GZIP);
     } catch (Throwable throwable) {
       Sonar.get().getLogger().error("Could not load mappings for {}: {}", fileName, throwable);
       throw new IllegalStateException(throwable);
