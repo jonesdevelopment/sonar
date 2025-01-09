@@ -35,6 +35,7 @@ public final class DimensionRegistry {
   public final CompoundBinaryTag CODEC_1_19_1;
   public final CompoundBinaryTag CODEC_1_19_4;
   public final CompoundBinaryTag CODEC_1_20;
+  public final CompoundBinaryTag CODEC_1_20_5;
   public final CompoundBinaryTag CODEC_1_21;
   public final CompoundBinaryTag CODEC_1_21_2;
   public final CompoundBinaryTag CODEC_1_21_4;
@@ -47,6 +48,7 @@ public final class DimensionRegistry {
     CODEC_1_19_1 = getCodec("codec_1_19_1.nbt");
     CODEC_1_19_4 = getCodec("codec_1_19_4.nbt");
     CODEC_1_20 = getCodec("codec_1_20.nbt");
+    CODEC_1_20_5 = getCodec("codec_1_20_5.nbt");
     CODEC_1_21 = getCodec("codec_1_21.nbt");
     CODEC_1_21_2 = getCodec("codec_1_21_2.nbt");
     CODEC_1_21_4 = getCodec("codec_1_21_4.nbt");
