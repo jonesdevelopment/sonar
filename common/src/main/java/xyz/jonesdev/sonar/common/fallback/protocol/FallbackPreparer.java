@@ -80,7 +80,7 @@ public class FallbackPreparer {
   public final FallbackPacket PRE_JOIN_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(PRE_JOIN_KEEP_ALIVE_ID));
   public final FallbackPacket[] REGISTRY_SYNC_1_20 = new FallbackPacket[] {
     new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null))};
-  public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20);
+  public final FallbackPacket[] REGISTRY_SYNC_1_20_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_20_5);
   public final FallbackPacket[] REGISTRY_SYNC_1_21 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21);
   public final FallbackPacket[] REGISTRY_SYNC_1_21_2 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_2);
   public final FallbackPacket[] REGISTRY_SYNC_1_21_4 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_4);

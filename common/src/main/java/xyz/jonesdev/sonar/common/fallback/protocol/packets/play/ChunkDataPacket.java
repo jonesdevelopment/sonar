@@ -96,7 +96,7 @@ public final class ChunkDataPacket implements FallbackPacket {
       ProtocolUtil.writeVarInt(byteBuf, 0);
     } else {
       final byte[] sectionData = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
-      int count = protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2) ? 24 : 16;
+      int count = 24;
       ProtocolUtil.writeVarInt(byteBuf, sectionData.length * count);
 
       for (int i = 0; i < count; i++) {
