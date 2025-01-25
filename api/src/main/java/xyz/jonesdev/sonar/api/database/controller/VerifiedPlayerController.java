@@ -133,6 +133,8 @@ public final class VerifiedPlayerController {
   public void close() {
     // The connection source will always be null if the database type is NONE.
     if (connectionSource != null) {
+      // Shut down the update service before letting it re-use the connection.
+      updateService.shutdown();
       try {
         connectionSource.close();
       } catch (Exception exception) {
@@ -140,7 +142,6 @@ public final class VerifiedPlayerController {
       }
       // Make sure not to reuse a closed connection
       connectionSource = null;
-      updateService.shutdown();
     }
   }
 
