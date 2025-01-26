@@ -211,7 +211,7 @@ public enum Language {
 
   public static Language fromCode(final @NotNull String code) {
     for (final Language language : values()) {
-      if (language.code.equals(code)) {
+      if (language.code.equalsIgnoreCase(code)) {
         return language;
       }
     }
