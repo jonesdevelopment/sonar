@@ -1,0 +1,209 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Precisa de ajuda ou tem dúvidas? https://jonesdev.xyz/discord
+# Código-fonte: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development e Sonar Contributors, licenciado sob GPL-3.0
+#
+
+# Configurações gerais para o Sonar
+general:
+  # O Sonar deve verificar automaticamente se há novas atualizações?
+  # O Sonar usa a API do GitHub para verificar se a versão atual está desatualizada
+  check-for-updates: true
+  # O Sonar deve registrar os endereços IP dos jogadores no console?
+  log-player-addresses: true
+  # Número máximo de jogadores online com o mesmo endereço IP
+  max-online-per-ip: 3
+
+# Configurações de sensibilidade para o rastreador de ataques
+# Edite isso apenas se você souber o que está fazendo
+attack-tracker:
+  # Número mínimo de novos jogadores para que um ataque seja detectado
+  min-players-for-attack: 8
+  # Tempo que deve passar para que um ataque seja considerado encerrado
+  # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
+  min-attack-duration: 30000
+  # Número de vezes que um incidente deve ser relatado para ser reconhecido como um ataque
+  # Este número atua como um buffer para filtrar notificações de ataque falsas
+  min-attack-threshold: 2
+  # Tempo que deve passar para que um novo ataque seja detectado
+  # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
+  attack-cooldown-delay: 3000
+
+# Você pode conectar o Sonar a um banco de dados para manter jogadores verificados mesmo após reiniciar seu servidor
+# Nota: Endereços IP são salvos em texto simples. Você é responsável por manter seu banco de dados seguro!
+database:
+  # Tipo de banco de dados que o Sonar usa para armazenar jogadores verificados
+  # Tipos possíveis: NONE, MYSQL, MARIADB, H2
+  type: NONE
+  # Arquivo no diretório de plugins do Sonar usado para o banco de dados H2
+  filename: verified_players
+  # Endereço do host para autenticação com o banco de dados SQL
+  host: localhost
+  # Porta para autenticação com o banco de dados SQL
+  port: 3306
+  # Nome do banco de dados SQL
+  name: sonar
+  # Nome de usuário para autenticação com o banco de dados SQL
+  username: ''
+  # Senha para autenticação com o banco de dados SQL
+  password: ''
+  # Quantos dias o Sonar deve manter jogadores verificados no banco de dados?
+  maximum-age: 5
+
+# Cada nova solicitação de login será enfileirada para evitar ataques de spam
+# A fila é atualizada a cada 1 segundo (20 ticks)
+queue:
+  # Número de polls de fila concorrentes por 1 segundo
+  max-polls: 30
+
+# Cada novo jogador que se junta pela primeira vez será enviado para
+# um servidor limbo leve onde verificações avançadas de bot são realizadas
+verification:
+  # Quando o Sonar deve verificar novos jogadores?
+  # Tipos possíveis: ALWAYS, DURING_ATTACK
+  # - ALWAYS: Novos jogadores sempre serão verificados (Recomendado)
+  # - DURING_ATTACK: Novos jogadores serão verificados apenas durante um ataque
+  timing: ALWAYS
+  checks:
+    # Verifica se o movimento de queda dos jogadores segue a fórmula de gravidade do Minecraft
+    # Todos os movimentos previstos são pré-calculados para economizar desempenho
+    gravity:
+      # O Sonar deve verificar a gravidade do cliente? (Recomendado)
+      enabled: true
+      # O Sonar deve fazer o jogador resolver um CAPTCHA se falhar na verificação de gravidade?
+      captcha-on-fail: false
+      # O número de ticks que o jogador deve cair para ser permitido atingir a plataforma
+      max-movement-ticks: 8
+
+    # Verifica se o jogador está colidindo com blocos gerados abaixo dele
+    collision:
+      # O Sonar deve verificar se o jogador colide com blocos? (Recomendado)
+      enabled: true
+
+    # Verifica se o cliente envia pacotes adequados ao entrar em um barco
+    vehicle:
+      # O Sonar deve verificar se o jogador entra corretamente em um barco?
+      enabled: true
+      # Número mínimo de pacotes enviados pelo cliente
+      minimum-packets: 2
+
+    # Faz o jogador digitar um código de um mapa virtual no chat
+    map-captcha:
+      # Quando o Sonar deve fazer o jogador resolver um CAPTCHA?
+      # Tipos possíveis: ALWAYS, DURING_ATTACK, NEVER
+      # - ALWAYS: Novos jogadores sempre receberão um CAPTCHA
+      # - DURING_ATTACK: Novos jogadores receberão um CAPTCHA apenas durante um ataque
+      # - NEVER: Novos jogadores nunca receberão um CAPTCHA (Recomendado)
+      timing: NEVER
+      # Caminho para a imagem de fundo que o Sonar usa para o CAPTCHA
+      # Se a imagem não for encontrada, um ruído será usado como fundo padrão.
+      # Você pode colocar o nome do arquivo aqui se o arquivo estiver no diretório de plugins do Sonar
+      background: ''
+      # Quantas respostas de CAPTCHA o Sonar deve preparar?
+      # Esta tarefa acontece de forma assíncrona em segundo plano
+      precompute: 500
+      # Quanto tempo o Sonar deve esperar até que o jogador falhe no CAPTCHA?
+      # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
+      max-duration: 30000
+      # Quantas vezes um jogador deve falhar no CAPTCHA antes de falhar na verificação?
+      max-tries: 3
+      # Caracteres (letras/números) que são permitidos na resposta ao CAPTCHA
+      # Não é recomendável adicionar números ou letras que possam parecer semelhantes.
+      # Você deve editar isso apenas se souber o que está fazendo
+      alphabet: 'abcdefhjkmnoprstuxyz'
+
+    # Verifica se os jogadores estão enviando uma marca de cliente válida para o servidor
+    client-brand:
+      # O Sonar deve verificar marcas de cliente válidas? (Recomendado)
+      enabled: true
+      # Regex para validar marcas de cliente durante a verificação
+      valid-regex: ^[!-~ ]+$
+      # Comprimento máximo da marca de cliente durante a verificação
+      max-length: 64
+
+    # Regex para validar nomes de usuário durante a verificação
+    valid-name-regex: ^[a-zA-Z0-9_]+$
+    # Regex para validar o local do cliente durante a verificação
+    valid-locale-regex: ^[a-zA-Z_]+$
+
+  # Se habilitado, o jogador será transferido de volta para o servidor de origem
+  # após passar com sucesso pela verificação do bot.
+  # Este recurso foi introduzido pela Mojang na versão 1.20.5 do Minecraft
+  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
+  transfer:
+    # O Sonar deve transferir o jogador para o servidor de origem (em vez de expulsá-lo)?
+    # Para que isso funcione, você deve habilitar o recurso na configuração do seu servidor.
+    # Além disso, você pode querer reduzir a quantidade de limitação de taxa de login
+    # realizada pelo Velocity ou outros proxies/plugins, pois isso pode impedir que o
+    # jogador seja transferido corretamente.
+    # Se seu servidor permitir que jogadores Bedrock se juntem via Geyser, certifique-se de configurar
+    # o TransferTool para Geyser, para que jogadores Bedrock sejam redirecionados para o servidor correto.
+    # https://github.com/onebeastchris/TransferTool
+    enabled: false
+    # Para qual servidor o Sonar deve transferir o jogador quando a verificação for passada?
+    # Por favor, insira o IP do servidor usado pelos jogadores para se conectar normalmente ao seu servidor.
+    # Por exemplo, você pode colocar "mc.hypixel.net" ou um IP direto como "1.1.1.1"
+    destination-host: "play.my-server.com"
+    # Qual porta o Sonar deve usar ao transferir o jogador para o servidor de origem?
+    # Se seu servidor não precisar de uma porta para se conectar, você pode deixar isso como 25565.
+    destination-port: 25565
+
+  # O modo de jogo do jogador durante a verificação
+  # Tipos possíveis: SURVIVAL, CREATIVE, ADVENTURE
+  # - SURVIVAL: todos os componentes da UI são visíveis
+  # - CREATIVE: saúde e fome estão ocultas
+  # - ADVENTURE: todos os componentes da UI são visíveis
+  gamemode: ADVENTURE
+  # Tempo de luz do dia no mundo de verificação
+  # Você pode encontrar todos os tempos de luz do dia aqui:
+  # https://minecraft.wiki/w/Daylight_cycle
+  # Esta é apenas uma configuração visual e não altera o processo de verificação!
+  # Se este valor for definido como 1000, o pacote não será enviado.
+  time-of-day: 1000
+  # O Sonar armazena em cache a maioria dos pacotes que envia ao cliente, incluindo o pacote LoginSuccess.
+  # Qual nome de usuário o Sonar deve usar para o pacote LoginSuccess?
+  # O nome de usuário não será visível para o jogador sem modificações no cliente
+  cached-username: "Sonar"
+  # O Sonar deve registrar novas tentativas de verificação?
+  log-connections: true
+  # O Sonar deve registrar novas tentativas de verificação durante ataques?
+  log-during-attack: false
+  # O Sonar deve registrar cada movimento/mudança de posição durante a verificação?
+  # Isso não é recomendado para servidores de produção, mas pode ser útil para detectar erros.
+  debug-xyz-positions: false
+  # O Sonar também deve verificar jogadores Geyser (Bedrock)?
+  # Este recurso é experimental e pode causar problemas
+  # Se isso estiver desativado, jogadores Bedrock serão ignorados
+  check-geyser-players: true
+  # O tempo desde que o jogador parou de enviar pacotes antes de desconectar
+  # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
+  read-timeout: 8000
+  # O tempo desde que o servidor parou de enviar pacotes antes de desconectar o jogador
+  # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
+  write-timeout: 10000
+  # Quanto tempo um jogador deve esperar antes de se reconectar durante a verificação
+  # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
+  rejoin-delay: 5000
+  # Quanto tempo o Sonar deve lembrar o número de falhas de verificação para um jogador?
+  # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
+  remember-time: 120000
+  # Quanto tempo um endereço IP deve ser negado de fazer login ao falhar na verificação muitas vezes?
+  # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
+  blacklist-time: 600000
+  # Com que frequência um jogador deve falhar na verificação para ser colocado na lista negra?
+  # (Defina este valor como 0 para desativar completamente a lista negra)
+  blacklist-threshold: 2
+  # Lista de IDs de protocolo que não podem se juntar ao servidor
+  # Você pode encontrar a lista completa de todos os IDs de protocolo aqui:
+  # https://wiki.vg/Protocol_version_numbers
+  # Por exemplo, Minecraft 1.20 tem o ID 763.
+  blacklisted-protocols: []
