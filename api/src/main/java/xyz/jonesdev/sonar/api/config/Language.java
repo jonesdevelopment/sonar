@@ -140,6 +140,7 @@ public enum Language {
   FA("Persian"),
   PL("Polish"),
   PT("Portuguese"),
+  PT_BR("Brazilian Portuguese", "pt-br"),
   PS("Pushto"),
   QU("Quechua"),
   RM("Raeto-Romance"),
@@ -203,7 +204,18 @@ public enum Language {
     this.code = name().toLowerCase();
   }
 
+  Language(final String name, final String code) {
+    this.name = name;
+    this.code = code;
+  }
+
   public static Language fromCode(final @NotNull String code) {
-    return Language.valueOf(code.toUpperCase());
+    for (final Language language : values()) {
+      if (language.code.equalsIgnoreCase(code)) {
+        return language;
+      }
+    }
+    // Fallback to English
+    return EN;
   }
 }

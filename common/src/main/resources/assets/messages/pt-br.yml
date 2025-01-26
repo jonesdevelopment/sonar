@@ -1,0 +1,299 @@
+#
+#   /$$$$$$
+#  /$$__  $$
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$
+# |  $$$$$$  /$$__  $$| $$__  $$ |____  $$ /$$__  $$
+#  \____  $$| $$  \ $$| $$  \ $$  /$$$$$$$| $$  \__/
+#  /$$  \ $$| $$  | $$| $$  | $$ /$$__  $$| $$
+# |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
+#  \______/  \______/ |__/  |__/ \_______/|__/
+#
+# Precisa de ajuda ou tem dúvidas? https://jonesdev.xyz/discord
+# Código-fonte: https://github.com/jonesdevelopment/sonar
+# Copyright Jones Development e Sonar Contributors, licenciado sob GPL-3.0
+#
+
+# Placeholder para cada '<prefix>' neste arquivo de configuração
+prefix: <b><yellow>Sonar</b> <gray>» <white>
+# Placeholder para cada '<support-url>' neste arquivo de configuração
+support-url: https://jonesdev.xyz/discord/
+# Placeholder para cada '<header>' neste arquivo de configuração
+header:
+  - <b><yellow>Sonar</b><reset>
+  - ''
+# Placeholder para cada '<footer>' neste arquivo de configuração
+footer:
+  - <gray>Se você acredita que isso é um erro, entre em contato com um administrador.
+# Mensagem de desconexão que é mostrada quando alguém se junta, mas há muitos jogadores online com seu endereço IP
+too-many-online-per-ip:
+  - '<header>'
+  - <red>Há muitos jogadores online com seu endereço IP.
+  - '<footer>'
+
+# Traduções para comandos
+commands:
+  # Mensagem mostrada quando um jogador tenta executar /sonar sem permissão
+  no-permission: '<prefix><red>Você não tem permissão para executar este comando.'
+  # Mensagem mostrada quando alguém usa um comando incorretamente
+  incorrect-usage: '<prefix><red>Uso: /sonar <subcommand-usage>'
+  # Mensagem mostrada quando alguém fornece um endereço IP inválido (Formato inválido)
+  invalid-ip-address: '<prefix>O endereço IP que você forneceu parece ser inválido.'
+  # Mensagem mostrada quando o console executa um comando que é apenas para jogadores
+  player-only: '<prefix><red>Você só pode executar este comando como um jogador.'
+  # Mensagem mostrada quando um jogador executa um comando que é apenas para console
+  console-only: '<prefix><red>Por razões de segurança, você só pode executar este comando através do console.'
+  # Mensagem mostrada quando um jogador não tem permissão para executar um determinado subcomando
+  subcommand-no-permission: '<prefix><red>Você não tem permissão para executar este subcomando. <gray>(<permission>)'
+
+  # Traduções para '/sonar'
+  main:
+    # Mensagem informativa que é mostrada acima de tudo ao executar o comando principal
+    header:
+      - <yellow>Executando <b>Sonar</b> <version> em <platform>.
+      - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development e Contribuidores do Sonar</click>
+      - ''
+      - <gray>Precisa de ajuda ou tem alguma dúvida?
+      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Clique para abrir o Discord)'>Abra um ticket no Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Clique para abrir o GitHub)'>ou abra um novo problema no GitHub.
+      - ''
+    # Formatação da lista de subcomandos mostrada ao executar o comando principal
+    subcommands: '<suggest-subcommand><hover:show_text:''<gray>Somente jogadores: </gray><only-players><br><gray>Requer console: </gray><only-console><br><gray>Permissão: </gray><white><permission><br><gray>Aliases: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'
+    # Formatação para valores de sim (marca de seleção) e não (cruz) no texto de hover dos subcomandos
+    tick: '<green>✔</green>'
+    cross: '<red>✗</red>'
+    # Formatação para as informações da versão
+    outdated-version: ' <red><click:open_url:''https://github.com/jonesdevelopment/sonar/releases/latest''><hover:show_text:''(Clique para baixar a versão mais recente do Sonar)''>(Desatualizado)</hover></click></red>'
+    unstable-version: ' <gold>(Instável)</gold>'
+    api-error: ' <dark_red><hover:show_text:''Verifique os logs do servidor para mais informações''>(Erro de API)</hover></dark_red>'
+
+  # Traduções para '/sonar reload'
+  reload:
+    # Descrição para este subcomando
+    description: "Recarregar todas as configurações"
+    # Mensagem mostrada quando alguém começa a recarregar o Sonar
+    start: '<prefix>Recarregando o Sonar...'
+    # Mensagem mostrada quando o Sonar termina de recarregar
+    finish: '<prefix><green>Recarregado com sucesso <gray>(<time-taken>ms)'
+
+  # Traduções para '/sonar verbose'
+  verbose:
+    # Descrição para este subcomando
+    description: "Ativar ou desativar o verbose do Sonar"
+    # Mensagem mostrada quando um jogador se inscreve no verbose do Sonar
+    subscribe: '<prefix>Você agora está visualizando o verbose do Sonar.'
+    # Mensagem mostrada quando um jogador se desinscreve do verbose do Sonar
+    unsubscribe: '<prefix>Você não está mais visualizando o verbose do Sonar.'
+
+  # Traduções para '/sonar notify'
+  notify:
+    # Descrição para este subcomando
+    description: "Ativar ou desativar notificações de ataque"
+    # Mensagem mostrada quando um jogador se inscreve nas notificações de ataque do Sonar
+    subscribe: '<prefix>Você agora está visualizando as notificações de ataque do Sonar.'
+    # Mensagem mostrada quando um jogador se desinscreve das notificações de ataque do Sonar
+    unsubscribe: '<prefix>Você não está mais visualizando as notificações de ataque do Sonar.'
+
+  # Traduções para '/sonar blacklist'
+  blacklist:
+    # Descrição para este subcomando
+    description: "Gerenciar endereços IP na lista negra"
+    # Mensagem mostrada quando alguém tenta limpar a lista negra, mas está vazia
+    empty: '<prefix>A lista negra está atualmente vazia. Portanto, nenhum endereço IP foi removido da lista negra.'
+    # Mensagem mostrada quando alguém limpa a lista negra
+    clear: '<prefix>Você removeu com sucesso um total de <amount> endereço(s) IP da lista negra.'
+    # Mensagem mostrada quando alguém verifica o tamanho da lista negra
+    size: '<prefix>A lista negra atualmente contém <amount> endereço(s) IP.'
+    # Mensagem mostrada quando alguém remove um endereço IP da lista negra
+    remove: '<prefix>Removido com sucesso <ip> da lista negra.'
+    # Mensagem mostrada quando alguém adiciona um endereço IP à lista negra
+    add: '<prefix>Adicionado com sucesso <ip> à lista negra.'
+    # Mensagem mostrada quando alguém tenta adicionar um endereço IP à lista negra, mas já está na lista
+    ip-duplicate: '<prefix>O endereço IP que você forneceu já está na lista negra.'
+    # Mensagem mostrada quando alguém remove um endereço IP da lista negra, mas não está na lista
+    ip-not-found: '<prefix>O endereço IP que você forneceu não está na lista negra.'
+
+  # Traduções para '/sonar verified'
+  verified:
+    # Descrição para este subcomando
+    description: "Gerenciar endereços IP verificados"
+    # Mensagem mostrada quando alguém tenta limpar a lista de jogadores verificados, mas está vazia
+    empty: '<prefix>A lista de jogadores verificados está atualmente vazia. Portanto, nenhum jogador foi desverificado.'
+    # Mensagem mostrada quando alguém limpa a lista de jogadores verificados
+    clear: '<prefix>Você desverificou com sucesso um total de <amount> jogador(es) únicos.'
+    # Mensagem mostrada quando alguém verifica o tamanho da lista de jogadores verificados
+    size: '<prefix>Atualmente há <amount> jogador(es) únicos verificados.'
+    # Mensagem mostrada quando alguém desverifica um endereço IP
+    remove: '<prefix>Desverificado com sucesso <ip>.'
+    # Mensagem mostrada quando alguém verifica um endereço IP
+    add: '<prefix>Verificado com sucesso <ip>.'
+    # Mensagem mostrada quando alguém tenta verificar um endereço IP/UUID que já está verificado
+    already: '<prefix>O endereço IP e UUID que você forneceu já estão verificados.'
+    # Mensagem mostrada quando alguém desverifica um endereço IP, mas não está verificado
+    ip-not-found: '<prefix>O endereço IP que você forneceu não está verificado.'
+    # Mensagem mostrada quando alguém consulta o histórico de verificação de um endereço IP
+    history: '<prefix><yellow>UUIDs anteriores para <ip>:'
+    history-entry: ' <gray>▪ <white><uuid>'
+
+  # Traduções para '/sonar statistics'
+  statistics:
+    # Descrição para este subcomando
+    description: "Mostrar estatísticas da sessão deste servidor"
+    # Mensagem informativa que é mostrada acima de tudo ao visualizar as estatísticas
+    header: '<prefix>Mostrando estatísticas de <statistics-type> para esta sessão:'
+    # Mensagem mostrada quando um jogador tenta visualizar um tipo de estatística desconhecido
+    unknown-type: '<prefix><red>Tipo de estatística desconhecido! Estatísticas disponíveis: <gray><statistics>'
+    # Formato da mensagem de estatísticas gerais
+    general:
+      - ' <dark_aqua>▪ <gray>Endereços IP verificados: <white><verified>'
+      - ' <dark_aqua>▪ <gray>Endereços IP em verificação: <white><verifying>'
+      - ' <dark_aqua>▪ <gray>Endereços IP na lista negra: <white><blacklisted>'
+      - ' <dark_aqua>▪ <gray>Logins atualmente na fila: <white><queued>'
+      - ' <dark_aqua>▪ <gray>Total de entradas não únicas: <white><total-joins>'
+      - ' <dark_aqua>▪ <gray>Total de tentativas de verificação: <white><total-attempts>'
+      - ' <dark_aqua>▪ <gray>Total de falhas de verificação: <white><total-failed>'
+      - ' <dark_aqua>▪ <gray>Tempo de atividade do servidor: <white><server-uptime>'
+    # Formato da mensagem de estatísticas de CPU
+    cpu:
+      - ' <dark_aqua>▪ <gray>Uso de CPU do processo agora: <white><process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Uso de CPU do sistema agora: <white><system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Uso de CPU do processo por núcleo: <white><average-process-cpu>%'
+      - ' <dark_aqua>▪ <gray>Uso de CPU do sistema por núcleo: <white><average-system-cpu>%'
+      - ' <dark_aqua>▪ <gray>Total de CPUs virtuais: <white><virtual-core-count>'
+    # Formato da mensagem de estatísticas de memória
+    memory:
+      - ' <dark_aqua>▪ <gray>Total de memória livre: <white><free-memory>'
+      - ' <dark_aqua>▪ <gray>Total de memória usada: <white><used-memory>'
+      - ' <dark_aqua>▪ <gray>Total de memória máxima: <white><max-memory>'
+      - ' <dark_aqua>▪ <gray>Total de memória alocada: <white><total-memory>'
+    # Formato da mensagem de estatísticas de rede
+    network:
+      - ' <dark_aqua>▪ <gray>Largura de banda usada atualmente (entrada): <white><incoming-traffic>'
+      - ' <dark_aqua>▪ <gray>Largura de banda usada atualmente (saída): <white><outgoing-traffic>'
+      - ' <dark_aqua>▪ <gray>Largura de banda total usada (entrada): <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Largura de banda total usada (saída): <white><incoming-traffic-ttl>'
+
+  # Traduções para '/sonar dump'
+  dump:
+    # Descrição para este subcomando
+    description: "Imprimir informações do desenvolvedor"
+    # Formato das informações enviadas ao console
+    log: "Dump gerado: <dumped-json-data>"
+
+# Traduções para todas as mensagens durante o processo de verificação
+verification:
+  # Traduções para todas as mensagens de depuração durante a verificação
+  logs:
+    # Mensagem registrada no console sempre que um novo jogador se junta ao servidor
+    connection: '<username>/<ip> (<protocol>) se conectou.'
+    # Mensagem registrada no console sempre que um jogador falha na verificação
+    failed: '<username>/<ip> (<protocol>) falhou no teste do bot por: <reason>'
+    # Mensagem registrada no console sempre que um jogador é colocado na lista negra
+    blacklisted: '<username>/<ip> (<protocol>) foi colocado na lista negra por muitas tentativas falhadas'
+    # Mensagem registrada no console sempre que um jogador é verificado
+    successful: '<username> foi verificado com sucesso (<time-taken>s!).'
+
+  # Mensagens que são mostradas ao jogador quando ele deve inserir o CAPTCHA
+  captcha:
+    # Mensagem mostrada ao jogador quando ele deve inserir a resposta ao CAPTCHA
+    enter: '<prefix><green>Por favor, insira o texto no chat que é exibido no mapa.'
+    # Mensagem mostrada ao jogador quando ele insere a resposta errada no chat
+    incorrect: '<prefix><red>Você inseriu uma resposta errada! Por favor, tente novamente.'
+
+  # Mensagem mostrada ao jogador quando ele está sendo verificado
+  # Defina isso como '' para desativar a mensagem de boas-vindas completamente
+  welcome: '<prefix><green>Você está sendo verificado. Por favor, não se mova; este é um processo automático.'
+
+  # Mensagem de desconexão que é mostrada quando alguém se junta enquanto o captcha não foi preparado ainda
+  currently-preparing:
+    - <header>
+    - <yellow>Seus dados anti-bot ainda não foram preparados.
+    - <gray>Por favor, aguarde alguns segundos antes de tentar verificar novamente.
+    - <footer>
+  # Mensagem de desconexão que é mostrada quando alguém se junta com uma versão do Minecraft não suportada
+  unsupported-version:
+    - <header>
+    - <red>Este servidor não suporta sua versão do Minecraft.
+    - <footer>
+  # Mensagem de desconexão que é mostrada quando alguém se reconecta muito rápido durante a verificação
+  too-fast-reconnect:
+    - <header>
+    - <gold>Você se reconectou muito rápido, tente novamente mais tarde.
+    - <gray>Por favor, aguarde alguns segundos antes de tentar verificar novamente.
+    - <footer>
+  # Mensagem de desconexão que é mostrada quando alguém se junta, mas já está verificando
+  already-verifying:
+    - <header>
+    - <red>Seu endereço IP está atualmente sendo verificado.
+    - <red>Por favor, aguarde alguns segundos antes de tentar verificar novamente.
+    - <footer>
+  # Mensagem de desconexão que é mostrada quando alguém se junta, mas já está na fila para verificação
+  already-queued:
+    - <header>
+    - <red>Seu endereço IP está atualmente na fila para verificação.
+    - <red>Por favor, aguarde alguns minutos antes de tentar verificar novamente.
+    - <footer>
+  # Mensagem de desconexão que é mostrada quando alguém se junta, mas está temporariamente na lista negra
+  blacklisted:
+    - <header>
+    - <red>Você está atualmente negado de entrar no servidor.
+    - <red>Por favor, aguarde alguns minutos para poder entrar no servidor novamente.
+    - <gold>Falso positivo? <gray><support-url>
+    - <footer>
+  # Mensagem de desconexão que é mostrada quando alguém se junta com um nome de usuário inválido
+  invalid-username:
+    - <header>
+    - <red>Seu nome de usuário contém caracteres inválidos.
+    - <footer>
+  # Mensagem de desconexão que é mostrada quando alguém se junta com uma versão na lista negra
+  blacklisted-protocol:
+    - <header>
+    - <red>Você está usando uma versão que não é permitida em nosso servidor.
+    - <gold>Precisa de ajuda para fazer login? <gray><support-url>
+    - <footer>
+  # Mensagem de desconexão que é mostrada quando alguém verifica com sucesso
+  success:
+    - <header>
+    - <green>Você passou na verificação com sucesso.
+    - <white>Você agora pode jogar no servidor quando se reconectar.
+  # Mensagem de desconexão que é mostrada quando alguém falha na verificação
+  failed:
+    - <header>
+    - <red>Você falhou na verificação do bot.
+    - <gray>Por favor, aguarde alguns segundos antes de tentar verificar novamente.
+    - <gold>Precisa de ajuda para fazer login? <gray><support-url>
+    - <footer>
+
+# Traduções para mensagens de verbose da actionbar do Sonar
+verbose:
+  layout:
+    # Layout para o verbose da actionbar do Sonar
+    normal: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s <white><logins-per-second> <dark_aqua>╺ <gray>Verificando <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    # Layout para o verbose da actionbar do Sonar durante um ataque
+    attack: '<prefix><gray>CPS <white><connections-per-second> <dark_aqua>╺ <gray>Logins/s <white><logins-per-second> <dark_aqua>╺ <gray>Fila <white><queued> <dark_aqua>╺ <gray>Verificando <white><verifying> <dark_aqua>╺ <gray>Duração <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+  # Animação para a action bar
+  # Alternativas:
+  # - ▙, ▛, ▜, ▟
+  # - ⬈, ⬊, ⬋, ⬉
+  animation:
+    - ◜
+    - ◝
+    - ◞
+    - ◟
+
+# Traduções para mensagens de notificação de ataque do Sonar
+notifications:
+  # Layout para o título da notificação de ataque do Sonar
+  title: <yellow><b>Sonar<reset>
+  # Layout para o subtítulo da notificação de ataque do Sonar
+  subtitle: <gray>Um ataque de bot foi detectado
+  # Layout para a notificação de ataque do Sonar no chat
+  chat:
+    - ''
+    - <yellow><b>Sonar<reset>
+    - ''
+    - <gray>Um ataque de bot foi detectado.
+    - ' <dark_aqua>▪ <gray>Logins por segundo: <white><logins-per-second>'
+    - ' <dark_aqua>▪ <gray>Jogadores verificando: <white><verifying>'
+    - ' <dark_aqua>▪ <gray>Jogadores na fila: <white><queued>'
+    - ''
+    - <gray>Veja mais informações usando <white><click:run_command:'/sonar verbose'><hover:show_text:'(Clique para executar)'>/sonar verbose</hover></click><gray> ou <white><click:run_command:'/sonar stats'><hover:show_text:'(Clique para executar)'>/sonar stats</hover></click><gray>.
+    - ''
