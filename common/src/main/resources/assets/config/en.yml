@@ -139,7 +139,7 @@ verification:
   # If enabled, the player will be transferred back to the origin server
   # after successfully passing the bot verification.
   # This feature was introduced by Mojang in Minecraft version 1.20.5
-  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
+  # https://docs.jonesdev.xyz/administration/configuring-sonar/configuring-the-verification/using-1.20.5+-transfers
   transfer:
     # Should Sonar transfer the player to the origin server (instead of kicking them)?
     # For this to work, you must enable the feature in your server's configuration.

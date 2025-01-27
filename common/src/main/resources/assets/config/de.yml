@@ -136,7 +136,7 @@ verification:
   # Wenn aktiviert, wird der Player zurück zum Ursprungsserver gesendet,
   # falls dieser die der Bot-Verifizierung erfolgreich besteht.
   # Diese Funktion wurde von Mojang in Minecraft Version 1.20.5 eingeführt
-  # Anleitung: https://youtu.be/aSWrzQVjGnc?t=71
+  # https://docs.jonesdev.xyz/administration/configuring-sonar/configuring-the-verification/using-1.20.5+-transfers
   transfer:
     # Sollte Sonar den Spieler auf den Ursprungsserver senden (anstatt ihn zu kicken)?
     # Damit dies funktioniert, müssen Sie die Funktion in der Konfiguration Ihres Servers aktivieren.

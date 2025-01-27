@@ -138,7 +138,7 @@ verification:
   # Indien ingeschakeld, wordt de speler teruggestuurd naar de oorspronkelijke server
   # nadat u de bot-verificatie met succes heeft doorstaan.
   # Deze functie is geïntroduceerd door Mojang in Minecraft versie 1.20.5
-  # Handleiding: https://youtu.be/aSWrzQVjGnc?t=71
+  # https://docs.jonesdev.xyz/administration/configuring-sonar/configuring-the-verification/using-1.20.5+-transfers
   transfer:
     # Moet Sonar de speler overbrengen naar de oorspronkelijke server (in plaats van hem te schoppen)?
     # Om dit te laten werken, moet u de functie inschakelen in de configuratie van uw server

@@ -137,7 +137,7 @@ verification:
 
   # თუ ჩართულია, მოთამაშე გადავა საწყის სერვერში ვერიფიკაციის წარმატებით გავლის შემდეგ
   # ეს ფუნქცია დაემატა Mojang-ის მიერ Minecraft-ის 1.20.5 ვერსიაში
-  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
+  # https://docs.jonesdev.xyz/administration/configuring-sonar/configuring-the-verification/using-1.20.5+-transfers
   transfer:
     # უნდა გადაიყვანოს თუ არა Sonar-მა მოთამაშე საწყის სერვერზე (მათი გაგდების ნაცვლად)?
     # ამისთვის, თქვენ უნდა ჩართოთ ეს ფუნქცია თქვენი სერვერის კონფიგურაციაში

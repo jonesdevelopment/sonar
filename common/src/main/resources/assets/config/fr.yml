@@ -138,7 +138,7 @@ verification:
   # S'il est activé, le joueur sera renvoyé au serveur d'origine
   # après avoir passé avec succès la vérification du bot.
   # Cette fonctionnalité a été introduite par Mojang dans la version Minecraft 1.20.5
-  # Tutoriel: https://youtu.be/aSWrzQVjGnc?t=71
+  # https://docs.jonesdev.xyz/administration/configuring-sonar/configuring-the-verification/using-1.20.5+-transfers
   transfer:
     # Sonar devrait-il transférer le joueur au serveur d'origine (au lieu de l'expulser) ?
     # Pour que cela fonctionne, vous devez activer la fonctionnalité dans la configuration de votre serveur

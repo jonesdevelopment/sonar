@@ -137,7 +137,7 @@ verification:
   # Если включено, игрок будет возвращен на исходный сервер
   # после успешного прохождения проверки на бота.
   # Эта функция была введена Mojang в версии Minecraft 1.20.5
-  # Учебник: https://youtu.be/aSWrzQVjGnc?t=71
+  # https://docs.jonesdev.xyz/administration/configuring-sonar/configuring-the-verification/using-1.20.5+-transfers
   transfer:
     # Должен ли Sonar переместить игрока на исходный сервер (вместо выкидывания его)?
     # Для этого необходимо включить функцию в конфигурации вашего сервера

@@ -138,7 +138,7 @@ verification:
   # Se habilitado, o jogador será transferido de volta para o servidor de origem
   # após passar com sucesso pela verificação do bot.
   # Este recurso foi introduzido pela Mojang na versão 1.20.5 do Minecraft
-  # Tutorial: https://youtu.be/aSWrzQVjGnc?t=71
+  # https://docs.jonesdev.xyz/administration/configuring-sonar/configuring-the-verification/using-1.20.5+-transfers
   transfer:
     # O Sonar deve transferir o jogador para o servidor de origem (em vez de expulsá-lo)?
     # Para que isso funcione, você deve habilitar o recurso na configuração do seu servidor.

@@ -139,7 +139,7 @@ verification:
   # Je-li povoleno, hráč bude přenesen zpět na původní server
   # po úspěšném absolvování ověření bota.
   # Tuto funkci představil Mojang ve verzi Minecraft 1.20.5
-  # Tutoriál: https://youtu.be/aSWrzQVjGnc?t=71
+  # https://docs.jonesdev.xyz/administration/configuring-sonar/configuring-the-verification/using-1.20.5+-transfers
   transfer:
     # Měl by Sonar přenést hráče na původní server (místo toho, aby je vyhodil)?
     # Aby to fungovalo, musíte tuto funkci povolit v konfiguraci vašeho serveru
