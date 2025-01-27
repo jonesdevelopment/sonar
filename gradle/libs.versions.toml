@@ -29,7 +29,7 @@ bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 bstats-velocity = { module = "org.bstats:bstats-velocity", version.ref = "bstats" }
 imagefilters = "com.jhlabs:filters:2.0.235-1"
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.0"
-annotations = "org.jetbrains:annotations:26.0.1"
+annotations = "org.jetbrains:annotations:26.0.2"
 simpleyaml = "com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4"
 ormlite = "com.j256.ormlite:ormlite-jdbc:6.1"
 lombok = "org.projectlombok:lombok:1.18.36"
