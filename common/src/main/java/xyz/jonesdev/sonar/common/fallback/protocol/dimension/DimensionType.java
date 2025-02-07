@@ -24,7 +24,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DimensionType {
   OVERWORLD("minecraft:overworld", 0, 0),
+  @Deprecated
   THE_NETHER("minecraft:the_nether", -1, 1),
+  @Deprecated
   THE_END("minecraft:the_end", 1, 2);
 
   private final String key;
