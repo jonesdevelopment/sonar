@@ -37,11 +37,11 @@ public final class FallbackCaptchaHandler extends FallbackVerificationHandler {
 
     // Disconnect the player if there is no CAPTCHA available at the moment
     if (!CaptchaPreparer.isCaptchaAvailable()) {
-      user.disconnect(Sonar.get().getConfig().getVerification().getCurrentlyPreparing());
+      user.disconnect(Sonar.get0().getConfig().getVerification().getCurrentlyPreparing());
       throw QuietDecoderException.INSTANCE;
     }
 
-    this.tries = Sonar.get().getConfig().getVerification().getMap().getMaxTries();
+    this.tries = Sonar.get0().getConfig().getVerification().getMap().getMaxTries();
 
     // We may not be on slot 4, so we need to make sure to synchronize the current slot
     user.delayedWrite(CAPTCHA_HELD_ITEM_SLOT);
@@ -66,7 +66,7 @@ public final class FallbackCaptchaHandler extends FallbackVerificationHandler {
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     // Check if the player took too long to enter the CAPTCHA
-    final int maxDuration = Sonar.get().getConfig().getVerification().getMap().getMaxDuration();
+    final int maxDuration = Sonar.get0().getConfig().getVerification().getMap().getMaxDuration();
     checkState(!user.getLoginTimer().elapsed(maxDuration), "took too long to enter CAPTCHA");
 
     if (packet instanceof SystemChatPacket) {
@@ -83,7 +83,7 @@ public final class FallbackCaptchaHandler extends FallbackVerificationHandler {
     } else if (packet instanceof SetPlayerPositionPacket
       || packet instanceof SetPlayerPositionRotationPacket) {
       // A position packet is sent approximately every second
-      if (Sonar.get().getConfig().getVerification().getGamemode().isSurvivalOrAdventure()) {
+      if (Sonar.get0().getConfig().getVerification().getGamemode().isSurvivalOrAdventure()) {
         final long difference = maxDuration - user.getLoginTimer().delay();
         final int index = (int) (difference / 1000D);
         // Make sure we can safely get and send the packet

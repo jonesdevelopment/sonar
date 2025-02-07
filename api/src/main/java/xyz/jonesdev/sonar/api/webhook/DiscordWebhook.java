@@ -59,18 +59,18 @@ public final class DiscordWebhook {
         // Discord replies with HTTP_NO_CONTENT (204) if the request is successful
         final int code = urlConnection.getResponseCode();
         if (code != HTTP_NO_CONTENT) {
-          Sonar.get().getLogger().warn("Unexpected Discord webhook response code {}", code);
+          Sonar.get0().getLogger().warn("Unexpected Discord webhook response code {}", code);
         }
       } catch (Exception exception) {
-        Sonar.get().getLogger().error("Could not send webhook: {}", exception);
+        Sonar.get0().getLogger().error("Could not send webhook: {}", exception);
       }
     });
   }
 
   private static String prepareSerializedContent(final SonarConfiguration.Webhook.@NotNull Embed embed) {
-    final String content = Sonar.get().getConfig().getWebhook().getContent();
-    final String username = Sonar.get().getConfig().getWebhook().getUsername();
-    final String avatarUrl = Sonar.get().getConfig().getWebhook().getAvatarUrl();
+    final String content = Sonar.get0().getConfig().getWebhook().getContent();
+    final String username = Sonar.get0().getConfig().getWebhook().getUsername();
+    final String avatarUrl = Sonar.get0().getConfig().getWebhook().getAvatarUrl();
 
     int rgb = embed.getR();
     rgb = (rgb << 8) + embed.getG();
@@ -78,8 +78,8 @@ public final class DiscordWebhook {
 
     final Webhook.EmbedMessage embedMessage = new Webhook.EmbedMessage(
       embed.getTitle(), embed.getDescription(), embed.getTitleUrl(), rgb, new Webhook.Field[0],
-      new Webhook.Footer(Sonar.get().getConfig().getWebhook().getFooter().getText(),
-        Sonar.get().getConfig().getWebhook().getFooter().getIconUrl()));
+      new Webhook.Footer(Sonar.get0().getConfig().getWebhook().getFooter().getText(),
+        Sonar.get0().getConfig().getWebhook().getFooter().getIconUrl()));
     final List<Webhook.EmbedMessage> embeds = Collections.singletonList(embedMessage);
 
     final Webhook webhook = new Webhook(content, username, avatarUrl, false, embeds);

@@ -38,7 +38,7 @@ public final class BungeeSonarCommand extends Command implements TabExecutor, So
     // Create our own invocation source wrapper to handle messages properly
     final InvocationSource invocationSource = new InvocationSource(
       sender instanceof ProxiedPlayer ? ((ProxiedPlayer) sender).getUniqueId() : null,
-      Sonar.get().sender(sender),
+      Sonar.get0().sender(sender),
       sender::hasPermission);
     // Pass the invocation source and command arguments to our command handler
     handle(invocationSource, args);

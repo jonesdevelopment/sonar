@@ -89,7 +89,7 @@ public final class SimpleYamlConfig {
 
   public int getInt(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      Sonar.get0().getLogger().warn("Could not find {} in {}.", path, file.getName());
       return 0;
     }
     return yaml.getInt(path);
@@ -97,7 +97,7 @@ public final class SimpleYamlConfig {
 
   public boolean getBoolean(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      Sonar.get0().getLogger().warn("Could not find {} in {}.", path, file.getName());
       return false;
     }
     return yaml.getBoolean(path);
@@ -105,7 +105,7 @@ public final class SimpleYamlConfig {
 
   public @NotNull String getString(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      Sonar.get0().getLogger().warn("Could not find {} in {}.", path, file.getName());
       return "";
     }
     final Object object = yaml.get(path);
@@ -117,7 +117,7 @@ public final class SimpleYamlConfig {
 
   public List<String> getStringList(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      Sonar.get0().getLogger().warn("Could not find {} in {}.", path, file.getName());
       return new ArrayList<>(0);
     }
     return yaml.getStringList(path);
@@ -125,7 +125,7 @@ public final class SimpleYamlConfig {
 
   public List<Integer> getIntList(final String path) {
     if (!yaml.contains(path)) {
-      Sonar.get().getLogger().warn("Could not find {} in {}.", path, file.getName());
+      Sonar.get0().getLogger().warn("Could not find {} in {}.", path, file.getName());
       return new ArrayList<>(0);
     }
     return yaml.getIntegerList(path);

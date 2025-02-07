@@ -30,4 +30,11 @@ public class SonarSupplier {
     }
     sonar = _sonar;
   }
+
+  public Sonar get() {
+    if (sonar == null) {
+      throw new IllegalStateException("Sonar is not initialized yet");
+    }
+    return sonar;
+  }
 }

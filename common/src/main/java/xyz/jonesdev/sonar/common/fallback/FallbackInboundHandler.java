@@ -55,11 +55,11 @@ public final class FallbackInboundHandler extends ChannelInboundHandlerAdapter {
     // Account for this by checking if the inetAddress has been set yet
     if (inetAddress != null) {
       // Remove the IP address from the queue
-      Sonar.get().getFallback().getQueue().getPlayers().compute(inetAddress, (ignored, action) -> {
+      Sonar.get0().getFallback().getQueue().getPlayers().compute(inetAddress, (ignored, action) -> {
         // The player is not queued, so we need to remove them from other maps as well
         if (action == null) {
           // Remove the IP address from the connected players, if needed
-          Sonar.get().getFallback().getConnected().compute(inetAddress, (__, v) -> {
+          Sonar.get0().getFallback().getConnected().compute(inetAddress, (__, v) -> {
             /*
              * Remove this account from the online players or decrement the number of accounts
              * with the same IP, but only if the player is logging into the backend server.
@@ -67,7 +67,7 @@ public final class FallbackInboundHandler extends ChannelInboundHandlerAdapter {
              * we've never actually incremented it in the first place ¯\_(ツ)_/¯
              */
             if (v == null) {
-              Sonar.get().getFallback().getOnline().compute(inetAddress,
+              Sonar.get0().getFallback().getOnline().compute(inetAddress,
                 (ignored1, count) -> count == null || count <= 1 ? null : count - 1);
             }
             return null;

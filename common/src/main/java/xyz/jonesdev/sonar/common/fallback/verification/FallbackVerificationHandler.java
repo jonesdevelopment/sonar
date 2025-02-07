@@ -49,11 +49,11 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
     GlobalSonarStatistics.totalSuccessfulVerifications++;
 
     // Add verified player to the database
-    Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(
+    Sonar.get0().getVerifiedPlayerController().add(new VerifiedPlayer(
       user.getFingerprint(), user.getLoginTimer().getStart()));
 
     // Call the VerifySuccessEvent for external API usage
-    Sonar.get().getEventManager().publish(new UserVerifySuccessEvent(user));
+    Sonar.get0().getEventManager().publish(new UserVerifySuccessEvent(user));
 
     // If enabled, transfer the player back to the origin server.
     // This feature was introduced by Mojang in Minecraft version 1.20.5.
@@ -71,11 +71,11 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
       }
     } else {
       // Disconnect player with the verification success message
-      user.disconnect(Sonar.get().getConfig().getVerification().getVerificationSuccess());
+      user.disconnect(Sonar.get0().getConfig().getVerification().getVerificationSuccess());
     }
 
-    Sonar.get().getLogger().info(
-      Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.successful")
+    Sonar.get0().getLogger().info(
+      Sonar.get0().getConfig().getMessagesConfig().getString("verification.logs.successful")
         .replace("<username>", user.getUsername())
         .replace("<time-taken>", user.getLoginTimer().toString()));
   }
@@ -83,46 +83,46 @@ public abstract class FallbackVerificationHandler implements FallbackPacketListe
   protected final void fail(final @NotNull String reason) {
     GlobalSonarStatistics.totalFailedVerifications++;
 
-    user.disconnect(Sonar.get().getConfig().getVerification().getVerificationFailed());
+    user.disconnect(Sonar.get0().getConfig().getVerification().getVerificationFailed());
 
-    final boolean shouldLog = Sonar.get().getAttackTracker().getCurrentAttack() == null
-      || Sonar.get().getConfig().getVerification().isLogDuringAttack();
+    final boolean shouldLog = Sonar.get0().getAttackTracker().getCurrentAttack() == null
+      || Sonar.get0().getConfig().getVerification().isLogDuringAttack();
 
     if (shouldLog) {
-      Sonar.get().getLogger().info(
-        Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.failed")
+      Sonar.get0().getLogger().info(
+        Sonar.get0().getConfig().getMessagesConfig().getString("verification.logs.failed")
           .replace("<username>", user.getUsername())
-          .replace("<ip>", Sonar.get().getConfig().formatAddress(user.getInetAddress()))
+          .replace("<ip>", Sonar.get0().getConfig().formatAddress(user.getInetAddress()))
           .replace("<protocol>", user.getProtocolVersion().getName())
           .replace("<reason>", reason));
     }
 
     // Call the VerifyFailedEvent for external API usage
-    Sonar.get().getEventManager().publish(new UserVerifyFailedEvent(user, reason));
+    Sonar.get0().getEventManager().publish(new UserVerifyFailedEvent(user, reason));
 
     // Use a label, so we can easily add more code beneath this method in the future
     blacklist: {
       final String hostAddress = user.getInetAddress().getHostAddress();
-      final int score = Sonar.get().getFallback().getBlacklist().get(hostAddress, __ -> 0);
+      final int score = Sonar.get0().getFallback().getBlacklist().get(hostAddress, __ -> 0);
       final int newScore = score + 1;
 
-      Sonar.get().getFallback().getBlacklist().put(hostAddress, newScore);
+      Sonar.get0().getFallback().getBlacklist().put(hostAddress, newScore);
 
       // The user is allowed to disable the blacklist entirely by setting the threshold to 0
-      final int limit = Sonar.get().getConfig().getVerification().getBlacklistThreshold();
+      final int limit = Sonar.get0().getConfig().getVerification().getBlacklistThreshold();
       // The player hasn't been blacklisted yet, so skip this iteration
       if (newScore < limit) break blacklist;
 
       GlobalSonarStatistics.totalBlacklistedPlayers++;
 
       // Call the BotBlacklistedEvent for external API usage
-      Sonar.get().getEventManager().publish(new UserBlacklistedEvent(user));
+      Sonar.get0().getEventManager().publish(new UserBlacklistedEvent(user));
 
       if (shouldLog) {
-        Sonar.get().getLogger().info(
-          Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.blacklisted")
+        Sonar.get0().getLogger().info(
+          Sonar.get0().getConfig().getMessagesConfig().getString("verification.logs.blacklisted")
             .replace("<username>", user.getUsername())
-            .replace("<ip>", Sonar.get().getConfig().formatAddress(user.getInetAddress()))
+            .replace("<ip>", Sonar.get0().getConfig().formatAddress(user.getInetAddress()))
             .replace("<protocol>", user.getProtocolVersion().getName()));
       }
     }

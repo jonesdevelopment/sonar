@@ -142,7 +142,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
-    if (user.isForceCaptcha() || Sonar.get().getFallback().shouldPerformCaptcha()) {
+    if (user.isForceCaptcha() || Sonar.get0().getFallback().shouldPerformCaptcha()) {
       user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackCaptchaHandler(user));
     } else {
       finishVerification();
@@ -185,7 +185,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     inputs++;
 
     // Check if we've received more than the minimum number of packets
-    final int minimumPackets = Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets();
+    final int minimumPackets = Sonar.get0().getConfig().getVerification().getVehicle().getMinimumPackets();
     if (inputs > minimumPackets && rotations > minimumPackets
       && paddles > minimumPackets && vehicleMoves > minimumPackets) {
       // Move on to the next stage

@@ -76,18 +76,18 @@ public final class FallbackUserWrapper implements FallbackUser {
 
     GlobalSonarStatistics.totalAttemptedVerifications++;
 
-    if (Sonar.get().getConfig().getVerification().isLogConnections()
-      && (Sonar.get().getAttackTracker().getCurrentAttack() == null
-      || Sonar.get().getConfig().getVerification().isLogDuringAttack())) {
-      Sonar.get().getLogger().info(
-        Sonar.get().getConfig().getMessagesConfig().getString("verification.logs.connection")
+    if (Sonar.get0().getConfig().getVerification().isLogConnections()
+      && (Sonar.get0().getAttackTracker().getCurrentAttack() == null
+      || Sonar.get0().getConfig().getVerification().isLogDuringAttack())) {
+      Sonar.get0().getLogger().info(
+        Sonar.get0().getConfig().getMessagesConfig().getString("verification.logs.connection")
           .replace("<username>", username)
-          .replace("<ip>", Sonar.get().getConfig().formatAddress(inetAddress))
+          .replace("<ip>", Sonar.get0().getConfig().formatAddress(inetAddress))
           .replace("<protocol>", protocolVersion.getName()));
     }
 
     // Call the VerifyJoinEvent for external API usage
-    Sonar.get().getEventManager().publish(new UserVerifyJoinEvent(this));
+    Sonar.get0().getEventManager().publish(new UserVerifyJoinEvent(this));
 
     // Run this in the channel's event loop to avoid issues
     channel.eventLoop().execute(() -> {
@@ -97,7 +97,7 @@ public final class FallbackUserWrapper implements FallbackUser {
       }
 
       // Mark the player as connected by caching them in a map of verifying players
-      Sonar.get().getFallback().getConnected().compute(inetAddress, (__, v) -> true);
+      Sonar.get0().getFallback().getConnected().compute(inetAddress, (__, v) -> true);
 
       // Replace normal encoder to allow custom packets
       final FallbackPacketEncoder newEncoder = new FallbackPacketEncoder(protocolVersion);

@@ -34,16 +34,16 @@ public final class ReloadCommand extends Subcommand {
   @Override
   protected void execute(final @NotNull InvocationSource source, final String @NotNull [] args) {
     source.sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.reload.start"),
-      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+      Sonar.get0().getConfig().getMessagesConfig().getString("commands.reload.start"),
+      Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
 
     final SystemTimer timer = new SystemTimer();
 
-    Sonar.get().reload();
+    Sonar.get0().reload();
 
     source.sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.reload.finish"),
-      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+      Sonar.get0().getConfig().getMessagesConfig().getString("commands.reload.finish"),
+      Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
       Placeholder.unparsed("time-taken", String.valueOf(timer.delay()))));
   }
 }

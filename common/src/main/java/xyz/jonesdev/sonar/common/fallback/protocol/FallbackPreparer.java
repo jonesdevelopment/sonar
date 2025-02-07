@@ -122,12 +122,12 @@ public class FallbackPreparer {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void prepare() {
     // Preload the packet registry to avoid CPU/RAM issues on 1st connection
-    Sonar.get().getLogger().info("Preloading all registered packets...");
+    Sonar.get0().getLogger().info("Preloading all registered packets...");
     FallbackPacketRegistry.values();
 
     // Prepare LoginSuccess packet with capped username to 16 characters
     final UUID uuid = UUID.randomUUID();
-    String username = Sonar.get().getConfig().getGeneralConfig().getString("verification.cached-username");
+    String username = Sonar.get0().getConfig().getGeneralConfig().getString("verification.cached-username");
     if (username.length() > 16) {
       username = username.substring(0, 16);
     }
@@ -135,7 +135,7 @@ public class FallbackPreparer {
 
     // Prepare JoinGame packet
     joinGame = new FallbackPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
-      Sonar.get().getConfig().getVerification().getGamemode().getId(),
+      Sonar.get0().getConfig().getVerification().getGamemode().getId(),
       -1, 0, 0,
       RANDOM.nextInt(3), 1, 0, 0,
       new String[]{"lol"}, "lol", "flat",
@@ -144,7 +144,7 @@ public class FallbackPreparer {
       false, false, false, true));
 
     // Prepare the gravity check
-    maxMovementTick = Sonar.get().getConfig().getVerification().getGravity().getMaxMovementTicks();
+    maxMovementTick = Sonar.get0().getConfig().getVerification().getGravity().getMaxMovementTicks();
 
     double motionY = 0, fallDistance = 0;
 
@@ -184,25 +184,25 @@ public class FallbackPreparer {
     }
 
     // Prepare disconnect packets during login
-    blacklisted = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getBlacklisted(), true));
-    alreadyVerifying = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getAlreadyVerifying(), true));
-    alreadyQueued = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getAlreadyQueued(), true));
-    protocolBlacklisted = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getProtocolBlacklisted(), true));
-    reconnectedTooFast = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getTooFastReconnect(), true));
-    unsupportedVersion = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getVerification().getUnsupportedVersion(), true));
-    tooManyOnlinePerIP = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get().getConfig().getTooManyOnlinePerIp(), true));
+    blacklisted = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getVerification().getBlacklisted(), true));
+    alreadyVerifying = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getVerification().getAlreadyVerifying(), true));
+    alreadyQueued = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getVerification().getAlreadyQueued(), true));
+    protocolBlacklisted = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getVerification().getProtocolBlacklisted(), true));
+    reconnectedTooFast = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getVerification().getTooFastReconnect(), true));
+    unsupportedVersion = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getVerification().getUnsupportedVersion(), true));
+    tooManyOnlinePerIP = new FallbackPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getTooManyOnlinePerIp(), true));
 
     // Prepare transfer packet
-    if (Sonar.get().getConfig().getGeneralConfig().getBoolean("verification.transfer.enabled")) {
+    if (Sonar.get0().getConfig().getGeneralConfig().getBoolean("verification.transfer.enabled")) {
       transferToOrigin = new FallbackPacketSnapshot(new TransferPacket(
-        Sonar.get().getConfig().getGeneralConfig().getString("verification.transfer.destination-host"),
-        Sonar.get().getConfig().getGeneralConfig().getInt("verification.transfer.destination-port")));
+        Sonar.get0().getConfig().getGeneralConfig().getString("verification.transfer.destination-host"),
+        Sonar.get0().getConfig().getGeneralConfig().getInt("verification.transfer.destination-port")));
     } else {
       transferToOrigin = null;
     }
 
     // Prepare update time packet
-    final int timeOfDay = Sonar.get().getConfig().getVerification().getTimeOfDay();
+    final int timeOfDay = Sonar.get0().getConfig().getVerification().getTimeOfDay();
     if (timeOfDay != 1000) {
       updateTime = new UpdateTimePacket(0L, timeOfDay, false);
     } else {
@@ -210,29 +210,29 @@ public class FallbackPreparer {
     }
 
     // If the welcome message is empty, we don't need to send a message to the player
-    final String welcome = Sonar.get().getConfig().getMessagesConfig().getString("verification.welcome");
+    final String welcome = Sonar.get0().getConfig().getMessagesConfig().getString("verification.welcome");
     if (welcome.isEmpty()) {
       welcomeMessage = null;
     } else {
       welcomeMessage = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
         MiniMessage.miniMessage().deserialize(welcome,
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())))));
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())))));
     }
 
-    if (Sonar.get().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
-      || Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+    if (Sonar.get0().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
+      || Sonar.get0().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
       // Prepare CAPTCHA messages
       enterCodeMessage = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
         MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("verification.captcha.enter"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())))));
+          Sonar.get0().getConfig().getMessagesConfig().getString("verification.captcha.enter"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())))));
       incorrectCaptcha = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
         MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("verification.captcha.incorrect"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())))));
+          Sonar.get0().getConfig().getMessagesConfig().getString("verification.captcha.incorrect"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())))));
 
       // Prepare countdown
-      xpCountdown = new FallbackPacket[Sonar.get().getConfig().getVerification().getMap().getMaxDuration() / 1000];
+      xpCountdown = new FallbackPacket[Sonar.get0().getConfig().getVerification().getMap().getMaxDuration() / 1000];
 
       for (int i = 0; i < xpCountdown.length; i++) {
         final float bar = (float) i / xpCountdown.length;
@@ -241,15 +241,15 @@ public class FallbackPreparer {
 
       // Update the CAPTCHA generator if necessary
       final CaptchaGenerationStartEvent generationStartEvent = new CaptchaGenerationStartEvent(
-        Sonar.get().getFallback().getCaptchaGenerator());
-      Sonar.get().getEventManager().publish(generationStartEvent);
+        Sonar.get0().getFallback().getCaptchaGenerator());
+      Sonar.get0().getEventManager().publish(generationStartEvent);
 
       if (generationStartEvent.getCaptchaGenerator() == null
         || generationStartEvent.getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
-        Sonar.get().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(
-          Sonar.get().getConfig().getVerification().getMap().getBackgroundImage()));
+        Sonar.get0().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(
+          Sonar.get0().getConfig().getVerification().getMap().getBackgroundImage()));
       } else {
-        Sonar.get().getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
+        Sonar.get0().getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
       }
 
       // Prepare CAPTCHA answers
@@ -259,13 +259,13 @@ public class FallbackPreparer {
       enterCodeMessage = null;
       incorrectCaptcha = null;
       xpCountdown = null;
-      Sonar.get().getFallback().setCaptchaGenerator(null);
+      Sonar.get0().getFallback().setCaptchaGenerator(null);
     }
 
     maxTotalPacketsSent = maxMovementTick + 2
       + (xpCountdown == null ? 0 : xpCountdown.length) * 20 + 5
-      + Sonar.get().getConfig().getVerification().getVehicle().getMinimumPackets() * 4
-      + Sonar.get().getConfig().getVerification().getMap().getMaxTries()
+      + Sonar.get0().getConfig().getVerification().getVehicle().getMinimumPackets() * 4
+      + Sonar.get0().getConfig().getVerification().getMap().getMaxTries()
       + 150 /* some arbitrary leeway */;
   }
 

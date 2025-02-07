@@ -49,16 +49,16 @@ public final class Fallback {
   private Ratelimiter<InetAddress> ratelimiter;
 
   public boolean shouldVerifyNewPlayers() {
-    return shouldPerform(Sonar.get().getConfig().getVerification().getTiming());
+    return shouldPerform(Sonar.get0().getConfig().getVerification().getTiming());
   }
 
   public boolean shouldPerformCaptcha() {
-    return shouldPerform(Sonar.get().getConfig().getVerification().getMap().getTiming());
+    return shouldPerform(Sonar.get0().getConfig().getVerification().getMap().getTiming());
   }
 
   private static boolean shouldPerform(final SonarConfiguration.Verification.Timing timing) {
     return timing == SonarConfiguration.Verification.Timing.ALWAYS
       || (timing == SonarConfiguration.Verification.Timing.DURING_ATTACK
-      && Sonar.get().getAttackTracker().getCurrentAttack() != null);
+      && Sonar.get0().getAttackTracker().getCurrentAttack() != null);
   }
 }

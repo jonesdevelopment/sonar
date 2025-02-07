@@ -49,10 +49,10 @@ public final class DumpCommand extends Subcommand {
   protected void execute(final @NotNull InvocationSource source, final String @NotNull [] args) {
     final var mappings = new WeakHashMap<String, Object>();
     mappings.put("sonar", new Dump.Sonar(
-      Sonar.get().getVersion().getFormatted(),
-      Sonar.get().getPlatform(),
-      Sonar.get().getVersion().getGitBranch(),
-      Sonar.get().getVersion().getGitCommit()
+      Sonar.get0().getVersion().getFormatted(),
+      Sonar.get0().getPlatform(),
+      Sonar.get0().getVersion().getGitBranch(),
+      Sonar.get0().getVersion().getGitCommit()
     ));
     mappings.put("runtime", new Dump.Runtime(
       getVirtualCores(),
@@ -72,7 +72,7 @@ public final class DumpCommand extends Subcommand {
       formatMemory(getFreeMemory()),
       formatMemory(getUsedMemory())
     ));
-    Sonar.get().getLogger().info(Sonar.get().getConfig().getMessagesConfig().getString("commands.dump.log")
+    Sonar.get0().getLogger().info(Sonar.get0().getConfig().getMessagesConfig().getString("commands.dump.log")
       .replace("<dumped-json-data>", GSON.toJson(mappings)));
   }
 

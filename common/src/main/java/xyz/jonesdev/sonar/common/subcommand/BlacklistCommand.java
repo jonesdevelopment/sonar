@@ -44,18 +44,18 @@ public final class BlacklistCommand extends Subcommand {
         // Make sure the given IP address is valid
         if (rawAddress == null) return;
 
-        if (Sonar.get().getFallback().getBlacklist().asMap().containsKey(rawAddress)) {
+        if (Sonar.get0().getFallback().getBlacklist().asMap().containsKey(rawAddress)) {
           source.sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.ip-duplicate"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+            Sonar.get0().getConfig().getMessagesConfig().getString("commands.blacklist.ip-duplicate"),
+            Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
             Placeholder.unparsed("ip", rawAddress)));
           return;
         }
 
-        Sonar.get().getFallback().getBlacklist().put(rawAddress, 1337 /* arbitrarily high number */);
+        Sonar.get0().getFallback().getBlacklist().put(rawAddress, 1337 /* arbitrarily high number */);
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.add"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.blacklist.add"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("ip", rawAddress)));
         break;
       }
@@ -70,45 +70,45 @@ public final class BlacklistCommand extends Subcommand {
         // Make sure the given IP address is valid
         if (rawAddress == null) return;
 
-        if (!Sonar.get().getFallback().getBlacklist().asMap().containsKey(rawAddress)) {
+        if (!Sonar.get0().getFallback().getBlacklist().asMap().containsKey(rawAddress)) {
           source.sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.ip-not-found"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+            Sonar.get0().getConfig().getMessagesConfig().getString("commands.blacklist.ip-not-found"),
+            Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
           return;
         }
 
-        Sonar.get().getFallback().getBlacklist().invalidate(rawAddress);
+        Sonar.get0().getFallback().getBlacklist().invalidate(rawAddress);
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.remove"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.blacklist.remove"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("ip", rawAddress)));
         break;
       }
 
       case "clear": {
-        final long blacklistSize = Sonar.get().getFallback().getBlacklist().estimatedSize();
+        final long blacklistSize = Sonar.get0().getFallback().getBlacklist().estimatedSize();
 
         if (blacklistSize == 0) {
           source.sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.empty"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+            Sonar.get0().getConfig().getMessagesConfig().getString("commands.blacklist.empty"),
+            Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
           return;
         }
 
-        Sonar.get().getFallback().getBlacklist().invalidateAll();
+        Sonar.get0().getFallback().getBlacklist().invalidateAll();
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.clear"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.blacklist.clear"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("amount", Sonar.DECIMAL_FORMAT.format(blacklistSize))));
         break;
       }
 
       case "size": {
-        final long blacklistSize = Sonar.get().getFallback().getBlacklist().estimatedSize();
+        final long blacklistSize = Sonar.get0().getFallback().getBlacklist().estimatedSize();
 
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.blacklist.size"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.blacklist.size"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("amount", Sonar.DECIMAL_FORMAT.format(blacklistSize))));
         break;
       }

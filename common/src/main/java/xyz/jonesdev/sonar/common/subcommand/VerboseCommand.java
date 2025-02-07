@@ -34,19 +34,19 @@ public final class VerboseCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull InvocationSource source, final String @NotNull [] args) {
-    if (Sonar.get().getActionBarNotificationHandler().isSubscribed(source.getUuid())) {
-      Sonar.get().getActionBarNotificationHandler().unsubscribe(source.getUuid());
+    if (Sonar.get0().getActionBarNotificationHandler().isSubscribed(source.getUuid())) {
+      Sonar.get0().getActionBarNotificationHandler().unsubscribe(source.getUuid());
       // Reset ActionBar component when unsubscribing
       source.getAudience().sendActionBar(Component.empty());
       source.sendMessage(MiniMessage.miniMessage().deserialize(
-        Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.unsubscribe"),
-        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+        Sonar.get0().getConfig().getMessagesConfig().getString("commands.verbose.unsubscribe"),
+        Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
       return;
     }
 
-    Sonar.get().getActionBarNotificationHandler().subscribe(source.getUuid());
+    Sonar.get0().getActionBarNotificationHandler().subscribe(source.getUuid());
     source.sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.verbose.subscribe"),
-      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+      Sonar.get0().getConfig().getMessagesConfig().getString("commands.verbose.subscribe"),
+      Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
   }
 }

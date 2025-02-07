@@ -49,17 +49,17 @@ public final class VerifiedCommand extends Subcommand {
         final String username = args[3];
         final String fingerprint = FingerprintingUtil.getFingerprint(username, hostAddress);
 
-        if (!Sonar.get().getVerifiedPlayerController().getCache().contains(fingerprint)) {
+        if (!Sonar.get0().getVerifiedPlayerController().getCache().contains(fingerprint)) {
           source.sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.ip-not-found"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+            Sonar.get0().getConfig().getMessagesConfig().getString("commands.verified.ip-not-found"),
+            Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
           return;
         }
 
-        Sonar.get().getVerifiedPlayerController().remove(fingerprint);
+        Sonar.get0().getVerifiedPlayerController().remove(fingerprint);
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.remove"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.verified.remove"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("ip", hostAddress),
           Placeholder.unparsed("username", username)));
         break;
@@ -78,46 +78,46 @@ public final class VerifiedCommand extends Subcommand {
         final String username = args[3];
         final String fingerprint = FingerprintingUtil.getFingerprint(username, hostAddress);
 
-        if (Sonar.get().getVerifiedPlayerController().getCache().contains(fingerprint)) {
+        if (Sonar.get0().getVerifiedPlayerController().getCache().contains(fingerprint)) {
           source.sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.already"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+            Sonar.get0().getConfig().getMessagesConfig().getString("commands.verified.already"),
+            Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
           return;
         }
 
-        Sonar.get().getVerifiedPlayerController().add(new VerifiedPlayer(fingerprint, System.currentTimeMillis()));
+        Sonar.get0().getVerifiedPlayerController().add(new VerifiedPlayer(fingerprint, System.currentTimeMillis()));
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.add"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.verified.add"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("ip", hostAddress),
           Placeholder.unparsed("username", username)));
         break;
       }
 
       case "clear": {
-        final int verifiedSize = Sonar.get().getVerifiedPlayerController().getCache().size();
+        final int verifiedSize = Sonar.get0().getVerifiedPlayerController().getCache().size();
 
         if (verifiedSize == 0) {
           source.sendMessage(MiniMessage.miniMessage().deserialize(
-            Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.empty"),
-            Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+            Sonar.get0().getConfig().getMessagesConfig().getString("commands.verified.empty"),
+            Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
           return;
         }
 
-        Sonar.get().getVerifiedPlayerController().clearAll();
+        Sonar.get0().getVerifiedPlayerController().clearAll();
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.clear"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.verified.clear"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("amount", Sonar.DECIMAL_FORMAT.format(verifiedSize))));
         break;
       }
 
       case "size": {
-        final int verifiedSize = Sonar.get().getVerifiedPlayerController().getCache().size();
+        final int verifiedSize = Sonar.get0().getVerifiedPlayerController().getCache().size();
 
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.verified.size"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.verified.size"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("amount", Sonar.DECIMAL_FORMAT.format(verifiedSize))));
         break;
       }

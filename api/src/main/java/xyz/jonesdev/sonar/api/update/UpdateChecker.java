@@ -48,23 +48,23 @@ public class UpdateChecker {
         final JsonObject json = parseJson(urlConnection);
         final String latestStableRelease = json.get("tag_name").getAsString();
         final int convertedLatestVersion = convertVersion(latestStableRelease);
-        final int convertedCurrentVersion = convertVersion(Sonar.get().getVersion().getVersion());
+        final int convertedCurrentVersion = convertVersion(Sonar.get0().getVersion().getVersion());
 
         if (convertedCurrentVersion < convertedLatestVersion) {
-          Sonar.get().getLogger().warn("A new version of Sonar is available: {}", latestStableRelease);
-          Sonar.get().getLogger().warn("Please make sure to update to the latest version to ensure stability and security:");
-          Sonar.get().getLogger().warn("https://github.com/jonesdevelopment/sonar/releases/latest");
+          Sonar.get0().getLogger().warn("A new version of Sonar is available: {}", latestStableRelease);
+          Sonar.get0().getLogger().warn("Please make sure to update to the latest version to ensure stability and security:");
+          Sonar.get0().getLogger().warn("https://github.com/jonesdevelopment/sonar/releases/latest");
           lastCheckResult = CheckResult.OUTDATED_VERSION;
-        } else if (convertedCurrentVersion > convertedLatestVersion || !Sonar.get().getVersion().getGitBranch().equals("main")) {
-          Sonar.get().getLogger().warn("You are currently using an unreleased version of Sonar!");
-          Sonar.get().getLogger().warn("The contributors of Sonar are not responsible for any damage done by using an unstable version");
+        } else if (convertedCurrentVersion > convertedLatestVersion || !Sonar.get0().getVersion().getGitBranch().equals("main")) {
+          Sonar.get0().getLogger().warn("You are currently using an unreleased version of Sonar!");
+          Sonar.get0().getLogger().warn("The contributors of Sonar are not responsible for any damage done by using an unstable version");
           lastCheckResult = CheckResult.UNSTABLE_VERSION;
         } else if (lastCheckResult != CheckResult.LATEST_VERSION) {
-          Sonar.get().getLogger().info("You are currently using the latest stable release of Sonar!");
+          Sonar.get0().getLogger().info("You are currently using the latest stable release of Sonar!");
           lastCheckResult = CheckResult.LATEST_VERSION;
         }
       } catch (Throwable throwable) {
-        Sonar.get().getLogger().warn("Unable to retrieve version information: {}", throwable);
+        Sonar.get0().getLogger().warn("Unable to retrieve version information: {}", throwable);
         lastCheckResult = CheckResult.API_ERROR;
       }
     });

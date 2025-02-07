@@ -33,17 +33,17 @@ public final class NotifyCommand extends Subcommand {
 
   @Override
   protected void execute(final @NotNull InvocationSource source, final String @NotNull [] args) {
-    if (Sonar.get().getChatNotificationHandler().isSubscribed(source.getUuid())) {
-      Sonar.get().getChatNotificationHandler().unsubscribe(source.getUuid());
+    if (Sonar.get0().getChatNotificationHandler().isSubscribed(source.getUuid())) {
+      Sonar.get0().getChatNotificationHandler().unsubscribe(source.getUuid());
       source.sendMessage(MiniMessage.miniMessage().deserialize(
-        Sonar.get().getConfig().getMessagesConfig().getString("commands.notify.unsubscribe"),
-        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+        Sonar.get0().getConfig().getMessagesConfig().getString("commands.notify.unsubscribe"),
+        Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
       return;
     }
 
-    Sonar.get().getChatNotificationHandler().subscribe(source.getUuid());
+    Sonar.get0().getChatNotificationHandler().subscribe(source.getUuid());
     source.sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.notify.subscribe"),
-      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+      Sonar.get0().getConfig().getMessagesConfig().getString("commands.notify.subscribe"),
+      Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
   }
 }

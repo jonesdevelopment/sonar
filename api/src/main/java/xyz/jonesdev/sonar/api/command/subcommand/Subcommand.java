@@ -48,8 +48,8 @@ public abstract class Subcommand {
   protected static @Nullable String validateIP(final InvocationSource source, final String raw) {
     if (!IPv4_REGEX.matcher(raw).matches() && !IPv6_REGEX.matcher(raw).matches()) {
       source.sendMessage(MiniMessage.miniMessage().deserialize(
-        Sonar.get().getConfig().getMessagesConfig().getString("commands.invalid-ip-address"),
-        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+        Sonar.get0().getConfig().getMessagesConfig().getString("commands.invalid-ip-address"),
+        Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
       return null;
     }
     return raw;
@@ -61,8 +61,8 @@ public abstract class Subcommand {
 
   protected final void incorrectUsage(final @NotNull InvocationSource invocationSource, final String usage) {
     invocationSource.sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.incorrect-usage"),
-      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+      Sonar.get0().getConfig().getMessagesConfig().getString("commands.incorrect-usage"),
+      Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
       Placeholder.unparsed("subcommand-usage", usage)));
   }
 
@@ -70,16 +70,16 @@ public abstract class Subcommand {
     // Check if the subcommand can only be executed by players
     if (info.onlyPlayers() && !invocationSource.isPlayer()) {
       invocationSource.sendMessage(MiniMessage.miniMessage().deserialize(
-        Sonar.get().getConfig().getMessagesConfig().getString("commands.player-only"),
-        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+        Sonar.get0().getConfig().getMessagesConfig().getString("commands.player-only"),
+        Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
       return;
     }
 
     // Check if the subcommand can only be executed though console
     if (info.onlyConsole() && invocationSource.isPlayer()) {
       invocationSource.sendMessage(MiniMessage.miniMessage().deserialize(
-        Sonar.get().getConfig().getMessagesConfig().getString("commands.console-only"),
-        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix())));
+        Sonar.get0().getConfig().getMessagesConfig().getString("commands.console-only"),
+        Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())));
       return;
     }
 
@@ -95,7 +95,7 @@ public abstract class Subcommand {
 
   public final @NotNull String getDescription() {
     final String path = String.format("commands.%s.description", info.name());
-    return Objects.requireNonNull(Sonar.get().getConfig().getMessagesConfig().getString(path));
+    return Objects.requireNonNull(Sonar.get0().getConfig().getMessagesConfig().getString(path));
   }
 
   protected abstract void execute(final @NotNull InvocationSource source, final String @NotNull [] args);

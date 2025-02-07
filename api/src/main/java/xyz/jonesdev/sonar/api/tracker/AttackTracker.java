@@ -52,10 +52,10 @@ public final class AttackTracker {
   }
 
   public void checkIfUnderAttack() {
-    final long joinsPerSecond = Sonar.get().getStatistics().getLoginsPerSecond();
-    final int verifyingPlayers = Sonar.get().getFallback().getConnected().size();
-    final int queuedPlayers = Sonar.get().getFallback().getQueue().getPlayers().size();
-    final int minPlayers = Sonar.get().getConfig().getMinPlayersForAttack();
+    final long joinsPerSecond = Sonar.get0().getStatistics().getLoginsPerSecond();
+    final int verifyingPlayers = Sonar.get0().getFallback().getConnected().size();
+    final int queuedPlayers = Sonar.get0().getFallback().getQueue().getPlayers().size();
+    final int minPlayers = Sonar.get0().getConfig().getMinPlayersForAttack();
 
     if (joinsPerSecond > minPlayers // Check the number of bots/joins per second.
       || verifyingPlayers > minPlayers // Check the number of verifying players.
@@ -66,10 +66,10 @@ public final class AttackTracker {
       // An attack has been detected
       if (currentAttack == null) {
         currentAttack = new AttackStatistics();
-        currentAttack.successfulVerifications = Sonar.get().getVerifiedPlayerController().getCache().size();
-        currentAttack.failedVerifications = Sonar.get().getStatistics().getTotalFailedVerifications();
-        Sonar.get().getEventManager().publish(new AttackDetectedEvent());
-        Sonar.get().getChatNotificationHandler().handleNotification();
+        currentAttack.successfulVerifications = Sonar.get0().getVerifiedPlayerController().getCache().size();
+        currentAttack.failedVerifications = Sonar.get0().getStatistics().getTotalFailedVerifications();
+        Sonar.get0().getEventManager().publish(new AttackDetectedEvent());
+        Sonar.get0().getChatNotificationHandler().handleNotification();
       } else {
         // Reset attack timer if we're still under attack
         currentAttack.timer.reset();
@@ -80,7 +80,7 @@ public final class AttackTracker {
         // Update joins per second peak if necessary
         currentAttack.peakJoinsPerSecond = joinsPerSecond;
       }
-      final long connectionsPerSecond = Sonar.get().getStatistics().getConnectionsPerSecond();
+      final long connectionsPerSecond = Sonar.get0().getStatistics().getConnectionsPerSecond();
       if (connectionsPerSecond > currentAttack.peakConnectionsPerSecond) {
         // Update connections per second peak if necessary
         currentAttack.peakConnectionsPerSecond = connectionsPerSecond;
@@ -96,14 +96,14 @@ public final class AttackTracker {
         currentAttack.peakProcessMemoryUsage = processMemoryUsage;
       }
     } else if (currentAttack != null) {
-      if (currentAttack.duration.delay() > Sonar.get().getConfig().getMinAttackDuration()
-        && currentAttack.timer.delay() > Sonar.get().getConfig().getAttackCooldownDelay()) {
+      if (currentAttack.duration.delay() > Sonar.get0().getConfig().getMinAttackDuration()
+        && currentAttack.timer.delay() > Sonar.get0().getConfig().getAttackCooldownDelay()) {
         // The current attack has stopped
-        Sonar.get().getEventManager().publish(new AttackMitigatedEvent(currentAttack));
+        Sonar.get0().getEventManager().publish(new AttackMitigatedEvent(currentAttack));
 
-        if (++attackThreshold > Sonar.get().getConfig().getMinAttackThreshold()) {
+        if (++attackThreshold > Sonar.get0().getConfig().getMinAttackThreshold()) {
           // Post webhook to Discord
-          Optional.ofNullable(Sonar.get().getConfig().getWebhook().getDiscordWebhook())
+          Optional.ofNullable(Sonar.get0().getConfig().getWebhook().getDiscordWebhook())
             .ifPresent(webhook -> {
               // Save attack statistics
               final long deltaInMillis = currentAttack.duration.delay();
@@ -116,15 +116,15 @@ public final class AttackTracker {
               final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
               final String startTimestamp = String.valueOf(currentAttack.duration.getStart() / 1000L);
               final String endTimestamp = String.valueOf(System.currentTimeMillis() / 1000L);
-              final long blacklisted = Sonar.get().getFallback().getBlacklist().estimatedSize();
+              final long blacklisted = Sonar.get0().getFallback().getBlacklist().estimatedSize();
               // Calculate during-attack-statistics using their deltas
-              final long totalVerified = Sonar.get().getVerifiedPlayerController().getCache().size();
+              final long totalVerified = Sonar.get0().getVerifiedPlayerController().getCache().size();
               final long verified = Math.max(totalVerified - currentAttack.successfulVerifications, 0);
-              final long totalFailed = Sonar.get().getStatistics().getTotalFailedVerifications();
+              final long totalFailed = Sonar.get0().getStatistics().getTotalFailedVerifications();
               final long failed = Math.max(totalFailed - currentAttack.failedVerifications, 0);
 
               webhook.post(() -> {
-                final SonarConfiguration.Webhook.Embed config = Sonar.get().getConfig().getWebhook().getEmbed();
+                final SonarConfiguration.Webhook.Embed config = Sonar.get0().getConfig().getWebhook().getEmbed();
                 final String description = config.getDescription()
                   .replace("<start-timestamp>", startTimestamp)
                   .replace("<end-timestamp>", endTimestamp)

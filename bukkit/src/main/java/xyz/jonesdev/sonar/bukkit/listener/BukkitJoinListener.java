@@ -92,7 +92,7 @@ public final class BukkitJoinListener implements Listener {
         channel.close();
       }
     } catch (Throwable throwable) {
-      Sonar.get().getLogger().warn("Couldn't find {}: {}", event.getPlayer().getName(), throwable);
+      Sonar.get0().getLogger().warn("Couldn't find {}: {}", event.getPlayer().getName(), throwable);
     }
   }
 }

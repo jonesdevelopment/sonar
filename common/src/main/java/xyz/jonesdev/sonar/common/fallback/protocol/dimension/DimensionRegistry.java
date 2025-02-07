@@ -58,7 +58,7 @@ public final class DimensionRegistry {
     try (final InputStream inputStream = Sonar.class.getResourceAsStream("/assets/codecs/" + fileName)) {
       return BinaryTagIO.unlimitedReader().read(Objects.requireNonNull(inputStream), BinaryTagIO.Compression.GZIP);
     } catch (Throwable throwable) {
-      Sonar.get().getLogger().error("Could not load mappings for {}: {}", fileName, throwable);
+      Sonar.get0().getLogger().error("Could not load mappings for {}: {}", fileName, throwable);
       throw new IllegalStateException(throwable);
     }
   }

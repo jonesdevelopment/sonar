@@ -47,21 +47,21 @@ public final class ScheduledServiceManager {
     VERBOSE.scheduleAtFixedRate(() -> {
       // Make sure to clean up the cached statistics since we don't want to display wrong values
       GlobalSonarStatistics.cleanUpCaches();
-      Sonar.get().getFallback().getBlacklist().cleanUp();
+      Sonar.get0().getFallback().getBlacklist().cleanUp();
       // Update the attack tracker
-      Sonar.get().getAttackTracker().checkIfUnderAttack();
+      Sonar.get0().getAttackTracker().checkIfUnderAttack();
       // Publish the action bar notifications
-      Sonar.get().getActionBarNotificationHandler().handleNotification();
+      Sonar.get0().getActionBarNotificationHandler().handleNotification();
     }, 0L, 250L, TimeUnit.MILLISECONDS);
 
-    FALLBACK_QUEUE.scheduleAtFixedRate(() -> Sonar.get().getFallback().getQueue().poll(),
+    FALLBACK_QUEUE.scheduleAtFixedRate(() -> Sonar.get0().getFallback().getQueue().poll(),
       1L, 1L, TimeUnit.SECONDS);
 
     STATISTICS.scheduleAtFixedRate(GlobalSonarStatistics::hitEverySecond,
       0L, 1L, TimeUnit.SECONDS);
 
     // This config setting only updates when the server is restarted
-    if (Sonar.get().getConfig().getGeneralConfig().getBoolean("general.check-for-updates")) {
+    if (Sonar.get0().getConfig().getGeneralConfig().getBoolean("general.check-for-updates")) {
       UPDATE_NOTIFIER.scheduleAtFixedRate(UpdateChecker::checkForUpdates,
         0L, 2L, TimeUnit.HOURS);
     }

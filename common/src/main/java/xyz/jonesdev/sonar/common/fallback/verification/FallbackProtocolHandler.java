@@ -170,9 +170,9 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
-    if (!user.isGeyser() && Sonar.get().getConfig().getVerification().getVehicle().isEnabled()) {
+    if (!user.isGeyser() && Sonar.get0().getConfig().getVerification().getVehicle().isEnabled()) {
       user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackVehicleHandler(user));
-    } else if (user.isForceCaptcha() || Sonar.get().getFallback().shouldPerformCaptcha()) {
+    } else if (user.isForceCaptcha() || Sonar.get0().getFallback().shouldPerformCaptcha()) {
       user.channel().pipeline().get(FallbackPacketDecoder.class).setListener(new FallbackCaptchaHandler(user));
     } else {
       // The player has passed all checks

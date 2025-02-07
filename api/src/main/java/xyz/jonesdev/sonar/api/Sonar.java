@@ -164,8 +164,22 @@ public interface Sonar {
    * Gets the instance of the Sonar API.
    *
    * @return The {@link Sonar} instance.
+   * @throws IllegalStateException If Sonar has not been initialized.
    */
   @NotNull static Sonar get() {
+    return SonarSupplier.get();
+  }
+
+  /**
+   * Gets the instance of the Sonar API.
+   * Only use this method if you understand the implications,
+   * and have a specific reason to bypass the standard {@link #get()} method.
+   * In most cases, {@link #get()} is the preferred way to access the Sonar API.
+   *
+   * @return The Sonar instance.
+   */
+  @ApiStatus.Internal
+  @NotNull static Sonar get0() {
     return SonarSupplier.sonar;
   }
 }

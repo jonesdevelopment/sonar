@@ -267,7 +267,7 @@ public class FallbackBukkitInjector {
         return;
       }
     } catch (Exception exception) {
-      Sonar.get().getLogger().error("An error occurred while injecting {}", exception);
+      Sonar.get0().getLogger().error("An error occurred while injecting {}", exception);
     }
   }
 }

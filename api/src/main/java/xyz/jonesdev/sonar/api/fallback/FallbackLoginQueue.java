@@ -38,7 +38,7 @@ public final class FallbackLoginQueue {
   private final ConcurrentMap<InetAddress, Runnable> players = new ConcurrentHashMap<>(512);
 
   public void poll() {
-    final int maxQueuePolls = Math.min(players.size(), Sonar.get().getConfig().getQueue().getMaxQueuePolls());
+    final int maxQueuePolls = Math.min(players.size(), Sonar.get0().getConfig().getQueue().getMaxQueuePolls());
     // No need to initiate an executor service task if nobody is currently queued
     if (maxQueuePolls <= 0) return;
     // We need to be cautious here since we don't want any concurrency issues

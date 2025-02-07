@@ -38,14 +38,14 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     // Bedrock users start falling immediately
     this.canFall = user.isGeyser();
     // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
-    this.enableGravityCheck = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isEnabled();
-    this.enableCollisionsCheck = !user.isGeyser() && Sonar.get().getConfig().getVerification().getGravity().isCheckCollisions();
+    this.enableGravityCheck = !user.isGeyser() && Sonar.get0().getConfig().getVerification().getGravity().isEnabled();
+    this.enableCollisionsCheck = !user.isGeyser() && Sonar.get0().getConfig().getVerification().getGravity().isCheckCollisions();
 
     // First, write the JoinGame packet to the buffer
     user.delayedWrite(joinGame);
     // Then, write the ClientAbilities packet to the buffer
     // This is only necessary if the player is in creative mode
-    if (Sonar.get().getConfig().getVerification().getGamemode() == CREATIVE) {
+    if (Sonar.get0().getConfig().getVerification().getGamemode() == CREATIVE) {
       user.delayedWrite(DEFAULT_ABILITIES);
     }
     // Write the DefaultSpawnPosition packet to the buffer
@@ -188,8 +188,8 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     this.y = y;
 
     // Log/debug position if enabled in the configuration
-    if (Sonar.get().getConfig().getVerification().isDebugXYZPositions()) {
-      Sonar.get().getLogger().info("{}: {}/{}/{} ly={}, dy={}, h={}, g={}, r={}",
+    if (Sonar.get0().getConfig().getVerification().isDebugXYZPositions()) {
+      Sonar.get0().getLogger().info("{}: {}/{}/{} ly={}, dy={}, h={}, g={}, r={}",
         user.getUsername(), x, y, z, lastY, deltaY, blockHeight, onGround, rotated);
     }
 
@@ -262,7 +262,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
 
   private void failOrShowCaptcha(final String debug) {
     // Do not throw an exception if the user configured to display the CAPTCHA instead
-    if (Sonar.get().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
+    if (Sonar.get0().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
       user.setForceCaptcha(true);
       markSuccess();
       return;

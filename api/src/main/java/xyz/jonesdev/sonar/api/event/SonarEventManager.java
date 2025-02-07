@@ -47,7 +47,7 @@ public final class SonarEventManager {
         try {
           eventListener.handle(event);
         } catch (Throwable throwable) {
-          Sonar.get().getLogger().error("Could not pass {} to listener: {}",
+          Sonar.get0().getLogger().error("Could not pass {} to listener: {}",
             event.getClass().getSimpleName(), throwable);
         }
       }

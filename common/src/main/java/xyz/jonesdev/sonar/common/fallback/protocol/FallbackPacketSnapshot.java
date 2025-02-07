@@ -50,7 +50,7 @@ public final class FallbackPacketSnapshot implements FallbackPacket {
         try {
           originalPacket.encode(byteBuf, protocolVersion);
         } catch (Throwable throwable) {
-          Sonar.get().getLogger().error("Could not encode packet {} for version {}: {}",
+          Sonar.get0().getLogger().error("Could not encode packet {} for version {}: {}",
             originalPacket, protocolVersion, throwable);
           break;
         }

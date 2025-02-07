@@ -56,17 +56,17 @@ public final class VerifiedPlayerController {
   private final ExecutorService updateService = Executors.newSingleThreadExecutor();
 
   public VerifiedPlayerController(final @NotNull LibraryManager libraryManager) {
-    final SonarConfiguration.Database database = Sonar.get().getConfig().getDatabase();
+    final SonarConfiguration.Database database = Sonar.get0().getConfig().getDatabase();
     cachedDatabaseType = database.getType();
 
     if (cachedDatabaseType == SonarConfiguration.Database.Type.NONE) {
-      Sonar.get().getLogger().warn("Configure a database to save verified players.");
+      Sonar.get0().getLogger().warn("Configure a database to save verified players.");
       return;
     }
 
     // Make sure to only load the driver once per database type
     if (!cachedDatabaseType.isLoaded()) {
-      Sonar.get().getLogger().info("Loading {} driver version {}",
+      Sonar.get0().getLogger().info("Loading {} driver version {}",
         cachedDatabaseType.getDatabaseType().getDatabaseName(),
         cachedDatabaseType.getDatabaseDriver().getVersion());
       libraryManager.loadLibrary(cachedDatabaseType.getDatabaseDriver());
@@ -79,20 +79,20 @@ public final class VerifiedPlayerController {
       // H2 has a different JDBC URL layout
       // https://www.codejava.net/java-se/jdbc/connect-to-h2-database-examples
       if (cachedDatabaseType == SonarConfiguration.Database.Type.H2) {
-        final File file = new File(Sonar.get().getConfig().getPluginFolder(),
-          Sonar.get().getConfig().getGeneralConfig().getString("database.filename"));
+        final File file = new File(Sonar.get0().getConfig().getPluginFolder(),
+          Sonar.get0().getConfig().getGeneralConfig().getString("database.filename"));
         jdbcURL = String.format(cachedDatabaseType.getConnectionString(), file.getAbsolutePath());
       } else {
         // Normal JDBC URL layout for MySQL/MariaDB/...
         jdbcURL = String.format(cachedDatabaseType.getConnectionString(),
-          Sonar.get().getConfig().getGeneralConfig().getString("database.host"),
-          Sonar.get().getConfig().getGeneralConfig().getInt("database.port"),
-          Sonar.get().getConfig().getGeneralConfig().getString("database.name"));
+          Sonar.get0().getConfig().getGeneralConfig().getString("database.host"),
+          Sonar.get0().getConfig().getGeneralConfig().getInt("database.port"),
+          Sonar.get0().getConfig().getGeneralConfig().getString("database.name"));
       }
 
       connectionSource = new JdbcConnectionSource(jdbcURL,
-        Sonar.get().getConfig().getGeneralConfig().getString("database.username"),
-        Sonar.get().getConfig().getGeneralConfig().getString("database.password"),
+        Sonar.get0().getConfig().getGeneralConfig().getString("database.username"),
+        Sonar.get0().getConfig().getGeneralConfig().getString("database.password"),
         cachedDatabaseType.getDatabaseType());
 
       try {
@@ -159,7 +159,7 @@ public final class VerifiedPlayerController {
       for (final VerifiedPlayer player : oldEntries) {
         dao.delete(player);
       }
-      Sonar.get().getLogger().info("Removed {} database entries older than {} days.",
+      Sonar.get0().getLogger().info("Removed {} database entries older than {} days.",
         oldEntries.size(), maximumAge);
     }
   }

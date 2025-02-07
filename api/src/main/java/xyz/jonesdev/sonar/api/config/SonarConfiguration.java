@@ -66,14 +66,14 @@ public final class SonarConfiguration {
       final URL defaultLanguageFile = Sonar.class.getResource("/assets/language.properties");
       // Make sure the file actually exists before trying to copy it
       if (defaultLanguageFile == null) {
-        Sonar.get().getLogger().error("Cannot check for custom language (is the file missing?)");
+        Sonar.get0().getLogger().error("Cannot check for custom language (is the file missing?)");
         return DEFAULT_FALLBACK_LANGUAGE;
       }
       // Copy the file to the plugin data directory
       try (final InputStream inputStream = defaultLanguageFile.openStream()) {
         Files.copy(inputStream, languageFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
       } catch (IOException exception) {
-        Sonar.get().getLogger().error("Error copying file: {}", exception);
+        Sonar.get0().getLogger().error("Error copying file: {}", exception);
         return DEFAULT_FALLBACK_LANGUAGE;
       }
     }
@@ -87,13 +87,13 @@ public final class SonarConfiguration {
         // Try parsing the property as a language
         return Language.fromCode(property);
       } catch (Throwable throwable) {
-        Sonar.get().getLogger().error("Could not find requested language: {}", throwable);
-        Sonar.get().getLogger().error("You can view a full list of valid language codes here:");
-        Sonar.get().getLogger().error("https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes");
-        Sonar.get().getLogger().error("If a translation does not exist yet, Sonar will use English (en).");
+        Sonar.get0().getLogger().error("Could not find requested language: {}", throwable);
+        Sonar.get0().getLogger().error("You can view a full list of valid language codes here:");
+        Sonar.get0().getLogger().error("https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes");
+        Sonar.get0().getLogger().error("If a translation does not exist yet, Sonar will use English (en).");
       }
     } catch (IOException exception) {
-      Sonar.get().getLogger().error("Error reading language file: {}", exception);
+      Sonar.get0().getLogger().error("Error reading language file: {}", exception);
     }
     return DEFAULT_FALLBACK_LANGUAGE;
   }
@@ -112,13 +112,13 @@ public final class SonarConfiguration {
         final String property = System.getProperty("user.language", "en");
         language = Language.fromCode(property);
         // Make sure the user knows that we're using the system language for translations
-        Sonar.get().getLogger().info("Using system language ({}) for translations.", language);
+        Sonar.get0().getLogger().info("Using system language ({}) for translations.", language);
       } catch (Exception exception) {
-        Sonar.get().getLogger().warn("Could not use system language for translations.");
-        Sonar.get().getLogger().warn("Using default language ({}) for translations.", language);
+        Sonar.get0().getLogger().warn("Could not use system language for translations.");
+        Sonar.get0().getLogger().warn("Using default language ({}) for translations.", language);
       }
     } else {
-      Sonar.get().getLogger().info("Using custom language ({}) for translations.", language);
+      Sonar.get0().getLogger().info("Using custom language ({}) for translations.", language);
     }
 
     // Load all configurations
@@ -158,12 +158,12 @@ public final class SonarConfiguration {
     verification.timing = Verification.Timing.valueOf(generalConfig.getString("verification.timing"));
     // Warn the user if the verification timing is set to NEVER
     if (verification.timing == Verification.Timing.NEVER) {
-      Sonar.get().getLogger().warn(" ");
-      Sonar.get().getLogger().warn("You have set the verification timing to 'NEVER'.");
-      Sonar.get().getLogger().warn("Sonar will NOT perform the bot verification at all, therefore making it useless.");
-      Sonar.get().getLogger().warn("It is highly suggested to set this option to either 'DURING_ATTACK' or 'ALWAYS'.");
-      Sonar.get().getLogger().warn("Please only edit this option if you really know what you are doing.");
-      Sonar.get().getLogger().warn(" ");
+      Sonar.get0().getLogger().warn(" ");
+      Sonar.get0().getLogger().warn("You have set the verification timing to 'NEVER'.");
+      Sonar.get0().getLogger().warn("Sonar will NOT perform the bot verification at all, therefore making it useless.");
+      Sonar.get0().getLogger().warn("It is highly suggested to set this option to either 'DURING_ATTACK' or 'ALWAYS'.");
+      Sonar.get0().getLogger().warn("Please only edit this option if you really know what you are doing.");
+      Sonar.get0().getLogger().warn(" ");
     }
 
     verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled");
@@ -187,7 +187,7 @@ public final class SonarConfiguration {
       if (backgroundFile.exists()) {
         verification.map.backgroundImage = backgroundFile;
       } else {
-        Sonar.get().getLogger().error("Could not find background image {}", backgroundFile.getAbsolutePath());
+        Sonar.get0().getLogger().error("Could not find background image {}", backgroundFile.getAbsolutePath());
       }
     }
 
@@ -288,7 +288,7 @@ public final class SonarConfiguration {
     final String resourceName = url + "/" + language.getCode() + ".yml";
     URL result = Sonar.class.getResource("/assets/" + resourceName);
     if (result == null) {
-      Sonar.get().getLogger().warn("Could not find " + resourceName + "! Using en.yml!");
+      Sonar.get0().getLogger().warn("Could not find " + resourceName + "! Using en.yml!");
       result = Objects.requireNonNull(Sonar.class.getResource("/assets/" + url + "/en.yml"));
     }
     return result;
@@ -297,7 +297,7 @@ public final class SonarConfiguration {
   private static int clamp(final int v, final int max, final int min) {
     final int output = Math.max(Math.min(v, min), max);
     if (output != v) {
-      Sonar.get().getLogger().warn("Clamped configuration value {} to {}", v, output);
+      Sonar.get0().getLogger().warn("Clamped configuration value {} to {}", v, output);
     }
     return output;
   }

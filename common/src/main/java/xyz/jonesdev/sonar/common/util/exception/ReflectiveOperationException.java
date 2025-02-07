@@ -23,7 +23,7 @@ public final class ReflectiveOperationException extends RuntimeException {
   public ReflectiveOperationException(final Throwable throwable) {
     super(throwable);
 
-    Sonar.get().getLogger().error("A reflective operation resulted in error:");
+    Sonar.get0().getLogger().error("A reflective operation resulted in error:");
     throwable.printStackTrace(System.err);
   }
 }

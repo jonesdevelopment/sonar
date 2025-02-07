@@ -130,7 +130,7 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @Override
   public int getTotalPlayersVerified() {
-    return Sonar.get().getVerifiedPlayerController().getCache().size();
+    return Sonar.get0().getVerifiedPlayerController().getCache().size();
   }
 
   @Override
@@ -145,7 +145,7 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @Override
   public long getCurrentAttemptedVerifications() {
-    return Sonar.get().getFallback().getConnected().size();
+    return Sonar.get0().getFallback().getConnected().size();
   }
 
   @Override
@@ -155,7 +155,7 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @Override
   public long getCurrentBlacklistSize() {
-    return Sonar.get().getFallback().getBlacklist().estimatedSize();
+    return Sonar.get0().getFallback().getBlacklist().estimatedSize();
   }
 
   @Override

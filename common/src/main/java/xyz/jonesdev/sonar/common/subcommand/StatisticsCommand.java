@@ -47,16 +47,16 @@ public final class StatisticsCommand extends Subcommand {
         type = args[1].toLowerCase();
       } catch (Exception exception) {
         source.sendMessage(MiniMessage.miniMessage().deserialize(
-          Sonar.get().getConfig().getMessagesConfig().getString("commands.statistics.unknown-type"),
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Sonar.get0().getConfig().getMessagesConfig().getString("commands.statistics.unknown-type"),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("statistics", getArguments())));
         return;
       }
     }
 
     source.sendMessage(MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("commands.statistics.header"),
-      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+      Sonar.get0().getConfig().getMessagesConfig().getString("commands.statistics.header"),
+      Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
       Placeholder.unparsed("statistics-type", type)));
     source.sendMessage(Component.empty());
 
@@ -64,29 +64,29 @@ public final class StatisticsCommand extends Subcommand {
 
     switch (type) {
       case "general": {
-        final long seconds = Sonar.get().getLaunchTimer().delay() / 1000L;
+        final long seconds = Sonar.get0().getLaunchTimer().delay() / 1000L;
         final long days = seconds / (24L * 60L * 60L);
         final long hours = (seconds % (24L * 60L * 60L)) / (60L * 60L);
         final long minutes = (seconds % (60L * 60L)) / 60L;
         final String serverUptime = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds % 60L);
 
         placeholders = new TagResolver.Single[]{
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("verified", Sonar.DECIMAL_FORMAT.format(Sonar.get().getVerifiedPlayerController().getCache().size())),
-          Placeholder.unparsed("verifying", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
-          Placeholder.unparsed("blacklisted", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
-          Placeholder.unparsed("queued", Sonar.DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getPlayers().size())),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
+          Placeholder.unparsed("verified", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getVerifiedPlayerController().getCache().size())),
+          Placeholder.unparsed("verifying", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getFallback().getConnected().size())),
+          Placeholder.unparsed("blacklisted", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getFallback().getBlacklist().estimatedSize())),
+          Placeholder.unparsed("queued", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getFallback().getQueue().getPlayers().size())),
           Placeholder.unparsed("server-uptime", serverUptime),
-          Placeholder.unparsed("total-joins", Sonar.DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined())),
-          Placeholder.unparsed("total-attempts", Sonar.DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications())),
-          Placeholder.unparsed("total-failed", Sonar.DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications()))
+          Placeholder.unparsed("total-joins", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalPlayersJoined())),
+          Placeholder.unparsed("total-attempts", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalAttemptedVerifications())),
+          Placeholder.unparsed("total-failed", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalFailedVerifications()))
         };
         break;
       }
 
       case "cpu": {
         placeholders = new TagResolver.Single[]{
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("process-cpu", Sonar.DECIMAL_FORMAT.format(getProcessCPUUsage())),
           Placeholder.unparsed("system-cpu", Sonar.DECIMAL_FORMAT.format(getSystemCPUUsage())),
           Placeholder.unparsed("average-process-cpu", Sonar.DECIMAL_FORMAT.format(getAverageProcessCPUUsage())),
@@ -98,7 +98,7 @@ public final class StatisticsCommand extends Subcommand {
 
       case "memory": {
         placeholders = new TagResolver.Single[]{
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("free-memory", formatMemory(getFreeMemory())),
           Placeholder.unparsed("used-memory", formatMemory(getUsedMemory())),
           Placeholder.unparsed("max-memory", formatMemory(getMaxMemory())),
@@ -109,17 +109,17 @@ public final class StatisticsCommand extends Subcommand {
 
       case "network": {
         placeholders = new TagResolver.Single[]{
-          Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-          Placeholder.unparsed("incoming-traffic", Sonar.get().getStatistics().getPerSecondIncomingBandwidthFormatted()),
-          Placeholder.unparsed("outgoing-traffic", Sonar.get().getStatistics().getPerSecondOutgoingBandwidthFormatted()),
-          Placeholder.unparsed("incoming-traffic-ttl", formatMemory(Sonar.get().getStatistics().getTotalIncomingBandwidth())),
-          Placeholder.unparsed("outgoing-traffic-ttl", formatMemory(Sonar.get().getStatistics().getTotalOutgoingBandwidth())),
+          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
+          Placeholder.unparsed("incoming-traffic", Sonar.get0().getStatistics().getPerSecondIncomingBandwidthFormatted()),
+          Placeholder.unparsed("outgoing-traffic", Sonar.get0().getStatistics().getPerSecondOutgoingBandwidthFormatted()),
+          Placeholder.unparsed("incoming-traffic-ttl", formatMemory(Sonar.get0().getStatistics().getTotalIncomingBandwidth())),
+          Placeholder.unparsed("outgoing-traffic-ttl", formatMemory(Sonar.get0().getStatistics().getTotalOutgoingBandwidth())),
         };
         break;
       }
     }
 
-    final List<String> parts = Sonar.get().getConfig().getMessagesConfig().getStringList(
+    final List<String> parts = Sonar.get0().getConfig().getMessagesConfig().getStringList(
       "commands.statistics." + type);
     for (final String msg : parts) {
       source.sendMessage(MiniMessage.miniMessage().deserialize(msg, placeholders));

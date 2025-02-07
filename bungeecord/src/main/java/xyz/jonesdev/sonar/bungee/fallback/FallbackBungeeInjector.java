@@ -53,7 +53,7 @@ public class FallbackBungeeInjector {
       // Replace the original channel initializer with our new injected initializer
       unsafe.putObject(base, offset, injectedInitializer);
     } catch (Exception exception) {
-      Sonar.get().getLogger().error("An error occurred while injecting {}", exception);
+      Sonar.get0().getLogger().error("An error occurred while injecting {}", exception);
     }
   }
 }

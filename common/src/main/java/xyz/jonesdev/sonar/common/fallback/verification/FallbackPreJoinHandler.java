@@ -135,7 +135,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
         "illegal PluginMessage channel: " + pluginMessage.getChannel());
 
       // Validate the client branding using a regex to filter unwanted characters.
-      if (Sonar.get().getConfig().getVerification().getBrand().isEnabled()) {
+      if (Sonar.get0().getConfig().getVerification().getBrand().isEnabled()) {
         validateClientBrand(pluginMessage.getData());
       }
 
@@ -157,8 +157,8 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
   private void markSuccess() {
     if (user.channel().isActive()) {
-      if (!Sonar.get().getConfig().getVerification().getValidNameRegex().matcher(user.getUsername()).matches()) {
-        user.disconnect(Sonar.get().getConfig().getVerification().getInvalidUsername());
+      if (!Sonar.get0().getConfig().getVerification().getValidNameRegex().matcher(user.getUsername()).matches()) {
+        user.disconnect(Sonar.get0().getConfig().getVerification().getInvalidUsername());
         return;
       }
 
@@ -183,7 +183,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     // Check if the client brand is too short. It has to have at least 2 bytes.
     checkState(data.length > 1, "client brand is too short");
     // Check if the decoded client brand string is too long
-    checkState(data.length < Sonar.get().getConfig().getVerification().getBrand().getMaxLength(),
+    checkState(data.length < Sonar.get0().getConfig().getVerification().getBrand().getMaxLength(),
       "client brand contains too much data: " + data.length);
     // https://discord.com/channels/923308209769426994/1116066363887321199/1256929441053933608
     String brand = new String(data, StandardCharsets.UTF_8);
@@ -194,14 +194,14 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     // Check for illegal client brands
     checkState(!brand.equals("Vanilla"), "illegal client brand: " + brand);
     // Regex pattern for validating client brands
-    final Pattern pattern = Sonar.get().getConfig().getVerification().getBrand().getValidRegex();
+    final Pattern pattern = Sonar.get0().getConfig().getVerification().getBrand().getValidRegex();
     checkState(pattern.matcher(brand).matches(), "client brand does not match pattern: " + brand);
   }
 
   private void validateClientLocale(final @NotNull String locale) {
     // Check the client locale by performing a simple regex check
     // that disallows non-ascii characters by default.
-    final Pattern pattern = Sonar.get().getConfig().getVerification().getValidLocaleRegex();
+    final Pattern pattern = Sonar.get0().getConfig().getVerification().getValidLocaleRegex();
     checkState(pattern.matcher(locale).matches(), "client locale does not match pattern: " + locale);
   }
 }

@@ -44,12 +44,12 @@ public class CaptchaPreparer {
     }
 
     final SystemTimer timer = new SystemTimer();
-    Sonar.get().getLogger().info("Asynchronously preparing CAPTCHA answers...");
-    Sonar.get().getLogger().info("Players will be able to join even if the preparation isn't finished");
+    Sonar.get0().getLogger().info("Asynchronously preparing CAPTCHA answers...");
+    Sonar.get0().getLogger().info("Players will be able to join even if the preparation isn't finished");
 
     // Prepare cache
-    final int precomputeAmount = Sonar.get().getConfig().getVerification().getMap().getPrecomputeAmount();
-    final char[] alphabet = Sonar.get().getConfig().getVerification().getMap().getAlphabet().toCharArray();
+    final int precomputeAmount = Sonar.get0().getConfig().getVerification().getMap().getPrecomputeAmount();
+    final char[] alphabet = Sonar.get0().getConfig().getVerification().getMap().getAlphabet().toCharArray();
 
     preparedAmount = 0;
     cached = new MapCaptchaInfo[precomputeAmount];
@@ -62,13 +62,13 @@ public class CaptchaPreparer {
         for (int j = 0; j < answer.length; j++) {
           answer[j] = alphabet[RANDOM.nextInt(alphabet.length)];
         }
-        final BufferedImage image = Sonar.get().getFallback().getCaptchaGenerator().createImage(answer);
+        final BufferedImage image = Sonar.get0().getFallback().getCaptchaGenerator().createImage(answer);
         // Convert and cache converted Minecraft map bytes
         cached[preparedAmount++] = new MapCaptchaInfo(new String(answer), MapColorPalette.imageToBuffer(image));
       }
 
-      Sonar.get().getLogger().info("Finished preparing {} CAPTCHA answers ({}s)!", preparedAmount, timer);
-      Sonar.get().getEventManager().publish(new CaptchaGenerationEndEvent(timer, preparedAmount));
+      Sonar.get0().getLogger().info("Finished preparing {} CAPTCHA answers ({}s)!", preparedAmount, timer);
+      Sonar.get0().getEventManager().publish(new CaptchaGenerationEndEvent(timer, preparedAmount));
     });
   }
 

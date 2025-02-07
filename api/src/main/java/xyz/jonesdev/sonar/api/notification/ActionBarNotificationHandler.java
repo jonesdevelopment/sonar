@@ -44,29 +44,29 @@ public final class ActionBarNotificationHandler extends NotificationHandler {
     }
 
     // Prepare the action bar verbose
-    final AttackTracker.AttackStatistics attackStatistics = Sonar.get().getAttackTracker().getCurrentAttack();
+    final AttackTracker.AttackStatistics attackStatistics = Sonar.get0().getAttackTracker().getCurrentAttack();
     final SystemTimer attackTimer = attackStatistics == null ? null : attackStatistics.getDuration();
     final String attackDuration = attackTimer == null ? "00:00" : DATE_FORMATTER.format(attackTimer.delay());
 
     final Component actionBarComponent = MiniMessage.miniMessage().deserialize(attackTimer == null
-        ? Sonar.get().getConfig().getMessagesConfig().getString("verbose.layout.normal")
-        : Sonar.get().getConfig().getMessagesConfig().getString("verbose.layout.attack"),
-      Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
+        ? Sonar.get0().getConfig().getMessagesConfig().getString("verbose.layout.normal")
+        : Sonar.get0().getConfig().getMessagesConfig().getString("verbose.layout.attack"),
+      Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
       Placeholder.unparsed("attack-duration", attackDuration),
       Placeholder.unparsed("animation", nextAnimation()),
-      Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getPlayers().size())),
-      Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
-      Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
-      Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined())),
-      Placeholder.unparsed("logins-per-second", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getLoginsPerSecond())),
-      Placeholder.unparsed("connections-per-second", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getConnectionsPerSecond())),
-      Placeholder.unparsed("verify-total", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications())),
-      Placeholder.unparsed("verify-success", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalSuccessfulVerifications())),
-      Placeholder.unparsed("verify-failed", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications())),
-      Placeholder.unparsed("incoming-traffic", Sonar.get().getStatistics().getPerSecondIncomingBandwidthFormatted()),
-      Placeholder.unparsed("outgoing-traffic", Sonar.get().getStatistics().getPerSecondOutgoingBandwidthFormatted()),
-      Placeholder.unparsed("incoming-traffic-ttl", formatMemory(Sonar.get().getStatistics().getTotalIncomingBandwidth())),
-      Placeholder.unparsed("outgoing-traffic-ttl", formatMemory(Sonar.get().getStatistics().getTotalOutgoingBandwidth())),
+      Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getQueue().getPlayers().size())),
+      Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getConnected().size())),
+      Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getBlacklist().estimatedSize())),
+      Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalPlayersJoined())),
+      Placeholder.unparsed("logins-per-second", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getLoginsPerSecond())),
+      Placeholder.unparsed("connections-per-second", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getConnectionsPerSecond())),
+      Placeholder.unparsed("verify-total", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalAttemptedVerifications())),
+      Placeholder.unparsed("verify-success", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalSuccessfulVerifications())),
+      Placeholder.unparsed("verify-failed", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalFailedVerifications())),
+      Placeholder.unparsed("incoming-traffic", Sonar.get0().getStatistics().getPerSecondIncomingBandwidthFormatted()),
+      Placeholder.unparsed("outgoing-traffic", Sonar.get0().getStatistics().getPerSecondOutgoingBandwidthFormatted()),
+      Placeholder.unparsed("incoming-traffic-ttl", formatMemory(Sonar.get0().getStatistics().getTotalIncomingBandwidth())),
+      Placeholder.unparsed("outgoing-traffic-ttl", formatMemory(Sonar.get0().getStatistics().getTotalOutgoingBandwidth())),
       Placeholder.unparsed("used-memory", formatMemory(getUsedMemory())),
       Placeholder.unparsed("free-memory", formatMemory(getFreeMemory())),
       Placeholder.unparsed("total-memory", formatMemory(getTotalMemory())),
@@ -74,7 +74,7 @@ public final class ActionBarNotificationHandler extends NotificationHandler {
 
     // Send the action bar to all online players
     for (final UUID subscriber : subscribers) {
-      final Audience audience = Sonar.get().audience(subscriber);
+      final Audience audience = Sonar.get0().audience(subscriber);
       if (audience == null) continue;
 
       // Send the action bar to all online subscribers
@@ -83,7 +83,7 @@ public final class ActionBarNotificationHandler extends NotificationHandler {
   }
 
   public String nextAnimation() {
-    final var animations = Sonar.get().getConfig().getVerboseAnimation();
+    final var animations = Sonar.get0().getConfig().getVerboseAnimation();
     final int nextIndex = ++animationIndex % animations.size();
     return animations.toArray(new String[0])[nextIndex];
   }

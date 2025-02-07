@@ -43,30 +43,30 @@ public final class ChatNotificationHandler extends NotificationHandler {
 
     // Prepare the chat notification
     final Component notificationTitle = MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("notifications.title"));
+      Sonar.get0().getConfig().getMessagesConfig().getString("notifications.title"));
     final Component notificationSubtitle = MiniMessage.miniMessage().deserialize(
-      Sonar.get().getConfig().getMessagesConfig().getString("notifications.subtitle"));
+      Sonar.get0().getConfig().getMessagesConfig().getString("notifications.subtitle"));
     final Title title = Title.title(notificationTitle, notificationSubtitle);
 
-    final List<String> chatNotification = Sonar.get().getConfig().getMessagesConfig().getStringList("notifications.chat");
+    final List<String> chatNotification = Sonar.get0().getConfig().getMessagesConfig().getStringList("notifications.chat");
     final Component[] chatNotificationComponents = new Component[chatNotification.size()];
 
     for (int i = 0; i < chatNotificationComponents.length; i++) {
       chatNotificationComponents[i] = MiniMessage.miniMessage().deserialize(chatNotification.get(i),
-        Placeholder.component("prefix", Sonar.get().getConfig().getPrefix()),
-        Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get().getFallback().getQueue().getPlayers().size())),
-        Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get().getFallback().getConnected().size())),
-        Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get().getFallback().getBlacklist().estimatedSize())),
-        Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalPlayersJoined())),
-        Placeholder.unparsed("logins-per-second", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getLoginsPerSecond())),
-        Placeholder.unparsed("connections-per-second", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getConnectionsPerSecond())),
-        Placeholder.unparsed("verify-total", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalAttemptedVerifications())),
-        Placeholder.unparsed("verify-success", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalSuccessfulVerifications())),
-        Placeholder.unparsed("verify-failed", DECIMAL_FORMAT.format(Sonar.get().getStatistics().getTotalFailedVerifications())),
-        Placeholder.unparsed("incoming-traffic", Sonar.get().getStatistics().getPerSecondIncomingBandwidthFormatted()),
-        Placeholder.unparsed("outgoing-traffic", Sonar.get().getStatistics().getPerSecondOutgoingBandwidthFormatted()),
-        Placeholder.unparsed("incoming-traffic-ttl", formatMemory(Sonar.get().getStatistics().getTotalIncomingBandwidth())),
-        Placeholder.unparsed("outgoing-traffic-ttl", formatMemory(Sonar.get().getStatistics().getTotalOutgoingBandwidth())),
+        Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
+        Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getQueue().getPlayers().size())),
+        Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getConnected().size())),
+        Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getBlacklist().estimatedSize())),
+        Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalPlayersJoined())),
+        Placeholder.unparsed("logins-per-second", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getLoginsPerSecond())),
+        Placeholder.unparsed("connections-per-second", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getConnectionsPerSecond())),
+        Placeholder.unparsed("verify-total", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalAttemptedVerifications())),
+        Placeholder.unparsed("verify-success", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalSuccessfulVerifications())),
+        Placeholder.unparsed("verify-failed", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalFailedVerifications())),
+        Placeholder.unparsed("incoming-traffic", Sonar.get0().getStatistics().getPerSecondIncomingBandwidthFormatted()),
+        Placeholder.unparsed("outgoing-traffic", Sonar.get0().getStatistics().getPerSecondOutgoingBandwidthFormatted()),
+        Placeholder.unparsed("incoming-traffic-ttl", formatMemory(Sonar.get0().getStatistics().getTotalIncomingBandwidth())),
+        Placeholder.unparsed("outgoing-traffic-ttl", formatMemory(Sonar.get0().getStatistics().getTotalOutgoingBandwidth())),
         Placeholder.unparsed("used-memory", formatMemory(getUsedMemory())),
         Placeholder.unparsed("free-memory", formatMemory(getFreeMemory())),
         Placeholder.unparsed("total-memory", formatMemory(getTotalMemory())),
@@ -74,8 +74,8 @@ public final class ChatNotificationHandler extends NotificationHandler {
     }
 
     // Send the title and chat messages to all online players
-    for (final UUID subscriber : Sonar.get().getChatNotificationHandler().getSubscribers()) {
-      final Audience audience = Sonar.get().audience(subscriber);
+    for (final UUID subscriber : Sonar.get0().getChatNotificationHandler().getSubscribers()) {
+      final Audience audience = Sonar.get0().audience(subscriber);
       if (audience == null) continue;
 
       // Send the message to all online subscribers
