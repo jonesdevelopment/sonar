@@ -49,22 +49,68 @@ public interface Sonar {
   @ApiStatus.Internal
   @NotNull Audience sender(final @NotNull Object object);
 
+  /**
+   * Gets the platform Sonar is running on (e.g., Bukkit, BungeeCord, Velocity).
+   *
+   * @return The {@link SonarPlatform} enum representing the current platform.
+   */
   @NotNull SonarPlatform getPlatform();
 
+  /**
+   * Gets the logger instance for Sonar.
+   *
+   * @return The {@link LoggerWrapper} instance.
+   */
   @NotNull LoggerWrapper getLogger();
 
+  /**
+   * Gets the Sonar configuration.
+   *
+   * @return The {@link SonarConfiguration} instance.
+   */
   @NotNull SonarConfiguration getConfig();
 
+  /**
+   * Gets the subcommand registry for Sonar commands.
+   *
+   * @return The {@link SubcommandRegistry} instance.
+   */
   @NotNull SubcommandRegistry getSubcommandRegistry();
 
+  /**
+   * Gets the controller for verified players.
+   * Used for managing players who have passed the verification.
+   *
+   * @return The {@link VerifiedPlayerController} instance.
+   */
   VerifiedPlayerController getVerifiedPlayerController();
 
+  /**
+   * Gets the handler for action bar notifications.
+   *
+   * @return The {@link ActionBarNotificationHandler} instance.
+   */
   @NotNull ActionBarNotificationHandler getActionBarNotificationHandler();
 
+  /**
+   * Gets the handler for chat notifications.
+   *
+   * @return The {@link ChatNotificationHandler} instance.
+   */
   @NotNull ChatNotificationHandler getChatNotificationHandler();
 
+  /**
+   * Gets the system timer used for tracking plugin launch time.
+   *
+   * @return The {@link SystemTimer} instance.
+   */
   @NotNull SystemTimer getLaunchTimer();
 
+  /**
+   * Gets the statistics tracker for Sonar.
+   *
+   * @return The {@link SonarStatistics} instance.
+   */
   @NotNull SonarStatistics getStatistics();
 
   @SuppressWarnings("unused")
@@ -73,24 +119,52 @@ public interface Sonar {
   @SuppressWarnings("unused")
   void setChatNotificationHandler(final @NotNull ChatNotificationHandler notificationHandler);
 
+  /**
+   * Reloads the Sonar configuration.
+   */
   void reload();
 
+  /**
+   * Gets the current version of Sonar.
+   *
+   * @return The {@link SonarVersion} instance.
+   */
   @NotNull default SonarVersion getVersion() {
     return SonarVersion.INSTANCE;
   }
 
+  /**
+   * Gets the event manager for Sonar.
+   *
+   * @return The {@link SonarEventManager} instance.
+   */
   @NotNull default SonarEventManager getEventManager() {
     return SonarEventManager.INSTANCE;
   }
 
+  /**
+   * Gets the attack tracker for Sonar.
+   *
+   * @return The {@link AttackTracker} instance.
+   */
   @NotNull default AttackTracker getAttackTracker() {
     return AttackTracker.INSTANCE;
   }
 
+  /**
+   * Gets the anti-bot handler (called "Fallback") for Sonar.
+   *
+   * @return The {@link Fallback} instance.
+   */
   @NotNull default Fallback getFallback() {
     return Fallback.INSTANCE;
   }
 
+  /**
+   * Gets the instance of the Sonar API.
+   *
+   * @return The {@link Sonar} instance.
+   */
   @NotNull static Sonar get() {
     return SonarSupplier.sonar;
   }
