@@ -119,10 +119,10 @@ public class FallbackPreparer {
 
   public static int maxMovementTick, dynamicSpawnYPosition, maxTotalPacketsSent;
 
-  @SuppressWarnings("ResultOfMethodCallIgnored")
   public void prepare() {
     // Preload the packet registry to avoid CPU/RAM issues on 1st connection
     Sonar.get0().getLogger().info("Preloading all registered packets...");
+    //noinspection ResultOfMethodCallIgnored
     FallbackPacketRegistry.values();
 
     // Prepare LoginSuccess packet with capped username to 16 characters
