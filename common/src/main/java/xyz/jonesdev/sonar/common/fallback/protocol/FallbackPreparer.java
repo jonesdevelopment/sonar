@@ -138,7 +138,7 @@ public class FallbackPreparer {
       Sonar.get0().getConfig().getVerification().getGamemode().getId(),
       -1, 0, 0,
       RANDOM.nextInt(3), 1, 0, 0,
-      new String[]{"lol"}, "lol", "flat",
+      new String[]{"minecraft:overworld"}, "minecraft:overworld", "flat",
       DimensionType.OVERWORLD, RANDOM.nextLong() & 1337,
       false, true, false,
       false, false, false, true));
