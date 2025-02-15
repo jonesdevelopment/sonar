@@ -77,10 +77,13 @@ public class FallbackBungeeInjector {
     val original = ProxyServer.getInstance().unsafe().getFrontendChannelInitializer();
     val newFrontend = BungeeChannelInitializer.create(
       channel -> {
+        if (original.getChannelAcceptor().accept(channel)) {
+          return false;
+        }
         FallbackInjectedChannelInitializer.inject(channel,
           pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_PACKET_HANDLER,
             new FallbackBungeeInboundHandler()));
-        return original.getChannelAcceptor().accept(channel);
+        return true;
       });
     ProxyServer.getInstance().unsafe().setFrontendChannelInitializer(newFrontend);
   }
