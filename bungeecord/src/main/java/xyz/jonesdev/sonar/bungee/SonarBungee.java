@@ -86,6 +86,10 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
 
   @Override
   public void enable() {
+    // Add warning because of questionable design choices that haunt me in my dreams.
+    logger.warn("The use of BungeeCord is supported but not condoned.");
+    logger.warn("Consider upgrading to Velocity (https://velocitypowered.com)");
+
     // Initialize bStats.org metrics
     metrics = new Metrics(getPlugin(), getPlatform().getMetricsId());
 
