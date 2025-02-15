@@ -60,6 +60,10 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
       throw new ReflectiveOperationException(throwable);
     }
 
+    inject(channel, sonarPipelineInjector);
+  }
+
+  public static void inject(final @NotNull Channel channel, final Consumer<ChannelPipeline> sonarPipelineInjector) {
     // Inject Sonar's channel handler into the pipeline;
     // Also make sure the player is not a fake player to avoid compatibility issues
     if (channel.isActive() && !FakeChannelUtil.isFakeChannel(channel)) {
