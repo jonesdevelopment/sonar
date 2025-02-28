@@ -83,7 +83,7 @@ public class FallbackBungeeInjector {
     final BungeeChannelInitializer newInitializer = BungeeChannelInitializer.create(
       channel -> {
         // https://github.com/SpigotMC/BungeeCord/pull/3787#issuecomment-2661059876
-        if (original.getChannelAcceptor().accept(channel)) {
+        if (!original.getChannelAcceptor().accept(channel)) {
           return false;
         }
         FallbackInjectedChannelInitializer.inject(channel,
