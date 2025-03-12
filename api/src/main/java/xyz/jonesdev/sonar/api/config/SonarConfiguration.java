@@ -447,14 +447,14 @@ public final class SonarConfiguration {
     @Getter
     @RequiredArgsConstructor
     public enum Type {
-      MYSQL("MySQL", "jdbc:mysql://%s:%d/%s", new MysqlDatabaseTypeAdapter(),
+      MYSQL("MySQL", "jdbc:mysql://%s:%d/%s%s", new MysqlDatabaseTypeAdapter(),
         Library.builder()
           .groupId("com{}mysql")
           .artifactId("mysql-connector-j")
           .version("9.0.0")
           .relocate("com{}mysql", "xyz{}jonesdev{}sonar{}libs{}mysql")
           .build()),
-      MARIADB("MariaDB", "jdbc:mariadb://%s:%d/%s", new MariaDbDatabaseTypeAdapter(),
+      MARIADB("MariaDB", "jdbc:mariadb://%s:%d/%s%s", new MariaDbDatabaseTypeAdapter(),
         Library.builder()
           .groupId("org{}mariadb{}jdbc")
           .artifactId("mariadb-java-client")

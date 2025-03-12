@@ -87,7 +87,8 @@ public final class VerifiedPlayerController {
         jdbcURL = String.format(cachedDatabaseType.getConnectionString(),
           Sonar.get0().getConfig().getGeneralConfig().getString("database.host"),
           Sonar.get0().getConfig().getGeneralConfig().getInt("database.port"),
-          Sonar.get0().getConfig().getGeneralConfig().getString("database.name"));
+          Sonar.get0().getConfig().getGeneralConfig().getString("database.name"),
+          "?autoReconnect=true");
       }
 
       connectionSource = new JdbcConnectionSource(jdbcURL,
