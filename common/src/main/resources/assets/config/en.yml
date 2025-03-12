@@ -109,6 +109,9 @@ verification:
       # If the image isn't found, a noise will be used as the default background.
       # You can put the name of the file here if the file is in Sonar's plugin directory
       background: ''
+      # Style of the map CAPTCHA (Default: 'modern').
+      # To use the old design, set this to 'legacy'.
+      style: 'modern'
       # How many CAPTCHA answers should Sonar prepare?
       # This task happens asynchronously in the background
       precompute: 500

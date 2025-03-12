@@ -110,6 +110,9 @@ verification:
       # Pokud není obrázek nalezen, bude jako výchozí pozadí použit šum
       # Zde můžete jednoduše zadat název souboru, pokud je soubor v adresáři pluginu
       background: ''
+      # Style of the map CAPTCHA (Default: 'modern').
+      # To use the old design, set this to 'legacy'.
+      style: 'modern'
       # Kolik odpovědí by měl Sonar předgenerovat?
       # Tento úkol běží souběžně v pozadí
       precompute: 500

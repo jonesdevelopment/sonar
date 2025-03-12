@@ -109,6 +109,9 @@ verification:
       # თუ გამოსახულება არ მოიძებნა, ფონად გამოყენებული იქნება noise ი
       # შეგიძლიათ უბრალოდ ჩაწეროთ ფაილის სახელი, თუ ის პლაგინის დირექტორიაშია
       background: ''
+      # Style of the map CAPTCHA (Default: 'modern').
+      # To use the old design, set this to 'legacy'.
+      style: 'modern'
       # რამდენი პასუხი უნდა მოამზადოს Sonar-მა?
       # ეს ხდება ასინქრონულად (ანუ ამის გამოთვლას სერვერი არ დაელოდება) უკანა ფონზე
       precompute: 500

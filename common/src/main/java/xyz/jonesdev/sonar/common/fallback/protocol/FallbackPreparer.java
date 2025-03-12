@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.event.impl.CaptchaGenerationStartEvent;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
+import xyz.jonesdev.sonar.captcha.legacy.LegacyCaptchaGenerator;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
 import xyz.jonesdev.sonar.common.fallback.protocol.dimension.DimensionRegistry;
@@ -40,6 +41,7 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.login.LoginSuccessPac
 import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
 
+import java.io.File;
 import java.util.Random;
 import java.util.UUID;
 
@@ -245,9 +247,13 @@ public class FallbackPreparer {
       Sonar.get0().getEventManager().publish(generationStartEvent);
 
       if (generationStartEvent.getCaptchaGenerator() == null
-        || generationStartEvent.getCaptchaGenerator() instanceof StandardCaptchaGenerator) {
-        Sonar.get0().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(
-          Sonar.get0().getConfig().getVerification().getMap().getBackgroundImage()));
+        || generationStartEvent.getCaptchaGenerator() instanceof StandardCaptchaGenerator
+        || generationStartEvent.getCaptchaGenerator() instanceof LegacyCaptchaGenerator) {
+        final File backgroundImage = Sonar.get0().getConfig().getVerification().getMap().getBackgroundImage();
+        final boolean useLegacyCaptchaGenerator = Sonar.get0().getConfig().getGeneralConfig()
+          .getString("verification.checks.map-captcha.style").equalsIgnoreCase("legacy");
+        Sonar.get0().getFallback().setCaptchaGenerator(useLegacyCaptchaGenerator
+          ? new LegacyCaptchaGenerator(backgroundImage) : new StandardCaptchaGenerator(backgroundImage));
       } else {
         Sonar.get0().getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
       }

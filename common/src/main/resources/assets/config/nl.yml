@@ -109,6 +109,9 @@ verification:
       # Als de afbeelding niet wordt gevonden, wordt er een ruis gebruikt als standaardachtergrond
       # U kunt eenvoudig de naam van het bestand hier plaatsen als het bestand zich in de plugin map bevindt
       background: ''
+      # Style of the map CAPTCHA (Default: 'modern').
+      # To use the old design, set this to 'legacy'.
+      style: 'modern'
       # Hoeveel antwoorden moet Sonar voorbereiden?
       # Deze taak gebeurt asynchroon op de achtergrond
       precompute: 500
