@@ -107,8 +107,8 @@ verification:
       # Wenn das Bild nicht gefunden wird, wird ein Rauschen als Standardhintergrund verwendet
       # Sie können hier einfach den Namen der Datei eingeben, wenn sich die Datei im Plugin-Verzeichnis befindet
       background: ''
-      # Style of the map CAPTCHA (Default: 'modern').
-      # To use the old design, set this to 'legacy'.
+      # Stil der Karte CAPTCHA (Standard: 'modern').
+      # Um das alte Design zu verwenden, setzen Sie dies auf 'legacy'.
       style: 'modern'
       # Wie viele Antworten soll Sonar vorbereiten?
       # Dieser Vorgang erfolgt asynchron im Hintergrund
