@@ -108,6 +108,9 @@ verification:
       # Se a imagem não for encontrada, um ruído será usado como fundo padrão.
       # Você pode colocar o nome do arquivo aqui se o arquivo estiver no diretório de plugins do Sonar
       background: ''
+      # Estilo do CAPTCHA do mapa (Padrão: 'modern').
+      # Para usar o design antigo, defina-o como 'legacy'.
+      style: 'modern'
       # Quantas respostas de CAPTCHA o Sonar deve preparar?
       # Esta tarefa acontece de forma assíncrona em segundo plano
       precompute: 500

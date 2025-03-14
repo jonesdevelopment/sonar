@@ -109,6 +109,9 @@ verification:
       # Si l'image n'est pas trouvée, un bruit sera utilisé comme arrière-plan par défaut
       # Vous pouvez simplement mettre le nom du fichier ici si le fichier est dans le répertoire du plugin
       background: ''
+      # Style de la carte CAPTCHA (par défaut : 'moderne').
+      # Pour utiliser l'ancien design, mettez ce paramètre à 'legacy'.
+      style: 'modern'
       # Combien de réponses Sonar devrait-il préparer ?
       # Cette tâche se déroule de manière asynchrone en arrière-plan
       precompute: 500

@@ -109,6 +109,9 @@ verification:
       # Jeśli obraz nie zostanie znaleziony, jako domyślne tło zostanie użyty szum
       # Możesz umieścić nazwę pliku tutaj, jeśli plik znajduje się w katalogu pluginu
       background: ''
+      # Styl mapy CAPTCHA (domyślnie: 'nowoczesny').
+      # Aby użyć starego projektu, ustaw to na 'legacy'.
+      style: 'modern'
       # Ile możliwych odpowiedzi powinien przygotować Sonar?
       # Zadanie to wykonywane jest asynchronicznie w tle
       precompute: 500

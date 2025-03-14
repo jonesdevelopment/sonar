@@ -20,9 +20,11 @@ package xyz.jonesdev.sonar.common.service;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.update.UpdateChecker;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
+import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 @UtilityClass
 public final class ScheduledServiceManager {
   private final ScheduledExecutorService VERBOSE = createScheduledExecutor("sonar-verbose-thread");
+  private final ScheduledExecutorService DB_CLEANUP = createScheduledExecutor("sonar-db-cleanup-thread");
   private final ScheduledExecutorService FALLBACK_QUEUE = createScheduledExecutor("sonar-queue-thread");
   private final ScheduledExecutorService STATISTICS = createScheduledExecutor("sonar-statistics-thread");
   private final ScheduledExecutorService UPDATE_NOTIFIER = createScheduledExecutor("sonar-update-notifier");
@@ -44,6 +47,18 @@ public final class ScheduledServiceManager {
   }
 
   public void start() {
+    if (Sonar.get0().getVerifiedPlayerController().getCachedDatabaseType() != SonarConfiguration.Database.Type.NONE) {
+      DB_CLEANUP.scheduleAtFixedRate(() -> {
+        try {
+          Sonar.get0().getVerifiedPlayerController().clearOld(
+            Sonar.get0().getVerifiedPlayerController().getMaximumAge(), true);
+        } catch (SQLException exception) {
+          Sonar.get0().getLogger().error("Error cleaning database entries!");
+          exception.printStackTrace(System.err);
+        }
+      }, Sonar.get0().getVerifiedPlayerController().getMaximumAge(), 1L, TimeUnit.DAYS);
+    }
+
     VERBOSE.scheduleAtFixedRate(() -> {
       // Make sure to clean up the cached statistics since we don't want to display wrong values
       GlobalSonarStatistics.cleanUpCaches();
@@ -68,6 +83,7 @@ public final class ScheduledServiceManager {
   }
 
   public void stop() {
+    DB_CLEANUP.shutdown();
     VERBOSE.shutdown();
     FALLBACK_QUEUE.shutdown();
     STATISTICS.shutdown();

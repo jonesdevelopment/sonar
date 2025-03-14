@@ -85,16 +85,16 @@ verification:
       # ტიკების მაქსიმალური რაოდენობა რომელითაც მოთამაშე უნდა დაეცეს, რათა პლატფორმაზე დაცემა შეეძლოს. (20 ტიკი = 1 წამი)
       max-movement-ticks: 8
 
-    # Checks if the player is colliding with blocks spawned below them
+    # ამოწმებს, ეჯახება თუ არა მოთამაშე მათ ქვემოთ წარმოქმნილ ბლოკებს
     collision:
       # უნდა შეამოწმოს თუ არა Sonar-მა, ეტაკება თუ არა მოთამაშე ბლოკებს? (რეკომენდებულია)
       enabled: true
 
     # ამოწმებს, აგზავნის თუ არა კლიენტი შესაბამის პაკეტებს სატრანსპორტო საშუალებაზე დაჯდომის დროს
     vehicle:
-      # Should Sonar check if the player properly enters a boat?
+      # უნდა შეამოწმოს თუ არა სონარმა მოთამაშე სწორად შესული თუ არა ნავში?
       enabled: true
-      # Minimum number of packets sent by the client
+      # კლიენტის მიერ გაგზავნილი პაკეტების მინიმალური რაოდენობა
       minimum-packets: 2
 
     # დააწერინეთ მოთამაშეს კოდი ჩატში, რომელიც იქნება ნაჩვენები ვირტუალურ მაპზე, რომელიც ხელში ეჭირებათ
@@ -109,6 +109,9 @@ verification:
       # თუ გამოსახულება არ მოიძებნა, ფონად გამოყენებული იქნება noise ი
       # შეგიძლიათ უბრალოდ ჩაწეროთ ფაილის სახელი, თუ ის პლაგინის დირექტორიაშია
       background: ''
+      # რუკის სტილი CAPTCHA (ნაგულისხმევი: 'modern').
+      # ძველი დიზაინის გამოსაყენებლად დააყენეთ ეს 'legacy'.
+      style: 'modern'
       # რამდენი პასუხი უნდა მოამზადოს Sonar-მა?
       # ეს ხდება ასინქრონულად (ანუ ამის გამოთვლას სერვერი არ დაელოდება) უკანა ფონზე
       precompute: 500
@@ -144,8 +147,8 @@ verification:
     # დამატებით, შეიძლება გინდოდეთ შეამციროთ შესვლის სიხშირის ლიმიტი
     # რომელსაც ახორციელებს Velocity ან სხვა პროქსიები/პლაგინები, რადგან ეს შეიძლება ხელს უშლიდეს
     # მოთამაშის სწორად გადაყვანას
-    # If your server allows Bedrock players to join via Geyser, make sure to set up
-    # TransferTool for Geyser, so Bedrock players are redirected to the correct server.
+    # თუ თქვენი სერვერი საშუალებას აძლევს Bedrock მოთამაშეებს შეუერთდნენ Geyser-ის საშუალებით, დარწმუნდით, რომ დააყენეთ
+    # TransferTool Geyser-ისთვის, ასე რომ Bedrock მოთამაშეები გადამისამართდებიან სწორ სერვერზე.
     # https://github.com/onebeastchris/TransferTool
     enabled: false
     # რომელ სერვერზე უნდა გადაიყვანოს Sonar-მა მოთამაშე ვერიფიკაციის გავლის შემდეგ?
@@ -162,15 +165,15 @@ verification:
   # - CREATIVE: სიცოცხლის და საჭმლის მაჩვენებლები იშლება
   # - ADVENTURE: ყველა UI კომპონენტი ჩანს
   gamemode: ADVENTURE
-  # Daylight time in the verification world
-  # You can find all daylight times here:
+  # დღის განათება გადამოწმების სამყაროში
+  # აქ შეგიძლიათ იპოვოთ მთელი დღის დრო:
   # https://minecraft.wiki/w/Daylight_cycle
-  # This is only a visual setting and does not change the verification process!
-  # If this value is set to 1000, the packet will not be sent.
+  # ეს მხოლოდ ვიზუალური პარამეტრია და არ ცვლის გადამოწმების პროცესს!
+  # თუ ეს მნიშვნელობა დაყენებულია 1000-ზე, პაკეტი არ გაიგზავნება.
   time-of-day: 1000
-  # Sonar caches most packets it sends to the client, including the LoginSuccess packet.
-  # Which username should Sonar use for the LoginSuccess packet?
-  # The username will not be visible to the player without client modifications
+  # Sonar ინახავს პაკეტების უმეტესობას, რომლებსაც ის უგზავნის კლიენტს, მათ შორის LoginSuccess პაკეტს.
+  # რომელი მომხმარებლის სახელი უნდა გამოიყენოს Sonar-მა LoginSuccess პაკეტისთვის?
+  # მომხმარებლის სახელი არ იქნება ხილული მოთამაშისთვის კლიენტის ცვლილებების გარეშე
   cached-username: "Sonar"
   # ჩაიწეროს თუ არა Sonar-მა ახალი ვერიფიკაციის მცდელობები?
   log-connections: true

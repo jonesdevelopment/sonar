@@ -54,6 +54,8 @@ public final class VerifiedPlayerController {
   @Getter
   private final @NotNull SonarConfiguration.Database.Type cachedDatabaseType;
   private final ExecutorService updateService = Executors.newSingleThreadExecutor();
+  @Getter
+  private int maximumAge;
 
   public VerifiedPlayerController(final @NotNull LibraryManager libraryManager) {
     final SonarConfiguration.Database database = Sonar.get0().getConfig().getDatabase();
@@ -87,7 +89,8 @@ public final class VerifiedPlayerController {
         jdbcURL = String.format(cachedDatabaseType.getConnectionString(),
           Sonar.get0().getConfig().getGeneralConfig().getString("database.host"),
           Sonar.get0().getConfig().getGeneralConfig().getInt("database.port"),
-          Sonar.get0().getConfig().getGeneralConfig().getString("database.name"));
+          Sonar.get0().getConfig().getGeneralConfig().getString("database.name"),
+          "?autoReconnect=true");
       }
 
       connectionSource = new JdbcConnectionSource(jdbcURL,
@@ -107,6 +110,7 @@ public final class VerifiedPlayerController {
 
       dao = DaoManager.createDao(connectionSource, VerifiedPlayer.class);
       queryBuilder = dao.queryBuilder();
+      maximumAge = database.getMaximumAge();
 
       // Make sure to run the clean task and the caching task in the same thread
       // https://github.com/jonesdevelopment/sonar/issues/150
@@ -114,7 +118,7 @@ public final class VerifiedPlayerController {
         if (connectionSource != null) {
           try {
             // Make sure to clear all outdated entries first
-            clearOld(database.getMaximumAge());
+            clearOld(maximumAge, false);
             // Add all entries from the database to the cache
             dao.queryForAll().forEach(verifiedPlayer -> cache.add(verifiedPlayer.getFingerprint()));
           } catch (SQLException exception) {
@@ -148,7 +152,8 @@ public final class VerifiedPlayerController {
   /**
    * Clear all old entries using the given timestamp
    */
-  private void clearOld(final @Range(from = 1, to = 365) int maximumAge) throws SQLException {
+  public void clearOld(final @Range(from = 1, to = 365) int maximumAge,
+                       final boolean removeExisting) throws SQLException {
     final long timestamp = Instant.now().minus(maximumAge, ChronoUnit.DAYS).getEpochSecond() * 1000L;
 
     final List<VerifiedPlayer> oldEntries = queryBuilder.where()
@@ -158,6 +163,9 @@ public final class VerifiedPlayerController {
     if (oldEntries != null && !oldEntries.isEmpty()) {
       for (final VerifiedPlayer player : oldEntries) {
         dao.delete(player);
+        if (removeExisting) {
+          cache.remove(player.getFingerprint());
+        }
       }
       Sonar.get0().getLogger().info("Removed {} database entries older than {} days.",
         oldEntries.size(), maximumAge);
