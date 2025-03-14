@@ -71,7 +71,7 @@ public enum ProtocolVersion {
   MINECRAFT_1_21(767, "1.21"),
   MINECRAFT_1_21_2(768, "1.21.2"),
   MINECRAFT_1_21_4(769, "1.21.4"),
-  MINECRAFT_1_21_5_PRE1(1073742063, "1.21.5-pre1");
+  MINECRAFT_1_21_5_PRE2(1073742064, "1.21.5-pre2");
 
   private final int protocol;
   private final String name;
