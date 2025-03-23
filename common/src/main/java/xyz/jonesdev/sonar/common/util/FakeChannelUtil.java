@@ -34,6 +34,8 @@ public class FakeChannelUtil {
   public boolean isFakeChannel(final @NotNull Channel channel) {
     final String simpleClassName = channel.getClass().getSimpleName();
     // Player spoof plugins use fake channels (e.g., Spoof Engine uses "FakeChannel")
-    return "FakeChannel".equals(simpleClassName) || "SpoofedChannel".equals(simpleClassName);
+    return "FakeChannel".equals(simpleClassName)
+      || "SpoofedChannel".equals(simpleClassName)
+      || "EmbeddedChannel".equals(simpleClassName);
   }
 }
