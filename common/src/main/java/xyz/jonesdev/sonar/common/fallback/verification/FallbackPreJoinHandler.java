@@ -150,7 +150,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       user.delayedWrite(packet);
     }
     // Write the FinishConfiguration packet to the buffer
-    user.delayedWrite(FINISH_CONFIGURATION);
+    user.delayedWrite(FinishConfigurationPacket.INSTANCE);
     // Send all packets in one flush
     user.channel().flush();
   }

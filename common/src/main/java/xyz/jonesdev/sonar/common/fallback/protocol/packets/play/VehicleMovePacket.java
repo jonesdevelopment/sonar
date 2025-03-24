@@ -37,11 +37,7 @@ public final class VehicleMovePacket implements FallbackPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final ProtocolVersion protocolVersion) throws Exception {
-    byteBuf.writeDouble(x);
-    byteBuf.writeDouble(y);
-    byteBuf.writeDouble(z);
-    byteBuf.writeFloat(yaw);
-    byteBuf.writeFloat(pitch);
+    throw new UnsupportedOperationException();
   }
 
   @Override

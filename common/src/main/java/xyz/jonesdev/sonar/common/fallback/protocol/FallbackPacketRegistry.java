@@ -66,7 +66,7 @@ public enum FallbackPacketRegistry {
       clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
         map(0x01, MINECRAFT_1_20_2, true),
         map(0x02, MINECRAFT_1_20_5, true));
-      clientbound.register(FinishConfigurationPacket.class, FinishConfigurationPacket::new,
+      clientbound.register(FinishConfigurationPacket.class, () -> FinishConfigurationPacket.INSTANCE,
         map(0x02, MINECRAFT_1_20_2, true),
         map(0x03, MINECRAFT_1_20_5, true));
       clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
@@ -81,7 +81,7 @@ public enum FallbackPacketRegistry {
       serverbound.register(PluginMessagePacket.class, PluginMessagePacket::new,
         map(0x01, MINECRAFT_1_20_2, false),
         map(0x02, MINECRAFT_1_20_5, false));
-      serverbound.register(FinishConfigurationPacket.class, FinishConfigurationPacket::new,
+      serverbound.register(FinishConfigurationPacket.class, () -> FinishConfigurationPacket.INSTANCE,
         map(0x02, MINECRAFT_1_20_2, false),
         map(0x03, MINECRAFT_1_20_5, false));
       serverbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
@@ -275,24 +275,6 @@ public enum FallbackPacketRegistry {
         map(0x35, MINECRAFT_1_20_5, true),
         map(0x37, MINECRAFT_1_21_2, true),
         map(0x36, MINECRAFT_1_21_5_RC1, true));
-      clientbound.register(SetDefaultSpawnPositionPacket.class, SetDefaultSpawnPositionPacket::new,
-        map(0x05, MINECRAFT_1_7_2, true),
-        map(0x43, MINECRAFT_1_9, true),
-        map(0x45, MINECRAFT_1_12, true),
-        map(0x46, MINECRAFT_1_12_1, true),
-        map(0x49, MINECRAFT_1_13, true),
-        map(0x4D, MINECRAFT_1_14, true),
-        map(0x4E, MINECRAFT_1_15, true),
-        map(0x42, MINECRAFT_1_16, true),
-        map(0x4B, MINECRAFT_1_17, true),
-        map(0x4A, MINECRAFT_1_19, true),
-        map(0x4D, MINECRAFT_1_19_1, true),
-        map(0x4C, MINECRAFT_1_19_3, true),
-        map(0x50, MINECRAFT_1_19_4, true),
-        map(0x52, MINECRAFT_1_20_2, true),
-        map(0x54, MINECRAFT_1_20_3, true),
-        map(0x56, MINECRAFT_1_20_5, true),
-        map(0x5B, MINECRAFT_1_21_2, true));
       clientbound.register(MapDataPacket.class, MapDataPacket::new,
         map(0x34, MINECRAFT_1_7_2, true),
         map(0x24, MINECRAFT_1_9, true),

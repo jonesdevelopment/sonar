@@ -18,10 +18,14 @@
 package xyz.jonesdev.sonar.common.fallback.protocol.packets.configuration;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FinishConfigurationPacket implements FallbackPacket {
+  public static final FinishConfigurationPacket INSTANCE = new FinishConfigurationPacket();
 
   @Override
   public void encode(final ByteBuf byteBuf, final ProtocolVersion protocolVersion) {
