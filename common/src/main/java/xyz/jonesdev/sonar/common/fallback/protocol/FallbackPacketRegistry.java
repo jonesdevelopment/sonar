@@ -66,7 +66,7 @@ public enum FallbackPacketRegistry {
       clientbound.register(DisconnectPacket.class, DisconnectPacket::new,
         map(0x01, MINECRAFT_1_20_2, true),
         map(0x02, MINECRAFT_1_20_5, true));
-      clientbound.register(FinishConfigurationPacket.class, FinishConfigurationPacket::new,
+      clientbound.register(FinishConfigurationPacket.class, () -> FinishConfigurationPacket.INSTANCE,
         map(0x02, MINECRAFT_1_20_2, true),
         map(0x03, MINECRAFT_1_20_5, true));
       clientbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
@@ -81,7 +81,7 @@ public enum FallbackPacketRegistry {
       serverbound.register(PluginMessagePacket.class, PluginMessagePacket::new,
         map(0x01, MINECRAFT_1_20_2, false),
         map(0x02, MINECRAFT_1_20_5, false));
-      serverbound.register(FinishConfigurationPacket.class, FinishConfigurationPacket::new,
+      serverbound.register(FinishConfigurationPacket.class, () -> FinishConfigurationPacket.INSTANCE,
         map(0x02, MINECRAFT_1_20_2, false),
         map(0x03, MINECRAFT_1_20_5, false));
       serverbound.register(KeepAlivePacket.class, KeepAlivePacket::new,
