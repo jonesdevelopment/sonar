@@ -48,10 +48,6 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     if (Sonar.get0().getConfig().getVerification().getGamemode() == CREATIVE) {
       user.delayedWrite(DEFAULT_ABILITIES);
     }
-    // Write the DefaultSpawnPosition packet to the buffer
-    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_3)) {
-      user.delayedWrite(defaultSpawnPosition);
-    }
     // Teleport the player to the position where we're starting to check them
     if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       user.delayedWrite(spawnPosition);
