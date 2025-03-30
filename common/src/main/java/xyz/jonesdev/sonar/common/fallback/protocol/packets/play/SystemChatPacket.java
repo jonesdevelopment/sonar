@@ -118,6 +118,10 @@ public final class SystemChatPacket implements FallbackPacket {
         ProtocolUtil.readVarInt(byteBuf);
         final byte[] bytes = new byte[DIV_FLOOR];
         byteBuf.readBytes(bytes);
+
+        if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
+          byteBuf.readByte(); // Check sum
+        }
       }
     }
   }

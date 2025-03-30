@@ -39,6 +39,7 @@ public final class DimensionRegistry {
   public final CompoundBinaryTag CODEC_1_21;
   public final CompoundBinaryTag CODEC_1_21_2;
   public final CompoundBinaryTag CODEC_1_21_4;
+  public final CompoundBinaryTag CODEC_1_21_5;
 
   static {
     CODEC_1_16 = getCodec("codec_1_16.nbt");
@@ -52,6 +53,7 @@ public final class DimensionRegistry {
     CODEC_1_21 = getCodec("codec_1_21.nbt");
     CODEC_1_21_2 = getCodec("codec_1_21_2.nbt");
     CODEC_1_21_4 = getCodec("codec_1_21_4.nbt");
+    CODEC_1_21_5 = getCodec("codec_1_21_5.nbt");
   }
 
   private @NotNull CompoundBinaryTag getCodec(final @NotNull String fileName) {

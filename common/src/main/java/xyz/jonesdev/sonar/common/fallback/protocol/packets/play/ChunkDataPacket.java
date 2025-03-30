@@ -60,15 +60,26 @@ public final class ChunkDataPacket implements FallbackPacket {
     }
 
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_14)) {
-      final long[] motionBlockingData = new long[protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_18) ? 36 : 37];
-      final CompoundBinaryTag motionBlockingTag = CompoundBinaryTag.builder()
-        .put("MOTION_BLOCKING", LongArrayBinaryTag.longArrayBinaryTag(motionBlockingData))
-        .build();
-      final CompoundBinaryTag rootTag = CompoundBinaryTag.builder()
-        .put("root", motionBlockingTag)
-        .build();
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
+        // In 1.21.5. They changed to List<EnumMap<Heightmap.Type, long[]>>
+        ProtocolUtil.writeVarInt(byteBuf, 1); // List size
+        ProtocolUtil.writeVarInt(byteBuf, 4); // Ordinal of MOTION_BLOCKING
+        // Write long array
+        ProtocolUtil.writeVarInt(byteBuf, 37);
+        for (int i = 0; i < 37; i++) {
+          byteBuf.writeLong(0);
+        }
+      } else { // Nbt for older version
+        final long[] motionBlockingData = new long[protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_18) ? 36 : 37];
+        final CompoundBinaryTag motionBlockingTag = CompoundBinaryTag.builder()
+          .put("MOTION_BLOCKING", LongArrayBinaryTag.longArrayBinaryTag(motionBlockingData))
+          .build();
+        final CompoundBinaryTag rootTag = CompoundBinaryTag.builder()
+          .put("root", motionBlockingTag)
+          .build();
 
-      ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, rootTag);
+        ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, rootTag);
+      }
 
       if (protocolVersion.inBetween(ProtocolVersion.MINECRAFT_1_15, ProtocolVersion.MINECRAFT_1_17_1)) {
         if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_16_2)) {
@@ -95,7 +106,12 @@ public final class ChunkDataPacket implements FallbackPacket {
     } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_18)) {
       ProtocolUtil.writeVarInt(byteBuf, 0);
     } else {
-      final byte[] sectionData = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
+      // nonEmptyBlockCount. short occupies 2 bytes.
+      // SingularPalette (byte) + id (varint) + long array with size (older)
+      // Since 1.21.5. The length of the long array of PaletteStorage no longer depends on the VarInt in the packet
+      // SingularPalette doesn't need to read any additional long array.
+      // So we'll remove suffix 0 as array length here. The cost of writing a palette has been reduced from 3 to 2 bytes.
+      final byte[] sectionData = protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_21_5) ? new byte[]{0, 0, 0, 0, 0, 0, 1, 0} : new byte[]{0, 0, 0, 0, 0, 1};
       int count = 24;
       ProtocolUtil.writeVarInt(byteBuf, sectionData.length * count);
 
