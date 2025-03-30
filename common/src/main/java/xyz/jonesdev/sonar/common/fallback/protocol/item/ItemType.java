@@ -73,8 +73,19 @@ public enum ItemType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_2)) {
       return 1022;
     }
-    return 1031;
-  }, protocolVersion -> protocolVersion.greaterThanOrEquals(MINECRAFT_1_21_2) ? 36 : 26);
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_4)) {
+      return 1031;
+    }
+    return 1042;
+  }, protocolVersion -> {
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
+      return 26;
+    }
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_4)) {
+      return 36;
+    }
+    return 37;
+  });
 
   private final Function<ProtocolVersion, Integer> id;
   private final Function<ProtocolVersion, Integer> components;
