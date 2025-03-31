@@ -147,6 +147,8 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
 
       byteBuf.readerIndex(originalReaderIndex);
       ctx.fireChannelRead(byteBuf);
+    } else {
+      ctx.fireChannelRead(msg);
     }
   }
 }
