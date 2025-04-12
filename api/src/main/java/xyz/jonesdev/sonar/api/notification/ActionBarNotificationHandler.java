@@ -33,8 +33,8 @@ import static xyz.jonesdev.sonar.api.profiler.SimpleProcessProfiler.*;
 import static xyz.jonesdev.sonar.api.timer.SystemTimer.DATE_FORMATTER;
 
 @Getter
-public final class ActionBarNotificationHandler extends NotificationHandler {
-  private int animationIndex;
+public class ActionBarNotificationHandler extends NotificationHandler {
+  protected int animationIndex;
 
   @Override
   public void handleNotification() {
