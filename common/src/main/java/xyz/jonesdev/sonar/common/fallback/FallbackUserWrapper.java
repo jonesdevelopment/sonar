@@ -96,6 +96,12 @@ public final class FallbackUserWrapper implements FallbackUser {
         return;
       }
 
+      // How? Is there some kind of de-sync or race condition?
+      if (channel.pipeline().context(FALLBACK_FRAME_ENCODER) != null) {
+        channel.close(); // Nope ¯\_(ツ)_/¯
+        return;
+      }
+
       // Mark the player as connected by caching them in a map of verifying players
       Sonar.get0().getFallback().getConnected().compute(inetAddress, (__, v) -> true);
 
