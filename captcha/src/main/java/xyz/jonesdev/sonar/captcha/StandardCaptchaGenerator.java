@@ -109,12 +109,12 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     // Randomize the colors for the gradient effect
     for (int i = 0; i < COLORS.length; i++) {
       final float random = 0.9f + RANDOM.nextFloat() * 0.1f;
-      COLORS[i] = Color.getHSBColor(RANDOM.nextFloat(), random, random);
+      COLORS[i] = Color.getHSBColor(RANDOM.nextFloat(), random * 0.8f, random);
     }
 
     // Apply the random gradient effect
     graphics.setPaint(new LinearGradientPaint(0, 0, width, height,
-      COLOR_FRACTIONS, COLORS, MultipleGradientPaint.CycleMethod.REFLECT));
+      COLOR_FRACTIONS, COLORS, MultipleGradientPaint.CycleMethod.REPEAT));
   }
 
   private void drawCharacters(final @NotNull Graphics2D graphics,
