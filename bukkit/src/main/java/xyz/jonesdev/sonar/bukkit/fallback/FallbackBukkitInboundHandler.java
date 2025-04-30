@@ -122,6 +122,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
             updateRegistry(FallbackPacketRegistry.LOGIN, Objects.requireNonNull(protocolVersion));
             break;
           default:
+            byteBuf.release();
             throw ProtocolUtil.DEBUG ? new DecoderException("Bad handshake intent " + handshake.getIntent())
               : QuietDecoderException.INSTANCE;
         }
@@ -146,6 +147,8 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
 
       byteBuf.readerIndex(originalReaderIndex);
       ctx.fireChannelRead(byteBuf);
+    } else {
+      ctx.fireChannelRead(msg);
     }
   }
 }
