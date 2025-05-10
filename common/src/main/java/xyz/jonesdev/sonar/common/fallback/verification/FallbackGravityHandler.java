@@ -64,9 +64,13 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     // Make sure the client knows that we're sending chunks next
     if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_3)) {
       user.delayedWrite(START_WRITING_CHUNKS);
+
+      for (final FallbackPacket section : EMPTY_CHUNK_DATA) {
+        user.delayedWrite(section);
+      }
+    } else {
+      user.delayedWrite(EMPTY_CHUNK_DATA[0]);
     }
-    // Teleport player into an empty world by sending an empty chunk packet
-    user.delayedWrite(EMPTY_CHUNK_DATA);
     // Spawn the invisible platform below the player
     if (enableCollisionsCheck) {
       final int index = RANDOM.nextInt(BLOCKS_PACKETS.length);

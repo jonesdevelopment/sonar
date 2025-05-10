@@ -76,7 +76,18 @@ public class FallbackPreparer {
   public final FallbackPacket NO_MOVE_ABILITIES_BEDROCK = new PlayerAbilitiesPacket(0x06, 0, 0);
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
     SPAWN_X_POSITION, 10000, SPAWN_Z_POSITION, 0, 90, 0, 0, false, false, true));
-  public final FallbackPacket EMPTY_CHUNK_DATA = new FallbackPacketSnapshot(new ChunkDataPacket(0, 0));
+  // I think the people working at Microsoft are actually the *real* ultimate trolls of the internet!
+  public final FallbackPacket[] EMPTY_CHUNK_DATA = new FallbackPacket[]{
+    new FallbackPacketSnapshot(new ChunkDataPacket(0, 0)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(0, 1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(0, -1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(1, 0)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(1, 1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(1, -1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(-1, 0)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(-1, 1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(-1, -1))
+  };
   public final FallbackPacket PRE_JOIN_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(PRE_JOIN_KEEP_ALIVE_ID));
   public final FallbackPacket[] REGISTRY_SYNC_1_20 = new FallbackPacket[] {
     new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null))};
