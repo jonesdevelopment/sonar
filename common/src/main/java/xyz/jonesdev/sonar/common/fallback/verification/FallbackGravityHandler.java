@@ -52,7 +52,6 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_19_3)) {
       user.delayedWrite(defaultSpawnPosition);
     }
-    user.delayedWrite(CHUNK_HACK_FIX_POSITION); // I want to run away
     // Teleport the player to the position where we're starting to check them
     if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       user.delayedWrite(spawnPosition);
@@ -66,8 +65,10 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_3)) {
       user.delayedWrite(START_WRITING_CHUNKS);
     }
-    // Teleport player into an empty world by sending an empty chunk packet
-    user.delayedWrite(EMPTY_CHUNK_DATA);
+    // Teleport player into an empty world by sending empty chunk packets
+    for (final FallbackPacket section : EMPTY_CHUNK_DATA) {
+      user.delayedWrite(section);
+    }
     // Spawn the invisible platform below the player
     if (enableCollisionsCheck) {
       final int index = RANDOM.nextInt(BLOCKS_PACKETS.length);
