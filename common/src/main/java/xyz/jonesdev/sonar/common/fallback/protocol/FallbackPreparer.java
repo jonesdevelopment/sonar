@@ -41,8 +41,6 @@ import xyz.jonesdev.sonar.common.fallback.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -78,7 +76,13 @@ public class FallbackPreparer {
   public final FallbackPacket NO_MOVE_ABILITIES_BEDROCK = new PlayerAbilitiesPacket(0x06, 0, 0);
   public final FallbackPacket CAPTCHA_POSITION = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
     SPAWN_X_POSITION, 10000, SPAWN_Z_POSITION, 0, 90, 0, 0, false, false, true));
-  public final List<FallbackPacket> EMPTY_CHUNK_DATA = new ArrayList<>();
+  // I think the people working at Microsoft are actually the *real* ultimate trolls of the internet!
+  public final FallbackPacket[] EMPTY_CHUNK_DATA = new FallbackPacket[]{
+    new FallbackPacketSnapshot(new ChunkDataPacket(0, 0)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(-1, 1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(0, 1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(1, 1))
+  };
   public final FallbackPacket PRE_JOIN_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(PRE_JOIN_KEEP_ALIVE_ID));
   public final FallbackPacket[] REGISTRY_SYNC_1_20 = new FallbackPacket[] {
     new FallbackPacketSnapshot(new RegistryDataPacket(DimensionRegistry.CODEC_1_20, null, null))};
@@ -99,15 +103,6 @@ public class FallbackPreparer {
   public static final FallbackPacket REMOVE_VEHICLE = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
   public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(
     new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
-
-  static {
-    final int sectionEdgeSize = 1; // enough
-    for (int sectionX = -sectionEdgeSize; sectionX <= sectionEdgeSize; ++sectionX) {
-      for (int sectionZ = sectionEdgeSize; sectionZ <= sectionEdgeSize; ++sectionZ) {
-        EMPTY_CHUNK_DATA.add(new FallbackPacketSnapshot(new ChunkDataPacket(sectionX, sectionZ)));
-      }
-    }
-  }
 
   public FallbackPacket loginSuccess;
   public FallbackPacket welcomeMessage;
