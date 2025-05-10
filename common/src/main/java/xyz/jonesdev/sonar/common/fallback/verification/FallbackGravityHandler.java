@@ -93,7 +93,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
   private final boolean enableGravityCheck, enableCollisionsCheck;
   private boolean teleported, canFall, checkMovement;
   private double y, deltaY, blockHeight;
-  private int movementTick, clientTick, expectedTeleportId = -1337;
+  private int movementTick, clientTick, expectedTeleportId = FIRST_TELEPORT_ID;
   private SetPlayerPositionRotationPacket lastPositionPacket;
 
   @Override
@@ -122,9 +122,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
         "expected TP ID " + expectedTeleportId + ", but got " + confirmTeleport.getTeleportId());
 
       // The first teleport ID is not useful for us in this context, skip it
-      if (expectedTeleportId == -1337) { // this works (surprisingly)
-        expectedTeleportId = FIRST_TELEPORT_ID;
-      } else if (expectedTeleportId == FIRST_TELEPORT_ID) {
+      if (expectedTeleportId == FIRST_TELEPORT_ID) {
         lastPositionPacket = null;
         expectedTeleportId = SECOND_TELEPORT_ID;
       } else {
@@ -161,10 +159,6 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
 
   private void handleMovement(final double x, final double y, final double z,
                               final boolean onGround, final boolean rotated) {
-    if (y == 400) {
-      System.out.println("skipping the first");
-      return; // no, thanks!
-    }
     if (!checkMovement) {
       // No need to continue checking if the gravity and collision checks are disabled
       if (!enableGravityCheck && !enableCollisionsCheck) {
