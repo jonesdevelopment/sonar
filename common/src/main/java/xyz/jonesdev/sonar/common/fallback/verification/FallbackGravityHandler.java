@@ -64,9 +64,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     // Make sure the client knows that we're sending chunks next
     if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_3)) {
       user.delayedWrite(START_WRITING_CHUNKS);
-    }
-    // Teleport player into an empty world by sending empty chunk packets
-    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
+
       for (final FallbackPacket section : EMPTY_CHUNK_DATA) {
         user.delayedWrite(section);
       }
