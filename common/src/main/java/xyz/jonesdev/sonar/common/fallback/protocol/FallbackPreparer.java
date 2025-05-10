@@ -79,9 +79,14 @@ public class FallbackPreparer {
   // I think the people working at Microsoft are actually the *real* ultimate trolls of the internet!
   public final FallbackPacket[] EMPTY_CHUNK_DATA = new FallbackPacket[]{
     new FallbackPacketSnapshot(new ChunkDataPacket(0, 0)),
-    new FallbackPacketSnapshot(new ChunkDataPacket(-1, 1)),
     new FallbackPacketSnapshot(new ChunkDataPacket(0, 1)),
-    new FallbackPacketSnapshot(new ChunkDataPacket(1, 1))
+    new FallbackPacketSnapshot(new ChunkDataPacket(0, -1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(1, 0)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(1, 1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(1, -1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(-1, 0)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(-1, 1)),
+    new FallbackPacketSnapshot(new ChunkDataPacket(-1, -1))
   };
   public final FallbackPacket PRE_JOIN_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(PRE_JOIN_KEEP_ALIVE_ID));
   public final FallbackPacket[] REGISTRY_SYNC_1_20 = new FallbackPacket[] {
