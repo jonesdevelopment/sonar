@@ -1,7 +1,7 @@
 [versions]
 netty = "4.1.119.Final"
 adventure = "4.21.0"
-adventure-platform = "4.3.4"
+adventure-platform = "4.4.0"
 bstats = "3.1.0"
 libby = "2.0.0-SNAPSHOT"
 pluginyml = "0.6.0"
