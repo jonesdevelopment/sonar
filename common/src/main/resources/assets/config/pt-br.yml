@@ -186,7 +186,7 @@ verification:
   # O Sonar também deve verificar jogadores Geyser (Bedrock)?
   # Este recurso é experimental e pode causar problemas
   # Se isso estiver desativado, jogadores Bedrock serão ignorados
-  check-geyser-players: true
+  check-geyser-players: false
   # O tempo desde que o jogador parou de enviar pacotes antes de desconectar
   # (Este valor representa o tempo em milissegundos: 1 segundo = 1000 milissegundos)
   read-timeout: 8000

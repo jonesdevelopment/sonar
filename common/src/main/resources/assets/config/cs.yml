@@ -187,7 +187,7 @@ verification:
   # Měl by Sonar také kontrolovat hráče Geyser (Bedrock)?
   # Tato funkce je experimentální a může způsobit problémy
   # Pokud je toto zakázáno, hráči Bedrock budou přeskočeni
-  check-geyser-players: true
+  check-geyser-players: false
   # Doba, za kterou hráč přestal odesílat pakety před odpojením
   # (Hodnota udávaná v milisekundách: 1 sekunda = 1000 milisekund)
   read-timeout: 8000

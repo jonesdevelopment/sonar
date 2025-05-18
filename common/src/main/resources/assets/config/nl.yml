@@ -186,7 +186,7 @@ verification:
   # Moet Sonar ook Geyser (Bedrock) spelers controleren?
   # Deze functie is experimenteel en kan problemen veroorzaken
   # Als dit is uitgeschakeld, worden Bedrock-spelers overgeslagen
-  check-geyser-players: true
+  check-geyser-players: false
   # De hoeveelheid tijd die moet verstrijken voordat een speler een time-out krijgt
   # (Deze waarde vertegenwoordigt de tijd in milliseconden: 1 seconde = 1000 milliseconden)
   read-timeout: 8000

@@ -182,7 +182,7 @@ verification:
   # Sonar 是否应该检查来自 Geyser 的(基岩版)玩家?
   # 此功能是实验性的. 请报告任何因为误判而导致无法通过检查的问题
   # 如果关闭该选项 Sonar 将不检查这些玩家以便直接连接到服务器.
-  check-geyser-players: true
+  check-geyser-players: false
   # 播放器断开连接前停止发送数据包的时间
   # (该值为毫秒. 1秒等于1000毫秒.)
   read-timeout: 8000
