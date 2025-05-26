@@ -108,10 +108,6 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       }
       // Ensure that the client locale is correct
       validateClientLocale(clientInformation.getLocale());
-      // Check if the player sent an unused bit flag in the skin section
-      // TODO: check if this causes issues with cosmetics in pvp clients
-      checkState((clientInformation.getSkinParts() & 0x80) == 0,
-        "sent unused bit flag: " + clientInformation.getSkinParts());
 
       receivedClientInfo = true;
     } else if (packet instanceof PluginMessagePacket) {
