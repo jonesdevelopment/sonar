@@ -220,15 +220,18 @@ public class ProtocolUtil {
   public static void closeWith(final @NotNull Channel channel,
                                final @NotNull ProtocolVersion protocolVersion,
                                final @NotNull Object msg) {
+    final @NotNull ChannelFutureListener scheduledClose = channelFuture ->
+      channelFuture.channel().eventLoop().schedule(() -> channelFuture.channel().close(), 50, TimeUnit.MILLISECONDS);
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       channel.eventLoop().execute(() -> {
         channel.config().setAutoRead(false);
         channel.eventLoop().schedule(() -> {
-          channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+          channel.writeAndFlush(msg).addListener(scheduledClose);
         }, 250L, TimeUnit.MILLISECONDS);
       });
     } else {
-      channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+      channel.config().setAutoRead(false);
+      channel.writeAndFlush(msg).addListener(scheduledClose);
     }
   }
 
