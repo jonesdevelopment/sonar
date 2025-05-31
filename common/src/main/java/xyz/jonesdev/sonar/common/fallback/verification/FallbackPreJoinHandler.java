@@ -187,8 +187,6 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
       brand = brand.substring(1);
     }
-    // Check for illegal client brands
-    checkState(!brand.equals("Vanilla"), "illegal client brand: " + brand);
     // Regex pattern for validating client brands
     final Pattern pattern = Sonar.get0().getConfig().getVerification().getBrand().getValidRegex();
     checkState(pattern.matcher(brand).matches(), "client brand does not match pattern: " + brand);
