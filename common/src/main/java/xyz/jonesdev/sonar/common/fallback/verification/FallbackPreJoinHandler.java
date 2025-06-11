@@ -179,7 +179,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     // https://discord.com/channels/923308209769426994/1116066363887321199/1256929441053933608
     String brand = new String(data, StandardCharsets.UTF_8);
     // Remove the invalid character at the beginning of the client brand
-    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8)) {
+    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_8) && brand.length() > 1) {
       brand = brand.substring(1);
     }
     // Regex pattern for validating client brands
