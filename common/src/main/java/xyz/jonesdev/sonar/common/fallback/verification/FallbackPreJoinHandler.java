@@ -80,11 +80,11 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
         } else {
           markAcknowledged();
         }
-      }
 
-      // 1.8 clients send KeepAlive packets with the ID 0 every second
-      // while the player is in the "Downloading terrain" screen.
-      expectedKeepAliveId = 0;
+        // Disable the check for any further packets the client might send
+        // while loading the world (or similar).
+        expectedKeepAliveId = 0;
+      }
     } else if (packet instanceof LoginAcknowledgedPacket) {
       // Prevent users from sending multiple LoginAcknowledged packets
       checkState(!acknowledgedLogin, "sent duplicate login ack");
@@ -113,6 +113,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     } else if (packet instanceof PluginMessagePacket) {
       final PluginMessagePacket pluginMessage = (PluginMessagePacket) packet;
 
+      // TODO: Resolve as namespace (?)
       final boolean usingModernChannel = pluginMessage.getChannel().equals("minecraft:brand");
       final boolean usingLegacyChannel = pluginMessage.getChannel().equals("MC|Brand");
 
@@ -122,13 +123,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
       }
 
       // Make sure the player isn't sending the client brand multiple times
-      checkState(!receivedClientBrand, "sent duplicate plugin message");
-      // Check if the channel is correct - 1.13 uses the new namespace
-      // system ('minecraft:' + channel) and anything below 1.13 uses
-      // the legacy namespace system ('MC|' + channel).
-      checkState(usingLegacyChannel
-          || user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_13),
-        "illegal PluginMessage channel: " + pluginMessage.getChannel());
+      checkState(!receivedClientBrand, "sent duplicate client brand");
 
       // Validate the client branding using a regex to filter unwanted characters.
       if (Sonar.get0().getConfig().getVerification().getBrand().isEnabled()) {
