@@ -122,11 +122,11 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
         return;
       }
 
-      // Make sure the player isn't sending the client brand multiple times
-      checkState(!receivedClientBrand, "sent duplicate client brand");
-
       // Validate the client branding using a regex to filter unwanted characters.
       if (Sonar.get0().getConfig().getVerification().getBrand().isEnabled()) {
+        // Make sure the player isn't sending the client brand multiple times
+        checkState(!receivedClientBrand, "sent duplicate client brand");
+
         validateClientBrand(pluginMessage.getData());
       }
 
