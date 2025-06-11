@@ -161,7 +161,7 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
 
   void validateClientInformation() {
     checkState(receivedClientInfo, "didn't send client settings");
-    checkState(receivedClientBrand, "didn't send plugin message");
+    checkState(receivedClientBrand, "didn't send client brand");
   }
 
   private void updateEncoderDecoderState(final @NotNull FallbackPacketRegistry registry) {
