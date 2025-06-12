@@ -47,7 +47,7 @@ import static xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer.*;
 public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandlerAdapter {
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;
-  protected RemovalListener channelRemovalListener = RemovalListener.EMPTY;
+  protected @Nullable RemovalListener channelRemovalListener;
 
   /**
    * Validates and handles incoming handshake packets
@@ -191,7 +191,7 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
    * Removes all pipelines and rewrites them using our custom handlers
    */
   private static void rewriteProtocol(final @NotNull ChannelHandlerContext ctx,
-                                      final @NotNull RemovalListener removalListener) {
+                                      final @Nullable RemovalListener removalListener) {
     for (final Map.Entry<String, ChannelHandler> entry : ctx.pipeline()) {
       // Don't accidentally remove Sonar's handlers
       if (entry.getKey().startsWith("sonar")
@@ -202,7 +202,9 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
         continue;
       }
       ctx.pipeline().remove(entry.getValue());
-      removalListener.accept(ctx.pipeline(), entry.getKey(), entry.getValue());
+      if (removalListener != null) {
+        removalListener.accept(ctx.pipeline(), entry.getKey(), entry.getValue());
+      }
     }
     // Add our read/write timeout handler
     ctx.pipeline().addFirst(FALLBACK_TIMEOUT, new FallbackTimeoutHandler(
@@ -256,7 +258,5 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
     void accept(final @NotNull ChannelPipeline pipeline,
                 final @NotNull String name,
                 final @NotNull ChannelHandler handler);
-
-    RemovalListener EMPTY = (pipeline, name, handler) -> {};
   }
 }

@@ -45,7 +45,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
   FallbackBukkitInboundHandler() {
     updateRegistry(FallbackPacketRegistry.HANDSHAKE, DEFAULT_PROTOCOL_VERSION);
 
-    channelRemovalListener = (pipeline, name, handler) -> {
+    super.channelRemovalListener = (pipeline, name, handler) -> {
       final ChannelInactiveListener inactiveListener = pipeline.get(ChannelInactiveListener.class);
 
       if (inactiveListener != null) {
@@ -137,7 +137,7 @@ final class FallbackBukkitInboundHandler extends FallbackInboundHandlerAdapter {
           ctx.fireChannelRead(byteBuf.retain());
           // TODO: recode this?
           final ChannelHandler inboundHandler = ctx.pipeline().remove(FALLBACK_INBOUND_HANDLER);
-          if (inboundHandler != null) {
+          if (inboundHandler != null && channelRemovalListener != null) {
             channelRemovalListener.accept(ctx.pipeline(), FALLBACK_INBOUND_HANDLER, inboundHandler);
           }
         }, loginStart.getUsername(), socketAddress);
