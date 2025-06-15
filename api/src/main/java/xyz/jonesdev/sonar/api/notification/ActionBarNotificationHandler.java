@@ -54,6 +54,8 @@ public class ActionBarNotificationHandler extends NotificationHandler {
       Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
       Placeholder.unparsed("attack-duration", attackDuration),
       Placeholder.unparsed("animation", nextAnimation()),
+      Placeholder.unparsed("process-cpu", Sonar.DECIMAL_FORMAT.format(getProcessCPUUsage())),
+      Placeholder.unparsed("system-cpu", Sonar.DECIMAL_FORMAT.format(getSystemCPUUsage())),
       Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getQueue().getPlayers().size())),
       Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getConnected().size())),
       Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getBlacklist().estimatedSize())),
