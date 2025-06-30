@@ -74,7 +74,9 @@ public enum BukkitServerVersion {
   MINECRAFT_1_21_1,
   MINECRAFT_1_21_2,
   MINECRAFT_1_21_3,
-  MINECRAFT_1_21_4;
+  MINECRAFT_1_21_4,
+  MINECRAFT_1_21_5,
+  MINECRAFT_1_21_6;
 
   static final BukkitServerVersion[] REVERSED_VALUES;
 
