@@ -198,8 +198,9 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     }
 
     // Ensure that the player's Y coordinate is above the collision platform
-    checkState(y >= PLATFORM_Y_POSITION,
-      "fell through blocks: " + y + "/" + deltaY + "/" + movementTick);
+    if (y < PLATFORM_Y_POSITION) {
+      failOrShowCaptcha("fell through blocks: " + y + "/" + deltaY + "/" + movementTick);
+    }
 
     // The player is not allowed to move away from the collision platform.
     // This should not happen unless the max movement tick is configured to a high number.
