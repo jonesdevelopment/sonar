@@ -79,7 +79,7 @@ public final class FallbackCaptchaHandler extends FallbackVerificationHandler {
       // Decrement the number of tries left
       checkState(tries-- > 0, "failed CAPTCHA too often");
       // Send the player a chat message to let them know that the code they entered is incorrect
-      user.write(incorrectCaptcha);
+      user.write(incorrectCaptcha[tries]);
     } else if (packet instanceof SetPlayerPositionPacket
       || packet instanceof SetPlayerPositionRotationPacket) {
       // A position packet is sent approximately every second

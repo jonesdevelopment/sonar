@@ -196,7 +196,7 @@ verification:
     # Message shown to the player when they have to enter the answer to the CAPTCHA
     enter: '<prefix><green>Please enter the text in chat that is displayed on the map.'
     # Message shown to the player when they enter the wrong answer in chat
-    incorrect: '<prefix><red>You have entered a wrong answer! Please try again.'
+    incorrect: '<prefix><red>You have entered a wrong answer! You have <attempts-left> attempt(s) left.'
 
   # Message shown to the player when they are being verified
   # Set this to '' to disable the welcome message entirely

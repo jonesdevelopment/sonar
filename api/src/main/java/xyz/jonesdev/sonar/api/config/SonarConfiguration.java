@@ -177,7 +177,7 @@ public final class SonarConfiguration {
     verification.map.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.map-captcha.timing"));
     verification.map.precomputeAmount = clamp(generalConfig.getInt("verification.checks.map-captcha.precompute"), 10, 5000);
     verification.map.maxDuration = clamp(generalConfig.getInt("verification.checks.map-captcha.max-duration"), 5000, 360000);
-    verification.map.maxTries = generalConfig.getInt("verification.checks.map-captcha.max-tries");
+    verification.map.maxTries = clamp(generalConfig.getInt("verification.checks.map-captcha.max-tries"), 1, 100);
     verification.map.alphabet = generalConfig.getString("verification.checks.map-captcha.alphabet");
     verification.map.backgroundImage = null;
 

@@ -108,11 +108,11 @@ public class FallbackPreparer {
   public static final FallbackPacket REMOVE_VEHICLE = new RemoveEntitiesPacket(VEHICLE_ENTITY_ID);
   public static final FallbackPacket SET_VEHICLE_PASSENGERS = new FallbackPacketSnapshot(
     new SetPassengersPacket(VEHICLE_ENTITY_ID, PLAYER_ENTITY_ID));
+  public FallbackPacket[] incorrectCaptcha;
 
   public FallbackPacket loginSuccess;
   public FallbackPacket welcomeMessage;
   public FallbackPacket enterCodeMessage;
-  public FallbackPacket incorrectCaptcha;
   public static FallbackPacket joinGame;
   public FallbackPacket defaultSpawnPosition;
   public FallbackPacket spawnPosition;
@@ -238,11 +238,14 @@ public class FallbackPreparer {
         MiniMessage.miniMessage().deserialize(
           Sonar.get0().getConfig().getMessagesConfig().getString("verification.captcha.enter"),
           Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())))));
-      incorrectCaptcha = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
-        MiniMessage.miniMessage().deserialize(
-          Sonar.get0().getConfig().getMessagesConfig().getString("verification.captcha.incorrect"),
-          Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix())))));
-
+      incorrectCaptcha = new FallbackPacket[Sonar.get0().getConfig().getVerification().getMap().getMaxTries()];
+      for (int i = 0; i < incorrectCaptcha.length; i++) {
+        incorrectCaptcha[i] = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
+          MiniMessage.miniMessage().deserialize(
+            Sonar.get0().getConfig().getMessagesConfig().getString("verification.captcha.incorrect"),
+            Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
+            Placeholder.unparsed("attempts-left", String.valueOf(i + 1))))));
+      }
       // Prepare countdown
       xpCountdown = new FallbackPacket[Sonar.get0().getConfig().getVerification().getMap().getMaxDuration() / 1000];
 
