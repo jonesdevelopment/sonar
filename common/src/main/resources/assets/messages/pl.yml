@@ -199,7 +199,7 @@ verification:
     # Message shown to the player when they have to enter the answer to the captcha
     enter: '<prefix><green>Wprowadź na czacie tekst wyświetlany na mapie.'
     # Message shown to the player when they enter the wrong answer in chat
-    incorrect: '<prefix><red>Wprowadzono nieprawidłowy kod. Spróbuj ponownie.'
+    incorrect: '<prefix><red>Wprowadzono nieprawidłowy kod. Zostało <attempts-left> prób.'
 
   # Wiadomość wyświetlana graczowi podczas weryfikacji
   # Ustaw wartość '', aby całkowicie wyłączyć wiadomość powitalną

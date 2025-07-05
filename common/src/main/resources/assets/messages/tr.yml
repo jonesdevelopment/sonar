@@ -196,7 +196,7 @@ verification:
     # CAPTCHA'nın cevabını girmeleri gerektiğinde oyuncuya gösterilen mesaj
     enter: '<prefix><green>Lütfen haritada görüntülenen sohbet metnini girin.'
     # Message that is shown to the player when they enter the wrong answer in chat
-    incorrect: '<prefix><red>Yanlış bir cevap girdiniz! Lütfen tekrar deneyin.'
+    incorrect: '<prefix><red>Yanlış bir cevap girdiniz! <attempts-left> deneme(ler)iniz kaldı.'
 
   # Doğrulandıklarında oyuncuya gösterilen mesaj
   # Karşılama mesajını tamamen devre dışı bırakmak için bunu '' olarak ayarlayın

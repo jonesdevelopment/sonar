@@ -197,7 +197,7 @@ verification:
     # Nachricht, die dem Spieler angezeigt wird, wenn er den CAPTCHA-Code im Chat eingeben muss
     enter: '<prefix><green>Bitte gib den Text im Chat ein, der auf der Karte angezeigt wird.'
     # Nachricht, die dem Spieler angezeigt wird, wenn er den falschen Code im Chat eingibt
-    incorrect: '<prefix><red>Du hast eine falsche Antwort eingegeben! Bitte versuche es erneut.'
+    incorrect: '<prefix><red>Du hast eine falsche Antwort eingegeben! Sie haben noch <attempts-left> Versuch(e) übrig.'
 
   # Nachricht, die dem Spieler angezeigt wird, wenn er überprüft wird
   # Setzen Sie dies auf '', um die Willkommensnachricht vollständig zu deaktivieren

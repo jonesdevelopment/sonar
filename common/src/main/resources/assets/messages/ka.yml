@@ -196,7 +196,7 @@ verification:
     # მესიჯი რომელიც გაეგზავნება მოთამაშეს როცა მათ უნდა მიუთითონ CAPTCHA ს პასუხი
     enter: '<prefix><green>გთხოვთ დაწეროთ ჩატში ის კოდი რომელიც არის ნაჩვენები რუკაზე.'
     # მესიჯი რომელიც გაეგზავნება მოთამაშეს როცა ისინი ჩაწერენ არასწორ პასუხს ჩატში
-    incorrect: '<prefix><red>თქვენ მიუთითეთ არასწორი კოდი. გთხოვთ ხელახლა ცადოთ.'
+    incorrect: '<prefix><red>თქვენ მიუთითეთ არასწორი კოდი. თქვენ დაგრჩათ <attempts-left> მცდელობა(ები).'
 
   # Message shown to the player when they are being verified
   # Set this to '' to disable the welcome message entirely

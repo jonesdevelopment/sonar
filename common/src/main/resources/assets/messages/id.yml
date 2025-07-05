@@ -196,7 +196,7 @@ verification:
     # Pesan yang ditampilkan kepada pemain saat mereka harus memasukkan jawaban untuk CAPTCHA
     enter: '<prefix><green>Masukkan teks dalam obrolan yang ditampilkan di peta.'
     # Pesan yang ditampilkan kepada pemain saat mereka memasukkan jawaban yang salah di chat
-    incorrect: '<prefix><red>Anda telah memasukkan jawaban yang salah! Silakan coba lagi.'
+    incorrect: '<prefix><red>Anda telah memasukkan jawaban yang salah! Anda memiliki <attempts-left> percobaan yang tersisa.'
 
   # Pesan yang ditampilkan kepada pemain ketika mereka sedang diverifikasi
   # Atur ini ke '' untuk menonaktifkan pesan selamat datang sepenuhnya

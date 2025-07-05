@@ -196,7 +196,7 @@ verification:
     # Zpráva zobrazená hráči, když má zadat odpověď na captchu
     enter: '<prefix><green>Prosím, zadejte text do chatu, který se zobrazí na mapě.'
     # Zpráva zobrazená hráči, když zadá špatnou odpověď do chatu
-    incorrect: '<prefix><red>Zadali jste špatnou odpověď! Zkuste to prosím znovu.'
+    incorrect: '<prefix><red>Zadali jste špatnou odpověď! Zbývají vám <attempts-left> pokus(y).'
 
   # Zpráva zobrazená hráči při ověřování
   # Nastavením této hodnoty na '' uvítací zprávu zcela vypnete

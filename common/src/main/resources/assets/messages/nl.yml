@@ -196,7 +196,7 @@ verification:
     # Bericht dat aan de speler wordt getoond wanneer hij het antwoord op de CAPTCHA moet invoeren
     enter: '<prefix><green>Voer in de chat de tekst in die op de kaart wordt weergegeven.'
     # Bericht dat aan de speler wordt getoond wanneer hij of zij het verkeerde antwoord invoert in de chat
-    incorrect: '<prefix><red>Je hebt een verkeerd antwoord ingevoerd! Probeer het opnieuw.'
+    incorrect: '<prefix><red>Je hebt een verkeerd antwoord ingevoerd! Je hebt <attempts-left> poging(en) over.'
 
   # Bericht dat aan de speler wordt getoond als hij wordt geverifieerd
   # Stel dit in op '' om het welkomstbericht volledig uit te schakelen

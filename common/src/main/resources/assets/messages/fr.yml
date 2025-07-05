@@ -196,7 +196,7 @@ verification:
     # Message affiché au joueur lorsqu'il doit entrer la réponse au CAPTCHA
     enter: '<prefix><green>Veuillez saisir le texte en chat qui s''affiche sur la carte.'
     # Message affiché au joueur lorsqu'il entre la mauvaise réponse dans le chat
-    incorrect: '<prefix><red>Vous avez saisi une mauvaise réponse ! Veuillez réessayer.'
+    incorrect: '<prefix><red>Vous avez saisi une mauvaise réponse ! Il vous reste <attempts-left> tentative(s).'
 
   # Message affiché au joueur lorsqu'il est en cours de vérification
   # Réglez ce paramètre sur '' pour désactiver complètement le message de bienvenue

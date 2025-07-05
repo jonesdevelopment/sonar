@@ -196,7 +196,7 @@ verification:
     # 玩家需要输入验证码答案时显示的消息
     enter: '<prefix><green>请输入地图上显示的聊天文本.'
     # 当玩家输入错误的验证码时显示的消息
-    incorrect: '<prefix><red>您输入了错误的答案! 请重试.'
+    incorrect: '<prefix><red>您输入了错误的答案! 您还剩 <attempts-left> 次尝试。'
 
   # 当玩家正在接受验证时显示的信息
   # 将此项设置为''可完全禁用加入时发送的消息
