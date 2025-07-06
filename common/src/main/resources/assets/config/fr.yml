@@ -135,8 +135,6 @@ verification:
 
     # Regex pour valider les noms d'utilisateur lors de la vérification
     valid-name-regex: ^[a-zA-Z0-9_]+$
-    # Regex pour valider la locale client lors de la vérification
-    valid-locale-regex: ^[a-zA-Z_]+$
 
   # S'il est activé, le joueur sera renvoyé au serveur d'origine
   # après avoir passé avec succès la vérification du bot.

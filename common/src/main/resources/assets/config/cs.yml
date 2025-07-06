@@ -136,8 +136,6 @@ verification:
 
     # Regex pro validování jmen při verifikaci
     valid-name-regex: ^[a-zA-Z0-9_]+$
-    # Regex pro validaci "client locale" při verifikaci
-    valid-locale-regex: ^[a-zA-Z_]+$
 
   # Je-li povoleno, hráč bude přenesen zpět na původní server
   # po úspěšném absolvování ověření bota.

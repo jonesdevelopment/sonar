@@ -106,8 +106,6 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
         checkState(clientInformation.getViewDistance() >= 2,
           "view distance: " + clientInformation.getViewDistance());
       }
-      // Ensure that the client locale is correct
-      validateClientLocale(clientInformation.getLocale());
 
       receivedClientInfo = true;
     } else if (packet instanceof PluginMessagePacket) {
@@ -185,12 +183,5 @@ public final class FallbackPreJoinHandler extends FallbackVerificationHandler {
     // Regex pattern for validating client brands
     final Pattern pattern = Sonar.get0().getConfig().getVerification().getBrand().getValidRegex();
     checkState(pattern.matcher(brand).matches(), "client brand does not match pattern: " + brand);
-  }
-
-  private void validateClientLocale(final @NotNull String locale) {
-    // Check the client locale by performing a simple regex check
-    // that disallows non-ascii characters by default.
-    final Pattern pattern = Sonar.get0().getConfig().getVerification().getValidLocaleRegex();
-    checkState(pattern.matcher(locale).matches(), "client locale does not match pattern: " + locale);
   }
 }

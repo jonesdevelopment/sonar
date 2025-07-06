@@ -198,7 +198,6 @@ public final class SonarConfiguration {
     verification.timeOfDay = clamp(generalConfig.getInt("verification.time-of-day"), 0, 24000);
     verification.gamemode = Verification.Gamemode.valueOf(generalConfig.getString("verification.gamemode"));
     verification.validNameRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-name-regex"));
-    verification.validLocaleRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-locale-regex"));
 
     verification.checkGeyser = generalConfig.getBoolean("verification.check-geyser-players");
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
@@ -418,7 +417,6 @@ public final class SonarConfiguration {
     private boolean logDuringAttack;
     private boolean debugXYZPositions;
     private Pattern validNameRegex;
-    private Pattern validLocaleRegex;
 
     private int readTimeout;
     private int writeTimeout;

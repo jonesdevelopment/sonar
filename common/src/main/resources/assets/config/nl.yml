@@ -135,8 +135,6 @@ verification:
 
     # Regex voor het valideren van gebruikersnamen tijdens verificatie
     valid-name-regex: ^[a-zA-Z0-9_]+$
-    # Regex voor het valideren van de landinstelling van de client tijdens verificatie
-    valid-locale-regex: ^[a-zA-Z_]+$
 
   # Indien ingeschakeld, wordt de speler teruggestuurd naar de oorspronkelijke server
   # nadat u de bot-verificatie met succes heeft doorstaan.

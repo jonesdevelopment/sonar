@@ -133,8 +133,6 @@ verification:
 
     # Regex zur Validierung von Benutzernamen während der Überprüfung
     valid-name-regex: ^[a-zA-Z0-9_]+$
-    # Regex zur Validierung der Client-Spracheinstellung während der Überprüfung
-    valid-locale-regex: ^[a-zA-Z_]+$
 
   # Wenn aktiviert, wird der Player zurück zum Ursprungsserver gesendet,
   # falls dieser die der Bot-Verifizierung erfolgreich besteht.

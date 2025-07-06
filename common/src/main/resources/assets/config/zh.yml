@@ -133,8 +133,6 @@ verification:
 
     # 用于检查用户名是否有效的正则表达式
     valid-name-regex: ^[a-zA-Z0-9_]+$
-    # 用于检查客户端语言(例如 zh_CN)的正则表达式
-    valid-locale-regex: ^[a-zA-Z_]+$
 
   # 开启后 玩家将在验证成功后被重定向到指定的服务器
   # 该功能由 Mojang 在 Minecraft 1.20.5 版本中引入

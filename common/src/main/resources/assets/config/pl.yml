@@ -135,8 +135,6 @@ verification:
 
     # Regex do sprawdzania poprawności nazw użytkowników podczas weryfikacji
     valid-name-regex: ^[a-zA-Z0-9_]+$
-    # Regex do sprawdzania ustawień regionalnych klienta podczas weryfikacji
-    valid-locale-regex: ^[a-zA-Z_]+$
 
   # Jeśli opcja ta jest włączona, gracz zostanie przeniesiony z powrotem
   # na serwer początkowy po pomyślnym przejściu weryfikacji antybotowej.
