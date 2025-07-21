@@ -161,7 +161,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       if (!expectClientTick) {
         // Is it impossible for the client to not move during the gravity check?
         if (++tickWithoutMove >= 20) {
-          this.fail("expected position but got client tick end.");
+          fail("expected position but got client tick end.");
         }
       } else {
         tickWithoutMove = 0;
@@ -175,7 +175,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       return;
     }
     if (expectClientTick) {
-      this.failOrShowCaptcha("expected client tick end but got position.");
+      failOrShowCaptcha("expected client tick end but got position.");
     } else {
       expectClientTick = true;
     }
