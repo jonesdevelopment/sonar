@@ -208,7 +208,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     checkState(difference < 1e-7, "bad vehicle gravity: " + predicted + "/" + boatMotion);
 
     if (user.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_2)) {
-      this.finishRound();
+      finishRound();
     } else {
       expectVehiclePacket = ExpectVehiclePacket.CLIENT_TICK_END;
     }
