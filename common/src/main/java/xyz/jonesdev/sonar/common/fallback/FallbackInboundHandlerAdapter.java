@@ -168,23 +168,14 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
   protected final void initialLogin(final @NotNull Channel channel,
                                     final @NotNull InetAddress inetAddress,
                                     final @NotNull Runnable loginPacket) throws Exception {
-    Sonar.get0().getFallback().getOnline().compute(inetAddress, (__, count) -> {
-      final int maxOnlinePerIp = Sonar.get0().getConfig().getMaxOnlinePerIp();
-      // Skip the maximum online per IP check if it's disabled in the configuration
-      if (count != null && maxOnlinePerIp > 0) {
-        // Check if the number of online players using the same IP address as
-        // the connecting player is greater than the configured amount
-        if (count >= maxOnlinePerIp) {
-          customDisconnect(channel, tooManyOnlinePerIP, protocolVersion);
-          return count + 1;
-        }
-      }
-
-      // Let the server know about the login packet
-      loginPacket.run();
-      // Increment the number of accounts with the same IP
-      return count == null ? 1 : count + 1;
-    });
+    final int maxOnlinePerIp = Sonar.get0().getConfig().getMaxOnlinePerIp();
+    final int newCount = Sonar.get0().getFallback().getOnline().compute(inetAddress,
+      (__, count) -> count == null ? 1 : count + 1);
+    if (newCount > maxOnlinePerIp) {
+      customDisconnect(channel, tooManyOnlinePerIP, protocolVersion);
+      return;
+    }
+    loginPacket.run();
   }
 
   /**
