@@ -134,18 +134,18 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     if (state == State.WAITING) {
       return;
     }
-    checkState(!state.inVehicle && !waitingForStateChange,
-      "sending move packet while in vehicle");
-    expectVehiclePacket = null;
+    if (!state.inVehicle && !waitingForStateChange) {
+      expectVehiclePacket = null;
 
-    // Make sure the ground state and y position are correct
-    checkState(y <= boatY, "invalid y: " + y);
-    checkState(!isOnGround, "invalid ground state: " + y);
+      // Make sure the ground state and y position are correct
+      checkState(y <= boatY, "invalid y: " + y);
+      checkState(!isOnGround, "invalid ground state: " + y);
 
-    if (state == State.IN_AIR_AFTER_BOAT) {
-      spawnVehicle(State.IN_MINECART);
-    } else {
-      markSuccess();
+      if (state == State.IN_AIR_AFTER_BOAT) {
+        spawnVehicle(State.IN_MINECART);
+      } else {
+        markSuccess();
+      }
     }
   }
 
@@ -217,8 +217,9 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   private void onClientTickEnd(final @NotNull ClientTickEndPacket packet) {
     if (expectVehiclePacket == ExpectVehiclePacket.CLIENT_TICK_END) {
       finishRound();
-    } else if (!waitingForStateChange && state.inVehicle) { // Client can send end tick while not in vehicle
-      checkPacketOrder(ExpectVehiclePacket.CLIENT_TICK_END); // fail
+    } else if (!waitingForStateChange && state.inVehicle) {
+      // Client can send end tick while not in vehicle
+      checkPacketOrder(ExpectVehiclePacket.CLIENT_TICK_END);
     }
   }
 
