@@ -71,20 +71,7 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
   @Override
   public void handle(final @NotNull FallbackPacket packet) {
     if (packet instanceof KeepAlivePacket) {
-      final KeepAlivePacket keepAlivePacket = (KeepAlivePacket) packet;
-
-      // Check if we are expecting a KeepAlive packet
-      checkState(nextState != null, "invalid packet timing");
-      // Also check if the KeepAlive ID matches the expected ID
-      checkState(keepAlivePacket.getId() == expectedKeepAliveId,
-        "expected K ID " + expectedKeepAliveId + ", but got " + keepAlivePacket.getId());
-
-      state = nextState;
-      nextState = null;
-      waitingForStateChange = false;
-      if (!state.inVehicle) {
-        expectVehiclePacket = null;
-      }
+      onKeepAlive((KeepAlivePacket) packet);
     } else if (packet instanceof PaddleBoatPacket) {
       onPaddleBoat((PaddleBoatPacket) packet);
     } else if (packet instanceof VehicleMovePacket) {
@@ -101,6 +88,21 @@ public final class FallbackVehicleHandler extends FallbackVerificationHandler {
     } else if (packet instanceof SetPlayerPositionPacket) {
       final SetPlayerPositionPacket position = (SetPlayerPositionPacket) packet;
       handleMovement(position.getY(), position.isOnGround());
+    }
+  }
+
+  private void onKeepAlive(final @NotNull KeepAlivePacket keepAlive) {
+    // Check if we are expecting a KeepAlive packet
+    checkState(nextState != null, "invalid packet timing");
+    // Also check if the KeepAlive ID matches the expected ID
+    checkState(keepAlive.getId() == expectedKeepAliveId,
+      "expected K ID " + expectedKeepAliveId + ", but got " + keepAlive.getId());
+
+    state = nextState;
+    nextState = null;
+    waitingForStateChange = false;
+    if (!state.inVehicle) {
+      expectVehiclePacket = null;
     }
   }
 
