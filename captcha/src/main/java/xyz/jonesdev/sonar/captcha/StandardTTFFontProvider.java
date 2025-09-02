@@ -43,7 +43,7 @@ class StandardTTFFontProvider {
       // Set the font size and style
       return customFont.deriveFont(Font.PLAIN, STANDARD_FONT_SIZE);
     } catch (Exception exception) {
-      throw new IllegalStateException(exception);
+      throw new IllegalStateException("Error loading font. Does your environment support fonts?", exception);
     }
   }
 }
