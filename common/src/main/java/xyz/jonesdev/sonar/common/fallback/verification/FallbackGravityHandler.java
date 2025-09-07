@@ -179,6 +179,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
     } else {
       expectClientTick = true;
     }
+    tickWithoutMove = 0; // lag may cause some problems :(
   }
 
   private void markSuccess() {
