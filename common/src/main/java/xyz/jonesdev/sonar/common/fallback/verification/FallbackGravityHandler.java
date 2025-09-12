@@ -161,7 +161,7 @@ public final class FallbackGravityHandler extends FallbackVerificationHandler {
       if (!expectClientTick) {
         // Is it impossible for the client to not move during the gravity check?
         if (++tickWithoutMove >= 20) {
-          fail("expected position but got client tick end.");
+          //failOrShowCaptcha("expected position but got client tick end.");
         }
       } else {
         tickWithoutMove = 0;
