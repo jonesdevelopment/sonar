@@ -205,6 +205,7 @@ public final class SonarConfiguration {
     verification.debugXYZPositions = generalConfig.getBoolean("verification.debug-xyz-positions");
     verification.readTimeout = clamp(generalConfig.getInt("verification.read-timeout"), 1000, 30000);
     verification.writeTimeout = clamp(generalConfig.getInt("verification.write-timeout"), 1000, 30000);
+    verification.maxPacketCount = clamp(generalConfig.getInt("verification.max-packets"), 200, 9999);
     verification.reconnectDelay = clamp(generalConfig.getInt("verification.rejoin-delay"), 0, 100000);
     verification.rememberTime = clamp(generalConfig.getInt("verification.remember-time"), 0, 86400000);
     verification.blacklistTime = clamp(generalConfig.getInt("verification.blacklist-time"), 0, 86400000);
@@ -420,6 +421,7 @@ public final class SonarConfiguration {
 
     private int readTimeout;
     private int writeTimeout;
+    private int maxPacketCount;
     private int reconnectDelay;
     private int rememberTime;
     private int blacklistTime;

@@ -192,6 +192,8 @@ verification:
   # The time since the server stopped sending packets before disconnecting the player
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   write-timeout: 10000
+  # The maximum number of packets the client is allowed to send in total (during verification).
+  max-packets: 325
   # How long should a player wait before reconnecting during verification
   # (This value represents the time in milliseconds: 1 second = 1000 milliseconds)
   rejoin-delay: 5000

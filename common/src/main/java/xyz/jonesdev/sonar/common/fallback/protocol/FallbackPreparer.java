@@ -285,7 +285,7 @@ public class FallbackPreparer {
       + (xpCountdown == null ? 0 : xpCountdown.length) * 20 + 5
       + Sonar.get0().getConfig().getVerification().getVehicle().getMinimumPackets() * 4
       + Sonar.get0().getConfig().getVerification().getMap().getMaxTries()
-      + 150 /* some arbitrary leeway */;
+      + Sonar.get0().getConfig().getVerification().getMaxPacketCount();
   }
 
   public static FallbackPacket[] getRegistryPackets(final @NotNull ProtocolVersion protocolVersion) {
