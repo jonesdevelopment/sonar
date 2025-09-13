@@ -61,9 +61,9 @@ commands:
     tick: '<green>✔</green>'
     cross: '<red>✗</red>'
     # Formatting for the version information
-    outdated-version: ' <red><click:open_url:''https://github.com/jonesdevelopment/sonar/releases/latest''><hover:show_text:''(Click to download the latest version of Sonar)''>(Outdated)</hover></click></red>'
-    unstable-version: ' <gold>(Unstable)</gold>'
-    api-error: ' <dark_red><hover:show_text:''Check the server logs for more information''>(API error)</hover></dark_red>'
+    outdated-version: ' <red><click:open_url:''https://github.com/jonesdevelopment/sonar/releases/latest''><hover:show_text:''(დააჭირე, რომ გადმოწერო Sonar_ის უახლესი ვერსია)''>(Outdated)</hover></click></red>'
+    unstable-version: ' <gold>(არასტაბილური)</gold>'
+    api-error: ' <dark_red><hover:show_text:''შეამოწმე სერვერის Log_ები მეტი ინფორმაციისთვის''>(API error)</hover></dark_red>'
 
   # თარგმანი '/sonar reload' სთვის
   reload:
@@ -97,7 +97,7 @@ commands:
     # აღწერა ამ ქვე-ბრძანებისთვის
     description: "შეცვალე აკრძალული (დაბლოკილი) IP მისამართები"
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე ცდის შავი ნუსხის გასუფთავებას თუმცა იგი ცარიელია.
-    empty: '<prefix>შავი ნუსხა ამჟამად ცარიელია. ასე რომ არცერთი IP მისამართი არ მოშორებულა.'
+    empty: '<prefix>შავი ნუსხა ამჟამად ცარიელია. ასე რომ, არცერთი IP მისამართი არ მოშორებულა.'
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე გაასუფთავებს შავ ნუსხას.
     clear: '<prefix>თქვენ წარმატებით გაასუფთავეთ <amount> IP მისამართ(ებ)ი შავი ნუსხიდან.'
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე შეამოწმებს შავი ნუსხის ზომას.
@@ -114,9 +114,9 @@ commands:
   # თარგმანი '/sonar verified' სთვის
   verified:
     # აღწერა ამ ქვე-ბრძანებისთვის
-    description: "Manage verified IP მისამართები"
+    description: "განაგე შემოწმებული IP მისამართები"
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე ცდის გაასუფთავოს ნუსხა შემოწმებული მოთამაშეებისა თუმცა იგი ისედაც ცარიელია.
-    empty: '<prefix>ნუსხა შემოწმებული მოთამაშეებისა ისედაც ცარიელია. ასე რომ არ მოშორებულა არცერთი IP მისამართი იქიდან.'
+    empty: '<prefix>ნუსხა შემოწმებული მოთამაშეებისა ისედაც ცარიელია. ასე რომ, არ მოშორებულა არცერთი IP მისამართი იქიდან.'
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე გაასუფთავებს ნუსხას შემოწმებული მოთამაშეებისა.
     clear: '<prefix>თქვენ წარმატებით გაასუფთავეთ <amount> მოთამაშე შემოწმებულების ნუსხიდან.'
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე შეამოწმებს სიდიდეს შემოწმებული მოთამაშეების ნუსხისა.
@@ -124,7 +124,7 @@ commands:
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე მოშლის IP მისამართს შემოწმებულების სიიდან.
     remove: '<prefix>წარმატებით მოშორდა <ip>.'
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე დაამატებს IP მისამართს შემოწმებულების ნუსხაში.
-    add: '<prefix>Successfully verified <ip>.'
+    add: '<prefix>წარმატებით შემოწმდა <ip>.'
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე ცდის რომ დაამატოს IP/UUID შემოწმებულების ნუსხაში რაც უკვე დამატებულია.
     already: '<prefix>IP მისამართი/UUID რაც მოგვაწოდეთ ისედაც დამატებულია.'
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა ვინმე მოშლის IP მისამართს შემოწმებულების ნუსხიდან მაგრამ ის იქ არ არის.
@@ -136,7 +136,7 @@ commands:
   # თარგმანი '/sonar statistics' სთვის
   statistics:
     # აღწერა ამ ქვე-ბრძანებისთვის
-    description: "აჩვენე სერვერის ამჟამინდელი სტატისტიკები"
+    description: "აჩვენე სერვერის ამჟამინდელი სტატისტიკა"
     # ინფორმაციული მესიჯი რაც არის ნაჩვენები ყველაფრის ზემოთ როცა ნახულობთ სტატისტიკებს.
     header: '<prefix>ვაჩვენებთ <statistics-type> სტატისტიკას:'
     # მესიჯი, რომელიც იქნება ნაჩვენები, როცა მოთამაშე ცდის იხილოს უცნობი სტატისტიკა.
@@ -174,7 +174,7 @@ commands:
   # თარგმანი '/sonar dump' სთვის
   dump:
     # აღწერა ამ ქვე-ბრძანებისთვის
-    description: "Print developer information"
+    description: "აჩვენებს დეველოპერის ინფორმაციას"
     # ფორმატი ინფორმაციისთვის რაც კონსოლს ეგზავნება
     log: "გენერირდა: <dumped-json-data>"
 
@@ -194,48 +194,48 @@ verification:
   # მესიჯი რომელიც გაეგზავნება მოთამაშეს როცა მათ უნდა დაწერონ CAPTCHA
   captcha:
     # მესიჯი რომელიც გაეგზავნება მოთამაშეს როცა მათ უნდა მიუთითონ CAPTCHA ს პასუხი
-    enter: '<prefix><green>გთხოვთ დაწეროთ ჩატში ის კოდი რომელიც არის ნაჩვენები რუკაზე.'
+    enter: '<prefix><green>გთხოვთ დაწეროთ ჩატში კოდი, რომელიც არის ნაჩვენები რუკაზე.'
     # მესიჯი რომელიც გაეგზავნება მოთამაშეს როცა ისინი ჩაწერენ არასწორ პასუხს ჩატში
-    incorrect: '<prefix><red>თქვენ მიუთითეთ არასწორი კოდი. თქვენ დაგრჩათ <attempts-left> მცდელობა(ები).'
+    incorrect: '<prefix><red>კოდი არასწორია. დაგრჩათ <attempts-left> მცდელობა(ები).'
 
   # Message shown to the player when they are being verified
   # Set this to '' to disable the welcome message entirely
-  welcome: '<prefix><green>You are being verified. Please do not move; this is an automatic process.'
+  welcome: '<prefix><green>მოწმდებით. გთხოვთ არ გაინძრეთ; ეს ავტომატური პროცესია.'
 
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე შემოვა მაგრამ CAPTCHA არ არის მზად
   currently-preparing:
     - <header>
     - <yellow>ანტიბოტი ჯერ არ მომზადებულა.
-    - <gray>გთხოვთ დაიცადოთ რამოდენიმე წამი სანამ ხელახლა შემოხვალთ.
+    - <gray>გთხოვთ დაიცადოთ რამდენიმე წამი სანამ ხელახლა შემოხვალთ.
     - <footer>
   # Disconnect message that is shown when someone joins with an unsupported Minecraft version
   unsupported-version:
     - <header>
-    - <red>This server does not support your version of Minecraft.
+    - <red>თქვენი Minecraft_ის ვერსია არ არის მხარდაჭერილი.
     - <footer>
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე ხელახლა შემოდის ძალიან სწრაფად შემოწმების დროს.
   too-fast-reconnect:
     - <header>
     - <gold>თქვენ კავშირდებით ხელახლა ძალიან სწრაფად.
-    - <gray>გთხოვთ დაიცადოთ რამოდენიმე წამი სანამ ხელახლა ცდით შემოსვლას.
+    - <gray>გთხოვთ დაიცადოთ რამდენიმე წამი სანამ ხელახლა ცდით შემოსვლას.
     - <footer>
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე ცდის შემოსვლას თუმცა იგი უკვე მოწმდება
   already-verifying:
     - <header>
     - <red>თქვენი IP მისამართი ამჟამად უკვე მოწმდება.
-    - <red>გთხოვთ დაიცადოთ რამოდენიმე წამი სანამ ხელახლა ცდით შემოსვლას.
+    - <red>გთხოვთ დაიცადოთ რამდენიმე წამი სანამ ხელახლა ცდით შემოსვლას.
     - <footer>
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე შემოვა თუმცა იგი უკვე არის შემოწმების რიგში
   already-queued:
     - <header>
     - <red>თქვენი IP მისამართი უკვე არის რიგში შემოწმებისთვის.
-    - <red>გთხოვთ დაიცადოთ რამოდენიმე წუთი სანამ ხელახლა ცდით შემოსვლას.
+    - <red>გთხოვთ დაიცადოთ რამდენიმე წუთი სანამ ხელახლა ცდით შემოსვლას.
     - <footer>
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე შემოვა თუმცა დროებით დაბლოკილია
   blacklisted:
     - <header>
     - <red>თქვენ ამჟამად დაბლოკილი ხართ სერვერიდან.
-    - <red>გთხოვთ დაიცადოთ რამოდენიმე წუთი რომ ისევ შეგეძლოტ სერვერზე შემოსვლა.
+    - <red>გთხოვთ დაიცადოთ რამდენიმე წუთი, რომ ისევ შეგეძლოთ სერვერზე შემოსვლა.
     - <gold>შეცდომა? <gray><support-url>
     - <footer>
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე შემოვა არასწორი სახელით
@@ -253,12 +253,12 @@ verification:
   success:
     - <header>
     - <green>თქვენ წარმატებით გაიარეთ შემოწმება.
-    - <white>თქვენ უკვე შეგიძლიათ შეხვიდეთ სერვერზე.
+    - <white>უკვე შეგიძლიათ შეხვიდეთ სერვერზე.
   # გავარდნის მესიჯი რომელიც არის ნაჩვენები როცა ვინმე წარუმატებლად გაივლის შემოწმებას
   failed:
     - <header>
     - <red>თქვენ ვერ გაიარეთ შემოწმება.
-    - <gray>გთხოვთ დაიცადოთ რამოდენიმე წამი სანამ ხელახლა ცდით შემოსვლას.
+    - <gray>გთხოვთ დაიცადოთ რამდენიმე წამი სანამ ხელახლა ცდით შემოსვლას.
     - <gold>გჭირდებათ დახმარება შესვლაში? <gray><support-url>
     - <footer>
 
@@ -266,9 +266,9 @@ verification:
 verbose:
   layout:
     # ჩვენება Sonar_ის actionbar დეტალური ინფორმაციისთვის
-    normal: '<prefix><gray>კთწ <white><connections-per-second> <dark_aqua>╺ <gray>შემოსვლა/წ <white><logins-per-second> <dark_aqua>╺ <gray>მოწმდება <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    normal: '<prefix><gray>კ/წ <white><connections-per-second> <dark_aqua>╺ <gray>შემოსვლა/წ <white><logins-per-second> <dark_aqua>╺ <gray>მოწმდება <white><verifying> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
     # Layout for Sonar's actionbar verbose during an attack
-    attack: '<prefix><gray>კთწ <white><connections-per-second> <dark_aqua>╺ <gray>შემოსვლა/წ <white><logins-per-second> <dark_aqua>╺ <gray>რიგი <white><queued> <dark_aqua>╺ <gray>მოწმდება <white><verifying> <dark_aqua>╺ <gray>ხანგრძლივობა <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
+    attack: '<prefix><gray>კ/წ <white><connections-per-second> <dark_aqua>╺ <gray>შემოსვლა/წ <white><logins-per-second> <dark_aqua>╺ <gray>რიგი <white><queued> <dark_aqua>╺ <gray>მოწმდება <white><verifying> <dark_aqua>╺ <gray>ხანგრძლივობა <white><attack-duration> <dark_aqua>| <green>⬆ <white><outgoing-traffic>/s <red>⬇ <white><incoming-traffic>/s  <green><bold><animation>'
   # Animation for the action bar
   # Alternatives:
   # - ▙, ▛, ▜, ▟
