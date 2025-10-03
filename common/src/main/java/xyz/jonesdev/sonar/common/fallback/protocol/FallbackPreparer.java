@@ -168,6 +168,7 @@ public class FallbackPreparer {
     // Set the dynamic block and collide Y position based on the maximum fall distance
     dynamicSpawnYPosition = PLATFORM_Y_POSITION + (int) Math.ceil(fallDistance);
     defaultSpawnPosition = new FallbackPacketSnapshot(new SetDefaultSpawnPositionPacket(
+      "minecraft:overworld",
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     spawnPosition = new FallbackPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,
