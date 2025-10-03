@@ -35,5 +35,5 @@ ormlite = "com.j256.ormlite:ormlite-jdbc:6.1"
 lombok = "org.projectlombok:lombok:1.18.42"
 bungeecord = "net.md-5:bungeecord-proxy:1.21-SNAPSHOT"
 velocity = "io.papermc.velocity:velocity-proxy:3.4.0-SNAPSHOT"
-# We have to use 1.8.8 for backwards compatibility
-spigot = "org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT"
+# We have to use 1.16.5 for backwards compatibility
+spigot = "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"
