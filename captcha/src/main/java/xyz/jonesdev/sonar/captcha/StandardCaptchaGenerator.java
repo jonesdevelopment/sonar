@@ -113,8 +113,8 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
     }
 
     // Apply the random gradient effect
-    graphics.setPaint(new LinearGradientPaint(0, 0, width, height,
-      COLOR_FRACTIONS, COLORS, MultipleGradientPaint.CycleMethod.REPEAT));
+    graphics.setPaint(new RadialGradientPaint(0, 0, width,
+      COLOR_FRACTIONS, COLORS, MultipleGradientPaint.CycleMethod.REFLECT));
   }
 
   private void drawCharacters(final @NotNull Graphics2D graphics,
