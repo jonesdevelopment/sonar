@@ -61,7 +61,10 @@ public enum EntityType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_5)) {
       return 84;
     }
-    return 85;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_7)) {
+      return 85;
+    }
+    return 87;
   }),
   MINECART(protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_13_2)) {
@@ -100,7 +103,10 @@ public enum EntityType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_5)) {
       return 81;
     }
-    return 82;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_7)) {
+      return 82;
+    }
+    return 84;
   });
 
   private final Function<ProtocolVersion, Integer> id;

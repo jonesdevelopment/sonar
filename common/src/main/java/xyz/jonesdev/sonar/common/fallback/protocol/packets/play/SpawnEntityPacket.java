@@ -59,6 +59,10 @@ public final class SpawnEntityPacket implements FallbackPacket {
       byteBuf.writeDouble(x);
       byteBuf.writeDouble(y);
       byteBuf.writeDouble(z);
+
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_9)) {
+        encodeVelocity(byteBuf, velocityX, velocityY, velocityZ);
+      }
     } else {
       byteBuf.writeInt((int) (x * 32D));
       byteBuf.writeInt((int) (y * 32D));
@@ -75,11 +79,41 @@ public final class SpawnEntityPacket implements FallbackPacket {
       byteBuf.writeInt(data); // data
     }
 
-    if (data > 0 || protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)) {
-      byteBuf.writeShort((int) (velocityX * 8000D));
-      byteBuf.writeShort((int) (velocityY * 8000D));
-      byteBuf.writeShort((int) (velocityZ * 8000D));
+    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_21_9)) {
+      if (data > 0 || protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9)) {
+        byteBuf.writeShort((int) (velocityX * 8000D));
+        byteBuf.writeShort((int) (velocityY * 8000D));
+        byteBuf.writeShort((int) (velocityZ * 8000D));
+      }
     }
+  }
+
+  private static void encodeVelocity(final ByteBuf byteBuf, final double x, final double y, final double z) {
+    final double maxVal = Math.max(Math.abs(x), Math.max(Math.abs(y), Math.abs(z)));
+    if (maxVal < 3.051944088384301E-5) {
+      byteBuf.writeByte(0);
+      return;
+    }
+
+    final long scale = (long) Math.ceil(maxVal);
+    final boolean scaleTooLargeForBits = (scale & 3L) != scale;
+    final long scaleBits = scaleTooLargeForBits ? scale & 3L | 4L : scale;
+    final long encodedX = packLpVec3Component(x / scale) << 3;
+    final long encodedY = packLpVec3Component(y / scale) << 18;
+    final long encodedZ = packLpVec3Component(z / scale) << 33;
+    final long packed = scaleBits | encodedX | encodedY | encodedZ;
+
+    byteBuf.writeByte((byte) packed);
+    byteBuf.writeByte((byte) (packed >> 8));
+    byteBuf.writeInt((int) (packed >> 16));
+
+    if (scaleTooLargeForBits) {
+      ProtocolUtil.writeVarInt(byteBuf, (int) (scale >> 2));
+    }
+  }
+
+  private static long packLpVec3Component(double d) {
+    return Math.round((d * 0.5 + 0.5) * 32766.0);
   }
 
   @Override

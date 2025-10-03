@@ -25,12 +25,14 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPacket;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SetDefaultSpawnPositionPacket implements FallbackPacket {
+  private String dimensionName;
   private int x, y, z;
 
   @Override
@@ -40,6 +42,10 @@ public final class SetDefaultSpawnPositionPacket implements FallbackPacket {
       byteBuf.writeInt(y);
       byteBuf.writeInt(z);
     } else {
+      if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_9)) {
+        ProtocolUtil.writeString(byteBuf, dimensionName);
+      }
+
       final long encoded = protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_14)
         ? ((x & 0x3FFFFFFL) << 38) | ((y & 0xFFFL) << 26) | (z & 0x3FFFFFFL)
         : ((x & 0x3FFFFFFL) << 38) | ((y & 0x3FFFFFFL) << 12) | (z & 0xFFFL);
@@ -48,6 +54,10 @@ public final class SetDefaultSpawnPositionPacket implements FallbackPacket {
 
       if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_17)) {
         byteBuf.writeFloat(0f);
+
+        if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_9)) {
+          byteBuf.writeFloat(0f); // pitch
+        }
       }
     }
   }
