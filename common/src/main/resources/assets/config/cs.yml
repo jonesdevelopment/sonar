@@ -44,7 +44,7 @@ attack-tracker:
 # Nicméně, IP adresy nemůžou být vystopovány zpátky k hráči, protože Sonar používá UUID na ukládní místo jmeno hráčů
 database:
   # Typy datábázi se kterýma Sonar bude pracovat
-  # Typy: NONE, MYSQL, MARIADB, H2
+  # Typy: NONE, MYSQL, MARIADB, POSTGRESQL, H2
   type: NONE
   # Soubor v adresáři zásuvných modulů Sonaru použitý pro databázi H2
   filename: verified_players

@@ -42,7 +42,7 @@ attack-tracker:
 # Nota: Endereços IP são salvos em texto simples. Você é responsável por manter seu banco de dados seguro!
 database:
   # Tipo de banco de dados que o Sonar usa para armazenar jogadores verificados
-  # Tipos possíveis: NONE, MYSQL, MARIADB, H2
+  # Tipos possíveis: NONE, MYSQL, MARIADB, POSTGRESQL, H2
   type: NONE
   # Arquivo no diretório de plugins do Sonar usado para o banco de dados H2
   filename: verified_players
