@@ -43,7 +43,7 @@ attack-tracker:
 # Note: IP addresses are saved in plain text. You are responsible for keeping your database safe!
 database:
   # Type of database Sonar uses to store verified players
-  # Possible types: NONE, MYSQL, MARIADB, H2
+  # Possible types: NONE, MYSQL, MARIADB, POSTGRESQL, H2
   type: NONE
   # File in Sonar's plugin directory used for the H2 database
   filename: verified_players

@@ -30,6 +30,7 @@ import xyz.jonesdev.sonar.api.command.SonarCommand;
 import xyz.jonesdev.sonar.api.database.ormlite.H2DatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.database.ormlite.MariaDbDatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.database.ormlite.MysqlDatabaseTypeAdapter;
+import xyz.jonesdev.sonar.api.database.ormlite.PostgresDatabaseTypeAdapter;
 import xyz.jonesdev.sonar.api.webhook.DiscordWebhook;
 
 import java.io.File;
@@ -467,6 +468,13 @@ public final class SonarConfiguration {
           .artifactId("h2")
           .version("2.2.220")
           .relocate("org{}h2", "xyz{}jonesdev{}sonar{}libs{}h2")
+          .build()),
+      POSTGRESQL("PostgreSQL", "jdbc:postgresql://%s:%d/%s%s", new PostgresDatabaseTypeAdapter(),
+        Library.builder()
+          .groupId("org{}postgresql")
+          .artifactId("postgresql")
+          .version("42.7.8")
+          .relocate("org{}postgresql", "xyz{}jonesdev{}sonar{}libs{}postgresql")
           .build()),
       NONE("None", null, null, null);
 

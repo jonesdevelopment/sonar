@@ -62,6 +62,7 @@ allprojects {
       relocate("org.mariadb", "xyz.jonesdev.sonar.libs.mariadb")
       relocate("org.h2", "xyz.jonesdev.sonar.libs.h2")
       relocate("com.jhlabs", "xyz.jonesdev.sonar.libs.jhlabs")
+      relocate("org.postgresql", "xyz.jonesdev.sonar.libs.postgresql")
 
       // Exclude unnecessary metadata information
       exclude("META-INF/*/**")

@@ -43,7 +43,7 @@ attack-tracker:
 # Uwaga: Adresy IP są zapisywane w postaci zwykłego tekstu. Jesteś odpowiedzialny za bezpieczeństwo swojej bazy danych!
 database:
   # Typ bazy danych używanej przez Sonar.
-  # Dostępne rodzaje: NONE, MYSQL, MARIADB, H2
+  # Dostępne rodzaje: NONE, MYSQL, MARIADB, POSTGRESQL, H2
   type: NONE
   # Plik w folderze pluginu używany dla bazy danych H2
   filename: verified_players
