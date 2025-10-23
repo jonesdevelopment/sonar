@@ -169,11 +169,13 @@ public abstract class FallbackInboundHandlerAdapter extends ChannelInboundHandle
                                     final @NotNull InetAddress inetAddress,
                                     final @NotNull Runnable loginPacket) throws Exception {
     final int maxOnlinePerIp = Sonar.get0().getConfig().getMaxOnlinePerIp();
-    final int newCount = Sonar.get0().getFallback().getOnline().compute(inetAddress,
-      (__, count) -> count == null ? 1 : count + 1);
-    if (newCount > maxOnlinePerIp) {
-      customDisconnect(channel, tooManyOnlinePerIP, protocolVersion);
-      return;
+    if (maxOnlinePerIp > 0) {
+      final int newCount = Sonar.get0().getFallback().getOnline().compute(inetAddress,
+        (__, count) -> count == null ? 1 : count + 1);
+      if (newCount > maxOnlinePerIp) {
+        customDisconnect(channel, tooManyOnlinePerIP, protocolVersion);
+        return;
+      }
     }
     loginPacket.run();
   }
