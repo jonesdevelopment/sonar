@@ -53,6 +53,9 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
 
   @Override
   protected void initChannel(final Channel channel) throws Exception {
+    if (channel == null || !channel.isActive()) {
+      return;
+    }
     // Invoke the original method
     try {
       INIT_CHANNEL_METHOD.invokeExact(originalChannelInitializer, channel);
