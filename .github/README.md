@@ -57,10 +57,11 @@ If you or one of your players experiences a false positive, make sure to report 
 ## Sponsors
 Massive thanks to the sponsors of Sonar who help keep this project running:
 
-<a href="https://github.com/Hydoxl"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/107579333?v=4&h=50&w=50&fit=cover&mask=circle&maxage=7d" alt="logo" align="center"></a>
+<a href="https://github.com/Chumb3x"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/79834154?v=4&h=50&w=50&fit=cover&mask=circle&maxage=7d" alt="logo" align="center"></a>
 
 ### Past Sponsors
 
+<a href="https://github.com/Hydoxl"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/107579333?v=4&h=50&w=50&fit=cover&mask=circle&maxage=7d" alt="logo" align="center"></a>
 <a href="https://github.com/ItzErpandX"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/84748484?v=4?s=400?v=4&h=50&w=50&fit=cover&mask=circle&maxage=7d" alt="logo" align="center"></a>
 
 ## Building
