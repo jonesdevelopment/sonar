@@ -28,6 +28,7 @@ import xyz.jonesdev.sonar.api.config.SonarConfiguration;
 import xyz.jonesdev.sonar.api.event.impl.CaptchaGenerationStartEvent;
 import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
+import xyz.jonesdev.sonar.captcha.complex.ComplexCaptchaGenerator;
 import xyz.jonesdev.sonar.captcha.legacy.LegacyCaptchaGenerator;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockType;
 import xyz.jonesdev.sonar.common.fallback.protocol.block.BlockUpdate;
@@ -262,12 +263,24 @@ public class FallbackPreparer {
 
       if (generationStartEvent.getCaptchaGenerator() == null
         || generationStartEvent.getCaptchaGenerator() instanceof StandardCaptchaGenerator
-        || generationStartEvent.getCaptchaGenerator() instanceof LegacyCaptchaGenerator) {
+        || generationStartEvent.getCaptchaGenerator() instanceof LegacyCaptchaGenerator
+        || generationStartEvent.getCaptchaGenerator() instanceof ComplexCaptchaGenerator) {
         final File backgroundImage = Sonar.get0().getConfig().getVerification().getMap().getBackgroundImage();
-        final boolean useLegacyCaptchaGenerator = Sonar.get0().getConfig().getGeneralConfig()
-          .getString("verification.checks.map-captcha.style").equalsIgnoreCase("legacy");
-        Sonar.get0().getFallback().setCaptchaGenerator(useLegacyCaptchaGenerator
-          ? new LegacyCaptchaGenerator(backgroundImage) : new StandardCaptchaGenerator(backgroundImage));
+        switch (Sonar.get0().getConfig().getGeneralConfig()
+          .getString("verification.checks.map-captcha.style").toLowerCase()) {
+          case "legacy": {
+            Sonar.get0().getFallback().setCaptchaGenerator(new LegacyCaptchaGenerator(backgroundImage));
+            break;
+          }
+          case "complex": {
+            Sonar.get0().getFallback().setCaptchaGenerator(new ComplexCaptchaGenerator(backgroundImage));
+            break;
+          }
+          default: {;
+            Sonar.get0().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(backgroundImage));
+            break;
+          }
+        }
       } else {
         Sonar.get0().getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
       }

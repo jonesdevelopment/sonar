@@ -111,6 +111,7 @@ verification:
       background: ''
       # Stijl van de CAPTCHA kaart (Standaard: 'modern').
       # Om het oude ontwerp te gebruiken, stel je dit in op 'legacy'.
+      # To use an experimental design, set this to 'complex'.
       style: 'modern'
       # Hoeveel antwoorden moet Sonar voorbereiden?
       # Deze taak gebeurt asynchroon op de achtergrond

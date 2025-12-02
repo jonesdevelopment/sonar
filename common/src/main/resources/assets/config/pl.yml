@@ -111,6 +111,7 @@ verification:
       background: ''
       # Styl mapy CAPTCHA (domyślnie: 'nowoczesny').
       # Aby użyć starego projektu, ustaw to na 'legacy'.
+      # To use an experimental design, set this to 'complex'.
       style: 'modern'
       # Ile możliwych odpowiedzi powinien przygotować Sonar?
       # Zadanie to wykonywane jest asynchronicznie w tle

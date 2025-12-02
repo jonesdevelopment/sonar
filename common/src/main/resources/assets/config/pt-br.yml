@@ -110,6 +110,7 @@ verification:
       background: ''
       # Estilo do CAPTCHA do mapa (Padrão: 'modern').
       # Para usar o design antigo, defina-o como 'legacy'.
+      # To use an experimental design, set this to 'complex'.
       style: 'modern'
       # Quantas respostas de CAPTCHA o Sonar deve preparar?
       # Esta tarefa acontece de forma assíncrona em segundo plano

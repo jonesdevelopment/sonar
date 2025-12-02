@@ -49,8 +49,11 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private static final Random RANDOM = new Random();
   private static final Color[] COLORS = new Color[4];
   private static final float[] COLOR_FRACTIONS = new float[COLORS.length];
+  static final Font FONT;
 
   static {
+    FONT = TTFFontProvider.loadFont("/assets/fonts/Kingthings_Trypewriter_2.ttf");
+
     FBM.setAmount(0.6f);
     FBM.setScale(15);
 
@@ -124,8 +127,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
 
     for (int i = 0; i < answer.length; i++) {
       // Create a glyph vector for the character with a random font
-      final Font font = StandardTTFFontProvider.FONTS[RANDOM.nextInt(StandardTTFFontProvider.FONTS.length)];
-      glyphs[i] = font.createGlyphVector(ctx, String.valueOf(answer[i]));
+      glyphs[i] = FONT.createGlyphVector(ctx, String.valueOf(answer[i]));
     }
 
     final double scalingXY = 5 - Math.min(answer.length, 5) * 0.65;
@@ -135,7 +137,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
       .mapToDouble(glyph -> glyph.getLogicalBounds().getWidth() * scalingXY - 1)
       .sum();
     double beginX = Math.max(Math.min(width / 2D - totalWidth / 2D, totalWidth), 0);
-    double beginY = (height + StandardTTFFontProvider.STANDARD_FONT_SIZE / 2D) / 2D + scalingXY;
+    double beginY = (height + TTFFontProvider.STANDARD_FONT_SIZE / 2D) / 2D + scalingXY;
 
     // Draw each glyph one by one
     for (final GlyphVector glyph : glyphs) {

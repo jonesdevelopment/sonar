@@ -110,6 +110,7 @@ verification:
       background: ''
       # Стиль капч (по умолчанию: 'modern').
       # Чтобы использовать старый дизайн, установите значение 'legacy'.
+      # To use an experimental design, set this to 'complex'.
       style: 'modern'
       # Сколько капч должен подготовить Sonar?
       # Эта задача выполняется асинхронно в фоновом режиме

@@ -112,6 +112,7 @@ verification:
       background: ''
       # Styl mapy CAPTCHA (Výchozí: 'modern').
       # Chcete-li použít starý design, nastavte tuto hodnotu na 'legacy'.
+      # To use an experimental design, set this to 'complex'.
       style: 'modern'
       # Kolik odpovědí by měl Sonar předgenerovat?
       # Tento úkol běží souběžně v pozadí

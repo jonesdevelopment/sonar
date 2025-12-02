@@ -109,6 +109,7 @@ verification:
       background: ''
       # Stil der Karte CAPTCHA (Standard: 'modern').
       # Um das alte Design zu verwenden, setzen Sie dies auf 'legacy'.
+      # To use an experimental design, set this to 'complex'.
       style: 'modern'
       # Wie viele Antworten soll Sonar vorbereiten?
       # Dieser Vorgang erfolgt asynchron im Hintergrund

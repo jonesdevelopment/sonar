@@ -17,26 +17,16 @@
 
 package xyz.jonesdev.sonar.captcha;
 
-import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.InputStream;
 import java.util.Objects;
 
-@UtilityClass
-class StandardTTFFontProvider {
-  private static final String[] FONT_NAMES = {"Kingthings_Trypewriter_2"};
-  static final Font[] FONTS = new Font[FONT_NAMES.length];
+public final class TTFFontProvider {
   static final int STANDARD_FONT_SIZE = 25;
 
-  static {
-    for (int i = 0; i < FONT_NAMES.length; i++) {
-      FONTS[i] = loadFont(String.format("/assets/fonts/%s.ttf", FONT_NAMES[i]));
-    }
-  }
-
-  private static Font loadFont(final @NotNull String path) {
+  public static Font loadFont(final @NotNull String path) {
     try (final InputStream inputStream = StandardCaptchaGenerator.class.getResourceAsStream(path)) {
       // Load the font from the TTF file
       final Font customFont = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(inputStream));

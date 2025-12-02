@@ -111,6 +111,7 @@ verification:
       background: ''
       # Style of the map CAPTCHA (Default: 'modern').
       # To use the old design, set this to 'legacy'.
+      # To use an experimental design, set this to 'complex'.
       style: 'modern'
       # How many CAPTCHA answers should Sonar prepare?
       # This task happens asynchronously in the background

@@ -111,6 +111,7 @@ verification:
       background: ''
       # რუკის სტილი CAPTCHA (ნაგულისხმევი: 'modern').
       # ძველი დიზაინის გამოსაყენებლად დააყენეთ ეს 'legacy'.
+      # To use an experimental design, set this to 'complex'.
       style: 'modern'
       # რამდენი პასუხი უნდა მოამზადოს Sonar-მა?
       # ეს ხდება ასინქრონულად (ანუ ამის გამოთვლას სერვერი არ დაელოდება) უკანა ფონზე
