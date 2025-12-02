@@ -235,7 +235,6 @@ public class FallbackPreparer {
 
     if (Sonar.get0().getConfig().getVerification().getMap().getTiming() != SonarConfiguration.Verification.Timing.NEVER
       || Sonar.get0().getConfig().getVerification().getGravity().isCaptchaOnFail()) {
-      // Prepare CAPTCHA messages
       enterCodeMessage = new FallbackPacketSnapshot(new SystemChatPacket(new ComponentHolder(
         MiniMessage.miniMessage().deserialize(
           Sonar.get0().getConfig().getMessagesConfig().getString("verification.captcha.enter"),
@@ -248,7 +247,6 @@ public class FallbackPreparer {
             Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
             Placeholder.unparsed("attempts-left", String.valueOf(i + 1))))));
       }
-      // Prepare countdown
       xpCountdown = new FallbackPacket[Sonar.get0().getConfig().getVerification().getMap().getMaxDuration() / 1000];
 
       for (int i = 0; i < xpCountdown.length; i++) {
@@ -256,7 +254,6 @@ public class FallbackPreparer {
         xpCountdown[i] = new FallbackPacketSnapshot(new SetExperiencePacket(bar, i, 0));
       }
 
-      // Update the CAPTCHA generator if necessary
       final CaptchaGenerationStartEvent generationStartEvent = new CaptchaGenerationStartEvent(
         Sonar.get0().getFallback().getCaptchaGenerator());
       Sonar.get0().getEventManager().publish(generationStartEvent);
@@ -268,27 +265,22 @@ public class FallbackPreparer {
         final File backgroundImage = Sonar.get0().getConfig().getVerification().getMap().getBackgroundImage();
         switch (Sonar.get0().getConfig().getGeneralConfig()
           .getString("verification.checks.map-captcha.style").toLowerCase()) {
-          case "legacy": {
+          case "legacy":
             Sonar.get0().getFallback().setCaptchaGenerator(new LegacyCaptchaGenerator(backgroundImage));
             break;
-          }
-          case "complex": {
+          case "complex":
             Sonar.get0().getFallback().setCaptchaGenerator(new ComplexCaptchaGenerator(backgroundImage));
             break;
-          }
-          default: {;
+          default:
             Sonar.get0().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(backgroundImage));
             break;
-          }
         }
       } else {
         Sonar.get0().getLogger().info("Custom CAPTCHA generator detected, skipping reinitialization.");
       }
 
-      // Prepare CAPTCHA answers
       CaptchaPreparer.prepare();
     } else {
-      // Throw away if not needed
       enterCodeMessage = null;
       incorrectCaptcha = null;
       xpCountdown = null;
