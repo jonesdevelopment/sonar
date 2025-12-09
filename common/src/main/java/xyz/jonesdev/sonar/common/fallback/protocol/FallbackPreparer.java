@@ -97,6 +97,7 @@ public class FallbackPreparer {
   public final FallbackPacket[] REGISTRY_SYNC_1_21_2 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_2);
   public final FallbackPacket[] REGISTRY_SYNC_1_21_4 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_4);
   public final FallbackPacket[] REGISTRY_SYNC_1_21_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_5);
+  public final FallbackPacket[] REGISTRY_SYNC_1_21_11 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_11);
   public final FallbackPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
   public final static FallbackPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
   public final FallbackPacket RANDOM_KEEP_ALIVE = new FallbackPacketSnapshot(new KeepAlivePacket(RANDOM.nextInt()));
@@ -295,7 +296,9 @@ public class FallbackPreparer {
   }
 
   public static FallbackPacket[] getRegistryPackets(final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_11)) {
+      return REGISTRY_SYNC_1_21_11;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
       return REGISTRY_SYNC_1_21_5;
     } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_4)) {
       return REGISTRY_SYNC_1_21_4;

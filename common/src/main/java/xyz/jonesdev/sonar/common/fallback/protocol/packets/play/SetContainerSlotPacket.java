@@ -60,10 +60,10 @@ public final class SetContainerSlotPacket implements FallbackPacket {
       ProtocolUtil.writeVarInt(byteBuf, count);
     }
 
-    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_13_2)) {
-      byteBuf.writeShort(itemType.getId().apply(protocolVersion));
-    } else {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_13_2)) {
       ProtocolUtil.writeVarInt(byteBuf, itemType.getId().apply(protocolVersion));
+    } else {
+      byteBuf.writeShort(itemType.getId().apply(protocolVersion));
     }
 
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {
@@ -83,8 +83,8 @@ public final class SetContainerSlotPacket implements FallbackPacket {
     } else if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_20_5)) {
       ProtocolUtil.writeBinaryTag(byteBuf, protocolVersion, compoundBinaryTag);
     } else {
-      ProtocolUtil.writeVarInt(byteBuf, 1); // component count to add
-      ProtocolUtil.writeVarInt(byteBuf, 0); // component count to remove
+      ProtocolUtil.writeVarInt(byteBuf, 1); // addedComponentCount
+      ProtocolUtil.writeVarInt(byteBuf, 0); // removedComponentCount
       ProtocolUtil.writeVarInt(byteBuf, itemType.getComponents().apply(protocolVersion));
       ProtocolUtil.writeVarInt(byteBuf, 0); // data
     }
