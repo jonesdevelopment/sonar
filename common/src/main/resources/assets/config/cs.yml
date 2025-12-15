@@ -131,7 +131,7 @@ verification:
       # Měl by Sonar zkoušet pro validitu "client brandu"? (Doporučeno)
       enabled: true
       # Regex pro validitaci "client brand"
-      valid-regex: ^[!-~ ]+$
+      valid-regex: ^[!-~ §]+$
       # Maximální délka "client brand" při verifikaci
       max-length: 64
 

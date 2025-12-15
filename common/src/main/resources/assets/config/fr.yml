@@ -130,7 +130,7 @@ verification:
       # Sonar devrait-il vérifier les marques client valides ? (Recommandé)
       enabled: true
       # Regex pour valider les marques client lors de la vérification
-      valid-regex: ^[!-~ ]+$
+      valid-regex: ^[!-~ §]+$
       # Longueur maximale de la marque client lors de la vérification
       max-length: 64
 

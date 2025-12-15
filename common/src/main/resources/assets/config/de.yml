@@ -128,7 +128,7 @@ verification:
       # Soll Sonar auf gültige Client-Marken prüfen? (Empfohlen)
       enabled: true
       # Regex zur Validierung von Client-Marken während der Überprüfung
-      valid-regex: ^[!-~ ]+$
+      valid-regex: ^[!-~ §]+$
       # Maximale Länge der Client-Marke während der Überprüfung
       max-length: 64
 

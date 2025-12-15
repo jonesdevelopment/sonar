@@ -130,7 +130,7 @@ verification:
       # Czy Sonar powinien sprawdzać poprawność client brand? (Zalecane)
       enabled: true
       # Regex do sprawdzania poprawności client brand podczas weryfikacji
-      valid-regex: ^[!-~ ]+$
+      valid-regex: ^[!-~ §]+$
       # Maksymalna długość wartości client brand podczas weryfikacji
       max-length: 64
 

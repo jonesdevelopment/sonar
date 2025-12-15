@@ -128,7 +128,7 @@ verification:
       # 是否启用此检查? (建议启用)
       enabled: true
       # 用于检查客户端标识符的正则表达式
-      valid-regex: ^[!-~ ]+$
+      valid-regex: ^[!-~ §]+$
       # 客户端标识符的最长长度限制
       max-length: 64
 

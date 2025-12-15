@@ -130,7 +130,7 @@ verification:
       # Moet Sonar controleren op geldige Minecraft-klantmerk? (Aanbevolen)
       enabled: true
       # Regex voor het valideren van Minecraft-klantmerken tijdens verificatie
-      valid-regex: ^[!-~ ]+$
+      valid-regex: ^[!-~ §]+$
       # Maximale lengte van het Minecraft-klantmerk tijdens verificatie
       max-length: 64
 
