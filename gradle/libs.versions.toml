@@ -1,6 +1,6 @@
 [versions]
 netty = "4.2.7.Final"
-adventure = "4.24.0"
+adventure = "4.26.1"
 adventure-platform = "4.4.1"
 bstats = "3.1.0"
 libby = "2.0.0-SNAPSHOT"
