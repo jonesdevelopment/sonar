@@ -86,8 +86,6 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
       final int slotId = heldItemPacket.getSlot();
       // Also check if the player sent an invalid slot which is impossible by vanilla protocol
       checkState(slotId >= 0 && slotId <= 8, "slot out of range: " + slotId);
-      // Check if the player sent a duplicate slot packet which is impossible by vanilla protocol
-      checkState(slotId != currentClientSlotId, "duplicate slot: " + slotId);
 
       // Only continue checking if we're actually expecting a SetHeldItem packet
       if (expectedSlotId != -1
@@ -148,12 +146,7 @@ public final class FallbackProtocolHandler extends FallbackVerificationHandler {
     user.delayedWrite(INVALID_HELD_ITEM_SLOT);
     // Increment the player's slot by a random slot, and then modulo it by the maximum slot (8)
     expectedSlotId = (currentClientSlotId + 1 + RANDOM.nextInt(7)) % 8;
-    // Send two SetHeldItem packets with the same slot to check if the player responds with the correct slot.
-    // By vanilla protocol, the client does not respond to duplicate SetHeldItem packets.
-    // We can take advantage of this by sending two packets with the same content to check for a valid response.
-    final SetHeldItemPacket heldItemPacket = new SetHeldItemPacket(expectedSlotId);
-    user.delayedWrite(heldItemPacket);
-    user.delayedWrite(heldItemPacket);
+    user.delayedWrite(new SetHeldItemPacket(expectedSlotId));
     user.channel().flush();
   }
 
