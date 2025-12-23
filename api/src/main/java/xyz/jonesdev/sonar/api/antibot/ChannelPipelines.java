@@ -18,14 +18,14 @@
 package xyz.jonesdev.sonar.api.antibot;
 
 public interface ChannelPipelines {
-  String FALLBACK_INACTIVE_LISTENER = "sonar-inactive-listener";
-  String FALLBACK_INBOUND_HANDLER = "sonar-inbound-handler";
-  String FALLBACK_FRAME_DECODER = "sonar-frame-decoder";
-  String FALLBACK_FRAME_ENCODER = "sonar-frame-encoder";
-  String FALLBACK_TIMEOUT = "sonar-timeout";
-  String FALLBACK_PACKET_HANDLER = "sonar-packet-handler";
-  String FALLBACK_PACKET_ENCODER = "sonar-packet-encoder";
-  String FALLBACK_PACKET_DECODER = "sonar-packet-decoder";
-  String FALLBACK_TAIL_EXCEPTIONS = "sonar-exception-tail";
-  String FALLBACK_BANDWIDTH = "sonar-bandwidth-counter";
+  String SONAR_INACTIVE_LISTENER = "sonar-inactive-listener";
+  String SONAR_INBOUND_HANDLER = "sonar-inbound-handler";
+  String SONAR_FRAME_DECODER = "sonar-frame-decoder";
+  String SONAR_FRAME_ENCODER = "sonar-frame-encoder";
+  String SONAR_TIMEOUT = "sonar-timeout";
+  String SONAR_PACKET_HANDLER = "sonar-packet-handler";
+  String SONAR_PACKET_ENCODER = "sonar-packet-encoder";
+  String SONAR_PACKET_DECODER = "sonar-packet-decoder";
+  String SONAR_TAIL_EXCEPTIONS = "sonar-exception-tail";
+  String SONAR_BANDWIDTH = "sonar-bandwidth-counter";
 }

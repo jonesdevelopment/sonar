@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.fallback;
+package xyz.jonesdev.sonar.bungee.antibot;
 
 import io.netty.channel.ChannelHandlerContext;
 import net.md_5.bungee.netty.ChannelWrapper;

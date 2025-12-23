@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-public final class FallbackTimeoutHandler extends IdleStateHandler {
-  public FallbackTimeoutHandler(final int readTimeout, final int writeTimeout, final TimeUnit timeUnit) {
+public final class SonarTimeoutHandler extends IdleStateHandler {
+  public SonarTimeoutHandler(final int readTimeout, final int writeTimeout, final TimeUnit timeUnit) {
     super(false, readTimeout, writeTimeout, 0L, timeUnit);
   }
 

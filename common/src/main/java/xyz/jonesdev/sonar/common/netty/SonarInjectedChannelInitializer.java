@@ -33,10 +33,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.function.Consumer;
 
-import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_INBOUND_HANDLER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.SONAR_INBOUND_HANDLER;
 
 @RequiredArgsConstructor
-public final class FallbackInjectedChannelInitializer extends ChannelInitializer<Channel> {
+public final class SonarInjectedChannelInitializer extends ChannelInitializer<Channel> {
   private static final MethodHandle INIT_CHANNEL_METHOD;
 
   static {
@@ -75,9 +75,9 @@ public final class FallbackInjectedChannelInitializer extends ChannelInitializer
       // We need to be careful on Bukkit, as the encoder can be different
       if (Sonar.get0().getPlatform() == SonarPlatform.BUKKIT) {
         final String encoder = Sonar.get0().getPlatform().getEncoder().apply(channel.pipeline());
-        channel.pipeline().addBefore(encoder, FALLBACK_INBOUND_HANDLER, inboundHandler);
+        channel.pipeline().addBefore(encoder, SONAR_INBOUND_HANDLER, inboundHandler);
       } else {
-        channel.pipeline().addFirst(FALLBACK_INBOUND_HANDLER, inboundHandler);
+        channel.pipeline().addFirst(SONAR_INBOUND_HANDLER, inboundHandler);
       }
     }
   }

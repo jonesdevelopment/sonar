@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.velocity.fallback;
+package xyz.jonesdev.sonar.velocity.antibot;
 
 import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.network.ConnectionManager;
@@ -23,16 +23,16 @@ import com.velocitypowered.proxy.network.ServerChannelInitializerHolder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import lombok.experimental.UtilityClass;
-import xyz.jonesdev.sonar.common.netty.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.netty.SonarInjectedChannelInitializer;
 import xyz.jonesdev.sonar.common.util.exception.ReflectiveOperationException;
 
 import java.lang.reflect.Field;
 
 import static com.velocitypowered.proxy.network.Connections.MINECRAFT_DECODER;
-import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_PACKET_HANDLER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.SONAR_PACKET_HANDLER;
 
 @UtilityClass
-public class FallbackVelocityInjector {
+public class VelocityInjector {
   private final Field CONNECTION_MANAGER_FIELD;
   private final Field SERVER_CHANNEL_INITIALIZER_FIELD;
 
@@ -54,8 +54,8 @@ public class FallbackVelocityInjector {
 
       // Make sure to store the original channel initializer
       final ChannelInitializer<Channel> originalInitializer = connectionManager.serverChannelInitializer.get();
-      final ChannelInitializer<Channel> injectedInitializer = new FallbackInjectedChannelInitializer(
-        originalInitializer, pipeline -> pipeline.addAfter(MINECRAFT_DECODER, FALLBACK_PACKET_HANDLER,
+      final ChannelInitializer<Channel> injectedInitializer = new SonarInjectedChannelInitializer(
+        originalInitializer, pipeline -> pipeline.addAfter(MINECRAFT_DECODER, SONAR_PACKET_HANDLER,
         new VelocityInboundHandler()));
 
       // Replace the original channel initializer

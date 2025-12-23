@@ -152,11 +152,11 @@ public interface Sonar {
   }
 
   /**
-   * Gets the anti-bot handler (called "Fallback") for Sonar.
+   * Gets the anti-bot handler for Sonar.
    *
    * @return The {@link AntiBot} instance.
    */
-  @NotNull default AntiBot getFallback() {
+  @NotNull default AntiBot getAntiBot() {
     return AntiBot.INSTANCE;
   }
 

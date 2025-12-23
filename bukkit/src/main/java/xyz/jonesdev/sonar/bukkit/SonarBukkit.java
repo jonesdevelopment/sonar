@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.bukkit.antibot.BukkitInjector;
 import xyz.jonesdev.sonar.bukkit.command.BukkitSonarCommand;
-import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
 import xyz.jonesdev.sonar.bukkit.listener.BukkitJoinListener;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
@@ -108,8 +108,8 @@ public final class SonarBukkit extends SonarBootstrap<SonarBukkitPlugin> {
     Objects.requireNonNull(getPlugin().getCommand("sonar")).setExecutor(new BukkitSonarCommand());
 
     // Try to inject into the server
-    if (FallbackBukkitInjector.isLateBindEnabled()) {
-      getPlugin().getServer().getScheduler().runTask(getPlugin(), FallbackBukkitInjector::inject);
+    if (BukkitInjector.isLateBindEnabled()) {
+      getPlugin().getServer().getScheduler().runTask(getPlugin(), BukkitInjector::inject);
     } else {
       getPlugin().getServer().getPluginManager().registerEvents(new BukkitJoinListener(), getPlugin());
     }

@@ -54,9 +54,9 @@ public final class ChatNotificationHandler extends NotificationHandler {
     for (int i = 0; i < chatNotificationComponents.length; i++) {
       chatNotificationComponents[i] = MiniMessage.miniMessage().deserialize(chatNotification.get(i),
         Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
-        Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getQueue().getPlayers().size())),
-        Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getConnected().size())),
-        Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get0().getFallback().getBlacklist().estimatedSize())),
+        Placeholder.unparsed("queued", DECIMAL_FORMAT.format(Sonar.get0().getAntiBot().getQueue().getPlayers().size())),
+        Placeholder.unparsed("verifying", DECIMAL_FORMAT.format(Sonar.get0().getAntiBot().getConnected().size())),
+        Placeholder.unparsed("blacklisted", DECIMAL_FORMAT.format(Sonar.get0().getAntiBot().getBlacklist().estimatedSize())),
         Placeholder.unparsed("total-joins", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalPlayersJoined())),
         Placeholder.unparsed("logins-per-second", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getLoginsPerSecond())),
         Placeholder.unparsed("connections-per-second", DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getConnectionsPerSecond())),

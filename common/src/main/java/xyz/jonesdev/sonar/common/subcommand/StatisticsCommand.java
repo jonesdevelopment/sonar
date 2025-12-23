@@ -73,9 +73,9 @@ public final class StatisticsCommand extends Subcommand {
         placeholders = new TagResolver.Single[]{
           Placeholder.component("prefix", Sonar.get0().getConfig().getPrefix()),
           Placeholder.unparsed("verified", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getVerifiedPlayerController().getCache().size())),
-          Placeholder.unparsed("verifying", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getFallback().getConnected().size())),
-          Placeholder.unparsed("blacklisted", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getFallback().getBlacklist().estimatedSize())),
-          Placeholder.unparsed("queued", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getFallback().getQueue().getPlayers().size())),
+          Placeholder.unparsed("verifying", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getAntiBot().getConnected().size())),
+          Placeholder.unparsed("blacklisted", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getAntiBot().getBlacklist().estimatedSize())),
+          Placeholder.unparsed("queued", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getAntiBot().getQueue().getPlayers().size())),
           Placeholder.unparsed("server-uptime", serverUptime),
           Placeholder.unparsed("total-joins", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalPlayersJoined())),
           Placeholder.unparsed("total-attempts", Sonar.DECIMAL_FORMAT.format(Sonar.get0().getStatistics().getTotalAttemptedVerifications())),

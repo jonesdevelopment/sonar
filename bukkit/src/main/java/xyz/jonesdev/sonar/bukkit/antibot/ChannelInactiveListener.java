@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bukkit.fallback;
+package xyz.jonesdev.sonar.bukkit.antibot;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;

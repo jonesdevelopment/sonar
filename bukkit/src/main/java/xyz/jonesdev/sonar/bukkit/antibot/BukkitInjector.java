@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bukkit.fallback;
+package xyz.jonesdev.sonar.bukkit.antibot;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -26,7 +26,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.common.netty.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.netty.SonarInjectedChannelInitializer;
 import xyz.jonesdev.sonar.common.util.exception.ReflectiveOperationException;
 
 import java.lang.reflect.Field;
@@ -34,8 +34,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
-import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_INACTIVE_LISTENER;
-import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_PACKET_DECODER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.SONAR_INACTIVE_LISTENER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.SONAR_PACKET_DECODER;
 import static xyz.jonesdev.sonar.bukkit.SonarBukkit.INITIALIZE_LISTENER;
 
 // Check out these links if you want to see some more magic
@@ -43,7 +43,7 @@ import static xyz.jonesdev.sonar.bukkit.SonarBukkit.INITIALIZE_LISTENER;
 // https://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol/src/main/java/com/comphenix/tinyprotocol/TinyProtocol.java
 // https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/handlers/BukkitChannelInitializer.java
 @UtilityClass
-public class FallbackBukkitInjector {
+public class BukkitInjector {
   private final String LEGACY_NMS_PACKAGE;
   private final String OBC_PACKAGE;
 
@@ -253,10 +253,10 @@ public class FallbackBukkitInjector {
 
           INITIALIZE_LISTENER.thenAccept(__ -> {
             try {
-              childHandlerField.set(_bootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
+              childHandlerField.set(_bootstrap, new SonarInjectedChannelInitializer(originalInitializer,
                 pipeline -> {
-                  pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new BukkitInboundHandler());
-                  pipeline.addFirst(FALLBACK_INACTIVE_LISTENER, new ChannelInactiveListener());
+                  pipeline.addAfter("splitter", SONAR_PACKET_DECODER, new BukkitInboundHandler());
+                  pipeline.addFirst(SONAR_INACTIVE_LISTENER, new ChannelInactiveListener());
                 }
               ));
             } catch (IllegalAccessException exception) {

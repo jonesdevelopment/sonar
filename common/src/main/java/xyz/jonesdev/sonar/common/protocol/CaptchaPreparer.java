@@ -62,7 +62,7 @@ public class CaptchaPreparer {
         for (int j = 0; j < answer.length; j++) {
           answer[j] = alphabet[RANDOM.nextInt(alphabet.length)];
         }
-        final BufferedImage image = Sonar.get0().getFallback().getCaptchaGenerator().createImage(answer);
+        final BufferedImage image = Sonar.get0().getAntiBot().getCaptchaGenerator().createImage(answer);
         // Convert and cache converted Minecraft map bytes
         cached[preparedAmount++] = new MapCaptchaInfo(new String(answer), MapColorPalette.imageToBuffer(image));
       }

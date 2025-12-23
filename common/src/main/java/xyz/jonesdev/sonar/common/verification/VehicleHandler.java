@@ -142,7 +142,7 @@ public final class VehicleHandler extends VerificationHandler {
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
-    if (user.isForceCaptcha() || Sonar.get0().getFallback().shouldPerformCaptcha()) {
+    if (user.isForceCaptcha() || Sonar.get0().getAntiBot().shouldPerformCaptcha()) {
       user.channel().pipeline().get(SonarPacketDecoder.class).setListener(new CaptchaHandler(user));
     } else {
       finishVerification();

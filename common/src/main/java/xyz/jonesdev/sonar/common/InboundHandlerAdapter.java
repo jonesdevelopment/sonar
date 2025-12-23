@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.fingerprint.FingerprintingUtil;
-import xyz.jonesdev.sonar.common.netty.FallbackTimeoutHandler;
+import xyz.jonesdev.sonar.common.netty.SonarTimeoutHandler;
 import xyz.jonesdev.sonar.common.protocol.SonarPacket;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketRegistry;
@@ -64,7 +64,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
       throw QuietDecoderException.INSTANCE;
     }
     protocolVersion = ProtocolVersion.fromId(protocol);
-    ctx.pipeline().addFirst(FALLBACK_BANDWIDTH, BandwidthHandler.INSTANCE);
+    ctx.pipeline().addFirst(SONAR_BANDWIDTH, BandwidthHandler.INSTANCE);
   }
 
   /**
@@ -96,8 +96,8 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
     final InetAddress inetAddress = socketAddress.getAddress();
     ctx.pipeline().get(InboundHandler.class).setInetAddress(inetAddress);
 
-    // Check if Fallback is already verifying a player with the same IP address
-    if (Sonar.get0().getFallback().getConnected().containsKey(inetAddress)) {
+    // Check if Sonar is already verifying a player with the same IP address
+    if (Sonar.get0().getAntiBot().getConnected().containsKey(inetAddress)) {
       customDisconnect(ctx.channel(), alreadyVerifying, protocolVersion);
       return;
     }
@@ -112,7 +112,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
     // Check if the player failed the verification too many times
     final int limit = Sonar.get0().getConfig().getVerification().getBlacklistThreshold();
     if (limit > 0) {
-      final int score = Sonar.get0().getFallback().getBlacklist().asMap().getOrDefault(hostAddress, 0);
+      final int score = Sonar.get0().getAntiBot().getBlacklist().asMap().getOrDefault(hostAddress, 0);
       if (score >= limit) {
         customDisconnect(ctx.channel(), blacklisted, protocolVersion);
         return;
@@ -120,7 +120,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
     }
 
     // Don't continue the verification process if the verification is disabled
-    if (!Sonar.get0().getFallback().shouldVerifyNewPlayers()) {
+    if (!Sonar.get0().getAntiBot().shouldVerifyNewPlayers()) {
       initialLogin(ctx.channel(), inetAddress, initialLoginAction);
       return;
     }
@@ -140,7 +140,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
     }
 
     // Check if the IP address is currently being rate-limited
-    if (!Sonar.get0().getFallback().getRatelimiter().attempt(inetAddress)) {
+    if (!Sonar.get0().getAntiBot().getRatelimiter().attempt(inetAddress)) {
       customDisconnect(ctx.channel(), reconnectedTooFast, protocolVersion);
       return;
     }
@@ -149,7 +149,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
     rewriteProtocol(ctx, channelRemovalListener);
 
     // Queue the connection for further processing
-    Sonar.get0().getFallback().getQueue().getPlayers().compute(inetAddress, (__, runnable) -> {
+    Sonar.get0().getAntiBot().getQueue().getPlayers().compute(inetAddress, (__, runnable) -> {
       // Check if the player is already queued since we don't want bots to flood the queue
       if (runnable != null) {
         customDisconnect(ctx.channel(), alreadyQueued, protocolVersion);
@@ -170,7 +170,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
                                     final @NotNull Runnable loginPacket) throws Exception {
     final int maxOnlinePerIp = Sonar.get0().getConfig().getMaxOnlinePerIp();
     if (maxOnlinePerIp > 0) {
-      final int newCount = Sonar.get0().getFallback().getOnline().compute(inetAddress,
+      final int newCount = Sonar.get0().getAntiBot().getOnline().compute(inetAddress,
         (__, count) -> count == null ? 1 : count + 1);
       if (newCount > maxOnlinePerIp) {
         customDisconnect(channel, tooManyOnlinePerIP, protocolVersion);
@@ -200,7 +200,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
       }
     }
     // Add our read/write timeout handler
-    ctx.pipeline().addFirst(FALLBACK_TIMEOUT, new FallbackTimeoutHandler(
+    ctx.pipeline().addFirst(SONAR_TIMEOUT, new SonarTimeoutHandler(
       Sonar.get0().getConfig().getVerification().getReadTimeout(),
       Sonar.get0().getConfig().getVerification().getWriteTimeout(),
       TimeUnit.MILLISECONDS));
@@ -238,7 +238,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
       if (!(currentEncoder instanceof SonarPacketEncoder)) {
         final SonarPacketEncoder newEncoder = new SonarPacketEncoder(protocolVersion);
         newEncoder.updateRegistry(SonarPacketRegistry.LOGIN);
-        channel.pipeline().replace(encoder, FALLBACK_PACKET_ENCODER, newEncoder);
+        channel.pipeline().replace(encoder, SONAR_PACKET_ENCODER, newEncoder);
       }
       ProtocolUtil.closeWith(channel, protocolVersion, packet);
     } else {

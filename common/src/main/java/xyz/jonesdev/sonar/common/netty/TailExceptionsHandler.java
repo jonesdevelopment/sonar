@@ -23,8 +23,8 @@ import io.netty.channel.ChannelHandlerContext;
 import org.jetbrains.annotations.NotNull;
 
 @ChannelHandler.Sharable
-public final class FallbackTailExceptionsHandler extends ChannelDuplexHandler {
-  public static final FallbackTailExceptionsHandler INSTANCE = new FallbackTailExceptionsHandler();
+public final class TailExceptionsHandler extends ChannelDuplexHandler {
+  public static final TailExceptionsHandler INSTANCE = new TailExceptionsHandler();
 
   // We can override the default exceptionCaught method since the server
   // does not have any other pipelines that could handle this error.

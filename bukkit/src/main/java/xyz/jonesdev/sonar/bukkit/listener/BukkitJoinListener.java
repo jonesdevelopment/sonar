@@ -24,7 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
+import xyz.jonesdev.sonar.bukkit.antibot.BukkitInjector;
 import xyz.jonesdev.sonar.common.util.FakeChannelUtil;
 
 import java.lang.invoke.MethodHandle;
@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_BANDWIDTH;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.SONAR_BANDWIDTH;
 
 // https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
 public final class BukkitJoinListener implements Listener {
@@ -46,13 +46,13 @@ public final class BukkitJoinListener implements Listener {
 
   static {
     try {
-      final Method handleMethod = FallbackBukkitInjector.getOBCClass("entity.CraftPlayer")
+      final Method handleMethod = BukkitInjector.getOBCClass("entity.CraftPlayer")
         .getDeclaredMethod("getHandle");
-      final Field listenerField = FallbackBukkitInjector.findField(false, handleMethod.getReturnType(),
+      final Field listenerField = BukkitInjector.findField(false, handleMethod.getReturnType(),
         "PlayerConnection", "ServerGamePacketListenerImpl");
-      final Field networkManagerField = FallbackBukkitInjector.findField(true, listenerField.getType(),
+      final Field networkManagerField = BukkitInjector.findField(true, listenerField.getType(),
         "NetworkManager", "Connection");
-      final Field channelField = FallbackBukkitInjector.getFieldAt(networkManagerField.getType(), Channel.class, 0);
+      final Field channelField = BukkitInjector.getFieldAt(networkManagerField.getType(), Channel.class, 0);
 
       _handleMethod = MethodHandles.lookup().unreflect(handleMethod);
       _listenerField = MethodHandles.lookup().unreflectGetter(listenerField);
@@ -88,7 +88,7 @@ public final class BukkitJoinListener implements Listener {
       }
 
       // Close the channel if Sonar's handlers are not found when the PlayerJoinEvent is called
-      if (channel.pipeline().context(FALLBACK_BANDWIDTH) == null) {
+      if (channel.pipeline().context(SONAR_BANDWIDTH) == null) {
         channel.close();
       }
     } catch (Throwable throwable) {

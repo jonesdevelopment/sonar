@@ -165,7 +165,7 @@ public final class ProtocolHandler extends VerificationHandler {
     // Pass the player to the next best verification handler
     if (!user.isGeyser() && Sonar.get0().getConfig().getVerification().getVehicle().isEnabled()) {
       user.channel().pipeline().get(SonarPacketDecoder.class).setListener(new VehicleHandler(user));
-    } else if (user.isForceCaptcha() || Sonar.get0().getFallback().shouldPerformCaptcha()) {
+    } else if (user.isForceCaptcha() || Sonar.get0().getAntiBot().shouldPerformCaptcha()) {
       user.channel().pipeline().get(SonarPacketDecoder.class).setListener(new CaptchaHandler(user));
     } else {
       // The player has passed all checks

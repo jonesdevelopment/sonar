@@ -30,9 +30,9 @@ import xyz.jonesdev.sonar.api.antibot.SonarUser;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyJoinEvent;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
-import xyz.jonesdev.sonar.common.netty.FallbackTailExceptionsHandler;
-import xyz.jonesdev.sonar.common.netty.FallbackVarInt21FrameDecoder;
-import xyz.jonesdev.sonar.common.netty.FallbackVarIntLengthEncoder;
+import xyz.jonesdev.sonar.common.netty.MinecraftVarInt21FrameDecoder;
+import xyz.jonesdev.sonar.common.netty.MinecraftVarIntLengthEncoder;
+import xyz.jonesdev.sonar.common.netty.TailExceptionsHandler;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketDecoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketPreparer;
@@ -97,23 +97,23 @@ public final class UserWrapper implements SonarUser {
       }
 
       // How? Is there some kind of de-sync or race condition?
-      if (channel.pipeline().context(FALLBACK_FRAME_ENCODER) != null) {
+      if (channel.pipeline().context(SONAR_FRAME_ENCODER) != null) {
         channel.close(); // Nope ¯\_(ツ)_/¯
         return;
       }
 
       // Mark the player as connected by caching them in a map of verifying players
-      Sonar.get0().getFallback().getConnected().compute(inetAddress, (__, v) -> true);
+      Sonar.get0().getAntiBot().getConnected().compute(inetAddress, (__, v) -> true);
 
       // Replace normal encoder to allow custom packets
       final SonarPacketEncoder newEncoder = new SonarPacketEncoder(protocolVersion);
-      channel.pipeline().addFirst(FALLBACK_FRAME_ENCODER, FallbackVarIntLengthEncoder.INSTANCE);
-      channel.pipeline().addLast(FALLBACK_PACKET_ENCODER, newEncoder);
+      channel.pipeline().addFirst(SONAR_FRAME_ENCODER, MinecraftVarIntLengthEncoder.INSTANCE);
+      channel.pipeline().addLast(SONAR_PACKET_ENCODER, newEncoder);
 
       // Replace normal decoder to allow custom packets
       final SonarPacketDecoder newDecoder = new SonarPacketDecoder(protocolVersion);
-      channel.pipeline().addFirst(FALLBACK_FRAME_DECODER, new FallbackVarInt21FrameDecoder());
-      channel.pipeline().addLast(FALLBACK_PACKET_DECODER, newDecoder);
+      channel.pipeline().addFirst(SONAR_FRAME_DECODER, new MinecraftVarInt21FrameDecoder());
+      channel.pipeline().addLast(SONAR_PACKET_DECODER, newDecoder);
 
       // We're sending the LoginSuccess packet now
       newDecoder.updateRegistry(SonarPacketRegistry.LOGIN);
@@ -131,7 +131,7 @@ public final class UserWrapper implements SonarUser {
       newDecoder.setListener(new LoginHandler(this));
 
       // Make sure to catch all exceptions during the verification
-      channel.pipeline().addLast(FALLBACK_TAIL_EXCEPTIONS, FallbackTailExceptionsHandler.INSTANCE);
+      channel.pipeline().addLast(SONAR_TAIL_EXCEPTIONS, TailExceptionsHandler.INSTANCE);
     });
   }
 

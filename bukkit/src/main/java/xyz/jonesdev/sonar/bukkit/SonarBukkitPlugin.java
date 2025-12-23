@@ -18,7 +18,7 @@
 package xyz.jonesdev.sonar.bukkit;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.jonesdev.sonar.bukkit.fallback.FallbackBukkitInjector;
+import xyz.jonesdev.sonar.bukkit.antibot.BukkitInjector;
 
 public final class SonarBukkitPlugin extends JavaPlugin {
   private SonarBukkit bootstrap;
@@ -26,8 +26,8 @@ public final class SonarBukkitPlugin extends JavaPlugin {
   @Override
   public void onLoad() {
     // Inject early if late-bind is disabled
-    if (!FallbackBukkitInjector.isLateBindEnabled()) {
-      FallbackBukkitInjector.inject();
+    if (!BukkitInjector.isLateBindEnabled()) {
+      BukkitInjector.inject();
     }
   }
 

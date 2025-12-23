@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bungee.fallback;
+package xyz.jonesdev.sonar.bungee.antibot;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -27,15 +27,15 @@ import net.md_5.bungee.protocol.channel.BungeeChannelInitializer;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.common.netty.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.netty.SonarInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
 
 import static net.md_5.bungee.netty.PipelineUtils.PACKET_DECODER;
-import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_PACKET_HANDLER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.SONAR_PACKET_HANDLER;
 
 @UtilityClass
-public class FallbackBungeeInjector {
+public class BungeeInjector {
   public void inject() {
     try {
       final Field childField;
@@ -61,8 +61,8 @@ public class FallbackBungeeInjector {
     // Make sure to store the original channel initializer
     //noinspection unchecked
     val originalInitializer = (ChannelInitializer<Channel>) childField.get(null);
-    final ChannelInitializer<Channel> injectedInitializer = new FallbackInjectedChannelInitializer(
-      originalInitializer, pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_PACKET_HANDLER,
+    final ChannelInitializer<Channel> injectedInitializer = new SonarInjectedChannelInitializer(
+      originalInitializer, pipeline -> pipeline.addAfter(PACKET_DECODER, SONAR_PACKET_HANDLER,
       new BungeeInboundHandler()));
 
     final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
@@ -86,8 +86,8 @@ public class FallbackBungeeInjector {
         if (!original.getChannelAcceptor().accept(channel)) {
           return false;
         }
-        FallbackInjectedChannelInitializer.inject(channel,
-          pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_PACKET_HANDLER,
+        SonarInjectedChannelInitializer.inject(channel,
+          pipeline -> pipeline.addAfter(PACKET_DECODER, SONAR_PACKET_HANDLER,
             new BungeeInboundHandler()));
         return true;
       });

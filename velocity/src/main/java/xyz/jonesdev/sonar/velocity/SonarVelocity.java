@@ -27,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
+import xyz.jonesdev.sonar.velocity.antibot.VelocityInjector;
 import xyz.jonesdev.sonar.velocity.command.VelocitySonarCommand;
-import xyz.jonesdev.sonar.velocity.fallback.FallbackVelocityInjector;
 
 import java.util.UUID;
 
@@ -107,7 +107,7 @@ public final class SonarVelocity extends SonarBootstrap<SonarVelocityPlugin> {
       new VelocitySonarCommand());
 
     // Make sure to inject into the server's connection handler
-    FallbackVelocityInjector.inject(getPlugin().getServer());
+    VelocityInjector.inject(getPlugin().getServer());
   }
 
   @Override

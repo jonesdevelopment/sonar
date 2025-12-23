@@ -28,8 +28,8 @@ import java.util.List;
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintLengthEncoder.java
 @ChannelHandler.Sharable
-public final class FallbackVarIntLengthEncoder extends MessageToMessageEncoder<ByteBuf> {
-  public static final FallbackVarIntLengthEncoder INSTANCE = new FallbackVarIntLengthEncoder();
+public final class MinecraftVarIntLengthEncoder extends MessageToMessageEncoder<ByteBuf> {
+  public static final MinecraftVarIntLengthEncoder INSTANCE = new MinecraftVarIntLengthEncoder();
 
   @Override
   protected void encode(final @NotNull ChannelHandlerContext ctx,

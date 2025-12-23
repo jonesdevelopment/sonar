@@ -29,7 +29,7 @@ import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 import java.util.List;
 
 // https://github.com/PaperMC/Velocity/blob/dev/3.0.0/proxy/src/main/java/com/velocitypowered/proxy/protocol/netty/MinecraftVarintFrameDecoder.java
-public final class FallbackVarInt21FrameDecoder extends ByteToMessageDecoder {
+public final class MinecraftVarInt21FrameDecoder extends ByteToMessageDecoder {
 
   @Override
   protected void decode(final @NotNull ChannelHandlerContext ctx,

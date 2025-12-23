@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.jonesdev.sonar.bukkit.fallback;
+package xyz.jonesdev.sonar.bukkit.antibot;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -34,7 +34,7 @@ import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 import java.net.InetSocketAddress;
 import java.util.Objects;
 
-import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_INBOUND_HANDLER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.SONAR_INBOUND_HANDLER;
 import static xyz.jonesdev.sonar.common.protocol.packets.handshake.HandshakePacket.*;
 
 final class BukkitInboundHandler extends InboundHandlerAdapter {
@@ -136,9 +136,9 @@ final class BukkitInboundHandler extends InboundHandlerAdapter {
           byteBuf.readerIndex(originalReaderIndex);
           ctx.fireChannelRead(byteBuf.retain());
           // TODO: recode this?
-          final ChannelHandler inboundHandler = ctx.pipeline().remove(FALLBACK_INBOUND_HANDLER);
+          final ChannelHandler inboundHandler = ctx.pipeline().remove(SONAR_INBOUND_HANDLER);
           if (inboundHandler != null && channelRemovalListener != null) {
-            channelRemovalListener.accept(ctx.pipeline(), FALLBACK_INBOUND_HANDLER, inboundHandler);
+            channelRemovalListener.accept(ctx.pipeline(), SONAR_INBOUND_HANDLER, inboundHandler);
           }
         }, loginStart.getUsername(), socketAddress);
         byteBuf.release();

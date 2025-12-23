@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 public final class ScheduledServiceManager {
   private final ScheduledExecutorService VERBOSE = createScheduledExecutor("sonar-verbose-thread");
   private final ScheduledExecutorService DB_CLEANUP = createScheduledExecutor("sonar-db-cleanup-thread");
-  private final ScheduledExecutorService FALLBACK_QUEUE = createScheduledExecutor("sonar-queue-thread");
+  private final ScheduledExecutorService LOGIN_QUEUE = createScheduledExecutor("sonar-queue-thread");
   private final ScheduledExecutorService STATISTICS = createScheduledExecutor("sonar-statistics-thread");
   private final ScheduledExecutorService UPDATE_NOTIFIER = createScheduledExecutor("sonar-update-notifier");
 
@@ -62,14 +62,14 @@ public final class ScheduledServiceManager {
     VERBOSE.scheduleAtFixedRate(() -> {
       // Make sure to clean up the cached statistics since we don't want to display wrong values
       GlobalSonarStatistics.cleanUpCaches();
-      Sonar.get0().getFallback().getBlacklist().cleanUp();
+      Sonar.get0().getAntiBot().getBlacklist().cleanUp();
       // Update the attack tracker
       Sonar.get0().getAttackTracker().checkIfUnderAttack();
       // Publish the action bar notifications
       Sonar.get0().getActionBarNotificationHandler().handleNotification();
     }, 0L, 250L, TimeUnit.MILLISECONDS);
 
-    FALLBACK_QUEUE.scheduleAtFixedRate(() -> Sonar.get0().getFallback().getQueue().poll(),
+    LOGIN_QUEUE.scheduleAtFixedRate(() -> Sonar.get0().getAntiBot().getQueue().poll(),
       1L, 1L, TimeUnit.SECONDS);
 
     STATISTICS.scheduleAtFixedRate(GlobalSonarStatistics::hitEverySecond,
@@ -85,7 +85,7 @@ public final class ScheduledServiceManager {
   public void stop() {
     DB_CLEANUP.shutdown();
     VERBOSE.shutdown();
-    FALLBACK_QUEUE.shutdown();
+    LOGIN_QUEUE.shutdown();
     STATISTICS.shutdown();
     UPDATE_NOTIFIER.shutdown();
   }

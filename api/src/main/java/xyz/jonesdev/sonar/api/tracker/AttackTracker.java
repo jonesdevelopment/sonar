@@ -53,8 +53,8 @@ public final class AttackTracker {
 
   public void checkIfUnderAttack() {
     final long joinsPerSecond = Sonar.get0().getStatistics().getLoginsPerSecond();
-    final int verifyingPlayers = Sonar.get0().getFallback().getConnected().size();
-    final int queuedPlayers = Sonar.get0().getFallback().getQueue().getPlayers().size();
+    final int verifyingPlayers = Sonar.get0().getAntiBot().getConnected().size();
+    final int queuedPlayers = Sonar.get0().getAntiBot().getQueue().getPlayers().size();
     final int minPlayers = Sonar.get0().getConfig().getMinPlayersForAttack();
 
     if (joinsPerSecond > minPlayers // Check the number of bots/joins per second.
@@ -116,7 +116,7 @@ public final class AttackTracker {
               final String formattedDuration = String.format("%d minutes, %.0f seconds", minutes, seconds);
               final String startTimestamp = String.valueOf(currentAttack.duration.getStart() / 1000L);
               final String endTimestamp = String.valueOf(System.currentTimeMillis() / 1000L);
-              final long blacklisted = Sonar.get0().getFallback().getBlacklist().estimatedSize();
+              final long blacklisted = Sonar.get0().getAntiBot().getBlacklist().estimatedSize();
               // Calculate during-attack-statistics using their deltas
               final long totalVerified = Sonar.get0().getVerifiedPlayerController().getCache().size();
               final long verified = Math.max(totalVerified - currentAttack.successfulVerifications, 0);

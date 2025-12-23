@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
+import xyz.jonesdev.sonar.bungee.antibot.BungeeInjector;
 import xyz.jonesdev.sonar.bungee.command.BungeeSonarCommand;
-import xyz.jonesdev.sonar.bungee.fallback.FallbackBungeeInjector;
 import xyz.jonesdev.sonar.common.boot.SonarBootstrap;
 
 import java.util.UUID;
@@ -107,7 +107,7 @@ public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
     getPlugin().getServer().getPluginManager().registerCommand(getPlugin(), new BungeeSonarCommand());
 
     // Make sure to inject into the server's connection handler
-    FallbackBungeeInjector.inject();
+    BungeeInjector.inject();
   }
 
   @Override

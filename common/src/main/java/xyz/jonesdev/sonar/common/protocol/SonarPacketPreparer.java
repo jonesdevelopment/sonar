@@ -256,7 +256,7 @@ public class SonarPacketPreparer {
       }
 
       final CaptchaGenerationStartEvent generationStartEvent = new CaptchaGenerationStartEvent(
-        Sonar.get0().getFallback().getCaptchaGenerator());
+        Sonar.get0().getAntiBot().getCaptchaGenerator());
       Sonar.get0().getEventManager().publish(generationStartEvent);
 
       if (generationStartEvent.getCaptchaGenerator() == null
@@ -267,13 +267,13 @@ public class SonarPacketPreparer {
         switch (Sonar.get0().getConfig().getGeneralConfig()
           .getString("verification.checks.map-captcha.style").toLowerCase()) {
           case "legacy":
-            Sonar.get0().getFallback().setCaptchaGenerator(new LegacyCaptchaGenerator(backgroundImage));
+            Sonar.get0().getAntiBot().setCaptchaGenerator(new LegacyCaptchaGenerator(backgroundImage));
             break;
           case "complex":
-            Sonar.get0().getFallback().setCaptchaGenerator(new ComplexCaptchaGenerator(backgroundImage));
+            Sonar.get0().getAntiBot().setCaptchaGenerator(new ComplexCaptchaGenerator(backgroundImage));
             break;
           default:
-            Sonar.get0().getFallback().setCaptchaGenerator(new StandardCaptchaGenerator(backgroundImage));
+            Sonar.get0().getAntiBot().setCaptchaGenerator(new StandardCaptchaGenerator(backgroundImage));
             break;
         }
       } else {
@@ -285,7 +285,7 @@ public class SonarPacketPreparer {
       enterCodeMessage = null;
       incorrectCaptcha = null;
       xpCountdown = null;
-      Sonar.get0().getFallback().setCaptchaGenerator(null);
+      Sonar.get0().getAntiBot().setCaptchaGenerator(null);
     }
 
     maxTotalPacketsSent = maxMovementTick + 2

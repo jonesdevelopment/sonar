@@ -145,7 +145,7 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @Override
   public long getCurrentAttemptedVerifications() {
-    return Sonar.get0().getFallback().getConnected().size();
+    return Sonar.get0().getAntiBot().getConnected().size();
   }
 
   @Override
@@ -155,7 +155,7 @@ public final class GlobalSonarStatistics implements SonarStatistics {
 
   @Override
   public long getCurrentBlacklistSize() {
-    return Sonar.get0().getFallback().getBlacklist().estimatedSize();
+    return Sonar.get0().getAntiBot().getBlacklist().estimatedSize();
   }
 
   @Override

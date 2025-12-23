@@ -26,8 +26,8 @@ import xyz.jonesdev.sonar.api.database.model.VerifiedPlayer;
 import xyz.jonesdev.sonar.api.event.impl.UserBlacklistedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
-import xyz.jonesdev.sonar.common.netty.FallbackVarInt21FrameDecoder;
-import xyz.jonesdev.sonar.common.netty.FallbackVarIntLengthEncoder;
+import xyz.jonesdev.sonar.common.netty.MinecraftVarInt21FrameDecoder;
+import xyz.jonesdev.sonar.common.netty.MinecraftVarIntLengthEncoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketDecoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketListener;
@@ -64,8 +64,8 @@ public abstract class VerificationHandler implements SonarPacketListener {
         // Make sure we cannot receive any more packets from the player
         user.channel().pipeline().remove(SonarPacketDecoder.class);
         user.channel().pipeline().remove(SonarPacketEncoder.class);
-        user.channel().pipeline().remove(FallbackVarInt21FrameDecoder.class);
-        user.channel().pipeline().remove(FallbackVarIntLengthEncoder.class);
+        user.channel().pipeline().remove(MinecraftVarInt21FrameDecoder.class);
+        user.channel().pipeline().remove(MinecraftVarIntLengthEncoder.class);
       } else {
         ProtocolUtil.closeWith(user.channel(), user.getProtocolVersion(), transferToOrigin);
       }
@@ -103,10 +103,10 @@ public abstract class VerificationHandler implements SonarPacketListener {
     // Use a label, so we can easily add more code beneath this method in the future
     blacklist: {
       final String hostAddress = user.getInetAddress().getHostAddress();
-      final int score = Sonar.get0().getFallback().getBlacklist().get(hostAddress, __ -> 0);
+      final int score = Sonar.get0().getAntiBot().getBlacklist().get(hostAddress, __ -> 0);
       final int newScore = score + 1;
 
-      Sonar.get0().getFallback().getBlacklist().put(hostAddress, newScore);
+      Sonar.get0().getAntiBot().getBlacklist().put(hostAddress, newScore);
 
       // The user is allowed to disable the blacklist entirely by setting the threshold to 0
       final int limit = Sonar.get0().getConfig().getVerification().getBlacklistThreshold();
