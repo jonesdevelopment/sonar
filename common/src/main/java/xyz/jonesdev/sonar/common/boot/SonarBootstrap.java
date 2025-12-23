@@ -36,9 +36,9 @@ import xyz.jonesdev.sonar.api.notification.ActionBarNotificationHandler;
 import xyz.jonesdev.sonar.api.notification.ChatNotificationHandler;
 import xyz.jonesdev.sonar.api.statistics.SonarStatistics;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
-import xyz.jonesdev.sonar.common.fallback.protocol.FallbackPreparer;
-import xyz.jonesdev.sonar.common.fallback.ratelimit.CaffeineCacheRatelimiter;
-import xyz.jonesdev.sonar.common.fallback.ratelimit.NoopCacheRatelimiter;
+import xyz.jonesdev.sonar.common.protocol.SonarPacketPreparer;
+import xyz.jonesdev.sonar.common.ratelimit.CaffeineCacheRatelimiter;
+import xyz.jonesdev.sonar.common.ratelimit.NoopCacheRatelimiter;
 import xyz.jonesdev.sonar.common.service.ScheduledServiceManager;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.subcommand.*;
@@ -137,7 +137,7 @@ public abstract class SonarBootstrap<T> implements Sonar {
 
     // Prepare cached packets
     getLogger().info("Taking cached snapshots of all packets...");
-    FallbackPreparer.prepare();
+    SonarPacketPreparer.prepare();
 
     // Update ratelimiter cache
     getFallback().setRatelimiter(getConfig().getVerification().getReconnectDelay() > 0L

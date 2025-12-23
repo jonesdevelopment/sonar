@@ -29,7 +29,7 @@ import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.io.IOException;

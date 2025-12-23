@@ -20,12 +20,12 @@ package xyz.jonesdev.sonar.api.event.impl;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import xyz.jonesdev.sonar.api.antibot.SonarUser;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 @Getter
 @ToString
 @RequiredArgsConstructor
 public final class UserBlacklistedEvent implements SonarEvent {
-  private final FallbackUser user;
+  private final SonarUser user;
 }

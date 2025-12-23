@@ -24,7 +24,7 @@ import net.kyori.adventure.nbt.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.protocol.ProtocolVersion;
+import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 
 import java.util.ArrayList;
 import java.util.List;

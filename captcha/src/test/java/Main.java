@@ -16,7 +16,7 @@
  */
 
 import lombok.experimental.UtilityClass;
-import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
+import xyz.jonesdev.sonar.api.antibot.captcha.CaptchaGenerator;
 import xyz.jonesdev.sonar.captcha.complex.ComplexCaptchaGenerator;
 
 import javax.imageio.ImageIO;

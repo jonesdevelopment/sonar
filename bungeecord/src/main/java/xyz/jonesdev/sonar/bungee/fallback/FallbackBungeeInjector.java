@@ -27,12 +27,12 @@ import net.md_5.bungee.protocol.channel.BungeeChannelInitializer;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.netty.FallbackInjectedChannelInitializer;
 
 import java.lang.reflect.Field;
 
 import static net.md_5.bungee.netty.PipelineUtils.PACKET_DECODER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_HANDLER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_PACKET_HANDLER;
 
 @UtilityClass
 public class FallbackBungeeInjector {
@@ -63,7 +63,7 @@ public class FallbackBungeeInjector {
     val originalInitializer = (ChannelInitializer<Channel>) childField.get(null);
     final ChannelInitializer<Channel> injectedInitializer = new FallbackInjectedChannelInitializer(
       originalInitializer, pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_PACKET_HANDLER,
-      new FallbackBungeeInboundHandler()));
+      new BungeeInboundHandler()));
 
     final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
     unsafeField.setAccessible(true);
@@ -88,7 +88,7 @@ public class FallbackBungeeInjector {
         }
         FallbackInjectedChannelInitializer.inject(channel,
           pipeline -> pipeline.addAfter(PACKET_DECODER, FALLBACK_PACKET_HANDLER,
-            new FallbackBungeeInboundHandler()));
+            new BungeeInboundHandler()));
         return true;
       });
     ProxyServer.getInstance().unsafe().setFrontendChannelInitializer(newInitializer);

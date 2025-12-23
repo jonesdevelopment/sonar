@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
+import xyz.jonesdev.sonar.api.antibot.captcha.CaptchaGenerator;
 import xyz.jonesdev.sonar.captcha.filters.NoiseOverlayFilter;
 
 import javax.imageio.ImageIO;

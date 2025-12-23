@@ -19,7 +19,7 @@ package xyz.jonesdev.sonar.captcha.complex;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
+import xyz.jonesdev.sonar.api.antibot.captcha.CaptchaGenerator;
 import xyz.jonesdev.sonar.captcha.TTFFontProvider;
 
 import javax.imageio.ImageIO;

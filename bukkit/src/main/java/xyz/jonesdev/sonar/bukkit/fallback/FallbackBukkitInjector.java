@@ -26,7 +26,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
-import xyz.jonesdev.sonar.common.fallback.netty.FallbackInjectedChannelInitializer;
+import xyz.jonesdev.sonar.common.netty.FallbackInjectedChannelInitializer;
 import xyz.jonesdev.sonar.common.util.exception.ReflectiveOperationException;
 
 import java.lang.reflect.Field;
@@ -34,8 +34,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_INACTIVE_LISTENER;
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_PACKET_DECODER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_INACTIVE_LISTENER;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_PACKET_DECODER;
 import static xyz.jonesdev.sonar.bukkit.SonarBukkit.INITIALIZE_LISTENER;
 
 // Check out these links if you want to see some more magic
@@ -255,7 +255,7 @@ public class FallbackBukkitInjector {
             try {
               childHandlerField.set(_bootstrap, new FallbackInjectedChannelInitializer(originalInitializer,
                 pipeline -> {
-                  pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new FallbackBukkitInboundHandler());
+                  pipeline.addAfter("splitter", FALLBACK_PACKET_DECODER, new BukkitInboundHandler());
                   pipeline.addFirst(FALLBACK_INACTIVE_LISTENER, new ChannelInactiveListener());
                 }
               ));

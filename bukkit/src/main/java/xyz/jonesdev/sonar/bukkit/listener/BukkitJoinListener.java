@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static xyz.jonesdev.sonar.api.fallback.FallbackPipelines.FALLBACK_BANDWIDTH;
+import static xyz.jonesdev.sonar.api.antibot.ChannelPipelines.FALLBACK_BANDWIDTH;
 
 // https://github.com/ViaVersion/ViaVersion/blob/master/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
 public final class BukkitJoinListener implements Listener {

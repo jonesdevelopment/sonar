@@ -21,13 +21,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.antibot.SonarUser;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.FallbackUser;
 
 @Getter
 @ToString
 @RequiredArgsConstructor
 public final class UserVerifyFailedEvent implements SonarEvent {
-  private final @NotNull FallbackUser user;
+  private final @NotNull SonarUser user;
   private final @NotNull String reason;
 }

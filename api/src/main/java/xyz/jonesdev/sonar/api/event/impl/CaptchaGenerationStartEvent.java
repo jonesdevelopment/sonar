@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.api.event.impl;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import xyz.jonesdev.sonar.api.antibot.captcha.CaptchaGenerator;
 import xyz.jonesdev.sonar.api.event.SonarEvent;
-import xyz.jonesdev.sonar.api.fallback.captcha.CaptchaGenerator;
 
 @Getter
 @Setter
