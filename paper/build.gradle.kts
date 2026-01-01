@@ -6,7 +6,7 @@ plugins {
 
 paper {
   name = rootProject.name
-  main = "xyz.jonasdev.sonar.paper.SonarPaperPlugin"
+  main = "xyz.jonesdev.sonar.paper.SonarPaperPlugin"
   authors = listOf("Jones Development", "Sonar Contributors")
   website = "https://jonesdev.xyz/discord/"
   load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD

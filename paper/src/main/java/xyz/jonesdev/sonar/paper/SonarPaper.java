@@ -1,4 +1,4 @@
-package xyz.jonasdev.sonar.paper;
+package xyz.jonesdev.sonar.paper;
 
 import com.alessiodp.libby.PaperLibraryManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -9,7 +9,7 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.jonasdev.sonar.paper.command.PaperSonarCommand;
+import xyz.jonesdev.sonar.paper.command.PaperSonarCommand;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 import xyz.jonesdev.sonar.api.logger.LoggerWrapper;
 import xyz.jonesdev.sonar.bukkit.SonarBukkit;

@@ -1,4 +1,4 @@
-package xyz.jonasdev.sonar.paper;
+package xyz.jonesdev.sonar.paper;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.jonesdev.sonar.bukkit.antibot.BukkitInjector;

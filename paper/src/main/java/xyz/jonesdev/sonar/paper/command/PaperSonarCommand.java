@@ -1,4 +1,4 @@
-package xyz.jonasdev.sonar.paper.command;
+package xyz.jonesdev.sonar.paper.command;
 
 import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
