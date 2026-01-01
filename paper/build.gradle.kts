@@ -44,3 +44,9 @@ dependencies {
   implementation(rootProject.libs.bstats.bukkit)
   implementation(rootProject.libs.libby.paper)
 }
+
+tasks {
+  shadowJar {
+    relocate("net.kyori.adventure.nbt", "xyz.jonesdev.sonar.libs.kyori.adventure.nbt")
+  }
+}

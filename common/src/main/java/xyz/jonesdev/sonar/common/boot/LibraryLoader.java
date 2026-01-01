@@ -67,27 +67,39 @@ class LibraryLoader {
     );
 
     // Only load adventure if not on Velocity
-    if (platform != SonarPlatform.VELOCITY && platform != SonarPlatform.PAPER) {
-      libraryManager.loadLibraries(
-        Library.builder()
-          .groupId("net{}kyori")
-          .artifactId("adventure-text-minimessage")
-          .version("4.21.0")
-          .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
-          .build(),
-        Library.builder()
-          .groupId("net{}kyori")
-          .artifactId("adventure-text-serializer-gson")
-          .version("4.21.0")
-          .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
-          .build(),
-        Library.builder()
-          .groupId("net{}kyori")
-          .artifactId("adventure-nbt")
-          .version("4.21.0")
-          .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
-          .build()
-      );
+    if (platform != SonarPlatform.VELOCITY) {
+      if (platform != SonarPlatform.PAPER) {
+        libraryManager.loadLibraries(
+          Library.builder()
+            .groupId("net{}kyori")
+            .artifactId("adventure-text-minimessage")
+            .version("4.21.0")
+            .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
+            .build(),
+          Library.builder()
+            .groupId("net{}kyori")
+            .artifactId("adventure-text-serializer-gson")
+            .version("4.21.0")
+            .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
+            .build(),
+          Library.builder()
+            .groupId("net{}kyori")
+            .artifactId("adventure-nbt")
+            .version("4.21.0")
+            .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
+            .build()
+        );
+      } else {
+        // On Paper, we only relocate the nbt package since the rest of adventure is bundled with the server.
+        libraryManager.loadLibrary(
+          Library.builder()
+            .groupId("net{}kyori")
+            .artifactId("adventure-nbt")
+            .version("4.21.0")
+            .relocate("net{}kyori{}adventure{}nbt", "xyz{}jonesdev{}sonar{}libs{}kyori{}adventure{}nbt")
+            .build()
+        );
+      }
     }
   }
 }
