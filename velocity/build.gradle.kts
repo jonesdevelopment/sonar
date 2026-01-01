@@ -3,7 +3,6 @@ dependencies {
   implementation(project(":common"))
 
   compileOnly(rootProject.libs.velocity)
-  testCompileOnly(rootProject.libs.velocity)
 
   implementation(rootProject.libs.bstats.velocity)
   implementation(rootProject.libs.libby.velocity)

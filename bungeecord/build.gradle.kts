@@ -14,7 +14,6 @@ dependencies {
   implementation(project(":common"))
 
   compileOnly(rootProject.libs.bungeecord)
-  testCompileOnly(rootProject.libs.bungeecord)
 
   implementation(rootProject.libs.adventure.platform.bungee) {
     exclude(module = "adventure-nbt")
