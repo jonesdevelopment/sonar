@@ -102,7 +102,7 @@ allprojects {
 tasks {
   // This is a small wrapper tasks to simplify the building process
   register("build-sonar") {
-    val subprojects = listOf("api", "captcha", "common", "bukkit", "bungeecord", "velocity")
+    val subprojects = listOf("api", "captcha", "common", "bukkit", "bungeecord", "paper", "velocity")
     val buildTasks = subprojects.flatMap { listOf("$it:clean", "$it:spotlessApply", "$it:shadowJar") }
     dependsOn(buildTasks)
   }
