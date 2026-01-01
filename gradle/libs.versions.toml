@@ -12,6 +12,7 @@ shadow = "com.gradleup.shadow:8.3.8"
 spotless = "com.diffplug.spotless:7.2.1"
 pluginyml-bungee = { id = "net.minecrell.plugin-yml.bungee", version.ref = "pluginyml" }
 pluginyml-bukkit = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
+pluginyml-paper = { id = "net.minecrell.plugin-yml.paper", version.ref = "pluginyml" }
 
 [libraries]
 netty = { module = "io.netty:netty-all", version.ref = "netty" }
@@ -23,6 +24,7 @@ adventure-platform-bungee = { module = "net.kyori:adventure-platform-bungeecord"
 libby-core = { module = "com.alessiodp.libby:libby-core", version.ref = "libby" }
 libby-bungee = { module = "com.alessiodp.libby:libby-bungee", version.ref = "libby" }
 libby-bukkit = { module = "com.alessiodp.libby:libby-bukkit", version.ref = "libby" }
+libby-paper = { module = "com.alessiodp.libby:libby-paper", version.ref = "libby" }
 libby-velocity = { module = "com.alessiodp.libby:libby-velocity", version.ref = "libby" }
 bstats-bungee = { module = "org.bstats:bstats-bungeecord", version.ref = "bstats" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
@@ -35,5 +37,6 @@ ormlite = "com.j256.ormlite:ormlite-jdbc:6.1"
 lombok = "org.projectlombok:lombok:1.18.42"
 bungeecord = "net.md-5:bungeecord-proxy:1.21-SNAPSHOT"
 velocity = "io.papermc.velocity:velocity-proxy:3.4.0-SNAPSHOT"
+paper = "io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT"
 # We have to use 1.16.5 for backwards compatibility
 spigot = "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"

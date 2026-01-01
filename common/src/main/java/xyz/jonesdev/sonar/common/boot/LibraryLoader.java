@@ -67,7 +67,7 @@ class LibraryLoader {
     );
 
     // Only load adventure if not on Velocity
-    if (platform != SonarPlatform.VELOCITY) {
+    if (platform != SonarPlatform.VELOCITY && platform != SonarPlatform.PAPER) {
       libraryManager.loadLibraries(
         Library.builder()
           .groupId("net{}kyori")

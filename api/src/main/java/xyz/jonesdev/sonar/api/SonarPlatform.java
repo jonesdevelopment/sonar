@@ -30,6 +30,8 @@ public enum SonarPlatform {
     pipeline -> pipeline.context("outbound_config") != null ? "outbound_config" : "encoder"),
   BUNGEE("BungeeCord", 19109, "inbound-boss",
     pipeline -> "packet-encoder"),
+  PAPER("Paper", 19110, "packet_handler",
+    pipeline -> pipeline.context("outbound_config") != null ? "outbound_config" : "encoder"),
   VELOCITY("Velocity", 19107, "handler",
     pipeline -> "minecraft-encoder");
 
