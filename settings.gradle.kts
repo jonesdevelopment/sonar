@@ -6,6 +6,7 @@ sequenceOf(
   "common",
   "bukkit",
   "bungeecord",
+  "paper",
   "velocity"
 ).forEach {
   include(":$it")
