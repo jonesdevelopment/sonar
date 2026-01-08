@@ -93,7 +93,7 @@ public final class VerifiedPlayerController {
           "?autoReconnect=true");
       }
 
-      connectionSource = new JdbcConnectionSource(jdbcURL,
+      connectionSource = new JdbcPooledConnectionSource(jdbcURL,
         Sonar.get0().getConfig().getGeneralConfig().getString("database.username"),
         Sonar.get0().getConfig().getGeneralConfig().getString("database.password"),
         cachedDatabaseType.getDatabaseType());
