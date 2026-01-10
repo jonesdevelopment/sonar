@@ -30,6 +30,7 @@ import xyz.jonesdev.sonar.common.protocol.SonarPacket;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketRegistry;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
+import xyz.jonesdev.sonar.common.util.EaglerUtil;
 import xyz.jonesdev.sonar.common.util.GeyserUtil;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
@@ -120,7 +121,8 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
     }
 
     // Don't continue the verification process if the verification is disabled
-    if (!Sonar.get0().getAntiBot().shouldVerifyNewPlayers()) {
+    if (!Sonar.get0().getAntiBot().shouldVerifyNewPlayers()
+      || EaglerUtil.isEaglerConnection(ctx.channel())) {
       initialLogin(ctx.channel(), inetAddress, initialLoginAction);
       return;
     }
