@@ -25,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 @UtilityClass
 public class EaglerUtil {
   // https://github.com/lax1dude/eaglerxserver/blob/main/core/src/main/java/net/lax1dude/eaglercraft/backend/server/adapter/PipelineAttributes.java
-  public static final AttributeKey<Object> EAGLER_LISTENER_DATA = AttributeKey.valueOf("$eagler0");
-  public static final AttributeKey<Object> EAGLER_PIPELINE_DATA = AttributeKey.valueOf("$eagler1");
+  private static final String H_EAGLER_HANDSHAKE = "eagler-handshake";
+  private static final String H_EAGLER_FRAME_CODEC = "eagler-frame-codec";
 
   public boolean isEaglerConnection(final @NotNull Channel channel) {
-    return channel.attr(EAGLER_LISTENER_DATA).get() != null
-      || channel.attr(EAGLER_PIPELINE_DATA).get() != null;
+    return channel.pipeline().get(H_EAGLER_HANDSHAKE) != null
+      || channel.pipeline().get(H_EAGLER_FRAME_CODEC) != null;
   }
 }

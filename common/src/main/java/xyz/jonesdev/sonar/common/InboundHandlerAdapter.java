@@ -193,6 +193,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
         // Don't remove floodgate's pipelines
         || entry.getKey().startsWith("geyser")
         || entry.getKey().startsWith("floodgate")
+        || entry.getKey().startsWith("eagler")
         || entry.getKey().equals("DefaultChannelPipeline$TailContext#0")) {
         continue;
       }
