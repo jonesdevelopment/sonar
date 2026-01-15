@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 @UtilityClass
 public class EaglerUtil {
-  // https://github.com/lax1dude/eaglerxserver/blob/main/core/src/main/java/net/lax1dude/eaglercraft/backend/server/adapter/PipelineAttributes.java
+  // Detect EaglerXServer WebSocket connections by checking for Eagler-specific pipeline handlers.
   private static final String H_EAGLER_HANDSHAKE = "eagler-handshake";
   private static final String H_EAGLER_FRAME_CODEC = "eagler-frame-codec";
 
