@@ -108,9 +108,9 @@ verification:
       # 如果未找到指定的图片, 则自动通过噪音生成一个随机的背景图片.
       # 如果图片在该插件的配置文件夹下, 则可以简单地输入图片的文件名.
       background: ''
-      # 地图验证码的风格（默认：'modern'）.
+      # 地图验证码的风格（默认: 'modern'）.
       # 要使用旧设计, 请将其设置为 'legacy'.
-      # To use an experimental design, set this to 'complex'.
+      # 要使用实验设计, 请将此项设置为 'complex'.
       style: 'modern'
       # Sonar 应该一次准备多少个验证码?
       precompute: 500
@@ -182,6 +182,9 @@ verification:
   # 此功能是实验性的. 请报告任何因为误判而导致无法通过检查的问题
   # 如果关闭该选项 Sonar 将不检查这些玩家以便直接连接到服务器.
   check-geyser-players: false
+  # 声纳是否也应检测 EaglercraftX 玩家?
+  # 此功能尚在试验阶段, 可能引发问题
+  check-eagler-players: false
   # 播放器断开连接前停止发送数据包的时间
   # (该值为毫秒. 1秒等于1000毫秒.)
   read-timeout: 8000

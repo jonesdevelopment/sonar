@@ -182,6 +182,9 @@ verification:
   # Moet Sonar elke beweging/positieverandering tijdens de verificatie registreren?
   # Dit wordt niet aanbevolen voor productieservers, maar kan nuttig zijn bij het opsporen van fouten.
   debug-xyz-positions: false
+  # Moet Sonar ook EaglercraftX-spelers controleren?
+  # Deze functie is experimenteel en kan problemen veroorzaken.
+  check-eagler-players: false
   # Moet Sonar ook Geyser (Bedrock) spelers controleren?
   # Deze functie is experimenteel en kan problemen veroorzaken
   # Als dit is uitgeschakeld, worden Bedrock-spelers overgeslagen

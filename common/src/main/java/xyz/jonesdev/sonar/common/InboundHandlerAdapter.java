@@ -121,8 +121,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
     }
 
     // Don't continue the verification process if the verification is disabled
-    if (!Sonar.get0().getAntiBot().shouldVerifyNewPlayers()
-      || EaglerUtil.isEaglerConnection(ctx.channel())) {
+    if (!Sonar.get0().getAntiBot().shouldVerifyNewPlayers()) {
       initialLogin(ctx.channel(), inetAddress, initialLoginAction);
       return;
     }
@@ -130,6 +129,13 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
     // Completely skip Geyser connections if configured
     final boolean geyser = GeyserUtil.isGeyserConnection(ctx.channel(), socketAddress);
     if (geyser && !Sonar.get0().getConfig().getVerification().isCheckGeyser()) {
+      initialLogin(ctx.channel(), inetAddress, initialLoginAction);
+      return;
+    }
+
+    // Completely skip EaglercraftX connections if configured
+    if (EaglerUtil.isEaglerConnection(ctx.channel())
+      && !Sonar.get0().getConfig().getVerification().isCheckEagler()) {
       initialLogin(ctx.channel(), inetAddress, initialLoginAction);
       return;
     }

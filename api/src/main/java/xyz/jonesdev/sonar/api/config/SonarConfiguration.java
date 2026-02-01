@@ -201,6 +201,7 @@ public final class SonarConfiguration {
     verification.validNameRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-name-regex"));
 
     verification.checkGeyser = generalConfig.getBoolean("verification.check-geyser-players");
+    verification.checkEagler = generalConfig.getBoolean("verification.check-eagler-players");
     verification.logConnections = generalConfig.getBoolean("verification.log-connections");
     verification.logDuringAttack = generalConfig.getBoolean("verification.log-during-attack");
     verification.debugXYZPositions = generalConfig.getBoolean("verification.debug-xyz-positions");
@@ -415,6 +416,7 @@ public final class SonarConfiguration {
 
     private int timeOfDay;
     private boolean checkGeyser;
+    private boolean checkEagler;
     private boolean logConnections;
     private boolean logDuringAttack;
     private boolean debugXYZPositions;

@@ -186,6 +186,9 @@ verification:
   # Cette fonctionnalité est expérimentale et peut causer des problèmes
   # Si cela est désactivé, les joueurs Bedrock seront ignorés
   check-geyser-players: false
+  # Sonar devrait-il également vérifier les joueurs EaglercraftX ?
+  # Cette fonctionnalité est expérimentale et peut causer des problèmes.
+  check-eagler-players: false
   # Temps écoulé depuis que le joueur a cessé d'envoyer des paquets avant de se déconnecter
   # (Cette valeur représente le temps en millisecondes : 1 seconde = 1000 millisecondes)
   read-timeout: 8000
