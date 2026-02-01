@@ -47,7 +47,7 @@ class LibraryLoader {
       Library.builder()
         .groupId("com{}github{}ben-manes{}caffeine")
         .artifactId("caffeine")
-        .version("3.2.0")
+        .version("3.2.3")
         .relocate("com{}github{}benmanes{}caffeine", "xyz{}jonesdev{}sonar{}libs{}caffeine")
         .build(),
       // ORMLite
