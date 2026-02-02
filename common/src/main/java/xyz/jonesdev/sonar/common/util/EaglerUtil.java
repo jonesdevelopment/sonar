@@ -18,7 +18,6 @@
 package xyz.jonesdev.sonar.common.util;
 
 import io.netty.channel.Channel;
-import io.netty.util.AttributeKey;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 

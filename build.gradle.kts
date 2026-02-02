@@ -11,7 +11,7 @@ allprojects {
   repositories {
     mavenCentral()
     maven(url = "https://repo.jonesdev.xyz/releases/") // Bungee & Velocity proxy module
-    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") // libby
+    maven(url = "https://repo.alessiodp.com/snapshots/") // libby
   }
 
   apply(plugin = "java")
