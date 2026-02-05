@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# Precisa de ajuda ou tem dúvidas? https://jonesdev.xyz/discord
+# Precisa de ajuda ou tem dúvidas? https://sonar.top/discord
 # Código-fonte: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development e Sonar Contributors, licenciado sob GPL-3.0
 #
@@ -16,7 +16,7 @@
 # Placeholder para cada '<prefix>' neste arquivo de configuração
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Placeholder para cada '<support-url>' neste arquivo de configuração
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # Placeholder para cada '<header>' neste arquivo de configuração
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development e Contribuidores do Sonar</click>
       - ''
       - <gray>Precisa de ajuda ou tem alguma dúvida?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Clique para abrir o Discord)'>Abra um ticket no Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Clique para abrir o GitHub)'>ou abra um novo problema no GitHub.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Clique para abrir o Discord)'>Abra um ticket no Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Clique para abrir o GitHub)'>ou abra um novo problema no GitHub.
       - ''
     # Formatação da lista de subcomandos mostrada ao executar o comando principal
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Somente jogadores: </gray><only-players><br><gray>Requer console: </gray><only-console><br><gray>Permissão: </gray><white><permission><br><gray>Aliases: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'

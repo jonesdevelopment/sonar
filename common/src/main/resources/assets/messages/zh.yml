@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# 需要帮助吗? https://jonesdev.xyz/discord
+# 需要帮助吗? https://sonar.top/discord
 # 源代码: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, 以 GPL-3.0 许可
 #
@@ -16,7 +16,7 @@
 # <prefix> 占位符
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # <support-url> 占位符
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # <header> 占位符. (支持多行)
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development and Sonar Contributors</click>
       - ''
       - <gray>有问题或需要帮助?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Click to open Discord)'>在我们的Discord上打开一张ticket </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Click to open GitHub)'>或在Github打开新的问题.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Click to open Discord)'>在我们的Discord上打开一张ticket </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Click to open GitHub)'>或在Github打开新的问题.
       - ''
     # 执行根命令时 对于子命令的描述.
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>只有玩家可以执行该命令: </gray><only-players><br><gray>只有控制台可以执行该命令: </gray><only-console><br><gray>需要的权限: </gray><white><permission><br><gray>别名: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'

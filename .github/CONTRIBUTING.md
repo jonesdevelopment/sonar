@@ -1,6 +1,6 @@
 Before you start contributing, please take a moment to review our contributing guidelines.
 If you can't contribute but like the project, feel free to show your support by starring the project on GitHub or
-joining the [Discord](https://jonesdev.xyz/discord).
+joining the [Discord](https://sonar.top/discord).
 
 ## Contributing Guidelines:
 

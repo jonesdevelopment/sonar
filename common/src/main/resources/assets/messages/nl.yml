@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# Hulp nodig of vragen? https://jonesdev.xyz/discord
+# Hulp nodig of vragen? https://sonar.top/discord
 # Broncode: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, gelicentieerd onder GPL-3.0
 #
@@ -16,7 +16,7 @@
 # Tijdelijke aanduiding voor elke '<prefix>' in dit configuratiebestand
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Tijdelijke aanduiding voor elke '<support-url>' in dit configuratiebestand
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # Tijdelijke aanduiding voor elke '<header>' in dit configuratiebestand
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development and Sonar Contributors</click>
       - ''
       - <gray>Hulp nodig of vragen?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klik om Discord te openen)'>Open een ticket op de Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik om GitHub te openen)'>of open een nieuw probleem op GitHub.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Klik om Discord te openen)'>Open een ticket op de Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik om GitHub te openen)'>of open een nieuw probleem op GitHub.
       - ''
     # Opmaak van de lijst met subcommand die wordt weergegeven bij het uitvoeren van de hoofdopdracht
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Alleen spelers: </gray><only-players><br><gray>Vereist console: </gray><only-console><br><gray>Toestemming: </gray><white><permission><br><gray>Aliassen: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'

@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# Butuh bantuan atau memiliki pertanyaan? https://jonesdev.xyz/discord
+# Butuh bantuan atau memiliki pertanyaan? https://sonar.top/discord
 # Kode sumber: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, dilisensikan di bawah GPL-3.0
 #
@@ -16,7 +16,7 @@
 # Placeholder untuk setiap '<prefix>' dalam file konfigurasi ini
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Placeholder untuk setiap '<support-url>' dalam file konfigurasi ini
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # Placeholder untuk setiap '<header>' dalam file konfigurasi ini
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development dan Kontributor Sonar</click>
       - ''
       - <gray>Butuh bantuan atau memiliki pertanyaan?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Klik untuk membuka Discord)'>Buka tiket di Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik untuk membuka GitHub)'>atau buka masalah baru di GitHub.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Klik untuk membuka Discord)'>Buka tiket di Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Klik untuk membuka GitHub)'>atau buka masalah baru di GitHub.
       - ''
     # Format daftar sub-perintah yang ditampilkan saat menjalankan perintah utama
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Hanya pemain: </gray><only-players><br><gray>Membutuhkan konsol: </gray><only-console><br><gray>Izin: </gray><white><permission><br><gray>Alias: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'

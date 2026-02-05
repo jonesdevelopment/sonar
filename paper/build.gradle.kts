@@ -8,7 +8,7 @@ paper {
   name = rootProject.name
   main = "xyz.jonesdev.sonar.paper.SonarPaperPlugin"
   authors = listOf("Jones Development", "Sonar Contributors")
-  website = "https://jonesdev.xyz/discord/"
+  website = "https://sonar.top/discord/"
   load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
   apiVersion = "1.21" // ignore legacy plugin warning
   foliaSupported = true

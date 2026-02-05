@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# ¿Necesita ayuda o tiene alguna pregunta? https://jonesdev.xyz/discord
+# ¿Necesita ayuda o tiene alguna pregunta? https://sonar.top/discord
 # Código fuente: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, bajo licencia GPL-3.0
 #
@@ -16,7 +16,7 @@
 # Placeholder for every '<prefix>' in this configuration file
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Placeholder for every '<support-url>' in this configuration file
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # Placeholder for every '<header>' in this configuration file
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year>Jones Development and Sonar Contributors</click>
       - ''
       - <gray>¿Necesita ayuda o tiene alguna pregunta?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Haga clic para abrir Discord)'>Abrir un ticket en Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Haga click para abrir GitHub)'>o abra una nueva Issue en GitHub.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Haga clic para abrir Discord)'>Abrir un ticket en Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Haga click para abrir GitHub)'>o abra una nueva Issue en GitHub.
       - ''
     # Formatting of the list of subcommands shown when running the main command
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Solo jugadores: </gray><only-players><br><gray>Requiere consola: </gray><only-console><br><gray>Permiso: </gray><white><permission><br><gray>Alias: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'

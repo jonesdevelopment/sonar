@@ -11,7 +11,7 @@
   [![](https://www.codefactor.io/repository/github/jonesdevelopment/sonar/badge/main)](https://www.codefactor.io/repository/github/jonesdevelopment/sonar/overview/main)
   [![](https://img.shields.io/github/v/release/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/releases)
   [![](https://img.shields.io/github/issues/jonesdevelopment/sonar)](https://github.com/jonesdevelopment/sonar/issues)
-  [![](https://img.shields.io/discord/923308209769426994.svg?logo=discord)](https://jonesdev.xyz/discord)
+  [![](https://img.shields.io/discord/923308209769426994.svg?logo=discord)](https://sonar.top/discord)
   [![](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   <br>
   <!-- Quick navigation -->
@@ -21,7 +21,7 @@
   |
   [Pull Requests](https://github.com/jonesdevelopment/sonar/pulls)
   |
-  [Discord](https://jonesdev.xyz/discord)
+  [Discord](https://sonar.top/discord)
   |
   [License](https://github.com/jonesdevelopment/sonar/?tab=readme-ov-file#license)
 </div>
@@ -52,10 +52,10 @@ Sonar also protects against spambot attacks since it queues the incoming connect
 
 ### False positives
 Sonar is unlikely to ever falsely prevent a player from joining the server since Minecraft uses the TCP protocol, which means that packets are always sent in the correct order. Therefore, lag or ping should not affect the bot check.
-If you or one of your players experiences a false positive, make sure to report it by opening a [GitHub issue](https://github.com/jonesdevelopment/sonar/issues/new/choose) or a ticket on the [Discord server](https://jonesdev.xyz/discord/).
+If you or one of your players experiences a false positive, make sure to report it by opening a [GitHub issue](https://github.com/jonesdevelopment/sonar/issues/new/choose) or a ticket on the [Discord server](https://sonar.top/discord/).
 
 ## Sponsors
-If you are interested in sponsoring this project, please contact me via [Discord](https://jonesdev.xyz/discord/).
+If you are interested in sponsoring this project, please contact me via [Discord](https://sonar.top/discord/).
 
 ### Past Sponsors
 

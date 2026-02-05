@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# Besoin d'aide ou d'autres questions ? https://jonesdev.xyz/discord
+# Besoin d'aide ou d'autres questions ? https://sonar.top/discord
 # Code source : https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, licence sous GPL-3.0
 #
@@ -16,7 +16,7 @@
 # Espace réservé pour tout '<prefix>' dans ce fichier de configuration
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Espace réservé pour tout '<support-url>' dans ce fichier de configuration
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # Espace réservé pour tout '<header>' dans ce fichier de configuration
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development et les contributeurs de Sonar</click>
       - ''
       - <gray>Besoin d'aide ou avez-vous des questions ?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Cliquez pour ouvrir Discord)'>Ouvrez un ticket sur Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Cliquez pour ouvrir GitHub)'>ou ouvrez un nouveau problème sur GitHub.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Cliquez pour ouvrir Discord)'>Ouvrez un ticket sur Discord </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Cliquez pour ouvrir GitHub)'>ou ouvrez un nouveau problème sur GitHub.
       - ''
     # Format de la liste des sous-commandes affichée lors de l'exécution de la commande principale
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Seulement pour les joueurs : </gray><only-players><br><gray>Nécessite la console : </gray><only-console><br><gray>Permission : </gray><white><permission><br><gray>Alias : </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'

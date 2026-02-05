@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# Potrzebujesz pomocy lub masz pytania? https://jonesdev.xyz/discord
+# Potrzebujesz pomocy lub masz pytania? https://sonar.top/discord
 # Source code: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, na licencji GPL-3.0
 #
@@ -16,7 +16,7 @@
 # Placeholder for every '<prefix>' in this configuration file
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Placeholder for every '<support-url>' in this configuration file
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # Placeholder for every '<header>' in this configuration file
 header:
   - <b><yellow>Sonar</b><reset>
@@ -54,7 +54,7 @@ commands:
         Jones Development and Sonar Contributors</click>
       - ''
       - <gray>Potrzebujesz pomocy lub masz pytania?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Kliknij aby otworzyć Discord)'>Otwórz zgłoszenie na Discordzie </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Kliknij aby otworzyć GitHub)'>lub otwórz nowe zgłoszenie w serwisie GitHub.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Kliknij aby otworzyć Discord)'>Otwórz zgłoszenie na Discordzie </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Kliknij aby otworzyć GitHub)'>lub otwórz nowe zgłoszenie w serwisie GitHub.
       - ''
     # Formatting of the list of subcommands shown when running the main command
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Only players: </gray><only-players><br><gray>Require

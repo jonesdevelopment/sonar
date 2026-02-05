@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# Need help or have questions? https://jonesdev.xyz/discord
+# Need help or have questions? https://sonar.top/discord
 # Source code: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
@@ -16,7 +16,7 @@
 # Placeholder for every '<prefix>' in this configuration file
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Placeholder for every '<support-url>' in this configuration file
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # Placeholder for every '<header>' in this configuration file
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development e i collaboratori di Sonar</click>
       - ''
       - <gray>Hai bisogno di aiuto o hai domande?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Clicca per aprire Discord)'>Apri un ticket su Discord</hover></click> oppure <click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Clicca per aprire GitHub)'>apri una nuova issue su GitHub</hover></click>.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Clicca per aprire Discord)'>Apri un ticket su Discord</hover></click> oppure <click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Clicca per aprire GitHub)'>apri una nuova issue su GitHub</hover></click>.
       - ''
     # Formatting of the list of subcommands shown when running the main command
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Solo giocatori: </gray><only-players><br><gray>Richiede console: </gray><only-console><br><gray>Permesso: </gray><white><permission><br><gray>Alias: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'

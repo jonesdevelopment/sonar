@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# Potřebujete pomoc nebo máte otázky? https://jonesdev.xyz/discord
+# Potřebujete pomoc nebo máte otázky? https://sonar.top/discord
 # Zdrojový kód: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, licencováno pod GPL-3.0
 #
@@ -16,7 +16,7 @@
 # Zástupný text pro každý '<prefix>' v tomto konfiguračním souboru
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # Zástupný text pro každou '<support-url>' v tomto konfiguračním souboru
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # Zástupný text pro každý '<header>' v tomto konfiguračním souboru
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development a přispěvatelé Sonaru</click>
       - ''
       - <gray>Potřebujete pomoc nebo máte nějaké otázky?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(Kliknutím otevřete Discord)'>Otevřete ticket na Discordu </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Kliknutím otevřete GitHub)'>nebo otevřete nový problém na GitHubu.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(Kliknutím otevřete Discord)'>Otevřete ticket na Discordu </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(Kliknutím otevřete GitHub)'>nebo otevřete nový problém na GitHubu.
       - ''
     # Formátování seznamu podpříkazů zobrazených při spuštění hlavního příkazu
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>Pouze hráči: </gray><only-players><br><gray>Vyžaduje konzoli: </gray><only-console><br><gray>Oprávnění: </gray><white><permission><br><gray>Aliasy: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <subcommand>  <white><description></hover></suggest-subcommand>'

@@ -8,7 +8,7 @@
 # |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$
 #  \______/  \______/ |__/  |__/ \_______/|__/
 #
-# გჭირდება დახმარება ან გაქვს კითხვები? დაგვიკავშირდი https://jonesdev.xyz/discord
+# გჭირდება დახმარება ან გაქვს კითხვები? დაგვიკავშირდი https://sonar.top/discord
 # კოდის წყარო: https://github.com/jonesdevelopment/sonar
 # Copyright Jones Development and Sonar Contributors, licensed under GPL-3.0
 #
@@ -16,7 +16,7 @@
 # ცვლადი ყველა '<prefix>' სთვის ამ ფაილში.
 prefix: <b><yellow>Sonar</b> <gray>» <white>
 # ცვლადი ყველა '<support-url>' სთვის ამ ფაილში.
-support-url: https://jonesdev.xyz/discord/
+support-url: https://sonar.top/discord/
 # ცვლადი ყველა '<header>' სთვის ამ ფაილში.
 header:
   - <b><yellow>Sonar</b><reset>
@@ -53,7 +53,7 @@ commands:
       - <gray><click:open_url:'https://github.com/jonesdevelopment/sonar'>(C) <copyright-year> Jones Development and Sonar Contributors</click>
       - ''
       - <gray>გჭირდებათ დახმარება ან გაქვთ რამე კითხვა?
-      - <white><click:open_url:'https://jonesdev.xyz/discord/'><hover:show_text:'(დააჭირეთ რომ გახსნათ Discord)'>გახსენით ბილეთი Discord_ზე </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(დააჭირეთ რომ გახსნათ GitHub)'>ან შექმენით ახალი პრობლემის პოსტი GitHub_ზე.
+      - <white><click:open_url:'https://sonar.top/discord/'><hover:show_text:'(დააჭირეთ რომ გახსნათ Discord)'>გახსენით ბილეთი Discord_ზე </hover></click><click:open_url:'https://github.com/jonesdevelopment/sonar/issues'><hover:show_text:'(დააჭირეთ რომ გახსნათ GitHub)'>ან შექმენით ახალი პრობლემის პოსტი GitHub_ზე.
       - ''
     # ქვე-ბრძანებების ფორმატი რომელიც არის ნაჩვენები მთავარი ბრძანების გაცემის დროს.
     subcommands: '<suggest-subcommand><hover:show_text:''<gray>მხოლოდ მოთამაშეები: </gray><only-players><br><gray>აუცილებელია კონსოლი: </gray><only-console><br><gray>უფლება: </gray><white><permission><br><gray>სხვა-სახელი: </gray><aliases>''><dark_aqua> ▪ <gray>/sonar <ქვე-ბრძანება>  <white><description></hover></suggest-subcommand>'
