@@ -24,6 +24,8 @@
   [Discord](https://sonar.top/discord)
   |
   [License](https://github.com/jonesdevelopment/sonar/?tab=readme-ov-file#license)
+  |
+  [Documentation](https://docs.jonesdev.xyz/)
 </div>
 
 > ### Notice about Sonar 3.0
