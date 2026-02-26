@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 @ChannelHandler.Sharable
 public final class TailExceptionsHandler extends ChannelDuplexHandler {
   public static final TailExceptionsHandler INSTANCE = new TailExceptionsHandler();
+  // Do not enable unless instructed by support.
+  public static final boolean LOG_EXCEPTIONS = Boolean.getBoolean("sonar.log-netty-exceptions");
 
   // We can override the default exceptionCaught method since the server
   // does not have any other pipelines that could handle this error.
@@ -33,5 +35,8 @@ public final class TailExceptionsHandler extends ChannelDuplexHandler {
   public void exceptionCaught(final @NotNull ChannelHandlerContext ctx, final Throwable cause) throws Exception {
     // Close the channel if we encounter any errors.
     ctx.close();
+    if (LOG_EXCEPTIONS) {
+      cause.printStackTrace(System.err);
+    }
   }
 }

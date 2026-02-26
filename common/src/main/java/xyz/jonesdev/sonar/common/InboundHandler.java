@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.common.netty.TailExceptionsHandler;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 
 import java.net.InetAddress;
@@ -85,5 +86,8 @@ public final class InboundHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void exceptionCaught(final @NotNull ChannelHandlerContext ctx, final Throwable cause) throws Exception {
     ctx.close();
+    if (TailExceptionsHandler.LOG_EXCEPTIONS) {
+      cause.printStackTrace(System.err);
+    }
   }
 }
