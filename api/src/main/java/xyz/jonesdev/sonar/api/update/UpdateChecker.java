@@ -64,8 +64,8 @@ public class UpdateChecker {
           lastCheckResult = CheckResult.LATEST_VERSION;
         }
       } catch (Throwable throwable) {
-        Sonar.get0().getLogger().warn("Unable to retrieve version information: {}", throwable);
-        throwable.printStackTrace(System.err);
+        Sonar.get0().getLogger().warn("Failed to check for updates (is your firewall set up properly?): {}",
+          throwable);
         lastCheckResult = CheckResult.API_ERROR;
       }
     });
