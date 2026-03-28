@@ -42,6 +42,13 @@ jobs:
           path: bukkit/build/libs/Sonar-Bukkit.jar
           if-no-files-found: error
 
+      - name: Upload Paper Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sonar-Paper
+          path: paper/build/libs/Sonar-Paper.jar
+          if-no-files-found: error
+
       - name: Upload BungeeCord Artifact
         uses: actions/upload-artifact@v4
         with:
