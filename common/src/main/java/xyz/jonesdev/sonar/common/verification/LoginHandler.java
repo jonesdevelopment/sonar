@@ -138,6 +138,11 @@ public final class LoginHandler extends VerificationHandler {
     for (final SonarPacket packet : getRegistryPackets(user.getProtocolVersion())) {
       user.delayedWrite(packet);
     }
+    // Write the tags because Mojang decided to screw everyone over in 26.1.
+    final SonarPacket tags = getTagsPacket(user.getProtocolVersion());
+    if (tags != null) {
+      user.delayedWrite(tags);
+    }
     // Write the FinishConfiguration packet to the buffer
     user.delayedWrite(FinishConfigurationPacket.INSTANCE);
     // Send all packets in one flush

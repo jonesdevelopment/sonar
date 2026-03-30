@@ -23,6 +23,7 @@ import net.kyori.adventure.nbt.IntBinaryTag;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.config.SonarConfiguration;
@@ -37,6 +38,7 @@ import xyz.jonesdev.sonar.common.protocol.dimension.DimensionType;
 import xyz.jonesdev.sonar.common.protocol.entity.EntityType;
 import xyz.jonesdev.sonar.common.protocol.item.ItemType;
 import xyz.jonesdev.sonar.common.protocol.packets.configuration.RegistryDataPacket;
+import xyz.jonesdev.sonar.common.protocol.packets.configuration.UpdateTagsPacket;
 import xyz.jonesdev.sonar.common.protocol.packets.login.LoginSuccessPacket;
 import xyz.jonesdev.sonar.common.protocol.packets.play.*;
 import xyz.jonesdev.sonar.common.util.ComponentHolder;
@@ -98,6 +100,8 @@ public class SonarPacketPreparer {
   public final SonarPacket[] REGISTRY_SYNC_1_21_4 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_4);
   public final SonarPacket[] REGISTRY_SYNC_1_21_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_5);
   public final SonarPacket[] REGISTRY_SYNC_1_21_11 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_11);
+  public final SonarPacket[] REGISTRY_SYNC_26_1 = RegistryDataPacket.of(DimensionRegistry.CODEC_26_1);
+  public final SonarPacket TAGS_UPDATE_26_1 = UpdateTagsPacket.of(DimensionRegistry.TAGS_26_1);
   public final SonarPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
   public final static SonarPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
   public final SonarPacket RANDOM_KEEP_ALIVE = new SonarPacketSnapshot(new KeepAlivePacket(RANDOM.nextInt()));
@@ -295,8 +299,17 @@ public class SonarPacketPreparer {
       + Sonar.get0().getConfig().getVerification().getMaxPacketCount();
   }
 
+  public static @Nullable SonarPacket getTagsPacket(final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
+      return TAGS_UPDATE_26_1;
+    }
+    return null; // apparently doesn't crash the client; we're safe... for now.
+  }
+
   public static SonarPacket[] getRegistryPackets(final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_11)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
+      return REGISTRY_SYNC_26_1;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_11)) {
       return REGISTRY_SYNC_1_21_11;
     } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
       return REGISTRY_SYNC_1_21_5;

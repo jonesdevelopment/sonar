@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.protocol.SonarPacket;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @Getter
 @NoArgsConstructor
@@ -34,6 +35,17 @@ public final class UpdateTimePacket implements SonarPacket {
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
+      // muck fojang
+      byteBuf.writeLong(timeOfDay);
+      ProtocolUtil.writeVarInt(byteBuf, 1);
+      ProtocolUtil.writeVarInt(byteBuf, 0); // dimension
+      ProtocolUtil.writeVarLong(byteBuf, timeOfDay);
+      byteBuf.writeFloat(0f); // partialTicks
+      byteBuf.writeFloat(tickDayTime ? 1f : 0f); // rate
+      return;
+    }
+
     byteBuf.writeLong(worldAge);
     byteBuf.writeLong(timeOfDay);
 
