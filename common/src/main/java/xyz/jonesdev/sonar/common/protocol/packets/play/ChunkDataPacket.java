@@ -25,6 +25,7 @@ import lombok.ToString;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.LongArrayBinaryTag;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.protocol.SonarPacket;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
@@ -111,7 +112,7 @@ public final class ChunkDataPacket implements SonarPacket {
       // Since 1.21.5. The length of the long array of PaletteStorage no longer depends on the VarInt in the packet
       // SingularPalette doesn't need to read any additional long array.
       // So we'll remove suffix 0 as array length here. The cost of writing a palette has been reduced from 3 to 2 bytes.
-      final byte[] sectionData = protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_21_5) ? new byte[]{0, 0, 0, 0, 0, 0, 1, 0} : new byte[]{0, 0, 0, 0, 0, 1};
+      final byte[] sectionData = getSectionDataBytes(protocolVersion);
       int count = 24;
       ProtocolUtil.writeVarInt(byteBuf, sectionData.length * count);
 
@@ -139,6 +140,23 @@ public final class ChunkDataPacket implements SonarPacket {
         byteBuf.writeBytes(lightData);
       }
     }
+  }
+
+  private static byte @NonNull [] getSectionDataBytes(@NonNull ProtocolVersion protocolVersion) {
+    final byte[] sectionData;
+
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
+      // blockCount(2) + fluidCount(2) + blockPalette(3) + fluidPalette(3)
+      // Palette = bitsPerEntry(1) + id(1) + arrayLen(1)
+      sectionData = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
+      // blockCount(2) + fluidCount(2) + blockPalette(2) + fluidPalette(2)
+      sectionData = new byte[]{0, 0, 0, 0, 0, 1, 0, 1};
+    } else {
+      // Old versions: blockCount(2) + blockPalette(3) + fluidPalette(3)
+      sectionData = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
+    }
+    return sectionData;
   }
 
   @Override
