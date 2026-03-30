@@ -98,6 +98,7 @@ public class SonarPacketPreparer {
   public final SonarPacket[] REGISTRY_SYNC_1_21_4 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_4);
   public final SonarPacket[] REGISTRY_SYNC_1_21_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_5);
   public final SonarPacket[] REGISTRY_SYNC_1_21_11 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_11);
+  public final SonarPacket[] REGISTRY_SYNC_26_1 = RegistryDataPacket.of(DimensionRegistry.CODEC_26_1);
   public final SonarPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
   public final static SonarPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
   public final SonarPacket RANDOM_KEEP_ALIVE = new SonarPacketSnapshot(new KeepAlivePacket(RANDOM.nextInt()));
@@ -296,7 +297,9 @@ public class SonarPacketPreparer {
   }
 
   public static SonarPacket[] getRegistryPackets(final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_11)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
+      return REGISTRY_SYNC_26_1;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_11)) {
       return REGISTRY_SYNC_1_21_11;
     } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
       return REGISTRY_SYNC_1_21_5;
