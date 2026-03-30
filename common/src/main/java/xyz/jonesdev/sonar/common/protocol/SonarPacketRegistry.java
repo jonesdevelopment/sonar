@@ -356,8 +356,7 @@ public enum SonarPacketRegistry {
         map(0x12, MINECRAFT_1_19_3, true),
         map(0x14, MINECRAFT_1_19_4, true),
         map(0x15, MINECRAFT_1_20_2, true),
-        map(0x14, MINECRAFT_1_21_5, true),
-        map(0x16, MINECRAFT_26_1, true));
+        map(0x14, MINECRAFT_1_21_5, true));
       // minecraft:set_experience
       clientbound.register(SetExperiencePacket.class, SetExperiencePacket::new,
         map(0x1F, MINECRAFT_1_7_2, true),
