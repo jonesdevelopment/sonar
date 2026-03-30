@@ -145,15 +145,12 @@ public final class ChunkDataPacket implements SonarPacket {
   private static byte @NonNull [] getSectionDataBytes(@NonNull ProtocolVersion protocolVersion) {
     final byte[] sectionData;
 
+
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
-      // blockCount(2) + fluidCount(2) + blockPalette(3) + fluidPalette(3)
-      // Palette = bitsPerEntry(1) + id(1) + arrayLen(1)
       sectionData = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
-      // blockCount(2) + fluidCount(2) + blockPalette(2) + fluidPalette(2)
-      sectionData = new byte[]{0, 0, 0, 0, 0, 1, 0, 1};
+      sectionData = new byte[]{0, 0, 0, 0, 0, 1};
     } else {
-      // Old versions: blockCount(2) + blockPalette(3) + fluidPalette(3)
       sectionData = new byte[]{0, 0, 0, 0, 0, 0, 1, 0};
     }
     return sectionData;
