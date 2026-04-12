@@ -1,33 +1,17 @@
 ```
-# Gradle
+# Dependencies
 .gradle/
 build/
-.libs/
-
-# Dependencies
-libs/
-
-# Logs
-*.log
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# IDE
-.idea/
-*.iml
-*.ipr
-*.iws
-.vscode/
+# Logs
+*.log
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
-
-# Temporary files
-*.tmp
-*.temp
-*~
 ```
