@@ -1,13 +1,3 @@
-rootProject.name = "Sonar"
+rootProject.name = "CaptchaGenerator"
 
-sequenceOf(
-  "api",
-  "captcha",
-  "common",
-  "bukkit",
-  "bungeecord",
-  "paper",
-  "velocity"
-).forEach {
-  include(":$it")
-}
+include(":captcha")

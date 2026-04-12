@@ -1,0 +1,37 @@
+/*
+ * Copyright (C) 2025 CaptchaGenerator Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.captcha;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+import java.io.InputStream;
+import java.util.Objects;
+
+public final class TTFFontProvider {
+  static final int STANDARD_FONT_SIZE = 25;
+
+  public static Font loadFont(final @NotNull String path) {
+    try (final InputStream inputStream = TTFFontProvider.class.getResourceAsStream(path)) {
+      final Font customFont = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(inputStream));
+      return customFont.deriveFont(Font.PLAIN, STANDARD_FONT_SIZE);
+    } catch (Exception exception) {
+      throw new IllegalStateException("Error loading font. Does your environment support fonts?", exception);
+    }
+  }
+}
