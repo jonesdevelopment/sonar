@@ -1,34 +1,33 @@
-# GitHub
-.github/
-HEADER
-LICENSE
-.*ignore
-.*config
-.*attributes
-
-# Editor configurations
-.idea/
+```
+# Gradle
 .gradle/
-vscode/
-.fleet/
-
-# Build directories
-target/
-out/
-gradle/
 build/
-gradlew*
+.libs/
 
-# Uncommon files
-*.bat
-*.cmd
-*.jar
-*.class
-*.iml
-*.exe
-*.png
-*.jpg
-*.jpeg
+# Dependencies
+libs/
+
+# Logs
 *.log
-*.svg
-*.txt
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*~
+```
