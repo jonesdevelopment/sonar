@@ -13,7 +13,7 @@ If you discover a security vulnerability within Sonar, please follow these steps
 
 ## Contact
 
-If you have any questions or concerns regarding the security of this project, please open a ticket on Discord or contact me via email at contact@jonesdev.xyz.
+If you have any questions or concerns regarding the security of this project, please open a ticket on Discord or contact me via email at support@sonar.top.
 
 ## Acknowledgments
 
