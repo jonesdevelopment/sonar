@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.api.database.controller;
 import com.alessiodp.libby.LibraryManager;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
@@ -93,10 +94,11 @@ public final class VerifiedPlayerController {
           "?autoReconnect=true");
       }
 
-      connectionSource = new JdbcPooledConnectionSource(jdbcURL,
-        Sonar.get0().getConfig().getGeneralConfig().getString("database.username"),
-        Sonar.get0().getConfig().getGeneralConfig().getString("database.password"),
-        cachedDatabaseType.getDatabaseType());
+      final String user = Sonar.get0().getConfig().getGeneralConfig().getString("database.username");
+      final String pass = Sonar.get0().getConfig().getGeneralConfig().getString("database.password");
+      connectionSource = cachedDatabaseType == SonarConfiguration.Database.Type.H2
+        ? new JdbcConnectionSource(jdbcURL, user, pass, cachedDatabaseType.getDatabaseType())
+        : new JdbcPooledConnectionSource(jdbcURL, user, pass, cachedDatabaseType.getDatabaseType());
 
       try {
         TableUtils.createTableIfNotExists(connectionSource, VerifiedPlayer.class);
