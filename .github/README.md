@@ -30,9 +30,8 @@
 
 > ### Notice about Sonar 3.0
 > 
-> We're excited to announce the public release of Sonar 3.0.
-> If you are interested, please check out https://sonar.top/. You can read more about what sets Sonar 3.0 apart from Sonar 2.0 [here](<https://docs.sonar.top/faq>).
-> If you want more robust protection, better performance, and awesome new features, check out Sonar 3.0!
+> If you want more robust protection, better performance, and awesome new features, check out Sonar 3.0 at https://sonar.top/!
+> You can read more about what sets Sonar 3.0 apart from Sonar 2.0 [here](<https://sonar.top/docs/features>).
 
 ## Design and Goal
 * Effective, lightweight, and easy-to-use
