@@ -73,6 +73,10 @@ public class SonarPacketPreparer {
     0, 36 + MAP_SLOT, 1, ItemType.FILLED_MAP, CompoundBinaryTag.builder()
     .put("map", IntBinaryTag.intBinaryTag(0)) // map id
     .build());
+  public static final SonarPacket CAPTCHA_SET_CONTAINER_SLOT_OFFHAND = new SetContainerSlotPacket(
+    0, 45, 1, ItemType.FILLED_MAP, CompoundBinaryTag.builder()
+    .put("map", IntBinaryTag.intBinaryTag(0)) // map id
+    .build());
   public final static SonarPacket CAPTCHA_HELD_ITEM_SLOT = new SetHeldItemPacket(MAP_SLOT);
   public final SonarPacket DEFAULT_ABILITIES = new PlayerAbilitiesPacket(0x00, 0, 0);
   public final SonarPacket NO_MOVE_ABILITIES = new PlayerAbilitiesPacket(0x02, 0, 0);

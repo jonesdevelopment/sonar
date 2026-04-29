@@ -122,6 +122,9 @@ verification:
       # Zeichen (Buchstaben und Zahlen), die im Antwort-CAPTCHA erscheinen dürfen
       # Es wird nicht empfohlen, Zahlen oder Buchstaben hinzuzufügen, die einander ähneln könnten
       alphabet: 'abcdefhjkmnoprstuxyz'
+      # Should Sonar place the map in the player's offhand?
+      # This only works on Minecraft 1.9 and above.
+      place-in-offhand: false
 
     # Überprüft, ob die Spieler eine gültige Client-Marke an den Server senden
     client-brand:

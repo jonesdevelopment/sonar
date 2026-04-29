@@ -124,6 +124,9 @@ verification:
       # Não é recomendável adicionar números ou letras que possam parecer semelhantes.
       # Você deve editar isso apenas se souber o que está fazendo
       alphabet: 'abcdefhjkmnoprstuxyz'
+      # Should Sonar place the map in the player's offhand?
+      # This only works on Minecraft 1.9 and above.
+      place-in-offhand: false
 
     # Verifica se os jogadores estão enviando uma marca de cliente válida para o servidor
     client-brand:

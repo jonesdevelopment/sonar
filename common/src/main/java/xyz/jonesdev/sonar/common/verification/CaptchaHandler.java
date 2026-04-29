@@ -20,6 +20,7 @@ package xyz.jonesdev.sonar.common.verification;
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
 import xyz.jonesdev.sonar.api.antibot.SonarUser;
+import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.protocol.CaptchaPreparer;
 import xyz.jonesdev.sonar.common.protocol.SonarPacket;
 import xyz.jonesdev.sonar.common.protocol.map.MapCaptchaInfo;
@@ -43,9 +44,15 @@ public final class CaptchaHandler extends VerificationHandler {
 
     this.tries = Sonar.get0().getConfig().getVerification().getMap().getMaxTries();
 
-    // We may not be on slot 4, so we need to make sure to synchronize the current slot
-    user.delayedWrite(CAPTCHA_HELD_ITEM_SLOT);
-    user.delayedWrite(CAPTCHA_SET_CONTAINER_SLOT);
+    final boolean placeInOffhand = Sonar.get().getConfig().getVerification().getMap().isPlaceInOffhand()
+      && user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_9);
+    if (placeInOffhand) {
+      user.delayedWrite(CAPTCHA_SET_CONTAINER_SLOT_OFFHAND);
+    } else {
+      // We may not be on slot 4, so we need to make sure to synchronize the current slot
+      user.delayedWrite(CAPTCHA_HELD_ITEM_SLOT);
+      user.delayedWrite(CAPTCHA_SET_CONTAINER_SLOT);
+    }
     // Send random captcha to the player
     final MapCaptchaInfo captcha = CaptchaPreparer.getRandomCaptcha();
     this.answer = captcha.getAnswer().toLowerCase();

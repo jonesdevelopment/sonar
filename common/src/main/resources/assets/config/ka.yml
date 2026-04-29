@@ -124,6 +124,9 @@ verification:
       # სიმბოლოები (ასოები და რიცხვები), რომლებიც დაშვებულია გამოჩნდეს CAPTCHA-ს პასუხში
       # არ არის რეკომენდებული რიცხვების ან ასოების დამატება, რომლებიც შეიძლება ერთმანეთს ჰგავდეს
       alphabet: 'abcdefhjkmnoprstuxyz'
+      # Should Sonar place the map in the player's offhand?
+      # This only works on Minecraft 1.9 and above.
+      place-in-offhand: false
 
     # ამოწმებს, აგზავნიან თუ არა მოთამაშეები სერვერზე რეალურ მოთამაშის მეტსახელს
     client-brand:

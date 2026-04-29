@@ -181,6 +181,7 @@ public final class SonarConfiguration {
     verification.map.maxTries = clamp(generalConfig.getInt("verification.checks.map-captcha.max-tries"), 1, 100);
     verification.map.alphabet = generalConfig.getString("verification.checks.map-captcha.alphabet");
     verification.map.backgroundImage = null;
+    verification.map.placeInOffhand = generalConfig.getBoolean("verification.checks.map-captcha.place-in-offhand");
 
     final String backgroundPath = generalConfig.getString("verification.checks.map-captcha.background");
     if (!backgroundPath.isEmpty()) {
@@ -374,6 +375,7 @@ public final class SonarConfiguration {
       private int maxTries;
       private String alphabet;
       private File backgroundImage;
+      private boolean placeInOffhand;
     }
 
     @Getter

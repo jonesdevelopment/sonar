@@ -125,6 +125,9 @@ verification:
       # Znaky (čísla a písmena), které jsou povoleny k zobrazování v CAPTCHE
       # Nedoporučuje se přidávat čísla nebo písmena, která by se mohla navzájem podobat
       alphabet: 'abcdefhjkmnoprstuxyz'
+      # Should Sonar place the map in the player's offhand?
+      # This only works on Minecraft 1.9 and above.
+      place-in-offhand: false
 
     # Zkouší pokuď hráč posílá správný "client brand packet" serveru
     client-brand:

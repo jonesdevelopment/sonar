@@ -122,6 +122,9 @@ verification:
       # 允许出现在验证码答案中的字符
       # 不建议添加可能看起来彼此相似的数字或字母
       alphabet: 'abcdefhjkmnoprstuxyz'
+      # Should Sonar place the map in the player's offhand?
+      # This only works on Minecraft 1.9 and above.
+      place-in-offhand: false
 
     # 检查玩家是否正在向服务器发送有效的客户端标识符
     client-brand:

@@ -123,6 +123,9 @@ verification:
       # Символы (буквы и цифры), которые разрешено использовать в ответе на капчу
       # Не рекомендуется добавлять цифры или буквы, которые могут быть похожи друг на друга
       alphabet: 'abcdefhjkmnoprstuxyz'
+      # Should Sonar place the map in the player's offhand?
+      # This only works on Minecraft 1.9 and above.
+      place-in-offhand: false
 
     # Проверяет, отправляет ли игрок на сервер действительный клиентский бренд.
     client-brand:
