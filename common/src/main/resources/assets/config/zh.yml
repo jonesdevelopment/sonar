@@ -78,7 +78,7 @@ verification:
     # 检查玩家的下落移动是否遵循原版客户端.
     gravity:
       # Sonar 是否应该检查玩家的下落移动? (推荐启用)
-      enabled: true
+      timing: ALWAYS
       # 当玩家验证失败时 是否向他们发送地图验证码?
       captcha-on-fail: false
       # 玩家跌落在平台上多少tick后才能被算作站在平台上?
@@ -87,12 +87,12 @@ verification:
     # 检查玩家是否可以正确地站在方块上
     collision:
       # Sonar 是否应该生成方块平台以检查玩家下落与方块之间的碰撞? (推荐启用)
-      enabled: true
+      timing: ALWAYS
 
     # 检查客户端坐在实体上时是否发送了正确的数据包
     vehicle:
       # Sonar 是否应该让玩家坐在实体上, 以便检查他们的数据包是否合法?
-      enabled: true
+      timing: ALWAYS
       # 客户端需要发送的所需的最小数据包数量
       minimum-packets: 2
 

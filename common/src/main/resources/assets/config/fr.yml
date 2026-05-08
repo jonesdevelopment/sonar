@@ -79,7 +79,7 @@ verification:
     # Tous les mouvements prévus sont précalculés afin d'économiser les performances
     gravity:
       # Sonar devrait-il vérifier la gravité du client ? (Recommandé)
-      enabled: true
+      timing: ALWAYS
       # Sonar devrait-il faire résoudre un CAPTCHA au joueur s'il échoue à la vérification de la gravité ?
       captcha-on-fail: false
       # Nombre maximum de ticks que le joueur a pour tomber avant de pouvoir toucher la plateforme
@@ -88,12 +88,12 @@ verification:
     # Vérifie si le joueur entre en collision avec les blocs apparus en dessous de lui
     collision:
       # Sonar devrait-il vérifier si le joueur entre en collision avec des blocs ? (Recommandé)
-      enabled: true
+      timing: ALWAYS
 
     # Vérifie si le client envoie les paquets appropriés lorsqu'il monte dans un véhicule
     vehicle:
       # Sonar devrait-il vérifier si le joueur entre correctement dans un bateau ?
-      enabled: true
+      timing: ALWAYS
       # Nombre minimum de paquets envoyés par le client
       minimum-packets: 2
 

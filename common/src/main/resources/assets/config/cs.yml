@@ -80,7 +80,7 @@ verification:
     # Všechny předpokládané pohyby jsou předpočítány, kvůli ušetření výkonu
     gravity:
       # Měl by Sonar zkoušet pro gravitaci hráče (Doporučováno)
-      enabled: true
+      timing: ALWAYS
       # Měl by Sonar přimět hráče, aby vyřešil CAPTCHA, pokud neuspějí při kontrole gravitace?
       captcha-on-fail: false
       # Maximální počet ticků, který má hráč padat aby byl puštěn na verifikační platformu
@@ -89,12 +89,12 @@ verification:
     # Kontroluje, zda hráč naráží do bloků, které se vytvořily pod ním
     collision:
       # Měl by Sonar zkoušet jestli se hráč dotýka bloku? (Doporučováno)
-      enabled: true
+      timing: ALWAYS
 
     # Kontroluje, zda klient odesílá správné pakety při montáži vozidla
     vehicle:
       # Měl by sonar kontrolovat, zda hráč správně vstoupil na loď?
-      enabled: true
+      timing: ALWAYS
       # Minimální počet paketů odeslaných klientem
       minimum-packets: 2
 

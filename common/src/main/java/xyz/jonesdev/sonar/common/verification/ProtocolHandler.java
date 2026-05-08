@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common.verification;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.antibot.AntiBot;
 import xyz.jonesdev.sonar.api.antibot.SonarUser;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.protocol.SonarPacket;
@@ -163,7 +164,8 @@ public final class ProtocolHandler extends VerificationHandler {
 
   private void markSuccess() {
     // Pass the player to the next best verification handler
-    if (!user.isGeyser() && Sonar.get0().getConfig().getVerification().getVehicle().isEnabled()) {
+    if (!user.isGeyser()
+      && AntiBot.shouldPerform(Sonar.get0().getConfig().getVerification().getVehicle().getTiming())) {
       user.channel().pipeline().get(SonarPacketDecoder.class).setListener(new VehicleHandler(user));
     } else if (user.isForceCaptcha() || Sonar.get0().getAntiBot().shouldPerformCaptcha()) {
       user.channel().pipeline().get(SonarPacketDecoder.class).setListener(new CaptchaHandler(user));

@@ -56,7 +56,7 @@ public final class AntiBot {
     return shouldPerform(Sonar.get0().getConfig().getVerification().getMap().getTiming());
   }
 
-  private static boolean shouldPerform(final SonarConfiguration.Verification.Timing timing) {
+  public static boolean shouldPerform(final SonarConfiguration.Verification.Timing timing) {
     return timing == SonarConfiguration.Verification.Timing.ALWAYS
       || (timing == SonarConfiguration.Verification.Timing.DURING_ATTACK
       && Sonar.get0().getAttackTracker().getCurrentAttack() != null);

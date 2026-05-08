@@ -167,12 +167,12 @@ public final class SonarConfiguration {
       Sonar.get0().getLogger().warn(" ");
     }
 
-    verification.gravity.enabled = generalConfig.getBoolean("verification.checks.gravity.enabled");
-    verification.gravity.checkCollisions = generalConfig.getBoolean("verification.checks.collision.enabled");
+    verification.gravity.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.gravity.timing"));
+    verification.gravity.collisionTiming = Verification.Timing.valueOf(generalConfig.getString("verification.checks.collision.timing"));
     verification.gravity.captchaOnFail = generalConfig.getBoolean("verification.checks.gravity.captcha-on-fail");
     verification.gravity.maxMovementTicks = clamp(generalConfig.getInt("verification.checks.gravity.max-movement-ticks"), 2, 100);
 
-    verification.vehicle.enabled = generalConfig.getBoolean("verification.checks.vehicle.enabled");
+    verification.vehicle.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.vehicle.timing"));
     verification.vehicle.minimumPackets = clamp(generalConfig.getInt("verification.checks.vehicle.minimum-packets"), 0, 20);
 
     verification.map.timing = Verification.Timing.valueOf(generalConfig.getString("verification.checks.map-captcha.timing"));
@@ -380,15 +380,15 @@ public final class SonarConfiguration {
 
     @Getter
     public static final class Gravity {
-      private boolean enabled;
-      private boolean checkCollisions;
+      private Timing timing;
+      private Timing collisionTiming;
       private boolean captchaOnFail;
       private int maxMovementTicks;
     }
 
     @Getter
     public static final class Vehicle {
-      private boolean enabled;
+      private Timing timing;
       private int minimumPackets;
     }
 

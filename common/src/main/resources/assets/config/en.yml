@@ -79,7 +79,7 @@ verification:
     # All predicted motions are precalculated to save performance
     gravity:
       # Should Sonar check for valid client gravity? (Recommended)
-      enabled: true
+      timing: ALWAYS
       # Should Sonar make the player solve a CAPTCHA if they fail the gravity check?
       captcha-on-fail: false
       # The number of ticks the player has to fall to be allowed to hit the platform
@@ -88,12 +88,12 @@ verification:
     # Checks if the player is colliding with blocks spawned below them
     collision:
       # Should Sonar check if the player collides with blocks? (Recommended)
-      enabled: true
+      timing: ALWAYS
 
     # Checks if the client sends proper packets when entering a boat
     vehicle:
       # Should Sonar check if the player properly enters a boat?
-      enabled: true
+      timing: ALWAYS
       # Minimum number of packets sent by the client
       minimum-packets: 2
 

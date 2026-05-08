@@ -19,6 +19,7 @@ package xyz.jonesdev.sonar.common.verification;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.Sonar;
+import xyz.jonesdev.sonar.api.antibot.AntiBot;
 import xyz.jonesdev.sonar.api.antibot.SonarUser;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.common.protocol.SonarPacket;
@@ -38,8 +39,10 @@ public final class GravityHandler extends VerificationHandler {
     // Bedrock users start falling immediately
     this.canFall = user.isGeyser();
     // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
-    this.enableGravityCheck = !user.isGeyser() && Sonar.get0().getConfig().getVerification().getGravity().isEnabled();
-    this.enableCollisionsCheck = !user.isGeyser() && Sonar.get0().getConfig().getVerification().getGravity().isCheckCollisions();
+    this.enableGravityCheck = !user.isGeyser() && AntiBot.shouldPerform(
+      Sonar.get0().getConfig().getVerification().getGravity().getTiming());
+    this.enableCollisionsCheck = !user.isGeyser() && AntiBot.shouldPerform(
+      Sonar.get0().getConfig().getVerification().getGravity().getCollisionTiming());
 
     // First, write the JoinGame packet to the buffer
     user.delayedWrite(joinGame);

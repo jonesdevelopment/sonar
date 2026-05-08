@@ -77,7 +77,7 @@ verification:
     # Alle vorhergesagten Bewegungen werden vorausberechnet, um die Leistung zu sparen
     gravity:
       # Soll Sonar auf gültige Client-Gravitation prüfen? (Empfohlen)
-      enabled: true
+      timing: ALWAYS
       # Soll Sonar den Spieler dazu bringen, ein CAPTCHA zu lösen, wenn er die Schwerkraftprüfung nicht besteht?
       captcha-on-fail: false
       # Maximale Anzahl an Ticks, die der Spieler fallen muss, um die Plattform erreichen zu dürfen
@@ -86,12 +86,12 @@ verification:
     # Prüft, ob der Spieler mit Blöcken kollidiert, die unter ihm gespawnt sind
     collision:
       # Soll Sonar prüfen, ob der Spieler mit Blöcken kollidiert? (Empfohlen)
-      enabled: true
+      timing: ALWAYS
 
     # Überprüft, ob der Spieler beim Einsteigen in ein Boot die richtigen Pakete sendet
     vehicle:
       # Sollte Sonar prüfen, ob der Spieler richtig in ein Fahrzeug einsteigt?
-      enabled: true
+      timing: ALWAYS
       # Mindestanzahl der vom Client gesendeten Pakete
       minimum-packets: 2
 
