@@ -253,7 +253,8 @@ public final class SonarConfiguration {
 
     SonarCommand.prepareCachedTabSuggestions();
 
-    supportUrl = messagesConfig.getString("support-url");
+    supportUrl = messagesConfig.getString("support-url")
+      .replace("jonesdev.xyz", "sonar.top"); // Migration: Replace legacy URL
     header = MiniMessage.miniMessage().deserialize(
       String.join("<newline>", messagesConfig.getStringList("header")),
       Placeholder.unparsed("support-url", supportUrl),
