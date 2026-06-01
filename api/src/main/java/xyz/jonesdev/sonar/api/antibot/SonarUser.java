@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
@@ -44,6 +45,8 @@ public interface SonarUser {
   void setForceCaptcha(final boolean isForceCaptcha);
 
   boolean isGeyser();
+
+  @Nullable String getHostname();
 
   /**
    * Disconnect the player during/after verification

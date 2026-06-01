@@ -154,12 +154,19 @@ verification:
     # o TransferTool para Geyser, para que jogadores Bedrock sejam redirecionados para o servidor correto.
     # https://github.com/onebeastchris/TransferTool
     enabled: false
+    # Ao usar um proxy com forced hosts, o Sonar pode usar o hostname que o jogador
+    # usou originalmente para se conectar (do pacote handshake) como destino da transferência.
+    # Desative esta opção se seus forced hosts forem apenas para roteamento interno
+    # e você quiser que todos os jogadores sejam transferidos para o destination-host configurado.
+    use-handshake-hostname: false
     # Para qual servidor o Sonar deve transferir o jogador quando a verificação for passada?
     # Por favor, insira o IP do servidor usado pelos jogadores para se conectar normalmente ao seu servidor.
     # Por exemplo, você pode colocar "mc.hypixel.net" ou um IP direto como "1.1.1.1"
     destination-host: "play.my-server.com"
     # Qual porta o Sonar deve usar ao transferir o jogador para o servidor de origem?
     # Se seu servidor não precisar de uma porta para se conectar, você pode deixar isso como 25565.
+    # Se você estiver usando forced hosts (use-handshake-hostname: true), defina isto para
+    # a porta em que o proxy está ouvindo (a porta "bind" na configuração do seu proxy).
     destination-port: 25565
 
   # O modo de jogo do jogador durante a verificação
