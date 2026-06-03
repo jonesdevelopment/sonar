@@ -128,7 +128,6 @@ public class SonarPacketPreparer {
   public SonarPacket spawnPosition;
   public SonarPacket fallStartPosition;
   public SonarPacket fallStartPositionLegacy;
-  public static SonarPacket transferToOrigin;
   public SonarPacket blacklisted;
   public SonarPacket alreadyQueued;
   public SonarPacket alreadyVerifying;
@@ -214,15 +213,6 @@ public class SonarPacketPreparer {
     reconnectedTooFast = new SonarPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getVerification().getTooFastReconnect(), true));
     unsupportedVersion = new SonarPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getVerification().getUnsupportedVersion(), true));
     tooManyOnlinePerIP = new SonarPacketSnapshot(new DisconnectPacket(Sonar.get0().getConfig().getTooManyOnlinePerIp(), true));
-
-    // Prepare transfer packet
-    if (Sonar.get0().getConfig().getGeneralConfig().getBoolean("verification.transfer.enabled")) {
-      transferToOrigin = new SonarPacketSnapshot(new TransferPacket(
-        Sonar.get0().getConfig().getGeneralConfig().getString("verification.transfer.destination-host"),
-        Sonar.get0().getConfig().getGeneralConfig().getInt("verification.transfer.destination-port")));
-    } else {
-      transferToOrigin = null;
-    }
 
     // Prepare update time packet
     final int timeOfDay = Sonar.get0().getConfig().getVerification().getTimeOfDay();

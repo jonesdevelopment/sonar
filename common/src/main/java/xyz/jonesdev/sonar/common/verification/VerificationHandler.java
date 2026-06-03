@@ -28,11 +28,9 @@ import xyz.jonesdev.sonar.api.event.impl.UserVerifyFailedEvent;
 import xyz.jonesdev.sonar.api.event.impl.UserVerifySuccessEvent;
 import xyz.jonesdev.sonar.common.netty.MinecraftVarInt21FrameDecoder;
 import xyz.jonesdev.sonar.common.netty.MinecraftVarIntLengthEncoder;
-import xyz.jonesdev.sonar.common.protocol.SonarPacket;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketDecoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketListener;
-import xyz.jonesdev.sonar.common.protocol.SonarPacketSnapshot;
 import xyz.jonesdev.sonar.common.protocol.packets.play.TransferPacket;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
@@ -69,7 +67,7 @@ public abstract class VerificationHandler implements SonarPacketListener {
         ? hostname
         : Sonar.get0().getConfig().getGeneralConfig().getString("verification.transfer.destination-host");
       final int destinationPort = Sonar.get0().getConfig().getGeneralConfig().getInt("verification.transfer.destination-port");
-      final SonarPacket transferPacket = new SonarPacketSnapshot(new TransferPacket(destinationHost, destinationPort));
+      final TransferPacket transferPacket = new TransferPacket(destinationHost, destinationPort);
       // Send the transfer packet to the player (and close the channel if on Java Edition)
       if (user.isGeyser()) {
         user.write(transferPacket);
