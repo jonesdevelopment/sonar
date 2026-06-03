@@ -31,13 +31,12 @@ import xyz.jonesdev.sonar.common.netty.MinecraftVarIntLengthEncoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketDecoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketEncoder;
 import xyz.jonesdev.sonar.common.protocol.SonarPacketListener;
+import xyz.jonesdev.sonar.common.protocol.packets.play.TransferPacket;
 import xyz.jonesdev.sonar.common.statistics.GlobalSonarStatistics;
 import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 import xyz.jonesdev.sonar.common.util.exception.QuietDecoderException;
 
 import java.util.Random;
-
-import static xyz.jonesdev.sonar.common.protocol.SonarPacketPreparer.transferToOrigin;
 
 @RequiredArgsConstructor
 public abstract class VerificationHandler implements SonarPacketListener {
@@ -57,17 +56,28 @@ public abstract class VerificationHandler implements SonarPacketListener {
 
     // If enabled, transfer the player back to the origin server.
     // This feature was introduced by Mojang in Minecraft version 1.20.5.
-    if (transferToOrigin != null && user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
+    if (user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)
+      && Sonar.get0().getConfig().getGeneralConfig().getBoolean("verification.transfer.enabled")) {
+      // Use the original handshake hostname if configured and available (for forced hosts / proxy setups),
+      // otherwise fall back to the configured destination host.
+      final String hostname = user.getHostname();
+      final boolean useHandshake = Sonar.get0().getConfig().getGeneralConfig()
+        .getBoolean("verification.transfer.use-handshake-hostname");
+      final String destinationHost = useHandshake && hostname != null && !hostname.isEmpty()
+        ? hostname
+        : Sonar.get0().getConfig().getGeneralConfig().getString("verification.transfer.destination-host");
+      final int destinationPort = Sonar.get0().getConfig().getGeneralConfig().getInt("verification.transfer.destination-port");
+      final TransferPacket transferPacket = new TransferPacket(destinationHost, destinationPort);
       // Send the transfer packet to the player (and close the channel if on Java Edition)
       if (user.isGeyser()) {
-        user.write(transferToOrigin);
+        user.write(transferPacket);
         // Make sure we cannot receive any more packets from the player
         user.channel().pipeline().remove(SonarPacketDecoder.class);
         user.channel().pipeline().remove(SonarPacketEncoder.class);
         user.channel().pipeline().remove(MinecraftVarInt21FrameDecoder.class);
         user.channel().pipeline().remove(MinecraftVarIntLengthEncoder.class);
       } else {
-        ProtocolUtil.closeWith(user.channel(), user.getProtocolVersion(), transferToOrigin);
+        ProtocolUtil.closeWith(user.channel(), user.getProtocolVersion(), transferPacket);
       }
     } else {
       // Disconnect player with the verification success message

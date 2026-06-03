@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Sonar Contributors
+ * Copyright (C) 2026 Sonar Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 import xyz.jonesdev.sonar.api.timer.SystemTimer;
 
@@ -44,6 +45,8 @@ public interface SonarUser {
   void setForceCaptcha(final boolean isForceCaptcha);
 
   boolean isGeyser();
+
+  @Nullable String getHostname();
 
   /**
    * Disconnect the player during/after verification

@@ -48,6 +48,7 @@ import static xyz.jonesdev.sonar.common.protocol.SonarPacketPreparer.*;
 public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter {
   protected @Nullable String username;
   protected ProtocolVersion protocolVersion;
+  protected @Nullable String handshakeHostname;
   protected @Nullable RemovalListener channelRemovalListener;
 
   /**
@@ -65,6 +66,7 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
       throw QuietDecoderException.INSTANCE;
     }
     protocolVersion = ProtocolVersion.fromId(protocol);
+    handshakeHostname = hostname;
     ctx.pipeline().addFirst(SONAR_BANDWIDTH, BandwidthHandler.INSTANCE);
   }
 
@@ -166,7 +168,8 @@ public abstract class InboundHandlerAdapter extends ChannelInboundHandlerAdapter
       }
 
       // Create an instance for the user and let the verification handler take over the channel
-      return () -> new UserWrapper(ctx, inetAddress, protocolVersion, username, fingerprint, geyser);
+      return () -> new UserWrapper(ctx, inetAddress, protocolVersion, username, fingerprint, geyser,
+        handshakeHostname);
     });
   }
 

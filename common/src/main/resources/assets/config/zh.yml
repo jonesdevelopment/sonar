@@ -150,12 +150,19 @@ verification:
     # TransferTool 扩展, 以便将 Bedrock 玩家重定向到正确的服务器.
     # https://github.com/onebeastchris/TransferTool
     enabled: false
+    # 当代理处于 forced hosts 模式时, Sonar 可以使用玩家最初连接时使用的
+    # 主机名（来自握手包）作为传输目标地址。
+    # 如果您的 forced hosts 仅用于内部路由, 并且您希望所有玩家都传输到
+    # 配置的 destination-host, 请禁用此选项。
+    use-handshake-hostname: false
     # 当玩家通过验证后, Sonar 应该将玩家转移到哪个服务器
     # 请输入玩家正常连接服务器时使用的服务器IP或域名
     # 例如使用域名("mc.hypixel.net") 或使用 IP 地址("1.1.1.1").
     destination-host: "play.my-server.com"
     # Sonar 应该告诉玩家通过以上域名的什么端口来连接到服务器?
     # 如果服务器地址不包含端口 请保留25565.
+    # 如果您使用 forced hosts (use-handshake-hostname: true), 请将此设置为
+    # 代理服务器监听的端口 (代理配置中的 "bind" 端口)。
     destination-port: 25565
 
   # 玩家正在验证时所使用的游戏模式
