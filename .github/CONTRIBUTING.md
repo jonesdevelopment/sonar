@@ -5,7 +5,7 @@ joining the [Discord](https://sonar.top/discord).
 ## Contributing Guidelines:
 
 1. Fork the repository and create a new branch for your contribution.
-2. Follow the coding guidelines for your code.
+2. Adhere to the Coding Guidelines and LLM Guidelines.
 3. Test your code before committing and pushing it.
 4. Use [semantic](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716) commit messages for your commits.
 
@@ -16,6 +16,17 @@ joining the [Discord](https://sonar.top/discord).
 - Use meaningful names for variables, classes, and methods.
 - Write clear comments to explain complex parts of your code.
 - Ensure your code is easy to read and maintain.
+
+## LLM Guidelines
+
+Keep the use of AI (including LLMs) for code generation to an absolute minimum. If possible, avoid using AI entirely due to potential complications regarding authorship, intellectual property, and copyright.
+
+If AI was utilized during the development of a Pull Request, you must disclose its exact use in the PR description. This includes:
+- The specific tool and model used (e.g., GPT 5.4, Claude 4.7 Sonnet, Gemini 3.1 Pro)
+- The nature of its use (e.g., optimization)
+- The exact prompts used, where relevant
+
+Please note that submissions will be rejected if AI usage raises concerns regarding code quality, licensing, or integrity.
 
 ## Bug Reports:
 
