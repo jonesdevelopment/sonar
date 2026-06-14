@@ -169,7 +169,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Aktuální příchozí využitá šířka pásma: <white><incoming-traffic>'
       - ' <dark_aqua>▪ <gray>Aktuální odchozí využitá šířka pásma: <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Celková příchozí využitá šířka pásma: <white><incoming-traffic-ttl>'
-      - ' <dark_aqua>▪ <gray>Celková odchozí využitá šířka pásma: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Celková odchozí využitá šířka pásma: <white><outgoing-traffic-ttl>'
 
   # Překlady pro '/sonar dump'
   dump:

@@ -169,7 +169,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Current incoming used bandwidth: <white><incoming-traffic>'
       - ' <dark_aqua>▪ <gray>Current outgoing used bandwidth: <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Total incoming used bandwidth: <white><incoming-traffic-ttl>'
-      - ' <dark_aqua>▪ <gray>Total outgoing used bandwidth: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Total outgoing used bandwidth: <white><outgoing-traffic-ttl>'
 
   # Translations for '/sonar dump'
   dump:

@@ -138,7 +138,7 @@ commands:
     # Bu alt komut için açıklama
     description: "Bu sunucunun oturum istatistiklerini göster"
     # İstatistikleri görüntülerken her şeyin üzerinde gösterilen bilgilendirme mesajı
-    header: 'Bu oturum için <statistics-type> istatistikleri gösteriliyor:'
+    header: '<prefix>Bu oturum için <statistics-type> istatistikleri gösteriliyor:'
     # Message that is shown when a player tries viewing an unknown statistic
     unknown-type: '<prefix><red>Bilinmeyen istatistik türü! Mevcut istatistikler: <gray><statistics>'
     # Genel istatistik mesajının biçimi
