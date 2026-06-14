@@ -88,9 +88,9 @@ commands:
     # Description de cette sous-commande
     description: "Activer ou désactiver les notifications d'attaque"
     # Message affiché lorsqu'un joueur s'abonne aux notifications d'attaque de Sonar
-    subscribed: "<prefix>Vous visualisez maintenant les notifications d'attaque de Sonar."
+    subscribe: "<prefix>Vous visualisez maintenant les notifications d'attaque de Sonar."
     # Message affiché lorsqu'un joueur se désabonne des notifications d'attaque de Sonar
-    unsubscribed: "<prefix>Vous ne visualisez plus les notifications d'attaque de Sonar."
+    unsubscribe: "<prefix>Vous ne visualisez plus les notifications d'attaque de Sonar."
 
   # Traductions pour '/sonar blacklist'
   blacklist:
@@ -107,7 +107,7 @@ commands:
     # Message affiché lorsque quelqu'un supprime une adresse IP de la liste noire
     remove: '<prefix>Adresse IP <ip> supprimée avec succès de la liste noire.'
     # Message affiché lorsque quelqu'un ajoute une adresse IP à la liste noire, mais qu'elle est déjà en liste noire
-    duplicate-ip: "<prefix>L'adresse IP que vous avez fournie est déjà sur la liste noire."
+    ip-duplicate: "<prefix>L'adresse IP que vous avez fournie est déjà sur la liste noire."
     # Message affiché lorsque quelqu'un supprime une adresse IP de la liste noire, mais qu'elle n'est pas en liste noire
     ip-not-found: "<prefix>L'adresse IP que vous avez fournie ne figure pas sur la liste noire."
 

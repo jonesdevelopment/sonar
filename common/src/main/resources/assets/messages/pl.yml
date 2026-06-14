@@ -172,7 +172,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Aktualnie używana przychodząca przepustowość: <white><incoming-traffic>'
       - ' <dark_aqua>▪ <gray>Aktualnie używana przepustowość wychodząca: <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Całkowita wykorzystana przepustowość przychodząca: <white><incoming-traffic-ttl>'
-      - ' <dark_aqua>▪ <gray>Całkowita wykorzystana przepustowość wychodząca: <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Całkowita wykorzystana przepustowość wychodząca: <white><outgoing-traffic-ttl>'
 
   # Translations for '/sonar dump'
   dump:

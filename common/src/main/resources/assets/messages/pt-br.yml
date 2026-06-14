@@ -169,7 +169,7 @@ commands:
       - ' <dark_aqua>▪ <gray>Largura de banda usada atualmente (entrada): <white><incoming-traffic>'
       - ' <dark_aqua>▪ <gray>Largura de banda usada atualmente (saída): <white><outgoing-traffic>'
       - ' <dark_aqua>▪ <gray>Largura de banda total usada (entrada): <white><incoming-traffic-ttl>'
-      - ' <dark_aqua>▪ <gray>Largura de banda total usada (saída): <white><incoming-traffic-ttl>'
+      - ' <dark_aqua>▪ <gray>Largura de banda total usada (saída): <white><outgoing-traffic-ttl>'
 
   # Traduções para '/sonar dump'
   dump:
