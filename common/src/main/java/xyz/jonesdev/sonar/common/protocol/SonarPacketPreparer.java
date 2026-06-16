@@ -155,12 +155,16 @@ public class SonarPacketPreparer {
     loginSuccess = new SonarPacketSnapshot(new LoginSuccessPacket(uuid, username, true));
 
     // Prepare JoinGame packet
+    final SonarConfiguration.Verification.Dimension configDimension =
+      Sonar.get0().getConfig().getVerification().getDimension();
+    final DimensionType verificationDimension = DimensionType.valueOf(configDimension.name());
+    final String dimensionKey = configDimension.getKey();
     joinGame = new SonarPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
       Sonar.get0().getConfig().getVerification().getGamemode().getId(),
       -1, 0, 0,
       RANDOM.nextInt(3), 1, 0, 0,
-      new String[]{"minecraft:overworld"}, "minecraft:overworld", "flat",
-      DimensionType.OVERWORLD, RANDOM.nextLong() & 1337,
+      new String[]{dimensionKey}, dimensionKey, "flat",
+      verificationDimension, RANDOM.nextLong() & 1337,
       false, true, false,
       false, false, false, true));
 
@@ -177,7 +181,7 @@ public class SonarPacketPreparer {
     // Set the dynamic block and collide Y position based on the maximum fall distance
     dynamicSpawnYPosition = PLATFORM_Y_POSITION + (int) Math.ceil(fallDistance);
     defaultSpawnPosition = new SonarPacketSnapshot(new SetDefaultSpawnPositionPacket(
-      "minecraft:overworld",
+      dimensionKey,
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION));
     spawnPosition = new SonarPacketSnapshot(new SetPlayerPositionRotationPacket(
       SPAWN_X_POSITION, IN_AIR_Y_POSITION, SPAWN_Z_POSITION,

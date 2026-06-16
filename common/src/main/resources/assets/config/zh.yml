@@ -165,6 +165,9 @@ verification:
     # 代理服务器监听的端口 (代理配置中的 "bind" 端口)。
     destination-port: 25565
 
+  # 验证世界的维度
+  # 可用类型: OVERWORLD, THE_NETHER, THE_END
+  dimension: OVERWORLD
   # 玩家正在验证时所使用的游戏模式
   # 可用类型: SURVIVAL, CREATIVE, ADVENTURE
   # - SURVIVAL: 生存模式, 所有UI可见

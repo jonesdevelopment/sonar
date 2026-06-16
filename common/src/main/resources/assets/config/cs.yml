@@ -170,6 +170,9 @@ verification:
     # na kterém proxy naslouchá (port "bind" v konfiguraci vašeho proxy).
     destination-port: 25565
 
+  # Dimenze ověřovacího světa
+  # Typy: OVERWORLD, THE_NETHER, THE_END
+  dimension: OVERWORLD
   # Gamemode hráče při verifikaci
   # Typy: SURVIVAL, CREATIVE, ADVENTURE
   # - SURVIVAL: všechny komponenty UI jsou zobrazeny

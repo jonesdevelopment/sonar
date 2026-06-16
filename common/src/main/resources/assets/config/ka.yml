@@ -169,6 +169,9 @@ verification:
     # რომელზეც პროქსი უსმენს ("bind" პორტი თქვენი პროქსის კონფიგურაციაში).
     destination-port: 25565
 
+  # გადამოწმების სამყაროს განზომილება
+  # შესაძლო ტიპები: OVERWORLD, THE_NETHER, THE_END
+  dimension: OVERWORLD
   # მოთამაშის თამაშის რეჟიმი გადამოწმების დროს
   # შესაძლო ტიპები: SURVIVAL, CREATIVE, ADVENTURE
   # - SURVIVAL: ყველა UI კომპონენტი ჩანს

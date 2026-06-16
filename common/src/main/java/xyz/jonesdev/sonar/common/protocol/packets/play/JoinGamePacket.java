@@ -140,7 +140,7 @@ public final class JoinGamePacket implements SonarPacket {
       byteBuf.writeBoolean(limitedCrafting);
 
       if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
-        ProtocolUtil.writeVarInt(byteBuf, dimension.getId());
+        ProtocolUtil.writeVarInt(byteBuf, findDimensionId(getRegistryCodec(protocolVersion)));
       } else {
         ProtocolUtil.writeString(byteBuf, dimension.getKey());
       }
@@ -171,6 +171,40 @@ public final class JoinGamePacket implements SonarPacket {
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
       byteBuf.writeBoolean(secureProfile);
     }
+  }
+
+  private int findDimensionId(final @NotNull CompoundBinaryTag codec) {
+    final CompoundBinaryTag dimensionType = codec.getCompound("minecraft:dimension_type");
+    if (dimensionType == null) return dimension.getId();
+    final ListBinaryTag values = dimensionType.getList("value");
+    if (values == null) return dimension.getId();
+    for (int i = 0; i < values.size(); i++) {
+      final CompoundBinaryTag entry = (CompoundBinaryTag) values.get(i);
+      if (entry == null) continue;
+      if (levelName.equals(entry.getString("name"))) {
+        return entry.getInt("id");
+      }
+    }
+    return dimension.getId();
+  }
+
+  private static @NotNull CompoundBinaryTag getRegistryCodec(final @NotNull ProtocolVersion protocolVersion) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
+      return DimensionRegistry.CODEC_26_1;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_11)) {
+      return DimensionRegistry.CODEC_1_21_11;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_5)) {
+      return DimensionRegistry.CODEC_1_21_5;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_4)) {
+      return DimensionRegistry.CODEC_1_21_4;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_2)) {
+      return DimensionRegistry.CODEC_1_21_2;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21)) {
+      return DimensionRegistry.CODEC_1_21;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
+      return DimensionRegistry.CODEC_1_20_5;
+    }
+    return DimensionRegistry.CODEC_1_20;
   }
 
   private static CompoundBinaryTag getCodec(final @NotNull ProtocolVersion protocolVersion) {

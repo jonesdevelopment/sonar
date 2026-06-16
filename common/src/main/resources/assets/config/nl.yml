@@ -170,6 +170,9 @@ verification:
     # de poort waarop de proxy luistert (de "bind"-poort in uw proxyconfiguratie).
     destination-port: 25565
 
+  # De dimensie van de verificatiewereld
+  # Mogelijke typen: OVERWORLD, THE_NETHER, THE_END
+  dimension: OVERWORLD
   # De spelmodus van de speler tijdens verificatie
   # Mogelijke typen: SURVIVAL, CREATIVE, ADVENTURE
   # - SURVIVAL: alle UI-componenten zijn zichtbaar

@@ -170,6 +170,9 @@ verification:
     # на котором слушает прокси (порт "bind" в конфигурации вашего прокси).
     destination-port: 25565
 
+  # Измерение мира проверки
+  # Возможные типы: OVERWORLD, THE_NETHER, THE_END
+  dimension: OVERWORLD
   # Режим игрока во время проверки
   # Возможные типы: SURVIVAL, CREATIVE, ADVENTURE
   # - SURVIVAL: все компоненты пользовательского интерфейса видны

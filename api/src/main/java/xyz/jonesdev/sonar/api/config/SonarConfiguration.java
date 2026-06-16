@@ -199,6 +199,7 @@ public final class SonarConfiguration {
 
     verification.timeOfDay = clamp(generalConfig.getInt("verification.time-of-day"), 0, 24000);
     verification.gamemode = Verification.Gamemode.valueOf(generalConfig.getString("verification.gamemode"));
+    verification.dimension = Verification.Dimension.valueOf(generalConfig.getString("verification.dimension"));
     verification.validNameRegex = Pattern.compile(generalConfig.getString("verification.checks.valid-name-regex"));
 
     verification.checkGeyser = generalConfig.getBoolean("verification.check-geyser-players");
@@ -405,6 +406,7 @@ public final class SonarConfiguration {
     }
 
     private Gamemode gamemode;
+    private Dimension dimension;
 
     @Getter
     @RequiredArgsConstructor
@@ -419,6 +421,16 @@ public final class SonarConfiguration {
       public boolean isSurvivalOrAdventure() {
         return this == SURVIVAL || this == ADVENTURE;
       }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public enum Dimension {
+      OVERWORLD("minecraft:overworld"),
+      THE_NETHER("minecraft:the_nether"),
+      THE_END("minecraft:the_end");
+
+      private final String key;
     }
 
     private int timeOfDay;

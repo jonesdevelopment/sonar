@@ -169,6 +169,9 @@ verification:
     # na którym nasłuchuje proxy (port "bind" w konfiguracji twojego proxy).
     destination-port: 25565
 
+  # Wymiar świata weryfikacji
+  # Dostępne rodzaje: OVERWORLD, THE_NETHER, THE_END
+  dimension: OVERWORLD
   # Tryb gry gracza (gamemode) podczas weryfikacji
   # Dostępne rodzaje: SURVIVAL, CREATIVE, ADVENTURE
   # - SURVIVAL: Wszystkie komponenty interfejsu są widoczne
