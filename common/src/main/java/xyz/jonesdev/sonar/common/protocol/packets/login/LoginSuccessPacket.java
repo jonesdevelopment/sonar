@@ -38,6 +38,7 @@ public final class LoginSuccessPacket implements SonarPacket {
   private UUID uuid;
   private String username;
   private boolean strictErrorHandling;
+  private UUID sessionId;
 
   @Override
   public void encode(final ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
@@ -60,6 +61,10 @@ public final class LoginSuccessPacket implements SonarPacket {
       || protocolVersion.equals(ProtocolVersion.MINECRAFT_1_21)) {
       // Whether the client should disconnect on its own if it receives invalid data from the server
       byteBuf.writeBoolean(strictErrorHandling);
+    }
+
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_2)) {
+      ProtocolUtil.writeUUID(byteBuf, sessionId);
     }
   }
 

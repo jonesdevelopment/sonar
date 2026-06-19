@@ -58,6 +58,7 @@ public final class JoinGamePacket implements SonarPacket {
   private boolean flat;
   private boolean limitedCrafting;
   private boolean secureProfile;
+  private boolean onlineMode;
 
   @Override
   public void encode(final @NotNull ByteBuf byteBuf, final @NotNull ProtocolVersion protocolVersion) throws Exception {
@@ -170,6 +171,10 @@ public final class JoinGamePacket implements SonarPacket {
 
     if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_20_5)) {
       byteBuf.writeBoolean(secureProfile);
+    }
+
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_2)) {
+      byteBuf.writeBoolean(onlineMode);
     }
   }
 

@@ -105,7 +105,9 @@ public class SonarPacketPreparer {
   public final SonarPacket[] REGISTRY_SYNC_1_21_5 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_5);
   public final SonarPacket[] REGISTRY_SYNC_1_21_11 = RegistryDataPacket.of(DimensionRegistry.CODEC_1_21_11);
   public final SonarPacket[] REGISTRY_SYNC_26_1 = RegistryDataPacket.of(DimensionRegistry.CODEC_26_1);
+  public final SonarPacket[] REGISTRY_SYNC_26_2 = RegistryDataPacket.of(DimensionRegistry.CODEC_26_2);
   public final SonarPacket TAGS_UPDATE_26_1 = UpdateTagsPacket.of(DimensionRegistry.TAGS_26_1);
+  public final SonarPacket TAGS_UPDATE_26_2 = UpdateTagsPacket.of(DimensionRegistry.TAGS_26_2);
   public final SonarPacket START_WRITING_CHUNKS = new GameEventPacket(13, 0);
   public final static SonarPacket INVALID_HELD_ITEM_SLOT = new SetHeldItemPacket(-1);
   public final SonarPacket RANDOM_KEEP_ALIVE = new SonarPacketSnapshot(new KeepAlivePacket(RANDOM.nextInt()));
@@ -152,7 +154,7 @@ public class SonarPacketPreparer {
     if (username.length() > 16) {
       username = username.substring(0, 16);
     }
-    loginSuccess = new SonarPacketSnapshot(new LoginSuccessPacket(uuid, username, true));
+    loginSuccess = new SonarPacketSnapshot(new LoginSuccessPacket(uuid, username, true, UUID.randomUUID()));
 
     // Prepare JoinGame packet
     joinGame = new SonarPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
@@ -162,7 +164,7 @@ public class SonarPacketPreparer {
       new String[]{"minecraft:overworld"}, "minecraft:overworld", "flat",
       DimensionType.OVERWORLD, RANDOM.nextLong() & 1337,
       false, true, false,
-      false, false, false, true));
+      false, false, false, true, false));
 
     // Prepare the gravity check
     maxMovementTick = Sonar.get0().getConfig().getVerification().getGravity().getMaxMovementTicks();
@@ -294,14 +296,18 @@ public class SonarPacketPreparer {
   }
 
   public static @Nullable SonarPacket getTagsPacket(final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_2)) {
+      return TAGS_UPDATE_26_2;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
       return TAGS_UPDATE_26_1;
     }
     return null; // apparently doesn't crash the client; we're safe... for now.
   }
 
   public static SonarPacket[] getRegistryPackets(final @NotNull ProtocolVersion protocolVersion) {
-    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
+    if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_2)) {
+      return REGISTRY_SYNC_26_2;
+    } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_1)) {
       return REGISTRY_SYNC_26_1;
     } else if (protocolVersion.greaterThanOrEquals(ProtocolVersion.MINECRAFT_1_21_11)) {
       return REGISTRY_SYNC_1_21_11;
