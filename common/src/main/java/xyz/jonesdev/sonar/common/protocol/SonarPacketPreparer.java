@@ -154,7 +154,7 @@ public class SonarPacketPreparer {
     if (username.length() > 16) {
       username = username.substring(0, 16);
     }
-    loginSuccess = new SonarPacketSnapshot(new LoginSuccessPacket(uuid, username, true));
+    loginSuccess = new SonarPacketSnapshot(new LoginSuccessPacket(uuid, username, true, UUID.randomUUID()));
 
     // Prepare JoinGame packet
     joinGame = new SonarPacketSnapshot(new JoinGamePacket(PLAYER_ENTITY_ID,
@@ -164,7 +164,7 @@ public class SonarPacketPreparer {
       new String[]{"minecraft:overworld"}, "minecraft:overworld", "flat",
       DimensionType.OVERWORLD, RANDOM.nextLong() & 1337,
       false, true, false,
-      false, false, false, true));
+      false, false, false, true, false));
 
     // Prepare the gravity check
     maxMovementTick = Sonar.get0().getConfig().getVerification().getGravity().getMaxMovementTicks();
