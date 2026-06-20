@@ -220,16 +220,25 @@ public class ProtocolUtil {
   public static void closeWith(final @NotNull Channel channel,
                                final @NotNull ProtocolVersion protocolVersion,
                                final @NotNull Object msg) {
-    if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
-      channel.eventLoop().execute(() -> {
-        channel.config().setAutoRead(false);
-        channel.eventLoop().schedule(() -> {
-          channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
-        }, 250L, TimeUnit.MILLISECONDS);
-      });
-    } else {
-      channel.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
-    }
+    // Prevent reading any more packets from the client
+    channel.config().setAutoRead(false);
+
+    final long delay = protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8) ? 250L : 50L;
+
+    // Vanilla Minecraft adds a small delay between writing the
+    // disconnect/transfer packet and closing the connection.
+    // Without this, the TCP close can arrive at the client before
+    // the packet is processed, causing "Connection Reset".
+    channel.writeAndFlush(msg).addListener((ChannelFutureListener) future -> {
+      final Channel ch = future.channel();
+      if (ch.isActive()) {
+        ch.eventLoop().schedule(() -> {
+          if (ch.isActive()) {
+            ch.close();
+          }
+        }, delay, TimeUnit.MILLISECONDS);
+      }
+    });
   }
 
   public static @NotNull UUID readUUID(final @NotNull ByteBuf byteBuf) {
