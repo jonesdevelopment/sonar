@@ -87,7 +87,15 @@ public final class SonarPacketDecoder extends ChannelInboundHandlerAdapter {
 
         // Let our verification handler process the packet
         if (listener != null) {
-          listener.handle(packet);
+          try {
+            listener.handle(packet);
+          } catch (QuietDecoderException expected) {
+            // fail() already called disconnect via closeWith() and scheduled
+            // a delayed close. Don't let the exception propagate to
+            // TailExceptionsHandler — it would close the channel immediately,
+            // bypassing the delay and potentially discarding the disconnect packet.
+            return;
+          }
           // Make sure to let the timeout handler know about this packet
           ctx.fireChannelRead(packet);
         }
