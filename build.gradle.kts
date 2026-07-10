@@ -75,6 +75,12 @@ allprojects {
 
     compileJava {
       options.encoding = "UTF-8"
+      options.release.set(17)
+    }
+
+    java {
+      toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+      disableAutoTargetJvm()
     }
 
     jar {
@@ -93,9 +99,6 @@ allprojects {
         attributes["Git-Commit"] = gitCommit
       }
     }
-
-    java.sourceCompatibility = JavaVersion.VERSION_11
-    java.targetCompatibility = JavaVersion.VERSION_11
   }
 }
 
