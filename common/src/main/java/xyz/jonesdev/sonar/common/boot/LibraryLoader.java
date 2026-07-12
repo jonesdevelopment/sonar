@@ -73,19 +73,19 @@ class LibraryLoader {
           Library.builder()
             .groupId("net{}kyori")
             .artifactId("adventure-text-minimessage")
-            .version("4.21.0")
+            .version("5.2.0")
             .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
             .build(),
           Library.builder()
             .groupId("net{}kyori")
             .artifactId("adventure-text-serializer-gson")
-            .version("4.21.0")
+            .version("5.2.0")
             .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
             .build(),
           Library.builder()
             .groupId("net{}kyori")
             .artifactId("adventure-nbt")
-            .version("4.21.0")
+            .version("5.2.0")
             .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
             .build()
         );
@@ -95,7 +95,7 @@ class LibraryLoader {
           Library.builder()
             .groupId("net{}kyori")
             .artifactId("adventure-nbt")
-            .version("4.21.0")
+            .version("5.2.0")
             .relocate("net{}kyori{}adventure{}nbt", "xyz{}jonesdev{}sonar{}libs{}kyori{}adventure{}nbt")
             .build()
         );
