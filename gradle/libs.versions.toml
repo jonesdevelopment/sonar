@@ -1,5 +1,5 @@
 [versions]
-netty = "4.2.15.Final"
+netty = "4.2.16.Final"
 adventure = "5.2.0"
 adventure-platform = "4.4.1"
 bstats = "3.2.1"
@@ -8,7 +8,7 @@ pluginyml = "0.6.0"
 
 [plugins]
 indra-git = "net.kyori.indra.git:3.2.0"
-shadow = "com.gradleup.shadow:9.4.3"
+shadow = "com.gradleup.shadow:9.6.0"
 spotless = "com.diffplug.spotless:8.8.0"
 pluginyml-bungee = { id = "net.minecrell.plugin-yml.bungee", version.ref = "pluginyml" }
 pluginyml-bukkit = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }

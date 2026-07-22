@@ -121,7 +121,7 @@ public abstract class VerificationHandler implements SonarPacketListener {
       // The user is allowed to disable the blacklist entirely by setting the threshold to 0
       final int limit = Sonar.get0().getConfig().getVerification().getBlacklistThreshold();
       // The player hasn't been blacklisted yet, so skip this iteration
-      if (newScore < limit) break blacklist;
+      if (limit <= 0 || newScore < limit) break blacklist;
 
       GlobalSonarStatistics.totalBlacklistedPlayers++;
 
