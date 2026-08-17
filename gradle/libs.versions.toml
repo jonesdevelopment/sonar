@@ -7,7 +7,7 @@ libby = "2.0.0-SNAPSHOT"
 pluginyml = "0.6.0"
 
 [plugins]
-indra-git = "net.kyori.indra.git:3.2.0"
+indra-git = "net.kyori.indra.git:4.1.0"
 shadow = "com.gradleup.shadow:9.6.1"
 spotless = "com.diffplug.spotless:8.9.0"
 pluginyml-bungee = { id = "net.minecrell.plugin-yml.bungee", version.ref = "pluginyml" }
