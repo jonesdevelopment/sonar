@@ -85,7 +85,10 @@ public enum ItemType {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21_11)) {
       return 1104;
     }
-    return 1105;
+    if (protocolVersion.lessThanOrEquals(MINECRAFT_26_1)) {
+      return 1105;
+    }
+    return 1133;
   }, protocolVersion -> {
     if (protocolVersion.lessThanOrEquals(MINECRAFT_1_21)) {
       return 26;
