@@ -21,6 +21,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.common.util.ProtocolUtil;
 
 @ChannelHandler.Sharable
 public final class TailExceptionsHandler extends ChannelDuplexHandler {
@@ -33,6 +34,20 @@ public final class TailExceptionsHandler extends ChannelDuplexHandler {
   // Additionally, this will also run after our custom decoder.
   @Override
   public void exceptionCaught(final @NotNull ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+    // If ProtocolUtil#closeWith(...) already queued a graceful write-then-close for
+    // this channel (e.g. VerificationHandler#fail() calls disconnect() and then
+    // throws to unwind), don't race it with a second, immediate close() here. Doing
+    // so can abort the still-in-flight kick/disconnect packet write before it's fully
+    // flushed, so the client only receives a truncated packet instead of our message.
+    // The scheduled close from closeWith() will still run once the write completes.
+    // See: https://github.com/jonesdevelopment/sonar/issues/476
+    if (Boolean.TRUE.equals(ctx.channel().attr(ProtocolUtil.CLOSING).get())) {
+      if (LOG_EXCEPTIONS) {
+        cause.printStackTrace(System.err);
+      }
+      return;
+    }
+
     // Close the channel if we encounter any errors.
     ctx.close();
     if (LOG_EXCEPTIONS) {

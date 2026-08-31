@@ -24,6 +24,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
+import io.netty.util.AttributeKey;
 import io.netty.util.Version;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -217,9 +218,20 @@ public class ProtocolUtil {
     }
   }
 
+  public static final AttributeKey<Boolean> CLOSING = AttributeKey.valueOf("sonar-graceful-close-in-progress");
+
   public static void closeWith(final @NotNull Channel channel,
                                final @NotNull ProtocolVersion protocolVersion,
                                final @NotNull Object msg) {
+    // Mark this channel as already undergoing a graceful close *before* we queue the
+    // write. If something downstream (e.g. an exception thrown right after this call,
+    // such as VerificationHandler#fail()'s QuietDecoderException) reaches
+    // TailExceptionsHandler while our writeAndFlush(...).addListener(CLOSE) is still
+    // in flight, that handler must not call ctx.close() a second time - doing so can
+    // abort the still-pending write and deliver only a truncated packet to the client
+    // (which then sees a bare disconnect/reset instead of our kick message).
+    // See: https://github.com/jonesdevelopment/sonar/issues/476
+    channel.attr(CLOSING).set(true);
     if (protocolVersion.lessThan(ProtocolVersion.MINECRAFT_1_8)) {
       channel.eventLoop().execute(() -> {
         channel.config().setAutoRead(false);
