@@ -47,7 +47,7 @@ Sonar analyzes a player's behavior before joining the actual server, therefore s
 1. Sonar sends the player to a lightweight fake server when they connect for the first time.
 2. Sonar verifies that players obey the laws of Minecraft's physics, including gravity and proper block collision.
 3. Sonar verifies that players send legitimate packets when interacting with vehicles (e.g. boats).
-4. Sonar makes sure that players send legitimate packets according to the [vanilla Minecraft protocol](<https://wiki.vg/Protocol>).
+4. Sonar makes sure that players send legitimate packets according to the [vanilla Minecraft protocol](<https://minecraft.wiki/w/Java_Edition_protocol/>).
 
 Sonar also protects against spambot attacks since it queues the incoming connections, therefore making it technically impossible to have a ton of bots join the server at the same time.
 
