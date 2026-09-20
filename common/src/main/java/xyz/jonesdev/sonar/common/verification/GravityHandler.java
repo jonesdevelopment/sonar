@@ -36,7 +36,8 @@ public final class GravityHandler extends VerificationHandler {
     super(user);
 
     this.preJoinHandler = preJoinHandler;
-    // Bedrock users and 26.3+ clients start falling immediately
+    // Client can send movement packet without first position-and-rot packet (usually caused by teleport, < 26.3 Java)
+    // 26.3+ client will no longer send movement packet for teleports. (positions included in teleport confirm)
     this.canFall = user.isGeyser() || user.getProtocolVersion().greaterThanOrEquals(ProtocolVersion.MINECRAFT_26_3);
     // We don't want to check Geyser players for valid gravity, as this might cause issues because of the protocol
     this.enableGravityCheck = !user.isGeyser() && AntiBot.shouldPerform(
