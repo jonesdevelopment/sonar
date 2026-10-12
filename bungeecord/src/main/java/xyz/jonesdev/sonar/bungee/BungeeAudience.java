@@ -78,6 +78,7 @@ final class BungeeAudience implements Audience {
       .stay(times == null ? 70 : toTicks(times.stay()))
       .fadeOut(times == null ? 20 : toTicks(times.fadeOut()))
       .send((ProxiedPlayer) sender);
+  }
 
   private static int toTicks(final @NotNull Duration duration) {
     return (int) (duration.toMillis() / 50L);
