@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Sonar Contributors
+ * Copyright (C) 2026 Sonar Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,8 +59,8 @@ final class BungeeAudience implements Audience {
   @Override
   public void sendActionBar(final @NotNull Component message) {
     // Only players have an action bar
-    if (sender instanceof ProxiedPlayer) {
-      ((ProxiedPlayer) sender).sendMessage(ChatMessageType.ACTION_BAR, toBungee(message));
+    if (sender instanceof ProxiedPlayer player) {
+      player.sendMessage(ChatMessageType.ACTION_BAR, toBungee(message));
     }
   }
 
