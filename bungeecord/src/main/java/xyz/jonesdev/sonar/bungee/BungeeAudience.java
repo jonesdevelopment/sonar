@@ -70,15 +70,14 @@ final class BungeeAudience implements Audience {
     if (!(sender instanceof ProxiedPlayer)) return;
 
     final Title.Times times = title.times();
-    final net.md_5.bungee.api.Title bungeeTitle = ProxyServer.getInstance().createTitle()
+    ProxyServer.getInstance().createTitle()
       .title(toBungee(title.title()))
       .subTitle(toBungee(title.subtitle()))
       // Use the same defaults as Title#DEFAULT_TIMES (0.5s, 3.5s, 1s)
       .fadeIn(times == null ? 10 : toTicks(times.fadeIn()))
       .stay(times == null ? 70 : toTicks(times.stay()))
-      .fadeOut(times == null ? 20 : toTicks(times.fadeOut()));
-    bungeeTitle.send((ProxiedPlayer) sender);
-  }
+      .fadeOut(times == null ? 20 : toTicks(times.fadeOut()))
+      .send((ProxiedPlayer) sender);
 
   private static int toTicks(final @NotNull Duration duration) {
     return (int) (duration.toMillis() / 50L);
