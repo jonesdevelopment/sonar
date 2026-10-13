@@ -28,6 +28,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+import xyz.jonesdev.sonar.api.antibot.protocol.ProtocolVersion;
 
 import java.time.Duration;
 
@@ -40,11 +41,6 @@ import java.time.Duration;
  * {@link ComponentSerializer} allows us to depend on exactly one Adventure version.
  */
 final class BungeeAudience implements Audience {
-  /**
-   * Protocol version of Minecraft 1.16, the first version with support for hex colors
-   */
-  private static final int MINECRAFT_1_16_PROTOCOL = 735;
-
   private final CommandSender sender;
 
   BungeeAudience(final @NotNull CommandSender sender) {
@@ -87,7 +83,7 @@ final class BungeeAudience implements Audience {
   private @NotNull BaseComponent[] toBungee(final @NotNull Component component) {
     // Downsample hex colors for clients that do not support them
     final boolean legacyClient = sender instanceof ProxiedPlayer player
-      && player.getPendingConnection().getVersion() < MINECRAFT_1_16_PROTOCOL;
+      && player.getPendingConnection().getVersion() < ProtocolVersion.MINECRAFT_1_16.getProtocol();
     final GsonComponentSerializer serializer = legacyClient
       ? GsonComponentSerializer.colorDownsamplingGson()
       : GsonComponentSerializer.gson();
