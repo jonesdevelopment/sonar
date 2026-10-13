@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Sonar Contributors
+ * Copyright (C) 2026 Sonar Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +25,19 @@ import net.md_5.bungee.api.plugin.Plugin;
 public final class SonarBungeePlugin extends Plugin {
   private ProxyServer server;
   private SonarBungee bootstrap;
-
+ 
   @Override
   public void onEnable() {
     server = ProxyServer.getInstance();
 
+    // Adventure is not bundled in the jar, so the libraries have to be on the classpath
+    // before SonarBungee is loaded. The JVM resolves its Adventure types during class verification.
+    LibraryLoader.loadLibraries(new BungeeLibraryManager(this), SonarPlatform.BUNGEE);
+
     bootstrap = new SonarBungee(this);
     bootstrap.initialize();
   }
+
 
   @Override
   public void onDisable() {
