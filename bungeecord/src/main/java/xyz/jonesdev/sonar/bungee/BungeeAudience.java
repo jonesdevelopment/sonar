@@ -67,17 +67,17 @@ final class BungeeAudience implements Audience {
   @Override
   public void showTitle(final @NotNull Title title) {
     // Only players can see titles
-    if (!(sender instanceof ProxiedPlayer)) return;
-
-    final Title.Times times = title.times();
-    ProxyServer.getInstance().createTitle()
-      .title(toBungee(title.title()))
-      .subTitle(toBungee(title.subtitle()))
-      // Use the same defaults as Title#DEFAULT_TIMES (0.5s, 3.5s, 1s)
-      .fadeIn(times == null ? 10 : toTicks(times.fadeIn()))
-      .stay(times == null ? 70 : toTicks(times.stay()))
-      .fadeOut(times == null ? 20 : toTicks(times.fadeOut()))
-      .send((ProxiedPlayer) sender);
+    if (sender instanceof ProxiedPlayer player) {
+      final Title.Times times = title.times();
+      ProxyServer.getInstance().createTitle()
+        .title(toBungee(title.title()))
+        .subTitle(toBungee(title.subtitle()))
+        // Use the same defaults as Title#DEFAULT_TIMES (0.5s, 3.5s, 1s)
+        .fadeIn(times == null ? 10 : toTicks(times.fadeIn()))
+        .stay(times == null ? 70 : toTicks(times.stay()))
+        .fadeOut(times == null ? 20 : toTicks(times.fadeOut()))
+        .send(player);
+    }
   }
 
   private static int toTicks(final @NotNull Duration duration) {
@@ -86,8 +86,8 @@ final class BungeeAudience implements Audience {
 
   private @NotNull BaseComponent[] toBungee(final @NotNull Component component) {
     // Downsample hex colors for clients that do not support them
-    final boolean legacyClient = sender instanceof ProxiedPlayer
-      && ((ProxiedPlayer) sender).getPendingConnection().getVersion() < MINECRAFT_1_16_PROTOCOL;
+    final boolean legacyClient = sender instanceof ProxiedPlayer player
+      && player.getPendingConnection().getVersion() < MINECRAFT_1_16_PROTOCOL;
     final GsonComponentSerializer serializer = legacyClient
       ? GsonComponentSerializer.colorDownsamplingGson()
       : GsonComponentSerializer.gson();
