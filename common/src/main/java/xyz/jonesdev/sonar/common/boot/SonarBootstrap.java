@@ -68,7 +68,13 @@ public abstract class SonarBootstrap<T> implements Sonar {
                         final @NotNull File dataDirectory,
                         final @NotNull LibraryManager libraryManager) {
     // Load all libraries before anything else
-    LibraryLoader.loadLibraries(libraryManager, platform);
+    // HACK:
+    // We manually load the libraries on BungeeCord beforehand,
+    // so we skip this call to avoid loading libraries twice.
+    // See SonarBungeePlugin.java#L40
+    if (platform != SonarPlatform.BUNGEE) {
+      LibraryLoader.loadLibraries(libraryManager, platform);
+    }
     this.libraryManager = libraryManager;
     // Check if Netty is up to date
     ProtocolUtil.checkNettyVersion();

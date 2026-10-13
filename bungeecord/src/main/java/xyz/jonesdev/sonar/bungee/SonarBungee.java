@@ -20,8 +20,8 @@ package xyz.jonesdev.sonar.bungee;
 import com.alessiodp.libby.BungeeLibraryManager;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bstats.bungeecord.Metrics;
 import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
@@ -36,26 +36,22 @@ import java.util.UUID;
 
 @Getter
 public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
-  public SonarBungee(final @NotNull SonarBungeePlugin plugin) {
-    super(plugin, SonarPlatform.BUNGEE, plugin.getDataFolder(), new BungeeLibraryManager(plugin));
+  public SonarBungee(final @NotNull SonarBungeePlugin plugin, final @NotNull BungeeLibraryManager libraryManager) {
+    super(plugin, SonarPlatform.BUNGEE, plugin.getDataFolder(), libraryManager);
   }
-
-  /**
-   * Wrapper for BungeeCord audiences
-   */
-  private final BungeeAudiences bungeeAudiences = BungeeAudiences.create(getPlugin());
 
   @Override
   public @Nullable Audience audience(final @Nullable UUID uniqueId) {
     if (uniqueId == null) {
       return null;
     }
-    return bungeeAudiences.player(uniqueId);
+    final ProxiedPlayer player = getPlugin().getServer().getPlayer(uniqueId);
+    return player == null ? null : new BungeeAudience(player);
   }
 
   @Override
   public @NotNull Audience sender(final @NotNull Object object) {
-    return bungeeAudiences.sender((CommandSender) object);
+    return new BungeeAudience((CommandSender) object);
   }
 
   /**

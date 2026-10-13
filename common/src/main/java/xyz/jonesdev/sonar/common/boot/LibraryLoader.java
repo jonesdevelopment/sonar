@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import xyz.jonesdev.sonar.api.SonarPlatform;
 
 @UtilityClass
-class LibraryLoader {
-  void loadLibraries(final @NotNull LibraryManager libraryManager, final @NotNull SonarPlatform platform) {
+public class LibraryLoader {
+  public void loadLibraries(final @NotNull LibraryManager libraryManager, final @NotNull SonarPlatform platform) {
     libraryManager.addMavenCentral();
     libraryManager.addJitPack();
     libraryManager.loadLibraries(
@@ -69,25 +69,14 @@ class LibraryLoader {
     // Only load adventure if not on Velocity
     if (platform != SonarPlatform.VELOCITY) {
       if (platform != SonarPlatform.PAPER) {
+        // BungeeCord does not ship Adventure, and we do not bundle adventure-platform there anymore
+        // (mixing Adventure 4.x and 5.x in the same relocated package causes NoSuchMethodErrors).
+        // Therefore, adventure-api and everything else Adventure needs has to be resolved at runtime.
+        final boolean resolveTransitive = platform == SonarPlatform.BUNGEE;
         libraryManager.loadLibraries(
-          Library.builder()
-            .groupId("net{}kyori")
-            .artifactId("adventure-text-minimessage")
-            .version("5.2.0")
-            .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
-            .build(),
-          Library.builder()
-            .groupId("net{}kyori")
-            .artifactId("adventure-text-serializer-gson")
-            .version("5.2.0")
-            .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
-            .build(),
-          Library.builder()
-            .groupId("net{}kyori")
-            .artifactId("adventure-nbt")
-            .version("5.2.0")
-            .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori")
-            .build()
+          adventureLibrary("adventure-text-minimessage", resolveTransitive),
+          adventureLibrary("adventure-text-serializer-gson", resolveTransitive),
+          adventureLibrary("adventure-nbt", resolveTransitive)
         );
       } else {
         // On Paper, we only relocate the nbt package since the rest of adventure is bundled with the server.
@@ -101,5 +90,19 @@ class LibraryLoader {
         );
       }
     }
+  }
+
+  private @NotNull Library adventureLibrary(final @NotNull String artifactId, final boolean resolveTransitive) {
+    final Library.Builder builder = Library.builder()
+      .groupId("net{}kyori")
+      .artifactId(artifactId)
+      .version("5.2.0")
+      .relocate("net{}kyori", "xyz{}jonesdev{}sonar{}libs{}kyori");
+    if (resolveTransitive) {
+      builder.resolveTransitiveDependencies(true)
+        // Gson is already provided by the proxy, so we must not load another copy
+        .excludeTransitiveDependency("com.google.code.gson", "gson");
+    }
+    return builder.build();
   }
 }
