@@ -36,8 +36,8 @@ import java.util.UUID;
 
 @Getter
 public final class SonarBungee extends SonarBootstrap<SonarBungeePlugin> {
-  public SonarBungee(final @NotNull SonarBungeePlugin plugin) {
-    super(plugin, SonarPlatform.BUNGEE, plugin.getDataFolder(), new BungeeLibraryManager(plugin));
+  public SonarBungee(final @NotNull SonarBungeePlugin plugin, final @NotNull BungeeLibraryManager libraryManager) {
+    super(plugin, SonarPlatform.BUNGEE, plugin.getDataFolder(), libraryManager);
   }
 
   @Override

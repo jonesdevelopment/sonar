@@ -25,13 +25,7 @@ import xyz.jonesdev.sonar.api.SonarPlatform;
 
 @UtilityClass
 public class LibraryLoader {
-  private boolean loaded;
-
   public void loadLibraries(final @NotNull LibraryManager libraryManager, final @NotNull SonarPlatform platform) {
-    // The platform entry point might already have loaded all libraries
-    if (loaded) return;
-    loaded = true;
-
     libraryManager.addMavenCentral();
     libraryManager.addJitPack();
     libraryManager.loadLibraries(

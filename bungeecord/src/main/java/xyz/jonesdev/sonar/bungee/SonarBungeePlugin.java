@@ -28,19 +28,20 @@ import xyz.jonesdev.sonar.common.boot.LibraryLoader;
 public final class SonarBungeePlugin extends Plugin {
   private ProxyServer server;
   private SonarBungee bootstrap;
- 
+
   @Override
   public void onEnable() {
     server = ProxyServer.getInstance();
 
+    // HACK:
     // Adventure is not bundled in the jar, so the libraries have to be on the classpath
     // before SonarBungee is loaded. The JVM resolves its Adventure types during class verification.
-    LibraryLoader.loadLibraries(new BungeeLibraryManager(this), SonarPlatform.BUNGEE);
+    final BungeeLibraryManager libraryManager = new BungeeLibraryManager(this);
+    LibraryLoader.loadLibraries(libraryManager, SonarPlatform.BUNGEE);
 
-    bootstrap = new SonarBungee(this);
+    bootstrap = new SonarBungee(this, libraryManager);
     bootstrap.initialize();
   }
-
 
   @Override
   public void onDisable() {
