@@ -17,7 +17,7 @@
 
 import lombok.experimental.UtilityClass;
 import xyz.jonesdev.sonar.api.antibot.captcha.CaptchaGenerator;
-import xyz.jonesdev.sonar.captcha.complex.ComplexCaptchaGenerator;
+import xyz.jonesdev.sonar.captcha.StandardCaptchaGenerator;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -29,7 +29,7 @@ import java.util.Random;
 public class Main {
   public void main(final String... args) throws IOException {
     final Random random = new Random();
-    final CaptchaGenerator standardCaptchaGenerator = new ComplexCaptchaGenerator(null);
+    final CaptchaGenerator standardCaptchaGenerator = new StandardCaptchaGenerator(null);
 
     final long start = System.currentTimeMillis();
     final char[] dictionary = {'a', 'b', 'c', 'd', 'e', 'f'/*, 'g'*/, 'h'/*, 'i'*/, 'j',

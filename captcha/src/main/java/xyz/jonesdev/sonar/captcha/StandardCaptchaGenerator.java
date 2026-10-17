@@ -54,13 +54,13 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   static {
     FONT = TTFFontProvider.loadFont("/assets/fonts/Kingthings_Trypewriter_2.ttf");
 
-    FBM.setAmount(0.6f);
-    FBM.setScale(15);
+    FBM.setAmount(0.55f + RANDOM.nextFloat(0.15f));
+    FBM.setScale(10 + RANDOM.nextFloat(10));
 
     SMEAR.setShape(SmearFilter.SQUARES);
     SMEAR.setDensity(0.1f);
     SMEAR.setDistance(0);
-    SMEAR.setMix(0.35f);
+    SMEAR.setMix(0.25f + RANDOM.nextFloat(0.25f));
 
     // Create fractions based on the number of colors
     for (int i = 0; i < COLOR_FRACTIONS.length; i++) {
@@ -111,7 +111,7 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   private void applyRandomColorGradient(final @NotNull Graphics2D graphics) {
     // Randomize the colors for the gradient effect
     for (int i = 0; i < COLORS.length; i++) {
-      final float random = 0.9f + RANDOM.nextFloat() * 0.1f;
+      final float random = 0.8f + RANDOM.nextFloat() * 0.2f;
       COLORS[i] = Color.getHSBColor(RANDOM.nextFloat(), random * 0.8f, random);
     }
 
@@ -161,8 +161,8 @@ public final class StandardCaptchaGenerator implements CaptchaGenerator {
   }
 
   private void createGlyphOutline(final @NotNull Graphics2D graphics, final @NotNull Shape shape) {
-    final float txy = 1.25f + RANDOM.nextFloat();
-    final float width = 1 + RANDOM.nextFloat();
+    final float txy = RANDOM.nextFloat(0.1f, 2f);
+    final float width = RANDOM.nextFloat(0.5f, 2f);
 
     // Create a randomly translated and stroked shape based on the original glyph shape
     final AffineTransform translation = AffineTransform.getTranslateInstance(txy, txy);
