@@ -544,8 +544,7 @@ public enum SonarPacketRegistry {
         map(0x28, MINECRAFT_1_21_2, false),
         map(0x29, MINECRAFT_1_21_4, false),
         map(0x2A, MINECRAFT_1_21_6, false),
-        map(0x26, MINECRAFT_26_1, false),
-        map(0x2B, MINECRAFT_26_3, false));
+        map(0x2B, MINECRAFT_26_1, false));
       // minecraft:move_vehicle
       serverbound.register(VehicleMovePacket.class, VehicleMovePacket::new,
         map(0x10, MINECRAFT_1_9, false),
